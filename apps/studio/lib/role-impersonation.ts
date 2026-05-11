@@ -1,8 +1,8 @@
-import { getImpersonationSQL } from '@supabase/pg-meta'
-import type { User } from 'data/auth/users-infinite-query'
-import { RoleImpersonationState as ValtioRoleImpersonationState } from 'state/role-impersonation-state'
+import { getImpersonationSQL, type SafeSqlFragment } from '@supabase/pg-meta'
 
 import { uuidv4 } from './helpers'
+import type { User } from '@/data/auth/users-infinite-query'
+import { RoleImpersonationState as ValtioRoleImpersonationState } from '@/state/role-impersonation-state'
 
 type PostgrestImpersonationRole =
   | {
@@ -96,7 +96,10 @@ export function getPostgrestClaims(projectRef: string, role: PostgrestImpersonat
 
 export type RoleImpersonationState = Pick<ValtioRoleImpersonationState, 'role' | 'claims'>
 
-export function wrapWithRoleImpersonation(sql: string, state?: RoleImpersonationState) {
+export function wrapWithRoleImpersonation(
+  sql: SafeSqlFragment,
+  state?: RoleImpersonationState
+): SafeSqlFragment {
   const { role, claims } = state ?? { role: undefined, claims: undefined }
 
   if (role === undefined) return sql

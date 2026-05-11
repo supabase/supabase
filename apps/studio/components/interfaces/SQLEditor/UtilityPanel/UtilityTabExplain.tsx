@@ -1,16 +1,16 @@
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import CopyButton from 'components/ui/CopyButton'
-import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
-import { ExplainHeader } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
+import Results from './Results'
+import { ExplainVisualizer } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer'
+import { ExplainHeader } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
 import {
   isExplainQuery,
   isTextFormatExplain,
-} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import Results from './Results'
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import CopyButton from '@/components/ui/CopyButton'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityTabExplainProps = {
   id: string
@@ -24,7 +24,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
 
   if (isExecuting) {
     return (
-      <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+      <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark">
         <Loader2 size={14} className="animate-spin" />
         <p className="m-0 border-0 font-mono text-sm">Running EXPLAIN ANALYZE...</p>
       </div>
@@ -37,7 +37,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
     )
 
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+      <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
         <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4 pb-9">
           <div className="flex flex-col gap-y-1">
             {formattedError.length > 0 ? (
@@ -72,7 +72,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
 
   if (!explainResult || explainResult.rows.length === 0) {
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+      <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
         <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
           No execution plan available. The query will be analyzed when you switch to this tab.
         </p>
@@ -85,7 +85,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
 
   if (!isValidExplain) {
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+      <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
         <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
           Unable to parse explain results. Please try running the query again.
         </p>

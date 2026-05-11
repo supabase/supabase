@@ -1,11 +1,11 @@
 import Link from 'next/link'
 
-import { SignInWithGitHub } from 'components/interfaces/SignIn/SignInWithGitHub'
-import { SignUpForm } from 'components/interfaces/SignIn/SignUpForm'
-import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
+import { SignInWithGitHub } from '@/components/interfaces/SignIn/SignInWithGitHub'
+import { SignUpForm } from '@/components/interfaces/SignIn/SignUpForm'
+import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
 
 const SignUpPage: NextPageWithLayout = () => {
   const {

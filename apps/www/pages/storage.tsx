@@ -1,21 +1,26 @@
-import ApiExamples from 'data/products/storage/api-examples'
-import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
-import StoragePermissionsData from 'data/products/storage/permissions-examples'
-import Solutions from '~/data/MainProducts'
 import { ArrowUpRight, Shuffle, Wifi, X } from 'lucide-react'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
-import { Button, Image } from 'ui'
-import ImageCarousel from '~/components/Carousels/ImageCarousel'
-import FeatureColumn from '~/components/FeatureColumn'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductIcon from '~/components/ProductIcon'
-import ProductsNav from '~/components/Products/ProductsNav'
-import ProductHeader from '~/components/Sections/ProductHeader'
-import dynamic from 'next/dynamic'
+import { Button } from 'ui'
+import { Image } from 'ui-patterns/Image'
+
+import ImageCarousel from '@/components/Carousels/ImageCarousel'
+import FeatureColumn from '@/components/FeatureColumn'
+import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import ProductIcon from '@/components/ProductIcon'
+import ProductsNav from '@/components/Products/ProductsNav'
+import ProductHeader from '@/components/Sections/ProductHeader'
+import Solutions from '@/data/MainProducts'
+import ApiExamples from '@/data/products/storage/api-examples'
+import DashboardViewData from '@/data/products/storage/dashboard-carousel.json'
+import StoragePermissionsData from '@/data/products/storage/permissions-examples'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
@@ -24,6 +29,8 @@ const SplitCodeBlockCarousel = dynamic(
   () => import('~/components/Carousels/SplitCodeBlockCarousel')
 )
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
+
+// When updating page content, also update public/llms/storage.txt
 
 function StoragePage() {
   // base path for images
@@ -49,6 +56,27 @@ function StoragePage() {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              softwareApplicationSchema({
+                name: 'Supabase Storage',
+                description: meta_description,
+                url: 'https://supabase.com/storage',
+                image: `https://supabase.com${basePath}/images/product/storage/storage-og.jpg`,
+              })
+            ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.storage)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.STORAGE} />
         <ProductHeader
@@ -223,7 +251,7 @@ function StoragePage() {
               </p>
               <div className="mt-4 flex gap-2">
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/docs/guides/storage/analytics-buckets">Read the docs</Link>
+                  <Link href="/docs/guides/storage/analytics/introduction">Read the docs</Link>
                 </Button>
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/analytics-buckets">Read the blog post</Link>
@@ -240,7 +268,7 @@ function StoragePage() {
               </p>
               <div className="mt-4 flex gap-2">
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/docs/guides/storage/vector-buckets">Read the docs</Link>
+                  <Link href="/docs/guides/storage/vector/introduction">Read the docs</Link>
                 </Button>
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/vector-buckets">Read the blog post</Link>

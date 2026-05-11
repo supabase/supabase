@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
+
+import apiWrapper from '@/lib/api/apiWrapper'
 
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
 

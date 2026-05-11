@@ -1,38 +1,38 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { useAnalyticsBucketCreateMutation } from 'data/storage/analytics-bucket-create-mutation'
-import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
-import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   cn,
   DialogFooter,
   DialogSection,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   SheetFooter,
   SheetSection,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { useIcebergWrapperExtension } from './AnalyticsBucketDetails/useIcebergWrapper'
 import {
   reservedPrefixes,
   reservedSuffixes,
   validBucketNameRegex,
 } from './CreateAnalyticsBucketForm.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
+import { useAnalyticsBucketCreateMutation } from '@/data/storage/analytics-bucket-create-mutation'
+import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
+import { useIcebergWrapperCreateMutation } from '@/data/storage/iceberg-wrapper-create-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const FormSchema = z
   .object({
@@ -193,10 +193,10 @@ export const CreateAnalyticsBucketForm = ({
 
   return (
     <>
-      <Section className="flex flex-col !p-0 flex-grow">
-        <Form_Shadcn_ {...form}>
+      <Section className="flex flex-col p-0! grow">
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+            <FormField
               key="name"
               name="name"
               control={form.control}
@@ -208,7 +208,7 @@ export const CreateAnalyticsBucketForm = ({
                   labelOptional="Cannot be changed after creation"
                   description="Must be between 3 – 63 characters. Only lowercase letters, numbers, and hyphens are allowed."
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Input_Shadcn_
                       id="name"
                       data-1p-ignore
@@ -218,7 +218,7 @@ export const CreateAnalyticsBucketForm = ({
                       {...field}
                       placeholder="Enter bucket name"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -229,7 +229,7 @@ export const CreateAnalyticsBucketForm = ({
                 className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
                 title="Wrappers extension must be updated for Iceberg Wrapper support"
               >
-                <p className="prose max-w-full text-sm !leading-normal">
+                <p className="prose max-w-full text-sm leading-normal!">
                   Update the <code className="text-code-inline">wrappers</code> extension by
                   upgrading your project from your{' '}
                   <InlineLink href={`/project/${ref}/settings/infrastructure`}>
@@ -247,7 +247,7 @@ export const CreateAnalyticsBucketForm = ({
                 type="default"
                 className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
               >
-                <p className="!leading-normal">
+                <p className="leading-normal!">
                   Supabase will install the{' '}
                   {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
                   Iceberg Wrapper integration on your behalf.{' '}
@@ -259,7 +259,7 @@ export const CreateAnalyticsBucketForm = ({
               </Admonition>
             )}
           </form>
-        </Form_Shadcn_>
+        </Form>
       </Section>
 
       <Footer>

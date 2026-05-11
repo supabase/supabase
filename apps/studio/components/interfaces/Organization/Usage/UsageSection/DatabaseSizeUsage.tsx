@@ -1,11 +1,5 @@
 import Link from 'next/link'
 import { useMemo } from 'react'
-
-import Panel from 'components/ui/Panel'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { formatBytes } from 'lib/helpers'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -14,8 +8,14 @@ import {
   CriticalIcon,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
+import Panel from '@/components/ui/Panel'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { OrgUsageResponse } from '@/data/usage/org-usage-query'
+import { formatBytes } from '@/lib/helpers'
 
 export interface DatabaseSizeUsageProps {
   slug: string
@@ -129,7 +129,7 @@ const DatabaseSizeUsage = ({
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center h-6 gap-3">
                         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-                          <span className="text-foreground font-semibold font-mono -mt-[2px]">
+                          <span className="text-foreground font-semibold font-mono mt-[-2px]">
                             {formatBytes(project.usage)}
                           </span>{' '}
                           Database Size

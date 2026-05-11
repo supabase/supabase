@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { Button, Input } from 'ui'
+import { Button, Input_Shadcn_ as Input } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 function base64URL(value: string) {
   return globalThis.btoa(value).replace(/[=]/g, '').replace(/[+]/g, '-').replace(/[\/]/g, '_')
@@ -105,30 +107,45 @@ const AppleSecretGenerator = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <Input
+      <FormItemLayout
+        isReactForm={false}
+        layout="vertical"
         label="Account ID"
+        description="Found in the upper-right corner of Apple Developer Center."
         labelOptional="required"
-        placeholder="Apple Developer account ID, 10 alphanumeric digits"
-        descriptionText="Found in the upper-right corner of Apple Developer Center."
-        value={teamID}
-        onChange={(e) => setTeamID(e.target.value.trim())}
-      />
-      <Input
+      >
+        <Input
+          placeholder="Apple Developer account ID, 10 alphanumeric digits"
+          value={teamID}
+          onChange={(e) => setTeamID(e.target.value.trim())}
+        />
+      </FormItemLayout>
+      <FormItemLayout
+        isReactForm={false}
+        layout="vertical"
         label="Service ID"
+        description="Found under Certificates, Identifiers & Profiles in Apple Developer Center."
         labelOptional="required"
-        placeholder="ID of the service, example: com.example.app.service"
-        descriptionText="Found under Certificates, Identifiers & Profiles in Apple Developer Center."
-        value={serviceID}
-        onChange={(e) => setServiceID(e.target.value.trim())}
-      />
-      <Input
+      >
+        <Input
+          placeholder="ID of the service, example: com.example.app.service"
+          value={serviceID}
+          onChange={(e) => setServiceID(e.target.value.trim())}
+        />
+      </FormItemLayout>
+      <FormItemLayout
+        isReactForm={false}
+        layout="vertical"
         label="Key ID"
+        description="If the file you select does not preserve the original name from Apple Developer Center, please enter the key ID."
         labelOptional="(optional)"
-        placeholder="Extracted from filename, AuthKey_XXXXXXXXXX.p8"
-        descriptionText="If the file you select does not preserve the original name from Apple Developer Center, please enter the key ID."
-        value={keyID}
-        onChange={(e) => setKeyID(e.target.value.trim())}
-      />
+      >
+        <Input
+          placeholder="Extracted from filename, AuthKey_XXXXXXXXXX.p8"
+          value={keyID}
+          onChange={(e) => setKeyID(e.target.value.trim())}
+        />
+      </FormItemLayout>
       <div>
         <input
           type="file"
@@ -176,14 +193,14 @@ const AppleSecretGenerator = () => {
       {secretKey && (
         <>
           <div style={{ height: '1rem' }} />
-          <Input
+          <FormItemLayout
+            isReactForm={false}
+            layout="vertical"
             label="Secret Key"
-            value={secretKey}
-            descriptionText={`Valid until: ${expiresAt}. Make sure you generate a new one before then!`}
-            reveal
-            copy
-            size="medium"
-          />
+            description={`Valid until: ${expiresAt}. Make sure you generate a new one before then!`}
+          >
+            <DataInput value={secretKey} copy reveal />
+          </FormItemLayout>
         </>
       )}
     </div>

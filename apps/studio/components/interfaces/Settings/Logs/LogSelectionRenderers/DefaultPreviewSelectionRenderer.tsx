@@ -1,5 +1,3 @@
-import { Service } from 'data/graphql/graphql'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -15,9 +13,11 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
-import { ErrorCodeTooltip } from 'components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
+import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
+import { Service } from '@/data/graphql/graphql'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 
 const LogRowCodeBlock = ({ value, className }: { value: string; className?: string }) => (
   <pre
@@ -48,7 +48,7 @@ const PropertyRow = ({
 
   const service = path?.startsWith('/auth/') ? Service.Auth : undefined
 
-  const handleSearch: LogSearchCallback = async (event: string, { query }: { query?: string }) => {
+  const handleSearch: LogSearchCallback = async (_event: string, { query }: { query?: string }) => {
     setSearch(query || '')
   }
 
@@ -134,14 +134,14 @@ const PropertyRow = ({
         <DropdownMenuTrigger className="group w-full" data-testid={dataTestId}>
           <div className="rounded-md w-full overflow-hidden">
             <div
-              className={cn('flex h-[var(--header-height)] w-full', {
+              className={cn('flex h-(--header-height) w-full', {
                 'flex-col gap-1.5 h-auto': isExpanded,
                 'items-center group-hover:bg-surface-300 gap-4': !isExpanded,
               })}
             >
               <h3
                 className={cn('pl-3 text-foreground-lighter text-sm text-left', {
-                  'h-[var(--header-height)] flex items-center': isExpanded,
+                  'h-(--header-height) flex items-center': isExpanded,
                 })}
               >
                 {keyName}

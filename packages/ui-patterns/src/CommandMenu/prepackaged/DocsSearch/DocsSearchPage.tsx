@@ -1,14 +1,14 @@
 'use client'
 
 import {
-  type DocsSearchResult as Page,
-  type DocsSearchResultSection as PageSection,
   DocsSearchResultType as PageType,
   useDocsSearch,
+  type DocsSearchResult as Page,
+  type DocsSearchResultSection as PageSection,
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
+import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_ } from 'ui'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
@@ -19,8 +19,8 @@ import {
   escapeAttributeSelector,
   generateCommandClassNames,
   TextHighlighter,
-  useCrossCompatRouter,
   useCommandMenuTelemetryContext,
+  useCrossCompatRouter,
   useQuery,
   useSetCommandMenuOpen,
   useSetQuery,
@@ -55,7 +55,7 @@ const IconContainer = (
   <div
     className={cn(
       'w-6 h-6',
-      'bg-surface-100 border rounded',
+      'bg-surface-100 border rounded-sm',
       'flex items-center justify-center',
       'text-foreground-muted',
       'group-aria-selected:bg-surface-200 group-aria-selected:text-foreground-lighter group-aria-selected:[&_svg]:scale-[103%]',
@@ -100,36 +100,42 @@ const DocsSearchPage = () => {
   )
 
   async function openLink(pageType: PageType, link: string) {
+    // A simple way to achieve opening links in new tab but room for improvement including support for middle clicks
+    let openInNewTab =
+      (window.event as KeyboardEvent)?.metaKey || (window.event as KeyboardEvent)?.ctrlKey
+    let finalLink: string = link
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
       case PageType.Troubleshooting:
         if (BASE_PATH === '/docs') {
-          router.push(link)
-          setIsOpen(false)
+          if (openInNewTab) {
+            finalLink = `/docs${link}`
+          }
         } else if (!BASE_PATH) {
-          router.push(`/docs${link}`)
-          setIsOpen(false)
+          finalLink = `/docs${link}`
         } else {
-          window.open(`https://supabase.com/docs${link}`, '_blank', 'noreferrer,noopener')
-          setIsOpen(false)
+          finalLink = `https://supabase.com/docs${link}`
+          openInNewTab = true
         }
         break
       case PageType.Integration:
-        if (!BASE_PATH) {
-          router.push(link)
-          setIsOpen(false)
-        } else {
-          window.open(`https://supabase.com${link}`, '_blank', 'noreferrer,noopener')
-          setIsOpen(false)
+        if (BASE_PATH) {
+          openInNewTab = true
+          finalLink = `https://supabase.com${link}`
         }
         break
       case PageType.GithubDiscussion:
-        window.open(link, '_blank', 'noreferrer,noopener')
-        setIsOpen(false)
+        openInNewTab = true
         break
       default:
         throw new Error(`Unknown page type '${pageType}'`)
+    }
+    if (openInNewTab) {
+      window.open(finalLink, '_blank', 'noreferrer,noopener')
+    } else {
+      router.push(finalLink)
+      setIsOpen(false)
     }
   }
 
@@ -196,7 +202,7 @@ const DocsSearchPage = () => {
                 key={`${page.path}-group`}
                 value={`${escapeAttributeSelector(page.title)}-group-index-${i}`}
                 forceMount={true}
-                className="overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
+                className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
               >
                 <CommandItem_Shadcn_
                   key={`${page.path}-item`}
@@ -264,7 +270,7 @@ const DocsSearchPage = () => {
             )
           })}
         {state.status === 'initial' && (
-          <CommandGroup_Shadcn_ className="overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
+          <CommandGroup_Shadcn_ className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
               return (
@@ -340,9 +346,9 @@ export function getPageIcon(page: Page) {
     case PageType.Reference:
     case PageType.Integration:
     case PageType.Troubleshooting:
-      return <Book strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -354,9 +360,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Reference:
     case PageType.Integration:
     case PageType.Troubleshooting:
-      return <Hash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <MessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

@@ -1,7 +1,7 @@
 import { useBreakpoint } from 'common'
 import { LucideIcon } from 'lucide-react'
 import Link from 'next/link'
-import type { ComponentType, SVGProps } from 'react'
+import type { ComponentType, ReactNode, SVGProps } from 'react'
 import { cn } from 'ui'
 
 export type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>
@@ -15,9 +15,9 @@ export interface Metadata {
 export interface HeroSection {
   id: string
   title: string
-  h1: JSX.Element
-  subheader: JSX.Element[]
-  image: JSX.Element | undefined
+  h1: ReactNode
+  subheader: ReactNode
+  image: ReactNode
   className?: string
   sectionContainerClassName?: string
   icon?: string
@@ -30,7 +30,7 @@ export interface HeroSection {
     name: string
     image: string
   }[]
-  footer?: React.ReactNode
+  footer?: ReactNode
   footerPosition?: 'left' | 'right' | 'bottom'
 }
 
@@ -38,7 +38,7 @@ export interface Quote {
   icon?: string
   author: string
   authorTitle?: string
-  quote: JSX.Element
+  quote: ReactNode
   avatar: string
 }
 
@@ -49,8 +49,8 @@ export interface Quotes {
 
 export interface Highlight {
   icon?: IconType
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  heading: ReactNode
+  subheading: ReactNode
   url?: string
 }
 
@@ -58,15 +58,15 @@ export interface Feature {
   id?: string
   icon?: IconType | string
   iconNoStroke?: boolean
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
-  img?: JSX.Element
+  heading: ReactNode
+  subheading: ReactNode
+  img?: ReactNode
 }
 
 export interface FeaturesSection {
   id: string
   label?: string
-  heading: string | JSX.Element
+  heading: ReactNode
   subheading?: string
   features: Feature[]
   // {
@@ -77,7 +77,7 @@ export interface FeaturesSection {
 export interface Testimonials {
   id: string
   label: string
-  heading: JSX.Element
+  heading: ReactNode
   videos: {
     [key: string]: {
       url: string
@@ -88,7 +88,7 @@ export interface Testimonials {
 export interface CTASection {
   id: string
   label: string
-  heading: JSX.Element | string
+  heading: ReactNode | string
   subheading: string
   cta: {
     label: string
@@ -99,13 +99,13 @@ export interface CTASection {
 
 export interface FrameworkLinkProps {
   name: string
-  icon: string | React.ReactNode
+  icon: string | ReactNode
   docs: string
 }
 
 export interface PostGridProps {
-  header: React.ReactNode
-  subheader: React.ReactNode
+  header: ReactNode
+  subheader: ReactNode
 }
 
 export const FrameworkLink = ({ framework }: { framework: FrameworkLinkProps }) => {

@@ -12,7 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@playwright/test": "^1.52.0",
+    "@playwright/test": "^1.59.1",
     "@supabase/supabase-js": "catalog:",
     "cross-fetch": "^4.1.0",
     "dotenv": "^16.5.0",

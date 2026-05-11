@@ -1,10 +1,4 @@
 import { useParams } from 'common'
-import { useTableRowOperations } from 'components/grid/hooks/useTableRowOperations'
-import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
@@ -17,6 +11,12 @@ import { EmptyValue } from '../common/EmptyValue'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
+import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const TextEditor = <TRow, TSummaryRow = unknown>({
   row,
@@ -143,13 +143,13 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                 <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
-                      <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                      <div className="px-1.5 py-[2.5px] rounded-sm bg-surface-300 border border-strong flex items-center justify-center">
                         <span className="text-[10px]">⏎</span>
                       </div>
                       <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                      <div className="px-1 py-[2.5px] rounded-sm bg-surface-300 border border-strong flex items-center justify-center">
                         <span className="text-[10px]">Esc</span>
                       </div>
                       <p className="text-xs text-foreground-light">Cancel changes</p>

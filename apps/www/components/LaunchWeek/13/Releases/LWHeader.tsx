@@ -10,7 +10,7 @@ const LWHeader = ({ className }: { className?: string }) => {
         className
       )}
     >
-      <SectionContainer className="h-full flex flex-col items-start justify-end gap-3 !max-w-none lg:!container !pb-4 md:!pb-10 !pointer-events-none">
+      <SectionContainer className="h-full flex flex-col items-start justify-end gap-3 max-w-none! lg:container! pb-4! md:pb-10! pointer-events-none!">
         <h1 className="text-3xl uppercase tracking-wide pointer-events-none">
           Launch Week <span className="font-mono">13</span>
         </h1>

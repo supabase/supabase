@@ -1,4 +1,4 @@
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 
 const pricingMetricBytes = [
   PricingMetric.DATABASE_SIZE,

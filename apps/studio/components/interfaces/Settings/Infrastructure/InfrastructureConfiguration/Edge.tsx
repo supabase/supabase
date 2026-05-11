@@ -1,14 +1,13 @@
 import { BaseEdge, Edge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 import { useParams } from 'common'
-import { useReplicationLagQuery } from 'data/read-replicas/replica-lag-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { Loader2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { EdgeData, REPLICA_STATUS } from './InstanceConfiguration.constants'
+import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 
 export const SmoothstepEdge = ({
-  id,
   sourceX,
   sourceY,
   targetX,
@@ -56,7 +55,7 @@ export const SmoothstepEdge = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <div
-                className="bg-surface-100 px-1.5 py-0.5 rounded absolute nodrag nopan"
+                className="bg-surface-100 px-1.5 py-0.5 rounded-sm absolute nodrag nopan"
                 style={{
                   transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
                   pointerEvents: 'all',

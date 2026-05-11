@@ -1,4 +1,4 @@
-import { Input } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 export type DNSRecordProps = {
   type: string
@@ -12,8 +12,23 @@ const DNSRecord = ({ type, name, value }: DNSRecordProps) => {
       <div className="w-[50px]">
         <p className="font-mono text-base">{type.toUpperCase()}</p>
       </div>
-      <Input readOnly copy disabled className="input-mono flex-1" value={name} layout="vertical" />
-      <Input readOnly copy disabled className="input-mono flex-1" value={value} layout="vertical" />
+
+      <Input
+        readOnly
+        copy
+        disabled
+        containerClassName="flex-1"
+        className="font-mono"
+        value={name}
+      />
+      <Input
+        readOnly
+        copy
+        disabled
+        containerClassName="flex-1"
+        className="font-mono"
+        value={value}
+      />
     </div>
   )
 }

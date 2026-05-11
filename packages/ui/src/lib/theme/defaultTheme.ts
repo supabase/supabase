@@ -23,11 +23,11 @@ const defaults = {
   },
   placeholder: 'placeholder-foreground-muted',
   focus: `
-    outline-none
+    outline-hidden
     focus:ring-current focus:ring-2
   `,
   'focus-visible': `
-    outline-none
+    outline-hidden
     transition-all
     outline-0
     focus-visible:outline-4
@@ -35,10 +35,11 @@ const defaults = {
   `,
   size: {
     // buttons, inputs, input labels use these sizes
+    // text-base on mobile (below md) to avoid zoom on focus
     text: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -54,13 +55,6 @@ const defaults = {
   overlay: {
     base: `absolute inset-0 bg-background opacity-50`,
     container: `fixed inset-0 transition-opacity`,
-  },
-}
-
-const utils = {
-  border: {
-    hover: 'border-opacity-50 hover:border-opacity-100',
-    fix: 'border-opacity-100',
   },
 }
 
@@ -129,7 +123,7 @@ export default {
           text-left
           cursor-pointer
 
-          outline-none
+          outline-hidden
           focus-visible:ring-1
           focus-visible:z-10
           ring-foreground-light
@@ -167,7 +161,7 @@ export default {
           text-base
           bg-transparent
 
-          outline-none
+          outline-hidden
           focus-visible:ring-1
           focus-visible:z-10
           ring-foreground-light
@@ -209,40 +203,6 @@ export default {
     },
     animate: {
       ...default___animations.accordion,
-    },
-  },
-
-  /*
-   * Badge
-   *
-   */
-
-  badge: {
-    base: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-normal bg-opacity-10',
-    size: {
-      large: 'px-3 py-0.5 rounded-full text-sm',
-    },
-    dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
-    color: {
-      brand: 'bg-brand-500 text-brand-600 border border-brand-500',
-      brandAlt: 'bg-brand bg-opacity-100 text-background border border-brand',
-      scale: 'bg-background text-foreground-light border border-strong',
-      tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
-      red: `bg-red-200 text-red-1100 border border-red-700`,
-      crimson: `bg-crimson-200 text-crimson-1100 border border-crimson-700`,
-      pink: `bg-pink-200 text-pink-1100 border border-pink-700`,
-      purple: `bg-purple-200 text-purple-1100 border border-purple-700`,
-      violet: `bg-violet-200 text-violet-1100 border border-violet-700`,
-      indigo: `bg-indigo-200 text-indigo-1100 border border-indigo-700`,
-      blue: `bg-blue-200 text-blue-1100 border border-blue-700`,
-      green: `bg-opacity-10 bg-brand-500 text-brand-600 border border-brand-500`,
-      grass: `bg-grass-200 text-grass-1100 border border-grass-700`,
-      orange: `bg-orange-200 text-orange-1100 border border-orange-700`,
-      yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
-      amber: `bg-amber-200 text-amber-1100 border border-amber-700`,
-      gold: `bg-gold-200 text-gold-1100 border border-gold-700`,
-      gray: `bg-200 text-gray-1100 border border-gray-700`,
-      slate: `bg-slate-200 text-slate-1100 border border-slate-700`,
     },
   },
 
@@ -296,7 +256,7 @@ export default {
       p-0 m-0
       text-foreground-muted
       cursor-pointer transition ease-in-out
-      bg-transparent border-transparent focus:outline-none
+      bg-transparent border-transparent focus:outline-hidden
       opacity-50 hover:opacity-100`,
   },
 
@@ -341,8 +301,8 @@ export default {
         space-x-2
         text-center
         transition
-        focus:outline-none
-        focus-visible:ring
+        focus:outline-hidden
+        focus-visible:ring-3
         focus-visible:ring-foreground-muted
         focus-visible:border-foreground-muted
       `,
@@ -364,11 +324,11 @@ export default {
         space-x-2
         text-center
         transition
-        shadow-sm
-        rounded
+        shadow-xs
+        rounded-sm
         border
-        focus:outline-none
-        focus-visible:ring
+        focus:outline-hidden
+        focus-visible:ring-3
         focus-visible:ring-foreground-muted
         focus-visible:border-foreground-muted
         `,
@@ -393,10 +353,10 @@ export default {
         space-x-2
         text-center
         transition
-        shadow-sm
+        shadow-xs
         rounded-full
-        focus:outline-none
-        focus-visible:ring
+        focus:outline-hidden
+        focus-visible:ring-3
         focus-visible:ring-foreground-muted
         focus-visible:border-foreground-muted
         `,
@@ -417,7 +377,7 @@ export default {
     },
     scrollable: `overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right`,
     wrappable: `flex-wrap`,
-    content: `focus:outline-none transition-height`,
+    content: `focus:outline-hidden transition-height`,
   },
 
   /*
@@ -430,7 +390,7 @@ export default {
       box-border
       w-full
       rounded-md
-      shadow-sm
+      shadow-xs
       transition-all
       text-foreground
       border
@@ -464,397 +424,6 @@ export default {
     textarea_actions_container_items: 'flex items-center',
   },
 
-  /*
-   * Select
-   */
-
-  select: {
-    base: `
-      block
-      box-border
-      w-full
-      rounded-md
-      shadow-sm
-      transition-all
-      text-foreground
-      border
-      focus-visible:shadow-md
-      ${defaults.focus}
-      focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
-      ${defaults.placeholder}
-
-      appearance-none
-      bg-none
-    `,
-    variants: {
-      standard: `
-        bg-background
-        border border-strong
-        `,
-      error: `
-        bg-destructive-200
-        border border-destructive-500
-        focus:ring-destructive-400
-        placeholder:text-destructive-400
-       `,
-    },
-    container: 'relative',
-    with_icon: with_icon_spacing_sizes,
-    size: {
-      ...default__padding_and_text,
-    },
-    disabled: 'opacity-50',
-    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
-    chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
-    chevron: 'h-5 w-5 text-foreground-lighter',
-  },
-
-  /*
-   * Input Number
-   */
-
-  inputNumber: {
-    base: `
-      block
-      box-border
-      w-full
-      rounded-md
-      shadow-sm
-      transition-all
-      text-foreground
-      border
-      focus-visible:shadow-md
-      ${defaults.focus}
-      focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
-      ${defaults.placeholder}
-
-      appearance-none
-      bg-none
-    `,
-    variants: {
-      standard: `
-        bg-control
-        border border-strong
-      `,
-      error: `
-        bg-destructive-200
-        border border-destructive-500
-        focus:ring-destructive-400
-        placeholder:text-destructive-400
-       `,
-    },
-    disabled: 'opacity-50',
-    container: 'relative',
-    with_icon: with_icon_spacing_sizes,
-    size: {
-      ...default__padding_and_text,
-    },
-    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
-  },
-
-  /*
-   *  Checkbox
-   *
-   *
-   * This Checkbox requires a plugin in your config:
-
-    ```
-    // tailwind.config.js
-    module.exports = {
-      // ...
-      plugins: [
-        // ...
-        require('@tailwindcss/forms'),
-      ],
-    }
-    ```
-   *
-   *
-  */
-
-  checkbox: {
-    base: `
-      bg-transparent
-      ${defaults.focus}
-      focus:ring-border-muted
-      text-brand
-      border-strong
-      shadow-sm
-      rounded
-      cursor-pointer
-    `,
-    container: `flex cursor-pointer leading-none`,
-    size: {
-      tiny: `h-3 w-3 mt-1 mr-3`,
-      small: `h-3.5 w-3.5 mt-0.5 mr-3.5`,
-      medium: `h-4 w-4 mt-0.5 mr-3.5`,
-      large: `h-5 w-5 mt-0.5 mr-4`,
-      xlarge: `h-5 w-5 mt-0.5 mr-4`,
-    },
-    disabled: 'opacity-50',
-    label: {
-      base: `text-foreground-light cursor-pointer`,
-      ...defaults.size.text,
-    },
-    label_before: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    label_after: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    description: {
-      base: `text-foreground-lighter`,
-      ...defaults.size.text,
-    },
-    group: `space-y-3`,
-  },
-
-  /*
-   *  Radio
-   *
-   *
-   * This Radio requires a plugin in your config:
-
-    ```
-    // tailwind.config.js
-    module.exports = {
-      // ...
-      plugins: [
-        // ...
-        require('@tailwindcss/forms'),
-      ],
-    }
-    ```
-   *
-   *
-  */
-
-  radio: {
-    base: `
-      absolute
-      ${defaults.focus}
-      focus:ring-brand-400
-      border-strong
-
-      text-brand
-      shadow-sm
-      cursor-pointer
-      peer
-
-      bg-surface-100
-    `,
-    hidden: `absolute opacity-0`,
-    size: {
-      tiny: `h-3 w-3`,
-      small: `h-3.5 w-3.5`,
-      medium: `h-4 w-4`,
-      large: `h-5 w-5`,
-      xlarge: `h-5 w-5`,
-    },
-    variants: {
-      cards: {
-        container: {
-          base: `relative cursor-pointer flex`,
-          align: {
-            vertical: 'flex flex-col space-y-1',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `-space-y-px shadow-sm`,
-        base: `
-          transition
-          border
-          first:rounded-tl-md first:rounded-tr-md
-          last:rounded-bl-md last:rounded-br-md
-        `,
-        size: {
-          tiny: `px-5 py-3`,
-          small: `px-6 py-4`,
-          medium: `px-6 py-4`,
-          large: `px-8 p-4`,
-          xlarge: `px-8 p-4`,
-        },
-        inactive: `
-          bg-surface-200
-          border-alternative
-          hover:border-strong
-          hover:bg-surface-300
-        `,
-        active: `
-          bg-selection z-10
-          border-stronger
-          border-1
-        `,
-        radio_offset: 'left-4',
-      },
-
-      'stacked-cards': {
-        container: {
-          base: `relative cursor-pointer flex items-center justify-between`,
-          align: {
-            vertical: 'flex flex-col space-y-1',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `space-y-3`,
-        base: `
-          transition
-          rounded-md
-          border
-          shadow-sm
-        `,
-        size: {
-          tiny: `px-5 py-3`,
-          small: `px-6 py-4`,
-          medium: `px-6 py-4`,
-          large: `px-8 p-4`,
-          xlarge: `px-8 p-4`,
-        },
-        inactive: `
-          bg-surface-200
-          border-alternative
-          hover:border-strong
-          hover:bg-surface-300
-        `,
-        active: `
-          bg-selection z-10
-          border-stronger
-          border-1
-        `,
-        radio_offset: 'left-4',
-      },
-
-      'small-cards': {
-        container: {
-          base: `relative cursor-pointer flex`,
-          align: {
-            vertical: 'flex flex-col space-y-1 items-center justify-center',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `flex flex-row gap-3`,
-        base: `
-          transition
-          border
-          rounded-lg
-          grow
-          items-center
-          flex-wrap
-          justify-center
-          shadow-sm
-        `,
-        size: {
-          tiny: `px-5 py-3`,
-          small: `px-6 py-4`,
-          medium: `px-6 py-4`,
-          large: `px-8 p-4`,
-          xlarge: `px-8 p-4`,
-        },
-        inactive: `
-          bg-surface-200
-          border-alternative
-          hover:border-strong
-          hover:bg-surface-300
-        `,
-        active: `
-          bg-selection z-10
-          border-stronger border-1
-        `,
-        radio_offset: 'left-4',
-      },
-
-      'large-cards': {
-        container: {
-          base: `relative cursor-pointer flex`,
-          align: {
-            vertical: 'flex flex-col space-y-1',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `grid grid-cols-12 gap-3`,
-        base: `
-          transition
-          border border-stronger
-          shadow-sm
-          rounded-lg
-          grow
-        `,
-        size: {
-          tiny: `px-5 py-3`,
-          small: `px-6 py-4`,
-          medium: `px-6 py-4`,
-          large: `px-8 p-4`,
-          xlarge: `px-8 p-4`,
-        },
-        inactive: `
-          bg-surface-200
-          border-alternative
-          hover:border-strong
-          hover:bg-surface-300
-        `,
-        active: `
-          bg-selection z-10
-          border-strong
-          border-1
-        `,
-        radio_offset: 'left-4',
-      },
-
-      list: {
-        container: {
-          base: `relative cursor-pointer flex`,
-          size: {
-            tiny: `pl-6`,
-            small: `pl-6`,
-            medium: `pl-7`,
-            large: `pl-7`,
-            xlarge: `pl-7`,
-          },
-          align: {
-            vertical: 'flex flex-col space-y-1',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `space-y-4`,
-        base: ``,
-        size: {
-          tiny: `0`,
-          small: `0`,
-          medium: `0`,
-          large: `0`,
-          xlarge: `0`,
-        },
-        active: ``,
-        radio_offset: 'left-0',
-      },
-    },
-    label: {
-      base: `text-foreground-light cursor-pointer`,
-      ...defaults.size.text,
-    },
-    label_before: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    label_after: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    description: {
-      base: `text-foreground-lighter`,
-      ...defaults.size.text,
-    },
-    optionalLabel: {
-      base: `text-foreground-lighter`,
-      ...defaults.size.text,
-    },
-    disabled: `opacity-50 cursor-auto border-dashed`,
-  },
-
   sidepanel: {
     base: `
       z-50
@@ -869,7 +438,7 @@ export default {
     header: `
       flex items-center
       space-y-1 py-4 px-4 bg-dash-sidebar sm:px-6
-      border-b h-[var(--header-height)]
+      border-b h-(--header-height)
     `,
     contents: `
       relative
@@ -926,60 +495,6 @@ export default {
     trigger: `
       border-none bg-transparent p-0 focus:ring-0
     `,
-  },
-
-  /*
-   *  Toggle
-   */
-
-  toggle: {
-    base: `
-      p-0 relative
-      inline-flex flex-shrink-0
-      border-2 border-transparent
-      rounded-full
-      cursor-pointer
-      transition-colors ease-in-out duration-200
-      ${defaults.focus}
-      focus:!ring-border
-      bg-foreground-muted/40
-
-      hover:bg-foreground-muted/60
-    `,
-    active: `
-      !bg-brand
-      !hover:bg-brand
-    `,
-    handle_container: {
-      tiny: 'h-4 w-7',
-      small: 'h-6 w-11',
-      medium: 'h-6 w-11',
-      large: 'h-7 w-12',
-      xlarge: 'h-7 w-12',
-    },
-    handle: {
-      base: `
-        inline-block h-5 w-5
-        rounded-full
-        bg-white
-        shadow ring-0
-        transition
-        ease-in-out duration-200
-      `,
-      tiny: '!h-3 !w-3',
-      small: '!h-5 !w-5',
-      medium: '!h-5 !w-5',
-      large: '!h-6 !w-6',
-      xlarge: '!h-6 !w-6',
-    },
-    handle_active: {
-      tiny: ' translate-x-3 dark:bg-white',
-      small: 'translate-x-5 dark:bg-white',
-      medium: 'translate-x-5 dark:bg-white',
-      large: 'translate-x-5 dark:bg-white',
-      xlarge: 'translate-x-5 dark:bg-white',
-    },
-    disabled: 'opacity-75 cursor-not-allowed',
   },
 
   /*
@@ -1063,8 +578,8 @@ export default {
     },
     size: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -1078,10 +593,10 @@ export default {
     trigger: `
       flex
       border-none
-      rounded
+      rounded-sm
       bg-transparent
       p-0
-      outline-none
+      outline-hidden
       outline-offset-1
       transition-all
       focus:outline-4
@@ -1091,7 +606,7 @@ export default {
       z-40
       bg-overlay
       border border-overlay
-      rounded
+      rounded-sm
       shadow-lg
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
@@ -1140,7 +655,7 @@ export default {
       base: `
         cursor-pointer
         flex space-x-3 items-center
-        outline-none
+        outline-hidden
         focus-visible:ring-1 ring-foreground-muted focus-visible:z-10
         group
       `,
@@ -1191,10 +706,11 @@ export default {
           rounded: `rounded-md`,
         },
         pills: {
-          base: `px-3 py-1`,
+          base: `my-px px-3 py-[3px] rounded-md transition-colors active:bg-sidebar-accent/50`,
           normal: `
             font-normal
             border-default
+            hover:bg-sidebar-accent/50
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
@@ -1293,7 +809,7 @@ export default {
       box-border
       w-full
       rounded-md
-      shadow-sm
+      shadow-xs
       text-foreground
       border
       focus-visible:shadow-md
@@ -1362,7 +878,7 @@ export default {
       focus:bg-border-overlay
       focus:text-foreground
       border-none
-      focus:outline-none
+      focus:outline-hidden
     `,
     option_active: `text-foreground bg-selection`,
     option_disabled: `cursor-not-allowed opacity-60`,
@@ -1411,7 +927,7 @@ export default {
   // Icon
 
   icon: {
-    container: `flex-shrink-0 flex items-center justify-center rounded-full p-3`,
+    container: `shrink-0 flex items-center justify-center rounded-full p-3`,
   },
 
   loading: {
@@ -1428,4 +944,4 @@ export default {
       m-auto
     `,
   },
-}
+} as const

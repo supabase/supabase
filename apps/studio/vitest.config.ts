@@ -25,8 +25,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
     setupFiles: [
-      resolve(dirname, './tests/vitestSetup.ts'),
       resolve(dirname, './tests/setup/polyfills.ts'),
+      resolve(dirname, './tests/vitestSetup.ts'),
       resolve(dirname, './tests/setup/radix.js'),
     ],
     // Don't look for tests in the nextjs output directory

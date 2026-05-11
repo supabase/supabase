@@ -31,6 +31,19 @@ export * from './sql/studio/database'
 export * from './sql/studio/table-editor'
 export * from './sql/studio/sql-editor'
 export * from './sql/studio/role-impersonation'
+export * from './sql/studio/integrations'
+
+export {
+  ident,
+  literal,
+  keyword,
+  safeSql,
+  rawSql,
+  untrustedSql,
+  acceptUntrustedSql,
+  joinSqlFragments,
+} from './pg-format'
+export type { SafeSqlFragment, UntrustedSqlFragment, DisplayableSqlFragment } from './pg-format'
 
 export default {
   roles,

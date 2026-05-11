@@ -1,18 +1,18 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
-// End of third-party imports
-
-import { API_URL, BASE_PATH } from 'lib/constants'
 import { http, HttpResponse } from 'msw'
-import { createMockOrganization, createMockProject } from 'tests/helpers'
-import { customRender } from 'tests/lib/custom-render'
-import { addAPIMock, mswServer } from 'tests/lib/msw'
-import { createMockProfileContext } from 'tests/lib/profile-helpers'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
-import { SupportFormPage } from '../SupportFormPage'
+import { SupportForm, SupportFormPage, SupportFormStatusButton } from '../SupportFormPage'
+// End of third-party imports
+
+import { API_URL, BASE_PATH } from '@/lib/constants'
+import { createMockOrganization, createMockProject } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
+import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
 type Screen = typeof screen
 
@@ -98,7 +98,7 @@ vi.mock('../support-storage-client', () => ({
   createSupportStorageClient: vi.fn(),
 }))
 
-vi.mock(import('lib/breadcrumbs'), async (importOriginal) => {
+vi.mock(import('@/lib/breadcrumbs'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
@@ -108,7 +108,7 @@ vi.mock(import('lib/breadcrumbs'), async (importOriginal) => {
 
 let createSupportStorageClientMock: ReturnType<typeof vi.fn>
 let getBreadcrumbSnapshotMock: ReturnType<typeof vi.fn>
-let generateAttachmentUrlSpy: ReturnType<typeof vi.fn>
+let generateAttachmentUrlSpy: ReturnType<typeof vi.fn<(...args: any[]) => any>>
 
 // Mock sonner toast
 vi.mock('sonner', () => ({
@@ -118,7 +118,7 @@ vi.mock('sonner', () => ({
   },
 }))
 
-vi.mock('data/utils/deployment-commit-query', () => ({
+vi.mock('@/data/utils/deployment-commit-query', () => ({
   useDeploymentCommitQuery: mockUseDeploymentCommitQuery,
 }))
 
@@ -163,7 +163,7 @@ vi.mock(import('common'), async (importOriginal) => {
   }
 })
 
-vi.mock(import('lib/gotrue'), async (importOriginal) => {
+vi.mock(import('@/lib/gotrue'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
@@ -174,7 +174,7 @@ vi.mock(import('lib/gotrue'), async (importOriginal) => {
   }
 })
 
-vi.mock(import('lib/constants'), async (importOriginal) => {
+vi.mock(import('@/lib/constants'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
@@ -184,6 +184,21 @@ vi.mock(import('lib/constants'), async (importOriginal) => {
 
 const renderSupportFormPage = (options?: Parameters<typeof customRender>[1]) =>
   customRender(<SupportFormPage />, {
+    profileContext: createMockProfileContext(),
+    ...options,
+  })
+
+const renderSupportForm = (
+  props?: Parameters<typeof SupportForm>[0],
+  options?: Parameters<typeof customRender>[1]
+) =>
+  customRender(<SupportForm {...props} />, {
+    profileContext: createMockProfileContext(),
+    ...options,
+  })
+
+const renderSupportFormStatusButton = (options?: Parameters<typeof customRender>[1]) =>
+  customRender(<SupportFormStatusButton />, {
     profileContext: createMockProfileContext(),
     ...options,
   })
@@ -355,7 +370,7 @@ describe('SupportFormPage', () => {
       })
     )
 
-    const breadcrumbsModule = await import('lib/breadcrumbs')
+    const breadcrumbsModule = await import('@/lib/breadcrumbs')
     getBreadcrumbSnapshotMock = vi.mocked(breadcrumbsModule.getOwnershipOfBreadcrumbSnapshot)
     getBreadcrumbSnapshotMock.mockReset()
     getBreadcrumbSnapshotMock.mockReturnValue([
@@ -458,7 +473,7 @@ describe('SupportFormPage', () => {
   })
 
   test('shows system status: healthy', async () => {
-    renderSupportFormPage()
+    renderSupportFormStatusButton()
 
     await waitFor(() => {
       expect(getStatusLink(screen)).toHaveTextContent('All systems operational')
@@ -483,7 +498,7 @@ describe('SupportFormPage', () => {
       )
     )
 
-    renderSupportFormPage()
+    renderSupportFormStatusButton()
 
     await waitFor(() => {
       expect(getStatusLink(screen)).toHaveTextContent('Active incident ongoing')
@@ -497,10 +512,21 @@ describe('SupportFormPage', () => {
       )
     )
 
-    renderSupportFormPage()
+    renderSupportFormStatusButton()
 
     await waitFor(() => {
       expect(getStatusLink(screen)).toHaveTextContent('Failed to check status')
+    })
+  })
+
+  test('loading with initial params prefills the organization and project', async () => {
+    renderSupportForm({ initialParams: { projectRef: 'project-3' } })
+
+    await waitFor(() => {
+      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      expect(screen.getByRole('combobox', { name: 'Select a project' })).toHaveTextContent(
+        'Project 3'
+      )
     })
   })
 

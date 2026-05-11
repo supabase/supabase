@@ -1,11 +1,11 @@
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { InlineLink } from '@/components/ui/InlineLink'
 import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   const { ref } = useParams()
@@ -28,7 +28,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
 const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
-      return error.dependents.join(', ')
+      return (error.dependents ?? []).join(', ') || 'Objects depending on pg_cron'
     case 'indexes_referencing_ll_to_earth':
       return `${error.schema_name}.${error.index_name}`
     case 'function_using_obsolete_lang':

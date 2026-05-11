@@ -1,10 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
-import type { Dictionary } from 'types'
-import { SidePanel, Toggle } from 'ui'
+import { Label_Shadcn_, SidePanel, Switch } from 'ui'
 
 import { ActionBar } from '../ActionBar'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -21,7 +18,10 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
@@ -133,7 +133,7 @@ export const RowEditor = ({
       updateEditorDirty()
 
       const payload = isNewRecord
-        ? generateRowObjectFromFields(rowFields)
+        ? generateRowObjectFromFields({ fields: rowFields })
         : generateUpdateRowPayload(row, rowFields)
 
       const configuration = { identifiers: {}, rowIdx: -1 }
@@ -192,18 +192,14 @@ export const RowEditor = ({
           visible={visible}
         >
           {isNewRecord && editable && (
-            <div className="flex items-center gap-x-2">
-              <Toggle
-                size="tiny"
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="create-more"
+                size="small"
                 checked={createMore}
-                onChange={() => setCreateMore(!createMore)}
+                onCheckedChange={(checked) => setCreateMore(checked)}
               />
-              <label
-                className="text-foreground-light text-sm cursor-pointer select-none"
-                onClick={() => setCreateMore(!createMore)}
-              >
-                Create more
-              </label>
+              <Label_Shadcn_ htmlFor="create-more">Create more</Label_Shadcn_>
             </div>
           )}
         </ActionBar>
@@ -211,7 +207,7 @@ export const RowEditor = ({
     >
       <form id={formId} onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
-          <div className="flex flex-grow flex-col">
+          <div className="flex grow flex-col">
             {requiredFields.length > 0 && (
               <SidePanel.Content>
                 <div className="space-y-10 py-6">
@@ -226,6 +222,7 @@ export const RowEditor = ({
                         onEditText={setSelectedValueForTextEdit}
                         onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                         isEditable={editable}
+                        isNewRow={isNewRecord || '__tempId' in row}
                       />
                     )
                   })}
@@ -254,6 +251,7 @@ export const RowEditor = ({
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                           isEditable={editable}
+                          isNewRow={isNewRecord || '__tempId' in row}
                         />
                       )
                     })}

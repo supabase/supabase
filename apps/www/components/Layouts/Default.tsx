@@ -1,11 +1,9 @@
 'use client'
 
+import Footer from 'components/Footer/index'
 import Nav from 'components/Nav/index'
-import dynamic from 'next/dynamic'
-import { cn } from 'ui'
 import { useForceDeepDark } from 'lib/theme.utils'
-
-const Footer = dynamic(() => import('components/Footer/index'))
+import { cn } from 'ui'
 
 type Props = {
   hideHeader?: boolean

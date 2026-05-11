@@ -1,29 +1,43 @@
 import { PostgresTable } from '@supabase/postgres-meta'
-import { useParams } from 'common'
-import { TableList } from 'components/interfaces/Database/Tables/TableList'
-import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { Entity, isTableLike, postgresTableToEntity } from 'data/table-editor/table-editor-types'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useState } from 'react'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import { TableList } from '@/components/interfaces/Database/Tables/TableList'
+import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { AutoEnableRLSNotice } from '@/components/ui/AutoEnableRLSNotice'
+import { Entity, isTableLike, postgresTableToEntity } from '@/data/table-editor/table-editor-types'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const snap = useTableEditorStateSnapshot()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<Entity>()
 
+  const [isAutoEnableRLSMinimized] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? ''),
+    false
+  )
+
   return (
     <>
-      <PageLayout title="Database Tables" size="large">
+      <PageLayout
+        title="Database Tables"
+        size="large"
+        primaryActions={isAutoEnableRLSMinimized && <AutoEnableRLSNotice iconOnly />}
+      >
         <PageContainer size="large">
           <PageSection>
+            {!isAutoEnableRLSMinimized && <AutoEnableRLSNotice />}
+
             <PageSectionContent>
               <TableList
                 onAddTable={snap.onAddTable}

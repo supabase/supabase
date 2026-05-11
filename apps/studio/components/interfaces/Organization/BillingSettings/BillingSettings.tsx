@@ -1,13 +1,5 @@
-import {
-  ScaffoldContainer,
-  ScaffoldContainerLegacy,
-  ScaffoldDivider,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { cn } from 'ui'
+
 import PaymentMethods from '../../Billing/Payment/PaymentMethods/PaymentMethods'
 import { InvoicesSection } from '../InvoicesSettings/InvoicesSection'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
@@ -16,6 +8,16 @@ import BillingEmail from './BillingEmail'
 import CostControl from './CostControl/CostControl'
 import CreditBalance from './CreditBalance'
 import Subscription from './Subscription/Subscription'
+import {
+  ScaffoldContainer,
+  ScaffoldContainerLegacy,
+  ScaffoldDivider,
+  ScaffoldTitle,
+} from '@/components/layouts/Scaffold'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 export const BillingSettings = () => {
   const {
@@ -33,11 +35,12 @@ export const BillingSettings = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner
+  const isStripeOrg = org?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const billingAccountDataEnabled =
     isBillingAccountDataEnabledOnProfileLevel && isNotOrgWithPartnerBilling
   const billingPaymentMethodsEnabled =
-    isBillingPaymentMethodsEnabledOnProfileLevel && isNotOrgWithPartnerBilling
+    isBillingPaymentMethodsEnabledOnProfileLevel && (isNotOrgWithPartnerBilling || isStripeOrg)
 
   return (
     <>
@@ -45,7 +48,7 @@ export const BillingSettings = () => {
         <ScaffoldTitle>Billing</ScaffoldTitle>
       </ScaffoldContainerLegacy>
 
-      <ScaffoldContainer id="subscription" className={cn('[&>div]:!pt-0')}>
+      <ScaffoldContainer id="subscription" className={cn('[&>div]:pt-0!')}>
         <Subscription />
       </ScaffoldContainer>
 

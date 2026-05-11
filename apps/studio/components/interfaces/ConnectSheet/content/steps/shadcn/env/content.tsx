@@ -13,7 +13,7 @@ function getEnvFile(
       code: [
         `NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
         projectKeys.publishableKey
-          ? `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+          ? `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey}`
           : `NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
         '',
       ].join('\n'),
@@ -31,7 +31,7 @@ function getEnvFile(
       code: [
         `${keyPrefix}_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
         projectKeys.publishableKey
-          ? `${keyPrefix}_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+          ? `${keyPrefix}_SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey}`
           : `${keyPrefix}_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
         '',
       ].join('\n'),

@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
-import { Button, cn, Image } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import { Button, cn } from 'ui'
+
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 interface Props {
   id: string
@@ -49,7 +50,7 @@ const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }
         </div>
       </div>
 
-      <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-transparent to-background opacity-80 z-0"></div>
+      <div className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-transparent to-background opacity-80 z-0"></div>
     </SectionContainer>
   )
 }

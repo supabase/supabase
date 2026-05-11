@@ -1,8 +1,9 @@
-import { useParams } from 'common'
-import { Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
-import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { Edit, MoreVertical, Plus, Power, PowerOff, Search, Trash, X } from 'lucide-react'
+import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -14,7 +15,9 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Table,
   TableBody,
   TableCell,
@@ -23,6 +26,7 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateOrUpdateCustomProviderSheet } from './CreateOrUpdateCustomProviderSheet'
@@ -33,15 +37,20 @@ import {
   getNextPlanForCustomProviders,
 } from './customProviders.utils'
 import { DeleteCustomProviderModal } from './DeleteCustomProviderModal'
+import { DisableCustomProviderModal } from './DisableCustomProviderModal'
 import AlertError from '@/components/ui/AlertError'
 import { FilterPopover } from '@/components/ui/FilterPopover'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useOAuthCustomProviderUpdateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
 import { useOAuthCustomProvidersQuery } from '@/data/oauth-custom-providers/oauth-custom-providers-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { toast } from 'sonner'
-import { Admonition } from 'ui-patterns/admonition'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const CUSTOM_PROVIDERS_SORT_VALUES = [
   'name:asc',
@@ -75,7 +84,7 @@ const NewProviderButton = ({
       disabled={!canCreateProvider}
       icon={<Plus />}
       onClick={() => setShowCreateSheet(true)}
-      className="flex-grow"
+      className="grow"
     >
       New Provider
     </Button>
@@ -87,6 +96,7 @@ export const CustomAuthProvidersList = () => {
 
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: authConfig, isPending: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
+  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
   const nextPlan = getNextPlanForCustomProviders(organization?.plan?.id)
   const isCustomProvidersEnabled = !!authConfig?.CUSTOM_OAUTH_ENABLED
   const providerLimit = authConfig?.CUSTOM_OAUTH_MAX_PROVIDERS || 0
@@ -102,6 +112,12 @@ export const CustomAuthProvidersList = () => {
     },
   })
 
+  const { mutate: updateCustomProvider } = useOAuthCustomProviderUpdateMutation({
+    onSuccess: () => {
+      toast.success('Custom provider enabled')
+    },
+  })
+
   const handleEnableCustomProviders = () => {
     if (projectRef) {
       updateAuthConfig({ projectRef, config: { CUSTOM_OAUTH_ENABLED: true } })
@@ -110,8 +126,10 @@ export const CustomAuthProvidersList = () => {
 
   const [selectedProviderToEdit, setSelectedProviderToEdit] = useState<string | null>(null)
   const [selectedProviderToDelete, setSelectedProviderToDelete] = useState<string | null>(null)
+  const [selectedProviderToDisable, setSelectedProviderToDisable] = useState<string | null>(null)
   const [filteredProviderTypes, setFilteredProviderTypes] = useState<string[]>([])
   const [filteredEnabledStatuses, setFilteredEnabledStatuses] = useState<string[]>([])
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const {
     data: customProviders,
@@ -149,6 +167,11 @@ export const CustomAuthProvidersList = () => {
   const providerToDelete = useMemo(
     () => customProviders?.find((p) => p.id === selectedProviderToDelete),
     [customProviders, selectedProviderToDelete]
+  )
+
+  const providerToDisable = useMemo(
+    () => customProviders?.find((p) => p.id === selectedProviderToDisable),
+    [customProviders, selectedProviderToDisable]
   )
 
   const filteredAndSortedCustomProviders = useMemo(() => {
@@ -194,6 +217,17 @@ export const CustomAuthProvidersList = () => {
     setFilteredProviderTypes([])
     setFilteredEnabledStatuses([])
   }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search custom providers' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, handleResetFilters)
 
   const handleSortChange = (column: CustomProvidersSortColumn) => {
     const [currentCol, currentOrder] = sort.split(':') as [
@@ -268,14 +302,19 @@ export const CustomAuthProvidersList = () => {
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-            <Input
-              placeholder="Search custom providers"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-            />
+            <InputGroup className="w-full lg:w-52">
+              <InputGroupInput
+                ref={searchInputRef}
+                size="tiny"
+                placeholder="Search custom providers"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+              />
+              <InputGroupAddon>
+                <Search />
+              </InputGroupAddon>
+            </InputGroup>
             <FilterPopover
               name="Provider Type"
               options={CUSTOM_PROVIDER_TYPE_OPTIONS}
@@ -349,10 +388,22 @@ export const CustomAuthProvidersList = () => {
                 </HoverCardContent>
               </HoverCard>
             ) : (
-              <NewProviderButton
-                canCreateProvider={canCreateProvider}
-                setShowCreateSheet={setShowCreateSheet}
-              />
+              <Shortcut
+                id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                label="Create new provider"
+                onTrigger={() => setShowCreateSheet(true)}
+                side="bottom"
+              >
+                <Button
+                  type="primary"
+                  disabled={!canCreateProvider}
+                  icon={<Plus />}
+                  onClick={() => setShowCreateSheet(true)}
+                  className="grow"
+                >
+                  New Provider
+                </Button>
+              </Shortcut>
             )}
           </div>
         </div>
@@ -387,7 +438,7 @@ export const CustomAuthProvidersList = () => {
                   </TableHead>
                   <TableHead>Enabled</TableHead>
                   <TableHead className="w-8 px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
+                    <div className="bg-200! px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -405,7 +456,7 @@ export const CustomAuthProvidersList = () => {
                       <TableCell className="flex" title={provider.name}>
                         <Button
                           type="text"
-                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
+                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:w-full!"
                           onClick={() => setSelectedProviderToEdit(provider.id)}
                           title={provider.name}
                         >
@@ -439,6 +490,30 @@ export const CustomAuthProvidersList = () => {
                                 <Edit size={12} />
                                 <p>Update</p>
                               </DropdownMenuItem>
+                              {provider.enabled ? (
+                                <DropdownMenuItem
+                                  className="space-x-2"
+                                  onClick={() => setSelectedProviderToDisable(provider.id)}
+                                >
+                                  <PowerOff size={12} />
+                                  <p>Disable</p>
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  className="space-x-2"
+                                  onClick={() =>
+                                    updateCustomProvider({
+                                      identifier: provider.identifier,
+                                      projectRef,
+                                      clientEndpoint,
+                                      enabled: true,
+                                    })
+                                  }
+                                >
+                                  <Power size={12} />
+                                  <p>Enable</p>
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => setSelectedProviderToDelete(provider.id)}
@@ -471,6 +546,12 @@ export const CustomAuthProvidersList = () => {
         visible={!!providerToDelete}
         selectedProvider={providerToDelete}
         onClose={() => setSelectedProviderToDelete(null)}
+      />
+
+      <DisableCustomProviderModal
+        visible={!!providerToDisable}
+        selectedProvider={providerToDisable}
+        onClose={() => setSelectedProviderToDisable(null)}
       />
     </>
   )

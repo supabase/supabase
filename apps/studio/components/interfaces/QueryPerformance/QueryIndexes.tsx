@@ -1,16 +1,4 @@
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
-import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import {
-  GetIndexAdvisorResultResponse,
-  useGetIndexAdvisorResult,
-} from 'data/database/retrieve-index-advisor-result-query'
-import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
@@ -22,12 +10,12 @@ import {
   AlertTitle_Shadcn_,
   Button,
   cn,
-  CodeBlock,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIndexInvalidation } from './hooks/useIndexInvalidation'
@@ -41,6 +29,18 @@ import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledSt
 import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 import { QueryPerformanceRow } from './QueryPerformance.types'
+import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import {
+  GetIndexAdvisorResultResponse,
+  useGetIndexAdvisorResult,
+} from '@/data/database/retrieve-index-advisor-result-query'
+import { useGetIndexesFromSelectQuery } from '@/data/database/retrieve-index-from-select-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface QueryIndexesProps {
   selectedRow: Pick<QueryPerformanceRow, 'query'>
@@ -81,7 +81,7 @@ export const QueryIndexes = ({
     query: selectedRow?.['query'],
   })
 
-  const { data: extensions, isPending: isLoadingExtensions } = useDatabaseExtensionsQuery({
+  const { isPending: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -175,7 +175,7 @@ export const QueryIndexes = ({
     return (
       <QueryPanelContainer className="h-full">
         <QueryPanelSection className="pt-2">
-          <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
+          <div className="border rounded-sm border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
             <p className="text-sm text-foreground-light">Enable Index Advisor</p>
             <p className="text-center text-xs text-foreground-lighter mb-2">
               Recommends indexes to improve query performance.
@@ -212,7 +212,7 @@ export const QueryIndexes = ({
                   language="sql"
                   className={cn(
                     'max-w-full max-h-[200px]',
-                    '!py-2 !px-2.5 prose dark:prose-dark',
+                    'py-2! px-2.5! prose dark:prose-dark',
                     '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                   )}
                 />
@@ -241,7 +241,7 @@ export const QueryIndexes = ({
         {isSuccess && (
           <div>
             {usedIndexes.length === 0 && (
-              <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
+              <div className="border rounded-sm border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
                 <p className="text-sm text-foreground-light">
                   No indexes are involved in this query
                 </p>
@@ -339,7 +339,7 @@ export const QueryIndexes = ({
                         language="sql"
                         className={cn(
                           'max-w-full max-h-[310px]',
-                          '!py-3 !px-3.5 prose dark:prose-dark transition',
+                          'py-3! px-3.5! prose dark:prose-dark transition',
                           '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                         )}
                       />
@@ -391,7 +391,7 @@ export const QueryIndexes = ({
               <h4 className="mb-2">FAQ</h4>
               <Accordion_Shadcn_ collapsible type="single" className="border rounded-md">
                 <AccordionItem_Shadcn_ value="1">
-                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
+                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition data-open:text-foreground">
                     What units are cost in?
                   </AccordionTrigger>
                   <AccordionContent_Shadcn_ className="px-4 text-foreground-light">
@@ -401,7 +401,7 @@ export const QueryIndexes = ({
                   </AccordionContent_Shadcn_>
                 </AccordionItem_Shadcn_>
                 <AccordionItem_Shadcn_ value="2" className="border-b-0">
-                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
+                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition data-open:text-foreground">
                     How should I prioritize start up and total cost?
                   </AccordionTrigger>
                   <AccordionContent_Shadcn_ className="px-4 text-foreground-light [&>div]:space-y-2">

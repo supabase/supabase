@@ -1,33 +1,16 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
-import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
-import { usePrefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useViewsQuery } from 'data/views/views-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { noop } from 'lodash'
 import { Check, Copy, Edit, Eye, Filter, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Button,
   Card,
-  Checkbox_Shadcn_,
+  Checkbox,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -53,6 +36,27 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { useForeignTablesQuery } from '@/data/foreign-tables/foreign-tables-query'
+import { useMaterializedViewsQuery } from '@/data/materialized-views/materialized-views-query'
+import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useViewsQuery } from '@/data/views/views-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface TableListProps {
   onAddTable: () => void
@@ -77,6 +81,8 @@ export const TableList = ({
 
   const [filterString, setFilterString] = useQueryState('search', parseAsString.withDefault(''))
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const { can: canUpdateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -187,6 +193,22 @@ export const TableList = ({
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
+  const canAddTables = canUpdateTables && !isSchemaLocked
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search tables' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setVisibleTypes(Object.values(ENTITY_TYPE))
+    setFilterString('')
+  })
+
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
   const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables
   const isLoading =
@@ -209,13 +231,22 @@ export const TableList = ({
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
         <div className="flex gap-2 items-center">
-          <SchemaSelector
-            className="flex-grow lg:flex-grow-0 w-[180px]"
-            size="tiny"
-            showError={false}
-            selectedSchemaName={selectedSchema}
-            onSelectSchema={setSelectedSchema}
-          />
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+            onTrigger={() => setSchemaSelectorOpen(true)}
+            side="bottom"
+            tooltipOpen={schemaSelectorOpen ? false : undefined}
+          >
+            <SchemaSelector
+              className="grow lg:grow-0 w-[180px]"
+              size="tiny"
+              showError={false}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
+              open={schemaSelectorOpen}
+              onOpenChange={setSchemaSelectorOpen}
+            />
+          </Shortcut>
           <Popover_Shadcn_>
             <PopoverTrigger_Shadcn_ asChild>
               <Button
@@ -232,7 +263,7 @@ export const TableList = ({
                   {Object.entries(ENTITY_TYPE).map(([key, value]) => (
                     <div key={key} className="group flex items-center justify-between py-0.5">
                       <div className="flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           id={key}
                           name={key}
                           checked={visibleTypes.includes(value)}
@@ -263,34 +294,45 @@ export const TableList = ({
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
         </div>
-        <div className="flex flex-grow justify-between gap-2 items-center">
+        <div className="flex grow justify-between gap-2 items-center">
           <Input
+            ref={searchInputRef}
             size="tiny"
-            className="flex-grow lg:flex-grow-0 w-52"
+            containerClassName="grow lg:grow-0 w-52"
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
             icon={<Search />}
           />
 
-          {!isSchemaLocked && (
-            <ButtonTooltip
-              className="w-auto ml-auto"
-              icon={<Plus />}
-              disabled={!canUpdateTables}
-              onClick={() => onAddTable()}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canUpdateTables
-                    ? 'You need additional permissions to create tables'
-                    : undefined,
-                },
-              }}
-            >
-              New table
-            </ButtonTooltip>
-          )}
+          {!isSchemaLocked &&
+            (canAddTables ? (
+              <Shortcut
+                id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                label="Create new table"
+                onTrigger={() => onAddTable()}
+                side="bottom"
+              >
+                <Button className="w-auto ml-auto" icon={<Plus />} onClick={() => onAddTable()}>
+                  New table
+                </Button>
+              </Shortcut>
+            ) : (
+              <ButtonTooltip
+                className="w-auto ml-auto"
+                icon={<Plus />}
+                disabled
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'You need additional permissions to create tables',
+                  },
+                }}
+              >
+                New table
+              </ButtonTooltip>
+            ))}
         </div>
       </div>
 
@@ -306,7 +348,7 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="w-0 !px-0" />
+                  <TableHead key="icon" className="w-0 px-0!" />
                   <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
                     Name
                   </TableHead>
@@ -367,7 +409,7 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="w-0 !pl-5 !pr-1">
+                        <TableCell className="w-0 pl-5! pr-1!">
                           <Tooltip>
                             <TooltipTrigger asChild className="cursor-default">
                               <div className="flex w-4 justify-center">

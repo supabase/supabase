@@ -26,10 +26,22 @@ export const examples: Registry = [
     files: ['example/admonition-button.tsx'],
   },
   {
+    name: 'admonition-description-only',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-description-only.tsx'],
+  },
+  {
     name: 'admonition-warning',
     type: 'components:example',
     registryDependencies: ['admonition'],
     files: ['example/admonition-warning.tsx'],
+  },
+  {
+    name: 'admonition-success',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-success.tsx'],
   },
   {
     name: 'admonition-destructive',
@@ -234,6 +246,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['calendar', 'form', 'popover'],
     files: ['example/calendar-form.tsx'],
+  },
+  {
+    name: 'single-value-field-array-demo',
+    type: 'components:example',
+    registryDependencies: ['button', 'form', 'input'],
+    files: ['example/single-value-field-array-demo.tsx'],
   },
   // {
   //   name: 'card-demo',
@@ -440,6 +458,18 @@ export const examples: Registry = [
     files: ['example/data-input-with-reveal-copy.tsx'],
   },
   {
+    name: 'data-input-with-reveal-copy-editable',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy-editable.tsx'],
+  },
+  {
+    name: 'data-input-with-reveal-copy-editable-empty',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy-editable-empty.tsx'],
+  },
+  {
     name: 'date-picker-demo',
     type: 'components:example',
     registryDependencies: ['button', 'calendar', 'popover'],
@@ -598,6 +628,23 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['input-otp', 'form'],
     files: ['example/input-otp-form.tsx'],
+  },
+  {
+    name: 'keyboard-shortcut-demo',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/keyboard-shortcut-demo.tsx'],
+  },
+  {
+    name: 'keyboard-shortcut-pill',
+    type: 'components:example',
+    files: ['example/keyboard-shortcut-pill.tsx'],
+  },
+  {
+    name: 'keyboard-shortcut-inline',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/keyboard-shortcut-inline.tsx'],
   },
   {
     name: 'label-demo',
@@ -1382,6 +1429,11 @@ export const examples: Registry = [
     name: 'multi-select-inline-search-input',
     type: 'components:example',
     files: ['example/multi-select-inline-search-input.tsx'],
+  },
+  {
+    name: 'multi-select-in-dialog',
+    type: 'components:example',
+    files: ['example/multi-select-in-dialog.tsx'],
   },
   {
     name: 'tree-view-demo',
