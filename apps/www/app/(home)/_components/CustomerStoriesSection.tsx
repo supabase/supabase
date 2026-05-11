@@ -33,7 +33,7 @@ const customerStories = [
     quote:
       "We could not have built this company without Supabase. If I had to go and build all these components myself, we wouldn't even have launched.",
     author: 'Thiago Peres, Founder & CTO, Rally',
-    authorImg: 'https://avatars.githubusercontent.com/u/914007?v=4',
+    authorImg: '/images/blog/avatars/thiago-peres-rally.jpeg',
     slug: 'rally',
     bgColor: 'color(display-p3 0.275 0.306 0.8)',
     bgGradient:
@@ -204,10 +204,13 @@ export function CustomerStoriesSection() {
                       </p>
                     </div>
                     <p
-                      className="text-xl font-normal leading-relaxed text-pretty"
-                      style={{ color: isDark ? '#222' : 'white' }}
+                      className="text-xl font-normal leading-snug text-pretty"
+                      style={{
+                        color: isDark ? '#222' : 'white',
+                        fontFamily: 'var(--font-heading)',
+                      }}
                     >
-                      "{story.quote}"
+                      {story.quote}
                     </p>
                     <div className="flex items-center gap-2 mb-4">
                       <img
@@ -304,10 +307,13 @@ export function CustomerStoriesSection() {
                   <motion.div layout className="flex flex-col gap-4 mt-auto">
                     <motion.p
                       layout
-                      className="text-xl font-normal leading-relaxed text-balance"
-                      style={{ color: isDark ? '#222' : 'white' }}
+                      className="text-2xl font-normal leading-snug text-balance"
+                      style={{
+                        color: isDark ? '#222' : 'white',
+                        fontFamily: 'var(--font-heading)',
+                      }}
                     >
-                      "{story.quote}"
+                      {story.quote}
                     </motion.p>
                     <motion.div layout className="flex items-center gap-2.5 mb-4">
                       <img
