@@ -42,7 +42,7 @@ export const FlyDeprecationBanner = () => {
   )
 
   const isExpired = Date.now() >= BANNER_EXPIRES_AT.getTime()
-  const onSignIn = router.pathname.includes('sign-in')
+  const onSignIn = router.pathname.startsWith('/sign-in')
 
   const shouldEvaluate = !isExpired && !onSignIn && isSuccess && !acknowledged
 
