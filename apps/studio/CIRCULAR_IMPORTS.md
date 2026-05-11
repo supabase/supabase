@@ -116,6 +116,49 @@ automatically. None known at the time of writing.
 above is approved, this row should be updated with the commit and the
 chunk-pin in `vite.config.ts` reverted in the same PR.
 
+### 2. `TypeError: e is not a function` in `folder-open-<hash>.js` — `ui` ↔ Lucide icon chunk cycle
+
+**Symptom.** Production runtime (Vercel deploy) shows a blank page and
+the console error:
+
+```
+Uncaught (in promise) TypeError: e is not a function
+    at folder-open-8foVFSby.js:1:45
+```
+
+Same shape for any other Lucide icon Rolldown happens to split into its
+own chunk (`folder-open`, `code`, `chevron-down`, …). The chunk does:
+
+```js
+import { wo as e } from "./ui-<hash>.js"
+var t = e("FolderOpen", [[...]])
+export { t }
+```
+
+— so `wo` is the exported `createLucideIcon` from the `ui` chunk, but
+the live binding is `undefined` when the icon chunk's top-level
+`createLucideIcon(...)` call runs.
+
+**Root cause.** Same shape as entry #1. `packages/ui` re-exports Lucide
+icons from its barrel, so the `ui` chunk transitively imports
+`lucide-react`. Rolldown then splits individual icons into per-icon
+chunks that import `createLucideIcon` _back_ from the `ui` chunk — a
+chunk-level cycle that leaves the binding undefined at evaluation time.
+The collision is observable in the `ui` chunk: it contains both
+`function O(...)` (Lucide's `createLucideIcon`) and unrelated `var O = …`
+redeclarations from minification, with `O as wo` in the export list.
+
+**Workaround.** `apps/studio/vite.config.ts` pins
+`node_modules/lucide-react/**` into a dedicated `lucide-react` chunk
+alongside the existing `class-variance-authority` pin. After the pin,
+the lucide chunk only imports from `rolldown-runtime` and the per-icon
+chunks disappear.
+
+**Real fix.** Same options as entry #1 — either restructure
+`packages/ui` so it doesn't re-export icons from its main barrel, or
+wait for a Rolldown chunker improvement that handles the cycle
+automatically.
+
 ## Empty rows
 
 (This section will fill up as we keep migrating. Add new entries above.)
