@@ -77,7 +77,7 @@ export const InputField = ({
                   ? 'EMPTY'
                   : `Default: ${field.defaultValue}`
             }
-            onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+            onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
           />
         </FormItemLayout>
       )
@@ -148,7 +148,7 @@ export const InputField = ({
             placeholder={field.defaultValue !== null ? `Default: ${field.defaultValue}` : 'NULL'}
             value={field.value ?? ''}
             disabled={!isEditable}
-            onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+            onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
           />
           <InputGroupAddon align="inline-end">
             {isEditable && (
@@ -209,7 +209,7 @@ export const InputField = ({
                   ? 'EMPTY'
                   : `Default: ${field.defaultValue === null ? 'NULL' : field.defaultValue}`
             }
-            onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+            onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
           />
           <InputGroupAddon align="block-end">
             <DropdownMenu>
@@ -272,7 +272,7 @@ export const InputField = ({
             value={field.value ?? ''}
             disabled={!isEditable || isTruncated}
             placeholder={!!field?.defaultValue ? `Default: ${field.defaultValue}` : 'NULL'}
-            onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+            onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton
@@ -302,7 +302,7 @@ export const InputField = ({
             {field.comment && <p>{field.comment}</p>}
           </>
         }
-        onChange={(value: any) => onUpdateField({ [field.name]: value })}
+        onChange={(value) => onUpdateField({ [field.name]: value })}
         disabled={!isEditable}
       />
     )
@@ -327,7 +327,7 @@ export const InputField = ({
       >
         <Select_Shadcn_
           value={defaultValue === null ? 'null' : defaultValue}
-          onValueChange={(value: string) => onUpdateField({ [field.name]: value })}
+          onValueChange={(value) => onUpdateField({ [field.name]: value })}
           disabled={!isEditable}
         >
           <SelectTrigger_Shadcn_>
@@ -367,7 +367,7 @@ export const InputField = ({
           value={field.value ?? ''}
           placeholder={`\\x`}
           disabled={!isEditable}
-          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+          onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
         />
       </FormItemLayout>
     )
@@ -401,7 +401,7 @@ export const InputField = ({
                 : 'NULL'
           }
           disabled={!isEditable || isTruncated}
-          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+          onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
         />
         <InputGroupAddon align="inline-end">
           {isTruncated ? (
