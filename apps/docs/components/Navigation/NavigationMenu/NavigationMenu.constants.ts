@@ -9,6 +9,7 @@ import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Naviga
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
   billingAll: billingEnabled,
+  docsAiTools: aiToolsEnabled,
   docsAuthArchitecture: authArchitectureEnabled,
   docsAuthConfiguration: authConfigurationEnabled,
   docsAuthFlows: authFlowsEnabled,
@@ -2290,32 +2291,30 @@ export const ai_tools: NavMenuConstant = {
   icon: 'ai-tools',
   title: 'AI Tools',
   url: '/guides/ai-tools',
-items: [    {
-      name: 'AI Tools',
-      url: undefined,
-      items: [
-        {
-          name: 'Supabase Agent Plugin',
-          url: '/guides/getting-started/plugins' as `/${string}`,
-        },
-        {
-          name: 'Prompts',
-          url: '/guides/getting-started/ai-prompts' as `/${string}`,
-        },
-        {
-          name: 'Agent Skills',
-          url: '/guides/getting-started/ai-skills' as `/${string}`,
-        },
-        {
-          name: 'Supabase MCP server',
-          url: '/guides/getting-started/mcp' as `/${string}`,
-        },
-        {
-          name: 'Deploy MCP servers',
-          url: '/guides/getting-started/byo-mcp' as `/${string}`,
-        },
-      ],
-    },]
+  enabled: aiToolsEnabled,
+  items: [
+    { name: 'Overview', url: '/guides/ai-tools' },
+    {
+      name: 'Supabase Agent Plugin',
+      url: '/guides/getting-started/plugins' as `/${string}`,
+    },
+    {
+      name: 'Prompts',
+      url: '/guides/getting-started/ai-prompts' as `/${string}`,
+    },
+    {
+      name: 'Agent Skills',
+      url: '/guides/getting-started/ai-skills' as `/${string}`,
+    },
+    {
+      name: 'Supabase MCP server',
+      url: '/guides/getting-started/mcp' as `/${string}`,
+    },
+    {
+      name: 'Deploy MCP servers',
+      url: '/guides/getting-started/byo-mcp' as `/${string}`,
+    },
+  ],
 }
 
 export const local_development: NavMenuConstant = {
