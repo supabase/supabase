@@ -324,6 +324,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Standalone (no shared shell)
 
+- [x] B `routes/index.tsx` — redirect-only root route. Mirrors the Next.js `redirects()` rules in `next.config.ts`: platform sends users to `/org` (or `/new/new-project` when deep-linked with `?next=new-project`), self-hosted sends them to `/project/default`. **Follow-up:** the redirect targets currently use `href` (full reload) because they were on the Next side when this was written; switch to `to` now that all of them live in the TanStack tree.
 - [x] A `routes/authorize.tsx` ← `pages/authorize.tsx` (APIAuthorizationLayout)
 - [x] A `routes/redeem.tsx` ← `pages/redeem.tsx` (RedeemCreditsLayout)
 - [x] A `routes/logout.tsx` ← `pages/logout.tsx`
@@ -349,15 +350,42 @@ NextApiRequest-shaped `req` and a proxy `res`.
 **Path conventions** — `pages/api/foo/[bar]/baz.ts` → `routes/api/foo/$bar/baz.ts`;
 `pages/api/foo/[[...slug]].ts` → `routes/api/foo/$.ts`.
 
-**Shim limitations** — body is buffered, not streamed. 3 routes need bespoke
-treatment instead:
+**Shim coverage.** The proxy `req` / `res` cover both the buffered and
+streaming patterns that pages-router handlers use:
 
-- `pages/api/mcp/index.ts` — `StreamableHTTPServerTransport.handleRequest` expects
-  Node req/res. Investigate whether the MCP SDK has a Web-fetch transport.
-- `pages/api/v1/projects/[ref]/functions/[slug]/body.ts` — pipes `fs.createReadStream`
-  into `res`. Rewrite with a Web `ReadableStream`.
-- `pages/api/ai/docs.ts` — already edge-runtime + Web `Response`. Direct re-export
-  as `GET`/`POST` handlers; no shim needed.
+- **Buffered responses** — `res.status`/`setHeader`/`json`/`send`/`write`/
+  `end` accumulate into a single `Response` body when the handler returns.
+- **Streaming responses** — `res.writeHead(status, headers?)` (or
+  `res.flushHeaders()`) flips the proxy into streaming mode: a Web
+  `ReadableStream` opens, buffered chunks flush into it, subsequent
+  `res.write(chunk)` enqueues live, `res.end()` closes it. `finalize()`
+  returns the `Response` while the handler keeps pushing chunks. This is
+  what makes `result.pipeUIMessageStreamToResponse(res, …)` (AI SDK)
+  stream token-by-token to the browser.
+- **Client abort** — Web `Request.signal` is plumbed through as
+  `req.on('close' | 'aborted', …)`. AI handlers that wire
+  `abortController.abort()` off those events keep working.
+- **EventEmitter surface** — `req.on`/`once`/`off`/`emit` (events `close`
+  / `aborted` are real; other names accepted but no-op). `res.on`/etc.
+  are no-op stubs so pipe helpers attaching `drain`/`close`/`error`
+  listeners don't crash.
+- **Body parsing** — JSON and `application/x-www-form-urlencoded` parsed
+  to `req.body`; everything else is the raw text. Multipart inbound is
+  not implemented — no studio handler reads multipart in.
+
+Two routes still bypass the shim because they're easier to write
+Web-natively from scratch:
+
+- `routes/api/v1/projects/$ref/functions/$slug/body.ts` — multipart
+  streaming OUT (artifact download). Builds the `Response` body as a
+  `ReadableStream`; each artifact file converts via
+  `Readable.toWeb(createReadStream(...))` and pulls chunk-by-chunk into
+  the stream.
+- `routes/api/mcp/index.ts` — uses MCP SDK's
+  `WebStandardStreamableHTTPServerTransport` (`handleRequest(request)`
+  returns a `Response` directly).
+- `pages/api/ai/docs.ts` was already edge-runtime / Web-Response native
+  — direct re-export, no shim involved.
 
 Tracking below is coarse — each bullet is a `pages/api/**` subtree. Check off
 once every file in the subtree has a `routes/api/**` counterpart. Expand into
@@ -381,10 +409,106 @@ per-file items only when a subtree has special cases.
 
 ---
 
+## Compat shim surface (`compat/next/`)
+
+The Next compat shims stay alive as long as any `pages/...` file is
+load-bearing. Listed here so the cleanup PR knows what to delete /
+inline.
+
+- `router.ts` — `useRouter()` for hook callers (TanStack `useRouter` +
+  `useLocation` + `useMatches` + `useParams` + `useSearch` glued
+  together), plus a `default` export (`SingletonRouter` shape) for the
+  one module-scope `import router from 'next/router'` consumer
+  (Support/DiscordCTACard) that reads `router.basePath` outside React.
+  `router.pathname` strips the trailing slash TanStack appends to index
+  routes (without it, `router.pathname.split('/')[3]` returns `''`
+  instead of `undefined` for index pages and the project sidebar's
+  active-route check breaks).
+- `_router-events.ts` — adapts `router.events.on(event, handler)` onto
+  `router.subscribe(tsEvent, …)`. Forwards Next's `(url, { shallow })`
+  args. Maps `routeChangeStart` / `routeChangeComplete` /
+  `beforeHistoryChange` / `hashChangeStart` / `hashChangeComplete`.
+  **Known gap:** Next's throw-from-`routeChangeStart`-to-cancel pattern
+  isn't supportable — `subscribe` is fire-and-forget.
+  `usePreventNavigationOnUnsavedChanges` relies on it and needs
+  migrating to TanStack's `useBlocker` separately.
+- `api.ts` — `toWebHandler(nextHandler)`. See **API routes → Shim
+  coverage** above.
+- `link.tsx`, `navigation.ts`, `dynamic.tsx`, `image.tsx`,
+  `legacy/image.tsx`, `script.tsx`, `head.tsx`, `server.ts` — comprehensive
+  drop-in replacements for the `next/*` modules studio imports. All
+  bundled via `vite.config.ts`'s `nextCompat()` plugin (alias) +
+  `ssr.noExternal: [/^next(\/|$)/]` so the shims always win over the
+  real Next packages.
+
+---
+
+## Build / bundler workarounds
+
+`vite.config.ts` carries two classes of build-time guard that exist
+purely because of how Rolldown chunks our specific dependency graph.
+They should be revisited (and ideally lifted) once the migration is
+done.
+
+### `manualChunks` pins
+
+Pin shared library code into dedicated chunks so per-component chunks
+can't import from a chunk that (transitively) imports them back —
+chunk-level cycles surface in the browser as
+`TypeError: <name> is not a function` at module-load time.
+
+- `class-variance-authority` — entry #1 in CIRCULAR_IMPORTS.md.
+- `lucide-react` — keeps Lucide icons from being per-icon-split into
+  chunks that import `createLucideIcon` back from the `ui` chunk
+  (`folder-open-<hash>.js` was the canary).
+- `react-vendor` (react + react-dom + scheduler + jsx-runtime) — pinned
+  before `lucide-react` so Rolldown doesn't suck React into the
+  lucide chunk for CJS interop and shift live-bindings across the rest
+  of the graph (`Alert-<hash>.js` was the canary).
+
+All three are documented in `CIRCULAR_IMPORTS.md` — slated for a
+follow-up structural fix in `packages/ui` so the pins can be lifted.
+
+### `assertNoChunkCycles` build plugin
+
+Vite plugin that runs Tarjan's SCC on the emitted chunk graph in
+`generateBundle` and fails the build if any unknown chunk cycle exists.
+The pre-existing CVA cycle is allowlisted by chunk basename
+(`KNOWN_CHUNK_CYCLES` constant) so the build still passes; any **new**
+cycle blocks the build with a message pointing at CIRCULAR_IMPORTS.md.
+
+Keep this plugin even after migration — it's not a Next-related shim,
+it's general protection against this entire class of bug. Just clear
+the allowlist when the underlying cycle is gone.
+
+### Other build-side migration changes
+
+- `pnpm-workspace.yaml` catalog now includes `@tanstack/react-router`,
+  `@tanstack/react-start`, `@tanstack/react-table` so studio and
+  ui-library stay aligned. `react-query` is **not** in the catalog yet
+  — three consumers (studio, docs, ui-library) sit on different 5.x
+  ranges and unifying them is a separate decision.
+- `NODE_OPTIONS=--max-old-space-size=8192` is set on the studio
+  `dev` script — Vite's Rolldown-RC frontend hits the default 4 GB
+  ceiling when chewing through studio's module graph in watch mode.
+
+---
+
 ## Deferred / revisit
 
 - ~~`pages/org/_/[[...routeSlug]].tsx`~~ landed as `routes/org.[_].tsx` + `routes/org.[_].$.tsx`. **Naming delta:** path-as-filename form (not `routes/org/[_]/index.tsx`) because the index-file form trips a router-generator bug at `getRouteNodes.js:132` — when an `index.tsx` has a bracket-escaped _parent_ segment, `originalRoutePath` gets wiped wholesale and the escape info is lost, so `_` gets stripped as pathless. The path-as-filename form keeps the last segment non-index and avoids the bug branch entirely. Next page accepts either Next-style `routeSlug` (string[]) or TanStack-style `_splat` (string) and normalises to the array shape.
 - ~~`pages/project/_/[[...routeSlug]].tsx`~~ landed as `routes/project.[_].tsx` + `routes/project.[_].$.tsx`. Same naming-delta rationale as the org catch-alls above.
-- Remove `RouteValidationWrapper` + `next/router` compat shim once no page under `pages/` remains
-- Remove `compat/next/` directory entirely once all Next imports are gone from workspace source
-- Delete this file
+
+### Cleanup checklist (after every `pages/...` file is gone)
+
+- Switch `routes/index.tsx` redirects from `href` to `to` — all targets
+  now live in the TanStack tree.
+- Migrate `usePreventNavigationOnUnsavedChanges` from `router.events.on('routeChangeStart', …)` (throw-to-cancel pattern) to TanStack's `useBlocker`.
+- Drop the `_splat` / `routeSlug` normalisation block from
+  `pages/org/_/[[...routeSlug]].tsx` + `pages/project/_/[[...routeSlug]].tsx` (only there to keep both runtimes mounting the same body).
+- Remove `RouteValidationWrapper` + `next/router` compat shim usage from `__root.tsx`.
+- Remove `compat/next/` directory entirely once no `next/*` import remains in workspace source.
+- Lift `manualChunks` pins (`class-variance-authority`, `lucide-react`, `react-vendor`) once the structural fix in `packages/ui` lands — see CIRCULAR_IMPORTS.md. Keep `assertNoChunkCycles`; just clear `KNOWN_CHUNK_CYCLES`.
+- Delete `pages/_app.tsx`, `pages/_document.tsx`, `pages/_error.jsx`, `pages/500.tsx`, `pages/404.tsx` (Next-only catch-alls; TanStack equivalents on `__root.tsx`).
+- Drop the `dev:next` / `build:next` / `start:next` scripts from `apps/studio/package.json` once we're committed to TanStack.
+- Delete this file.
