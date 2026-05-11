@@ -36,6 +36,7 @@ import {
 } from './useIsETLPrivateAlpha'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
@@ -44,6 +45,8 @@ import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
@@ -65,6 +68,7 @@ export const Destinations = () => {
           : null
 
   const prefetchedRef = useRef(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
   const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
@@ -143,6 +147,17 @@ export const Destinations = () => {
     setDestinationType(newDestinationDefaultType)
   }
 
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search destinations' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
+
   useEffect(() => {
     if (
       projectRef &&
@@ -190,6 +205,7 @@ export const Destinations = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Input
+              ref={searchInputRef}
               placeholder="Filter destinations"
               size="tiny"
               icon={<Search />}
@@ -209,14 +225,22 @@ export const Destinations = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            <Button
-              type="default"
-              icon={<Plus />}
-              disabled={!newDestinationDefaultType}
-              onClick={openDestinationPanel}
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Add destination"
+              onTrigger={openDestinationPanel}
+              options={{ enabled: !!newDestinationDefaultType }}
+              side="bottom"
             >
-              Add destination
-            </Button>
+              <Button
+                type="default"
+                icon={<Plus />}
+                disabled={!newDestinationDefaultType}
+                onClick={openDestinationPanel}
+              >
+                Add destination
+              </Button>
+            </Shortcut>
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
             {canDisableExternalReplication && (
               <DropdownMenu>

@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -14,12 +14,16 @@ import { RoleRowSkeleton } from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { useDatabaseRoleDeleteMutation } from '@/data/database-roles/database-role-delete-mutation'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
@@ -28,11 +32,26 @@ export const RolesList = () => {
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'roles'
   )
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search roles' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+    setFilterType('all')
+  })
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -107,12 +126,14 @@ export const RolesList = () => {
       <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center space-x-4">
           <Input
+            ref={searchInputRef}
             size="tiny"
             className="w-52"
             placeholder="Search for a role"
             icon={<Search />}
             value={filterString}
             onChange={(event) => setFilterString(event.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
             actions={
               filterString && (
                 <Button
@@ -191,22 +212,36 @@ export const RolesList = () => {
               ))}
             </TooltipContent>
           </Tooltip>
-          <ButtonTooltip
-            type="primary"
-            disabled={!canUpdateRoles}
-            icon={<Plus size={12} />}
-            onClick={() => setIsCreatingRole(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canUpdateRoles
-                  ? 'You need additional permissions to add a new role'
-                  : undefined,
-              },
-            }}
-          >
-            Add role
-          </ButtonTooltip>
+          {canUpdateRoles ? (
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Add new role"
+              onTrigger={() => setIsCreatingRole(true)}
+              side="bottom"
+            >
+              <Button
+                type="primary"
+                icon={<Plus size={12} />}
+                onClick={() => setIsCreatingRole(true)}
+              >
+                Add role
+              </Button>
+            </Shortcut>
+          ) : (
+            <ButtonTooltip
+              type="primary"
+              disabled
+              icon={<Plus size={12} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to add a new role',
+                },
+              }}
+            >
+              Add role
+            </ButtonTooltip>
+          )}
         </div>
       </div>
 

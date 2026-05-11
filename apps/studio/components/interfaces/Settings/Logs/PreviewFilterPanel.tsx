@@ -3,7 +3,17 @@ import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, cn, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  cn,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import {
   FILTER_OPTIONS,
@@ -14,7 +24,6 @@ import {
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
@@ -108,45 +117,52 @@ const PreviewFilterPanel = ({
             handleInputSearch(search)
           }}
         >
-          <Input
-            className="w-60"
-            size="tiny"
-            placeholder="Search events"
-            onChange={(e) => setSearch(e.target.value)}
-            onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-              setSearch(e.target.value)
-              handleInputSearch(e.target.value)
-            }}
-            icon={
-              <div className="text-foreground-lighter">
-                <Search size={14} />
-              </div>
-            }
-            value={search}
-            actions={
-              <div className="flex items-center gap-x-1 mr-0.5">
+          <InputGroup className="w-60">
+            <InputGroupInput
+              size="tiny"
+              placeholder="Search events"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                setSearch(e.target.value)
+                handleInputSearch(e.target.value)
+              }}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            <InputGroupAddon align="inline-end">
+              <div className="flex items-center gap-x-1">
                 {hasEdits && (
-                  <ButtonTooltip
-                    icon={<span>↲</span>}
-                    type="text"
-                    className="px-1 h-[20px]"
-                    onClick={() => handleInputSearch(search)}
-                    tooltip={{ content: { side: 'bottom', text: 'Search for events' } }}
-                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InputGroupButton type="text" onClick={() => handleInputSearch(search)}>
+                        <span>↲</span>
+                      </InputGroupButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Search for events</TooltipContent>
+                  </Tooltip>
                 )}
 
                 {search.length > 0 && (
-                  <ButtonTooltip
-                    icon={<X />}
-                    type="text"
-                    className="p-px h-[20px]"
-                    onClick={() => handleInputSearch('')}
-                    tooltip={{ content: { side: 'bottom', text: 'Clear search' } }}
-                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InputGroupButton
+                        type="text"
+                        onClick={() => {
+                          setSearch('')
+                          handleInputSearch('')
+                        }}
+                      >
+                        <X />
+                      </InputGroupButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Clear search</TooltipContent>
+                  </Tooltip>
                 )}
               </div>
-            }
-          />
+            </InputGroupAddon>
+          </InputGroup>
         </form>
 
         <Tooltip>
@@ -158,14 +174,11 @@ const PreviewFilterPanel = ({
               icon={
                 <div className="relative">
                   {newCount > 0 && (
-                    <div className="absolute -top-3 right-3 flex items-center justify-center">
-                      <div className="absolute z-20">
-                        <p style={{ fontSize: '0.6rem' }} className="text-white">
-                          {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                        </p>
+                    <div className="absolute -top-3 -right-3 flex items-center justify-center">
+                      <div className="absolute h-4 w-4 animate-ping rounded-full bg-brand opacity-60"></div>
+                      <div className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-medium leading-none text-white">
+                        {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                       </div>
-                      <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
-                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
                     </div>
                   )}
                   <RefreshCw />

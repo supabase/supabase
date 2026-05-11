@@ -5,7 +5,7 @@ import { IS_TEST_ENV } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 /**
- * Controls the default state of the "Automatically expose new tables and functions"
+ * Controls the default state of the "Automatically expose new tables"
  * checkbox at project creation. When the flag is on, the checkbox defaults
  * to unchecked (i.e. revoke SQL runs). When off/absent, the checkbox defaults
  * to checked (current behaviour — default grants remain).

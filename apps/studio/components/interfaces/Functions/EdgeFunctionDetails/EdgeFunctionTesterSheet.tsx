@@ -81,7 +81,18 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>
 
-export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
+export const EdgeFunctionTesterSheet = (props: EdgeFunctionTesterSheetProps) => {
+  const { ref: projectRef } = useParams()
+
+  // [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users.
+  return (
+    <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
+      <EdgeFunctionTesterSheetContent {...props} />
+    </RoleImpersonationStateContextProvider>
+  )
+}
+
+const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { ref: projectRef, functionSlug } = useParams()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
@@ -446,15 +457,10 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                {/* [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users. */}
-                <RoleImpersonationStateContextProvider
-                  key={`role-impersonation-state-${projectRef}`}
-                >
-                  <RoleImpersonationPopover
-                    disallowAuthenticatedOption
-                    header="Run edge function as a role"
-                  />
-                </RoleImpersonationStateContextProvider>
+                <RoleImpersonationPopover
+                  disallowAuthenticatedOption
+                  header="Run edge function as a role"
+                />
                 <Button
                   type="primary"
                   htmlType="submit"

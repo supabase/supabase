@@ -24,37 +24,40 @@ function debug(message: string, data?: unknown) {
 }
 
 function buildCrmConfig(crm: GoFormCrmConfig): CRMConfig {
-  const hubspotPortalId = process.env.HUBSPOT_PORTAL_ID
-  const customerioSiteId = process.env.CUSTOMERIO_SITE_ID
-  const customerioApiKey = process.env.CUSTOMERIO_API_KEY
+  const config: CRMConfig = {}
 
-  if (crm.hubspot && crm.customerio) {
+  if (crm.hubspot) {
+    const hubspotPortalId = process.env.HUBSPOT_PORTAL_ID
     if (!hubspotPortalId) throw new Error('HUBSPOT_PORTAL_ID env var is not set')
+    config.hubspot = { portalId: hubspotPortalId, formGuid: crm.hubspot.formGuid }
+  }
+
+  if (crm.customerio) {
+    const customerioSiteId = process.env.CUSTOMERIO_SITE_ID
+    const customerioApiKey = process.env.CUSTOMERIO_API_KEY
     if (!customerioSiteId) throw new Error('CUSTOMERIO_SITE_ID env var is not set')
     if (!customerioApiKey) throw new Error('CUSTOMERIO_API_KEY env var is not set')
-    return {
-      hubspot: { portalId: hubspotPortalId, formGuid: crm.hubspot.formGuid },
-      customerio: { siteId: customerioSiteId, apiKey: customerioApiKey },
-    }
+    config.customerio = { siteId: customerioSiteId, apiKey: customerioApiKey }
   }
-  if (crm.hubspot) {
-    if (!hubspotPortalId) throw new Error('HUBSPOT_PORTAL_ID env var is not set')
-    return { hubspot: { portalId: hubspotPortalId, formGuid: crm.hubspot.formGuid } }
+
+  if (crm.notion) {
+    const notionApiKey = process.env.NOTION_FORMS_API_KEY
+    if (!notionApiKey) throw new Error('NOTION_FORMS_API_KEY env var is not set')
+    config.notion = { apiKey: notionApiKey }
   }
-  // customerio only (guaranteed by schema refinement that at least one exists)
-  if (!customerioSiteId) throw new Error('CUSTOMERIO_SITE_ID env var is not set')
-  if (!customerioApiKey) throw new Error('CUSTOMERIO_API_KEY env var is not set')
-  return { customerio: { siteId: customerioSiteId, apiKey: customerioApiKey } }
+
+  return config
 }
 
 /**
- * Submit form values to the configured CRM providers (HubSpot and/or Customer.io).
+ * Submit form values to the configured CRM providers (HubSpot, Customer.io, Notion).
  *
  * Credentials are read from environment variables:
  *   - HubSpot:     HUBSPOT_PORTAL_ID
  *   - Customer.io: CUSTOMERIO_SITE_ID, CUSTOMERIO_API_KEY
+ *   - Notion:      NOTION_FORMS_API_KEY
  *
- * Per-form config (formGuid, event name, field mappings) lives in the page definition.
+ * Per-form config (formGuid, event name, database_id, field mappings) lives in the page definition.
  */
 export async function submitFormAction(
   crm: GoFormCrmConfig,
@@ -85,6 +88,7 @@ export async function submitFormAction(
         providers: Object.keys(crmConfig),
         hubspot: crm.hubspot ? { formGuid: crm.hubspot.formGuid } : undefined,
         customerio: crm.customerio ? { event: crm.customerio.event } : undefined,
+        notion: crm.notion ? { database_id: crm.notion.database_id } : undefined,
       })
       client = new CRMClient(crmConfig)
     } catch (err: any) {
@@ -122,9 +126,24 @@ export async function submitFormAction(
       })
     }
 
-    // submitEvent is typed via generics — cast to any to avoid fighting the conditional types
-    // (the runtime behavior is correct: CRMClient checks which clients are configured)
-    const { errors } = await (client as CRMClient).submitEvent({
+    // Build Notion page properties: map form fields via columnMap, then merge staticProperties
+    let notion: { databaseId: string; properties: Record<string, unknown> } | undefined
+    if (crm.notion) {
+      const columnMap = crm.notion.columnMap ?? {}
+      const properties: Record<string, unknown> = {}
+      for (const [formField, columnName] of Object.entries(columnMap)) {
+        if (formField in values) {
+          properties[columnName] = values[formField]
+        }
+      }
+      if (crm.notion.staticProperties) {
+        Object.assign(properties, crm.notion.staticProperties)
+      }
+      notion = { databaseId: crm.notion.database_id, properties }
+      debug('Notion payload', { databaseId: crm.notion.database_id, properties })
+    }
+
+    const { errors } = await client.submitEvent({
       email,
       hubspotFields,
       context,
@@ -134,7 +153,8 @@ export async function submitFormAction(
         ? { ...(values as Record<string, unknown>), ...crm.customerio.staticProperties }
         : undefined,
       customerioProfile,
-    } as any)
+      notion,
+    })
 
     if (errors.length > 0) {
       debug(

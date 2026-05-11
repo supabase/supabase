@@ -1,4 +1,3 @@
-import { type PostgresPolicy } from '@supabase/postgres-meta'
 import { Check, ChevronDown, Edit, X } from 'lucide-react'
 import { useMemo } from 'react'
 import {
@@ -9,13 +8,14 @@ import {
   WarningIcon,
 } from 'ui'
 
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface RLSTableCardProps {
   table: { schema: string; name: string; isRLSEnabled: boolean }
   role?: string
-  policies: PostgresPolicy[]
-  handleSelectEditPolicy: (policy: PostgresPolicy) => void
+  policies: Policy[]
+  handleSelectEditPolicy: (policy: Policy) => void
 }
 
 export const RLSTableCard = ({
@@ -157,8 +157,8 @@ const TableAccessPolicySummary = ({
   policies,
   handleSelectEditPolicy,
 }: {
-  policies: PostgresPolicy[]
-  handleSelectEditPolicy: (policy: PostgresPolicy) => void
+  policies: Policy[]
+  handleSelectEditPolicy: (policy: Policy) => void
 }) => {
   return (
     <div className="border rounded-sm mt-4">

@@ -148,8 +148,13 @@ const MessagesTable = ({
     <>
       <section className="flex w-full flex-col md:max-h-[calc(100vh-var(--header-height)-3rem)]">
         <ShimmerLine active={enabled} />
-        <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
-          <div className="flex grow flex-col">
+        <div
+          className={cn(
+            'grid grid-rows-2 grid-cols-1 lg:flex h-full lg:flex-row',
+            enabled ? 'border-brand-400' : null
+          )}
+        >
+          <div className="flex grow flex-col lg:w-1/2">
             {enabled && (
               <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
                 <div className="inline-flex gap-2.5 text-xs">
@@ -224,7 +229,8 @@ const MessagesTable = ({
               }}
             />
           </div>
-          <div className="flex w-1/2 flex-col">
+
+          <div className="flex lg:w-1/2 flex-col">
             <MessageSelection onClose={() => setFocusedLog(null)} log={focusedLog} />
           </div>
         </div>

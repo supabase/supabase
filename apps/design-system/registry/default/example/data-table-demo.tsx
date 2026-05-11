@@ -24,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
+  Input_Shadcn_ as Input,
   Table,
   TableBody,
   TableCell,
@@ -196,7 +196,7 @@ export default function DataTableDemo() {
           placeholder="Filter by email"
           value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
           onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
-          className="max-w-sm"
+          className="max-w-xs"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

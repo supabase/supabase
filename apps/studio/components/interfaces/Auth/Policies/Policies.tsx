@@ -1,4 +1,3 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { isEmpty } from 'lodash'
 import Link from 'next/link'
@@ -11,6 +10,7 @@ import {
   PolicyTableRow,
   PolicyTableRowProps,
 } from '@/components/interfaces/Auth/Policies/PolicyTableRow'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
@@ -25,7 +25,7 @@ interface PoliciesProps {
   isLocked: boolean
   visibleTableIds: Set<number>
   onSelectCreatePolicy: (table: string) => void
-  onSelectEditPolicy: (policy: PostgresPolicy) => void
+  onSelectEditPolicy: (policy: Policy) => void
   onResetSearch?: () => void
 }
 
@@ -83,13 +83,13 @@ export const Policies = ({
   )
 
   const onSelectEditPolicy = useCallback(
-    (policy: PostgresPolicy) => {
+    (policy: Policy) => {
       onSelectEditPolicyAI(policy)
     },
     [onSelectEditPolicyAI]
   )
 
-  const onSelectDeletePolicy = useCallback((policy: PostgresPolicy) => {
+  const onSelectDeletePolicy = useCallback((policy: Policy) => {
     setSelectedPolicyToDelete(policy)
   }, [])
 
