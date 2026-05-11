@@ -9,7 +9,6 @@ import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Naviga
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
   billingAll: billingEnabled,
-  docsAiTools: aiToolsEnabled,
   docsAuthArchitecture: authArchitectureEnabled,
   docsAuthConfiguration: authConfigurationEnabled,
   docsAuthFlows: authFlowsEnabled,
@@ -58,6 +57,8 @@ const {
   'sdk:python',
   'sdk:swift',
 ])
+
+const aiToolsEnabled = true
 
 const jsOnly =
   !sdkCsharpEnabled && !sdkDartEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
