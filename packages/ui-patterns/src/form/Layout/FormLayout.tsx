@@ -303,10 +303,7 @@ export const FormLayout = React.forwardRef<
           data-formlayout-id="message"
         />
       ) : error && !hideMessage ? (
-        <p
-          className={cn('mt-2 text-sm text-destructive', layout === 'flex-row-reverse' && 'mt-0')}
-          {...props}
-        >
+        <p className={cn('mt-2 text-sm text-destructive', layout === 'flex-row-reverse' && 'mt-0')}>
           {error}
         </p>
       ) : null
