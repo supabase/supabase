@@ -79,7 +79,10 @@ describe(`EditSecretModal`, () => {
 
     await screen.findByRole(`dialog`)
 
-    const nameInput = screen.getByLabelText(`Name`)
+    // The decrypted-value query resolves on a separate render tick from the
+    // vault list query that opens the dialog. Wait for the form fields to
+    // replace the skeleton before reading them.
+    const nameInput = await screen.findByLabelText(`Name`)
     const descriptionInput = screen.getByLabelText(`Description`)
     const valueInput = screen.getByLabelText(`Secret value`)
     const togglePasswordButton = screen.getByRole(`button`, { name: `Show secret value` })
