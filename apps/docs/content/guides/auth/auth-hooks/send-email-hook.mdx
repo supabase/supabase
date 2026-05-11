@@ -642,8 +642,8 @@ supabase functions deploy send-email --no-verify-jwt
 Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver internationalized email templates to best support local users in their native language. Ensure that you have configured `POSTMARK_SERVER_TOKEN` and `SEND_EMAIL_HOOK_SECRET` in your `.env` file.
 
 ```javascript
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 const postmarkEndpoint = 'https://api.postmarkapp.com/email'
 // Replace this with your email
@@ -741,8 +741,8 @@ Deno.serve(async (req) => {
     .replace('{{token}}', email_data.token || '')
     .replace('{{new_token}}', email_data.new_token || '')
     .replace('{{site_url}}', email_data.site_url || '')
-    .replace('{{old_email}}', email_data.email || '')
-    .replace('{{new_email}}', email_data.new_email || '')
+    .replace('{{old_email}}', email_data.old_email || '')
+    .replace('{{new_email}}', user.new_email || '')
 
   const requestOptions = {
     method: 'POST',
@@ -843,8 +843,8 @@ async function sendEmailWithPostmark(user: any, email_data: any, serverToken: st
         .replace('{{token}}', email_data.token || '')
         .replace('{{new_token}}', email_data.new_token || '')
         .replace('{{site_url}}', email_data.site_url || '')
-        .replace('{{old_email}}', email_data.email || '')
-        .replace('{{new_email}}', email_data.new_email || '');
+        .replace('{{old_email}}', email_data.old_email || '')
+        .replace('{{new_email}}', user.new_email || '');
 
     const requestOptions = {
         method: 'POST',
@@ -872,8 +872,8 @@ async function sendEmailWithSendGrid(user: any, email_data: any, apiKey: string)
         .replace('{{token}}', email_data.token || '')
         .replace('{{new_token}}', email_data.new_token || '')
         .replace('{{site_url}}', email_data.site_url || '')
-        .replace('{{old_email}}', email_data.email || '')
-        .replace('{{new_email}}', email_data.new_email || '');
+        .replace('{{old_email}}', email_data.old_email || '')
+        .replace('{{new_email}}', user.new_email || '');
 
     const requestOptions = {
         method: 'POST',
