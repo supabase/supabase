@@ -1,7 +1,6 @@
 import * as z from 'zod'
 
 import type { AuthTemplate, TemplateVariable, TemplateVariableName } from './EmailTemplates.types'
-import { InlineLink } from '@/components/ui/InlineLink'
 
 const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
   ConfirmationURL: {
