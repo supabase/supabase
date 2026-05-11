@@ -128,7 +128,7 @@ function IntegrationPartnersPage(props: Props) {
                       <button
                         key={category.slug}
                         onClick={() => router.push(`#${category.slug}`)}
-                        className="text-foreground-light block text-base"
+                        className="text-foreground-light block text-base cursor-pointer"
                       >
                         {category.name}
                       </button>
