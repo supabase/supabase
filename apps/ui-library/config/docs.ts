@@ -93,6 +93,7 @@ export const componentPages: SidebarNavGroup = {
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
       href: '/docs/nextjs/realtime-monaco',
       items: [],
+      new: true,
       commandItemLabel: 'Realtime Monaco',
     },
     {
@@ -100,6 +101,7 @@ export const componentPages: SidebarNavGroup = {
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
       href: '/docs/nextjs/realtime-flow',
       items: [],
+      new: true,
       commandItemLabel: 'Realtime Flow',
     },
     {

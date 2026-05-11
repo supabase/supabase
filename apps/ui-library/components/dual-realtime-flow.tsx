@@ -9,10 +9,6 @@ export function DualRealtimeFlow() {
         <BlockPreview name="realtime-flow-demo" isPair />
         <BlockPreview name="realtime-flow-demo" isPair />
       </div>
-      <div className="flex flex-row -space-x-px w-full">
-        <BlockPreview name="realtime-flow-demo-2" isPair />
-        <BlockPreview name="realtime-flow-demo-2" isPair />
-      </div>
     </>
   )
 }
