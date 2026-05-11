@@ -17,7 +17,7 @@ toc_depth: 2
 
 Today we're releasing `@supabase/server` in public beta.
 
-This is a new package that handles auth verification, client setup, request context, and common server-side boilerplate for you. It works across Edge Functions, Cloudflare Workers, Hono and Bun.
+This is a new package that handles auth verification, client setup, request context, and common server-side boilerplate for you. It works across Edge Functions, Vercel Functions, Cloudflare Workers, Hono and Bun.
 
 We anonymously analyzed 25,000 deployed Edge Functions and saw the same pattern everywhere: developers were rebuilding the same setup code over and over just to get to their actual business logic.
 
@@ -199,15 +199,17 @@ Now you get support for the new auth keys without manual JWT verification. Delet
 
 `withSupabase` returns a standard `(Request) => Promise<Response>` handler. It works with any runtime that supports the Web API pattern.
 
-Edge Functions and Cloudflare Workers:
+Edge Functions, Vercel Functions, and Cloudflare Workers:
 
 ```typescript
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from '@supabase/server'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, handler),
 }
 ```
+
+> On Edge Functions, declare the dependency in `deno.json` to import `@supabase/server` from `npm:@supabase/server`.
 
 Hono (with the included adapter):
 
@@ -286,9 +288,15 @@ No. `@supabase/ssr` handles cookie-based session management for frameworks like 
 
 If you would like to adopt the DX that this package provides, check our [SSR frameworks](https://github.com/supabase/server/blob/main/docs/ssr-frameworks.md) documentation for implementation references.
 
-**Does this only support Hono?**
+**Which runtimes does this support?**
 
-No. `withSupabase` works with any runtime that supports the standard `Request`/`Response` Web API: Edge Functions, Cloudflare Workers, Bun, and more. Hono was the first framework adapter we shipped, and we have already merged a community PR for the H3 adapter. We expect to accept more community-contributed adapters.
+Any runtime or platform that supports the standard `Request`/`Response` Web API. `withSupabase` returns a standard `(Request) => Promise<Response>` handler, so it works on Supabase Edge Functions, Vercel Functions, Cloudflare Workers, Bun, Deno and more.
+
+**Is Hono the only supported framework?**
+
+No. Hono was the first framework adapter we shipped, and we have already merged a community PR for the H3 adapter. We expect to accept more community-contributed adapters.
+
+See more in our adapters [documentation](https://github.com/supabase/server/tree/main/src/adapters).
 
 **Where is the documentation?**
 
@@ -315,9 +323,7 @@ npm install @supabase/server@latest
 npx skills add supabase/server
 ```
 
-The skill gives Claude Code and Cursor full context about the API surface, patterns, and migration paths. From there, you can prompt your way through most tasks.
-
-Migrate existing Edge Functions to the new API keys:
+The skill gives Claude Code, Codex, Cursor and any agentic coding tool full context about the API surface, patterns, and migration paths. From there, you can prompt your way through most tasks.
 
 ```
 Analyze all Edge Functions, and plan a full migration to use

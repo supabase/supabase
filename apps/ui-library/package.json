@@ -6,9 +6,10 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --port 3004",
-    "build": "pnpm run content:build && pnpm run build:registry && pnpm run build:llms && next build --turbopack",
+    "build": "pnpm run content:build && pnpm run build:registry && pnpm run build:llms && pnpm run build:app",
     "build:registry": "rimraf -G public/r/* && tsx ./scripts/build-registry.mts && shadcn build public/r/registry.json && tsx scripts/clean-registry.ts",
     "build:llms": "tsx ./scripts/build-llms-txt.ts",
+    "build:app": "next build --turbopack",
     "start": "next start",
     "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",

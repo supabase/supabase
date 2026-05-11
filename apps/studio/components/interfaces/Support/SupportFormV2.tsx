@@ -236,14 +236,14 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         {DASHBOARD_LOG_CATEGORIES.includes(category) && (
           <>
-            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
+            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}
 
         {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
           <>
-            <SupportAccessToggle form={form} />
+            <SupportAccessToggle form={form} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}

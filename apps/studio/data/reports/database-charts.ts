@@ -166,6 +166,38 @@ export const getReportAttributesV2: (
       ],
     },
     {
+      id: 'network-throughput',
+      label: 'Network throughput',
+      syncId: 'database-reports',
+      hide: false,
+      showTooltip: true,
+      format: 'bytes-per-second',
+      valuePrecision: 1,
+      showLegend: true,
+      showMaxValue: false,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 70,
+        tickFormatter: (value: any) => `${formatBytes(value, 1)}/s`,
+      },
+      defaultChartStyle: 'stackedAreaLine',
+      attributes: [
+        {
+          attribute: 'network_receive_bytes',
+          provider: 'infra-monitoring',
+          label: 'Network in',
+          tooltip: 'Inbound network throughput (bytes per second)',
+        },
+        {
+          attribute: 'network_transmit_bytes',
+          provider: 'infra-monitoring',
+          label: 'Network out',
+          tooltip: 'Outbound network throughput (bytes per second)',
+        },
+      ],
+    },
+    {
       id: 'disk-iops',
       label: 'Disk Input/Output operations per second (IOPS)',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,

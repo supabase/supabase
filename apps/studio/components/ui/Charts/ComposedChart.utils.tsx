@@ -1,12 +1,11 @@
 'use client'
 
-import dayjs from 'dayjs'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { formatPercentage, numberFormatter } from './Charts.utils'
-import { guessLocalTimezone } from '@/lib/dayjs'
+import { useFormatDateTime, useTimezone } from '@/lib/datetime'
 import { formatBytes } from '@/lib/helpers'
 
 export interface ReportAttributes {
@@ -154,6 +153,8 @@ export const CustomTooltip = ({
   showTotal,
   isActiveHoveredChart,
 }: TooltipProps) => {
+  const formatDateTime = useFormatDateTime()
+  const { timezone } = useTimezone()
   if (active && payload && payload.length) {
     /**
      * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
@@ -194,7 +195,7 @@ export const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
-    const localTimeZone = guessLocalTimezone()
+    const localTimeZone = timezone
 
     const rawPayload = payload.map((entry: any) => ({
       ...entry,
@@ -256,7 +257,7 @@ export const CustomTooltip = ({
         )}
       >
         <p className="text-foreground-light text-xs">{localTimeZone}</p>
-        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
+        <p className="font-medium">{formatDateTime(timestamp, DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
           {[...payload].reverse().map((entry: any, index: number) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />

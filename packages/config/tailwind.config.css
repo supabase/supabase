@@ -1,0 +1,6 @@
+@import 'tailwindcss';
+@import '../ui/build/css/source/global.css';
+@import '../ui/build/css/themes/dark.css';
+@import '../ui/build/css/themes/light.css';
+@import './unset-tw-colors.css';
+@config './tailwind.config.js';

@@ -108,6 +108,12 @@ export interface ShortcutDefinition {
    * standalone user preference.
    */
   showInSettings?: boolean
+
+  /**
+   * Optional grouping override for the Keyboard shortcuts reference sheet.
+   * Falls back to the shortcut id prefix when omitted.
+   */
+  referenceGroup?: string
 }
 
 export type RegistryDefinations<T extends string> = Record<T, ShortcutDefinition>
