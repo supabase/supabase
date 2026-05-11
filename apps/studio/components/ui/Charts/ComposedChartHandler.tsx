@@ -122,7 +122,7 @@ const ComposedChartHandler = ({
   id,
   syncId,
   ...otherProps
-}: PropsWithChildren) => {
+}: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
 
