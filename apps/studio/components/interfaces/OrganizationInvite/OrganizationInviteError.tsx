@@ -35,21 +35,17 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
   if (!data?.email_match) {
     return (
       <div className="flex flex-col gap-3">
-        <Admonition
-          type="warning"
-          title="Wrong account"
-          description={
-            profile?.primary_email ? (
-              <>
-                You are signed in as{' '}
-                <span className="font-medium text-foreground">{profile.primary_email}</span>. Sign
-                in with the email address that received this invite.
-              </>
-            ) : (
-              'Sign in with the email address that received this invite.'
-            )
-          }
-        />
+        <p className="text-sm leading-6 text-foreground-light">
+          {profile?.primary_email ? (
+            <>
+              You are signed in as{' '}
+              <span className="font-medium text-foreground">{profile.primary_email}</span>. Sign in
+              with the email address that received this invite.
+            </>
+          ) : (
+            'Sign in with the email address that received this invite.'
+          )}
+        </p>
         <Button type="default" block onClick={handleSignOut}>
           Sign out
         </Button>

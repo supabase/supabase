@@ -46,8 +46,13 @@ export const OrganizationInvite = () => {
   const inviteIsNoLongerValid =
     error?.code === 401 && error?.message.includes('Failed to retrieve organization')
 
+  const isWrongAccount = isSuccessInvitation && !!data && !data.email_match
   const showOrganizationHeader =
-    isSuccessInvitation && !!data && !data.token_does_not_exist && !data.expired_token
+    isSuccessInvitation &&
+    !!data &&
+    !data.token_does_not_exist &&
+    !data.expired_token &&
+    !isWrongAccount
   const organizationName = data?.organization_name ?? 'an organization'
   const isSignedOut = !isLoggedIn || (!profile && !isLoadingProfile)
   const isInvitationLoading =
@@ -58,15 +63,17 @@ export const OrganizationInvite = () => {
     ? 'Invite no longer available'
     : isSignedOut
       ? 'View invitation'
-      : isErrorInvitation
-        ? 'Unable to load invitation'
-        : data?.expired_token
-          ? 'Invite expired'
-          : data?.token_does_not_exist
-            ? 'Invite invalid'
-            : showOrganizationHeader
-              ? `Join ${organizationName}`
-              : undefined
+      : isWrongAccount
+        ? 'Wrong account'
+        : isErrorInvitation
+          ? 'Unable to load invitation'
+          : data?.expired_token
+            ? 'Invite expired'
+            : data?.token_does_not_exist
+              ? 'Invite invalid'
+              : showOrganizationHeader
+                ? `Join ${organizationName}`
+                : undefined
   const interstitialDescription = showOrganizationHeader
     ? isSignedOut
       ? `Sign in${isSignUpEnabled ? ' or create an account' : ''} to view this invitation`

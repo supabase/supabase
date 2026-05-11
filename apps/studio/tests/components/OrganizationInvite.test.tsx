@@ -186,6 +186,10 @@ describe('OrganizationInvite', () => {
     render(<OrganizationInvite />)
 
     expect(screen.getByText('Wrong account')).toBeInTheDocument()
+    expect(screen.queryByText('Join Acme Corp')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('You have been invited to join this Supabase organization')
+    ).not.toBeInTheDocument()
     expect(screen.getByText(/jane@acmecorp\.io/)).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Sign out' }))
