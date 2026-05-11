@@ -67,10 +67,12 @@ export function ApiKeyPill({
   }
 
   async function onCopy() {
+    if (!isSecret) return apiKey.api_key
     if (revealedKey) return revealedKey
 
     try {
       const key = await reveal()
+      clear()
       return key ?? ''
     } catch {
       toast.error('Failed to copy secret API key')
