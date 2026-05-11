@@ -166,8 +166,8 @@ const InputGroupInput = React.forwardRef<HTMLInputElement, InputProps>(
         'flex-1 block rounded-none border border-transparent -m-px bg-transparent shadow-none',
         'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
         'read-only:border-transparent',
-        'aria-invalid:border-transparent aria-invalid:bg-transparent',
-        'aria-invalid:focus:border-transparent aria-invalid:focus-visible:border-transparent',
+        'aria-[invalid=true]:border-transparent aria-[invalid=true]:bg-transparent',
+        'aria-[invalid=true]:focus:border-transparent aria-[invalid=true]:focus-visible:border-transparent',
         className
       )}
       {...props}
