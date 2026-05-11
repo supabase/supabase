@@ -121,7 +121,7 @@ curl -X POST '${endpoint}/auth/v1/token?grant_type=password' \\
   magicLinkLogin: {
     key: 'magic-link-login',
     category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
-    title: `Log in with Magic Link via Email`,
+    title: `Sign in with email link`,
     description: `
 Send a user a passwordless link which they can use to redeem an access_token.
 
@@ -171,7 +171,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
     category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Login via SMS OTP`,
     description: `
-SMS OTPs work like magic links, except you have to provide an interface for the user to verify the 6 digit number they receive.
+SMS OTPs work like email sign-in links, except you have to provide an interface for the user to verify the 6 digit number they receive.
 
 You must enter your own twilio credentials on the auth settings page to enable SMS-based Logins.`,
     js: (_apikey?: string, _endpoint?: string) => `

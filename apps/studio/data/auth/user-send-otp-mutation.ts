@@ -39,7 +39,7 @@ export const useUserSendOTPMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to send magic link: ${data.message}`)
+        toast.error(`Failed to send OTP: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

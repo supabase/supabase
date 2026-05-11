@@ -113,14 +113,14 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       setSuccessAction('send_magic_link')
       toast.success(
         isVerified
-          ? `Sent magic link to ${vars.user.email}`
+          ? `Sent sign-in link to ${vars.user.email}`
           : `Sent confirmation email to ${vars.user.email}`
       )
     },
     onError: (err) => {
       toast.error(
         isVerified
-          ? `Failed to send magic link: ${err.message}`
+          ? `Failed to send sign-in link: ${err.message}`
           : `Failed to send confirmation email: ${err.message}`
       )
     },
@@ -316,15 +316,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 }
               />
               <RowAction
-                title={isVerified ? 'Send Magic Link' : 'Send confirmation email'}
+                title={isVerified ? 'Send sign-in link' : 'Send confirmation email'}
                 description={
                   isVerified
-                    ? 'Passwordless login via email for the user'
+                    ? 'Send a passwordless sign-in link to the user'
                     : 'Send a confirmation email to the user'
                 }
                 button={{
                   icon: <Mail />,
-                  text: isVerified ? 'Send magic link' : 'Send confirmation email',
+                  text: isVerified ? 'Send sign-in link' : 'Send confirmation email',
                   isLoading: isSendingMagicLink,
                   disabled: !canSendMagicLink,
                   onClick: () => {
@@ -334,7 +334,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 success={
                   successAction === 'send_magic_link'
                     ? {
-                        title: isVerified ? 'Magic link sent' : 'Confirmation email sent',
+                        title: isVerified ? 'Sign-in link sent' : 'Confirmation email sent',
                         description: isVerified
                           ? `The link in the email is valid for ${formattedExpiry}`
                           : 'The confirmation email has been sent to the user',

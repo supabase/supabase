@@ -400,7 +400,7 @@ export const RateLimits = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Rate limit for token verifications"
-                        description="Number of OTP/Magic link verifications that can be made in a 5 minute interval per IP address"
+                        description="Number of OTP and sign-in link verifications that can be made in a 5 minute interval per IP address"
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>

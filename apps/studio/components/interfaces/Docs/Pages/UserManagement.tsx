@@ -88,7 +88,7 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
       />
 
       <DocSection
-        title="Log in with Magic Link via Email"
+        title="Sign in with email link"
         content={
           <>
             <p>Send a user a passwordless link which they can use to redeem an access_token.</p>
@@ -137,8 +137,8 @@ export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps
         content={
           <>
             <p>
-              SMS OTPs work like magic links, except you have to provide an interface for the user
-              to verify the 6 digit number they receive.
+              SMS OTPs work like email sign-in links, except you have to provide an interface for
+              the user to verify the 6 digit number they receive.
             </p>
             <p>
               You must enter your own twilio credentials on the auth settings page to enable
