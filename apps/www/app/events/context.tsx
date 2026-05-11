@@ -20,9 +20,10 @@ const EventsContext = createContext<EventsContextValue | undefined>(undefined)
 interface EventsProviderProps {
   children: ReactNode
   notionEvents: SupabaseEvent[]
+  mdxEvents: SupabaseEvent[]
 }
 
-export function EventsProvider({ children, notionEvents }: EventsProviderProps) {
+export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProviderProps) {
   const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -42,9 +43,12 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
 
         if (data.success) {
           const transformedEvents: SupabaseEvent[] = data.events.map((event: any) => {
-            let categories: string[] = []
-            const isMeetup = event.name.toLowerCase().includes('meetup')
-            if (isMeetup) categories.push('meetup')
+            // Categorize by the originating Luma calendar: events from the
+            // Supabase Hackathons calendar → `hackathon`; everything from the
+            // Supabase Community Events calendar → `community`.
+            const categories: string[] = [
+              event?.calendar === 'hackathon' ? 'hackathon' : 'community',
+            ]
 
             const rawUrl = event?.url || ''
             let safeUrl: string | undefined
@@ -73,7 +77,8 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
               location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
                 [event?.city, event?.country].filter(Boolean)
               ),
-              hosts: isMeetup || event?.hosts?.length === 0 ? [SUPABASE_HOST] : event?.hosts || [],
+              // All Luma events are Supabase-hosted regardless of which calendar they're from.
+              hosts: [SUPABASE_HOST],
               source: 'luma' as const,
               disable_page_build: true,
               link: safeUrl ? { href: safeUrl, target: '_blank' as const } : undefined,
@@ -91,14 +96,17 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
     fetchLumaEvents()
   }, [])
 
-  // Merge Notion (server) + Luma (client) events, excluding past events
+  // Merge Notion (server) + mdx (server) + Luma (client) events, showing only today and future.
   const allEvents = useMemo(() => {
     const now = new Date()
-    return [...notionEvents, ...lumaEvents].filter((event) => {
+    const startOfToday = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    )
+    return [...notionEvents, ...mdxEvents, ...lumaEvents].filter((event) => {
       const eventDate = new Date(event.end_date || event.date)
-      return eventDate >= now
+      return eventDate >= startOfToday
     })
-  }, [notionEvents, lumaEvents])
+  }, [notionEvents, mdxEvents, lumaEvents])
 
   const categories = useMemo(() => {
     const counts: { [key: string]: number } = { all: 0 }

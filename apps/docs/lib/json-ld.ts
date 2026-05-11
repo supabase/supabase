@@ -10,31 +10,54 @@ export function serializeJsonLd(schema: JsonLdSchema): string {
     .replace(/&/g, '\\u0026')
 }
 
-const DOCS_ROOT: BreadcrumbItem = { name: 'Docs', url: '' }
-const GUIDES_ROOT: BreadcrumbItem = { name: 'Guides', url: '/guides' }
+type ValidCrumb = BreadcrumbItem & { url: string }
+
+const DOCS_ROOT: ValidCrumb = { name: 'Docs', url: '' }
+const GUIDES_ROOT: ValidCrumb = { name: 'Guides', url: '/guides' }
 
 interface BreadcrumbListSchemaInput {
   pathname: string
   chain: BreadcrumbItem[]
 }
 
+const warnedPaths = new Set<string>()
+
+function isValidCrumb(crumb: BreadcrumbItem): crumb is ValidCrumb {
+  return crumb.url !== undefined && Boolean(crumb.title ?? crumb.name)
+}
+
 export function breadcrumbListSchema({ pathname, chain }: BreadcrumbListSchemaInput) {
-  const fullChain: BreadcrumbItem[] = [DOCS_ROOT, GUIDES_ROOT, ...chain]
+  const filteredChain = chain.filter(isValidCrumb)
+
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    filteredChain.length !== chain.length &&
+    !warnedPaths.has(pathname)
+  ) {
+    warnedPaths.add(pathname)
+    const dropped = chain
+      .filter((crumb) => !isValidCrumb(crumb))
+      .map((crumb) => crumb.title ?? crumb.name ?? '<unnamed>')
+    console.warn(
+      `[json-ld] Dropping breadcrumb items missing url or name from ${pathname}: ${dropped.join(', ')}`
+    )
+  }
+
+  if (filteredChain.length === 0) return null
+
+  const fullChain: ValidCrumb[] = [DOCS_ROOT, GUIDES_ROOT, ...filteredChain]
 
   const itemListElement = fullChain.map((crumb, index) => {
     const isLeaf = index === fullChain.length - 1
-    const name = crumb.title ?? crumb.name
     const path = isLeaf ? pathname : crumb.url
+    const itemUrl = path === '' ? PROD_URL : `${PROD_URL}${path}`
 
-    const listItem: Record<string, unknown> = {
+    return {
       '@type': 'ListItem',
       position: index + 1,
-      name,
+      name: crumb.title ?? crumb.name,
+      item: itemUrl,
     }
-    if (path !== undefined) {
-      listItem.item = path === '' ? PROD_URL : `${PROD_URL}${path}`
-    }
-    return listItem
   })
 
   return {

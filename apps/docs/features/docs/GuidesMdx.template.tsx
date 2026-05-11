@@ -71,10 +71,8 @@ const GuideTemplate = ({
 }: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
   const breadcrumbChain = resolveBreadcrumbs(pathname)
-  const breadcrumbJsonLd =
-    breadcrumbChain.length > 0
-      ? serializeJsonLd(breadcrumbListSchema({ pathname, chain: breadcrumbChain }))
-      : null
+  const breadcrumbSchema = breadcrumbListSchema({ pathname, chain: breadcrumbChain })
+  const breadcrumbJsonLd = breadcrumbSchema ? serializeJsonLd(breadcrumbSchema) : null
 
   return (
     <TocAnchorsProvider>

@@ -2,19 +2,24 @@ import { cva } from 'class-variance-authority'
 import { ComponentProps, forwardRef, ReactNode } from 'react'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 
+export type AdmonitionType =
+  | 'note'
+  | 'tip'
+  | 'caution'
+  | 'danger'
+  | 'deprecation'
+  | 'default'
+  | 'destructive'
+  | 'success'
+  | 'warning'
+
 export interface AdmonitionProps {
-  type:
-    | 'note'
-    | 'tip'
-    | 'caution'
-    | 'danger'
-    | 'deprecation'
-    | 'default'
-    | 'destructive'
-    | 'warning'
-  label?: string
+  type?: AdmonitionType
   title?: string
-  description?: string | ReactNode
+  /** @deprecated Prefer title for new usage. label remains supported for existing MDX content. */
+  label?: string
+  description?: ReactNode
+  children?: ReactNode
   showIcon?: boolean
   childProps?: {
     title?: ComponentProps<typeof AlertTitle_Shadcn_>
@@ -26,10 +31,7 @@ export interface AdmonitionProps {
   className?: string
 }
 
-const admonitionToAlertMapping: Record<
-  AdmonitionProps['type'],
-  'default' | 'destructive' | 'warning'
-> = {
+const admonitionToAlertMapping: Record<AdmonitionType, 'default' | 'destructive' | 'warning'> = {
   note: 'default',
   tip: 'default',
   caution: 'warning',
@@ -38,6 +40,7 @@ const admonitionToAlertMapping: Record<
   default: 'default',
   warning: 'warning',
   destructive: 'destructive',
+  success: 'default',
 }
 
 const InfoIcon = () => (
@@ -51,6 +54,21 @@ const InfoIcon = () => (
       fillRule="evenodd"
       clipRule="evenodd"
       d="M0.625 9.8252C0.625 4.44043 4.99023 0.0751953 10.375 0.0751953C15.7598 0.0751953 20.125 4.44043 20.125 9.8252C20.125 15.21 15.7598 19.5752 10.375 19.5752C4.99023 19.5752 0.625 15.21 0.625 9.8252ZM9.3584 4.38135C9.45117 4.28857 9.55518 4.20996 9.66699 4.14648C9.88086 4.02539 10.1245 3.96045 10.375 3.96045C10.5845 3.96045 10.7896 4.00586 10.9766 4.09229C11.1294 4.1626 11.2705 4.26025 11.3916 4.38135C11.6611 4.65088 11.8125 5.0166 11.8125 5.39795C11.8125 5.5249 11.7959 5.6499 11.7637 5.77002C11.6987 6.01172 11.5718 6.23438 11.3916 6.41455C11.1221 6.68408 10.7563 6.83545 10.375 6.83545C9.99365 6.83545 9.62793 6.68408 9.3584 6.41455C9.08887 6.14502 8.9375 5.7793 8.9375 5.39795C8.9375 5.29492 8.94873 5.19287 8.97021 5.09375C9.02783 4.82568 9.16162 4.57812 9.3584 4.38135ZM10.375 15.6899C10.0933 15.6899 9.82275 15.5781 9.62354 15.3789C9.42432 15.1797 9.3125 14.9092 9.3125 14.6274V9.31494C9.3125 9.0332 9.42432 8.7627 9.62354 8.56348C9.82275 8.36426 10.0933 8.25244 10.375 8.25244C10.6567 8.25244 10.9272 8.36426 11.1265 8.56348C11.3257 8.7627 11.4375 9.0332 11.4375 9.31494V14.6274C11.4375 14.7944 11.3979 14.9575 11.3242 15.104C11.2739 15.2046 11.2075 15.2979 11.1265 15.3789C10.9272 15.5781 10.6567 15.6899 10.375 15.6899Z"
+    />
+  </svg>
+)
+
+const SuccessIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 21 20"
+    className="w-6 h-6"
+    fill="currentColor"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M10.5 19.5C5.25329 19.5 1 15.2467 1 10C1 4.75329 5.25329 0.5 10.5 0.5C15.7467 0.5 20 4.75329 20 10C20 15.2467 15.7467 19.5 10.5 19.5ZM14.7803 7.78033C15.0732 7.48744 15.0732 7.01256 14.7803 6.71967C14.4874 6.42678 14.0126 6.42678 13.7197 6.71967L9.25 11.1893L7.28033 9.21967C6.98744 8.92678 6.51256 8.92678 6.21967 9.21967C5.92678 9.51256 5.92678 9.98744 6.21967 10.2803L8.71967 12.7803C9.01256 13.0732 9.48744 13.0732 9.78033 12.7803L14.7803 7.78033Z"
     />
   </svg>
 )
@@ -74,15 +92,20 @@ const admonitionSVG = cva('', {
   variants: {
     type: {
       default: `[&>svg]:bg-foreground-muted`,
+      success: `bg-brand-400/15 dark:bg-brand/10 border-brand-400 dark:border-brand-500 [&>svg]:text-white dark:[&>svg]:text-brand-link [&>svg]:bg-brand dark:[&>svg]:bg-brand-500/50`,
       warning: ``,
       destructive: ``,
     },
   },
 })
 
+const admonitionBodyClassName =
+  '[&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0 [&_p:only-child]:!mb-0 [&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5'
+
 export const Admonition = forwardRef<
   React.ElementRef<typeof Alert_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof Alert_Shadcn_> & AdmonitionProps
+  Omit<React.ComponentPropsWithoutRef<typeof Alert_Shadcn_>, keyof AdmonitionProps | 'children'> &
+    AdmonitionProps
 >(
   (
     {
@@ -102,6 +125,8 @@ export const Admonition = forwardRef<
     ref
   ) => {
     const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
+    const typeStyle = type === 'success' ? 'success' : typeMapped
+    const heading = title ?? label
 
     return (
       <Alert_Shadcn_
@@ -114,13 +139,15 @@ export const Admonition = forwardRef<
           // Container query context for responsive layout
           layout === 'responsive' && '@container',
           // SVG icon
-          admonitionSVG({ type: typeMapped }),
+          admonitionSVG({ type: typeStyle }),
           props.className
         )}
       >
         {!!icon ? (
           icon
-        ) : (showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+        ) : showIcon && typeStyle === 'success' ? (
+          <SuccessIcon />
+        ) : showIcon && (typeMapped === 'warning' || typeMapped === 'destructive') ? (
           <WarningIcon />
         ) : showIcon ? (
           <InfoIcon />
@@ -134,8 +161,8 @@ export const Admonition = forwardRef<
               'flex-col @md:flex-row @md:items-center @md:justify-between @md:gap-x-6 @lg:gap-x-8'
           )}
         >
-          {label || title ? (
-            <div>
+          <div>
+            {heading && (
               <AlertTitle_Shadcn_
                 {...childProps.title}
                 className={cn(
@@ -144,28 +171,35 @@ export const Admonition = forwardRef<
                   childProps.title?.className
                 )}
               >
-                {label || title}
+                {heading}
               </AlertTitle_Shadcn_>
-              {description && (
-                <AlertDescription_Shadcn_ className={childProps.description?.className}>
-                  {description}
-                </AlertDescription_Shadcn_>
-              )}
-              {/* // children is to handle Docs and MDX issues with children and <p> elements */}
-              {children && (
-                <AlertDescription_Shadcn_
-                  {...childProps.description}
-                  className={cn('', childProps?.description?.className)}
-                >
-                  {children}
-                </AlertDescription_Shadcn_>
-              )}
-            </div>
-          ) : (
-            <div className="text my-0.5 [&_p]:mt-0 [&_p]:mb-1.5 [&_p:last-child]:mb-0">
-              {children}
-            </div>
-          )}
+            )}
+            {description && (
+              <AlertDescription_Shadcn_
+                {...childProps.description}
+                className={cn(
+                  admonitionBodyClassName,
+                  !heading && 'my-0.5',
+                  childProps.description?.className
+                )}
+              >
+                {description}
+              </AlertDescription_Shadcn_>
+            )}
+            {/* // children is to handle Docs and MDX issues with children and <p> elements */}
+            {children && (
+              <AlertDescription_Shadcn_
+                {...childProps.description}
+                className={cn(
+                  admonitionBodyClassName,
+                  !heading && !description && 'my-0.5',
+                  childProps?.description?.className
+                )}
+              >
+                {children}
+              </AlertDescription_Shadcn_>
+            )}
+          </div>
           {actions && (
             <div
               className={cn(

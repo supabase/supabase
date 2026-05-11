@@ -32,6 +32,11 @@ const ACTIVE_DATABASE_SHORTCUT_IDS = [
   SHORTCUT_IDS.NAV_DATABASE_TABLES,
 ] satisfies ShortcutId[]
 
+const ACTIVE_AUTH_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.NAV_AUTH_USERS,
+] satisfies ShortcutId[]
+
 let sequenceIdCounter = 0
 
 const buildSequenceRegistration = (id: ShortcutId): SequenceRegistrationView => {
@@ -126,6 +131,15 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Database Navigation')).toBeInTheDocument()
     expect(screen.queryByText(/^Navigation$/)).not.toBeInTheDocument()
     expect(screen.getByText('Go to Tables')).toBeInTheDocument()
+  })
+
+  it('shows the auth navigation section when auth shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_AUTH_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Global Navigation')).toBeInTheDocument()
+    expect(screen.getByText('Auth Navigation')).toBeInTheDocument()
+    expect(screen.queryByText(/^Navigation$/)).not.toBeInTheDocument()
+    expect(screen.getByText('Go to Users')).toBeInTheDocument()
   })
 
   it('does not show inactive database shortcuts in search results', async () => {
