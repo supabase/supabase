@@ -15,14 +15,16 @@ export function useFlyDeprecationProjects({ enabled }: { enabled: boolean }) {
   const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const orgSlug = selectedOrg?.slug
-  const orgName = selectedOrg?.name ?? orgSlug ?? ''
+  const orgName = selectedOrg?.name ?? ''
 
   const { data: orgProjectsData, isFetched } = useOrgProjectsInfiniteQuery(
     { slug: orgSlug },
     { enabled: enabled && Boolean(orgSlug), staleTime: 30 * 60 * 1000 }
   )
 
-  const isReady = !enabled || !orgSlug || isFetched
+  if (!enabled || !orgSlug) {
+    return { isReady: false, primaries: [], branches: [] }
+  }
 
   const byRef = new Map<string, FlyDeprecationProject & { isBranch: boolean }>()
 
@@ -30,7 +32,7 @@ export function useFlyDeprecationProjects({ enabled }: { enabled: boolean }) {
     byRef.set(selectedProject.ref, {
       ref: selectedProject.ref,
       name: selectedProject.name,
-      orgSlug: orgSlug ?? '',
+      orgSlug,
       orgName,
       isBranch: Boolean(selectedProject.parent_project_ref),
     })
@@ -43,7 +45,7 @@ export function useFlyDeprecationProjects({ enabled }: { enabled: boolean }) {
     byRef.set(p.ref, {
       ref: p.ref,
       name: p.name,
-      orgSlug: orgSlug ?? '',
+      orgSlug,
       orgName,
       isBranch: Boolean(p.is_branch),
     })
@@ -56,5 +58,5 @@ export function useFlyDeprecationProjects({ enabled }: { enabled: boolean }) {
     ;(isBranch ? branches : primaries).push(rest)
   }
 
-  return { isReady, primaries, branches }
+  return { isReady: isFetched, primaries, branches }
 }
