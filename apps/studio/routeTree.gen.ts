@@ -46,6 +46,7 @@ import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
 import { Route as ProjectRefStorageRouteImport } from './routes/project/$ref/storage'
 import { Route as ProjectRefSqlRouteImport } from './routes/project/$ref/sql'
+import { Route as ProjectRefSettingsRouteImport } from './routes/project/$ref/settings'
 import { Route as ProjectRefRealtimeRouteImport } from './routes/project/$ref/realtime'
 import { Route as ProjectRefObservabilityRouteImport } from './routes/project/$ref/observability'
 import { Route as ProjectRefLogsRouteImport } from './routes/project/$ref/logs'
@@ -78,6 +79,15 @@ import { Route as ProjectRefStorageS3RouteImport } from './routes/project/$ref/s
 import { Route as ProjectRefSqlTemplatesRouteImport } from './routes/project/$ref/sql/templates'
 import { Route as ProjectRefSqlQuickstartsRouteImport } from './routes/project/$ref/sql/quickstarts'
 import { Route as ProjectRefSqlIdRouteImport } from './routes/project/$ref/sql/$id'
+import { Route as ProjectRefSettingsLogDrainsRouteImport } from './routes/project/$ref/settings/log-drains'
+import { Route as ProjectRefSettingsIntegrationsRouteImport } from './routes/project/$ref/settings/integrations'
+import { Route as ProjectRefSettingsInfrastructureRouteImport } from './routes/project/$ref/settings/infrastructure'
+import { Route as ProjectRefSettingsGeneralRouteImport } from './routes/project/$ref/settings/general'
+import { Route as ProjectRefSettingsDashboardRouteImport } from './routes/project/$ref/settings/dashboard'
+import { Route as ProjectRefSettingsComputeAndDiskRouteImport } from './routes/project/$ref/settings/compute-and-disk'
+import { Route as ProjectRefSettingsApiKeysRouteImport } from './routes/project/$ref/settings/api-keys'
+import { Route as ProjectRefSettingsApiRouteImport } from './routes/project/$ref/settings/api'
+import { Route as ProjectRefSettingsAddonsRouteImport } from './routes/project/$ref/settings/addons'
 import { Route as ProjectRefRealtimeSettingsRouteImport } from './routes/project/$ref/realtime/settings'
 import { Route as ProjectRefRealtimePoliciesRouteImport } from './routes/project/$ref/realtime/policies'
 import { Route as ProjectRefRealtimeInspectorRouteImport } from './routes/project/$ref/realtime/inspector'
@@ -166,6 +176,9 @@ import { Route as AppAccountTokensScopedRouteImport } from './routes/_app/accoun
 import { Route as ProjectRefStorageVectorsIndexRouteImport } from './routes/project/$ref/storage/vectors/index'
 import { Route as ProjectRefStorageFilesIndexRouteImport } from './routes/project/$ref/storage/files/index'
 import { Route as ProjectRefStorageAnalyticsIndexRouteImport } from './routes/project/$ref/storage/analytics/index'
+import { Route as ProjectRefSettingsWebhooksIndexRouteImport } from './routes/project/$ref/settings/webhooks/index'
+import { Route as ProjectRefSettingsJwtIndexRouteImport } from './routes/project/$ref/settings/jwt/index'
+import { Route as ProjectRefSettingsApiKeysIndexRouteImport } from './routes/project/$ref/settings/api-keys/index'
 import { Route as ProjectRefLogsExplorerIndexRouteImport } from './routes/project/$ref/logs/explorer/index'
 import { Route as ProjectRefFunctionsFunctionSlugIndexRouteImport } from './routes/project/$ref/functions/$functionSlug/index'
 import { Route as ProjectRefDatabaseTriggersIndexRouteImport } from './routes/project/$ref/database/triggers/index'
@@ -178,6 +191,10 @@ import { Route as AppOrgSlugWebhooksIndexRouteImport } from './routes/_app/org/$
 import { Route as AppOrgSlugPrivateAppsIndexRouteImport } from './routes/_app/org/$slug/private-apps/index'
 import { Route as ProjectRefStorageFilesSettingsRouteImport } from './routes/project/$ref/storage/files/settings'
 import { Route as ProjectRefStorageFilesPoliciesRouteImport } from './routes/project/$ref/storage/files/policies'
+import { Route as ProjectRefSettingsWebhooksEndpointIdRouteImport } from './routes/project/$ref/settings/webhooks/$endpointId'
+import { Route as ProjectRefSettingsJwtLegacyRouteImport } from './routes/project/$ref/settings/jwt/legacy'
+import { Route as ProjectRefSettingsBillingUsageRouteImport } from './routes/project/$ref/settings/billing/usage'
+import { Route as ProjectRefSettingsApiKeysLegacyRouteImport } from './routes/project/$ref/settings/api-keys/legacy'
 import { Route as ProjectRefLogsExplorerTemplatesRouteImport } from './routes/project/$ref/logs/explorer/templates'
 import { Route as ProjectRefLogsExplorerSavedRouteImport } from './routes/project/$ref/logs/explorer/saved'
 import { Route as ProjectRefLogsExplorerRecentRouteImport } from './routes/project/$ref/logs/explorer/recent'
@@ -448,6 +465,11 @@ const ProjectRefSqlRoute = ProjectRefSqlRouteImport.update({
   path: '/sql',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const ProjectRefSettingsRoute = ProjectRefSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ProjectRefRealtimeRoute = ProjectRefRealtimeRouteImport.update({
   id: '/realtime',
   path: '/realtime',
@@ -614,6 +636,59 @@ const ProjectRefSqlIdRoute = ProjectRefSqlIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ProjectRefSqlRoute,
 } as any)
+const ProjectRefSettingsLogDrainsRoute =
+  ProjectRefSettingsLogDrainsRouteImport.update({
+    id: '/log-drains',
+    path: '/log-drains',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsIntegrationsRoute =
+  ProjectRefSettingsIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsInfrastructureRoute =
+  ProjectRefSettingsInfrastructureRouteImport.update({
+    id: '/infrastructure',
+    path: '/infrastructure',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsGeneralRoute =
+  ProjectRefSettingsGeneralRouteImport.update({
+    id: '/general',
+    path: '/general',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsDashboardRoute =
+  ProjectRefSettingsDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsComputeAndDiskRoute =
+  ProjectRefSettingsComputeAndDiskRouteImport.update({
+    id: '/compute-and-disk',
+    path: '/compute-and-disk',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsApiKeysRoute =
+  ProjectRefSettingsApiKeysRouteImport.update({
+    id: '/api-keys',
+    path: '/api-keys',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsApiRoute = ProjectRefSettingsApiRouteImport.update({
+  id: '/api',
+  path: '/api',
+  getParentRoute: () => ProjectRefSettingsRoute,
+} as any)
+const ProjectRefSettingsAddonsRoute =
+  ProjectRefSettingsAddonsRouteImport.update({
+    id: '/addons',
+    path: '/addons',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
 const ProjectRefRealtimeSettingsRoute =
   ProjectRefRealtimeSettingsRouteImport.update({
     id: '/settings',
@@ -1101,6 +1176,24 @@ const ProjectRefStorageAnalyticsIndexRoute =
     path: '/analytics/',
     getParentRoute: () => ProjectRefStorageRoute,
   } as any)
+const ProjectRefSettingsWebhooksIndexRoute =
+  ProjectRefSettingsWebhooksIndexRouteImport.update({
+    id: '/webhooks/',
+    path: '/webhooks/',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsJwtIndexRoute =
+  ProjectRefSettingsJwtIndexRouteImport.update({
+    id: '/jwt/',
+    path: '/jwt/',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsApiKeysIndexRoute =
+  ProjectRefSettingsApiKeysIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProjectRefSettingsApiKeysRoute,
+  } as any)
 const ProjectRefLogsExplorerIndexRoute =
   ProjectRefLogsExplorerIndexRouteImport.update({
     id: '/explorer/',
@@ -1171,6 +1264,30 @@ const ProjectRefStorageFilesPoliciesRoute =
     id: '/files/policies',
     path: '/files/policies',
     getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
+const ProjectRefSettingsWebhooksEndpointIdRoute =
+  ProjectRefSettingsWebhooksEndpointIdRouteImport.update({
+    id: '/webhooks/$endpointId',
+    path: '/webhooks/$endpointId',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsJwtLegacyRoute =
+  ProjectRefSettingsJwtLegacyRouteImport.update({
+    id: '/jwt/legacy',
+    path: '/jwt/legacy',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsBillingUsageRoute =
+  ProjectRefSettingsBillingUsageRouteImport.update({
+    id: '/billing/usage',
+    path: '/billing/usage',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
+const ProjectRefSettingsApiKeysLegacyRoute =
+  ProjectRefSettingsApiKeysLegacyRouteImport.update({
+    id: '/legacy',
+    path: '/legacy',
+    getParentRoute: () => ProjectRefSettingsApiKeysRoute,
   } as any)
 const ProjectRefLogsExplorerTemplatesRoute =
   ProjectRefLogsExplorerTemplatesRouteImport.update({
@@ -1716,6 +1833,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
+  '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
   '/org/': typeof AppOrgIndexRoute
@@ -1806,6 +1924,15 @@ export interface FileRoutesByFullPath {
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
+  '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
+  '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
+  '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
+  '/project/$ref/settings/compute-and-disk': typeof ProjectRefSettingsComputeAndDiskRoute
+  '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
+  '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
+  '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
+  '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
+  '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
   '/project/$ref/sql/quickstarts': typeof ProjectRefSqlQuickstartsRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
@@ -1865,6 +1992,10 @@ export interface FileRoutesByFullPath {
   '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
   '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
   '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
+  '/project/$ref/settings/api-keys/legacy': typeof ProjectRefSettingsApiKeysLegacyRoute
+  '/project/$ref/settings/billing/usage': typeof ProjectRefSettingsBillingUsageRoute
+  '/project/$ref/settings/jwt/legacy': typeof ProjectRefSettingsJwtLegacyRoute
+  '/project/$ref/settings/webhooks/$endpointId': typeof ProjectRefSettingsWebhooksEndpointIdRoute
   '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
   '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
@@ -1877,6 +2008,9 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
   '/project/$ref/functions/$functionSlug/': typeof ProjectRefFunctionsFunctionSlugIndexRoute
   '/project/$ref/logs/explorer/': typeof ProjectRefLogsExplorerIndexRoute
+  '/project/$ref/settings/api-keys/': typeof ProjectRefSettingsApiKeysIndexRoute
+  '/project/$ref/settings/jwt/': typeof ProjectRefSettingsJwtIndexRoute
+  '/project/$ref/settings/webhooks/': typeof ProjectRefSettingsWebhooksIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/project/$ref/storage/vectors/': typeof ProjectRefStorageVectorsIndexRoute
@@ -1961,6 +2095,7 @@ export interface FileRoutesByTo {
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
+  '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
   '/org': typeof AppOrgIndexRoute
   '/api/connect': typeof ApiConnectIndexRoute
@@ -2048,6 +2183,14 @@ export interface FileRoutesByTo {
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
+  '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
+  '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
+  '/project/$ref/settings/compute-and-disk': typeof ProjectRefSettingsComputeAndDiskRoute
+  '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
+  '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
+  '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
+  '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
+  '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
   '/project/$ref/sql/quickstarts': typeof ProjectRefSqlQuickstartsRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
@@ -2107,6 +2250,10 @@ export interface FileRoutesByTo {
   '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
   '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
   '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
+  '/project/$ref/settings/api-keys/legacy': typeof ProjectRefSettingsApiKeysLegacyRoute
+  '/project/$ref/settings/billing/usage': typeof ProjectRefSettingsBillingUsageRoute
+  '/project/$ref/settings/jwt/legacy': typeof ProjectRefSettingsJwtLegacyRoute
+  '/project/$ref/settings/webhooks/$endpointId': typeof ProjectRefSettingsWebhooksEndpointIdRoute
   '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
   '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/org/$slug/private-apps': typeof AppOrgSlugPrivateAppsIndexRoute
@@ -2119,6 +2266,9 @@ export interface FileRoutesByTo {
   '/project/$ref/database/triggers': typeof ProjectRefDatabaseTriggersIndexRoute
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugIndexRoute
   '/project/$ref/logs/explorer': typeof ProjectRefLogsExplorerIndexRoute
+  '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysIndexRoute
+  '/project/$ref/settings/jwt': typeof ProjectRefSettingsJwtIndexRoute
+  '/project/$ref/settings/webhooks': typeof ProjectRefSettingsWebhooksIndexRoute
   '/project/$ref/storage/analytics': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files': typeof ProjectRefStorageFilesIndexRoute
   '/project/$ref/storage/vectors': typeof ProjectRefStorageVectorsIndexRoute
@@ -2213,6 +2363,7 @@ export interface FileRoutesById {
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
+  '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
   '/_app/org/': typeof AppOrgIndexRoute
@@ -2303,6 +2454,15 @@ export interface FileRoutesById {
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
+  '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
+  '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
+  '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
+  '/project/$ref/settings/compute-and-disk': typeof ProjectRefSettingsComputeAndDiskRoute
+  '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
+  '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
+  '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
+  '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
+  '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
   '/project/$ref/sql/quickstarts': typeof ProjectRefSqlQuickstartsRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
@@ -2362,6 +2522,10 @@ export interface FileRoutesById {
   '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
   '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
   '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
+  '/project/$ref/settings/api-keys/legacy': typeof ProjectRefSettingsApiKeysLegacyRoute
+  '/project/$ref/settings/billing/usage': typeof ProjectRefSettingsBillingUsageRoute
+  '/project/$ref/settings/jwt/legacy': typeof ProjectRefSettingsJwtLegacyRoute
+  '/project/$ref/settings/webhooks/$endpointId': typeof ProjectRefSettingsWebhooksEndpointIdRoute
   '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
   '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/_app/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
@@ -2374,6 +2538,9 @@ export interface FileRoutesById {
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
   '/project/$ref/functions/$functionSlug/': typeof ProjectRefFunctionsFunctionSlugIndexRoute
   '/project/$ref/logs/explorer/': typeof ProjectRefLogsExplorerIndexRoute
+  '/project/$ref/settings/api-keys/': typeof ProjectRefSettingsApiKeysIndexRoute
+  '/project/$ref/settings/jwt/': typeof ProjectRefSettingsJwtIndexRoute
+  '/project/$ref/settings/webhooks/': typeof ProjectRefSettingsWebhooksIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/project/$ref/storage/vectors/': typeof ProjectRefStorageVectorsIndexRoute
@@ -2467,6 +2634,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs'
     | '/project/$ref/observability'
     | '/project/$ref/realtime'
+    | '/project/$ref/settings'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
     | '/org/'
@@ -2557,6 +2725,15 @@ export interface FileRouteTypes {
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
+    | '/project/$ref/settings/addons'
+    | '/project/$ref/settings/api'
+    | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/compute-and-disk'
+    | '/project/$ref/settings/dashboard'
+    | '/project/$ref/settings/general'
+    | '/project/$ref/settings/infrastructure'
+    | '/project/$ref/settings/integrations'
+    | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
     | '/project/$ref/sql/quickstarts'
     | '/project/$ref/sql/templates'
@@ -2616,6 +2793,10 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/explorer/recent'
     | '/project/$ref/logs/explorer/saved'
     | '/project/$ref/logs/explorer/templates'
+    | '/project/$ref/settings/api-keys/legacy'
+    | '/project/$ref/settings/billing/usage'
+    | '/project/$ref/settings/jwt/legacy'
+    | '/project/$ref/settings/webhooks/$endpointId'
     | '/project/$ref/storage/files/policies'
     | '/project/$ref/storage/files/settings'
     | '/org/$slug/private-apps/'
@@ -2628,6 +2809,9 @@ export interface FileRouteTypes {
     | '/project/$ref/database/triggers/'
     | '/project/$ref/functions/$functionSlug/'
     | '/project/$ref/logs/explorer/'
+    | '/project/$ref/settings/api-keys/'
+    | '/project/$ref/settings/jwt/'
+    | '/project/$ref/settings/webhooks/'
     | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
     | '/project/$ref/storage/vectors/'
@@ -2712,6 +2896,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth'
     | '/project/$ref/database'
     | '/project/$ref/realtime'
+    | '/project/$ref/settings'
     | '/project/$ref/storage'
     | '/org'
     | '/api/connect'
@@ -2799,6 +2984,14 @@ export interface FileRouteTypes {
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
+    | '/project/$ref/settings/addons'
+    | '/project/$ref/settings/api'
+    | '/project/$ref/settings/compute-and-disk'
+    | '/project/$ref/settings/dashboard'
+    | '/project/$ref/settings/general'
+    | '/project/$ref/settings/infrastructure'
+    | '/project/$ref/settings/integrations'
+    | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
     | '/project/$ref/sql/quickstarts'
     | '/project/$ref/sql/templates'
@@ -2858,6 +3051,10 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/explorer/recent'
     | '/project/$ref/logs/explorer/saved'
     | '/project/$ref/logs/explorer/templates'
+    | '/project/$ref/settings/api-keys/legacy'
+    | '/project/$ref/settings/billing/usage'
+    | '/project/$ref/settings/jwt/legacy'
+    | '/project/$ref/settings/webhooks/$endpointId'
     | '/project/$ref/storage/files/policies'
     | '/project/$ref/storage/files/settings'
     | '/org/$slug/private-apps'
@@ -2870,6 +3067,9 @@ export interface FileRouteTypes {
     | '/project/$ref/database/triggers'
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/logs/explorer'
+    | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/jwt'
+    | '/project/$ref/settings/webhooks'
     | '/project/$ref/storage/analytics'
     | '/project/$ref/storage/files'
     | '/project/$ref/storage/vectors'
@@ -2963,6 +3163,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs'
     | '/project/$ref/observability'
     | '/project/$ref/realtime'
+    | '/project/$ref/settings'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
     | '/_app/org/'
@@ -3053,6 +3254,15 @@ export interface FileRouteTypes {
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
+    | '/project/$ref/settings/addons'
+    | '/project/$ref/settings/api'
+    | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/compute-and-disk'
+    | '/project/$ref/settings/dashboard'
+    | '/project/$ref/settings/general'
+    | '/project/$ref/settings/infrastructure'
+    | '/project/$ref/settings/integrations'
+    | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
     | '/project/$ref/sql/quickstarts'
     | '/project/$ref/sql/templates'
@@ -3112,6 +3322,10 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/explorer/recent'
     | '/project/$ref/logs/explorer/saved'
     | '/project/$ref/logs/explorer/templates'
+    | '/project/$ref/settings/api-keys/legacy'
+    | '/project/$ref/settings/billing/usage'
+    | '/project/$ref/settings/jwt/legacy'
+    | '/project/$ref/settings/webhooks/$endpointId'
     | '/project/$ref/storage/files/policies'
     | '/project/$ref/storage/files/settings'
     | '/_app/org/$slug/private-apps/'
@@ -3124,6 +3338,9 @@ export interface FileRouteTypes {
     | '/project/$ref/database/triggers/'
     | '/project/$ref/functions/$functionSlug/'
     | '/project/$ref/logs/explorer/'
+    | '/project/$ref/settings/api-keys/'
+    | '/project/$ref/settings/jwt/'
+    | '/project/$ref/settings/webhooks/'
     | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
     | '/project/$ref/storage/vectors/'
@@ -3532,6 +3749,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefSqlRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/project/$ref/settings': {
+      id: '/project/$ref/settings'
+      path: '/settings'
+      fullPath: '/project/$ref/settings'
+      preLoaderRoute: typeof ProjectRefSettingsRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/project/$ref/realtime': {
       id: '/project/$ref/realtime'
       path: '/realtime'
@@ -3755,6 +3979,69 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/sql/$id'
       preLoaderRoute: typeof ProjectRefSqlIdRouteImport
       parentRoute: typeof ProjectRefSqlRoute
+    }
+    '/project/$ref/settings/log-drains': {
+      id: '/project/$ref/settings/log-drains'
+      path: '/log-drains'
+      fullPath: '/project/$ref/settings/log-drains'
+      preLoaderRoute: typeof ProjectRefSettingsLogDrainsRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/integrations': {
+      id: '/project/$ref/settings/integrations'
+      path: '/integrations'
+      fullPath: '/project/$ref/settings/integrations'
+      preLoaderRoute: typeof ProjectRefSettingsIntegrationsRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/infrastructure': {
+      id: '/project/$ref/settings/infrastructure'
+      path: '/infrastructure'
+      fullPath: '/project/$ref/settings/infrastructure'
+      preLoaderRoute: typeof ProjectRefSettingsInfrastructureRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/general': {
+      id: '/project/$ref/settings/general'
+      path: '/general'
+      fullPath: '/project/$ref/settings/general'
+      preLoaderRoute: typeof ProjectRefSettingsGeneralRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/dashboard': {
+      id: '/project/$ref/settings/dashboard'
+      path: '/dashboard'
+      fullPath: '/project/$ref/settings/dashboard'
+      preLoaderRoute: typeof ProjectRefSettingsDashboardRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/compute-and-disk': {
+      id: '/project/$ref/settings/compute-and-disk'
+      path: '/compute-and-disk'
+      fullPath: '/project/$ref/settings/compute-and-disk'
+      preLoaderRoute: typeof ProjectRefSettingsComputeAndDiskRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/api-keys': {
+      id: '/project/$ref/settings/api-keys'
+      path: '/api-keys'
+      fullPath: '/project/$ref/settings/api-keys'
+      preLoaderRoute: typeof ProjectRefSettingsApiKeysRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/api': {
+      id: '/project/$ref/settings/api'
+      path: '/api'
+      fullPath: '/project/$ref/settings/api'
+      preLoaderRoute: typeof ProjectRefSettingsApiRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/addons': {
+      id: '/project/$ref/settings/addons'
+      path: '/addons'
+      fullPath: '/project/$ref/settings/addons'
+      preLoaderRoute: typeof ProjectRefSettingsAddonsRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
     }
     '/project/$ref/realtime/settings': {
       id: '/project/$ref/realtime/settings'
@@ -4372,6 +4659,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefStorageAnalyticsIndexRouteImport
       parentRoute: typeof ProjectRefStorageRoute
     }
+    '/project/$ref/settings/webhooks/': {
+      id: '/project/$ref/settings/webhooks/'
+      path: '/webhooks'
+      fullPath: '/project/$ref/settings/webhooks/'
+      preLoaderRoute: typeof ProjectRefSettingsWebhooksIndexRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/jwt/': {
+      id: '/project/$ref/settings/jwt/'
+      path: '/jwt'
+      fullPath: '/project/$ref/settings/jwt/'
+      preLoaderRoute: typeof ProjectRefSettingsJwtIndexRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/api-keys/': {
+      id: '/project/$ref/settings/api-keys/'
+      path: '/'
+      fullPath: '/project/$ref/settings/api-keys/'
+      preLoaderRoute: typeof ProjectRefSettingsApiKeysIndexRouteImport
+      parentRoute: typeof ProjectRefSettingsApiKeysRoute
+    }
     '/project/$ref/logs/explorer/': {
       id: '/project/$ref/logs/explorer/'
       path: '/explorer'
@@ -4455,6 +4763,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/storage/files/policies'
       preLoaderRoute: typeof ProjectRefStorageFilesPoliciesRouteImport
       parentRoute: typeof ProjectRefStorageRoute
+    }
+    '/project/$ref/settings/webhooks/$endpointId': {
+      id: '/project/$ref/settings/webhooks/$endpointId'
+      path: '/webhooks/$endpointId'
+      fullPath: '/project/$ref/settings/webhooks/$endpointId'
+      preLoaderRoute: typeof ProjectRefSettingsWebhooksEndpointIdRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/jwt/legacy': {
+      id: '/project/$ref/settings/jwt/legacy'
+      path: '/jwt/legacy'
+      fullPath: '/project/$ref/settings/jwt/legacy'
+      preLoaderRoute: typeof ProjectRefSettingsJwtLegacyRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/billing/usage': {
+      id: '/project/$ref/settings/billing/usage'
+      path: '/billing/usage'
+      fullPath: '/project/$ref/settings/billing/usage'
+      preLoaderRoute: typeof ProjectRefSettingsBillingUsageRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
+    '/project/$ref/settings/api-keys/legacy': {
+      id: '/project/$ref/settings/api-keys/legacy'
+      path: '/legacy'
+      fullPath: '/project/$ref/settings/api-keys/legacy'
+      preLoaderRoute: typeof ProjectRefSettingsApiKeysLegacyRouteImport
+      parentRoute: typeof ProjectRefSettingsApiKeysRoute
     }
     '/project/$ref/logs/explorer/templates': {
       id: '/project/$ref/logs/explorer/templates'
@@ -5470,6 +5806,60 @@ const ProjectRefRealtimeRouteChildren: ProjectRefRealtimeRouteChildren = {
 const ProjectRefRealtimeRouteWithChildren =
   ProjectRefRealtimeRoute._addFileChildren(ProjectRefRealtimeRouteChildren)
 
+interface ProjectRefSettingsApiKeysRouteChildren {
+  ProjectRefSettingsApiKeysLegacyRoute: typeof ProjectRefSettingsApiKeysLegacyRoute
+  ProjectRefSettingsApiKeysIndexRoute: typeof ProjectRefSettingsApiKeysIndexRoute
+}
+
+const ProjectRefSettingsApiKeysRouteChildren: ProjectRefSettingsApiKeysRouteChildren =
+  {
+    ProjectRefSettingsApiKeysLegacyRoute: ProjectRefSettingsApiKeysLegacyRoute,
+    ProjectRefSettingsApiKeysIndexRoute: ProjectRefSettingsApiKeysIndexRoute,
+  }
+
+const ProjectRefSettingsApiKeysRouteWithChildren =
+  ProjectRefSettingsApiKeysRoute._addFileChildren(
+    ProjectRefSettingsApiKeysRouteChildren,
+  )
+
+interface ProjectRefSettingsRouteChildren {
+  ProjectRefSettingsAddonsRoute: typeof ProjectRefSettingsAddonsRoute
+  ProjectRefSettingsApiRoute: typeof ProjectRefSettingsApiRoute
+  ProjectRefSettingsApiKeysRoute: typeof ProjectRefSettingsApiKeysRouteWithChildren
+  ProjectRefSettingsComputeAndDiskRoute: typeof ProjectRefSettingsComputeAndDiskRoute
+  ProjectRefSettingsDashboardRoute: typeof ProjectRefSettingsDashboardRoute
+  ProjectRefSettingsGeneralRoute: typeof ProjectRefSettingsGeneralRoute
+  ProjectRefSettingsInfrastructureRoute: typeof ProjectRefSettingsInfrastructureRoute
+  ProjectRefSettingsIntegrationsRoute: typeof ProjectRefSettingsIntegrationsRoute
+  ProjectRefSettingsLogDrainsRoute: typeof ProjectRefSettingsLogDrainsRoute
+  ProjectRefSettingsBillingUsageRoute: typeof ProjectRefSettingsBillingUsageRoute
+  ProjectRefSettingsJwtLegacyRoute: typeof ProjectRefSettingsJwtLegacyRoute
+  ProjectRefSettingsWebhooksEndpointIdRoute: typeof ProjectRefSettingsWebhooksEndpointIdRoute
+  ProjectRefSettingsJwtIndexRoute: typeof ProjectRefSettingsJwtIndexRoute
+  ProjectRefSettingsWebhooksIndexRoute: typeof ProjectRefSettingsWebhooksIndexRoute
+}
+
+const ProjectRefSettingsRouteChildren: ProjectRefSettingsRouteChildren = {
+  ProjectRefSettingsAddonsRoute: ProjectRefSettingsAddonsRoute,
+  ProjectRefSettingsApiRoute: ProjectRefSettingsApiRoute,
+  ProjectRefSettingsApiKeysRoute: ProjectRefSettingsApiKeysRouteWithChildren,
+  ProjectRefSettingsComputeAndDiskRoute: ProjectRefSettingsComputeAndDiskRoute,
+  ProjectRefSettingsDashboardRoute: ProjectRefSettingsDashboardRoute,
+  ProjectRefSettingsGeneralRoute: ProjectRefSettingsGeneralRoute,
+  ProjectRefSettingsInfrastructureRoute: ProjectRefSettingsInfrastructureRoute,
+  ProjectRefSettingsIntegrationsRoute: ProjectRefSettingsIntegrationsRoute,
+  ProjectRefSettingsLogDrainsRoute: ProjectRefSettingsLogDrainsRoute,
+  ProjectRefSettingsBillingUsageRoute: ProjectRefSettingsBillingUsageRoute,
+  ProjectRefSettingsJwtLegacyRoute: ProjectRefSettingsJwtLegacyRoute,
+  ProjectRefSettingsWebhooksEndpointIdRoute:
+    ProjectRefSettingsWebhooksEndpointIdRoute,
+  ProjectRefSettingsJwtIndexRoute: ProjectRefSettingsJwtIndexRoute,
+  ProjectRefSettingsWebhooksIndexRoute: ProjectRefSettingsWebhooksIndexRoute,
+}
+
+const ProjectRefSettingsRouteWithChildren =
+  ProjectRefSettingsRoute._addFileChildren(ProjectRefSettingsRouteChildren)
+
 interface ProjectRefSqlRouteChildren {
   ProjectRefSqlIdRoute: typeof ProjectRefSqlIdRoute
   ProjectRefSqlQuickstartsRoute: typeof ProjectRefSqlQuickstartsRoute
@@ -5528,6 +5918,7 @@ interface ProjectRefRouteChildren {
   ProjectRefLogsRoute: typeof ProjectRefLogsRouteWithChildren
   ProjectRefObservabilityRoute: typeof ProjectRefObservabilityRouteWithChildren
   ProjectRefRealtimeRoute: typeof ProjectRefRealtimeRouteWithChildren
+  ProjectRefSettingsRoute: typeof ProjectRefSettingsRouteWithChildren
   ProjectRefSqlRoute: typeof ProjectRefSqlRouteWithChildren
   ProjectRefStorageRoute: typeof ProjectRefStorageRouteWithChildren
   ProjectRefIndexRoute: typeof ProjectRefIndexRoute
@@ -5543,6 +5934,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefLogsRoute: ProjectRefLogsRouteWithChildren,
   ProjectRefObservabilityRoute: ProjectRefObservabilityRouteWithChildren,
   ProjectRefRealtimeRoute: ProjectRefRealtimeRouteWithChildren,
+  ProjectRefSettingsRoute: ProjectRefSettingsRouteWithChildren,
   ProjectRefSqlRoute: ProjectRefSqlRouteWithChildren,
   ProjectRefStorageRoute: ProjectRefStorageRouteWithChildren,
   ProjectRefIndexRoute: ProjectRefIndexRoute,

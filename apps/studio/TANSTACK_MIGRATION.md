@@ -82,7 +82,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/observability.tsx` — ObservabilityLayout (reads `observabilityLayoutTitle` from leaf staticData)
 - [x] `routes/project/$ref/advisors.tsx` — AdvisorsLayout (reads `advisorsLayoutTitle` from leaf staticData). Honours `skipAdvisorsLayout: true` opt-out for the rules sub-shell, which provides its own AdvisorsLayout-less-DefaultLayout wrap. Scans whole match chain (same pattern as functions.tsx).
 - [x] `routes/project/$ref/advisors/rules.tsx` — sub-shell that inlines the inner body of `AdvisorRulesLayout` (AdvisorsLayout + PageLayout with title/tabs/feature-preview badge), minus the outer DefaultLayout (already provided by the parent project shell). Sets `skipAdvisorsLayout: true` on its own staticData. **Delta vs plan:** the existing `AdvisorRulesLayout` component wraps in DefaultLayout + AdvisorsLayout internally, so reusing it as-is would double-wrap both. Inlined the inner part; the Next-side component is untouched.
-- [ ] `routes/project/$ref/settings.tsx` — SettingsLayout
+- [x] `routes/project/$ref/settings.tsx` — SettingsLayout (reads `settingsLayoutTitle` from leaf staticData). Honours `skipSettingsLayout: true` for `settings/api` (redirect-only page). Adds a sub-shell at `routes/project/$ref/settings/api-keys.tsx` providing `ApiKeysLayout` for both api-keys leaves; `jwt/index` wraps in `JWTKeysLayout` inline since `jwt/legacy` doesn't share it.
 - [ ] `routes/project/$ref/integrations.tsx` — ProjectIntegrationsLayout
 - [x] `routes/project/$ref/sql.tsx` — EditorBaseLayout + SQLEditorLayout. Twin of editor.tsx; all four leaves share identical layout props so the shell hardcodes them (no `staticData` overrides). EditorBaseLayout wraps in ProjectLayoutWithAuth; SQLEditorLayout adds its own `withAuth` HOC but no extra ProjectLayout — same shape as the table editor (auth check runs twice but no double render).
 - [x] `routes/project/$ref/editor.tsx` — EditorBaseLayout + TableEditorLayout. All three leaves share identical layout props so the shell hardcodes them (no `staticData` overrides). EditorBaseLayout wraps in `ProjectLayoutWithAuth` internally; TableEditorLayout's happy path is just a fragment + side-effect (banner) and only wraps in `ProjectLayoutWithAuth` on its no-permission branch — same as Next, no double-wrap in normal use.
@@ -273,21 +273,21 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/settings/*`
 
-- [ ] `routes/project/$ref/settings/general.tsx` ← `pages/project/[ref]/settings/general.tsx`
-- [ ] `routes/project/$ref/settings/addons.tsx` ← `pages/project/[ref]/settings/addons.tsx`
-- [ ] `routes/project/$ref/settings/api.tsx` ← `pages/project/[ref]/settings/api.tsx`
-- [ ] `routes/project/$ref/settings/compute-and-disk.tsx` ← `pages/project/[ref]/settings/compute-and-disk.tsx`
-- [ ] `routes/project/$ref/settings/dashboard.tsx` ← `pages/project/[ref]/settings/dashboard.tsx`
-- [ ] `routes/project/$ref/settings/infrastructure.tsx` ← `pages/project/[ref]/settings/infrastructure.tsx`
-- [ ] `routes/project/$ref/settings/integrations.tsx` ← `pages/project/[ref]/settings/integrations.tsx`
-- [ ] `routes/project/$ref/settings/log-drains.tsx` ← `pages/project/[ref]/settings/log-drains.tsx`
-- [ ] `routes/project/$ref/settings/api-keys/index.tsx` ← `pages/project/[ref]/settings/api-keys/index.tsx`
-- [ ] `routes/project/$ref/settings/api-keys/legacy.tsx` ← `pages/project/[ref]/settings/api-keys/legacy.tsx`
-- [ ] `routes/project/$ref/settings/billing/usage.tsx` ← `pages/project/[ref]/settings/billing/usage.tsx`
-- [ ] `routes/project/$ref/settings/jwt/index.tsx` ← `pages/project/[ref]/settings/jwt/index.tsx`
-- [ ] `routes/project/$ref/settings/jwt/legacy.tsx` ← `pages/project/[ref]/settings/jwt/legacy.tsx`
-- [ ] `routes/project/$ref/settings/webhooks/index.tsx` ← `pages/project/[ref]/settings/webhooks/index.tsx`
-- [ ] `routes/project/$ref/settings/webhooks/$endpointId.tsx` ← `pages/project/[ref]/settings/webhooks/[endpointId].tsx`
+- [x] A `routes/project/$ref/settings/general.tsx` ← `pages/project/[ref]/settings/general.tsx`
+- [x] A `routes/project/$ref/settings/addons.tsx` ← `pages/project/[ref]/settings/addons.tsx`
+- [x] A `routes/project/$ref/settings/api.tsx` ← `pages/project/[ref]/settings/api.tsx` (sets `skipSettingsLayout: true` — page is a useEffect redirect)
+- [x] A `routes/project/$ref/settings/compute-and-disk.tsx` ← `pages/project/[ref]/settings/compute-and-disk.tsx`
+- [x] A `routes/project/$ref/settings/dashboard.tsx` ← `pages/project/[ref]/settings/dashboard.tsx`
+- [x] A `routes/project/$ref/settings/infrastructure.tsx` ← `pages/project/[ref]/settings/infrastructure.tsx`
+- [x] A `routes/project/$ref/settings/integrations.tsx` ← `pages/project/[ref]/settings/integrations.tsx`
+- [x] A `routes/project/$ref/settings/log-drains.tsx` ← `pages/project/[ref]/settings/log-drains.tsx`
+- [x] A `routes/project/$ref/settings/api-keys/index.tsx` ← `pages/project/[ref]/settings/api-keys/index.tsx` (under `api-keys.tsx` sub-shell with ApiKeysLayout)
+- [x] A `routes/project/$ref/settings/api-keys/legacy.tsx` ← `pages/project/[ref]/settings/api-keys/legacy.tsx` (under `api-keys.tsx` sub-shell)
+- [x] A `routes/project/$ref/settings/billing/usage.tsx` ← `pages/project/[ref]/settings/billing/usage.tsx`
+- [x] A `routes/project/$ref/settings/jwt/index.tsx` ← `pages/project/[ref]/settings/jwt/index.tsx` (wraps in JWTKeysLayout inline)
+- [x] A `routes/project/$ref/settings/jwt/legacy.tsx` ← `pages/project/[ref]/settings/jwt/legacy.tsx`
+- [x] A `routes/project/$ref/settings/webhooks/index.tsx` ← `pages/project/[ref]/settings/webhooks/index.tsx`
+- [x] A `routes/project/$ref/settings/webhooks/$endpointId.tsx` ← `pages/project/[ref]/settings/webhooks/[endpointId].tsx`
 
 ### Project shell — `/integrations/*`
 
