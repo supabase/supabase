@@ -36,7 +36,7 @@ async function generate() {
     .map((page) => {
       const path = page
         .replace('.next/server/pages', '')
-        .replace('pages', '')
+        .replace(/^pages/, '')
         .replace('.html', '')
         // add a `/` for blog posts
         .replace('_blog', `/${blogUrl}`)
