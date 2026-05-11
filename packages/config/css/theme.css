@@ -498,6 +498,13 @@
   --color-scaleA-1100: var(--color-scaleA-1100);
   --color-scale-1200: var(--color-scale-1200);
   --color-scaleA-1200: var(--color-scaleA-1200);
+  --color-brand-100: var(--color-brand-100);
+  --color-brand-700: var(--color-brand-700);
+  --color-brand-800: var(--color-brand-800);
+  --color-brand-900: var(--color-brand-900);
+  --color-brand-1000: var(--color-brand-1000);
+  --color-brand-1100: var(--color-brand-1100);
+  --color-brand-1200: var(--color-brand-1200);
   --color-sidebar: hsl(var(--sidebar-background));
   --color-sidebar-foreground: hsl(var(--sidebar-foreground));
   --color-sidebar-primary: hsl(var(--sidebar-primary));

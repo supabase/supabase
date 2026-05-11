@@ -417,4 +417,16 @@
   --color-scaleA-1100: var(--colors-scaleA11);
   --color-scale-1200: var(--colors-scale12);
   --color-scaleA-1200: var(--colors-scaleA12);
+  --color-brand-100: var(--colors-brand1);
+  --color-brand-200: hsl(var(--brand-200));
+  --color-brand-300: hsl(var(--brand-300));
+  --color-brand-400: hsl(var(--brand-400));
+  --color-brand-500: hsl(var(--brand-500));
+  --color-brand-600: hsl(var(--brand-600));
+  --color-brand-700: var(--colors-brand7);
+  --color-brand-800: var(--colors-brand8);
+  --color-brand-900: var(--colors-brand9);
+  --color-brand-1000: var(--colors-brand10);
+  --color-brand-1100: var(--colors-brand11);
+  --color-brand-1200: var(--colors-brand12);
 }

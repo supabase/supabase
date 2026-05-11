@@ -174,6 +174,20 @@ for (let i = 1; i <= 12; i++) {
   themeLines.push(`  ${alpha}: var(${alpha});`)
 }
 
+// Supabase brand scale (--colors-brand{1..12} live in brand-vars.css with
+// per-theme overrides). Steps 200..600 are deliberately skipped — those are
+// owned by the semantic --color-brand-{200..600} tokens emitted above from
+// tw-extend-color-snapshot.js, which source hsl(var(--brand-{200..600})) from
+// the theme files. Re-emitting them here would silently override semantic
+// brand colors with raw scale values.
+const SEMANTIC_BRAND_STEPS = new Set([2, 3, 4, 5, 6])
+for (let i = 1; i <= 12; i++) {
+  if (SEMANTIC_BRAND_STEPS.has(i)) continue
+  const solid = `--color-brand-${i * 100}`
+  rootLines.push(`  ${solid}: var(--colors-brand${i});`)
+  themeLines.push(`  ${solid}: var(${solid});`)
+}
+
 // Sidebar shadcn semantic tokens.
 themeLines.push(`  --color-sidebar: hsl(var(--sidebar-background));`)
 themeLines.push(`  --color-sidebar-foreground: hsl(var(--sidebar-foreground));`)

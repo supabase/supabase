@@ -12,6 +12,7 @@
 /* Raw color values + per-theme overrides. Must come before colors.css so the
  * --colors-* references resolve to a value. */
 @import './css/radix-vars.css';
+@import './css/brand-vars.css';
 @import '../ui/build/css/source/global.css';
 @import '../ui/build/css/themes/dark.css';
 @import '../ui/build/css/themes/light.css';
