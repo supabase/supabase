@@ -4,7 +4,7 @@ import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } fr
 
 type Props = {
   label: string
-  icon: React.ReactNode
+  icon?: React.ReactNode
   dropdownItems?: React.ReactNode
   href: string
   isActive: boolean
@@ -25,7 +25,7 @@ export function LogsSidebarItem({ label, icon, dropdownItems, href, isActive, on
         href={href}
         className={'h-7 flex-1 text-sm px-4 flex items-center gap-2 truncate'}
       >
-        <span>{icon}</span>
+        {icon && <span>{icon}</span>}
         <span className="truncate">{label}</span>
       </Link>
       {dropdownItems && (
