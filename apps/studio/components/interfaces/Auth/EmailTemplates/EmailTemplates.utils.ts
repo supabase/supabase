@@ -1,10 +1,8 @@
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 import type { components } from '@/data/api'
-import type { Project } from '@/data/projects/project-detail-query'
 import type { Organization } from '@/types'
 
 type AuthConfig = components['schemas']['GoTrueConfigResponse']
-const CUSTOM_EMAIL_TEMPLATES_RESTRICTED_PROJECT_CUTOFF = '2026-05-01T00:00:00.000Z'
 
 /**
  * Convert template title to URL-friendly slug
@@ -21,23 +19,11 @@ export const hasCustomEmailSender = (config?: Partial<AuthConfig>) => {
   return isSmtpEnabled(config) || hasSendEmailHook
 }
 
-export const isProjectInCustomEmailTemplateRestrictedCohort = (
-  project?: Pick<Project, 'inserted_at'>
-) => {
-  const projectInsertedAtMs = Date.parse(project?.inserted_at ?? '')
-
-  return (
-    Number.isFinite(projectInsertedAtMs) &&
-    projectInsertedAtMs >= Date.parse(CUSTOM_EMAIL_TEMPLATES_RESTRICTED_PROJECT_CUTOFF)
-  )
-}
-
 export const isCustomEmailTemplateRestrictionStatusKnown = ({
   authConfig,
 }: {
   authConfig?: Partial<AuthConfig>
   organization?: Organization
-  project?: Pick<Project, 'inserted_at'>
 }) => {
   return authConfig !== undefined
 }
@@ -47,7 +33,6 @@ export const isCustomEmailTemplateEditingRestricted = ({
 }: {
   authConfig?: Partial<AuthConfig>
   organization?: Organization
-  project?: Pick<Project, 'inserted_at'>
 }) => {
   // Temporary Studio-only paygate while Platform/Auth own the exact eligibility cohort.
   return !hasCustomEmailSender(authConfig)

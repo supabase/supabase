@@ -51,7 +51,6 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -76,18 +75,15 @@ const RedirectToTemplates = () => {
 
   const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data: selectedProject } = useSelectedProjectQuery()
   const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
     authConfig,
     organization: selectedOrganization,
-    project: selectedProject,
   })
   const isTemplateEditBlocked =
     isTemplateRestrictionStatusKnown &&
     isCustomEmailTemplateEditingRestricted({
       authConfig,
       organization: selectedOrganization,
-      project: selectedProject,
     })
   const isTemplateEditorReadOnly = !isTemplateRestrictionStatusKnown || isTemplateEditBlocked
 
