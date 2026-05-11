@@ -291,6 +291,13 @@ const DatabaseUsage = () => {
           <LazyComposedChartHandler
             id="replication-lag"
             label="Replication lag"
+            format="s"
+            valuePrecision={2}
+            showTooltip
+            YAxisProps={{
+              width: 50,
+              tickFormatter: (value: any) => `${value}s`,
+            }}
             attributes={[
               {
                 attribute: 'physical_replication_lag_physical_replication_lag_seconds',
