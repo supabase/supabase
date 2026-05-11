@@ -25,12 +25,15 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import {
   PlanRequest,
   useSendUpgradeRequestMutation,
 } from '@/data/organizations/request-upgrade-mutation'
+import type { PlanId } from '@/data/subscriptions/types'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
@@ -41,9 +44,11 @@ const FormSchema = z.object({
 
 const formId = 'request-upgrade-form'
 
+type DisplayPlan = 'Free' | PlanRequest
+
 interface RequestUpgradeToBillingOwnersProps {
   block?: boolean
-  plan?: PlanRequest
+  plan?: DisplayPlan
   addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
@@ -68,6 +73,10 @@ export const RequestUpgradeToBillingOwners = ({
   const currentPlan = organization?.plan?.id
   const isFreePlan = currentPlan === 'free'
 
+  const requestedPlanId = plan.toLowerCase() as PlanId
+  const planChange = !addon ? getPlanChangeType(currentPlan, requestedPlanId) : 'upgrade'
+  const isInvalidDirection = planChange === 'downgrade' || planChange === 'none'
+
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
   const { data: roles } = useOrganizationRolesV2Query({ slug: organization?.slug })
   const orgRoles = roles?.org_scoped_roles ?? []
@@ -75,7 +84,7 @@ export const RequestUpgradeToBillingOwners = ({
   const { mutate: sendUpgradeRequest, isPending: isSubmitting } = useSendUpgradeRequestMutation({
     onSuccess: () => {
       track('request_upgrade_submitted', {
-        requestedPlan: plan,
+        requestedPlan: plan as PlanRequest,
         addon,
         currentPlan,
       })
@@ -144,19 +153,38 @@ export const RequestUpgradeToBillingOwners = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!slug) return console.error('Slug is required')
-    sendUpgradeRequest({ slug, plan, note: values.note })
+    sendUpgradeRequest({ slug, plan: plan as PlanRequest, note: values.note })
   }
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
       track('request_upgrade_modal_opened', {
-        requestedPlan: plan,
+        requestedPlan: plan as PlanRequest,
         addon,
         currentPlan,
         featureProposition,
       })
     }
     setOpen(isOpen)
+  }
+
+  if (isInvalidDirection) {
+    return (
+      <ButtonTooltip
+        block={block}
+        disabled
+        type="default"
+        className={className}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'Downgrades cannot be requested. Ask a billing owner to change the plan directly.',
+          },
+        }}
+      >
+        Not available
+      </ButtonTooltip>
+    )
   }
 
   return (

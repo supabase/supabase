@@ -308,7 +308,10 @@ export const PlanUpdateSidePanel = () => {
                         Current plan
                       </Button>
                     ) : !canUpdateSubscription ? (
-                      <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
+                      <RequestUpgradeToBillingOwners
+                        block
+                        plan={plan.name as 'Free' | 'Pro' | 'Team'}
+                      />
                     ) : (
                       <ButtonTooltip
                         block
