@@ -132,10 +132,6 @@ test('can click load older', async () => {
     { timeout: 10000 }
   )
 
-  // React 19 reassigns `.onclick` on managed elements as part of its event
-  // wiring, so a direct `loadOlder.onclick = vi.fn()` spy gets clobbered
-  // before the assertion runs. addEventListener is unaffected and gives us a
-  // clean way to confirm the click reached the button.
   const handleClick = vi.fn()
   loadOlder.addEventListener('click', handleClick)
 
