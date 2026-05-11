@@ -46,8 +46,8 @@ export const InlineEditorButton = () => {
         },
       }}
     >
-        <SqlEditor size={16} strokeWidth={1.5} />
-        <span className="sr-only">SQL Editor</span>
+      <SqlEditor size={16} strokeWidth={1.5} />
+      <span className="sr-only">SQL Editor</span>
     </ButtonTooltip>
   )
 }
