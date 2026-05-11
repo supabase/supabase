@@ -38,13 +38,13 @@ const EditableNode = memo(({ data }: NodeProps<Node<EditableNodeData>>) => {
       <Handle type="target" position={Position.Top} />
       <div className="space-y-3">
         <input
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+          className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground"
           value={data.label}
           onChange={(event) => data.onLabelChange?.(event.target.value)}
           placeholder="Write something..."
         />
         <div className="flex justify-end">
-          <Button type="button" size="sm" variant="outline" onClick={() => data.onRemove?.()}>
+          <Button type="button" size="sm" variant="secondary" onClick={() => data.onRemove?.()}>
             Remove
           </Button>
         </div>
