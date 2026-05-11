@@ -296,7 +296,7 @@ const DatabaseUsage = () => {
             showTooltip
             YAxisProps={{
               width: 50,
-              tickFormatter: (value: any) => `${value}s`,
+              tickFormatter: (value: number) => `${value}s`,
             }}
             attributes={[
               {
