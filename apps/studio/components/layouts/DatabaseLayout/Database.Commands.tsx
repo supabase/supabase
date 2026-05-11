@@ -82,8 +82,8 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         ? [
             {
               id: 'nav-database-replication',
-              name: 'Replication',
-              value: 'Database: Replication',
+              name: 'Manage Read Replicas',
+              value: 'Database: Manage Read Replicas',
               route: `/project/${ref}/database/replication`,
               defaultHidden: true,
             } as IRouteCommand,

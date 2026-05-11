@@ -124,7 +124,7 @@ export const databaseNavRegistry: RegistryDefinations<DatabaseNavShortcutId> = {
   },
   [DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_REPLICATION]: {
     id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_REPLICATION,
-    label: 'Go to Replication',
+    label: 'Manage Read Replicas',
     sequence: ['D', 'L'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_DATABASE,
