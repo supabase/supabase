@@ -125,6 +125,107 @@ function ssrStubGraphiql(): Plugin {
   }
 }
 
+// Build-time guard: scan the emitted client chunks for cross-chunk
+// circular imports and fail the build if any are found. Catches the
+// class of bug that produces runtime errors like
+// "TypeError: <name> is not a function" at module load — when chunk
+// A imports a binding from chunk B and B (transitively) imports A
+// back, ES module live-bindings can be undefined at the point the
+// chunk that evaluates first tries to use them.
+//
+// Cycles are matched by chunk basename prefix (stripping the
+// `assets/` directory and the `-<hash>.js` suffix), so the allowlist
+// stays stable across builds even as Rolldown reassigns hashes.
+const KNOWN_CHUNK_CYCLES: ReadonlyArray<ReadonlyArray<string>> = [
+  // Entry #1 in CIRCULAR_IMPORTS.md — the `cva`/TreeView/ui cycle.
+  // Worked around via the `class-variance-authority` manualChunks
+  // pin; the chunk graph still surfaces the cycle even though the
+  // top-level `cva(...)` call inside TreeView is no longer broken.
+  ['LoadingLine', 'TreeView', 'ui'],
+]
+
+function chunkPrefix(name: string): string {
+  return name
+    .replace(/^assets\//, '')
+    .replace(/-[A-Za-z0-9_-]{6,10}\.js$/, '')
+    .replace(/\.js$/, '')
+}
+
+function isKnownCycle(scc: string[]): boolean {
+  const prefixes = new Set(scc.map(chunkPrefix))
+  return KNOWN_CHUNK_CYCLES.some(
+    (known) => known.length === prefixes.size && known.every((p) => prefixes.has(p))
+  )
+}
+
+function assertNoChunkCycles(): Plugin {
+  return {
+    name: 'studio-assert-no-chunk-cycles',
+    apply: 'build',
+    generateBundle(_options, bundle) {
+      const graph: Record<string, Set<string>> = {}
+      for (const [name, asset] of Object.entries(bundle)) {
+        if (asset.type !== 'chunk') continue
+        graph[name] = new Set(asset.imports.filter((i) => i in bundle))
+      }
+
+      // Tarjan's strongly-connected-components algorithm. Any SCC with
+      // more than one node is a cycle in the output chunk graph.
+      const indices: Record<string, number> = {}
+      const lowlinks: Record<string, number> = {}
+      const onStack: Record<string, boolean> = {}
+      const stack: string[] = []
+      const sccs: string[][] = []
+      let nextIndex = 0
+
+      const strongconnect = (v: string) => {
+        indices[v] = nextIndex
+        lowlinks[v] = nextIndex
+        nextIndex++
+        stack.push(v)
+        onStack[v] = true
+        for (const w of graph[v] || []) {
+          if (indices[w] === undefined) {
+            strongconnect(w)
+            lowlinks[v] = Math.min(lowlinks[v], lowlinks[w])
+          } else if (onStack[w]) {
+            lowlinks[v] = Math.min(lowlinks[v], indices[w])
+          }
+        }
+        if (lowlinks[v] === indices[v]) {
+          const scc: string[] = []
+          let w: string | undefined
+          do {
+            w = stack.pop()
+            if (w === undefined) break
+            onStack[w] = false
+            scc.push(w)
+          } while (w !== v)
+          if (scc.length > 1) sccs.push(scc)
+        }
+      }
+
+      for (const v of Object.keys(graph)) {
+        if (indices[v] === undefined) strongconnect(v)
+      }
+
+      const unexpected = sccs.filter((scc) => !isKnownCycle(scc))
+      if (unexpected.length === 0) return
+
+      const summary = unexpected
+        .map((scc, i) => `  Cycle ${i + 1}:\n` + scc.map((c) => `    ${c}`).join('\n'))
+        .join('\n\n')
+      const msg =
+        `studio-assert-no-chunk-cycles: detected ${unexpected.length} new chunk-level cycle(s) in the client bundle.\n` +
+        `These cause "X is not a function" runtime errors at module-load time. ` +
+        `Either restructure the modules involved or add the cycle to KNOWN_CHUNK_CYCLES ` +
+        `in apps/studio/vite.config.ts (and document it in CIRCULAR_IMPORTS.md).\n\n` +
+        summary
+      this.error(msg)
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   // Inline NEXT_PUBLIC_* env vars at build time so `process.env.NEXT_PUBLIC_*`
   // works in the browser bundle (mirrors Next.js behaviour). loadEnv reads the
@@ -224,6 +325,15 @@ export default defineConfig(({ mode }) => {
     //   surfaces in the browser as "TypeError: e is not a function" at
     //   `folder-open-<hash>.js`.
     //
+    //   `react` / `react-dom` — pinning lucide-react alone caused
+    //   Rolldown to suck React into the lucide-react chunk (lucide
+    //   depends on React, no explicit pin further up the graph). That
+    //   shifted live-bindings across the rest of the chunk graph and
+    //   broke unrelated chunks (e.g. `Alert-<hash>.js` started crashing
+    //   with `c is not a function` because its `styleHandler` import
+    //   came in through the now-too-large `lucide-react` chunk). Pin
+    //   React explicitly so it stays a leaf vendor chunk.
+    //
     // See CIRCULAR_IMPORTS.md — slated to be lifted into a separate PR.
     build: {
       rollupOptions: {
@@ -231,6 +341,17 @@ export default defineConfig(({ mode }) => {
           manualChunks: (id) => {
             if (id.includes('node_modules/class-variance-authority/')) {
               return 'class-variance-authority'
+            }
+            // Pin React / React-DOM (and their JSX runtimes + scheduler)
+            // before lucide-react, so downstream chunks consume React
+            // from one place. Rolldown can still inline React into
+            // adjacent chunks for CJS interop, but the explicit pin
+            // anchors the canonical copy here.
+            if (
+              /node_modules\/(react|react-dom|scheduler)(\/|$)/.test(id) ||
+              /node_modules\/react\/jsx-(runtime|dev-runtime)/.test(id)
+            ) {
+              return 'react-vendor'
             }
             if (id.includes('node_modules/lucide-react/')) {
               return 'lucide-react'
@@ -269,6 +390,7 @@ export default defineConfig(({ mode }) => {
       nextCompat(),
       ssrStubGraphiql(),
       umdAmdShortCircuit(),
+      assertNoChunkCycles(),
       devtools(),
       tailwindcss(),
       tanstackStart({
