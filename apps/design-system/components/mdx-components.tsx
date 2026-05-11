@@ -31,6 +31,7 @@ import { StyleWrapper } from './style-wrapper'
 import { Callout } from '@/components/callout'
 import { CodeBlockWrapper } from '@/components/code-block-wrapper'
 import { CodeFragment } from '@/components/code-fragment'
+import { ColorPalette } from '@/components/color-palette'
 import { Colors } from '@/components/colors'
 import { ComponentExample } from '@/components/component-example'
 import { ComponentPreview } from '@/components/component-preview'
@@ -265,6 +266,7 @@ const components = {
     />
   ),
   Colors,
+  ColorPalette,
   Icons,
   ThemeSettings,
   CodeFragment,

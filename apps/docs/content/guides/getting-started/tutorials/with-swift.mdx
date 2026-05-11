@@ -9,7 +9,7 @@ description: 'Learn how to use Supabase in your SwiftUI App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/swift-user-management).
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/swift-user-management).
 
 </Admonition>
 
@@ -273,47 +273,9 @@ struct UpdateProfileParams: Encodable {
 
 </$CodeTabs>
 
-### Launch!
+## Profile photos
 
-Now that you've created all the views, add an entry point for the application. This will verify if the user has a valid session and route them to the authenticated or non-authenticated state.
-
-Add a new `AppView.swift` file.
-
-<$CodeTabs>
-
-```swift name=AppView.swift
-import SwiftUI
-
-struct AppView: View {
-  @State var isAuthenticated = false
-
-  var body: some View {
-    Group {
-      if isAuthenticated {
-        ProfileView()
-      } else {
-        AuthView()
-      }
-    }
-    .task {
-      for await state in supabase.auth.authStateChanges {
-        if [.initialSession, .signedIn, .signedOut].contains(state.event) {
-          isAuthenticated = state.session != nil
-        }
-      }
-    }
-  }
-}
-```
-
-</$CodeTabs>
-
-Update the entry point to the newly created `AppView`. Run in Xcode to launch your application in the simulator.
-
-## Bonus: Profile photos
-
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like
-photos and videos.
+Next, add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -561,5 +523,42 @@ struct Profile: Codable {
 </$CodeTabs>
 
 You no longer need the `UpdateProfileParams` struct, as you can now reuse the `Profile` struct for both request and response calls.
+
+### Launch!
+
+With all the views in place, add an entry point for the application.
+
+Add a new `AppView.swift` file.
+
+<$CodeTabs>
+
+```swift name=AppView.swift
+import SwiftUI
+
+struct AppView: View {
+  @State var isAuthenticated = false
+
+  var body: some View {
+    Group {
+      if isAuthenticated {
+        ProfileView()
+      } else {
+        AuthView()
+      }
+    }
+    .task {
+      for await state in supabase.auth.authStateChanges {
+        if [.initialSession, .signedIn, .signedOut].contains(state.event) {
+          isAuthenticated = state.session != nil
+        }
+      }
+    }
+  }
+}
+```
+
+</$CodeTabs>
+
+Update the entry point to the newly created `AppView`. Run in Xcode to launch your application in the simulator.
 
 At this stage you have a fully functional application!

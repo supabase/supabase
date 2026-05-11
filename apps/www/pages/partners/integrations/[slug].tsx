@@ -2,8 +2,9 @@ import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { type GetStaticPaths, type GetStaticProps } from 'next'
-import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import { serialize } from 'next-mdx-remote-client/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -189,7 +190,11 @@ function Partner({
                 </h2>
 
                 <div className="prose">
-                  <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
+                  {'error' in overview ? (
+                    <p>Error rendering integration page: {overview.error.message}</p>
+                  ) : (
+                    <MDXClient {...overview} components={mdxComponents(setFocusedImage)} />
+                  )}
                 </div>
               </div>
 
@@ -340,13 +345,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  const overview = await serialize(partner.overview, {
-    blockJS: false,
-    scope: {
-      chCodeConfig: codeHikeOptions,
-    },
-    mdxOptions: {
-      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+  const overview = await serialize({
+    source: partner.overview,
+    options: {
+      mdxOptions: {
+        remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+      },
     },
   })
 

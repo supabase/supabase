@@ -1,3 +1,4 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { last } from 'lodash'
 
@@ -37,13 +38,15 @@ export async function getDatabaseCronJobRuns({
 
   // Use runid for ordering and pagination since it's the primary key (indexed)
   // and preserves chronological order (auto-incrementing)
-  let query = `
+  const afterRunIdClause =
+    typeof afterRunId === 'number' ? safeSql`AND runid < ${literal(afterRunId)}` : safeSql``
+  const query = safeSql`
     SELECT * FROM cron.job_run_details
     WHERE
-      jobid = '${jobId}'
-      ${typeof afterRunId === 'number' ? `AND runid < '${afterRunId}'` : ''}
+      jobid = ${literal(jobId)}
+      ${afterRunIdClause}
     ORDER BY runid DESC
-    LIMIT ${CRON_JOB_RUNS_PAGE_SIZE}`
+    LIMIT ${literal(CRON_JOB_RUNS_PAGE_SIZE)}`
 
   const { result } = await executeSql({
     projectRef,

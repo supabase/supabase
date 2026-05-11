@@ -8,7 +8,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 export const CreateBucketButton = ({
   onClick,
 }: {
-  onClick?: MouseEventHandler<HTMLButtonElement>
+  onClick: MouseEventHandler<HTMLButtonElement>
 }) => {
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 

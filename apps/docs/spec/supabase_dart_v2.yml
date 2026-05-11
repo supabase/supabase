@@ -26,10 +26,10 @@ functions:
         isOptional: false
         type: string
         description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
-      - name: anonKey
+      - name: publishableKey
         isOptional: false
         type: string
-        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+        description: The publishable (anon) key supplied when you create a new project in your project dashboard. Use this for client-side apps. The deprecated `anonKey` parameter is still accepted but `publishableKey` takes precedence when both are supplied.
       - name: headers
         isOptional: true
         type: Map<String, String>
@@ -94,7 +94,7 @@ functions:
           Future<void> main() async {
             await Supabase.initialize(
               url: 'https://xyzcompany.supabase.co',
-              anonKey: 'publishable-or-anon-key',
+              publishableKey: 'your-publishable-key',
             );
 
             runApp(MyApp());
@@ -109,7 +109,7 @@ functions:
           ```dart
           final supabase = SupabaseClient(
             'https://xyzcompany.supabase.co',
-            'publishable-or-anon-key',
+            'your-secret-key', // use your secret key for server-side usage
           );
           ```
 
