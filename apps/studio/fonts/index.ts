@@ -18,19 +18,6 @@ export const inter = localFont({
   ],
 })
 
-export const manrope = localFont({
-  variable: '--font-manrope',
-  display: 'swap',
-  fallback: ['system-ui', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-  src: [
-    {
-      path: './manrope/Manrope-Variable.woff2',
-      weight: '200 800',
-      style: 'normal',
-    },
-  ],
-})
-
 export const sourceCodePro = localFont({
   variable: '--font-source-code-pro',
   display: 'swap',

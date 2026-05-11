@@ -53,7 +53,7 @@ import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProv
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useRootQueryClient } from '@/data/query-client'
-import { inter, manrope, sourceCodePro } from '@/fonts'
+import { inter, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
@@ -176,7 +176,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
                         <style
                           dangerouslySetInnerHTML={{
-                            __html: `:root{--font-custom:${inter.style.fontFamily};--font-sans:${inter.style.fontFamily};--font-heading:${manrope.style.fontFamily};--font-mono:${sourceCodePro.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                            __html: `:root{--font-custom:${inter.style.fontFamily};--font-sans:${inter.style.fontFamily};--font-mono:${sourceCodePro.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
                           }}
                         />
                         {/* Speed up initial API loading times by pre-connecting to the API domain */}

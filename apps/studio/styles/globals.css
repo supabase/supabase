@@ -158,32 +158,8 @@
   }
 
   h1,
-  h2,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-heading);
-  }
-  h1,
   h2 {
     font-weight: 500;
-  }
-  h3 {
-    font-family: var(--font-sans);
-  }
-  h3:is(
-    .text-lg,
-    .text-xl,
-    .text-2xl,
-    .text-3xl,
-    .text-4xl,
-    .text-5xl,
-    .text-6xl,
-    .text-7xl,
-    .text-8xl,
-    .text-9xl
-  ) {
-    font-family: var(--font-heading);
   }
   body {
     letter-spacing: -0.01em;

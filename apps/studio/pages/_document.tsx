@@ -1,6 +1,6 @@
 import Document, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
 
-import { inter, manrope, sourceCodePro } from '@/fonts'
+import { inter, sourceCodePro } from '@/fonts'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 class MyDocument extends Document {
@@ -12,7 +12,7 @@ class MyDocument extends Document {
 
   render() {
     return (
-      <Html lang="en" className={`${inter.variable} ${manrope.variable} ${sourceCodePro.variable}`}>
+      <Html lang="en" className={`${inter.variable} ${sourceCodePro.variable}`}>
         <Head>
           {/* Workaround for https://github.com/suren-atoyan/monaco-react/issues/272 */}
           <link
