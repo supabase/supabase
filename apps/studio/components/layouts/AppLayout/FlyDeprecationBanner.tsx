@@ -179,6 +179,8 @@ const FlyDeprecationDialog = ({
   )
 }
 
+const MAX_LISTED = 5
+
 const ProjectList = ({
   label,
   items,
@@ -189,6 +191,8 @@ const ProjectList = ({
   instructions: ReactNode
 }) => {
   if (items.length === 0) return null
+  const visible = items.slice(0, MAX_LISTED)
+  const remaining = items.length - visible.length
   return (
     <>
       <DialogSection className="text-sm flex flex-col gap-y-2">
@@ -201,11 +205,14 @@ const ProjectList = ({
           </p>
         ) : (
           <ul className="list-disc pl-5 space-y-1">
-            {items.map((p) => (
+            {visible.map((p) => (
               <li key={p.ref}>
                 {p.name} <span className="text-foreground-muted">({p.orgName})</span>
               </li>
             ))}
+            {remaining > 0 && (
+              <li className="text-foreground-muted list-none -ml-5">…and {remaining} more.</li>
+            )}
           </ul>
         )}
       </DialogSection>
