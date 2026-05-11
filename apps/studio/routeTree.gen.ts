@@ -47,6 +47,7 @@ import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
 import { Route as ProjectRefStorageRouteImport } from './routes/project/$ref/storage'
 import { Route as ProjectRefSqlRouteImport } from './routes/project/$ref/sql'
 import { Route as ProjectRefRealtimeRouteImport } from './routes/project/$ref/realtime'
+import { Route as ProjectRefObservabilityRouteImport } from './routes/project/$ref/observability'
 import { Route as ProjectRefFunctionsRouteImport } from './routes/project/$ref/functions'
 import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/editor'
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
@@ -62,6 +63,7 @@ import { Route as AppAccountSecurityRouteImport } from './routes/_app/account/se
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
 import { Route as ProjectRefSqlIndexRouteImport } from './routes/project/$ref/sql/index'
+import { Route as ProjectRefObservabilityIndexRouteImport } from './routes/project/$ref/observability/index'
 import { Route as ProjectRefFunctionsIndexRouteImport } from './routes/project/$ref/functions/index'
 import { Route as ProjectRefEditorIndexRouteImport } from './routes/project/$ref/editor/index'
 import { Route as ProjectRefBranchesIndexRouteImport } from './routes/project/$ref/branches/index'
@@ -77,6 +79,16 @@ import { Route as ProjectRefSqlIdRouteImport } from './routes/project/$ref/sql/$
 import { Route as ProjectRefRealtimeSettingsRouteImport } from './routes/project/$ref/realtime/settings'
 import { Route as ProjectRefRealtimePoliciesRouteImport } from './routes/project/$ref/realtime/policies'
 import { Route as ProjectRefRealtimeInspectorRouteImport } from './routes/project/$ref/realtime/inspector'
+import { Route as ProjectRefObservabilityStorageRouteImport } from './routes/project/$ref/observability/storage'
+import { Route as ProjectRefObservabilityRealtimeRouteImport } from './routes/project/$ref/observability/realtime'
+import { Route as ProjectRefObservabilityQueryPerformanceRouteImport } from './routes/project/$ref/observability/query-performance'
+import { Route as ProjectRefObservabilityQueryInsightsRouteImport } from './routes/project/$ref/observability/query-insights'
+import { Route as ProjectRefObservabilityPostgrestRouteImport } from './routes/project/$ref/observability/postgrest'
+import { Route as ProjectRefObservabilityEdgeFunctionsRouteImport } from './routes/project/$ref/observability/edge-functions'
+import { Route as ProjectRefObservabilityDatabaseRouteImport } from './routes/project/$ref/observability/database'
+import { Route as ProjectRefObservabilityAuthRouteImport } from './routes/project/$ref/observability/auth'
+import { Route as ProjectRefObservabilityApiOverviewRouteImport } from './routes/project/$ref/observability/api-overview'
+import { Route as ProjectRefObservabilityIdRouteImport } from './routes/project/$ref/observability/$id'
 import { Route as ProjectRefFunctionsSecretsRouteImport } from './routes/project/$ref/functions/secrets'
 import { Route as ProjectRefFunctionsNewRouteImport } from './routes/project/$ref/functions/new'
 import { Route as ProjectRefFunctionsFunctionSlugRouteImport } from './routes/project/$ref/functions/$functionSlug'
@@ -422,6 +434,11 @@ const ProjectRefRealtimeRoute = ProjectRefRealtimeRouteImport.update({
   path: '/realtime',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const ProjectRefObservabilityRoute = ProjectRefObservabilityRouteImport.update({
+  id: '/observability',
+  path: '/observability',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ProjectRefFunctionsRoute = ProjectRefFunctionsRouteImport.update({
   id: '/functions',
   path: '/functions',
@@ -498,6 +515,12 @@ const ProjectRefSqlIndexRoute = ProjectRefSqlIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProjectRefSqlRoute,
 } as any)
+const ProjectRefObservabilityIndexRoute =
+  ProjectRefObservabilityIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
 const ProjectRefFunctionsIndexRoute =
   ProjectRefFunctionsIndexRouteImport.update({
     id: '/',
@@ -579,6 +602,66 @@ const ProjectRefRealtimeInspectorRoute =
     id: '/inspector',
     path: '/inspector',
     getParentRoute: () => ProjectRefRealtimeRoute,
+  } as any)
+const ProjectRefObservabilityStorageRoute =
+  ProjectRefObservabilityStorageRouteImport.update({
+    id: '/storage',
+    path: '/storage',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityRealtimeRoute =
+  ProjectRefObservabilityRealtimeRouteImport.update({
+    id: '/realtime',
+    path: '/realtime',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityQueryPerformanceRoute =
+  ProjectRefObservabilityQueryPerformanceRouteImport.update({
+    id: '/query-performance',
+    path: '/query-performance',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityQueryInsightsRoute =
+  ProjectRefObservabilityQueryInsightsRouteImport.update({
+    id: '/query-insights',
+    path: '/query-insights',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityPostgrestRoute =
+  ProjectRefObservabilityPostgrestRouteImport.update({
+    id: '/postgrest',
+    path: '/postgrest',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityEdgeFunctionsRoute =
+  ProjectRefObservabilityEdgeFunctionsRouteImport.update({
+    id: '/edge-functions',
+    path: '/edge-functions',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityDatabaseRoute =
+  ProjectRefObservabilityDatabaseRouteImport.update({
+    id: '/database',
+    path: '/database',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityAuthRoute =
+  ProjectRefObservabilityAuthRouteImport.update({
+    id: '/auth',
+    path: '/auth',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityApiOverviewRoute =
+  ProjectRefObservabilityApiOverviewRouteImport.update({
+    id: '/api-overview',
+    path: '/api-overview',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityIdRoute =
+  ProjectRefObservabilityIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ProjectRefObservabilityRoute,
   } as any)
 const ProjectRefFunctionsSecretsRoute =
   ProjectRefFunctionsSecretsRouteImport.update({
@@ -1502,6 +1585,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
+  '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
@@ -1567,6 +1651,16 @@ export interface FileRoutesByFullPath {
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
+  '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
+  '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
+  '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
+  '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
+  '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
+  '/project/$ref/observability/query-insights': typeof ProjectRefObservabilityQueryInsightsRoute
+  '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
+  '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
+  '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -1582,6 +1676,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
+  '/project/$ref/observability/': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
@@ -1780,6 +1875,16 @@ export interface FileRoutesByTo {
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
+  '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
+  '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
+  '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
+  '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
+  '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
+  '/project/$ref/observability/query-insights': typeof ProjectRefObservabilityQueryInsightsRoute
+  '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
+  '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
+  '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -1795,6 +1900,7 @@ export interface FileRoutesByTo {
   '/project/$ref/branches': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor': typeof ProjectRefEditorIndexRoute
   '/project/$ref/functions': typeof ProjectRefFunctionsIndexRoute
+  '/project/$ref/observability': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
@@ -1939,6 +2045,7 @@ export interface FileRoutesById {
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
+  '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
@@ -2004,6 +2111,16 @@ export interface FileRoutesById {
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
+  '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
+  '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
+  '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
+  '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
+  '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
+  '/project/$ref/observability/query-insights': typeof ProjectRefObservabilityQueryInsightsRoute
+  '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
+  '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
+  '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -2019,6 +2136,7 @@ export interface FileRoutesById {
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
+  '/project/$ref/observability/': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/_app/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/_auth/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
@@ -2162,6 +2280,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/functions'
+    | '/project/$ref/observability'
     | '/project/$ref/realtime'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
@@ -2227,6 +2346,16 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/observability/$id'
+    | '/project/$ref/observability/api-overview'
+    | '/project/$ref/observability/auth'
+    | '/project/$ref/observability/database'
+    | '/project/$ref/observability/edge-functions'
+    | '/project/$ref/observability/postgrest'
+    | '/project/$ref/observability/query-insights'
+    | '/project/$ref/observability/query-performance'
+    | '/project/$ref/observability/realtime'
+    | '/project/$ref/observability/storage'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -2242,6 +2371,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
     | '/project/$ref/functions/'
+    | '/project/$ref/observability/'
     | '/project/$ref/sql/'
     | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
@@ -2440,6 +2570,16 @@ export interface FileRouteTypes {
     | '/project/$ref/editor/new'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/observability/$id'
+    | '/project/$ref/observability/api-overview'
+    | '/project/$ref/observability/auth'
+    | '/project/$ref/observability/database'
+    | '/project/$ref/observability/edge-functions'
+    | '/project/$ref/observability/postgrest'
+    | '/project/$ref/observability/query-insights'
+    | '/project/$ref/observability/query-performance'
+    | '/project/$ref/observability/realtime'
+    | '/project/$ref/observability/storage'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -2455,6 +2595,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches'
     | '/project/$ref/editor'
     | '/project/$ref/functions'
+    | '/project/$ref/observability'
     | '/project/$ref/sql'
     | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
@@ -2598,6 +2739,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/functions'
+    | '/project/$ref/observability'
     | '/project/$ref/realtime'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
@@ -2663,6 +2805,16 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/observability/$id'
+    | '/project/$ref/observability/api-overview'
+    | '/project/$ref/observability/auth'
+    | '/project/$ref/observability/database'
+    | '/project/$ref/observability/edge-functions'
+    | '/project/$ref/observability/postgrest'
+    | '/project/$ref/observability/query-insights'
+    | '/project/$ref/observability/query-performance'
+    | '/project/$ref/observability/realtime'
+    | '/project/$ref/observability/storage'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -2678,6 +2830,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
     | '/project/$ref/functions/'
+    | '/project/$ref/observability/'
     | '/project/$ref/sql/'
     | '/_app/org/$slug/webhooks/$endpointId'
     | '/_auth/partners/stripe/projects/login'
@@ -3146,6 +3299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefRealtimeRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/project/$ref/observability': {
+      id: '/project/$ref/observability'
+      path: '/observability'
+      fullPath: '/project/$ref/observability'
+      preLoaderRoute: typeof ProjectRefObservabilityRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/project/$ref/functions': {
       id: '/project/$ref/functions'
       path: '/functions'
@@ -3251,6 +3411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefSqlIndexRouteImport
       parentRoute: typeof ProjectRefSqlRoute
     }
+    '/project/$ref/observability/': {
+      id: '/project/$ref/observability/'
+      path: '/'
+      fullPath: '/project/$ref/observability/'
+      preLoaderRoute: typeof ProjectRefObservabilityIndexRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
     '/project/$ref/functions/': {
       id: '/project/$ref/functions/'
       path: '/'
@@ -3355,6 +3522,76 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/realtime/inspector'
       preLoaderRoute: typeof ProjectRefRealtimeInspectorRouteImport
       parentRoute: typeof ProjectRefRealtimeRoute
+    }
+    '/project/$ref/observability/storage': {
+      id: '/project/$ref/observability/storage'
+      path: '/storage'
+      fullPath: '/project/$ref/observability/storage'
+      preLoaderRoute: typeof ProjectRefObservabilityStorageRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/realtime': {
+      id: '/project/$ref/observability/realtime'
+      path: '/realtime'
+      fullPath: '/project/$ref/observability/realtime'
+      preLoaderRoute: typeof ProjectRefObservabilityRealtimeRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/query-performance': {
+      id: '/project/$ref/observability/query-performance'
+      path: '/query-performance'
+      fullPath: '/project/$ref/observability/query-performance'
+      preLoaderRoute: typeof ProjectRefObservabilityQueryPerformanceRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/query-insights': {
+      id: '/project/$ref/observability/query-insights'
+      path: '/query-insights'
+      fullPath: '/project/$ref/observability/query-insights'
+      preLoaderRoute: typeof ProjectRefObservabilityQueryInsightsRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/postgrest': {
+      id: '/project/$ref/observability/postgrest'
+      path: '/postgrest'
+      fullPath: '/project/$ref/observability/postgrest'
+      preLoaderRoute: typeof ProjectRefObservabilityPostgrestRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/edge-functions': {
+      id: '/project/$ref/observability/edge-functions'
+      path: '/edge-functions'
+      fullPath: '/project/$ref/observability/edge-functions'
+      preLoaderRoute: typeof ProjectRefObservabilityEdgeFunctionsRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/database': {
+      id: '/project/$ref/observability/database'
+      path: '/database'
+      fullPath: '/project/$ref/observability/database'
+      preLoaderRoute: typeof ProjectRefObservabilityDatabaseRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/auth': {
+      id: '/project/$ref/observability/auth'
+      path: '/auth'
+      fullPath: '/project/$ref/observability/auth'
+      preLoaderRoute: typeof ProjectRefObservabilityAuthRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/api-overview': {
+      id: '/project/$ref/observability/api-overview'
+      path: '/api-overview'
+      fullPath: '/project/$ref/observability/api-overview'
+      preLoaderRoute: typeof ProjectRefObservabilityApiOverviewRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/$id': {
+      id: '/project/$ref/observability/$id'
+      path: '/$id'
+      fullPath: '/project/$ref/observability/$id'
+      preLoaderRoute: typeof ProjectRefObservabilityIdRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
     }
     '/project/$ref/functions/secrets': {
       id: '/project/$ref/functions/secrets'
@@ -4759,6 +4996,45 @@ const ProjectRefFunctionsRouteChildren: ProjectRefFunctionsRouteChildren = {
 const ProjectRefFunctionsRouteWithChildren =
   ProjectRefFunctionsRoute._addFileChildren(ProjectRefFunctionsRouteChildren)
 
+interface ProjectRefObservabilityRouteChildren {
+  ProjectRefObservabilityIdRoute: typeof ProjectRefObservabilityIdRoute
+  ProjectRefObservabilityApiOverviewRoute: typeof ProjectRefObservabilityApiOverviewRoute
+  ProjectRefObservabilityAuthRoute: typeof ProjectRefObservabilityAuthRoute
+  ProjectRefObservabilityDatabaseRoute: typeof ProjectRefObservabilityDatabaseRoute
+  ProjectRefObservabilityEdgeFunctionsRoute: typeof ProjectRefObservabilityEdgeFunctionsRoute
+  ProjectRefObservabilityPostgrestRoute: typeof ProjectRefObservabilityPostgrestRoute
+  ProjectRefObservabilityQueryInsightsRoute: typeof ProjectRefObservabilityQueryInsightsRoute
+  ProjectRefObservabilityQueryPerformanceRoute: typeof ProjectRefObservabilityQueryPerformanceRoute
+  ProjectRefObservabilityRealtimeRoute: typeof ProjectRefObservabilityRealtimeRoute
+  ProjectRefObservabilityStorageRoute: typeof ProjectRefObservabilityStorageRoute
+  ProjectRefObservabilityIndexRoute: typeof ProjectRefObservabilityIndexRoute
+}
+
+const ProjectRefObservabilityRouteChildren: ProjectRefObservabilityRouteChildren =
+  {
+    ProjectRefObservabilityIdRoute: ProjectRefObservabilityIdRoute,
+    ProjectRefObservabilityApiOverviewRoute:
+      ProjectRefObservabilityApiOverviewRoute,
+    ProjectRefObservabilityAuthRoute: ProjectRefObservabilityAuthRoute,
+    ProjectRefObservabilityDatabaseRoute: ProjectRefObservabilityDatabaseRoute,
+    ProjectRefObservabilityEdgeFunctionsRoute:
+      ProjectRefObservabilityEdgeFunctionsRoute,
+    ProjectRefObservabilityPostgrestRoute:
+      ProjectRefObservabilityPostgrestRoute,
+    ProjectRefObservabilityQueryInsightsRoute:
+      ProjectRefObservabilityQueryInsightsRoute,
+    ProjectRefObservabilityQueryPerformanceRoute:
+      ProjectRefObservabilityQueryPerformanceRoute,
+    ProjectRefObservabilityRealtimeRoute: ProjectRefObservabilityRealtimeRoute,
+    ProjectRefObservabilityStorageRoute: ProjectRefObservabilityStorageRoute,
+    ProjectRefObservabilityIndexRoute: ProjectRefObservabilityIndexRoute,
+  }
+
+const ProjectRefObservabilityRouteWithChildren =
+  ProjectRefObservabilityRoute._addFileChildren(
+    ProjectRefObservabilityRouteChildren,
+  )
+
 interface ProjectRefRealtimeRouteChildren {
   ProjectRefRealtimeInspectorRoute: typeof ProjectRefRealtimeInspectorRoute
   ProjectRefRealtimePoliciesRoute: typeof ProjectRefRealtimePoliciesRoute
@@ -4829,6 +5105,7 @@ interface ProjectRefRouteChildren {
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
   ProjectRefEditorRoute: typeof ProjectRefEditorRouteWithChildren
   ProjectRefFunctionsRoute: typeof ProjectRefFunctionsRouteWithChildren
+  ProjectRefObservabilityRoute: typeof ProjectRefObservabilityRouteWithChildren
   ProjectRefRealtimeRoute: typeof ProjectRefRealtimeRouteWithChildren
   ProjectRefSqlRoute: typeof ProjectRefSqlRouteWithChildren
   ProjectRefStorageRoute: typeof ProjectRefStorageRouteWithChildren
@@ -4842,6 +5119,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
   ProjectRefEditorRoute: ProjectRefEditorRouteWithChildren,
   ProjectRefFunctionsRoute: ProjectRefFunctionsRouteWithChildren,
+  ProjectRefObservabilityRoute: ProjectRefObservabilityRouteWithChildren,
   ProjectRefRealtimeRoute: ProjectRefRealtimeRouteWithChildren,
   ProjectRefSqlRoute: ProjectRefSqlRouteWithChildren,
   ProjectRefStorageRoute: ProjectRefStorageRouteWithChildren,

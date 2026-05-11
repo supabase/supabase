@@ -79,7 +79,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/functions.tsx` — EdgeFunctionsLayout (reads `functionsLayoutTitle` from leaf `staticData`). Honours `skipFunctionsLayout: true` opt-out for the `$functionSlug` subtree, whose `EdgeFunctionDetailsLayout` already wraps `EdgeFunctionsLayout` internally — same pattern as auth.tsx. Sub-shell at `routes/project/$ref/functions/$functionSlug.tsx` provides `EdgeFunctionDetailsLayout` for all 5 slug leaves (reads `edgeFunctionDetailsTitle` from leaf staticData).
 - [x] `routes/project/$ref/branches.tsx` — BranchLayout only. **Delta vs plan:** the per-page `PageLayout` (with different titles + primary/secondary actions) stays in each leaf. Hoisted `BranchesPageWrapper` and `MergeRequestsPageWrapper` to top-level exports in their respective `pages/...` files so the route files can import + re-use the same wrapping.
 - [ ] `routes/project/$ref/logs.tsx` — LogsLayout
-- [ ] `routes/project/$ref/observability.tsx` — ObservabilityLayout
+- [x] `routes/project/$ref/observability.tsx` — ObservabilityLayout (reads `observabilityLayoutTitle` from leaf staticData)
 - [x] `routes/project/$ref/advisors.tsx` — AdvisorsLayout (reads `advisorsLayoutTitle` from leaf staticData). Honours `skipAdvisorsLayout: true` opt-out for the rules sub-shell, which provides its own AdvisorsLayout-less-DefaultLayout wrap. Scans whole match chain (same pattern as functions.tsx).
 - [x] `routes/project/$ref/advisors/rules.tsx` — sub-shell that inlines the inner body of `AdvisorRulesLayout` (AdvisorsLayout + PageLayout with title/tabs/feature-preview badge), minus the outer DefaultLayout (already provided by the parent project shell). Sets `skipAdvisorsLayout: true` on its own staticData. **Delta vs plan:** the existing `AdvisorRulesLayout` component wraps in DefaultLayout + AdvisorsLayout internally, so reusing it as-is would double-wrap both. Inlined the inner part; the Next-side component is untouched.
 - [ ] `routes/project/$ref/settings.tsx` — SettingsLayout
@@ -252,17 +252,17 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/observability/*`
 
-- [ ] `routes/project/$ref/observability/index.tsx` ← `pages/project/[ref]/observability/index.tsx`
-- [ ] `routes/project/$ref/observability/$id.tsx` ← `pages/project/[ref]/observability/[id].tsx`
-- [ ] `routes/project/$ref/observability/auth.tsx` ← `pages/project/[ref]/observability/auth.tsx`
-- [ ] `routes/project/$ref/observability/database.tsx` ← `pages/project/[ref]/observability/database.tsx`
-- [ ] `routes/project/$ref/observability/api-overview.tsx` ← `pages/project/[ref]/observability/api-overview.tsx`
-- [ ] `routes/project/$ref/observability/edge-functions.tsx` ← `pages/project/[ref]/observability/edge-functions.tsx`
-- [ ] `routes/project/$ref/observability/postgrest.tsx` ← `pages/project/[ref]/observability/postgrest.tsx`
-- [ ] `routes/project/$ref/observability/query-insights.tsx` ← `pages/project/[ref]/observability/query-insights.tsx`
-- [ ] `routes/project/$ref/observability/query-performance.tsx` ← `pages/project/[ref]/observability/query-performance.tsx`
-- [ ] `routes/project/$ref/observability/realtime.tsx` ← `pages/project/[ref]/observability/realtime.tsx`
-- [ ] `routes/project/$ref/observability/storage.tsx` ← `pages/project/[ref]/observability/storage.tsx`
+- [x] A `routes/project/$ref/observability/index.tsx` ← `pages/project/[ref]/observability/index.tsx`
+- [x] A `routes/project/$ref/observability/$id.tsx` ← `pages/project/[ref]/observability/[id].tsx`
+- [x] A `routes/project/$ref/observability/auth.tsx` ← `pages/project/[ref]/observability/auth.tsx`
+- [x] A `routes/project/$ref/observability/database.tsx` ← `pages/project/[ref]/observability/database.tsx`
+- [x] A `routes/project/$ref/observability/api-overview.tsx` ← `pages/project/[ref]/observability/api-overview.tsx`
+- [x] A `routes/project/$ref/observability/edge-functions.tsx` ← `pages/project/[ref]/observability/edge-functions.tsx`
+- [x] A `routes/project/$ref/observability/postgrest.tsx` ← `pages/project/[ref]/observability/postgrest.tsx`
+- [x] A `routes/project/$ref/observability/query-insights.tsx` ← `pages/project/[ref]/observability/query-insights.tsx`
+- [x] A `routes/project/$ref/observability/query-performance.tsx` ← `pages/project/[ref]/observability/query-performance.tsx`
+- [x] A `routes/project/$ref/observability/realtime.tsx` ← `pages/project/[ref]/observability/realtime.tsx`
+- [x] A `routes/project/$ref/observability/storage.tsx` ← `pages/project/[ref]/observability/storage.tsx`
 
 ### Project shell — `/advisors/*`
 
