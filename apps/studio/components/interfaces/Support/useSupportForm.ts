@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useRef, type Dispatch } from 'react'
+import { useEffect, useRef, useState, type Dispatch } from 'react'
 import { useForm, useWatch, type DefaultValues, type UseFormReturn } from 'react-hook-form'
 
 import { SupportFormSchema, type SupportFormValues } from './SupportForm.schema'
@@ -16,7 +16,7 @@ import {
 
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 
-const supportFormBaseDefaults: DefaultValues<SupportFormValues> = {
+const supportFormDefaultValues: DefaultValues<SupportFormValues> = {
   organizationSlug: NO_ORG_MARKER,
   projectRef: NO_PROJECT_MARKER,
   severity: 'Low',
@@ -41,33 +41,6 @@ export function useSupportForm(
   dispatch: Dispatch<SupportFormActions>,
   initialParams?: Partial<SupportFormUrlKeys>
 ): UseSupportFormResult {
-  // Seed defaults from the URL synchronously so controlled fields like the
-  // category Select start in their final state. Setting these via a useEffect
-  // setValue makes Radix Select switch from uncontrolled to controlled
-  // mid-mount, which on React 19 spuriously emits onValueChange('') and
-  // clears the field. See radix-ui/primitives#3381.
-  const initialParamsResult = useMemo(() => {
-    return initialParams !== undefined
-      ? loadSupportFormInitialParamsFromObject(initialParams)
-      : loadSupportFormInitialParams(typeof window === 'undefined' ? '' : window.location.search)
-    // Snapshot once; URL/object changes after mount are intentionally ignored.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const supportFormDefaultValues = useMemo<DefaultValues<SupportFormValues>>(() => {
-    return {
-      ...supportFormBaseDefaults,
-      ...(initialParamsResult.category ? { category: initialParamsResult.category } : {}),
-      ...(typeof initialParamsResult.subject === 'string'
-        ? { subject: initialParamsResult.subject }
-        : {}),
-      ...(typeof initialParamsResult.message === 'string'
-        ? { message: initialParamsResult.message }
-        : {}),
-      ...(initialParamsResult.sid ? { dashboardSentryIssueId: initialParamsResult.sid } : {}),
-    }
-  }, [initialParamsResult])
-
   const form = useForm<SupportFormValues>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -75,8 +48,36 @@ export function useSupportForm(
     defaultValues: supportFormDefaultValues,
   })
 
-  const urlParamsRef = useRef<SupportFormUrlKeys | null>(initialParamsResult)
-  const initialError = initialParamsResult.error ?? null
+  const urlParamsRef = useRef<SupportFormUrlKeys | null>(null)
+  const providedInitialParamsRef = useRef(initialParams)
+  const [initialError, setInitialError] = useState<string | null>(null)
+
+  // Load initial values from URL params after mount so SSR/SSG render with
+  // bare defaults (no `window` access) and the client hydrates against the
+  // same HTML. URL-derived values are applied here, post-hydration.
+  useEffect(() => {
+    const params =
+      providedInitialParamsRef.current !== undefined
+        ? loadSupportFormInitialParamsFromObject(providedInitialParamsRef.current)
+        : loadSupportFormInitialParams(window.location.search)
+    urlParamsRef.current = params
+    setInitialError(params.error ?? null)
+
+    if (params.category && !form.getFieldState('category').isDirty) {
+      form.setValue('category', params.category, { shouldDirty: false })
+    }
+    if (typeof params.subject === 'string' && !form.getFieldState('subject').isDirty) {
+      form.setValue('subject', params.subject, { shouldDirty: false })
+    }
+    if (typeof params.message === 'string' && !form.getFieldState('message').isDirty) {
+      form.setValue('message', params.message, { shouldDirty: false })
+    }
+    if (params.sid && !form.getFieldState('dashboardSentryIssueId').isDirty) {
+      form.setValue('dashboardSentryIssueId', params.sid, {
+        shouldDirty: false,
+      })
+    }
+  }, [form])
 
   const hasAppliedOrgProjectRef = useRef(false)
   const { data: organizations, isPending: organizationsLoading } = useOrganizationsQuery()
