@@ -232,7 +232,7 @@ describe('OrganizationInvite', () => {
     ).toBeInTheDocument()
   })
 
-  test('renders no-longer-valid and generic error states', () => {
+  test('renders no-longer-valid, invalid lookup, and generic error states', () => {
     mocks.useInvitationQuery.mockReturnValueOnce({
       data: undefined,
       error: responseError('Failed to retrieve organization', 401),
@@ -248,6 +248,24 @@ describe('OrganizationInvite', () => {
       screen.getByText('This invite has already been accepted or declined.')
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Back to dashboard' })).toHaveAttribute('href', '/')
+
+    mocks.useInvitationQuery.mockReturnValueOnce({
+      data: undefined,
+      error: responseError('Not Found', 404),
+      isSuccess: false,
+      isError: true,
+      isPending: false,
+    })
+
+    rerender(<OrganizationInvite />)
+
+    expect(screen.getByText('Invite invalid')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Open the full invite link again, or ask the organization owner for a new invite.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Not Found')).not.toBeInTheDocument()
 
     mocks.useInvitationQuery.mockReturnValueOnce({
       data: undefined,

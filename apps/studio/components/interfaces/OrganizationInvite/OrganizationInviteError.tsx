@@ -11,9 +11,15 @@ interface OrganizationInviteError {
   data?: OrganizationInviteByToken
   error?: ResponseError | null
   isError: boolean
+  isInvalidInvite?: boolean
 }
 
-export const OrganizationInviteError = ({ data, error, isError }: OrganizationInviteError) => {
+export const OrganizationInviteError = ({
+  data,
+  error,
+  isError,
+  isInvalidInvite,
+}: OrganizationInviteError) => {
   const router = useRouter()
   const signOut = useSignOut()
   const { profile } = useProfile()
@@ -21,6 +27,15 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
   const handleSignOut = async () => {
     await signOut()
     router.reload()
+  }
+
+  if (isInvalidInvite) {
+    return (
+      <Admonition
+        type="warning"
+        description="Open the full invite link again, or ask the organization owner for a new invite."
+      />
+    )
   }
 
   if (isError) {

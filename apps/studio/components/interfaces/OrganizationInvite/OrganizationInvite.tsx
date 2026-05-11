@@ -40,11 +40,14 @@ export const OrganizationInvite = () => {
       enabled: !!profile && !!slug && !!token,
     }
   )
+  const inviteIsNoLongerValid =
+    error?.code === 401 && error?.message.includes('Failed to retrieve organization')
+  const inviteIsInvalid =
+    (isSuccessInvitation && !!data?.token_does_not_exist) ||
+    (isErrorInvitation && error?.code === 404)
   const hasError =
     isErrorInvitation ||
     (isSuccessInvitation && (data.token_does_not_exist || data.expired_token || !data.email_match))
-  const inviteIsNoLongerValid =
-    error?.code === 401 && error?.message.includes('Failed to retrieve organization')
 
   const isWrongAccount = isSuccessInvitation && !!data && !data.email_match
   const showOrganizationHeader =
@@ -65,12 +68,12 @@ export const OrganizationInvite = () => {
       ? 'View invitation'
       : isWrongAccount
         ? 'Wrong account'
-        : isErrorInvitation
-          ? 'Unable to load invitation'
-          : data?.expired_token
-            ? 'Invite expired'
-            : data?.token_does_not_exist
-              ? 'Invite invalid'
+        : inviteIsInvalid
+          ? 'Invite invalid'
+          : isErrorInvitation
+            ? 'Unable to load invitation'
+            : data?.expired_token
+              ? 'Invite expired'
               : showOrganizationHeader
                 ? `Join ${organizationName}`
                 : undefined
@@ -172,7 +175,12 @@ export const OrganizationInvite = () => {
 
   if (hasError) {
     return withLayout(
-      <OrganizationInviteError data={data} error={error} isError={isErrorInvitation} />
+      <OrganizationInviteError
+        data={data}
+        error={error}
+        isError={isErrorInvitation}
+        isInvalidInvite={inviteIsInvalid}
+      />
     )
   }
 
