@@ -288,7 +288,10 @@ export const PolicyEditorPanel = memo(function ({
         }
         if (selectedPolicy.check) {
           if (selectedPolicy.command === 'INSERT') setUsing(safeSql`  ${selectedPolicy.check}`)
-          else setCheck(safeSql`  ${selectedPolicy.check}`)
+          else {
+            setCheck(safeSql`  ${selectedPolicy.check}`)
+            setShowCheckBlock(true)
+          }
         }
 
         setRolesFragment(
