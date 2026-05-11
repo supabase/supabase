@@ -103,7 +103,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const taxFailed = upcomingInvoice?.tax_status === 'failed'
 
   const planFeePaidInAdvance =
-    !planItem && upcomingInvoice?.fixed_fees_billing_mode === 'in_advance'
+    !planItem && upcomingInvoice?.fixed_fees_billing_mode === 'in_arrears'
 
   return (
     <>
