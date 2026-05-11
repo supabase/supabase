@@ -112,7 +112,7 @@ const AuthUsage = () => {
     { label: 'SAML', value: 'saml' },
     { label: 'Recovery', value: 'recovery' },
     { label: 'SSO/SAML', value: 'sso/saml' },
-    { label: 'Sign-in link', value: 'magiclink' },
+    { label: 'Magic link', value: 'magiclink' },
     { label: 'Keycloak', value: 'keycloak' },
     { label: 'Facebook', value: 'facebook' },
     { label: 'Twitch', value: 'twitch' },

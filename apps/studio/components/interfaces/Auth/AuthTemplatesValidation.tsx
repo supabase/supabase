@@ -76,8 +76,8 @@ const MAGIC_LINK: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MAGIC_LINK',
   type: 'object',
-  title: 'Sign-in link or code',
-  purpose: 'Send a one-time sign-in link or code',
+  title: 'Magic link or OTP',
+  purpose: 'Send a one-time sign-in link or one-time password',
   properties: {
     MAILER_SUBJECTS_MAGIC_LINK: {
       title: 'Subject',

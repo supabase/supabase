@@ -39,7 +39,7 @@ export const useUserSendMagicLinkMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to send sign-in link: ${data.message}`)
+        toast.error(`Failed to send magic link: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
