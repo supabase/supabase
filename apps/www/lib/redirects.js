@@ -3112,6 +3112,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts/:slug',
+    destination: '/docs/guides/ai-tools/ai-prompts/:slug',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/getting-started/ai-skills',
     destination: '/docs/guides/ai-tools/ai-skills',
   },
