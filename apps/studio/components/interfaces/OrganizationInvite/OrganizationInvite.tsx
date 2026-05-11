@@ -46,11 +46,12 @@ export const OrganizationInvite = () => {
   const inviteIsNoLongerValid =
     error?.code === 401 && error?.message.includes('Failed to retrieve organization')
 
-  const isInvitationLoading = isLoadingProfile || isLoadingInvitation || !router.isReady
   const showOrganizationHeader =
     isSuccessInvitation && !!data && !data.token_does_not_exist && !data.expired_token
   const organizationName = data?.organization_name ?? 'an organization'
   const isSignedOut = !isLoggedIn || (!profile && !isLoadingProfile)
+  const isInvitationLoading =
+    !isSignedOut && (isLoadingProfile || isLoadingInvitation || !router.isReady)
   const loginRedirectLink = `/sign-in?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
   const signupRedirectLink = `/sign-up?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
   const interstitialTitle = inviteIsNoLongerValid

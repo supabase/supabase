@@ -122,7 +122,7 @@ describe('OrganizationInvite', () => {
 
   test('renders sign-in actions for signed-out users', () => {
     mocks.isLoggedIn.mockReturnValue(false)
-    mocks.useProfile.mockReturnValue({ profile: null, isLoading: false })
+    mocks.useProfile.mockReturnValue({ profile: null, isLoading: true })
     mocks.useProfileNameAndPicture.mockReturnValue({
       username: undefined,
       primaryEmail: undefined,
