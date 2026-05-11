@@ -62,6 +62,7 @@ export const DateTimeInput = ({
           value={value}
           type={inputType}
           step={inputType == 'datetime-local' || inputType == 'time' ? '1' : undefined}
+          onChange={(e) => onChange(e.target.value)}
         />
         <InputGroupAddon align="inline-end">
           {!disabled && (
