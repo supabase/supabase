@@ -39,7 +39,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
   const extensionMeta = extensions.find((item) => item.name === extension.name)
   const docsUrl = extensionMeta?.link.startsWith('/guides')
     ? `${DOCS_URL}${extensionMeta?.link}`
-    : (extensionMeta?.link ?? undefined)
+    : extensionMeta?.link ?? undefined
 
   const { mutate: disableExtension, isPending: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
@@ -83,7 +83,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
           </div>
         </TableCell>
 
-        <TableCell className="font-mono tracking-tighter">
+        <TableCell className="w-28 font-mono tracking-tighter">
           {extension?.installed_version ?? extension.default_version}
         </TableCell>
 

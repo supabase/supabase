@@ -112,7 +112,9 @@ export const Extensions = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead key="name">Name</TableHead>
-                  <TableHead key="version">Version</TableHead>
+                  <TableHead key="version" className="w-28">
+                    Version
+                  </TableHead>
                   <TableHead key="schema">Schema</TableHead>
                   <TableHead key="description">Description</TableHead>
                   <TableHead key="used-by">Used by</TableHead>
