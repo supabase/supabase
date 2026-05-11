@@ -74,13 +74,26 @@ function CategorySelector({ form }: CategorySelectorProps) {
       control={form.control}
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
+        // Radix Select fires `onValueChange('')` when its controlled value
+        // transitions from `undefined` to a defined value whose matching
+        // SelectItem isn't mounted yet (the dropdown is closed, so
+        // SelectContent and the items it portals haven't registered). On
+        // React 19's stricter scheduling this races our `setValue` from
+        // useSupportForm and clobbers the prefilled category. No
+        // SelectItem can have value="" (Radix throws), so `v === ''` is
+        // always the spurious bubble — drop it. See
+        // radix-ui/primitives#3381.
+        const onValueChange = (v: string) => {
+          if (v === '' && field.value) return
+          field.onChange(v)
+        }
         return (
           <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
             <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 defaultValue={field.value}
-                onValueChange={field.onChange}
+                onValueChange={onValueChange}
               >
                 <SelectTrigger_Shadcn_ aria-label="Select an issue" className="w-full">
                   <SelectValue_Shadcn_ placeholder="Select an issue">
