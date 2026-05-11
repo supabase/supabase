@@ -39,14 +39,12 @@ export const AssistantButton = () => {
         },
       }}
     >
-      <>
         <AiIconAnimation
           allowHoverEffect={false}
           size={16}
           className={cn(isOpen && 'text-background')}
         />
         <span className="sr-only">AI Assistant</span>
-      </>
     </ButtonTooltip>
   )
 }

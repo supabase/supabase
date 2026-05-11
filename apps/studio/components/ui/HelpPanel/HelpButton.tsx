@@ -34,7 +34,6 @@ export const HelpButton = () => {
       }}
       tooltip={{ content: { text: 'Help' } }}
     >
-      <>
         <HelpCircle
           size={16}
           strokeWidth={1.5}
@@ -44,7 +43,6 @@ export const HelpButton = () => {
           )}
         />
         <span className="sr-only">Help</span>
-      </>
     </ButtonTooltip>
   )
 }
