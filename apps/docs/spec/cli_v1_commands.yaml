@@ -3907,7 +3907,10 @@ commands:
   - id: supabase-branches-get
     title: supabase branches get
     summary: Retrieve details of a preview branch
-    description: Retrieve details of the specified preview branch.
+    description: |
+      Retrieve details of the specified preview branch.
+
+      **Note:** For the main branch, password-dependent fields (`POSTGRES_URL`, `POSTGRES_URL_NON_POOLING`) are not populated because production database credentials are not retrievable via API.
     tags: []
     links: []
     usage: supabase branches get [name]
