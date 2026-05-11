@@ -3105,7 +3105,7 @@ module.exports = [
     source: '/docs/guides/getting-started/plugins',
     destination: '/docs/guides/ai-tools/plugins',
   },
-    {
+  {
     permanent: true,
     source: '/docs/guides/getting-started/ai-prompts',
     destination: '/docs/guides/ai-tools/ai-prompts',
