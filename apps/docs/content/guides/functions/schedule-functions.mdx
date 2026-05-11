@@ -34,6 +34,11 @@ select vault.create_secret('https://project-ref.supabase.co', 'project_url');
 select vault.create_secret('YOUR_SUPABASE_PUBLISHABLE_KEY', 'publishable_key');
 ```
 
+Run the Vault setup once before creating the cron job. The cron job reads the
+same `publishable_key` secret from Vault and sends it as the bearer token when
+it invokes your Edge Function, so the key is not hard-coded in the scheduled
+job definition.
+
 Make a POST request to a Supabase Edge Function every minute:
 
 ```sql
