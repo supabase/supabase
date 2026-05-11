@@ -3078,8 +3078,8 @@ export interface ComputeBadgeUpgradeClickedEvent {
  * @group Events
  * @source studio
  */
-export interface FlyDeprecationBannerViewedEvent {
-  action: 'fly_deprecation_banner_viewed'
+export interface FlyDeprecationBannerExposedEvent {
+  action: 'fly_deprecation_banner_exposed'
   groups: TelemetryGroups
   properties: {
     primaryCount: number
@@ -3613,7 +3613,7 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
-  | FlyDeprecationBannerViewedEvent
+  | FlyDeprecationBannerExposedEvent
   | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent

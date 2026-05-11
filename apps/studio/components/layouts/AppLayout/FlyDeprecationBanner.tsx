@@ -18,12 +18,12 @@ import {
 
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import {
   useFlyDeprecationProjects,
   type FlyDeprecationProject,
 } from '@/hooks/misc/useFlyDeprecationProjects'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTrack } from '@/lib/telemetry/track'
 
 const BANNER_EXPIRES_AT = new Date('2026-06-01T00:00:00Z')
 const BACKUP_RESTORE_CLI_URL =
@@ -49,39 +49,25 @@ export const FlyDeprecationBanner = () => {
   const { isReady, primaries, branches } = useFlyDeprecationProjects({ enabled: shouldEvaluate })
 
   const hasFlyResources = primaries.length > 0 || branches.length > 0
-  const firstProject = primaries[0] ?? branches[0]
-  const firstOrgSlug = firstProject?.orgSlug ?? ''
-  const firstProjectRef = firstProject?.ref ?? ''
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
-  const viewedRef = useRef(false)
+  const exposedRef = useRef(false)
   useEffect(() => {
-    if (!shouldEvaluate || !isReady || !hasFlyResources || viewedRef.current) return
-    viewedRef.current = true
-    sendEvent({
-      action: 'fly_deprecation_banner_viewed',
-      properties: { primaryCount: primaries.length, branchCount: branches.length },
-      groups: { project: firstProjectRef, organization: firstOrgSlug },
+    if (!shouldEvaluate || !isReady || !hasFlyResources || exposedRef.current) return
+    exposedRef.current = true
+    track('fly_deprecation_banner_exposed', {
+      primaryCount: primaries.length,
+      branchCount: branches.length,
     })
-  }, [
-    shouldEvaluate,
-    isReady,
-    hasFlyResources,
-    primaries.length,
-    branches.length,
-    firstProjectRef,
-    firstOrgSlug,
-    sendEvent,
-  ])
+  }, [shouldEvaluate, isReady, hasFlyResources, primaries.length, branches.length, track])
 
   if (!shouldEvaluate || !isReady || !hasFlyResources) return null
 
   const onDismiss = () => {
-    sendEvent({
-      action: 'fly_deprecation_banner_dismissed',
-      properties: { primaryCount: primaries.length, branchCount: branches.length },
-      groups: { project: firstProjectRef, organization: firstOrgSlug },
+    track('fly_deprecation_banner_dismissed', {
+      primaryCount: primaries.length,
+      branchCount: branches.length,
     })
     setAcknowledged(true)
   }
