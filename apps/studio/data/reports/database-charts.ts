@@ -75,6 +75,33 @@ export const getReportAttributesV2: (
       ],
     },
     {
+      id: 'swap-usage',
+      label: 'Swap usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
+      hide: false,
+      showTooltip: true,
+      showLegend: false,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: false,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: any) => formatBytes(value, 2),
+      },
+      attributes: [
+        {
+          attribute: 'swap_usage',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+          tooltip:
+            'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
+        },
+      ],
+    },
+    {
       id: 'cpu-usage',
       label: 'CPU usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#cpu-usage`,
