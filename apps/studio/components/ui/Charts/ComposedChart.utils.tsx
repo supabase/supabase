@@ -223,7 +223,7 @@ export const CustomTooltip = ({
         typeof format === 'string' &&
         format
       ) {
-        return `${formatted} ${format}`
+        return `${formatted}${format}`
       }
       return formatted
     }
