@@ -2298,24 +2298,35 @@ export const ai_tools: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/ai-tools' },
     {
-      name: 'Supabase Agent Plugin',
+      name: 'Agent Plugin',
       url: '/guides/ai-tools/plugins' as `/${string}`,
     },
     {
-      name: 'Prompts',
-      url: '/guides/ai-tools/ai-prompts' as `/${string}`,
+      name: 'MCP server',
+      url: '/guides/ai-tools/mcp' as `/${string}`,
     },
     {
       name: 'Agent Skills',
       url: '/guides/ai-tools/ai-skills' as `/${string}`,
     },
     {
-      name: 'Supabase MCP server',
-      url: '/guides/ai-tools/mcp' as `/${string}`,
+      name: 'Prompts',
+      url: '/guides/ai-tools/ai-prompts' as `/${string}`,
     },
+
     {
-      name: 'Deploy MCP servers',
-      url: '/guides/ai-tools/byo-mcp' as `/${string}`,
+      name: 'Build AI features',
+      url: undefined,
+      items: [
+        {
+          name: 'Deploy MCP servers',
+          url: '/guides/ai-tools/byo-mcp' as `/${string}`,
+        },
+        {
+          name: 'Vectors / Embeddings ',
+          url: '/guides/ai' as `/${string}`,
+        },
+      ],
     },
   ],
 }
