@@ -92,7 +92,6 @@ const ResetDbPassword = ({ disabled = false }) => {
     checkPasswordStrength(password)
   }
 
-  console.log({ passwordStrengthWarning })
   return (
     <>
       <PageSection id="database-password">
