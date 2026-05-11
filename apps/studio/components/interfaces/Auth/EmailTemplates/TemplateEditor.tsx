@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { Book } from 'lucide-react'
 import type { editor } from 'monaco-editor'
+import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
   Button,
@@ -27,13 +28,16 @@ import type { AuthTemplate } from './EmailTemplates.types'
 import { ResetTemplateDialog } from './ResetTemplateDialog'
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 
 interface TemplateEditorProps {
   template: AuthTemplate
@@ -161,29 +165,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     )
   }
 
-  // Single useMemo hook to parse and prepare message variables
-  const messageVariables = useMemo(() => {
-    if (!messageProperty?.description) return []
-
-    // Parse bullet point format: - `{{ .Variable }}` : Description
-    const lines = messageProperty.description.split('\n')
-    const variables: { variable: string; description: string }[] = []
-
-    for (const line of lines) {
-      // Match lines that start with a bullet point followed by a variable in the format {{ .Variable }}
-      // Handle variations in formatting (with or without backticks, different spacing)
-      const match = line.match(/-\s*`?({{\s*\.\w+\s*}})`?\s*(?::|-)?\s*(.+)/)
-      if (match && match[1] && match[2]) {
-        variables.push({
-          variable: match[1].replace(/`/g, '').trim(),
-          description: match[2].trim(),
-        })
-      }
-    }
-
-    return variables
-  }, [messageProperty?.description])
-
   // Check if form values have changed
   const formValues = form.watch()
   const baselineValues = INITIAL_VALUES
@@ -263,25 +244,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   control={form.control}
                   name={x}
                   render={({ field }) => (
-                    <FormItemLayout
-                      className="gap-y-3"
-                      layout="vertical"
-                      label={property.title}
-                      description={
-                        property.description ? (
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {property.description}
-                          </ReactMarkdown>
-                        ) : null
-                      }
-                      labelOptional={
-                        property.descriptionOptional ? (
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {property.descriptionOptional}
-                          </ReactMarkdown>
-                        ) : null
-                      }
-                    >
+                    <FormItemLayout className="gap-y-3" layout="vertical" label={property.title}>
                       <FormControl>
                         <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
                       </FormControl>
@@ -324,27 +287,68 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       editorRef={editorRef}
                     />
                   </div>
-                  {messageVariables.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {messageVariables.map(({ variable, description }) => (
-                        <Tooltip key={variable}>
+
+                  <div className="flex flex-col gap-y-1">
+                    <div className="flex items-center gap-x-1">
+                      <p className="text-sm">Template variables</p>
+                      <ButtonTooltip
+                        asChild
+                        type="text"
+                        className="w-7"
+                        icon={<Book />}
+                        tooltip={{
+                          content: {
+                            side: 'right',
+                            text: 'Documentation',
+                          },
+                        }}
+                      >
+                        <Link
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href={`${DOCS_URL}/guides/local-development/customizing-email-templates#template-variables`}
+                        />
+                      </ButtonTooltip>
+                    </div>
+                    <div className="flex flex-wrap gap-x-1">
+                      {template.variables.map((variable) => (
+                        <Tooltip key={variable.value}>
                           <TooltipTrigger asChild>
                             <Button
                               type="outline"
                               size="tiny"
                               className="rounded-full"
-                              onClick={() => insertTextAtCursor(variable)}
+                              onClick={() => insertTextAtCursor(variable.value)}
                             >
-                              {variable}
+                              {variable.value}
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent side="top">
-                            <p>{description || 'Variable description not available'}</p>
+                          <TooltipContent side="bottom">
+                            {variable.description}
+
+                            {variable.name === 'Token' &&
+                              template.variables.some((x) => x.name === 'ConfirmationURL') && (
+                                <>
+                                  {' '}
+                                  Can be used instead of{' '}
+                                  <code className="text-code-inline">ConfirmationURL</code>
+                                </>
+                              )}
+
+                            {variable.name === 'SiteURL' && (
+                              <>
+                                {' '}
+                                Configurable in your project's{' '}
+                                <InlineLink href={`/project/${projectRef}/auth/url-configuration`}>
+                                  authentication settings
+                                </InlineLink>
+                              </>
+                            )}
                           </TooltipContent>
                         </Tooltip>
                       ))}
                     </div>
-                  )}
+                  </div>
                 </>
               ) : (
                 <>
