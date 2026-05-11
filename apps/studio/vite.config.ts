@@ -207,21 +207,36 @@ export default defineConfig(({ mode }) => {
       ...publicEnvDefines,
       ...sharedDefines,
     },
-    // Circular-dep workaround: pin `class-variance-authority` to its own
-    // chunk. Without this, Rolldown splits `TreeView` into a separate
-    // chunk that imports `cva` from the `ui` chunk while the `ui` chunk
-    // imports `TreeView` back — a circular dep in the bundle output (not
-    // in source) that leaves `cva` undefined when TreeView's top-level
-    // `cva(...)` initializer runs at SSR prerender time. See
-    // CIRCULAR_IMPORTS.md (entry #1) — slated to be lifted into a
-    // separate PR.
+    // Circular-dep workaround: pin shared library code into dedicated
+    // chunks so per-component chunks don't import from a chunk that
+    // (transitively) imports them back.
+    //
+    //   `class-variance-authority` — TreeView gets split into its own
+    //   chunk that imports `cva` from the `ui` chunk while `ui` imports
+    //   TreeView back. Leaves `cva` undefined at TreeView's top-level
+    //   `cva(...)` call during SSR prerender.
+    //
+    //   `lucide-react` — each icon (e.g. `FolderOpen`) gets a per-icon
+    //   chunk that imports `createLucideIcon` from the `ui` chunk; the
+    //   `ui` chunk in turn re-exports icons from `lucide-react`. The
+    //   circular leaves `createLucideIcon` undefined when the icon
+    //   chunk's top-level `createLucideIcon('FolderOpen', …)` runs —
+    //   surfaces in the browser as "TypeError: e is not a function" at
+    //   `folder-open-<hash>.js`.
+    //
+    // See CIRCULAR_IMPORTS.md — slated to be lifted into a separate PR.
     build: {
       rollupOptions: {
         output: {
-          manualChunks: (id) =>
-            id.includes('node_modules/class-variance-authority/')
-              ? 'class-variance-authority'
-              : undefined,
+          manualChunks: (id) => {
+            if (id.includes('node_modules/class-variance-authority/')) {
+              return 'class-variance-authority'
+            }
+            if (id.includes('node_modules/lucide-react/')) {
+              return 'lucide-react'
+            }
+            return undefined
+          },
         },
       },
     },
