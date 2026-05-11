@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
@@ -16,6 +16,7 @@ interface ColumnForeignKeyProps {
   column: ColumnField
   relations: ForeignKey[]
   closePanel: () => void
+  onOpenChange?: (open: boolean) => void
   onUpdateColumnType: (type: string) => void
   onUpdateFkRelations: (fks: ForeignKey[]) => void
 }
@@ -25,6 +26,7 @@ const ColumnForeignKey = ({
   column,
   relations,
   closePanel,
+  onOpenChange,
   onUpdateColumnType,
   onUpdateFkRelations,
 }: ColumnForeignKeyProps) => {
@@ -44,6 +46,7 @@ const ColumnForeignKey = ({
     connectionString: project?.connectionString,
     id: tableId ?? id,
   })
+  useEffect(() => onOpenChange?.(open), [open, onOpenChange])
   const formattedColumnsForFkSelector = (table?.columns ?? []).map((c) => {
     return {
       id: c.id,

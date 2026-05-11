@@ -8,7 +8,10 @@ import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.const
 import { CronJobTableCell } from './CronJobTableCell'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 
-const unescapeSqlLiteral = (value = '') => value.replaceAll("''", "'")
+const unescapeSqlLiteral = (value = '', isEscapeString = false) => {
+  const unescaped = value.replaceAll("''", "'")
+  return isEscapeString ? unescaped.replaceAll('\\\\', '\\') : unescaped
+}
 
 export function buildCronQuery(name: string, schedule: string, command: string): SafeSqlFragment {
   return safeSql`select cron.schedule(${literal(name)}, ${literal(schedule)}, ${literal(command)});`
@@ -51,11 +54,11 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     const methodMatch = command.match(/select\s+net\.([^']+)\(\s*url:=/i)
     const method = methodMatch?.[1] || ''
 
-    const urlMatch = command.match(/url:='((?:''|[^'])*)'/i)
-    const url = unescapeSqlLiteral(urlMatch?.[1])
+    const urlMatch = command.match(/url:=(E)?'((?:''|[^'])*)'/i)
+    const url = unescapeSqlLiteral(urlMatch?.[2], Boolean(urlMatch?.[1]))
 
-    const bodyMatch = command.match(/body:='((?:''|[^'])*)'/i)
-    const body = unescapeSqlLiteral(bodyMatch?.[1])
+    const bodyMatch = command.match(/body:=(E)?'((?:''|[^'])*)'/i)
+    const body = unescapeSqlLiteral(bodyMatch?.[2], Boolean(bodyMatch?.[1]))
 
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
     const timeout = timeoutMatch?.[1] || ''
@@ -75,8 +78,9 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         }
       }
     } else {
-      const headersStringMatch = command.match(/headers:='((?:''|[^'])*)'/i)
-      const headersString = unescapeSqlLiteral(headersStringMatch?.[1]) || '{}'
+      const headersStringMatch = command.match(/headers:=(E)?'((?:''|[^'])*)'/i)
+      const headersString =
+        unescapeSqlLiteral(headersStringMatch?.[2], Boolean(headersStringMatch?.[1])) || '{}'
       try {
         const parsedHeaders = JSON.parse(headersString)
         headersObjs = Object.entries(parsedHeaders).map(([name, value]) => ({
