@@ -34,7 +34,9 @@ vi.mock('common', async (importOriginal) => {
 vi.mock('next/router', () => ({
   useRouter: () => ({
     isReady: true,
+    query: {},
     push: mocks.routerPush,
+    replace: vi.fn(),
     reload: mocks.routerReload,
   }),
 }))
@@ -198,8 +200,42 @@ describe('OrganizationInvite', () => {
     expect(mocks.routerReload).toHaveBeenCalled()
   })
 
+  test('renders expired and invalid invite states', () => {
+    mocks.useInvitationQuery.mockReturnValue({
+      data: { ...READY_INVITE, expired_token: true },
+      error: null,
+      isSuccess: true,
+      isError: false,
+      isPending: false,
+    })
+
+    const { rerender } = render(<OrganizationInvite />)
+
+    expect(screen.getByText('Invite expired')).toBeInTheDocument()
+    expect(
+      screen.getByText('Ask the organization owner to send you a new invite.')
+    ).toBeInTheDocument()
+
+    mocks.useInvitationQuery.mockReturnValue({
+      data: { ...READY_INVITE, token_does_not_exist: true },
+      error: null,
+      isSuccess: true,
+      isError: false,
+      isPending: false,
+    })
+
+    rerender(<OrganizationInvite />)
+
+    expect(screen.getByText('Invite invalid')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Open the full invite link again, or ask the organization owner for a new invite.'
+      )
+    ).toBeInTheDocument()
+  })
+
   test('renders no-longer-valid, invalid lookup, and generic error states', () => {
-    mocks.useInvitationQuery.mockReturnValueOnce({
+    mocks.useInvitationQuery.mockReturnValue({
       data: undefined,
       error: responseError('Failed to retrieve organization', 401),
       isSuccess: false,
@@ -215,7 +251,7 @@ describe('OrganizationInvite', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Back to dashboard' })).toHaveAttribute('href', '/')
 
-    mocks.useInvitationQuery.mockReturnValueOnce({
+    mocks.useInvitationQuery.mockReturnValue({
       data: undefined,
       error: responseError('Not Found', 404),
       isSuccess: false,
@@ -233,7 +269,7 @@ describe('OrganizationInvite', () => {
     ).toBeInTheDocument()
     expect(screen.queryByText('Not Found')).not.toBeInTheDocument()
 
-    mocks.useInvitationQuery.mockReturnValueOnce({
+    mocks.useInvitationQuery.mockReturnValue({
       data: undefined,
       error: responseError('Failed to retrieve token', 500),
       isSuccess: false,
