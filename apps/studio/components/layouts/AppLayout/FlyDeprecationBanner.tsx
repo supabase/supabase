@@ -26,9 +26,12 @@ import {
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 const BANNER_EXPIRES_AT = new Date('2026-06-01T00:00:00Z')
-const MIGRATION_GUIDE_URL =
+const BACKUP_RESTORE_CLI_URL =
   'https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore'
-const SUPPORT_URL = 'https://supabase.com/dashboard/support/new'
+const DASHBOARD_RESTORE_URL =
+  'https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore'
+const BRANCHING_DASHBOARD_URL = 'https://supabase.com/docs/guides/deployment/branching/dashboard'
+const SUPPORT_EMAIL = 'success@supabase.io'
 
 export const FlyDeprecationBanner = () => {
   const router = useRouter()
@@ -85,10 +88,10 @@ export const FlyDeprecationBanner = () => {
 
   const title =
     primaries.length > 0 && branches.length > 0
-      ? 'Action required: Fly.io projects and branches will be suspended May 31'
+      ? 'Action required: Fly.io project and branch suspensions begin May 31'
       : primaries.length > 0
-        ? 'Action required: Fly.io projects will be suspended May 31'
-        : 'Action required: Fly.io branches will be suspended May 31'
+        ? 'Action required: Fly.io project suspensions begin May 31'
+        : 'Action required: Fly.io branch suspensions begin May 31'
 
   return (
     <HeaderBanner
@@ -114,10 +117,10 @@ const FlyDeprecationDialog = ({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Fly.io deprecation: May 31, 2026</DialogTitle>
+          <DialogTitle>Fly.io deprecation: suspensions begin May 31, 2026</DialogTitle>
           <DialogDescription>
-            Supabase is sunsetting Fly.io infrastructure. Projects and branches still running on
-            Fly.io will be suspended on May 31, 2026.
+            Supabase will begin suspending projects and branches still running on Fly.io
+            infrastructure on May 31, 2026.
           </DialogDescription>
         </DialogHeader>
 
@@ -128,9 +131,18 @@ const FlyDeprecationDialog = ({
           items={primaries}
           note={
             <>
-              To preserve your data, follow the{' '}
-              <InlineLink href={MIGRATION_GUIDE_URL}>migration guide</InlineLink> to back up and
-              restore onto Supabase's general infrastructure.
+              <p>
+                To preserve your data, migrate each project to Supabase's general infrastructure:
+              </p>
+              <ol className="list-decimal pl-5 space-y-1">
+                <li>
+                  Back up your database using the{' '}
+                  <InlineLink href={BACKUP_RESTORE_CLI_URL}>Supabase CLI</InlineLink> (or take a{' '}
+                  <InlineLink href={DASHBOARD_RESTORE_URL}>Dashboard backup</InlineLink>).
+                </li>
+                <li>Create a new project on Supabase's general infrastructure.</li>
+                <li>Restore the backup into the new project.</li>
+              </ol>
             </>
           }
         />
@@ -140,17 +152,34 @@ const FlyDeprecationDialog = ({
           items={branches}
           note={
             <>
-              Merge preview branches before May 31. For persistent branches, take a{' '}
-              <InlineLink href={MIGRATION_GUIDE_URL}>snapshot</InlineLink>, then deploy a new branch
-              and restore your data.
+              <p>Merge preview branches before May 31. For persistent branches:</p>
+              <ol className="list-decimal pl-5 space-y-1">
+                <li>
+                  Take a{' '}
+                  <InlineLink href={BACKUP_RESTORE_CLI_URL}>
+                    snapshot of the branch database
+                  </InlineLink>{' '}
+                  before shutting it down.
+                </li>
+                <li>
+                  <InlineLink href={BRANCHING_DASHBOARD_URL}>
+                    Deploy a new persistent branch
+                  </InlineLink>{' '}
+                  on Supabase's general infrastructure.
+                </li>
+                <li>Restore your data manually from the snapshot.</li>
+              </ol>
             </>
           }
         />
 
         <DialogSection className="text-sm">
           <p>
-            Questions or need an extension?{' '}
-            <InlineLink href={SUPPORT_URL}>File a support ticket</InlineLink>.
+            Questions or need an extension? Email{' '}
+            <a className={InlineLinkClassName} href={`mailto:${SUPPORT_EMAIL}`}>
+              {SUPPORT_EMAIL}
+            </a>
+            .
           </p>
         </DialogSection>
 
@@ -186,7 +215,7 @@ const ProjectList = ({
           </li>
         ))}
       </ul>
-      <p>{note}</p>
+      {note}
     </DialogSection>
   )
 }
