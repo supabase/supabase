@@ -160,6 +160,7 @@ const ResetDbPassword = ({ disabled = false }) => {
           >
             <Input
               copy={password.length > 0}
+              aria-invalid={!!passwordStrengthWarning}
               type="password"
               placeholder="Type in a strong password"
               value={password}
