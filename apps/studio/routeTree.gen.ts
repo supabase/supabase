@@ -46,6 +46,7 @@ import { Route as AppOrganizationsRouteImport } from './routes/_app/organization
 import { Route as AppOrgRouteImport } from './routes/_app/org'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as ProjectRefIndexRouteImport } from './routes/project/$ref/index'
+import { Route as ApiMcpIndexRouteImport } from './routes/api/mcp/index'
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
 import { Route as AppNewIndexRouteImport } from './routes/_app/new/index'
@@ -285,6 +286,7 @@ import { Route as ApiV1ProjectsRefFunctionsSlugIndexRouteImport } from './routes
 import { Route as ApiPlatformStorageRefBucketsIdIndexRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/index'
 import { Route as ApiPlatformProjectsRefContentFoldersIndexRouteImport } from './routes/api/platform/projects/$ref/content/folders/index'
 import { Route as ApiPlatformAuthRefUsersIdIndexRouteImport } from './routes/api/platform/auth/$ref/users/$id/index'
+import { Route as ApiV1ProjectsRefFunctionsSlugBodyRouteImport } from './routes/api/v1/projects/$ref/functions/$slug/body'
 import { Route as ApiPlatformStorageRefBucketsIdEmptyRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/empty'
 import { Route as ApiPlatformProjectsRefContentItemIdRouteImport } from './routes/api/platform/projects/$ref/content/item/$id'
 import { Route as ApiPlatformProjectsRefContentFoldersIdRouteImport } from './routes/api/platform/projects/$ref/content/folders/$id'
@@ -484,6 +486,11 @@ const ProjectRefIndexRoute = ProjectRefIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProjectRefRoute,
+} as any)
+const ApiMcpIndexRoute = ApiMcpIndexRouteImport.update({
+  id: '/api/mcp/',
+  path: '/api/mcp/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiConnectIndexRoute = ApiConnectIndexRouteImport.update({
   id: '/api/connect/',
@@ -1835,6 +1842,12 @@ const ApiPlatformAuthRefUsersIdIndexRoute =
     path: '/api/platform/auth/$ref/users/$id/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiV1ProjectsRefFunctionsSlugBodyRoute =
+  ApiV1ProjectsRefFunctionsSlugBodyRouteImport.update({
+    id: '/api/v1/projects/$ref/functions/$slug/body',
+    path: '/api/v1/projects/$ref/functions/$slug/body',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPlatformStorageRefBucketsIdEmptyRoute =
   ApiPlatformStorageRefBucketsIdEmptyRouteImport.update({
     id: '/api/platform/storage/$ref/buckets/$id/empty',
@@ -1980,6 +1993,7 @@ export interface FileRoutesByFullPath {
   '/new/': typeof AppNewIndexRoute
   '/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
+  '/api/mcp/': typeof ApiMcpIndexRoute
   '/project/$ref/': typeof ProjectRefIndexRoute
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/org/$slug/apps': typeof AppOrgSlugAppsRoute
@@ -2190,6 +2204,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/content/folders/$id': typeof ApiPlatformProjectsRefContentFoldersIdRoute
   '/api/platform/projects/$ref/content/item/$id': typeof ApiPlatformProjectsRefContentItemIdRoute
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
+  '/api/v1/projects/$ref/functions/$slug/body': typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   '/api/platform/auth/$ref/users/$id/': typeof ApiPlatformAuthRefUsersIdIndexRoute
   '/api/platform/projects/$ref/content/folders/': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   '/api/platform/storage/$ref/buckets/$id/': typeof ApiPlatformStorageRefBucketsIdIndexRoute
@@ -2260,6 +2275,7 @@ export interface FileRoutesByTo {
   '/new': typeof AppNewIndexRoute
   '/org': typeof AppOrgIndexRoute
   '/api/connect': typeof ApiConnectIndexRoute
+  '/api/mcp': typeof ApiMcpIndexRoute
   '/project/$ref': typeof ProjectRefIndexRoute
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/org/$slug/apps': typeof AppOrgSlugAppsRoute
@@ -2467,6 +2483,7 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/content/folders/$id': typeof ApiPlatformProjectsRefContentFoldersIdRoute
   '/api/platform/projects/$ref/content/item/$id': typeof ApiPlatformProjectsRefContentItemIdRoute
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
+  '/api/v1/projects/$ref/functions/$slug/body': typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   '/api/platform/auth/$ref/users/$id': typeof ApiPlatformAuthRefUsersIdIndexRoute
   '/api/platform/projects/$ref/content/folders': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   '/api/platform/storage/$ref/buckets/$id': typeof ApiPlatformStorageRefBucketsIdIndexRoute
@@ -2549,6 +2566,7 @@ export interface FileRoutesById {
   '/_app/new/': typeof AppNewIndexRoute
   '/_app/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
+  '/api/mcp/': typeof ApiMcpIndexRoute
   '/project/$ref/': typeof ProjectRefIndexRoute
   '/_app/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/_app/org/$slug/apps': typeof AppOrgSlugAppsRoute
@@ -2759,6 +2777,7 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/content/folders/$id': typeof ApiPlatformProjectsRefContentFoldersIdRoute
   '/api/platform/projects/$ref/content/item/$id': typeof ApiPlatformProjectsRefContentItemIdRoute
   '/api/platform/storage/$ref/buckets/$id/empty': typeof ApiPlatformStorageRefBucketsIdEmptyRoute
+  '/api/v1/projects/$ref/functions/$slug/body': typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   '/api/platform/auth/$ref/users/$id/': typeof ApiPlatformAuthRefUsersIdIndexRoute
   '/api/platform/projects/$ref/content/folders/': typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   '/api/platform/storage/$ref/buckets/$id/': typeof ApiPlatformStorageRefBucketsIdIndexRoute
@@ -2840,6 +2859,7 @@ export interface FileRouteTypes {
     | '/new/'
     | '/org/'
     | '/api/connect/'
+    | '/api/mcp/'
     | '/project/$ref/'
     | '/account/tokens/scoped'
     | '/org/$slug/apps'
@@ -3050,6 +3070,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/content/folders/$id'
     | '/api/platform/projects/$ref/content/item/$id'
     | '/api/platform/storage/$ref/buckets/$id/empty'
+    | '/api/v1/projects/$ref/functions/$slug/body'
     | '/api/platform/auth/$ref/users/$id/'
     | '/api/platform/projects/$ref/content/folders/'
     | '/api/platform/storage/$ref/buckets/$id/'
@@ -3120,6 +3141,7 @@ export interface FileRouteTypes {
     | '/new'
     | '/org'
     | '/api/connect'
+    | '/api/mcp'
     | '/project/$ref'
     | '/account/tokens/scoped'
     | '/org/$slug/apps'
@@ -3327,6 +3349,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/content/folders/$id'
     | '/api/platform/projects/$ref/content/item/$id'
     | '/api/platform/storage/$ref/buckets/$id/empty'
+    | '/api/v1/projects/$ref/functions/$slug/body'
     | '/api/platform/auth/$ref/users/$id'
     | '/api/platform/projects/$ref/content/folders'
     | '/api/platform/storage/$ref/buckets/$id'
@@ -3408,6 +3431,7 @@ export interface FileRouteTypes {
     | '/_app/new/'
     | '/_app/org/'
     | '/api/connect/'
+    | '/api/mcp/'
     | '/project/$ref/'
     | '/_app/account/tokens/scoped'
     | '/_app/org/$slug/apps'
@@ -3618,6 +3642,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/content/folders/$id'
     | '/api/platform/projects/$ref/content/item/$id'
     | '/api/platform/storage/$ref/buckets/$id/empty'
+    | '/api/v1/projects/$ref/functions/$slug/body'
     | '/api/platform/auth/$ref/users/$id/'
     | '/api/platform/projects/$ref/content/folders/'
     | '/api/platform/storage/$ref/buckets/$id/'
@@ -3664,6 +3689,7 @@ export interface RootRouteChildren {
   ApiIntegrationsStripeSyncRoute: typeof ApiIntegrationsStripeSyncRoute
   IntegrationsGithubAuthorizeRoute: typeof IntegrationsGithubAuthorizeRoute
   ApiConnectIndexRoute: typeof ApiConnectIndexRoute
+  ApiMcpIndexRoute: typeof ApiMcpIndexRoute
   ApiAiCodeCompleteRoute: typeof ApiAiCodeCompleteRoute
   ApiAiFeedbackClassifyRoute: typeof ApiAiFeedbackClassifyRoute
   ApiAiFeedbackRateRoute: typeof ApiAiFeedbackRateRoute
@@ -3727,6 +3753,7 @@ export interface RootRouteChildren {
   ApiPlatformProjectsRefContentFoldersIdRoute: typeof ApiPlatformProjectsRefContentFoldersIdRoute
   ApiPlatformProjectsRefContentItemIdRoute: typeof ApiPlatformProjectsRefContentItemIdRoute
   ApiPlatformStorageRefBucketsIdEmptyRoute: typeof ApiPlatformStorageRefBucketsIdEmptyRoute
+  ApiV1ProjectsRefFunctionsSlugBodyRoute: typeof ApiV1ProjectsRefFunctionsSlugBodyRoute
   ApiPlatformAuthRefUsersIdIndexRoute: typeof ApiPlatformAuthRefUsersIdIndexRoute
   ApiPlatformProjectsRefContentFoldersIndexRoute: typeof ApiPlatformProjectsRefContentFoldersIndexRoute
   ApiPlatformStorageRefBucketsIdIndexRoute: typeof ApiPlatformStorageRefBucketsIdIndexRoute
@@ -4000,6 +4027,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/'
       preLoaderRoute: typeof ProjectRefIndexRouteImport
       parentRoute: typeof ProjectRefRoute
+    }
+    '/api/mcp/': {
+      id: '/api/mcp/'
+      path: '/api/mcp'
+      fullPath: '/api/mcp/'
+      preLoaderRoute: typeof ApiMcpIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/connect/': {
       id: '/api/connect/'
@@ -5674,6 +5708,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformAuthRefUsersIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/projects/$ref/functions/$slug/body': {
+      id: '/api/v1/projects/$ref/functions/$slug/body'
+      path: '/api/v1/projects/$ref/functions/$slug/body'
+      fullPath: '/api/v1/projects/$ref/functions/$slug/body'
+      preLoaderRoute: typeof ApiV1ProjectsRefFunctionsSlugBodyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/platform/storage/$ref/buckets/$id/empty': {
       id: '/api/platform/storage/$ref/buckets/$id/empty'
       path: '/api/platform/storage/$ref/buckets/$id/empty'
@@ -6456,6 +6497,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIntegrationsStripeSyncRoute: ApiIntegrationsStripeSyncRoute,
   IntegrationsGithubAuthorizeRoute: IntegrationsGithubAuthorizeRoute,
   ApiConnectIndexRoute: ApiConnectIndexRoute,
+  ApiMcpIndexRoute: ApiMcpIndexRoute,
   ApiAiCodeCompleteRoute: ApiAiCodeCompleteRoute,
   ApiAiFeedbackClassifyRoute: ApiAiFeedbackClassifyRoute,
   ApiAiFeedbackRateRoute: ApiAiFeedbackRateRoute,
@@ -6540,6 +6582,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPlatformProjectsRefContentItemIdRoute,
   ApiPlatformStorageRefBucketsIdEmptyRoute:
     ApiPlatformStorageRefBucketsIdEmptyRoute,
+  ApiV1ProjectsRefFunctionsSlugBodyRoute:
+    ApiV1ProjectsRefFunctionsSlugBodyRoute,
   ApiPlatformAuthRefUsersIdIndexRoute: ApiPlatformAuthRefUsersIdIndexRoute,
   ApiPlatformProjectsRefContentFoldersIndexRoute:
     ApiPlatformProjectsRefContentFoldersIndexRoute,

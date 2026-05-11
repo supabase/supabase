@@ -374,8 +374,8 @@ per-file items only when a subtree has special cases.
 - [x] `routes/api/integrations/**`
 - [x] `routes/api/platform/**` (60 files, scripted port)
 - [x] `routes/api/v1/**` — except `body.ts` (streaming rewrite)
-- [ ] `routes/api/v1/projects/$ref/functions/$slug/body.ts` — rewrite with Web streams
-- [ ] `routes/api/mcp/index.ts` — needs MCP SDK Web-fetch transport (investigate)
+- [x] `routes/api/v1/projects/$ref/functions/$slug/body.ts` — Web-streams rewrite. Returns a `Response` whose body is a `ReadableStream`; each artifact file is converted via `Readable.toWeb(createReadStream(...))` and pulled chunk-by-chunk into the multipart stream. Skips the `apiWrapper` since `getFunctionsArtifactStore` already asserts self-hosted mode (the pages-router `withAuth` was a no-op outside `IS_PLATFORM`).
+- [x] `routes/api/mcp/index.ts` — uses `WebStandardStreamableHTTPServerTransport` from `@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js`. Takes a Web `Request`, returns a `Response` directly — no shim needed. Query parsing pulled from `request.url`'s search params; headers passed through unchanged.
 - [x] `routes/api/incident-banner.ts`, `routes/api/incident-status.ts` — App
       Router routes under `app/api/**` (already Web-native, direct re-export)
 
