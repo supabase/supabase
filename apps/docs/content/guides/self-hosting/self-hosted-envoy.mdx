@@ -169,8 +169,8 @@ The protected routes (`/auth/v1/`, `/rest/v1/`, `/graphql/v1`, `/realtime/v1/api
 A Lua filter rejects missing or invalid keys with HTTP `401 Unauthorized`. An RBAC filter then applies finer-grained rules:
 
 - `/pg/` - only `service_role` keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`) are allowed (HTTP `403` otherwise).
-- `/rest/v1/` - only `service_role` keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`) are allowed (HTTP `401` otherwise).
-- All other protected routes (including `/rest/v1/*`) - any valid configured key is allowed.
+- `/rest/v1/` (exact path, OpenAPI schema root) - only `service_role` keys are allowed (HTTP `403` otherwise). `/rest/v1/<table>` and other Data API paths remain accessible to all valid keys.
+- All other protected routes - any valid configured key is allowed.
 
 ### Opaque key translation
 
