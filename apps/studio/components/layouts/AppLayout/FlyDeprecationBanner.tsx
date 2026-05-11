@@ -173,6 +173,8 @@ const FlyDeprecationDialog = ({
           }
         />
 
+        <DialogSectionSeparator />
+
         <DialogSection className="text-sm">
           <p>
             Questions or need an extension? Email{' '}
@@ -208,13 +210,19 @@ const ProjectList = ({
       <p className="font-medium">
         {label} ({items.length})
       </p>
-      <ul className="list-disc pl-5 space-y-1 text-foreground-light">
-        {items.map((p) => (
-          <li key={p.ref}>
-            {p.name} <span className="text-foreground-muted">— {p.orgName}</span>
-          </li>
-        ))}
-      </ul>
+      {items.length === 1 ? (
+        <p>
+          {items[0].name} <span className="text-foreground-muted">({items[0].orgName})</span>
+        </p>
+      ) : (
+        <ul className="list-disc pl-5 space-y-1">
+          {items.map((p) => (
+            <li key={p.ref}>
+              {p.name} <span className="text-foreground-muted">({p.orgName})</span>
+            </li>
+          ))}
+        </ul>
+      )}
       {note}
     </DialogSection>
   )
