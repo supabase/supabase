@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import {
   Button,
   cn,
@@ -46,8 +46,9 @@ export const FlyDeprecationBanner = () => {
   const { isReady, primaries, branches } = useFlyDeprecationProjects({ enabled: shouldEvaluate })
 
   const hasFlyResources = primaries.length > 0 || branches.length > 0
-  const firstOrgSlug = primaries[0]?.orgSlug ?? branches[0]?.orgSlug ?? ''
-  const firstProjectRef = primaries[0]?.ref ?? branches[0]?.ref ?? ''
+  const firstProject = primaries[0] ?? branches[0]
+  const firstOrgSlug = firstProject?.orgSlug ?? ''
+  const firstProjectRef = firstProject?.ref ?? ''
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -99,12 +100,13 @@ export const FlyDeprecationBanner = () => {
   )
 }
 
-interface FlyDeprecationDialogProps {
+const FlyDeprecationDialog = ({
+  primaries,
+  branches,
+}: {
   primaries: FlyDeprecationProject[]
   branches: FlyDeprecationProject[]
-}
-
-const FlyDeprecationDialog = ({ primaries, branches }: FlyDeprecationDialogProps) => {
+}) => {
   return (
     <Dialog>
       <DialogTrigger className={cn(InlineLinkClassName, 'cursor-pointer')}>
@@ -121,41 +123,29 @@ const FlyDeprecationDialog = ({ primaries, branches }: FlyDeprecationDialogProps
 
         <DialogSectionSeparator />
 
-        {primaries.length > 0 && (
-          <DialogSection className="text-sm flex flex-col gap-y-2">
-            <p className="font-medium">Projects on Fly.io ({primaries.length})</p>
-            <ul className="list-disc pl-5 space-y-1 text-foreground-light">
-              {primaries.map((p) => (
-                <li key={p.ref}>
-                  {p.name} <span className="text-foreground-muted">— {p.orgName}</span>
-                </li>
-              ))}
-            </ul>
-            <p>
+        <ProjectList
+          label="Projects on Fly.io"
+          items={primaries}
+          note={
+            <>
               To preserve your data, follow the{' '}
               <InlineLink href={MIGRATION_GUIDE_URL}>migration guide</InlineLink> to back up and
               restore onto Supabase's general infrastructure.
-            </p>
-          </DialogSection>
-        )}
+            </>
+          }
+        />
 
-        {branches.length > 0 && (
-          <DialogSection className="text-sm flex flex-col gap-y-2">
-            <p className="font-medium">Branches on Fly.io ({branches.length})</p>
-            <ul className="list-disc pl-5 space-y-1 text-foreground-light">
-              {branches.map((b) => (
-                <li key={b.ref}>
-                  {b.name} <span className="text-foreground-muted">— {b.orgName}</span>
-                </li>
-              ))}
-            </ul>
-            <p>
+        <ProjectList
+          label="Branches on Fly.io"
+          items={branches}
+          note={
+            <>
               Merge preview branches before May 31. For persistent branches, take a{' '}
               <InlineLink href={MIGRATION_GUIDE_URL}>snapshot</InlineLink>, then deploy a new branch
               and restore your data.
-            </p>
-          </DialogSection>
-        )}
+            </>
+          }
+        />
 
         <DialogSection className="text-sm">
           <p>
@@ -171,5 +161,32 @@ const FlyDeprecationDialog = ({ primaries, branches }: FlyDeprecationDialogProps
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+const ProjectList = ({
+  label,
+  items,
+  note,
+}: {
+  label: string
+  items: FlyDeprecationProject[]
+  note: ReactNode
+}) => {
+  if (items.length === 0) return null
+  return (
+    <DialogSection className="text-sm flex flex-col gap-y-2">
+      <p className="font-medium">
+        {label} ({items.length})
+      </p>
+      <ul className="list-disc pl-5 space-y-1 text-foreground-light">
+        {items.map((p) => (
+          <li key={p.ref}>
+            {p.name} <span className="text-foreground-muted">— {p.orgName}</span>
+          </li>
+        ))}
+      </ul>
+      <p>{note}</p>
+    </DialogSection>
   )
 }

@@ -2,10 +2,7 @@ import { useQueries } from '@tanstack/react-query'
 
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { projectKeys } from '@/data/projects/keys'
-import {
-  getOrganizationProjects,
-  type OrgProject,
-} from '@/data/projects/org-projects-infinite-query'
+import { getOrganizationProjects } from '@/data/projects/org-projects-infinite-query'
 import { PROVIDERS } from '@/lib/constants/infrastructure'
 
 export interface FlyDeprecationProject {
@@ -13,20 +10,9 @@ export interface FlyDeprecationProject {
   name: string
   orgSlug: string
   orgName: string
-  isBranch: boolean
 }
 
-export interface FlyDeprecationProjectsResult {
-  isReady: boolean
-  primaries: FlyDeprecationProject[]
-  branches: FlyDeprecationProject[]
-}
-
-export function useFlyDeprecationProjects({
-  enabled,
-}: {
-  enabled: boolean
-}): FlyDeprecationProjectsResult {
+export function useFlyDeprecationProjects({ enabled }: { enabled: boolean }) {
   const { data: organizations } = useOrganizationsQuery({ enabled })
 
   const orgProjectsQueries = useQueries({
@@ -43,24 +29,21 @@ export function useFlyDeprecationProjects({
     organizations !== undefined &&
     (organizations.length === 0 || orgProjectsQueries.every((q) => q.isFetched))
 
-  const flyProjects: FlyDeprecationProject[] = orgProjectsQueries.flatMap((query, idx) => {
-    const org = (organizations ?? [])[idx]
-    if (!org) return []
-    const projects = query.data?.projects ?? []
-    return projects
-      .filter((p: OrgProject) => p.cloud_provider === PROVIDERS.FLY.id)
-      .map((p: OrgProject) => ({
-        ref: p.ref,
-        name: p.name,
-        orgSlug: org.slug,
-        orgName: org.name,
-        isBranch: p.is_branch,
-      }))
-  })
+  const { primaries, branches } = (organizations ?? []).reduce<{
+    primaries: FlyDeprecationProject[]
+    branches: FlyDeprecationProject[]
+  }>(
+    (acc, org, idx) => {
+      const projects = orgProjectsQueries[idx]?.data?.projects ?? []
+      for (const p of projects) {
+        if (p.cloud_provider !== PROVIDERS.FLY.id) continue
+        const bucket = p.is_branch ? acc.branches : acc.primaries
+        bucket.push({ ref: p.ref, name: p.name, orgSlug: org.slug, orgName: org.name })
+      }
+      return acc
+    },
+    { primaries: [], branches: [] }
+  )
 
-  return {
-    isReady,
-    primaries: flyProjects.filter((p) => !p.isBranch),
-    branches: flyProjects.filter((p) => p.isBranch),
-  }
+  return { isReady, primaries, branches }
 }
