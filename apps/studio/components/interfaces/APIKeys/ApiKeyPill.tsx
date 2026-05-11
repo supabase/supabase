@@ -6,11 +6,10 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { useRevealedSecret } from './useRevealedSecret'
 import CopyButton from '@/components/ui/CopyButton'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-
-import { useRevealedSecret } from './useRevealedSecret'
 
 export function ApiKeyPill({
   apiKey,
@@ -27,7 +26,12 @@ export function ApiKeyPill({
     'service_api_keys'
   )
 
-  const { data: revealedKey, isLoading, reveal, clear } = useRevealedSecret({
+  const {
+    data: revealedKey,
+    isLoading,
+    reveal,
+    clear,
+  } = useRevealedSecret({
     projectRef,
     id: apiKey.id as string,
   })
