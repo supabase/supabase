@@ -46,7 +46,7 @@ export interface ComposedChartHandlerProps {
   syncId?: string
   YAxisProps?: {
     width?: number
-    tickFormatter?: (value: any) => string
+    tickFormatter?: (value: number) => string
     domain?: [number | string, number | string]
     allowDataOverflow?: boolean
   }

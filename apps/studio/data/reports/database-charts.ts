@@ -48,7 +48,7 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: any) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytes(value, 2),
       },
       attributes: [
         {
@@ -89,7 +89,7 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: any) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytes(value, 2),
       },
       attributes: [
         {
@@ -206,7 +206,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 70,
-        tickFormatter: (value: any) => `${formatBytes(value, 1)}/s`,
+        tickFormatter: (value: number) => `${formatBytes(value, 1)}/s`,
       },
       defaultChartStyle: 'stackedAreaLine',
       attributes: [
@@ -238,7 +238,7 @@ export const getReportAttributesV2: (
       showMaxValue: true,
       YAxisProps: {
         width: 55,
-        tickFormatter: (value: any) => compactNumberFormatter(value),
+        tickFormatter: (value: number) => compactNumberFormatter(value),
       },
       defaultChartStyle: 'bar',
       attributes: [
@@ -282,7 +282,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 70,
-        tickFormatter: (value: any) => `${formatBytes(value, 1)}/s`,
+        tickFormatter: (value: number) => `${formatBytes(value, 1)}/s`,
       },
       defaultChartStyle: 'stackedAreaLine',
       attributes: [
@@ -479,7 +479,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 65,
-        tickFormatter: (value: any) => formatBytes(value, 1),
+        tickFormatter: (value: number) => formatBytes(value, 1),
       },
       hideChartType: false,
       defaultChartStyle: 'bar',
