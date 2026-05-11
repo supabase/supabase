@@ -1,5 +1,6 @@
 import { MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
+import { type MouseEventHandler } from 'react'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
   dropdownItems?: React.ReactNode
   href: string
   isActive: boolean
-  onClick?: (e: any) => void
+  onClick?: MouseEventHandler<HTMLAnchorElement>
 }
 export function LogsSidebarItem({ label, icon, dropdownItems, href, isActive, onClick }: Props) {
   return (
