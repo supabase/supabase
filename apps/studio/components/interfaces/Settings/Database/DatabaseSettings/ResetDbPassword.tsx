@@ -2,7 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, Input, Modal } from 'ui'
+import { Button, Card, CardContent, Modal } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionContent,
@@ -90,6 +92,7 @@ const ResetDbPassword = ({ disabled = false }) => {
     checkPasswordStrength(password)
   }
 
+  console.log({ passwordStrengthWarning })
   return (
     <>
       <PageSection id="database-password">
@@ -142,14 +145,11 @@ const ResetDbPassword = ({ disabled = false }) => {
         onCancel={() => setShowResetDbPass(false)}
       >
         <Modal.Content className="w-full space-y-8">
-          <Input
-            type="password"
-            value={password}
-            copy={password.length > 0}
-            onChange={onDbPassChange}
+          <FormItemLayout
+            layout="vertical"
+            isReactForm={false}
             error={passwordStrengthWarning}
-            // @ts-ignore
-            descriptionText={
+            description={
               <PasswordStrengthBar
                 passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
                 passwordStrengthMessage={passwordStrengthMessage}
@@ -157,7 +157,16 @@ const ResetDbPassword = ({ disabled = false }) => {
                 generateStrongPassword={generatePassword}
               />
             }
-          />
+          >
+            <Input
+              copy={password.length > 0}
+              type="password"
+              placeholder="Type in a strong password"
+              value={password}
+              autoComplete="off"
+              onChange={onDbPassChange}
+            />
+          </FormItemLayout>
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex items-center justify-end space-x-2">

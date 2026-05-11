@@ -115,7 +115,7 @@ function InputGroupAddon({
   )
 }
 
-const inputGroupButtonVariants = cva('', {
+const inputGroupButtonVariants = cva('relative', {
   variants: {
     size: {
       tiny: "h-6 gap-1 rounded-md px-2 has-[>svg]:px-2 [&>svg:not([class*='size-'])]:size-3.5",
@@ -127,22 +127,20 @@ const inputGroupButtonVariants = cva('', {
   },
 })
 
-function InputGroupButton({
-  className,
-  type = 'text',
-  size = 'tiny',
-  ...props
-}: Omit<React.ComponentProps<typeof Button>, 'size'> &
-  VariantProps<typeof inputGroupButtonVariants>) {
+const InputGroupButton = React.forwardRef<
+  HTMLButtonElement,
+  Omit<React.ComponentProps<typeof Button>, 'size'> & VariantProps<typeof inputGroupButtonVariants>
+>(function InputGroupButton({ className, type = 'text', size = 'tiny', ...props }, ref) {
   return (
     <Button
       type={type}
       size={size}
       className={cn(inputGroupButtonVariants({ size }), className)}
+      ref={ref}
       {...props}
     />
   )
-}
+})
 
 function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
   return (
@@ -165,7 +163,7 @@ const InputGroupInput = React.forwardRef<HTMLInputElement, InputProps>(
       ref={ref}
       data-slot="input-group-control"
       className={cn(
-        'flex-1 rounded-none border border-transparent -m-px bg-transparent shadow-none',
+        'flex-1 block rounded-none border border-transparent -m-px bg-transparent shadow-none',
         'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
         'read-only:border-transparent',
         'aria-invalid:border-transparent aria-invalid:bg-transparent',
