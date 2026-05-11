@@ -5,7 +5,6 @@ import { Download, Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert,
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -24,6 +23,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import {
+  Admonition,
   PageSection,
   PageSectionContent,
   PageSectionMeta,
@@ -186,15 +186,18 @@ export const SSLConfiguration = () => {
               </AlertDialog>
             </FormLayout>
             {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
-              <Alert
-                withIcon
-                variant="warning"
+              <Admonition
+                type="warning"
+                layout="horizontal"
                 title="SSL enforcement was not updated successfully"
-              >
-                Please try updating again, or contact{' '}
-                <SupportLink className={InlineLinkClassName}>support</SupportLink> if this error
-                persists
-              </Alert>
+                description={
+                  <>
+                    Please try updating again, or contact{' '}
+                    <SupportLink className={InlineLinkClassName}>support</SupportLink> if this error
+                    persists
+                  </>
+                }
+              />
             )}
           </CardContent>
           <CardContent>

@@ -7,7 +7,6 @@ export * from './src/components/Icon/IconBackground'
 
 export { Card as Card_legacy_ } from './src/components/Card'
 export * from './src/components/Tabs'
-export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
 

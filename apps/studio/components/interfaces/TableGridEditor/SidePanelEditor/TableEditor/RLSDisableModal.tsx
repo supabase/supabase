@@ -1,5 +1,5 @@
 import { AlertOctagon, Lock, ShieldOff } from 'lucide-react'
-import { Alert } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -11,14 +11,12 @@ export function RLSDisableModalContent() {
   return (
     <div className="text-sm text-foreground-light grid gap-4">
       <div className="grid gap-1">
-        <Alert
-          variant="warning"
-          className="px-4! py-3!"
+        <Admonition
+          type="warning"
+          layout="horizontal"
           title="This table will be publicly readable and writable"
-          withIcon
-        >
-          <p>Anyone can edit or delete data in this table.</p>
-        </Alert>
+          description="Anyone can edit or delete data in this table."
+        />
         <ul className="mt-4 space-y-5">
           <li className="flex gap-3">
             <AlertOctagon size={14} />

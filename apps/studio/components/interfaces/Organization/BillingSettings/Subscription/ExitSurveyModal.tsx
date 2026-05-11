@@ -1,7 +1,8 @@
 import { useFlag, useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Alert, Button, cn, Input, Modal } from 'ui'
+import { Button, cn, Input, Modal } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
@@ -147,14 +148,17 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
             </div>
           </div>
           {hasProjectsWithComputeDowngrade && (
-            <Alert
-              withIcon
-              variant="warning"
+            <Admonition
+              type="warning"
+              layout="horizontal"
               title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
-            >
-              This is due to changes in compute instances from the downgrade. Affected projects
-              include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
-            </Alert>
+              description={
+                <>
+                  This is due to changes in compute instances from the downgrade. Affected projects
+                  include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
+                </>
+              }
+            />
           )}
         </div>
       </Modal.Content>
