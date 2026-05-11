@@ -60,14 +60,17 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
           },
         }}
       >
-        <Lightbulb
-          size={16}
-          strokeWidth={1.5}
-          className={cn(
-            'text-foreground-light group-hover:text-foreground',
-            isOpen && 'text-background group-hover:text-background'
-          )}
-        />
+        <>
+          <Lightbulb
+            size={16}
+            strokeWidth={1.5}
+            className={cn(
+              'text-foreground-light group-hover:text-foreground',
+              isOpen && 'text-background group-hover:text-background'
+            )}
+          />
+          <span className="sr-only">Advisor Center</span>
+        </>
       </ButtonTooltip>
       {hasCriticalIssues ? (
         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-destructive" />

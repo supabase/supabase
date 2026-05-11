@@ -34,14 +34,17 @@ export const HelpButton = () => {
       }}
       tooltip={{ content: { text: 'Help' } }}
     >
-      <HelpCircle
-        size={16}
-        strokeWidth={1.5}
-        className={cn(
-          'text-foreground-light group-hover:text-foreground',
-          isOpen && 'text-background group-hover:text-background'
-        )}
-      />
+      <>
+        <HelpCircle
+          size={16}
+          strokeWidth={1.5}
+          className={cn(
+            'text-foreground-light group-hover:text-foreground',
+            isOpen && 'text-background group-hover:text-background'
+          )}
+        />
+        <span className="sr-only">Help</span>
+      </>
     </ButtonTooltip>
   )
 }
