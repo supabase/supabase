@@ -27,6 +27,7 @@ import {
   useProjectDailyStatsQuery,
 } from '@/data/analytics/project-daily-stats-query'
 import { METRICS } from '@/lib/constants/metrics'
+import { useFormatDateTime } from '@/lib/datetime'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
 
@@ -72,6 +73,7 @@ export const ChartBlock = ({
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
+  const formatChartDate = useFormatDateTime()
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -253,19 +255,19 @@ export const ChartBlock = ({
       }
     >
       {loading ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <Loader2 size={18} className="animate-spin text-border-strong" />
           <p className="text-xs text-foreground-lighter text-center">Loading data for {label}</p>
         </div>
       ) : chartData === undefined ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <WarningIcon />
           <p className="text-xs text-foreground-lighter text-center">
             Unable to load data for {label}
           </p>
         </div>
       ) : data.length === 0 ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2">
           <NoDataPlaceholder
             size="small"
             className="border-0"
@@ -316,7 +318,7 @@ export const ChartBlock = ({
                     <ChartTooltipContent
                       className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => formatChartDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />
@@ -343,7 +345,7 @@ export const ChartBlock = ({
                   content={
                     <ChartTooltipContent
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => formatChartDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />

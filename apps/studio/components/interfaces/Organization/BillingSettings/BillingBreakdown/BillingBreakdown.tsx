@@ -58,7 +58,7 @@ const BillingBreakdown = () => {
                 barClass="bg-foreground"
                 labelBottom={`${billingCycleStart.format('MMMM DD')} - ${billingCycleEnd.format('MMMM DD')}`}
                 bgClass="bg-surface-300"
-                labelBottomClass="!text-foreground-light p-1 m-0"
+                labelBottomClass="text-foreground-light! p-1 m-0"
                 labelTop={
                   subscription
                     ? `${daysToCycleEnd} ${daysToCycleEnd === 1 ? 'day' : 'days'} left`
@@ -84,9 +84,8 @@ const BillingBreakdown = () => {
               </>
             ) : (
               <>
-                Your upcoming invoice (excluding credits) will continue to update until the end of
-                your billing cycle on {billingCycleEnd.format('MMMM DD')}. For a more detailed
-                breakdown, visit the{' '}
+                Your upcoming invoice will continue to update until the end of your billing cycle on{' '}
+                {billingCycleEnd.format('MMMM DD')}. For a more detailed breakdown, visit the{' '}
                 <InlineLink href={`/org/${orgSlug}/usage`}>usage page.</InlineLink>
               </>
             )}

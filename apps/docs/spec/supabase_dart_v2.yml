@@ -26,10 +26,10 @@ functions:
         isOptional: false
         type: string
         description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
-      - name: anonKey
+      - name: publishableKey
         isOptional: false
         type: string
-        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+        description: The publishable (anon) key supplied when you create a new project in your project dashboard. Use this for client-side apps. The deprecated `anonKey` parameter is still accepted but `publishableKey` takes precedence when both are supplied.
       - name: headers
         isOptional: true
         type: Map<String, String>
@@ -94,7 +94,7 @@ functions:
           Future<void> main() async {
             await Supabase.initialize(
               url: 'https://xyzcompany.supabase.co',
-              anonKey: 'publishable-or-anon-key',
+              publishableKey: 'your-publishable-key',
             );
 
             runApp(MyApp());
@@ -109,7 +109,7 @@ functions:
           ```dart
           final supabase = SupabaseClient(
             'https://xyzcompany.supabase.co',
-            'publishable-or-anon-key',
+            'your-secret-key', // use your secret key for server-side usage
           );
           ```
 
@@ -2114,15 +2114,15 @@ functions:
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the Flutter app.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the Flutter app.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
         isSpotlight: true
         code: |
           ```dart
-          final supabase = SupabaseClient(supabaseUrl, serviceRoleKey);
+          final supabase = SupabaseClient(supabaseUrl, secretKey);
           ```
   - id: get-user-by-id
     title: 'getUserById()'
@@ -3857,6 +3857,7 @@ functions:
       - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
       - `stream()` will emit the initial data as well as any further change on the database as `Stream<List<Map<String, dynamic>>>` by combining Postgrest and Realtime.
       - Takes a list of primary key column names that will be used to update and delete the proper records within the SDK.
+      - To use a private Realtime channel, pass `channelOptions: const RealtimeChannelConfig(private: true)` to the `stream()` call.
       - The following filters are available
         - `.eq('column', value)` listens to rows where the column equals the value
         - `.neq('column', value)` listens to rows where the column does not equal the value

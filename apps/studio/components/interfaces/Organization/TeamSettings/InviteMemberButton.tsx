@@ -16,9 +16,9 @@ import {
   DialogTitle,
   DialogTrigger,
   ExpandingTextArea,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -56,6 +56,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
 
 export const InviteMemberButton = () => {
@@ -93,6 +94,8 @@ export const InviteMemberButton = () => {
   const hasOrgRole =
     (userMemberData?.role_ids ?? []).length === 1 &&
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
+
+  const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const { rolesAddable } = useGetRolesManagementPermissions(
     organization?.slug,
@@ -245,7 +248,7 @@ export const InviteMemberButton = () => {
           type="primary"
           disabled={!canInviteMembers}
           icon={<UserPlus size={14} />}
-          className="pointer-events-auto flex-grow md:flex-grow-0"
+          className="pointer-events-auto grow md:grow-0"
           onClick={() => setIsOpen(true)}
           tooltip={{
             content: {
@@ -286,19 +289,19 @@ export const InviteMemberButton = () => {
             </>
           }
         />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id="organization-invitation"
             className="flex flex-col gap-y-4"
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              <FormField_Shadcn_
+              <FormField
                 name="role"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Role">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_ className="text-sm capitalize">
                           {orgScopedRoles.find((role) => role.id === Number(field.value))?.name ??
@@ -308,30 +311,42 @@ export const InviteMemberButton = () => {
                           <SelectGroup_Shadcn_>
                             {orgScopedRoles.map((role) => {
                               const canAssignRole = rolesAddable.includes(role.id)
+                              const isOwnerRole = role.name === 'Owner'
+                              const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                              const disabled = !canAssignRole || disabledForStripe
+                              const disabledReason = disabledForStripe
+                                ? 'Cannot be assigned in Stripe Projects organizations'
+                                : !canAssignRole
+                                  ? 'Additional permissions required to assign role'
+                                  : undefined
 
                               return (
                                 <SelectItem_Shadcn_
                                   key={role.id}
                                   value={role.id.toString()}
-                                  className="text-sm [&>span:nth-child(2)]:w-full [&>span:nth-child(2)]:flex [&>span:nth-child(2)]:items-center [&>span:nth-child(2)]:justify-between"
-                                  disabled={!canAssignRole}
+                                  className="text-sm"
+                                  disabled={disabled}
                                 >
-                                  <span>{role.name}</span>
-                                  {!canAssignRole && (
-                                    <span>Additional permissions required to assign role</span>
-                                  )}
+                                  <div className="flex flex-col gap-0.5">
+                                    <span>{role.name}</span>
+                                    {disabledReason && (
+                                      <span className="text-xs text-foreground-lighter">
+                                        {disabledReason}
+                                      </span>
+                                    )}
+                                  </div>
                                 </SelectItem_Shadcn_>
                               )
                             })}
                           </SelectGroup_Shadcn_>
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
               {hasSsoProvider && (
-                <FormField_Shadcn_
+                <FormField
                   name="requireSso"
                   control={form.control}
                   render={({ field }) => (
@@ -339,7 +354,7 @@ export const InviteMemberButton = () => {
                       label="Invitation type"
                       description="Choose how the invitee should authenticate"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_>
                             <SelectValue_Shadcn_ placeholder="Automatic (based on your account)" />
@@ -358,26 +373,26 @@ export const InviteMemberButton = () => {
                             </SelectGroup_Shadcn_>
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
               {hasAccessToProjectLevelPermissions && (
-                <FormField_Shadcn_
+                <FormField
                   name="applyToOrg"
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout layout="flex" label="Grant this role on all projects">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
               {!applyToOrg && (
-                <FormField_Shadcn_
+                <FormField
                   name="projectRef"
                   control={form.control}
                   render={({ field }) => (
@@ -385,7 +400,7 @@ export const InviteMemberButton = () => {
                       label="Select a project"
                       description="Project access can be adjusted after the user joins"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <OrganizationProjectSelector
                           fetchOnMount
                           sameWidthAsTrigger
@@ -397,17 +412,17 @@ export const InviteMemberButton = () => {
                           onSelect={(project) => field.onChange(project.ref)}
                           onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
-              <FormField_Shadcn_
+              <FormField
                 name="email"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Email addresses">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <ExpandingTextArea
                         autoFocus
                         {...field}
@@ -420,12 +435,12 @@ export const InviteMemberButton = () => {
                         data-form-type="other"
                         data-bwignore
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <Button type="default" onClick={confirmOnClose}>
                 Cancel
               </Button>
@@ -434,7 +449,7 @@ export const InviteMemberButton = () => {
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
       <DiscardChangesConfirmationDialog
         {...discardChangesModalProps}

@@ -166,7 +166,7 @@ export const JWTSecretKeysTable = () => {
 
   if (!canReadAPIKeys && !isLoadingCanReadAPIKeys) {
     return (
-      <div className="bg-surface-100 rounded-md border shadow-sm">
+      <div className="bg-surface-100 rounded-md border shadow-xs">
         <div className="flex items-center py-8 px-8 space-x-2">
           <AlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">

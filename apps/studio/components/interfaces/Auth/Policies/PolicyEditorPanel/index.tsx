@@ -1,6 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Monaco } from '@monaco-editor/react'
-import type { PostgresPolicy } from '@supabase/postgres-meta'
+import {
+  acceptUntrustedSql,
+  ident,
+  joinSqlFragments,
+  safeSql,
+  untrustedSql,
+  type DisplayableSqlFragment,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta/src/pg-format'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
@@ -10,9 +18,9 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  Form_Shadcn_,
+  Form,
   Label_Shadcn_,
   ScrollArea,
   Sheet,
@@ -32,6 +40,7 @@ import { PolicyEditorPanelHeader } from './PolicyEditorPanelHeader'
 import { PolicyTemplates } from './PolicyTemplates'
 import { QueryError } from './QueryError'
 import { RLSCodeEditor } from './RLSCodeEditor'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { IStandaloneCodeEditor } from '@/components/interfaces/SQLEditor/SQLEditor.types'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -41,13 +50,14 @@ import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sq
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 interface PolicyEditorPanelProps {
   visible: boolean
   schema: string
   searchString?: string
   selectedTable?: string
-  selectedPolicy?: PostgresPolicy
+  selectedPolicy?: Policy
   onSelectCancel: () => void
   authContext: 'database' | 'realtime'
 }
@@ -70,6 +80,8 @@ const defaultValues = {
 
 /**
  * Using memo for this component because everything rerenders on window focus because of outside fetches
+ * Note: For INSERT command, editor one holds the check expression (not using)
+   Whereas for others: editor one = using, editor two = optional check
  */
 export const PolicyEditorPanel = memo(function ({
   visible,
@@ -90,8 +102,9 @@ export const PolicyEditorPanel = memo(function ({
   )
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
-  const [using, setUsing] = useState('')
-  const [check, setCheck] = useState('')
+  const [using, setUsing] = useState<DisplayableSqlFragment | undefined>(undefined)
+  const [check, setCheck] = useState<DisplayableSqlFragment | undefined>(undefined)
+  const [rolesFragment, setRolesFragment] = useState<SafeSqlFragment>(safeSql`public`)
   const [fieldError, setFieldError] = useState<string>()
   const [showCheckBlock, setShowCheckBlock] = useState(true)
 
@@ -172,17 +185,14 @@ export const PolicyEditorPanel = memo(function ({
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const { name, table, behavior, command, roles } = data
-    let using = editorOneRef.current?.getValue().trim() ?? undefined
-    let check = editorTwoRef.current?.getValue().trim()
 
-    // [Terry] b/c editorOneRef will be the check statement in this scenario
-    if (command === 'insert') {
-      check = using
-    }
+    // [Joshen] Refer to top note as to why we're using the "USING" section for INSERT
+    const usingExpr = command !== 'insert' ? using : undefined
+    const checkExpr = command === 'insert' ? using : check
 
-    if (command === 'insert' && (check === undefined || check.length === 0)) {
+    if (command === 'insert' && !checkExpr?.trim()) {
       return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
-    } else if (command !== 'insert' && (using === undefined || using.length === 0)) {
+    } else if (command !== 'insert' && !usingExpr?.trim()) {
       return setFieldError('Please provide a SQL expression for the USING statement')
     } else {
       setFieldError(undefined)
@@ -190,14 +200,14 @@ export const PolicyEditorPanel = memo(function ({
 
     if (selectedPolicy === undefined) {
       const sql = generateCreatePolicyQuery({
-        name: name,
+        name,
         schema,
         table,
         behavior,
         command,
-        roles: roles.length === 0 ? 'public' : roles,
-        using: using ?? '',
-        check: command === 'insert' ? (using ?? '') : (check ?? ''),
+        roles: rolesFragment,
+        using: usingExpr ? acceptUntrustedSql(usingExpr) : undefined,
+        check: checkExpr ? acceptUntrustedSql(checkExpr) : undefined,
       })
 
       setError(undefined)
@@ -214,20 +224,23 @@ export const PolicyEditorPanel = memo(function ({
         name?: string
         definition?: string
         check?: string
-        roles?: string[]
+        roles?: Array<string>
       } = {}
       const updatedRoles = roles.length === 0 ? ['public'] : roles.split(', ')
+      // Trim for string comparison against the stored policy values
+      const usingVal = using?.trim()
+      const checkVal = check?.trim()
 
       if (name !== selectedPolicy.name) payload.name = name
       if (!isEqual(selectedPolicy.roles, updatedRoles)) payload.roles = updatedRoles
-      if (selectedPolicy.definition !== null && selectedPolicy.definition !== using)
-        payload.definition = using
+      if (selectedPolicy.definition !== null && selectedPolicy.definition !== usingVal)
+        payload.definition = usingVal
 
       if (selectedPolicy.command === 'INSERT') {
-        // [Joshen] Cause editorOneRef will be the check statement in this scenario
-        if (selectedPolicy.check !== using) payload.check = using
+        // [Joshen] Cause editor one will be the check statement in this scenario
+        if (selectedPolicy.check !== usingVal) payload.check = usingVal
       } else {
-        if (selectedPolicy.check !== check) payload.check = check
+        if (selectedPolicy.check !== checkVal) payload.check = checkVal
       }
 
       if (Object.keys(payload).length === 0) return onSelectCancel()
@@ -241,8 +254,7 @@ export const PolicyEditorPanel = memo(function ({
     }
   }
 
-  // when the panel is closed, reset all values
-  useEffect(() => {
+  const resetState = useStaticEffectEvent(() => {
     if (!visible) {
       editorOneRef.current?.setValue('')
       editorTwoRef.current?.setValue('')
@@ -251,8 +263,9 @@ export const PolicyEditorPanel = memo(function ({
       setShowDetails(false)
       setSelectedDiff(undefined)
 
-      setUsing('')
-      setCheck('')
+      setUsing(undefined)
+      setCheck(undefined)
+      setRolesFragment(safeSql`public`)
       setShowCheckBlock(false)
       setFieldError(undefined)
 
@@ -268,16 +281,35 @@ export const PolicyEditorPanel = memo(function ({
           command: command.toLowerCase(),
           roles: roles.length === 1 && roles[0] === 'public' ? '' : roles.join(', '),
         })
-        if (selectedPolicy.definition) setUsing(`  ${selectedPolicy.definition}`)
-        if (selectedPolicy.check) setCheck(`  ${selectedPolicy.check}`)
-        if (selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
-          setShowCheckBlock(true)
+
+        // [Joshen] Refer to top note as to why we're using the "USING" section for INSERT
+        if (selectedPolicy.definition) {
+          setUsing(safeSql`  ${selectedPolicy.definition}`)
         }
+        if (selectedPolicy.check) {
+          if (selectedPolicy.command === 'INSERT') setUsing(safeSql`  ${selectedPolicy.check}`)
+          else {
+            setCheck(safeSql`  ${selectedPolicy.check}`)
+            setShowCheckBlock(true)
+          }
+        }
+
+        setRolesFragment(
+          roles.length === 1 && roles[0] === 'public'
+            ? safeSql`public`
+            : joinSqlFragments(
+                roles.map((r) => ident(r)),
+                ', '
+              )
+        )
       } else if (selectedTable !== undefined) {
         form.reset({ ...defaultValues, table: selectedTable })
       }
     }
-  }, [visible])
+  })
+
+  // when the panel is closed, reset all values
+  useEffect(resetState, [visible, resetState])
 
   // whenever the deps (current policy details, new error or error panel opens) change, recalculate
   // the height of the editor
@@ -290,7 +322,7 @@ export const PolicyEditorPanel = memo(function ({
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
           <Sheet open={visible} onOpenChange={handleOpenChange}>
             <SheetContent
@@ -298,7 +330,7 @@ export const PolicyEditorPanel = memo(function ({
               size={showTools ? 'lg' : 'default'}
               className={cn(
                 'bg-surface-200 p-0 flex flex-row gap-0',
-                showTools ? '!min-w-[100vw] lg:!min-w-[1000px]' : '!min-w-[100vw] lg:!min-w-[600px]'
+                showTools ? 'min-w-screen! lg:min-w-[1000px]!' : 'min-w-screen! lg:min-w-[600px]!'
               )}
             >
               <div className={cn('flex flex-col grow w-full', showTools && 'w-[60%]')}>
@@ -323,12 +355,14 @@ export const PolicyEditorPanel = memo(function ({
                         setShowCheckBlock(true)
                       }
                     }}
+                    onRolesChange={(frag) => setRolesFragment(frag)}
                     authContext={authContext}
                   />
                   <div className="h-full">
                     <LockedCreateQuerySection
                       schema={schema}
                       selectedPolicy={selectedPolicy}
+                      isRenamingPolicy={isRenamingPolicy}
                       formFields={{ name, table, behavior, command, roles }}
                     />
 
@@ -348,11 +382,12 @@ export const PolicyEditorPanel = memo(function ({
                             ? '-- Provide a SQL expression for the with check statement'
                             : '-- Provide a SQL expression for the using statement'
                         }
-                        defaultValue={command === 'insert' ? check : using}
-                        value={command === 'insert' ? check : using}
+                        defaultValue={using}
+                        value={using}
                         editorRef={editorOneRef}
                         monacoRef={monacoOneRef as any}
                         lineNumberStart={6}
+                        onInputChange={(value) => setUsing(untrustedSql(value ?? ''))}
                         onChange={() => {
                           setExpOneContentHeight(editorOneRef.current?.getContentHeight() ?? 0)
                           setExpOneLineCount(editorOneRef.current?.getModel()?.getLineCount() ?? 1)
@@ -412,6 +447,7 @@ export const PolicyEditorPanel = memo(function ({
                             editorRef={editorTwoRef}
                             monacoRef={monacoTwoRef as any}
                             lineNumberStart={7 + expOneLineCount}
+                            onInputChange={(value) => setCheck(untrustedSql(value ?? ''))}
                             onChange={() => {
                               setExpTwoContentHeight(editorTwoRef.current?.getContentHeight() ?? 0)
                               setExpTwoLineCount(
@@ -461,7 +497,7 @@ export const PolicyEditorPanel = memo(function ({
 
                     {supportWithCheck && (
                       <div className="px-5 py-3 flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           id="use-check"
                           name="use-check"
                           checked={showCheckBlock}
@@ -481,7 +517,7 @@ export const PolicyEditorPanel = memo(function ({
                     {error !== undefined && (
                       <QueryError error={error} open={errorPanelOpen} setOpen={setErrorPanelOpen} />
                     )}
-                    <SheetFooter className="flex items-center !justify-end px-5 py-4 w-full border-t">
+                    <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
                       <Button
                         type="default"
                         disabled={isExecuting || isUpdating}
@@ -532,7 +568,7 @@ export const PolicyEditorPanel = memo(function ({
                     <TabsContent_Shadcn_
                       value="templates"
                       className={cn(
-                        '!mt-0 overflow-y-auto',
+                        'mt-0! overflow-y-auto',
                         'data-[state=active]:flex data-[state=active]:grow'
                       )}
                     >
@@ -548,8 +584,26 @@ export const PolicyEditorPanel = memo(function ({
                             form.setValue('command', value.command.toLowerCase())
                             form.setValue('roles', value.roles.join(', ') ?? '')
 
-                            setUsing(`  ${value.definition}`)
-                            setCheck(`  ${value.check}`)
+                            setUsing(safeSql`  ${value.definition}`)
+
+                            // [Joshen] Refer to top note as to why we're using the "USING" section for INSERT
+                            if (value.check) {
+                              if (value.command === 'INSERT') {
+                                setUsing(safeSql`  ${value.check}`)
+                              } else {
+                                setCheck(safeSql`  ${value.check}`)
+                              }
+                            }
+
+                            setRolesFragment(
+                              value.roles.length === 0 ||
+                                (value.roles.length === 1 && value.roles[0] === 'public')
+                                ? safeSql`public`
+                                : joinSqlFragments(
+                                    value.roles.map((r: string) => ident(r)),
+                                    ', '
+                                  )
+                            )
                             setExpOneLineCount(1)
                             setExpTwoLineCount(1)
                             setFieldError(undefined)
@@ -571,7 +625,7 @@ export const PolicyEditorPanel = memo(function ({
             </SheetContent>
           </Sheet>
         </form>
-      </Form_Shadcn_>
+      </Form>
 
       <DiscardChangesConfirmationDialog
         {...modalProps}

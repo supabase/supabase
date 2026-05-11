@@ -30,7 +30,7 @@ export type ServiceHealthCardProps = {
 
 export const ServiceHealthCard = ({
   serviceName,
-  serviceKey,
+  serviceKey: _serviceKey,
   total,
   errorRate,
   errorCount,
@@ -42,7 +42,7 @@ export const ServiceHealthCard = ({
   onBarClick,
   datetimeFormat,
 }: ServiceHealthCardProps) => {
-  const { status, color } = getHealthStatus(errorRate, total)
+  const { color } = getHealthStatus(errorRate, total)
 
   return (
     <Card className="mb-0 md:mb-0 h-full flex flex-col">

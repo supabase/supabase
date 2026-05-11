@@ -4,19 +4,15 @@ import '@/styles/editor.css'
 import '@/styles/focus.css'
 import '@/styles/graphiql-base.css'
 import '@/styles/grid.css'
-import '@/styles/main.css'
+import '@/styles/globals.css'
 import '@/styles/markdown-preview.css'
 import '@/styles/monaco.css'
 import '@/styles/react-data-grid-logs.css'
 import '@/styles/reactflow.css'
 import '@/styles/storage.css'
 import '@/styles/stripe.css'
-import '@/styles/toast.css'
-import '@/styles/typography.css'
 import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
-import 'ui/build/css/themes/dark.css'
-import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
@@ -43,6 +39,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
+import { TimestampInfoProvider } from 'ui-patterns'
 
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
@@ -52,13 +49,16 @@ import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProv
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
+import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useRootQueryClient } from '@/data/query-client'
 import { inter, manrope, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
@@ -98,6 +98,11 @@ const FeatureFlagProviderWithOrgContext = ({
   )
 }
 
+const TimestampInfoTimezoneBridge = ({ children }: { children: React.ReactNode }) => {
+  const { timezone } = useTimezone()
+  return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
+}
+
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
   // locally. We're however, only storing the assets which we need (based on what the network tab loads
@@ -122,7 +127,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
-  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+  const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
       const eventId = Sentry.captureException(error)
@@ -161,60 +166,67 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 getConfigCatFlags={getConfigCatFlags}
               >
                 <ProfileProvider>
-                  <Head>
-                    <title>{appTitle ?? 'Supabase'}</title>
-                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                    <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
-                    <meta name="googlebot" content="notranslate" />
-                    {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
-                    <style
-                      dangerouslySetInnerHTML={{
-                        __html: `:root{--font-custom:${inter.style.fontFamily};--font-sans:${inter.style.fontFamily};--font-heading:${manrope.style.fontFamily};--font-mono:${sourceCodePro.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
-                      }}
-                    />
-                    {/* Speed up initial API loading times by pre-connecting to the API domain */}
-                    {IS_PLATFORM && (
-                      <link
-                        rel="preconnect"
-                        href={new URL(API_URL).origin}
-                        crossOrigin="use-credentials"
-                      />
-                    )}
-                  </Head>
-                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
-                  <TooltipProvider delayDuration={0}>
-                    <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
-                        <DevToolbarProvider apiUrl={API_URL}>
-                          <AiAssistantStateContextProvider>
-                            <CommandProvider>
-                              <FeaturePreviewContextProvider>
-                                <MainScrollContainerProvider>
-                                  {getLayout(<Component {...pageProps} />)}
-                                </MainScrollContainerProvider>
-                                <StudioCommandMenu />
-                                <FeaturePreviewModal />
-                                <UpdateBillingAddressModal />
-                              </FeaturePreviewContextProvider>
-                              <Toaster />
-                              <MonacoThemeProvider />
-                            </CommandProvider>
-                          </AiAssistantStateContextProvider>
-                          <DevToolbar extraTabs={devToolbarExtraTabs} />
-                          <DevToolbarTrigger />
-                        </DevToolbarProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                  <Telemetry />
-                  {!isTestEnv && (
-                    <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
-                  )}
+                  <TimezoneProvider>
+                    <TimestampInfoTimezoneBridge>
+                      <Head>
+                        <title>{appTitle ?? 'Supabase'}</title>
+                        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                        <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
+                        <meta name="googlebot" content="notranslate" />
+                        {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                        <style
+                          dangerouslySetInnerHTML={{
+                            __html: `:root{--font-custom:${inter.style.fontFamily};--font-sans:${inter.style.fontFamily};--font-heading:${manrope.style.fontFamily};--font-mono:${sourceCodePro.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                          }}
+                        />
+                        {/* Speed up initial API loading times by pre-connecting to the API domain */}
+                        {IS_PLATFORM && (
+                          <link
+                            rel="preconnect"
+                            href={new URL(API_URL).origin}
+                            crossOrigin="use-credentials"
+                          />
+                        )}
+                      </Head>
+                      <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
+                      <TooltipProvider delayDuration={0}>
+                        <RouteValidationWrapper>
+                          <ThemeProvider
+                            defaultTheme="system"
+                            themes={['dark', 'light', 'classic-dark']}
+                            enableSystem
+                            disableTransitionOnChange
+                          >
+                            <DevToolbarProvider apiUrl={API_URL}>
+                              <AiAssistantStateContextProvider>
+                                <CommandProvider>
+                                  <BannerStackProvider>
+                                    <FeaturePreviewContextProvider>
+                                      <MainScrollContainerProvider>
+                                        {getLayout(<Component {...pageProps} />)}
+                                      </MainScrollContainerProvider>
+                                      <GlobalShortcuts />
+                                      <StudioCommandMenu />
+                                      <FeaturePreviewModal />
+                                      <UpdateBillingAddressModal />
+                                    </FeaturePreviewContextProvider>
+                                  </BannerStackProvider>
+                                  <Toaster />
+                                  <MonacoThemeProvider />
+                                </CommandProvider>
+                              </AiAssistantStateContextProvider>
+                              <DevToolbar extraTabs={devToolbarExtraTabs} />
+                              <DevToolbarTrigger />
+                            </DevToolbarProvider>
+                          </ThemeProvider>
+                        </RouteValidationWrapper>
+                      </TooltipProvider>
+                      <Telemetry />
+                      {!isTestEnv && (
+                        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+                      )}
+                    </TimestampInfoTimezoneBridge>
+                  </TimezoneProvider>
                 </ProfileProvider>
               </FeatureFlagProviderWithOrgContext>
             </AuthProvider>

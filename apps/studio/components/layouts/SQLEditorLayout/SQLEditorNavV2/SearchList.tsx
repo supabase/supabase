@@ -69,7 +69,7 @@ export const SearchList = ({ search }: SearchListProps) => {
 
   return (
     <>
-      <div className="flex flex-col flex-grow">
+      <div className="flex flex-col grow">
         {isLoadingCount ? (
           <div className="px-4 py-1 pb-2.5">
             <Loader2 className="animate-spin" size={14} />

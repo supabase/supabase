@@ -4,8 +4,8 @@ import {
   Badge,
   buttonVariants,
   cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -41,7 +41,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
   const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="storageType"
       control={control}
       render={({ field }) => (
@@ -90,11 +90,11 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                 )}
               />
             ) : (
-              <FormControl_Shadcn_>
+              <FormControl>
                 <SelectTrigger_Shadcn_ className="h-14 max-w-[420px]">
                   <SelectValue_Shadcn_ />
                 </SelectTrigger_Shadcn_>
-              </FormControl_Shadcn_>
+              </FormControl>
             )}
             <SelectContent_Shadcn_>
               <>
@@ -107,7 +107,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                           key={item.type}
                           disabled={disableInput || disableIo2}
                           value={item.type}
-                          className={cn(disableIo2 && '!pointer-events-auto')}
+                          className={cn(disableIo2 && 'pointer-events-auto!')}
                         >
                           <div className="flex flex-col gap-0 items-start">
                             <div className="flex gap-2 items-center">

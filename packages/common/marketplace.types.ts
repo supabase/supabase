@@ -3,18 +3,7 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
-      v_secret_id: {
-        Row: {
-          create_secret: string | null
-        }
-        Insert: {
-          create_secret?: string | null
-        }
-        Update: {
-          create_secret?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       categories: {
@@ -56,7 +45,9 @@ export type Database = {
           partner_logo: string | null
           partner_name: string | null
           partner_slug: string | null
+          publish_dashboard: boolean | null
           publish_location: 'marketplace' | 'dashboard' | 'both' | null
+          publish_marketplace: boolean | null
           secret_key_prefix: string | null
           slug: string | null
           title: string | null
