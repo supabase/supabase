@@ -21,6 +21,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
+import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
@@ -60,6 +61,7 @@ import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/da
 import { Route as ProjectRefBranchesRouteImport } from './routes/project/$ref/branches'
 import { Route as ProjectRefAuthRouteImport } from './routes/project/$ref/auth'
 import { Route as ProjectRefAdvisorsRouteImport } from './routes/project/$ref/advisors'
+import { Route as IntegrationsVercelInstallRouteImport } from './routes/integrations/vercel/install'
 import { Route as IntegrationsGithubAuthorizeRouteImport } from './routes/integrations/github/authorize'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
 import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-functions/test'
@@ -223,6 +225,8 @@ import { Route as ProjectRefDatabaseBackupsPitrRouteImport } from './routes/proj
 import { Route as ProjectRefAuthTemplatesTemplateIdRouteImport } from './routes/project/$ref/auth/templates/$templateId'
 import { Route as ProjectRefAdvisorsRulesSecurityRouteImport } from './routes/project/$ref/advisors/rules/security'
 import { Route as ProjectRefAdvisorsRulesPerformanceRouteImport } from './routes/project/$ref/advisors/rules/performance'
+import { Route as IntegrationsVercelSlugMarketplaceChooseProjectRouteImport } from './routes/integrations/vercel/$slug/marketplace/choose-project'
+import { Route as IntegrationsVercelSlugDeployButtonNewProjectRouteImport } from './routes/integrations/vercel/$slug/deploy-button/new-project'
 import { Route as ApiV1ProjectsRefApiKeysRouteImport } from './routes/api/v1/projects/$ref/api-keys'
 import { Route as ApiPlatformPropsOrgSlugRouteImport } from './routes/api/platform/props/org/$slug'
 import { Route as ApiPlatformProjectsRefSettingsRouteImport } from './routes/api/platform/projects/$ref/settings'
@@ -348,6 +352,11 @@ const ProjectRefRoute = ProjectRefRouteImport.update({
 const NewSlugRoute = NewSlugRouteImport.update({
   id: '/new/$slug',
   path: '/new/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsVercelRoute = IntegrationsVercelRouteImport.update({
+  id: '/integrations/vercel',
+  path: '/integrations/vercel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
@@ -547,6 +556,12 @@ const ProjectRefAdvisorsRoute = ProjectRefAdvisorsRouteImport.update({
   path: '/advisors',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const IntegrationsVercelInstallRoute =
+  IntegrationsVercelInstallRouteImport.update({
+    id: '/install',
+    path: '/install',
+    getParentRoute: () => IntegrationsVercelRoute,
+  } as any)
 const IntegrationsGithubAuthorizeRoute =
   IntegrationsGithubAuthorizeRouteImport.update({
     id: '/integrations/github/authorize',
@@ -1462,6 +1477,18 @@ const ProjectRefAdvisorsRulesPerformanceRoute =
     path: '/performance',
     getParentRoute: () => ProjectRefAdvisorsRulesRoute,
   } as any)
+const IntegrationsVercelSlugMarketplaceChooseProjectRoute =
+  IntegrationsVercelSlugMarketplaceChooseProjectRouteImport.update({
+    id: '/$slug/marketplace/choose-project',
+    path: '/$slug/marketplace/choose-project',
+    getParentRoute: () => IntegrationsVercelRoute,
+  } as any)
+const IntegrationsVercelSlugDeployButtonNewProjectRoute =
+  IntegrationsVercelSlugDeployButtonNewProjectRouteImport.update({
+    id: '/$slug/deploy-button/new-project',
+    path: '/$slug/deploy-button/new-project',
+    getParentRoute: () => IntegrationsVercelRoute,
+  } as any)
 const ApiV1ProjectsRefApiKeysRoute = ApiV1ProjectsRefApiKeysRouteImport.update({
   id: '/api/v1/projects/$ref/api-keys',
   path: '/api/v1/projects/$ref/api-keys',
@@ -1892,6 +1919,7 @@ export interface FileRoutesByFullPath {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/account/audit': typeof AppAccountAuditRoute
@@ -1905,6 +1933,7 @@ export interface FileRoutesByFullPath {
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
+  '/integrations/vercel/install': typeof IntegrationsVercelInstallRoute
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
@@ -2060,6 +2089,8 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/integrations/vercel/$slug/deploy-button/new-project': typeof IntegrationsVercelSlugDeployButtonNewProjectRoute
+  '/integrations/vercel/$slug/marketplace/choose-project': typeof IntegrationsVercelSlugMarketplaceChooseProjectRoute
   '/project/$ref/advisors/rules/performance': typeof ProjectRefAdvisorsRulesPerformanceRoute
   '/project/$ref/advisors/rules/security': typeof ProjectRefAdvisorsRulesSecurityRoute
   '/project/$ref/auth/templates/$templateId': typeof ProjectRefAuthTemplatesTemplateIdRoute
@@ -2172,6 +2203,7 @@ export interface FileRoutesByTo {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
@@ -2184,6 +2216,7 @@ export interface FileRoutesByTo {
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
+  '/integrations/vercel/install': typeof IntegrationsVercelInstallRoute
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
@@ -2329,6 +2362,8 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/integrations/vercel/$slug/deploy-button/new-project': typeof IntegrationsVercelSlugDeployButtonNewProjectRoute
+  '/integrations/vercel/$slug/marketplace/choose-project': typeof IntegrationsVercelSlugMarketplaceChooseProjectRoute
   '/project/$ref/advisors/rules/performance': typeof ProjectRefAdvisorsRulesPerformanceRoute
   '/project/$ref/advisors/rules/security': typeof ProjectRefAdvisorsRulesSecurityRoute
   '/project/$ref/auth/templates/$templateId': typeof ProjectRefAuthTemplatesTemplateIdRoute
@@ -2445,6 +2480,7 @@ export interface FileRoutesById {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/_app/account/audit': typeof AppAccountAuditRoute
@@ -2458,6 +2494,7 @@ export interface FileRoutesById {
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
+  '/integrations/vercel/install': typeof IntegrationsVercelInstallRoute
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
@@ -2613,6 +2650,8 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/integrations/vercel/$slug/deploy-button/new-project': typeof IntegrationsVercelSlugDeployButtonNewProjectRoute
+  '/integrations/vercel/$slug/marketplace/choose-project': typeof IntegrationsVercelSlugMarketplaceChooseProjectRoute
   '/project/$ref/advisors/rules/performance': typeof ProjectRefAdvisorsRulesPerformanceRoute
   '/project/$ref/advisors/rules/security': typeof ProjectRefAdvisorsRulesSecurityRoute
   '/project/$ref/auth/templates/$templateId': typeof ProjectRefAuthTemplatesTemplateIdRoute
@@ -2728,6 +2767,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/integrations/vercel'
     | '/new/$slug'
     | '/project/$ref'
     | '/account/audit'
@@ -2741,6 +2781,7 @@ export interface FileRouteTypes {
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
     | '/integrations/github/authorize'
+    | '/integrations/vercel/install'
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
@@ -2896,6 +2937,8 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/integrations/vercel/$slug/deploy-button/new-project'
+    | '/integrations/vercel/$slug/marketplace/choose-project'
     | '/project/$ref/advisors/rules/performance'
     | '/project/$ref/advisors/rules/security'
     | '/project/$ref/auth/templates/$templateId'
@@ -3008,6 +3051,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/integrations/vercel'
     | '/new/$slug'
     | '/account/audit'
     | '/account/me'
@@ -3020,6 +3064,7 @@ export interface FileRouteTypes {
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
     | '/integrations/github/authorize'
+    | '/integrations/vercel/install'
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/database'
@@ -3165,6 +3210,8 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/integrations/vercel/$slug/deploy-button/new-project'
+    | '/integrations/vercel/$slug/marketplace/choose-project'
     | '/project/$ref/advisors/rules/performance'
     | '/project/$ref/advisors/rules/security'
     | '/project/$ref/auth/templates/$templateId'
@@ -3280,6 +3327,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/integrations/vercel'
     | '/new/$slug'
     | '/project/$ref'
     | '/_app/account/audit'
@@ -3293,6 +3341,7 @@ export interface FileRouteTypes {
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
     | '/integrations/github/authorize'
+    | '/integrations/vercel/install'
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
@@ -3448,6 +3497,8 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/integrations/vercel/$slug/deploy-button/new-project'
+    | '/integrations/vercel/$slug/marketplace/choose-project'
     | '/project/$ref/advisors/rules/performance'
     | '/project/$ref/advisors/rules/security'
     | '/project/$ref/auth/templates/$templateId'
@@ -3553,6 +3604,7 @@ export interface RootRouteChildren {
   ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
   ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
+  IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   NewSlugRoute: typeof NewSlugRoute
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
   ApiAiDocsRoute: typeof ApiAiDocsRoute
@@ -3721,6 +3773,13 @@ declare module '@tanstack/react-router' {
       path: '/new/$slug'
       fullPath: '/new/$slug'
       preLoaderRoute: typeof NewSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations/vercel': {
+      id: '/integrations/vercel'
+      path: '/integrations/vercel'
+      fullPath: '/integrations/vercel'
+      preLoaderRoute: typeof IntegrationsVercelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/status-override': {
@@ -3995,6 +4054,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/advisors'
       preLoaderRoute: typeof ProjectRefAdvisorsRouteImport
       parentRoute: typeof ProjectRefRoute
+    }
+    '/integrations/vercel/install': {
+      id: '/integrations/vercel/install'
+      path: '/install'
+      fullPath: '/integrations/vercel/install'
+      preLoaderRoute: typeof IntegrationsVercelInstallRouteImport
+      parentRoute: typeof IntegrationsVercelRoute
     }
     '/integrations/github/authorize': {
       id: '/integrations/github/authorize'
@@ -5137,6 +5203,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefAdvisorsRulesPerformanceRouteImport
       parentRoute: typeof ProjectRefAdvisorsRulesRoute
     }
+    '/integrations/vercel/$slug/marketplace/choose-project': {
+      id: '/integrations/vercel/$slug/marketplace/choose-project'
+      path: '/$slug/marketplace/choose-project'
+      fullPath: '/integrations/vercel/$slug/marketplace/choose-project'
+      preLoaderRoute: typeof IntegrationsVercelSlugMarketplaceChooseProjectRouteImport
+      parentRoute: typeof IntegrationsVercelRoute
+    }
+    '/integrations/vercel/$slug/deploy-button/new-project': {
+      id: '/integrations/vercel/$slug/deploy-button/new-project'
+      path: '/$slug/deploy-button/new-project'
+      fullPath: '/integrations/vercel/$slug/deploy-button/new-project'
+      preLoaderRoute: typeof IntegrationsVercelSlugDeployButtonNewProjectRouteImport
+      parentRoute: typeof IntegrationsVercelRoute
+    }
     '/api/v1/projects/$ref/api-keys': {
       id: '/api/v1/projects/$ref/api-keys'
       path: '/api/v1/projects/$ref/api-keys'
@@ -5716,6 +5796,23 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface IntegrationsVercelRouteChildren {
+  IntegrationsVercelInstallRoute: typeof IntegrationsVercelInstallRoute
+  IntegrationsVercelSlugDeployButtonNewProjectRoute: typeof IntegrationsVercelSlugDeployButtonNewProjectRoute
+  IntegrationsVercelSlugMarketplaceChooseProjectRoute: typeof IntegrationsVercelSlugMarketplaceChooseProjectRoute
+}
+
+const IntegrationsVercelRouteChildren: IntegrationsVercelRouteChildren = {
+  IntegrationsVercelInstallRoute: IntegrationsVercelInstallRoute,
+  IntegrationsVercelSlugDeployButtonNewProjectRoute:
+    IntegrationsVercelSlugDeployButtonNewProjectRoute,
+  IntegrationsVercelSlugMarketplaceChooseProjectRoute:
+    IntegrationsVercelSlugMarketplaceChooseProjectRoute,
+}
+
+const IntegrationsVercelRouteWithChildren =
+  IntegrationsVercelRoute._addFileChildren(IntegrationsVercelRouteChildren)
+
 interface ProjectRefAdvisorsRulesRouteChildren {
   ProjectRefAdvisorsRulesPerformanceRoute: typeof ProjectRefAdvisorsRulesPerformanceRoute
   ProjectRefAdvisorsRulesSecurityRoute: typeof ProjectRefAdvisorsRulesSecurityRoute
@@ -6247,6 +6344,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIncidentBannerRoute: ApiIncidentBannerRoute,
   ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
+  IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   NewSlugRoute: NewSlugRoute,
   ProjectRefRoute: ProjectRefRouteWithChildren,
   ApiAiDocsRoute: ApiAiDocsRoute,

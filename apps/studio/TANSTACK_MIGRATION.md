@@ -64,8 +64,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/_app.tsx` — AppLayout + DefaultLayout (reads `defaultLayoutHeaderTitle`/`hideMobileMenu` from leaf `staticData`)
 - [x] `routes/_app/account.tsx` — AccountLayout (reads `accountLayoutTitle` from leaf `staticData`)
 - [x] `routes/_app/org.tsx` — OrganizationLayout (reads `orgLayoutTitle` from leaf `staticData`). **Delta vs plan:** placed at `_app/org.tsx` (wraps both `/org/` index and `/org/$slug/*`) instead of `_app/org/$slug.tsx`. PageLayout stays inline on `/org/$slug/index.tsx` since only that one route uses it.
-- [ ] `routes/_app/new.tsx` — WizardLayout (+ DefaultLayout hideMobileMenu override)
-- [ ] `routes/_app/integrations/vercel.tsx` — VercelIntegrationWindowLayout
+- [x] `routes/_app/new.tsx` — skipped; only `_app/new/index.tsx` lives under \_app (inlines WizardLayout). `new/$slug` is top-level (no AppLayout) so a sub-shell would not actually share state.
+- [x] `routes/integrations/vercel.tsx` — VercelIntegrationWindowLayout. **Delta vs plan:** placed at top-level rather than under `_app/` — Next getLayout for all three leaves wraps only in VercelIntegrationWindowLayout, no AppLayout/DefaultLayout.
 
 ### Project shell
 
@@ -134,9 +134,9 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### App shell — integrations
 
-- [ ] `routes/_app/integrations/vercel/install.tsx` ← `pages/integrations/vercel/install.tsx`
-- [ ] `routes/_app/integrations/vercel/$slug/marketplace/choose-project.tsx` ← `pages/integrations/vercel/[slug]/marketplace/choose-project.tsx`
-- [ ] `routes/_app/integrations/vercel/$slug/deploy-button/new-project.tsx` ← `pages/integrations/vercel/[slug]/deploy-button/new-project.tsx`
+- [x] A `routes/integrations/vercel/install.tsx` ← `pages/integrations/vercel/install.tsx`
+- [x] A `routes/integrations/vercel/$slug/marketplace/choose-project.tsx` ← `pages/integrations/vercel/[slug]/marketplace/choose-project.tsx`
+- [x] A `routes/integrations/vercel/$slug/deploy-button/new-project.tsx` ← `pages/integrations/vercel/[slug]/deploy-button/new-project.tsx`
 - [x] A `routes/integrations/github/authorize.tsx` ← `pages/integrations/github/authorize.tsx` **Delta vs plan:** placed at top-level rather than under `_app/` — Next page has no getLayout (renders bare), so adding AppLayout/DefaultLayout via \_app would be a behaviour change.
 
 ### Project shell — home
