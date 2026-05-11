@@ -332,7 +332,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### Error pages (handled at root)
 
 - [x] A `__root.tsx` — wired `notFoundComponent` to `pages/404.tsx`
-- [ ] `__root.tsx` — wire `errorComponent` for `pages/500.tsx` / `_error.jsx`
+- [x] `__root.tsx` — wired `errorComponent` to `pages/500.tsx`. Mirrors the in-tree `react-error-boundary` Sentry capture (`scope.setTag('routerErrorComponent', true)`) so router-level errors (loader/component-render failures before the in-tree boundary mounts) still report. `pages/_error.jsx` stays load-bearing under Next but isn't reached at runtime under TanStack — it's the pages-router catch-all that has no TanStack equivalent.
 
 ---
 

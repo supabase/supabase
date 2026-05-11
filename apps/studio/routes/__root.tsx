@@ -73,6 +73,7 @@ import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
 import Error404 from '@/pages/404'
+import Error500 from '@/pages/500'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
 dayjs.extend(customParseFormat)
@@ -253,11 +254,31 @@ function NotFound() {
   return <Error404 />
 }
 
+function ErrorBoundaryRoute({ error }: { error: Error }) {
+  // Mirrors `errorBoundaryHandler` above (used by the in-tree
+  // `react-error-boundary`) — TanStack's `errorComponent` covers
+  // errors thrown during route load/render before the in-tree
+  // boundary mounts, so we report from both layers.
+  useEffect(() => {
+    Sentry.withScope((scope) => {
+      scope.setTag('routerErrorComponent', true)
+      const eventId = Sentry.captureException(error)
+      if (eventId && error && typeof error === 'object') {
+        ;(error as any).sentryId = eventId
+      }
+    })
+    console.error(error.stack)
+  }, [error])
+
+  return <Error500 />
+}
+
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: buildRootHead,
   component: RootComponent,
   shellComponent: RootDocument,
   notFoundComponent: NotFound,
+  errorComponent: ErrorBoundaryRoute,
 })
 
 function RootComponent() {
