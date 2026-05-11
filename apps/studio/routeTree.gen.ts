@@ -48,6 +48,7 @@ import { Route as ProjectRefStorageRouteImport } from './routes/project/$ref/sto
 import { Route as ProjectRefSqlRouteImport } from './routes/project/$ref/sql'
 import { Route as ProjectRefRealtimeRouteImport } from './routes/project/$ref/realtime'
 import { Route as ProjectRefObservabilityRouteImport } from './routes/project/$ref/observability'
+import { Route as ProjectRefLogsRouteImport } from './routes/project/$ref/logs'
 import { Route as ProjectRefFunctionsRouteImport } from './routes/project/$ref/functions'
 import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/editor'
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
@@ -64,6 +65,7 @@ import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
 import { Route as ProjectRefSqlIndexRouteImport } from './routes/project/$ref/sql/index'
 import { Route as ProjectRefObservabilityIndexRouteImport } from './routes/project/$ref/observability/index'
+import { Route as ProjectRefLogsIndexRouteImport } from './routes/project/$ref/logs/index'
 import { Route as ProjectRefFunctionsIndexRouteImport } from './routes/project/$ref/functions/index'
 import { Route as ProjectRefEditorIndexRouteImport } from './routes/project/$ref/editor/index'
 import { Route as ProjectRefBranchesIndexRouteImport } from './routes/project/$ref/branches/index'
@@ -89,6 +91,19 @@ import { Route as ProjectRefObservabilityDatabaseRouteImport } from './routes/pr
 import { Route as ProjectRefObservabilityAuthRouteImport } from './routes/project/$ref/observability/auth'
 import { Route as ProjectRefObservabilityApiOverviewRouteImport } from './routes/project/$ref/observability/api-overview'
 import { Route as ProjectRefObservabilityIdRouteImport } from './routes/project/$ref/observability/$id'
+import { Route as ProjectRefLogsStorageLogsRouteImport } from './routes/project/$ref/logs/storage-logs'
+import { Route as ProjectRefLogsReplicationLogsRouteImport } from './routes/project/$ref/logs/replication-logs'
+import { Route as ProjectRefLogsRealtimeLogsRouteImport } from './routes/project/$ref/logs/realtime-logs'
+import { Route as ProjectRefLogsPostgrestLogsRouteImport } from './routes/project/$ref/logs/postgrest-logs'
+import { Route as ProjectRefLogsPostgresLogsRouteImport } from './routes/project/$ref/logs/postgres-logs'
+import { Route as ProjectRefLogsPoolerLogsRouteImport } from './routes/project/$ref/logs/pooler-logs'
+import { Route as ProjectRefLogsPgcronLogsRouteImport } from './routes/project/$ref/logs/pgcron-logs'
+import { Route as ProjectRefLogsPgUpgradeLogsRouteImport } from './routes/project/$ref/logs/pg-upgrade-logs'
+import { Route as ProjectRefLogsEdgeLogsRouteImport } from './routes/project/$ref/logs/edge-logs'
+import { Route as ProjectRefLogsEdgeFunctionsLogsRouteImport } from './routes/project/$ref/logs/edge-functions-logs'
+import { Route as ProjectRefLogsDedicatedPoolerLogsRouteImport } from './routes/project/$ref/logs/dedicated-pooler-logs'
+import { Route as ProjectRefLogsCronLogsRouteImport } from './routes/project/$ref/logs/cron-logs'
+import { Route as ProjectRefLogsAuthLogsRouteImport } from './routes/project/$ref/logs/auth-logs'
 import { Route as ProjectRefFunctionsSecretsRouteImport } from './routes/project/$ref/functions/secrets'
 import { Route as ProjectRefFunctionsNewRouteImport } from './routes/project/$ref/functions/new'
 import { Route as ProjectRefFunctionsFunctionSlugRouteImport } from './routes/project/$ref/functions/$functionSlug'
@@ -151,6 +166,7 @@ import { Route as AppAccountTokensScopedRouteImport } from './routes/_app/accoun
 import { Route as ProjectRefStorageVectorsIndexRouteImport } from './routes/project/$ref/storage/vectors/index'
 import { Route as ProjectRefStorageFilesIndexRouteImport } from './routes/project/$ref/storage/files/index'
 import { Route as ProjectRefStorageAnalyticsIndexRouteImport } from './routes/project/$ref/storage/analytics/index'
+import { Route as ProjectRefLogsExplorerIndexRouteImport } from './routes/project/$ref/logs/explorer/index'
 import { Route as ProjectRefFunctionsFunctionSlugIndexRouteImport } from './routes/project/$ref/functions/$functionSlug/index'
 import { Route as ProjectRefDatabaseTriggersIndexRouteImport } from './routes/project/$ref/database/triggers/index'
 import { Route as ProjectRefDatabaseTablesIndexRouteImport } from './routes/project/$ref/database/tables/index'
@@ -162,6 +178,9 @@ import { Route as AppOrgSlugWebhooksIndexRouteImport } from './routes/_app/org/$
 import { Route as AppOrgSlugPrivateAppsIndexRouteImport } from './routes/_app/org/$slug/private-apps/index'
 import { Route as ProjectRefStorageFilesSettingsRouteImport } from './routes/project/$ref/storage/files/settings'
 import { Route as ProjectRefStorageFilesPoliciesRouteImport } from './routes/project/$ref/storage/files/policies'
+import { Route as ProjectRefLogsExplorerTemplatesRouteImport } from './routes/project/$ref/logs/explorer/templates'
+import { Route as ProjectRefLogsExplorerSavedRouteImport } from './routes/project/$ref/logs/explorer/saved'
+import { Route as ProjectRefLogsExplorerRecentRouteImport } from './routes/project/$ref/logs/explorer/recent'
 import { Route as ProjectRefFunctionsFunctionSlugLogsRouteImport } from './routes/project/$ref/functions/$functionSlug/logs'
 import { Route as ProjectRefFunctionsFunctionSlugInvocationsRouteImport } from './routes/project/$ref/functions/$functionSlug/invocations'
 import { Route as ProjectRefFunctionsFunctionSlugDetailsRouteImport } from './routes/project/$ref/functions/$functionSlug/details'
@@ -439,6 +458,11 @@ const ProjectRefObservabilityRoute = ProjectRefObservabilityRouteImport.update({
   path: '/observability',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const ProjectRefLogsRoute = ProjectRefLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ProjectRefFunctionsRoute = ProjectRefFunctionsRouteImport.update({
   id: '/functions',
   path: '/functions',
@@ -521,6 +545,11 @@ const ProjectRefObservabilityIndexRoute =
     path: '/',
     getParentRoute: () => ProjectRefObservabilityRoute,
   } as any)
+const ProjectRefLogsIndexRoute = ProjectRefLogsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectRefLogsRoute,
+} as any)
 const ProjectRefFunctionsIndexRoute =
   ProjectRefFunctionsIndexRouteImport.update({
     id: '/',
@@ -663,6 +692,81 @@ const ProjectRefObservabilityIdRoute =
     path: '/$id',
     getParentRoute: () => ProjectRefObservabilityRoute,
   } as any)
+const ProjectRefLogsStorageLogsRoute =
+  ProjectRefLogsStorageLogsRouteImport.update({
+    id: '/storage-logs',
+    path: '/storage-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsReplicationLogsRoute =
+  ProjectRefLogsReplicationLogsRouteImport.update({
+    id: '/replication-logs',
+    path: '/replication-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsRealtimeLogsRoute =
+  ProjectRefLogsRealtimeLogsRouteImport.update({
+    id: '/realtime-logs',
+    path: '/realtime-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsPostgrestLogsRoute =
+  ProjectRefLogsPostgrestLogsRouteImport.update({
+    id: '/postgrest-logs',
+    path: '/postgrest-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsPostgresLogsRoute =
+  ProjectRefLogsPostgresLogsRouteImport.update({
+    id: '/postgres-logs',
+    path: '/postgres-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsPoolerLogsRoute =
+  ProjectRefLogsPoolerLogsRouteImport.update({
+    id: '/pooler-logs',
+    path: '/pooler-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsPgcronLogsRoute =
+  ProjectRefLogsPgcronLogsRouteImport.update({
+    id: '/pgcron-logs',
+    path: '/pgcron-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsPgUpgradeLogsRoute =
+  ProjectRefLogsPgUpgradeLogsRouteImport.update({
+    id: '/pg-upgrade-logs',
+    path: '/pg-upgrade-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsEdgeLogsRoute = ProjectRefLogsEdgeLogsRouteImport.update({
+  id: '/edge-logs',
+  path: '/edge-logs',
+  getParentRoute: () => ProjectRefLogsRoute,
+} as any)
+const ProjectRefLogsEdgeFunctionsLogsRoute =
+  ProjectRefLogsEdgeFunctionsLogsRouteImport.update({
+    id: '/edge-functions-logs',
+    path: '/edge-functions-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsDedicatedPoolerLogsRoute =
+  ProjectRefLogsDedicatedPoolerLogsRouteImport.update({
+    id: '/dedicated-pooler-logs',
+    path: '/dedicated-pooler-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsCronLogsRoute = ProjectRefLogsCronLogsRouteImport.update({
+  id: '/cron-logs',
+  path: '/cron-logs',
+  getParentRoute: () => ProjectRefLogsRoute,
+} as any)
+const ProjectRefLogsAuthLogsRoute = ProjectRefLogsAuthLogsRouteImport.update({
+  id: '/auth-logs',
+  path: '/auth-logs',
+  getParentRoute: () => ProjectRefLogsRoute,
+} as any)
 const ProjectRefFunctionsSecretsRoute =
   ProjectRefFunctionsSecretsRouteImport.update({
     id: '/secrets',
@@ -997,6 +1101,12 @@ const ProjectRefStorageAnalyticsIndexRoute =
     path: '/analytics/',
     getParentRoute: () => ProjectRefStorageRoute,
   } as any)
+const ProjectRefLogsExplorerIndexRoute =
+  ProjectRefLogsExplorerIndexRouteImport.update({
+    id: '/explorer/',
+    path: '/explorer/',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
 const ProjectRefFunctionsFunctionSlugIndexRoute =
   ProjectRefFunctionsFunctionSlugIndexRouteImport.update({
     id: '/',
@@ -1061,6 +1171,24 @@ const ProjectRefStorageFilesPoliciesRoute =
     id: '/files/policies',
     path: '/files/policies',
     getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
+const ProjectRefLogsExplorerTemplatesRoute =
+  ProjectRefLogsExplorerTemplatesRouteImport.update({
+    id: '/explorer/templates',
+    path: '/explorer/templates',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsExplorerSavedRoute =
+  ProjectRefLogsExplorerSavedRouteImport.update({
+    id: '/explorer/saved',
+    path: '/explorer/saved',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsExplorerRecentRoute =
+  ProjectRefLogsExplorerRecentRouteImport.update({
+    id: '/explorer/recent',
+    path: '/explorer/recent',
+    getParentRoute: () => ProjectRefLogsRoute,
   } as any)
 const ProjectRefFunctionsFunctionSlugLogsRoute =
   ProjectRefFunctionsFunctionSlugLogsRouteImport.update({
@@ -1585,6 +1713,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
+  '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
@@ -1651,6 +1780,19 @@ export interface FileRoutesByFullPath {
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
+  '/project/$ref/logs/cron-logs': typeof ProjectRefLogsCronLogsRoute
+  '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
+  '/project/$ref/logs/edge-functions-logs': typeof ProjectRefLogsEdgeFunctionsLogsRoute
+  '/project/$ref/logs/edge-logs': typeof ProjectRefLogsEdgeLogsRoute
+  '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
+  '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
+  '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
+  '/project/$ref/logs/postgres-logs': typeof ProjectRefLogsPostgresLogsRoute
+  '/project/$ref/logs/postgrest-logs': typeof ProjectRefLogsPostgrestLogsRoute
+  '/project/$ref/logs/realtime-logs': typeof ProjectRefLogsRealtimeLogsRoute
+  '/project/$ref/logs/replication-logs': typeof ProjectRefLogsReplicationLogsRoute
+  '/project/$ref/logs/storage-logs': typeof ProjectRefLogsStorageLogsRoute
   '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
   '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
   '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
@@ -1676,6 +1818,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
+  '/project/$ref/logs/': typeof ProjectRefLogsIndexRoute
   '/project/$ref/observability/': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
@@ -1719,6 +1862,9 @@ export interface FileRoutesByFullPath {
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
   '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
+  '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
+  '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
+  '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
   '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
   '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
@@ -1730,6 +1876,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
   '/project/$ref/functions/$functionSlug/': typeof ProjectRefFunctionsFunctionSlugIndexRoute
+  '/project/$ref/logs/explorer/': typeof ProjectRefLogsExplorerIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/project/$ref/storage/vectors/': typeof ProjectRefStorageVectorsIndexRoute
@@ -1875,6 +2022,19 @@ export interface FileRoutesByTo {
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
+  '/project/$ref/logs/cron-logs': typeof ProjectRefLogsCronLogsRoute
+  '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
+  '/project/$ref/logs/edge-functions-logs': typeof ProjectRefLogsEdgeFunctionsLogsRoute
+  '/project/$ref/logs/edge-logs': typeof ProjectRefLogsEdgeLogsRoute
+  '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
+  '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
+  '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
+  '/project/$ref/logs/postgres-logs': typeof ProjectRefLogsPostgresLogsRoute
+  '/project/$ref/logs/postgrest-logs': typeof ProjectRefLogsPostgrestLogsRoute
+  '/project/$ref/logs/realtime-logs': typeof ProjectRefLogsRealtimeLogsRoute
+  '/project/$ref/logs/replication-logs': typeof ProjectRefLogsReplicationLogsRoute
+  '/project/$ref/logs/storage-logs': typeof ProjectRefLogsStorageLogsRoute
   '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
   '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
   '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
@@ -1900,6 +2060,7 @@ export interface FileRoutesByTo {
   '/project/$ref/branches': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor': typeof ProjectRefEditorIndexRoute
   '/project/$ref/functions': typeof ProjectRefFunctionsIndexRoute
+  '/project/$ref/logs': typeof ProjectRefLogsIndexRoute
   '/project/$ref/observability': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
@@ -1943,6 +2104,9 @@ export interface FileRoutesByTo {
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
   '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
+  '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
+  '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
+  '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
   '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
   '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/org/$slug/private-apps': typeof AppOrgSlugPrivateAppsIndexRoute
@@ -1954,6 +2118,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/tables': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers': typeof ProjectRefDatabaseTriggersIndexRoute
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugIndexRoute
+  '/project/$ref/logs/explorer': typeof ProjectRefLogsExplorerIndexRoute
   '/project/$ref/storage/analytics': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files': typeof ProjectRefStorageFilesIndexRoute
   '/project/$ref/storage/vectors': typeof ProjectRefStorageVectorsIndexRoute
@@ -2045,6 +2210,7 @@ export interface FileRoutesById {
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
+  '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
@@ -2111,6 +2277,19 @@ export interface FileRoutesById {
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
+  '/project/$ref/logs/cron-logs': typeof ProjectRefLogsCronLogsRoute
+  '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
+  '/project/$ref/logs/edge-functions-logs': typeof ProjectRefLogsEdgeFunctionsLogsRoute
+  '/project/$ref/logs/edge-logs': typeof ProjectRefLogsEdgeLogsRoute
+  '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
+  '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
+  '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
+  '/project/$ref/logs/postgres-logs': typeof ProjectRefLogsPostgresLogsRoute
+  '/project/$ref/logs/postgrest-logs': typeof ProjectRefLogsPostgrestLogsRoute
+  '/project/$ref/logs/realtime-logs': typeof ProjectRefLogsRealtimeLogsRoute
+  '/project/$ref/logs/replication-logs': typeof ProjectRefLogsReplicationLogsRoute
+  '/project/$ref/logs/storage-logs': typeof ProjectRefLogsStorageLogsRoute
   '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
   '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
   '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
@@ -2136,6 +2315,7 @@ export interface FileRoutesById {
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
+  '/project/$ref/logs/': typeof ProjectRefLogsIndexRoute
   '/project/$ref/observability/': typeof ProjectRefObservabilityIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/_app/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
@@ -2179,6 +2359,9 @@ export interface FileRoutesById {
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
   '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
+  '/project/$ref/logs/explorer/recent': typeof ProjectRefLogsExplorerRecentRoute
+  '/project/$ref/logs/explorer/saved': typeof ProjectRefLogsExplorerSavedRoute
+  '/project/$ref/logs/explorer/templates': typeof ProjectRefLogsExplorerTemplatesRoute
   '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
   '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/_app/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
@@ -2190,6 +2373,7 @@ export interface FileRoutesById {
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
   '/project/$ref/functions/$functionSlug/': typeof ProjectRefFunctionsFunctionSlugIndexRoute
+  '/project/$ref/logs/explorer/': typeof ProjectRefLogsExplorerIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/project/$ref/storage/vectors/': typeof ProjectRefStorageVectorsIndexRoute
@@ -2280,6 +2464,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/functions'
+    | '/project/$ref/logs'
     | '/project/$ref/observability'
     | '/project/$ref/realtime'
     | '/project/$ref/sql'
@@ -2346,6 +2531,19 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/logs/auth-logs'
+    | '/project/$ref/logs/cron-logs'
+    | '/project/$ref/logs/dedicated-pooler-logs'
+    | '/project/$ref/logs/edge-functions-logs'
+    | '/project/$ref/logs/edge-logs'
+    | '/project/$ref/logs/pg-upgrade-logs'
+    | '/project/$ref/logs/pgcron-logs'
+    | '/project/$ref/logs/pooler-logs'
+    | '/project/$ref/logs/postgres-logs'
+    | '/project/$ref/logs/postgrest-logs'
+    | '/project/$ref/logs/realtime-logs'
+    | '/project/$ref/logs/replication-logs'
+    | '/project/$ref/logs/storage-logs'
     | '/project/$ref/observability/$id'
     | '/project/$ref/observability/api-overview'
     | '/project/$ref/observability/auth'
@@ -2371,6 +2569,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
     | '/project/$ref/functions/'
+    | '/project/$ref/logs/'
     | '/project/$ref/observability/'
     | '/project/$ref/sql/'
     | '/org/$slug/webhooks/$endpointId'
@@ -2414,6 +2613,9 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
     | '/project/$ref/functions/$functionSlug/logs'
+    | '/project/$ref/logs/explorer/recent'
+    | '/project/$ref/logs/explorer/saved'
+    | '/project/$ref/logs/explorer/templates'
     | '/project/$ref/storage/files/policies'
     | '/project/$ref/storage/files/settings'
     | '/org/$slug/private-apps/'
@@ -2425,6 +2627,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/'
     | '/project/$ref/database/triggers/'
     | '/project/$ref/functions/$functionSlug/'
+    | '/project/$ref/logs/explorer/'
     | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
     | '/project/$ref/storage/vectors/'
@@ -2570,6 +2773,19 @@ export interface FileRouteTypes {
     | '/project/$ref/editor/new'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/logs/auth-logs'
+    | '/project/$ref/logs/cron-logs'
+    | '/project/$ref/logs/dedicated-pooler-logs'
+    | '/project/$ref/logs/edge-functions-logs'
+    | '/project/$ref/logs/edge-logs'
+    | '/project/$ref/logs/pg-upgrade-logs'
+    | '/project/$ref/logs/pgcron-logs'
+    | '/project/$ref/logs/pooler-logs'
+    | '/project/$ref/logs/postgres-logs'
+    | '/project/$ref/logs/postgrest-logs'
+    | '/project/$ref/logs/realtime-logs'
+    | '/project/$ref/logs/replication-logs'
+    | '/project/$ref/logs/storage-logs'
     | '/project/$ref/observability/$id'
     | '/project/$ref/observability/api-overview'
     | '/project/$ref/observability/auth'
@@ -2595,6 +2811,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches'
     | '/project/$ref/editor'
     | '/project/$ref/functions'
+    | '/project/$ref/logs'
     | '/project/$ref/observability'
     | '/project/$ref/sql'
     | '/org/$slug/webhooks/$endpointId'
@@ -2638,6 +2855,9 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
     | '/project/$ref/functions/$functionSlug/logs'
+    | '/project/$ref/logs/explorer/recent'
+    | '/project/$ref/logs/explorer/saved'
+    | '/project/$ref/logs/explorer/templates'
     | '/project/$ref/storage/files/policies'
     | '/project/$ref/storage/files/settings'
     | '/org/$slug/private-apps'
@@ -2649,6 +2869,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables'
     | '/project/$ref/database/triggers'
     | '/project/$ref/functions/$functionSlug'
+    | '/project/$ref/logs/explorer'
     | '/project/$ref/storage/analytics'
     | '/project/$ref/storage/files'
     | '/project/$ref/storage/vectors'
@@ -2739,6 +2960,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/functions'
+    | '/project/$ref/logs'
     | '/project/$ref/observability'
     | '/project/$ref/realtime'
     | '/project/$ref/sql'
@@ -2805,6 +3027,19 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/logs/auth-logs'
+    | '/project/$ref/logs/cron-logs'
+    | '/project/$ref/logs/dedicated-pooler-logs'
+    | '/project/$ref/logs/edge-functions-logs'
+    | '/project/$ref/logs/edge-logs'
+    | '/project/$ref/logs/pg-upgrade-logs'
+    | '/project/$ref/logs/pgcron-logs'
+    | '/project/$ref/logs/pooler-logs'
+    | '/project/$ref/logs/postgres-logs'
+    | '/project/$ref/logs/postgrest-logs'
+    | '/project/$ref/logs/realtime-logs'
+    | '/project/$ref/logs/replication-logs'
+    | '/project/$ref/logs/storage-logs'
     | '/project/$ref/observability/$id'
     | '/project/$ref/observability/api-overview'
     | '/project/$ref/observability/auth'
@@ -2830,6 +3065,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
     | '/project/$ref/functions/'
+    | '/project/$ref/logs/'
     | '/project/$ref/observability/'
     | '/project/$ref/sql/'
     | '/_app/org/$slug/webhooks/$endpointId'
@@ -2873,6 +3109,9 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
     | '/project/$ref/functions/$functionSlug/logs'
+    | '/project/$ref/logs/explorer/recent'
+    | '/project/$ref/logs/explorer/saved'
+    | '/project/$ref/logs/explorer/templates'
     | '/project/$ref/storage/files/policies'
     | '/project/$ref/storage/files/settings'
     | '/_app/org/$slug/private-apps/'
@@ -2884,6 +3123,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/'
     | '/project/$ref/database/triggers/'
     | '/project/$ref/functions/$functionSlug/'
+    | '/project/$ref/logs/explorer/'
     | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
     | '/project/$ref/storage/vectors/'
@@ -3306,6 +3546,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefObservabilityRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/project/$ref/logs': {
+      id: '/project/$ref/logs'
+      path: '/logs'
+      fullPath: '/project/$ref/logs'
+      preLoaderRoute: typeof ProjectRefLogsRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/project/$ref/functions': {
       id: '/project/$ref/functions'
       path: '/functions'
@@ -3417,6 +3664,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/observability/'
       preLoaderRoute: typeof ProjectRefObservabilityIndexRouteImport
       parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/logs/': {
+      id: '/project/$ref/logs/'
+      path: '/'
+      fullPath: '/project/$ref/logs/'
+      preLoaderRoute: typeof ProjectRefLogsIndexRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
     }
     '/project/$ref/functions/': {
       id: '/project/$ref/functions/'
@@ -3592,6 +3846,97 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/observability/$id'
       preLoaderRoute: typeof ProjectRefObservabilityIdRouteImport
       parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/logs/storage-logs': {
+      id: '/project/$ref/logs/storage-logs'
+      path: '/storage-logs'
+      fullPath: '/project/$ref/logs/storage-logs'
+      preLoaderRoute: typeof ProjectRefLogsStorageLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/replication-logs': {
+      id: '/project/$ref/logs/replication-logs'
+      path: '/replication-logs'
+      fullPath: '/project/$ref/logs/replication-logs'
+      preLoaderRoute: typeof ProjectRefLogsReplicationLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/realtime-logs': {
+      id: '/project/$ref/logs/realtime-logs'
+      path: '/realtime-logs'
+      fullPath: '/project/$ref/logs/realtime-logs'
+      preLoaderRoute: typeof ProjectRefLogsRealtimeLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/postgrest-logs': {
+      id: '/project/$ref/logs/postgrest-logs'
+      path: '/postgrest-logs'
+      fullPath: '/project/$ref/logs/postgrest-logs'
+      preLoaderRoute: typeof ProjectRefLogsPostgrestLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/postgres-logs': {
+      id: '/project/$ref/logs/postgres-logs'
+      path: '/postgres-logs'
+      fullPath: '/project/$ref/logs/postgres-logs'
+      preLoaderRoute: typeof ProjectRefLogsPostgresLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/pooler-logs': {
+      id: '/project/$ref/logs/pooler-logs'
+      path: '/pooler-logs'
+      fullPath: '/project/$ref/logs/pooler-logs'
+      preLoaderRoute: typeof ProjectRefLogsPoolerLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/pgcron-logs': {
+      id: '/project/$ref/logs/pgcron-logs'
+      path: '/pgcron-logs'
+      fullPath: '/project/$ref/logs/pgcron-logs'
+      preLoaderRoute: typeof ProjectRefLogsPgcronLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/pg-upgrade-logs': {
+      id: '/project/$ref/logs/pg-upgrade-logs'
+      path: '/pg-upgrade-logs'
+      fullPath: '/project/$ref/logs/pg-upgrade-logs'
+      preLoaderRoute: typeof ProjectRefLogsPgUpgradeLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/edge-logs': {
+      id: '/project/$ref/logs/edge-logs'
+      path: '/edge-logs'
+      fullPath: '/project/$ref/logs/edge-logs'
+      preLoaderRoute: typeof ProjectRefLogsEdgeLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/edge-functions-logs': {
+      id: '/project/$ref/logs/edge-functions-logs'
+      path: '/edge-functions-logs'
+      fullPath: '/project/$ref/logs/edge-functions-logs'
+      preLoaderRoute: typeof ProjectRefLogsEdgeFunctionsLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/dedicated-pooler-logs': {
+      id: '/project/$ref/logs/dedicated-pooler-logs'
+      path: '/dedicated-pooler-logs'
+      fullPath: '/project/$ref/logs/dedicated-pooler-logs'
+      preLoaderRoute: typeof ProjectRefLogsDedicatedPoolerLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/cron-logs': {
+      id: '/project/$ref/logs/cron-logs'
+      path: '/cron-logs'
+      fullPath: '/project/$ref/logs/cron-logs'
+      preLoaderRoute: typeof ProjectRefLogsCronLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/auth-logs': {
+      id: '/project/$ref/logs/auth-logs'
+      path: '/auth-logs'
+      fullPath: '/project/$ref/logs/auth-logs'
+      preLoaderRoute: typeof ProjectRefLogsAuthLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
     }
     '/project/$ref/functions/secrets': {
       id: '/project/$ref/functions/secrets'
@@ -4027,6 +4372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefStorageAnalyticsIndexRouteImport
       parentRoute: typeof ProjectRefStorageRoute
     }
+    '/project/$ref/logs/explorer/': {
+      id: '/project/$ref/logs/explorer/'
+      path: '/explorer'
+      fullPath: '/project/$ref/logs/explorer/'
+      preLoaderRoute: typeof ProjectRefLogsExplorerIndexRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
     '/project/$ref/functions/$functionSlug/': {
       id: '/project/$ref/functions/$functionSlug/'
       path: '/'
@@ -4103,6 +4455,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/storage/files/policies'
       preLoaderRoute: typeof ProjectRefStorageFilesPoliciesRouteImport
       parentRoute: typeof ProjectRefStorageRoute
+    }
+    '/project/$ref/logs/explorer/templates': {
+      id: '/project/$ref/logs/explorer/templates'
+      path: '/explorer/templates'
+      fullPath: '/project/$ref/logs/explorer/templates'
+      preLoaderRoute: typeof ProjectRefLogsExplorerTemplatesRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/explorer/saved': {
+      id: '/project/$ref/logs/explorer/saved'
+      path: '/explorer/saved'
+      fullPath: '/project/$ref/logs/explorer/saved'
+      preLoaderRoute: typeof ProjectRefLogsExplorerSavedRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/explorer/recent': {
+      id: '/project/$ref/logs/explorer/recent'
+      path: '/explorer/recent'
+      fullPath: '/project/$ref/logs/explorer/recent'
+      preLoaderRoute: typeof ProjectRefLogsExplorerRecentRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
     }
     '/project/$ref/functions/$functionSlug/logs': {
       id: '/project/$ref/functions/$functionSlug/logs'
@@ -4996,6 +5369,53 @@ const ProjectRefFunctionsRouteChildren: ProjectRefFunctionsRouteChildren = {
 const ProjectRefFunctionsRouteWithChildren =
   ProjectRefFunctionsRoute._addFileChildren(ProjectRefFunctionsRouteChildren)
 
+interface ProjectRefLogsRouteChildren {
+  ProjectRefLogsAuthLogsRoute: typeof ProjectRefLogsAuthLogsRoute
+  ProjectRefLogsCronLogsRoute: typeof ProjectRefLogsCronLogsRoute
+  ProjectRefLogsDedicatedPoolerLogsRoute: typeof ProjectRefLogsDedicatedPoolerLogsRoute
+  ProjectRefLogsEdgeFunctionsLogsRoute: typeof ProjectRefLogsEdgeFunctionsLogsRoute
+  ProjectRefLogsEdgeLogsRoute: typeof ProjectRefLogsEdgeLogsRoute
+  ProjectRefLogsPgUpgradeLogsRoute: typeof ProjectRefLogsPgUpgradeLogsRoute
+  ProjectRefLogsPgcronLogsRoute: typeof ProjectRefLogsPgcronLogsRoute
+  ProjectRefLogsPoolerLogsRoute: typeof ProjectRefLogsPoolerLogsRoute
+  ProjectRefLogsPostgresLogsRoute: typeof ProjectRefLogsPostgresLogsRoute
+  ProjectRefLogsPostgrestLogsRoute: typeof ProjectRefLogsPostgrestLogsRoute
+  ProjectRefLogsRealtimeLogsRoute: typeof ProjectRefLogsRealtimeLogsRoute
+  ProjectRefLogsReplicationLogsRoute: typeof ProjectRefLogsReplicationLogsRoute
+  ProjectRefLogsStorageLogsRoute: typeof ProjectRefLogsStorageLogsRoute
+  ProjectRefLogsIndexRoute: typeof ProjectRefLogsIndexRoute
+  ProjectRefLogsExplorerRecentRoute: typeof ProjectRefLogsExplorerRecentRoute
+  ProjectRefLogsExplorerSavedRoute: typeof ProjectRefLogsExplorerSavedRoute
+  ProjectRefLogsExplorerTemplatesRoute: typeof ProjectRefLogsExplorerTemplatesRoute
+  ProjectRefLogsExplorerIndexRoute: typeof ProjectRefLogsExplorerIndexRoute
+}
+
+const ProjectRefLogsRouteChildren: ProjectRefLogsRouteChildren = {
+  ProjectRefLogsAuthLogsRoute: ProjectRefLogsAuthLogsRoute,
+  ProjectRefLogsCronLogsRoute: ProjectRefLogsCronLogsRoute,
+  ProjectRefLogsDedicatedPoolerLogsRoute:
+    ProjectRefLogsDedicatedPoolerLogsRoute,
+  ProjectRefLogsEdgeFunctionsLogsRoute: ProjectRefLogsEdgeFunctionsLogsRoute,
+  ProjectRefLogsEdgeLogsRoute: ProjectRefLogsEdgeLogsRoute,
+  ProjectRefLogsPgUpgradeLogsRoute: ProjectRefLogsPgUpgradeLogsRoute,
+  ProjectRefLogsPgcronLogsRoute: ProjectRefLogsPgcronLogsRoute,
+  ProjectRefLogsPoolerLogsRoute: ProjectRefLogsPoolerLogsRoute,
+  ProjectRefLogsPostgresLogsRoute: ProjectRefLogsPostgresLogsRoute,
+  ProjectRefLogsPostgrestLogsRoute: ProjectRefLogsPostgrestLogsRoute,
+  ProjectRefLogsRealtimeLogsRoute: ProjectRefLogsRealtimeLogsRoute,
+  ProjectRefLogsReplicationLogsRoute: ProjectRefLogsReplicationLogsRoute,
+  ProjectRefLogsStorageLogsRoute: ProjectRefLogsStorageLogsRoute,
+  ProjectRefLogsIndexRoute: ProjectRefLogsIndexRoute,
+  ProjectRefLogsExplorerRecentRoute: ProjectRefLogsExplorerRecentRoute,
+  ProjectRefLogsExplorerSavedRoute: ProjectRefLogsExplorerSavedRoute,
+  ProjectRefLogsExplorerTemplatesRoute: ProjectRefLogsExplorerTemplatesRoute,
+  ProjectRefLogsExplorerIndexRoute: ProjectRefLogsExplorerIndexRoute,
+}
+
+const ProjectRefLogsRouteWithChildren = ProjectRefLogsRoute._addFileChildren(
+  ProjectRefLogsRouteChildren,
+)
+
 interface ProjectRefObservabilityRouteChildren {
   ProjectRefObservabilityIdRoute: typeof ProjectRefObservabilityIdRoute
   ProjectRefObservabilityApiOverviewRoute: typeof ProjectRefObservabilityApiOverviewRoute
@@ -5105,6 +5525,7 @@ interface ProjectRefRouteChildren {
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
   ProjectRefEditorRoute: typeof ProjectRefEditorRouteWithChildren
   ProjectRefFunctionsRoute: typeof ProjectRefFunctionsRouteWithChildren
+  ProjectRefLogsRoute: typeof ProjectRefLogsRouteWithChildren
   ProjectRefObservabilityRoute: typeof ProjectRefObservabilityRouteWithChildren
   ProjectRefRealtimeRoute: typeof ProjectRefRealtimeRouteWithChildren
   ProjectRefSqlRoute: typeof ProjectRefSqlRouteWithChildren
@@ -5119,6 +5540,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
   ProjectRefEditorRoute: ProjectRefEditorRouteWithChildren,
   ProjectRefFunctionsRoute: ProjectRefFunctionsRouteWithChildren,
+  ProjectRefLogsRoute: ProjectRefLogsRouteWithChildren,
   ProjectRefObservabilityRoute: ProjectRefObservabilityRouteWithChildren,
   ProjectRefRealtimeRoute: ProjectRefRealtimeRouteWithChildren,
   ProjectRefSqlRoute: ProjectRefSqlRouteWithChildren,
