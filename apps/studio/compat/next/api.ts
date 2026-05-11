@@ -93,6 +93,32 @@ async function buildRequest(
     }
   }
 
+  // Surface a tiny subset of Node's `IncomingMessage` EventEmitter API so
+  // handlers that wire client-abort via `req.on('close', …)` /
+  // `req.on('aborted', …)` (e.g. AI streaming routes) can still hook into
+  // the Web `Request.signal`. We don't model arbitrary event types — only
+  // `close` and `aborted`, both of which fire when the signal aborts.
+  const listeners: Record<string, Set<(...args: unknown[]) => void>> = {}
+  const fireAbort = () => {
+    for (const event of ['close', 'aborted'] as const) {
+      const set = listeners[event]
+      if (!set) continue
+      for (const fn of set) {
+        try {
+          fn()
+        } catch {
+          // Swallow — Node would emit `error` on the request, but we
+          // have nothing meaningful to do with it here.
+        }
+      }
+    }
+  }
+  if (request.signal.aborted) {
+    queueMicrotask(fireAbort)
+  } else {
+    request.signal.addEventListener('abort', fireAbort, { once: true })
+  }
+
   return {
     method,
     url: url.pathname + url.search,
@@ -100,6 +126,37 @@ async function buildRequest(
     query,
     body,
     cookies,
+    on(event: string, fn: (...args: unknown[]) => void) {
+      ;(listeners[event] ??= new Set()).add(fn)
+      return this
+    },
+    off(event: string, fn: (...args: unknown[]) => void) {
+      listeners[event]?.delete(fn)
+      return this
+    },
+    once(event: string, fn: (...args: unknown[]) => void) {
+      const wrapper = (...args: unknown[]) => {
+        listeners[event]?.delete(wrapper)
+        fn(...args)
+      }
+      ;(listeners[event] ??= new Set()).add(wrapper)
+      return this
+    },
+    removeListener(event: string, fn: (...args: unknown[]) => void) {
+      listeners[event]?.delete(fn)
+      return this
+    },
+    removeAllListeners(event?: string) {
+      if (event) listeners[event]?.clear()
+      else for (const set of Object.values(listeners)) set.clear()
+      return this
+    },
+    emit(event: string, ...args: unknown[]) {
+      const set = listeners[event]
+      if (!set) return false
+      for (const fn of set) fn(...args)
+      return true
+    },
   } as unknown as NextApiRequest
 }
 
