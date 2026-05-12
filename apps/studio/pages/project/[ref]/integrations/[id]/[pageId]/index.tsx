@@ -32,8 +32,9 @@ import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/In
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { MarketplaceDetail } from '@/components/interfaces/Integrations/Marketplace/MarketplaceDetail'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -43,6 +44,12 @@ import type { NextPageWithLayout } from '@/types'
 type NavigationItem = { label: string; href: string; active?: boolean }
 
 const IntegrationPage: NextPageWithLayout = () => {
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  if (isMarketplaceEnabled) return <MarketplaceDetail />
+  return <LegacyIntegrationPage />
+}
+
+const LegacyIntegrationPage = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { ref, id, pageId, childId } = useParams()
@@ -240,7 +247,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
 IntegrationPage.getLayout = (page) => (
   <DefaultLayout>
-    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
+    <ProjectIntegrationsLayoutDispatch>{page}</ProjectIntegrationsLayoutDispatch>
   </DefaultLayout>
 )
 

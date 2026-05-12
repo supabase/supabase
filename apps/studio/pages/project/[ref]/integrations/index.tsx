@@ -25,8 +25,9 @@ import {
 import { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { MarketplaceIndex } from '@/components/interfaces/Integrations/Marketplace/MarketplaceIndex'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
@@ -205,6 +206,12 @@ function useFeaturedIntegratios(
 }
 
 const IntegrationsPage: NextPageWithLayout = () => {
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  if (isMarketplaceEnabled) return <MarketplaceIndex />
+  return <LegacyIntegrationsPage />
+}
+
+const LegacyIntegrationsPage = () => {
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const [search, setSearch] = useQueryState(
@@ -357,7 +364,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
 
 IntegrationsPage.getLayout = (page) => (
   <DefaultLayout>
-    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
+    <ProjectIntegrationsLayoutDispatch>{page}</ProjectIntegrationsLayoutDispatch>
   </DefaultLayout>
 )
 
