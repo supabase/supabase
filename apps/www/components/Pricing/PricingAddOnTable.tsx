@@ -3,7 +3,7 @@
 import classNames from 'classnames'
 import { ChevronUp } from 'lucide-react'
 import { Fragment, useMemo, useState, type ReactNode } from 'react'
-import { Collapsible } from 'ui'
+import { Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
 
 import { Check } from './PricingIcons'
 
@@ -35,8 +35,8 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
 
   return (
     <div className="group overflow-hidden rounded-md shadow-md transition duration-500 hover:shadow-lg">
-      <Collapsible open={isAddOnOpen} onOpenChange={setIsAddOnOpen}>
-        <Collapsible.Trigger asChild>
+      <Collapsible_Shadcn_ open={isAddOnOpen} onOpenChange={setIsAddOnOpen}>
+        <CollapsibleTrigger_Shadcn_ asChild>
           <button
             className={classNames(
               'text-foreground bg-blue-500 border border-overlay group flex w-full flex-col items-start rounded-t-md lg:flex-row lg:items-center',
@@ -70,9 +70,9 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
               <ChevronUp className="data-open-parent:rotate-0 data-closed-parent:rotate-180 h-8 w-8 transition" />
             </div>
           </button>
-        </Collapsible.Trigger>
+        </CollapsibleTrigger_Shadcn_>
 
-        <Collapsible.Content>
+        <CollapsibleContent_Shadcn_>
           <div>
             <table className="text-foreground m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table">
               <thead>
@@ -112,8 +112,8 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
               </tbody>
             </table>
           </div>
-        </Collapsible.Content>
-      </Collapsible>
+        </CollapsibleContent_Shadcn_>
+      </Collapsible_Shadcn_>
     </div>
   )
 }

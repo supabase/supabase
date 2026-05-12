@@ -6,7 +6,9 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Collapsible,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,7 +47,6 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
   const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: role,
@@ -93,7 +94,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
   const formId = `role-update-form-${role.id}`
 
   return (
-    <Collapsible
+    <Collapsible_Shadcn_
       open={isExpanded}
       className={cn(
         'bg-surface-100',
@@ -109,7 +110,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
       )}
     >
       <div className={cn('flex items-center relative', !disabled && 'pr-(--card-padding-x)')}>
-        <Collapsible.Trigger asChild>
+        <CollapsibleTrigger_Shadcn_ asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
@@ -150,7 +151,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               </p>
             </div>
           </button>
-        </Collapsible.Trigger>
+        </CollapsibleTrigger_Shadcn_>
         {!disabled && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -176,7 +177,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           </DropdownMenu>
         )}
       </div>
-      <Collapsible.Content>
+      <CollapsibleContent_Shadcn_>
         <Form {...form}>
           <form
             id={formId}
@@ -228,7 +229,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             )}
           </form>
         </Form>
-      </Collapsible.Content>
-    </Collapsible>
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
   )
 }
