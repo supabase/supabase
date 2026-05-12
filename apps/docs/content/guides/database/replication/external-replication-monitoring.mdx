@@ -1,25 +1,25 @@
 ---
-id: 'replication-monitoring'
-title: 'Replication Monitoring'
-description: 'Monitor the status and health of your replication pipelines.'
+id: 'external-replication-monitoring'
+title: 'External Replication Monitoring'
+description: 'Monitor the status and health of your external replication pipelines.'
 subtitle: 'Track replication status, view logs, and troubleshoot issues.'
 sidebar_label: 'Monitoring'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-Replication is currently in private alpha. Access is limited and features may change.
+External replication is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-After setting up replication, you can monitor the status and health of your replication pipelines directly from the Supabase Dashboard. The pipeline is the active Postgres replication process that continuously streams changes from your database to your destination.
+After setting up external replication, you can monitor the status and health of your replication pipelines directly from the Supabase Dashboard. The pipeline is the active Postgres replication process that continuously streams changes from your database to your destination.
 
 ### Viewing pipeline status
 
 To monitor your replication pipelines:
 
 1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
-2. Select the **replication** tab
+2. Select the **Replication** tab
 3. You'll see a list of all your destinations with their pipeline status
 
 <Image
@@ -153,7 +153,7 @@ Logs contain diagnostic information that may be too technical for most users. If
 
 #### Checking if replication is healthy
 
-1. Navigate to [Database](/dashboard/project/_/database/replication) → **replication**
+1. Navigate to [Database](/dashboard/project/_/database/replication) → **Replication**
 2. Verify your destination shows **Running** status
 3. Click **View status** to check replication lag and table states
 4. Ensure all tables show **Live** state
@@ -175,7 +175,7 @@ To ensure optimal performance:
 1. Regularly check replication lag metrics in the pipeline status view
 2. Monitor table states to ensure tables are staying in **Live** state
 3. Review logs for warnings or performance issues
-4. If lag is consistently high, consider adjusting your publication or batch wait time settings
+4. If lag is consistently high, review your publication and destination configuration
 
 ### Troubleshooting
 
@@ -187,9 +187,9 @@ If you notice issues with your replication:
 4. **Verify publication**: Ensure your Postgres publication is properly configured
 5. **Monitor replication lag**: High lag may indicate performance issues
 
-For more troubleshooting tips, see the [Replication FAQ](/docs/guides/database/replication/replication-faq).
+For more troubleshooting tips, see the [external replication FAQ](/docs/guides/database/replication/external-replication-faq).
 
 ### Next steps
 
-- [Set up replication](/docs/guides/database/replication/replication-setup)
-- [View replication FAQ](/docs/guides/database/replication/replication-faq)
+- [Set up external replication](/docs/guides/database/replication/external-replication-setup)
+- [View external replication FAQ](/docs/guides/database/replication/external-replication-faq)

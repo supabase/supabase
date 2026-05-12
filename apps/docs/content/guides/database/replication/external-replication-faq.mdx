@@ -1,22 +1,22 @@
 ---
-id: 'replication-faq'
-title: 'Replication FAQ'
-description: 'Frequently asked questions about replication.'
-subtitle: 'Common questions and answers about replication.'
+id: 'external-replication-faq'
+title: 'External Replication FAQ'
+description: 'Frequently asked questions about external replication.'
+subtitle: 'Common questions and answers about external replication.'
 sidebar_label: 'FAQ'
 ---
 
 <Admonition type="caution" label="Private Alpha">
 
-Replication is currently in private alpha. Access is limited and features may change.
+External replication is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
 ## What destinations are supported?
 
-Replication currently supports **BigQuery** as the only managed destination. See the [Setup guide](/docs/guides/database/replication/replication-setup#step-3-add-a-destination) for configuration details.
+External replication currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
 
-We are working on adding more destinations in the future. Availability may continue to vary based on the planned roll-out strategy.
+New destinations are in the works. Availability may continue to vary based on the planned roll-out strategy.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -25,6 +25,37 @@ We are working on adding more destinations in the future. Availability may conti
 We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
 
 As a result, managed replication to Analytics Buckets through Supabase ETL is no longer available. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
+
+## What does ETL do in my database?
+
+When you enable external replication, Supabase ETL installs database objects that help it track replication state and support schema changes:
+
+- An event trigger that runs on every `ALTER TABLE` statement. ETL uses this to support schema change handling.
+- A set of tables in the `etl` schema. These tables track ETL state for your pipelines.
+
+The ETL state tables are not updated very often, especially after the initial copy phase is complete.
+
+## What schema changes are supported?
+
+Schema change support is currently in beta and limited to the BigQuery destination.
+
+Supported schema changes:
+
+- Adding a column
+- Removing a column
+- Renaming a column
+
+External replication does not currently support changing column data types or replicating column default values. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+
+## How do I remove ETL from my project?
+
+To disable external replication and remove the database objects installed by ETL:
+
+1. Delete all external replication pipelines in your project.
+2. After all pipelines are removed, open the three-dot actions menu on the Replication page.
+3. Click the option to disable external replication.
+
+This cleans up the ETL objects that were installed when external replication was enabled.
 
 ## Why is a table not being replicated?
 
@@ -38,7 +69,7 @@ Check your publication settings and verify your table meets the requirements.
 
 ## Why aren't publication changes reflected after adding or removing tables?
 
-After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/replication-setup#adding-or-removing-tables) for instructions.
+After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/external-replication-setup#adding-or-removing-tables) for instructions.
 
 ## Why is a pipeline in failed state?
 
@@ -49,7 +80,7 @@ Pipeline failures occur during the streaming phase when an error happens while r
 3. Fix the underlying issue (e.g., schema mismatches, destination connectivity)
 4. Restart the pipeline
 
-See [Handling errors](/docs/guides/database/replication/replication-monitoring#handling-errors) for more details.
+See [Handling errors](/docs/guides/database/replication/external-replication-monitoring#handling-errors) for more details.
 
 ## Why is a table in error state?
 
@@ -57,26 +88,24 @@ Table errors occur during the copy phase. To recover, click **View status**, fin
 
 ## How to verify replication is working
 
-Check the [Database](/dashboard/project/_/database/replication) → **replication** page:
+Check the [Database](/dashboard/project/_/database/replication) → **Replication** page:
 
 1. Verify your pipeline shows **Running** status
 2. Click **View status** to check table states
 3. Ensure all tables show **Live** state (actively replicating)
 4. Monitor replication lag metrics
 
-See the [Replication Monitoring guide](/docs/guides/database/replication/replication-monitoring) for comprehensive monitoring instructions.
+See the [external replication monitoring guide](/docs/guides/database/replication/external-replication-monitoring) for comprehensive monitoring instructions.
 
 ## How to stop or pause replication
 
-You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/replication-setup#managing-your-pipeline) for details on available actions.
+You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/external-replication-setup#managing-your-pipeline) for details on available actions.
 
 Note: Stopping replication will cause changes to queue up in the WAL.
 
 ## What happens if a table is deleted at the destination?
 
-If a table is deleted downstream at the destination (for example, in your BigQuery dataset), the replication pipeline will automatically recreate it.
-
-This behavior is by design to prevent the pipeline from breaking if tables are accidentally deleted. The pipeline ensures that all tables in your publication are always present at the destination.
+If a table is deleted downstream at the destination, the behavior depends on the destination. In general, the replication pipeline will try to recreate the missing table so that all tables in your publication can continue replicating.
 
 **To permanently remove a table from your destination:**
 
@@ -106,7 +135,7 @@ However, if a transaction in your database takes longer than this waiting period
 
 **Understanding transaction boundaries**: A transaction is a group of database changes that happen together (for example, all changes within a `BEGIN...COMMIT` block). Postgres logical replication must process entire transactions - it cannot process part of a transaction, stop, and then continue from the middle. This means if a transaction is interrupted, the whole transaction must be replayed when the pipeline resumes.
 
-**Example scenario**: Suppose you have a batch operation that updates 10,000 rows within a single transaction. If this operation takes 10 minutes to complete and you stop the pipeline after 5 minutes (when 5,000 rows have been processed), the pipeline cannot resume from row 5,001. Instead, when it restarts, it must reprocess all 10,000 rows from the beginning, resulting in the first 5,000 rows being sent to your destination twice.
+**Example scenario**: Suppose you have a large operation that updates 10,000 rows within a single transaction. If this operation takes 10 minutes to complete and you stop the pipeline after 5 minutes (when 5,000 rows have been processed), the pipeline cannot resume from row 5,001. Instead, when it restarts, it must reprocess all 10,000 rows from the beginning, resulting in the first 5,000 rows being sent to your destination twice.
 
 **Important**: There are currently no plans to implement automatic deduplication. If your use case requires guaranteed exactly-once delivery, you should implement deduplication logic in your downstream systems based on primary keys or other unique identifiers.
 
@@ -118,6 +147,6 @@ Navigate to [Logs](/dashboard/project/_/logs/explorer) → **Replication** to se
 
 If you need assistance:
 
-1. Check the [Replication Setup guide](/docs/guides/database/replication/replication-setup) and [Replication Monitoring guide](/docs/guides/database/replication/replication-monitoring)
+1. Check the [external replication setup guide](/docs/guides/database/replication/external-replication-setup) and [external replication monitoring guide](/docs/guides/database/replication/external-replication-monitoring)
 2. Review this FAQ for common issues
 3. Contact support with your error details and logs
