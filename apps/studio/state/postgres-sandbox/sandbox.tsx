@@ -88,6 +88,7 @@ export const PostgresSandboxProvider = ({ children }: PropsWithChildren) => {
   }
 
   const syncSandbox = async () => {
+    if (isSyncing) return
     if (!sandbox) return console.error('Sandbox has not been loaded')
     await applyToCore(sandbox)
   }
