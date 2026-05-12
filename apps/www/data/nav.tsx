@@ -1,6 +1,6 @@
-import DevelopersDropdown from 'components/Nav/DevelopersDropdown'
-import ProductDropdown from 'components/Nav/ProductDropdown'
-import SolutionsDropdown from 'components/Nav/SolutionsDropdown'
+import { DevelopersDropdown } from 'components/Nav/DevelopersDropdown'
+import { ProductDropdown } from 'components/Nav/ProductDropdown'
+import { SolutionsDropdown } from 'components/Nav/SolutionsDropdown'
 
 import { data as DevelopersData } from 'data/Developers'
 import MainProductsData from 'data/MainProducts'

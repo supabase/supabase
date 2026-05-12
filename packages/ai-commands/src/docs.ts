@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { codeBlock, oneLine } from 'common-tags'
 import type OpenAI from 'openai'
+
 import { ApplicationError, UserError } from './errors'
 import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from './tokenizer'
 import type { Message } from './types'
@@ -16,7 +17,8 @@ interface PageSection {
 export async function clippy(
   openai: OpenAI,
   supabaseClient: SupabaseClient<any, 'public', any>,
-  messages: Message[]
+  messages: Message[],
+  options?: { useAltSearchIndex?: boolean }
 ) {
   // TODO: better sanitization
   const contextMessages = messages.map(({ role, content }) => {
@@ -63,14 +65,19 @@ export async function clippy(
 
   const [{ embedding }] = embeddingResponse.data
 
+  const searchFunction = options?.useAltSearchIndex
+    ? 'match_page_sections_v2_nimbus'
+    : 'match_page_sections_v2'
+  const joinedTable = options?.useAltSearchIndex ? 'page_nimbus' : 'page'
+
   const { error: matchError, data: pageSections } = (await supabaseClient
-    .rpc('match_page_sections_v2', {
+    .rpc(searchFunction, {
       embedding,
       match_threshold: 0.78,
       min_content_length: 50,
     })
     .neq('rag_ignore', true)
-    .select('content,page!inner(path),rag_ignore')
+    .select(`content,${joinedTable}!inner(path),rag_ignore`)
     .limit(10)) as { error: any; data: PageSection[] | null }
 
   if (matchError || !pageSections) {
@@ -92,7 +99,10 @@ export async function clippy(
       break
     }
 
-    const pagePath = pageSection.page.path
+    const pagePath = options?.useAltSearchIndex
+      ? // @ts-ignore
+        pageSection.page_nimbus.path
+      : pageSection.page.path
 
     // Include source reference with each section
     contextText += `[Source ${sourceIndex}: ${pagePath}]\n${content.trim()}\n---\n`

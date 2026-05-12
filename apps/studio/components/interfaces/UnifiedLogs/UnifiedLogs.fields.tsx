@@ -1,14 +1,34 @@
-import { format } from 'date-fns'
 import { User } from 'lucide-react'
-
-import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
-import { DataTableFilterField, Option } from 'components/ui/DataTable/DataTable.types'
-import { getLevelColor } from 'components/ui/DataTable/DataTable.utils'
 import { cn } from 'ui'
+
 import { LOG_TYPES, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta, SheetField } from './UnifiedLogs.types'
 import { getLevelLabel } from './UnifiedLogs.utils'
+import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
+import { DataTableFilterField, Option } from '@/components/ui/DataTable/DataTable.types'
+import { getLevelColor } from '@/components/ui/DataTable/DataTable.utils'
+import { useFormatDateTime } from '@/lib/datetime'
+
+const DateCell = (props: { date: ColumnSchema['date'] }) => {
+  const formatDateTime = useFormatDateTime()
+  const month = formatDateTime(props.date, 'MMM')
+  const day = formatDateTime(props.date, 'DD')
+  const year = formatDateTime(props.date, 'YYYY')
+  const time = formatDateTime(props.date, 'HH:mm:ss')
+
+  return (
+    <div className="font-mono whitespace-nowrap flex items-center gap-1 justify-end">
+      <span>{month}</span>
+      <span className="text-foreground/50">·</span>
+      <span>{day}</span>
+      <span className="text-foreground/50">·</span>
+      <span>{year}</span>
+      <span className="text-foreground/50">·</span>
+      <span>{time}</span>
+    </div>
+  )
+}
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
@@ -52,7 +72,7 @@ export const filterFields = [
 
       return (
         <div className="flex items-center gap-2 w-full min-w-0">
-          <span className="flex-shrink-0 text-foreground">{statusValue}</span>
+          <span className="shrink-0 text-foreground">{statusValue}</span>
           {statusLabel && (
             <span className="text-[0.7rem] text-foreground-lighter truncate" title={statusLabel}>
               {statusLabel}
@@ -127,25 +147,7 @@ export const sheetFields = [
     id: 'date',
     label: 'Date',
     type: 'timerange',
-    component: (props) => {
-      const date = new Date(props.date)
-      const month = format(date, 'LLL')
-      const day = format(date, 'dd')
-      const year = format(date, 'y')
-      const time = format(date, 'HH:mm:ss')
-
-      return (
-        <div className="font-mono whitespace-nowrap flex items-center gap-1 justify-end">
-          <span>{month}</span>
-          <span className="text-foreground/50">·</span>
-          <span>{day}</span>
-          <span className="text-foreground/50">·</span>
-          <span>{year}</span>
-          <span className="text-foreground/50">·</span>
-          <span>{time}</span>
-        </div>
-      )
-    },
+    component: DateCell,
     skeletonClassName: 'w-36',
   },
   {

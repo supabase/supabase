@@ -1,27 +1,30 @@
+import { useFlag } from 'common'
 import { PropsWithChildren } from 'react'
 
-import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
-import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
-import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
-import { useFlag } from 'hooks/ui/useFlag'
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
+import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
+import { FlyDeprecationBanner } from '@/components/layouts/AppLayout/FlyDeprecationBanner'
+import { NoticeBanner, NoticeBanner2 } from '@/components/layouts/AppLayout/NoticeBanner'
+import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 
-const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
-  const ongoingIncident = useFlag('ongoingIncident')
+export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
+  const showNoticeBanner2 = useFlag('showNoticeBanner2')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
   return (
     <div className="flex flex-col">
-      <div className="flex-shrink-0">
-        {ongoingIncident && <IncidentBanner />}
+      <div className="shrink-0">
+        <StatusPageBanner />
         {showNoticeBanner && <NoticeBanner />}
+        {showNoticeBanner2 && <NoticeBanner2 />}
+        <FlyDeprecationBanner />
         <OrganizationResourceBanner />
+        {/* Disabled until reintroduced or removed altogether. */}
+        {/* <TaxIdBanner /> */}
         {clockSkewBanner && <ClockSkewBanner />}
       </div>
       {children}
     </div>
   )
 }
-
-export default AppBannerWrapper

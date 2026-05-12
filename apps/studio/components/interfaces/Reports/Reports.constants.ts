@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
 
-import { PlanId } from 'data/subscriptions/types'
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import { PlanId } from '@/data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 
@@ -26,32 +26,32 @@ export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_10_MINUTES,
     calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_30_MINUTES,
     calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
     calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
     calcTo: () => dayjs().toISOString(),
     default: true,
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS,
     calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS,
     calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['free', 'pro', 'team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
   },
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_7_DAYS,
@@ -86,25 +86,34 @@ export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true)
       const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
       const filterKey = filter.key.includes('.') ? normalizedKey : filter.key
 
+      const hasQuotes =
+        filter.value.toString().includes('"') || filter.value.toString().includes("'")
+
+      const valueIsNumber = !isNaN(Number(filter.value))
+      const valueWithQuotes = !valueIsNumber && hasQuotes ? filter.value : `'${filter.value}'`
+      const lowercaseValue = !valueIsNumber && String(valueWithQuotes).toLowerCase()
+
+      const finalValue = valueIsNumber ? filter.value : lowercaseValue
+
       // Handle different comparison operators
       switch (filter.compare) {
         case 'matches':
-          return `REGEXP_CONTAINS(${filterKey}, '${filter.value}')`
+          return `REGEXP_CONTAINS(${filterKey}, ${finalValue})`
         case 'is':
-          return `${filterKey} = ${filter.value}`
+          return `${filterKey} = ${finalValue}`
         case '!=':
-          return `${filterKey} != ${filter.value}`
+          return `${filterKey} != ${finalValue}`
         case '>=':
-          return `${filterKey} >= ${filter.value}`
+          return `${filterKey} >= ${finalValue}`
         case '<=':
-          return `${filterKey} <= ${filter.value}`
+          return `${filterKey} <= ${finalValue}`
         case '>':
-          return `${filterKey} > ${filter.value}`
+          return `${filterKey} > ${finalValue}`
         case '<':
-          return `${filterKey} < ${filter.value}`
+          return `${filterKey} < ${finalValue}`
         default:
           // Fallback to exact match for unknown operators
-          return `${filterKey} = ${filter.value}`
+          return `${filterKey} = ${finalValue}`
       }
     })
     .filter(Boolean) // Remove any null/undefined conditions
@@ -292,6 +301,26 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           timestamp ASC
         `,
       },
+      requestsByCountry: {
+        queryType: 'logs',
+        sql: (filters) => `
+        -- reports-api-requests-by-country
+        select
+          cf.country as country,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          cross join unnest(request.cf) as cf
+        where
+          cf.country is not null
+        ${generateRegexpWhere(filters, false)}
+        group by
+          cf.country
+        `,
+      },
     },
   },
   [Presets.AUTH]: {
@@ -351,7 +380,7 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-most-frequently-invoked
 set search_path to public, extensions;
 
@@ -369,7 +398,17 @@ select
     -- min_time,
     -- max_time,
     -- mean_time,
-    statements.rows / statements.calls as avg_rows${
+    coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows,
+    statements.rows as rows_read,
+    case
+      when (statements.shared_blks_hit + statements.shared_blks_read) > 0
+      then round(
+        (statements.shared_blks_hit * 100.0) /
+        (statements.shared_blks_hit + statements.shared_blks_read),
+        2
+      )
+      else 0
+    end as cache_hit_rate${
       runIndexAdvisor
         ? `,
     case
@@ -391,22 +430,34 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  ${where || ''}
+  -- skip queries that were never actually executed
+  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by statements.calls desc'}
   limit 20`,
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_, where, orderBy, runIndexAdvisor = false) => `
+        sql: (_, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
+-- compute total time once up front so we don't need a window function over all rows
+with grand_total as (
+  select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
+  from pg_stat_statements where calls > 0
+)
 select
     auth.rolname,
     statements.query,
     statements.calls,
     statements.total_exec_time + statements.total_plan_time as total_time,
-    to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time${
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    coalesce(
+      ((statements.total_exec_time + statements.total_plan_time) /
+        (select v from grand_total)) *
+        100,
+      0
+    ) as prop_total_time${
       runIndexAdvisor
         ? `,
     case
@@ -428,13 +479,14 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  ${where || ''}
+  -- skip queries that were never actually executed
+  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by total_time desc'}
   limit 20`,
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-slowest-execution-time
 set search_path to public, extensions;
 
@@ -452,7 +504,7 @@ select
     -- min_time,
     -- max_time,
     -- mean_time,
-    statements.rows / statements.calls as avg_rows${
+    coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows${
       runIndexAdvisor
         ? `,
     case
@@ -474,7 +526,8 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  ${where || ''}
+  -- skip queries that were never actually executed
+  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by max_time desc'}
   limit 20`,
       },
@@ -490,6 +543,135 @@ select
     'table hit rate' as name,
     sum(heap_blks_hit) / nullif(sum(heap_blks_hit) + sum(heap_blks_read),0) as ratio
   from pg_statio_user_tables;`,
+      },
+      unified: {
+        queryType: 'db',
+        sql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          filterIndexAdvisor = false,
+          page = 1,
+          pageSize = 20
+        ) => {
+          const offset = (page - 1) * pageSize
+          // When filtering by index suggestions we need a larger scan window since we don't
+          // know how many rows will match. Cap at a reasonable upper bound to avoid running
+          // index_advisor() across the entire dataset on any code path where it's active.
+          const INDEX_ADVISOR_SCAN_CAP = 500
+          const baseScanTarget =
+            filterIndexAdvisor && runIndexAdvisor ? offset + pageSize * 10 : offset + pageSize
+          const baseCteLimit = runIndexAdvisor
+            ? Math.min(baseScanTarget, INDEX_ADVISOR_SCAN_CAP)
+            : baseScanTarget
+          const baseQuery = `
+        -- reports-query-performance-unified
+        set search_path to public, extensions;
+
+        -- compute total time once up front so we don't need a window function over all rows
+        with grand_total as (
+          select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
+          from pg_stat_statements where calls > 0
+        ),
+        base as (
+          select
+            auth.rolname,
+            statements.query,
+            statements.calls,
+            statements.total_exec_time + statements.total_plan_time as total_time,
+            statements.min_exec_time + statements.min_plan_time as min_time,
+            statements.max_exec_time + statements.max_plan_time as max_time,
+            statements.mean_exec_time + statements.mean_plan_time as mean_time,
+            coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows,
+            statements.rows as rows_read,
+            statements.shared_blks_hit as debug_hit,
+            statements.shared_blks_read as debug_read,
+            case
+              when (statements.shared_blks_hit + statements.shared_blks_read) > 0
+              then (statements.shared_blks_hit::numeric * 100.0) /
+                   (statements.shared_blks_hit + statements.shared_blks_read)
+              else 0
+            end as cache_hit_rate,
+            coalesce(
+              ((statements.total_exec_time + statements.total_plan_time) /
+                (select v from grand_total)) *
+                100,
+              0
+            ) as prop_total_time
+          from pg_stat_statements as statements
+            inner join pg_authid as auth on statements.userid = auth.oid
+          -- skip queries that were never actually executed
+          WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
+          ${orderBy || 'order by total_time desc'}
+          ${baseCteLimit !== null ? `limit ${baseCteLimit}` : ''}
+        ),
+        query_results as (
+          select
+            base.*${
+              runIndexAdvisor
+                ? `,
+            case
+              when (lower(base.query) like 'select%' or lower(base.query) like 'with pgrst%')
+              then (
+                select json_build_object(
+                  'has_suggestion', array_length(index_statements, 1) > 0,
+                  'startup_cost_before', startup_cost_before,
+                  'startup_cost_after', startup_cost_after,
+                  'total_cost_before', total_cost_before,
+                  'total_cost_after', total_cost_after,
+                  'index_statements', index_statements
+                )
+                from index_advisor(base.query)
+              )
+              else null
+            end as index_advisor_result`
+                : ''
+            }
+          from base
+        )
+        select *
+        from query_results
+        ${filterIndexAdvisor && runIndexAdvisor ? `where (index_advisor_result->>'has_suggestion')::boolean = true` : ''}
+        ${orderBy || 'order by total_time desc'}
+        limit ${pageSize} offset ${offset}`
+
+          return baseQuery
+        },
+      },
+      slowQueriesCount: {
+        queryType: 'db',
+        sql: () => `
+        -- reports-query-performance-slow-queries-count
+        set search_path to public, extensions;
+
+        -- Count of slow queries (> 1 second average)
+        SELECT count(*) as slow_queries_count
+        -- alias needed to reference columns in WHERE
+        FROM pg_stat_statements as statements
+        -- skip never-executed queries; mean_exec_time > 1000ms = avg over 1 second
+        WHERE statements.calls > 0 AND statements.mean_exec_time > 1000;`,
+      },
+      queryMetrics: {
+        queryType: 'db',
+        sql: (_params, where, orderBy, _runIndexAdvisor = false, _filterIndexAdvisor = false) => `
+        -- reports-query-performance-metrics
+        set search_path to public, extensions;
+
+        SELECT
+          COALESCE(ROUND(AVG(statements.rows::numeric / NULLIF(statements.calls, 0)), 1), 0) as avg_rows_per_call,
+          COUNT(*) FILTER (WHERE statements.total_exec_time + statements.total_plan_time > 1000) as slow_queries,
+          COALESCE(
+            ROUND(
+              SUM(statements.shared_blks_hit) * 100.0 /
+              NULLIF(SUM(statements.shared_blks_hit + statements.shared_blks_read), 0),
+              2
+            ), 0
+          ) || '%' as cache_hit_rate
+        FROM pg_stat_statements as statements
+        -- skip queries that were never actually executed
+        WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
+        ${orderBy || ''}`,
       },
     },
   },
@@ -530,4 +712,77 @@ export const DEPRECATED_REPORTS = [
   'total_storage_options_requests',
   'total_storage_patch_requests',
   'total_options_requests',
+  'total_rest_ingress',
+  'total_rest_get_requests',
+  'total_rest_post_requests',
+  'total_rest_patch_requests',
+  'total_rest_delete_requests',
+  'total_storage_get_requests',
+  'total_storage_post_requests',
+  'total_storage_delete_requests',
+  'total_auth_delete_requests',
+  'total_get_requests',
+  'total_patch_requests',
+  'total_post_requests',
+  'total_ingress',
+  'total_delete_requests',
 ]
+
+export const EDGE_FUNCTION_REGIONS = [
+  {
+    key: 'ap-northeast-1',
+    label: 'Tokyo',
+  },
+  {
+    key: 'ap-northeast-2',
+    label: 'Seoul',
+  },
+  {
+    key: 'ap-south-1',
+    label: 'Mumbai',
+  },
+  {
+    key: 'ap-southeast-1',
+    label: 'Singapore',
+  },
+  {
+    key: 'ap-southeast-2',
+    label: 'Sydney',
+  },
+  {
+    key: 'ca-central-1',
+    label: 'Canada Central',
+  },
+  {
+    key: 'us-east-1',
+    label: 'N. Virginia',
+  },
+  {
+    key: 'us-west-1',
+    label: 'N. California',
+  },
+  {
+    key: 'us-west-2',
+    label: 'Oregon',
+  },
+  {
+    key: 'eu-central-1',
+    label: 'Frankfurt',
+  },
+  {
+    key: 'eu-west-1',
+    label: 'Ireland',
+  },
+  {
+    key: 'eu-west-2',
+    label: 'London',
+  },
+  {
+    key: 'eu-west-3',
+    label: 'Paris',
+  },
+  {
+    key: 'sa-east-1',
+    label: 'São Paulo',
+  },
+] as const

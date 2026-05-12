@@ -1,10 +1,11 @@
-import { GripHorizontal, Loader2 } from 'lucide-react'
+import { Code, GripHorizontal } from 'lucide-react'
 import { DragEvent, PropsWithChildren, ReactNode } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface ReportBlockContainerProps {
-  icon: ReactNode
+  icon?: ReactNode
   label: string
+  badge?: ReactNode
   actions: ReactNode
   loading?: boolean
   draggable?: boolean
@@ -16,6 +17,7 @@ interface ReportBlockContainerProps {
 export const ReportBlockContainer = ({
   icon,
   label,
+  badge,
   actions,
   loading = false,
   draggable = false,
@@ -33,42 +35,28 @@ export const ReportBlockContainer = ({
       draggable={draggable}
       unselectable={draggable ? 'on' : undefined}
       onDragStart={onDragStart}
-      className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded border shadow-sm"
+      className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded-sm border shadow-xs"
     >
       <Tooltip>
         <TooltipTrigger asChild>
           <div
             className={cn(
-              'grid-item-drag-handle flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group',
+              'grid-item-drag-handle flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group h-9',
               draggable && 'cursor-move'
             )}
           >
-            <div
-              className={cn(
-                showDragHandle && 'transition-opacity opacity-100 group-hover:opacity-0'
-              )}
-            >
-              {loading ? (
-                <Loader2
-                  size={(icon as any)?.props?.size ?? 16}
-                  className="text-foreground-lighter animate-spin"
-                />
-              ) : (
-                icon
-              )}
-            </div>
-            {showDragHandle && (
-              <div className="absolute left-3 top-2.5 z-10 opacity-0 transition-opacity group-hover:opacity-100">
-                <GripHorizontal size={16} strokeWidth={1.5} />
-              </div>
+            {showDragHandle ? (
+              <GripHorizontal size={16} strokeWidth={1.5} />
+            ) : icon ? (
+              icon
+            ) : (
+              <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
-            <h3
-              title={label}
-              className="!text-xs font-medium text-foreground-light flex-1 truncate"
-            >
-              {label}
-            </h3>
-            <div className="flex items-center">{actions}</div>
+            <div className={cn('flex items-center gap-2 flex-1 min-w-0 transition-opacity')}>
+              <h3 className="heading-meta truncate">{label}</h3>
+              {badge && <div className="flex items-center shrink-0">{badge}</div>}
+            </div>
+            <div className="flex items-center shrink-0">{actions}</div>
           </div>
         </TooltipTrigger>
         {tooltip && (
@@ -77,8 +65,20 @@ export const ReportBlockContainer = ({
           </TooltipContent>
         )}
       </Tooltip>
-      <div className={cn('flex flex-col flex-grow items-center', hasChildren && 'border-t')}>
-        {children}
+      <div
+        className={cn(
+          'relative flex flex-col grow w-full',
+          hasChildren && 'border-t overflow-hidden'
+        )}
+      >
+        <div
+          className={cn(
+            'flex flex-col grow items-center overflow-hidden',
+            loading && 'pointer-events-none'
+          )}
+        >
+          {children}
+        </div>
       </div>
     </div>
   )

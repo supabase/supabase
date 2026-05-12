@@ -2,7 +2,7 @@ import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 
-const Realtime = ({ language }: ContentProps) => {
+export const Realtime = ({ language }: ContentProps) => {
   return (
     <>
       <ContentSnippet selectedLanguage={language} snippet={DOCS_CONTENT.realtime} />
@@ -13,5 +13,3 @@ const Realtime = ({ language }: ContentProps) => {
     </>
   )
 }
-
-export default Realtime

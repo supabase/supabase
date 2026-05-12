@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { DEFAULT_QUERY_PARAMS } from 'components/interfaces/Reports/Reports.constants'
+import { DEFAULT_QUERY_PARAMS } from '@/components/interfaces/Reports/Reports.constants'
 import {
   BaseReportParams,
   MetaQueryResponse,
   ReportQuery,
-} from 'components/interfaces/Reports/Reports.types'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+} from '@/components/interfaces/Reports/Reports.types'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export interface DbQueryHook<T = any> {
   isLoading: boolean
@@ -50,12 +50,19 @@ const useDbQuery = ({
   const {
     data,
     error: rqError,
-    isLoading,
+    isPending,
     isRefetching,
     refetch,
-  } = useQuery(
-    ['projects', project?.ref, 'db', { ...params, sql: resolvedSql, identifier }, where, orderBy],
-    ({ signal }) => {
+  } = useQuery({
+    queryKey: [
+      'projects',
+      project?.ref,
+      'db',
+      { ...params, sql: resolvedSql, identifier },
+      where,
+      orderBy,
+    ],
+    queryFn: ({ signal }) => {
       return executeSql(
         {
           projectRef: project?.ref,
@@ -65,18 +72,16 @@ const useDbQuery = ({
         signal
       ).then((res) => res.result) as Promise<MetaQueryResponse>
     },
-    {
-      enabled: Boolean(resolvedSql),
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    }
-  )
+    enabled: Boolean(resolvedSql),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  })
 
   const error = rqError || (typeof data === 'object' ? data?.error : '')
   return {
     error,
     data,
-    isLoading,
+    isLoading: isPending,
     isRefetching,
     params,
     runQuery: refetch,

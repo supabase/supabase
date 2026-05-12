@@ -1,8 +1,9 @@
 import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
+import { LogoLoader } from 'ui'
 
-import { formatSql } from 'lib/formatSql'
+import { formatSql } from '@/lib/formatSql'
 
 // [Joshen] We should deprecate this and use CodeEditor instead
 
@@ -64,7 +65,7 @@ const SqlEditor = ({
     }
   }, [queryId])
 
-  const onMount = (editor: any, monaco: any) => {
+  const onMount = (editor: any, _monaco: any) => {
     editorRef.current = editor
 
     // Add margin above first line
@@ -77,8 +78,6 @@ const SqlEditor = ({
     })
   }
 
-  const Loading = () => <h4 className="text-lg">Loading</h4>
-
   return (
     <Editor
       className="monaco-editor"
@@ -86,7 +85,7 @@ const SqlEditor = ({
       defaultLanguage={language}
       defaultValue={defaultValue}
       path={queryId}
-      loading={<Loading />}
+      loading={<LogoLoader />}
       options={{
         readOnly,
         tabSize: 2,

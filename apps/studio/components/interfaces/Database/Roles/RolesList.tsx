@@ -1,36 +1,57 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import SparkBar from 'components/ui/SparkBar'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CreateRolePanel } from './CreateRolePanel'
-import { DeleteRoleModal } from './DeleteRoleModal'
 import { RoleRow } from './RoleRow'
 import { RoleRowSkeleton } from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { SparkBar } from '@/components/ui/SparkBar'
+import { useDatabaseRoleDeleteMutation } from '@/data/database-roles/database-role-delete-mutation'
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
-const RolesList = () => {
+export const RolesList = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
-  const [isCreatingRole, setIsCreatingRole] = useState(false)
-  const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canUpdateRoles } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateRoles } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'roles'
   )
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search roles' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+    setFilterType('all')
+  })
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -38,11 +59,34 @@ const RolesList = () => {
   })
   const maxConnectionLimit = maxConnData?.maxConnections
 
-  const { data, isLoading } = useDatabaseRolesQuery({
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const {
+    mutate: deleteDatabaseRole,
+    isPending: isDeleting,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseRoleDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted role`)
+      setSelectedRoleIdToDelete(null)
+    },
+  })
+
+  const [isCreatingRole, setIsCreatingRole] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false)
+  )
+
+  const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = useQueryState('delete', parseAsString)
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
+  const roleToDelete = roles?.find((role) => role.id.toString() === selectedRoleIdToDelete)
 
   const filteredRoles = (
     filterType === 'active' ? roles.filter((role) => role.activeConnections > 0) : roles
@@ -60,17 +104,36 @@ const RolesList = () => {
     (r) => -r.activeConnections
   )
 
+  const deleteRole = async () => {
+    if (!project) return console.error('Project is required')
+    if (!roleToDelete) return console.error('Failed to delete role: role is missing')
+    deleteDatabaseRole({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      id: roleToDelete.id,
+    })
+  }
+
+  useEffect(() => {
+    if (isSuccess && !!selectedRoleIdToDelete && !roleToDelete && !isSuccessDelete) {
+      toast('Role cannot be found')
+      setSelectedRoleIdToDelete(null)
+    }
+  }, [isSuccess, selectedRoleIdToDelete, roleToDelete, isSuccessDelete, setSelectedRoleIdToDelete])
+
   return (
     <>
       <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center space-x-4">
           <Input
+            ref={searchInputRef}
             size="tiny"
             className="w-52"
             placeholder="Search for a role"
-            icon={<Search size={12} />}
+            icon={<Search />}
             value={filterString}
-            onChange={(event: any) => setFilterString(event.target.value)}
+            onChange={(event) => setFilterString(event.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
             actions={
               filterString && (
                 <Button
@@ -86,24 +149,24 @@ const RolesList = () => {
           />
           <div className="flex items-center border border-strong rounded-full w-min h-[26px]">
             <button
-              className={[
+              className={cn(
                 'text-xs w-[80px] h-full text-center rounded-l-full flex items-center justify-center transition',
                 filterType === 'all'
                   ? 'bg-overlay-hover text-foreground'
-                  : 'hover:bg-surface-200 text-foreground-light',
-              ].join(' ')}
+                  : 'hover:bg-surface-200 text-foreground-light'
+              )}
               onClick={() => setFilterType('all')}
             >
               All roles
             </button>
-            <div className="h-full w-[1px] border-r border-strong"></div>
+            <div className="h-full w-px border-r border-strong"></div>
             <button
-              className={[
+              className={cn(
                 'text-xs w-[80px] h-full text-center rounded-r-full flex items-center justify-center transition',
                 filterType === 'active'
                   ? 'bg-overlay-hover text-foreground'
-                  : 'hover:bg-surface-200 text-foreground-light',
-              ].join(' ')}
+                  : 'hover:bg-surface-200 text-foreground-light'
+              )}
               onClick={() => setFilterType('active')}
             >
               Active roles
@@ -149,30 +212,44 @@ const RolesList = () => {
               ))}
             </TooltipContent>
           </Tooltip>
-          <ButtonTooltip
-            type="primary"
-            disabled={!canUpdateRoles}
-            icon={<Plus size={12} />}
-            onClick={() => setIsCreatingRole(true)}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canUpdateRoles
-                  ? 'You need additional permissions to add a new role'
-                  : undefined,
-              },
-            }}
-          >
-            Add role
-          </ButtonTooltip>
+          {canUpdateRoles ? (
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Add new role"
+              onTrigger={() => setIsCreatingRole(true)}
+              side="bottom"
+            >
+              <Button
+                type="primary"
+                icon={<Plus size={12} />}
+                onClick={() => setIsCreatingRole(true)}
+              >
+                Add role
+              </Button>
+            </Shortcut>
+          ) : (
+            <ButtonTooltip
+              type="primary"
+              disabled
+              icon={<Plus size={12} />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to add a new role',
+                },
+              }}
+            >
+              Add role
+            </ButtonTooltip>
+          )}
         </div>
       </div>
 
       <div className="space-y-4">
         <div>
-          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t flex items-center space-x-4">
+          <div className="bg-surface-100 border border-default px-card py-3 rounded-t flex items-center space-x-4">
             <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
-            <Badge variant="brand">Protected</Badge>
+            <Badge variant="success">Protected</Badge>
           </div>
 
           {isLoading
@@ -182,13 +259,13 @@ const RolesList = () => {
                   disabled
                   key={role.id}
                   role={role}
-                  onSelectDelete={setSelectedRoleToDelete}
+                  onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
         </div>
 
         <div>
-          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t">
+          <div className="bg-surface-100 border border-default px-card py-3 rounded-t">
             <p className="text-sm text-foreground-light">Other database roles</p>
           </div>
 
@@ -199,7 +276,7 @@ const RolesList = () => {
                   key={role.id}
                   disabled={!canUpdateRoles}
                   role={role}
-                  onSelectDelete={setSelectedRoleToDelete}
+                  onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
         </div>
@@ -211,13 +288,18 @@ const RolesList = () => {
 
       <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
 
-      <DeleteRoleModal
-        role={selectedRoleToDelete}
-        visible={selectedRoleToDelete !== undefined}
-        onClose={() => setSelectedRoleToDelete(undefined)}
-      />
+      <ConfirmationModal
+        visible={!!roleToDelete}
+        loading={isDeleting}
+        onCancel={() => setSelectedRoleIdToDelete(null)}
+        title={`Confirm to delete role "${roleToDelete?.name}"`}
+        onConfirm={deleteRole}
+      >
+        <p className="text-sm">
+          This will automatically revoke any membership of this role in other roles, and this action
+          cannot be undone.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }
-
-export default RolesList

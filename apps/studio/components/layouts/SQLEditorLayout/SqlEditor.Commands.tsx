@@ -1,26 +1,17 @@
 import { type PostgresColumn } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef } from 'react'
-
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
-import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { useProfile } from 'lib/profile'
 import {
   cn,
-  CodeBlock,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import {
   Breadcrumb,
@@ -37,6 +28,15 @@ import {
   useSetCommandMenuSize,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
+import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippets-query'
+import { usePrefetchTables, useTablesQuery, type TablesData } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { useProfile } from '@/lib/profile'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -76,7 +76,7 @@ export function useSnippetCommands() {
     [
       {
         id: 'run-snippet',
-        name: 'Run snippet',
+        name: 'Run snippet...',
         icon: () => <Code />,
         action: () => setPage(SNIPPET_PAGE_NAME),
       },
@@ -93,7 +93,7 @@ function RunSnippetPage() {
   const { ref } = useParams()
   const {
     data: snippetPages,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useSqlSnippetsQuery({
@@ -103,10 +103,14 @@ function RunSnippetPage() {
   const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
   const { profile } = useProfile()
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   useSetCommandMenuSize('xlarge')
 
@@ -193,17 +197,18 @@ function SnippetSelector({
   const isSQLSnippet = selectedSnippet?.type === 'sql'
 
   return (
-    <div className="w-full flex-grow min-h-0 grid gap-4 md:grid-cols-2">
+    <div className="w-full grow min-h-0 grid gap-4 md:grid-cols-2">
       <CommandList_Shadcn_
         className={cn(
-          '!h-full min-h-0 max-h-[unset] py-2 overflow-hidden',
-          '[&>[cmdk-list-sizer]]:h-full [&>[cmdk-list-sizer]]:flex [&>[cmdk-list-sizer]]:flex-col'
+          'h-full! min-h-0 max-h-[unset] py-2 overflow-hidden',
+          '*:[[cmdk-list-sizer]]:h-full *:[[cmdk-list-sizer]]:flex *:[[cmdk-list-sizer]]:flex-col'
         )}
       >
         {!!snippets && snippets.length > 0 && (
-          <CommandGroup_Shadcn_ className="flex-grow min-h-0 overflow-auto">
+          <CommandGroup_Shadcn_ className="grow min-h-0 overflow-auto">
             {snippets.map((snippet) => (
               <CommandItem_Shadcn_
+                key={snippet.id}
                 id={`${snippet.id}-${snippet.name}`}
                 className={generateCommandClassNames(false)}
                 value={snippetValue(snippet)}
@@ -215,7 +220,7 @@ function SnippetSelector({
           </CommandGroup_Shadcn_>
         )}
         {canCreateNew && (
-          <div className="min-h-fit flex-grow-0">
+          <div className="min-h-fit grow-0">
             <hr className="mt-4 mb-2 mx-2" />
             <CommandGroup_Shadcn_ forceMount={true}>
               <CommandItem_Shadcn_
@@ -232,7 +237,7 @@ function SnippetSelector({
       </CommandList_Shadcn_>
       <CodeBlock
         language="sql"
-        value={isSQLSnippet ? selectedSnippet?.content?.sql : ''}
+        value={isSQLSnippet ? selectedSnippet?.content?.unchecked_sql : ''}
         wrapperClassName="hidden md:block"
         className="w-full h-full border-0 [&>code]:overflow-scroll [&>code]:block [&>code]:w-full [&>code]:h-full"
         hideCopy
@@ -244,7 +249,7 @@ function SnippetSelector({
 function snippetValue(snippet: SqlSnippet) {
   if (snippet.type !== 'sql') return ''
   return escapeAttributeSelector(
-    `${snippet.id}-${snippet.name}-${snippet?.content?.sql.slice(0, 30)}`
+    `${snippet.id}-${snippet.name}-${snippet?.content?.unchecked_sql.slice(0, 30)}`
   ).toLowerCase()
 }
 
@@ -283,7 +288,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
     [
       {
         id: 'query-table',
-        name: 'Query a table',
+        name: 'Query a table...',
         icon: () => <Table2 />,
         action: () => setPage(QUERY_TABLE_PAGE_NAME),
       },
@@ -298,7 +303,7 @@ function TableSelector() {
   const { data: protectedSchemas } = useProtectedSchemas()
   const {
     data: tablesData,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useTablesQuery({
@@ -351,7 +356,7 @@ select ${
     !table.columns
       ? '*'
       : `
-${table.columns.map((column, index, array) => `\t${column.name}`).join(',\n')}`
+${table.columns.map((column) => `\t${column.name}`).join(',\n')}`
   }
 from ${formatTableIdentifier(table)}
 -- where

@@ -1,31 +1,30 @@
+import { useParams } from 'common'
 import { ChevronRight, FileCode, X } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
-
-import { useParams } from 'common'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
   cn,
-  CodeBlock,
-  CodeBlockLang,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
+
 import { ConnectionParameters } from './ConnectionParameters'
-import { DirectConnectionIcon, TransactionIcon } from './PoolerIcons'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
   badge?: string
   title: string
   description: string
+  contentFooter?: ReactNode
   connectionString: string
   ipv4Status: {
     type: 'error' | 'success'
@@ -64,11 +63,11 @@ const IPv4StatusIcon = ({ className, active }: { className?: string; active: boo
       </svg>
 
       {!active ? (
-        <div className="absolute -right-1.5 -top-1.5 bg-destructive rounded w-4 h-4 flex items-center justify-center">
+        <div className="absolute -right-1.5 -top-1.5 bg-destructive rounded-sm w-4 h-4 flex items-center justify-center">
           <X size={10} strokeWidth={4} className="text-white rounded-full" />
         </div>
       ) : (
-        <div className="absolute -right-1.5 -top-1.5 bg-brand-500 rounded w-4 h-4 flex items-center justify-center">
+        <div className="absolute -right-1.5 -top-1.5 bg-brand-500 rounded-sm w-4 h-4 flex items-center justify-center">
           <svg
             width="10"
             height="10"
@@ -106,6 +105,7 @@ export const ConnectionPanel = ({
   badge,
   title,
   description,
+  contentFooter,
   connectionString,
   ipv4Status,
   notice,
@@ -124,14 +124,24 @@ export const ConnectionPanel = ({
 
   const links = ipv4Status.links ?? []
 
+  const isTransactionDedicatedPooler = type === 'transaction' && badge === 'Dedicated Pooler'
+
   return (
-    <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
-      <div className="flex flex-col">
+    <div className="relative text-sm flex flex-col gap-5 lg:grid lg:grid-cols-12 w-full">
+      <div className="col-span-4 flex flex-col">
         <div className="flex items-center gap-x-2 mb-2">
           <h1 className="text-sm">{title}</h1>
-          {!!badge && <Badge>{badge}</Badge>}
+          {!!badge && !isTransactionDedicatedPooler && <Badge>{badge}</Badge>}
         </div>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
+        {contentFooter}
+      </div>
+      <div className="col-span-8 flex flex-col gap-2">
+        {isTransactionDedicatedPooler && (
+          <div className="text-xs flex items-center text-foreground-light">
+            Using the Dedicated Pooler:
+          </div>
+        )}
         <div className="flex flex-col -space-y-px">
           {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
           {type === 'transaction' && isSessionMode ? (
@@ -160,12 +170,12 @@ export const ConnectionPanel = ({
                 )}
                 language={lang}
                 value={connectionString}
-                className="[&_code]:text-[12px] [&_code]:text-foreground"
+                className="[&_code]:text-[12px] [&_code]:text-foreground [&_code]:whitespace-normal!"
                 hideLineNumbers
                 onCopyCallback={onCopyCallback}
               />
               {notice && (
-                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
+                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-light">
                   {notice?.map((text: string) => (
                     <p key={text} className="text-xs text-foreground-lighter">
                       {text}
@@ -176,37 +186,8 @@ export const ConnectionPanel = ({
               {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
             </>
           )}
-          {children}
         </div>
-      </div>
-      <div className="flex flex-col items-end">
         <div className="flex flex-col -space-y-px w-full">
-          {type !== 'session' && (
-            <>
-              <div className="relative border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
-                <div className="absolute top-2 left-2.5">
-                  {type === 'transaction' ? <TransactionIcon /> : <DirectConnectionIcon />}
-                </div>
-                <div className="flex flex-col pl-[52px]">
-                  <span className="text-xs text-foreground">
-                    {type === 'transaction'
-                      ? 'Suitable for a large number of connected clients'
-                      : 'Suitable for long-lived, persistent connections'}
-                  </span>
-                </div>
-              </div>
-              <div className="border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
-                <div className="flex flex-col pl-[52px]">
-                  <span className="text-xs text-foreground">
-                    {type === 'transaction'
-                      ? 'Pre-warmed connection pool to Postgres'
-                      : 'Each client has a dedicated connection to Postgres'}
-                  </span>
-                </div>
-              </div>
-            </>
-          )}
-
           {IS_PLATFORM && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
               <div className="flex items-center gap-2">
@@ -239,14 +220,15 @@ export const ConnectionPanel = ({
 
           {type === 'session' && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
-              <div className="flex w-6 h-6 rounded items-center justify-center gap-2 flex-shrink-0 bg-surface-100">
+              <div className="flex w-6 h-6 rounded-sm items-center justify-center gap-2 shrink-0 bg-surface-100">
                 <WarningIcon />
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-foreground">Only use on a IPv4 network</span>
-                <span className="text-xs text-foreground-lighter">
-                  Use Direct Connection if connecting via an IPv6 network
-                </span>
+                <div className="flex flex-col text-xs text-foreground-lighter">
+                  <p>Session pooler connections are IPv4 proxied for free.</p>
+                  <p>Use Direct Connection if connecting via an IPv6 network.</p>
+                </div>
               </div>
             </div>
           )}
@@ -255,16 +237,16 @@ export const ConnectionPanel = ({
             <Collapsible_Shadcn_ className="group -space-y-px">
               <CollapsibleTrigger_Shadcn_
                 asChild
-                className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-muted"
+                className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-muted"
               >
                 <Button
                   type="default"
                   size="tiny"
-                  className="text-foreground-lighter !bg-dash-sidebar"
+                  className="text-foreground-lighter bg-dash-sidebar!"
                   icon={
                     <ChevronRight
                       className={cn(
-                        'group-data-[state=open]/collapse:rotate-90 text-foreground-muted transition-transform'
+                        'group-data-open/collapse:rotate-90 text-foreground-muted transition-transform'
                       )}
                     />
                   }
@@ -304,6 +286,7 @@ export const ConnectionPanel = ({
             </Collapsible_Shadcn_>
           )}
         </div>
+        {children}
       </div>
     </div>
   )

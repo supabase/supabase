@@ -1,16 +1,16 @@
 import { Table } from '@tanstack/react-table'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
 import {
   Button,
   Collapsible_Shadcn_ as Collapsible,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
+
 import { BlockFieldConfig } from '../../types'
 import { BlockField } from './BlockField'
+import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 interface CollapsibleSectionProps {
   title: string
@@ -23,7 +23,7 @@ interface CollapsibleSectionProps {
   defaultOpen?: boolean
 }
 
-const CollapsibleSection = ({
+export const CollapsibleSection = ({
   title,
   fields,
   data,
@@ -50,7 +50,7 @@ const CollapsibleSection = ({
             </div>
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down pt-1">
+        <CollapsibleContent className="transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down pt-1">
           {fields.map((field) => (
             <BlockField
               key={field.id}
@@ -67,5 +67,3 @@ const CollapsibleSection = ({
     </div>
   )
 }
-
-export { CollapsibleSection }

@@ -1,20 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Edit2, Trash } from 'lucide-react'
 import Link from 'next/link'
-
-import { ContentBase } from 'data/content/content-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
-import { Dashboards } from 'types'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Menu,
 } from 'ui'
+
+import { ContentBase } from '@/data/content/content-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useProfile } from '@/lib/profile'
+import type { Dashboards } from '@/types'
 
 interface ReportMenuItemProps {
   item: {
@@ -41,59 +41,71 @@ export const ReportMenuItem = ({
   onSelectDelete,
 }: ReportMenuItemProps) => {
   const { profile } = useProfile()
-  const canUpdateCustomReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
-    resource: {
-      type: 'report',
-      visibility: item.report.visibility,
-      owner_id: item.report.owner_id,
-    },
-    subject: { id: profile?.id },
-  })
+  const { can: canUpdateCustomReport } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'user_content',
+    {
+      resource: {
+        type: 'report',
+        visibility: item.report.visibility,
+        owner_id: item.report.owner_id,
+      },
+      subject: { id: profile?.id },
+    }
+  )
+
+  const menuItem = (
+    <Menu.Item active={item.key === pageKey}>
+      <div className="flex w-full items-center justify-between gap-1">
+        <span className="truncate">{item.name}</span>
+
+        {canUpdateCustomReport && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="text"
+                className="px-1 opacity-50 hover:opacity-100"
+                icon={<ChevronDown size={12} strokeWidth={2} />}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-32 *:gap-x-2">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  if (!item.id) return
+                  onSelectEdit()
+                }}
+              >
+                <Edit2 size={12} />
+                <div>Rename report</div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  if (!item.id) return
+                  onSelectDelete()
+                }}
+              >
+                <Trash size={12} />
+                <div>Delete report</div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
+    </Menu.Item>
+  )
 
   return (
-    <Link
-      className={cn(
-        'pr-2 h-7 pl-3 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-        'flex items-center justify-between rounded-md group relative',
-        item.key === pageKey ? 'bg-surface-300 text-foreground' : 'hover:bg-surface-200'
-      )}
-      key={item.key + '-menukey'}
-      href={item.url}
-    >
-      <div>{item.name}</div>
-
-      {canUpdateCustomReport && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="text"
-              className="px-1 opacity-50 hover:opacity-100"
-              icon={<ChevronDown size={12} strokeWidth={2} />}
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-32 *:gap-x-2">
-            <DropdownMenuItem
-              onClick={() => {
-                if (!item.id) return
-                onSelectEdit()
-              }}
-            >
-              <Edit2 size={12} />
-              <div>Rename report</div>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                if (!item.id) return
-                onSelectDelete()
-              }}
-            >
-              <Trash size={12} />
-              <div>Delete report</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+    <Link key={item.key + '-menukey'} href={item.url} className="block">
+      {menuItem}
     </Link>
   )
 }

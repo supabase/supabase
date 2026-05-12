@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 
+import { isFeatureEnabled } from 'common'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
@@ -89,6 +90,7 @@ const navCommands = [
     value: 'Reference, API, SDK: Go to Dart reference (Flutter)',
     route: '/reference/dart/introduction',
     icon: () => <ArrowRight />,
+    enabled: isFeatureEnabled('sdk:dart'),
   },
   {
     id: 'nav-ref-python',
@@ -96,6 +98,7 @@ const navCommands = [
     value: 'Reference, API, SDK: Go to Python reference',
     route: '/reference/python/introduction',
     icon: () => <ArrowRight />,
+    enabled: isFeatureEnabled('sdk:python'),
   },
   {
     id: 'nav-ref-csharp',
@@ -103,6 +106,7 @@ const navCommands = [
     value: 'Reference, API, SDK: Go to C# reference',
     route: '/reference/csharp/introduction',
     icon: () => <ArrowRight />,
+    enabled: isFeatureEnabled('sdk:csharp'),
   },
   {
     id: 'nav-ref-swift',
@@ -110,6 +114,7 @@ const navCommands = [
     value: 'Reference, API, SDK: Go to Swift reference',
     route: '/reference/swift/introduction',
     icon: () => <ArrowRight />,
+    enabled: isFeatureEnabled('sdk:swift'),
   },
   {
     id: 'nav-ref-kotlin',
@@ -117,6 +122,7 @@ const navCommands = [
     value: 'Reference, API, SDK: Go to Kotlin reference',
     route: '/reference/kotlin/introduction',
     icon: () => <ArrowRight />,
+    enabled: isFeatureEnabled('sdk:kotlin'),
   },
   {
     id: 'nav-ref-cli',
@@ -143,11 +149,20 @@ const navCommands = [
     name: 'Go to Integrations',
     route: 'https://supabase.com/partners/integrations',
     icon: () => <ArrowRight />,
+    enabled: isFeatureEnabled('integrations:partners'),
   },
-] satisfies ICommand[]
+  {
+    id: 'nav-ui',
+    name: 'Go to Supabase UI Library',
+    route: 'https://supabase.com/ui',
+    icon: () => <ArrowRight />,
+  },
+] satisfies Array<ICommand & { enabled?: boolean }>
+
+const filteredNavCommands = navCommands.filter((command) => command.enabled !== false)
 
 const useDocsNavCommands = () => {
-  useRegisterCommands('Go to', navCommands)
+  useRegisterCommands('Go to', filteredNavCommands)
 }
 
 export { useDocsNavCommands }

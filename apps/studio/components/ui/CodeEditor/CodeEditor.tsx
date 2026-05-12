@@ -1,15 +1,14 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { cn, LogoLoader } from 'ui'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatSql } from 'lib/formatSql'
-import { timeout } from 'lib/helpers'
-import { cn } from 'ui'
-import { Loading } from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
+import { timeout } from '@/lib/helpers'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
 const DEFAULT_ACTIONS = {
@@ -44,7 +43,7 @@ interface CodeEditorProps {
   onInputChange?: (value?: string) => void
 }
 
-const CodeEditor = ({
+export const CodeEditor = ({
   id,
   language,
   defaultValue,
@@ -72,6 +71,11 @@ const CodeEditor = ({
     ...DEFAULT_ACTIONS,
     ...actions,
   }
+
+  const runQueryCallbackRef = useRef(runQuery.callback)
+  useEffect(() => {
+    runQueryCallbackRef.current = runQuery.callback
+  }, [runQuery.callback])
 
   const showPlaceholderDefault = placeholder !== undefined && (value ?? '').trim().length === 0
   const [showPlaceholder, setShowPlaceholder] = useState(showPlaceholderDefault)
@@ -112,11 +116,7 @@ const CodeEditor = ({
               // @ts-ignore
               identifier: 'add-placeholder',
               range: new monaco.Range(1, 1, 1, 1),
-              text: (placeholder ?? '')
-                .split('\n\n')
-                .join('\n')
-                .replaceAll('*', '')
-                .replaceAll('&nbsp;', ' '),
+              text: (placeholder ?? '').split('\n\n').join('\n').replaceAll('&nbsp;', ' '),
             },
           ])
         },
@@ -135,7 +135,7 @@ const CodeEditor = ({
           const selectedValue = (editorRef?.current as any)
             .getModel()
             .getValueInRange((editorRef?.current as any)?.getSelection())
-          runQuery.callback(selectedValue || (editorRef?.current as any)?.getValue())
+          runQueryCallbackRef.current(selectedValue || (editorRef?.current as any)?.getValue())
         },
       })
     }
@@ -238,7 +238,7 @@ const CodeEditor = ({
         value={value ?? undefined}
         language={language}
         defaultValue={defaultValue ?? undefined}
-        loading={loading || <Loading />}
+        loading={loading || <LogoLoader />}
         options={optionsMerged}
         onMount={onMount}
         onChange={onChangeContent}
@@ -247,7 +247,7 @@ const CodeEditor = ({
         <div
           className={cn(
             'monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono',
-            '[&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter',
+            '[&>div>p]:text-foreground-lighter [&>div>p]:m-0! tracking-tighter',
             showPlaceholder ? 'block' : 'hidden'
           )}
         >

@@ -1,8 +1,9 @@
-import { InlineLink } from 'components/ui/InlineLink'
-import { auth } from 'lib/gotrue'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { auth } from '@/lib/gotrue'
 
 export const SignInPartner = () => {
   const router = useRouter()
@@ -33,7 +34,7 @@ export const SignInPartner = () => {
       <Loader2 className="animate-spin" />
       <h2 className="text-lg text-center">Signing in to Supabase Dashboard</h2>
       <p className="text-xs text-foreground-lighter text-center max-w-[220px] sm:max-w-full">
-        By continuing, you agree to Supabase's{' '}
+        By continuing, you agree to Supabase’s{' '}
         <InlineLink
           href="https://supabase.com/terms"
           className="text-foreground-lighter hover:text-foreground"

@@ -1,24 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import { Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
+  Badge,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   cn,
   SQL_ICON,
   Tabs_Shadcn_,
@@ -26,9 +19,30 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
+
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
+import { SQL_TEMPLATES } from '@/components/interfaces/SQLEditor/SQLEditor.queries'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useProfile } from '@/lib/profile'
+import {
+  useImpersonatedAAL,
+  useImpersonatedExternalAuth,
+  useImpersonatedUser,
+  useIsImpersonatingAnon,
+  useRoleImpersonationStateSnapshot,
+} from '@/state/role-impersonation-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import { type ResponseError } from '@/types'
 
 export function NewTab() {
   const router = useRouter()
@@ -37,30 +51,43 @@ export function NewTab() {
   const { profile } = useProfile()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const snap = useTableEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabs = useTabsStateSnapshot()
-
   const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
 
-  const { mutate: sendEvent } = useSendEventMutation()
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const roleState = useRoleImpersonationStateSnapshot()
+  const impersonatingAnon = useIsImpersonatingAnon()
+  const impersonatedUser = useImpersonatedUser()
+  const impersonatedExternalUser = useImpersonatedExternalAuth()
+  const impersonatedAAL = useImpersonatedAAL()
 
-  const tableEditorActions = [
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
     {
-      icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
-      title: 'Create a table',
-      description: 'Design and create a new database table',
-      bgColor: 'bg-blue-500',
-      isBeta: false,
-      onClick: snap.onAddTable,
-    },
-  ]
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
+
+  const tableEditorActions = isSchemaLocked
+    ? []
+    : [
+        {
+          icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+          title: 'Create a table',
+          description: 'Design and create a new database table',
+          bgColor: 'bg-blue-500',
+          isBeta: false,
+          onClick: () => snap.onAddTable(),
+        },
+      ]
 
   const sqlEditorActions = [
     {
@@ -86,7 +113,6 @@ export function NewTab() {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,
@@ -105,21 +131,54 @@ export function NewTab() {
       })
 
       router.push(`/project/${ref}/sql/${snippet.id}`)
-    } catch (error: any) {
-      toast.error(`Failed to create new query: ${error.message}`)
+    } catch (error) {
+      toast.error(`Failed to create new query: ${(error as ResponseError).message}`)
     }
   }
 
   return (
     <div className="bg-surface-100 h-full overflow-y-auto py-12">
       <div className="mx-auto max-w-2xl flex flex-col gap-10 px-10">
+        {(!!impersonatedUser || !!impersonatedExternalUser || impersonatingAnon) && (
+          <Card>
+            <CardHeader className="py-2 px-3 flex-row items-center justify-between w-full space-y-0">
+              <CardTitle className="text-foreground-light">Currently impersonating as</CardTitle>
+              <Button
+                type="default"
+                className="font-sans"
+                onClick={() => roleState.setRole(undefined)}
+              >
+                Stop
+              </Button>
+            </CardHeader>
+            <CardContent className="py-2 px-3 text-sm flex items-center justify-between">
+              <div className="flex items-center gap-x-2">
+                {impersonatingAnon ? (
+                  <p>Anonymous</p>
+                ) : (
+                  <p>{impersonatedUser?.email ?? impersonatedExternalUser}</p>
+                )}
+                {impersonatedAAL && <Badge>{impersonatedAAL.toUpperCase()}</Badge>}
+              </div>
+              {impersonatingAnon && <p className="text-foreground-lighter">Not logged-in</p>}
+              {!!impersonatedUser && (
+                <p>
+                  ID: <code className="text-code-inline">{impersonatedUser.id}</code>
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           {actions.map((item, i) => (
             <ActionCard key={`action-card-${i}`} {...item} />
           ))}
         </div>
+
         <RecentItems />
       </div>
+
       {editor === 'sql' && (
         <div className="flex flex-col gap-4 mx-auto py-10">
           <Tabs_Shadcn_ defaultValue="templates">

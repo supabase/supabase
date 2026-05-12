@@ -1,12 +1,15 @@
 import dagre from '@dagrejs/dagre'
 import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import { Edge, Node, Position } from '@xyflow/react'
 import { uniqBy } from 'lodash'
-import { Edge, Node, Position } from 'reactflow'
-import 'reactflow/dist/style.css'
 
-import { tryParseJson } from 'lib/helpers'
-import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
+import '@xyflow/react/dist/style.css'
+
 import { LOCAL_STORAGE_KEYS } from 'common'
+
+import { TableNodeData } from './Schemas.constants'
+import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from './SchemaTableNode'
+import { tryParseJson } from '@/lib/helpers'
 
 const NODE_SEP = 25
 const RANK_SEP = 50
@@ -34,19 +37,24 @@ export async function getGraphDataFromTables(
         isUnique: column.is_unique,
         isUpdateable: column.is_updatable,
         isIdentity: column.is_identity,
+        description: column.comment ?? '',
       }
     })
 
+    const data: TableNodeData = {
+      ref,
+      id: table.id,
+      name: table.name,
+      description: table.comment ?? '',
+      schema: table.schema,
+      isForeign: false,
+      columns,
+    }
+
     return {
+      data,
       id: `${table.id}`,
       type: 'table',
-      data: {
-        ref,
-        id: table.id,
-        name: table.name,
-        isForeign: false,
-        columns,
-      } as TableNodeData,
       position: { x: 0, y: 0 },
     }
   })
@@ -66,17 +74,27 @@ export async function getGraphDataFromTables(
 
     // Create additional [this->foreign] node that we can point to on the graph.
     if (rel.target_table_schema !== currentSchema) {
-      nodes.push({
-        id: rel.constraint_name,
-        type: 'table',
-        data: {
-          ref,
-          name: `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`,
+      const targetId = `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`
+
+      const targetNode = nodes.find((n) => n.id === targetId)
+      if (!targetNode) {
+        const data: TableNodeData = {
+          id: rel.id,
+          ref: ref!,
+          schema: rel.target_table_schema,
+          name: targetId,
+          description: '',
           isForeign: true,
           columns: [],
-        } as TableNodeData,
-        position: { x: 0, y: 0 },
-      })
+        }
+
+        nodes.push({
+          id: targetId,
+          type: 'table',
+          data: data,
+          position: { x: 0, y: 0 },
+        })
+      }
 
       const [source, sourceHandle] = findTablesHandleIds(
         tables,
@@ -89,8 +107,17 @@ export async function getGraphDataFromTables(
           id: String(rel.id),
           source,
           sourceHandle,
-          target: rel.constraint_name,
-          targetHandle: rel.constraint_name,
+          target: targetId,
+          targetHandle: targetId,
+          deletable: false,
+          data: {
+            sourceName: rel.source_table_name,
+            sourceSchemaName: rel.source_schema,
+            sourceColumnName: rel.source_column_name,
+            targetName: rel.target_table_name,
+            targetSchemaName: rel.target_table_schema,
+            targetColumnName: rel.target_column_name,
+          },
         })
       }
 
@@ -116,6 +143,15 @@ export async function getGraphDataFromTables(
         sourceHandle,
         target,
         targetHandle,
+        type: 'default',
+        data: {
+          sourceName: rel.source_table_name,
+          sourceSchemaName: rel.source_schema,
+          sourceColumnName: rel.source_column_name,
+          targetName: rel.target_table_name,
+          targetSchemaName: rel.target_table_schema,
+          targetColumnName: rel.target_column_name,
+        },
       })
     }
   }
@@ -147,7 +183,7 @@ function findTablesHandleIds(
   return []
 }
 
-export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
+export const getLayoutedElementsViaDagre = (nodes: Node<TableNodeData>[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
   dagreGraph.setGraph({
@@ -188,7 +224,7 @@ export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
 }
 
 const getLayoutedElementsViaLocalStorage = (
-  nodes: Node[],
+  nodes: Node<TableNodeData>[],
   edges: Edge[],
   positions: { [key: string]: { x: number; y: number } }
 ) => {
@@ -219,4 +255,40 @@ const getLayoutedElementsViaLocalStorage = (
     }
   })
   return { nodes, edges }
+}
+
+export const getTableDefinitionAsMarkdown = (table: TableNodeData) => {
+  let markdown = `## Table \`${escapeForMarkdown(table.name)}\`\n\n`
+  if (table.description) {
+    markdown += `${table.description}\n\n`
+  }
+  markdown += `### Columns\n\n`
+  markdown += `| Name | Type | Constraints |\n`
+  markdown += `|------|------|-------------|\n`
+
+  return table.columns.reduce((current, column) => {
+    current += `| \`${escapeForMarkdown(column.name)}\` | \`${escapeForMarkdown(column.format)}\` | ${column.isPrimary ? 'Primary' : ''}${column.isNullable ? ' Nullable' : ''}${column.isUnique ? ' Unique' : ''}${column.isIdentity ? ' Identity' : ''} |\n`
+    return current
+  }, markdown)
+}
+
+export const getSchemaAsMarkdown = (schema: string, tables: TableNodeData[]) => {
+  return tables.reduce((current, table) => {
+    if (table.schema === schema) {
+      current += `${getTableDefinitionAsMarkdown(table)}\n`
+    }
+    return current
+  }, '')
+}
+
+const escapeForMarkdown = (str: string) => {
+  return (
+    str
+      // Escape backslashes first so later escapes are not ambiguous
+      .replace(/\\/g, '\\\\')
+      // Escape backticks and pipes for markdown tables
+      .replace(/([|`])/g, '\\$1')
+      // Remove new lines
+      .replace(/\n/g, ' ')
+  )
 }

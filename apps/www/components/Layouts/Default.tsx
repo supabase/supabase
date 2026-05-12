@@ -1,7 +1,9 @@
-import Nav from 'components/Nav/index'
+'use client'
+
 import Footer from 'components/Footer/index'
+import Nav from 'components/Nav/index'
+import { useForceDeepDark } from 'lib/theme.utils'
 import { cn } from 'ui'
-import { useForceDeepDark } from '~/lib/theme.utils'
 
 type Props = {
   hideHeader?: boolean

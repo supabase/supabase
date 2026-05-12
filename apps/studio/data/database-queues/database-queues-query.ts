@@ -1,7 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useQuery } from '@tanstack/react-query'
+
 import { databaseQueuesKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
@@ -15,7 +17,7 @@ export type PostgresQueue = {
   created_at: string
 }
 
-const queueSqlQuery = `select * from pgmq.list_queues();`
+const queueSqlQuery = safeSql`select * from pgmq.list_queues();`
 
 export async function getDatabaseQueues({ projectRef, connectionString }: DatabaseQueuesVariables) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -33,13 +35,14 @@ export type DatabaseQueueError = ResponseError
 
 export const useQueuesQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,
-  { enabled = true, ...options }: UseQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
 ) =>
-  useQuery<DatabaseQueueData, DatabaseQueueError, TData>(
-    databaseQueuesKeys.list(projectRef),
-    () => getDatabaseQueues({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseQueueData, DatabaseQueueError, TData>({
+    queryKey: databaseQueuesKeys.list(projectRef),
+    queryFn: () => getDatabaseQueues({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

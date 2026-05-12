@@ -1,9 +1,11 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
 import { Content } from './content-query'
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
 import { SNIPPET_PAGE_LIMIT } from './sql-folders-query'
+import { get } from '@/data/fetchers'
+import { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type SqlSnippet = Extract<Content, { type: 'sql' }>
 
@@ -49,7 +51,7 @@ export async function getSqlSnippets(
 
   return {
     cursor: data.cursor,
-    contents: data.data as unknown as SqlSnippet[],
+    contents: remapSqlContentFields(data.data as unknown as SqlSnippet[]),
   }
 }
 
@@ -61,17 +63,22 @@ export const useSqlSnippetsQuery = <TData = SqlSnippetsData>(
   {
     enabled = true,
     ...options
-  }: UseInfiniteQueryOptions<SqlSnippetsData, SqlSnippetsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    SqlSnippetsData,
+    SqlSnippetsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) =>
-  useInfiniteQuery<SqlSnippetsData, SqlSnippetsError, TData>(
-    contentKeys.sqlSnippets(projectRef, { sort, name, visibility, favorite }),
-    ({ signal, pageParam: cursor }) =>
+  useInfiniteQuery({
+    queryKey: contentKeys.sqlSnippets(projectRef, { sort, name, visibility, favorite }),
+    queryFn: ({ signal, pageParam: cursor }) =>
       getSqlSnippets({ projectRef, cursor, sort, name, visibility, favorite }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam(lastPage) {
-        return lastPage.cursor
-      },
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: undefined,
+    getNextPageParam(lastPage) {
+      return lastPage.cursor
+    },
+    ...options,
+  })

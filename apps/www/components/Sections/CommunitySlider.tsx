@@ -46,21 +46,21 @@ const cards: CardInterface[] = [
     role: 'Co-Founder, Markprompt',
     quote:
       'We decided to use Supabase over other specialized vector databases because it enabled us to be GDPR compliant from day one with little effort.',
-    image: vectorImagesDir + 'supabase+mendable.svg',
+    image: vectorImagesDir + 'supabase+firecrawl.svg',
     abstract: 'Markprompt and Supabase - GDPR-Compliant AI Chatbots for Docs and Websites.',
     url: '/customers/markprompt',
   },
   {
     type: 'customer-story',
     avatar: '',
-    customer: 'Mendable',
+    customer: 'Firecrawl',
     author: 'Caleb Peffer',
-    role: 'CEO, Mendable',
+    role: 'CEO, Firecrawl',
     quote:
       'We tried other vector databases - we tried Faiss, we tried Weaviate, we tried Pinecone. We found them to be incredibly expensive and not very intuitive. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
     image: vectorImagesDir + 'supabase+markprompt.svg',
-    abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
-    url: '/customers/mendable',
+    abstract: 'Firecrawl switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
+    url: '/customers/firecrawl',
   },
   {
     type: 'twitter',
@@ -104,7 +104,7 @@ const CommunitySlider = () => {
   }, [ref.current, swiperInstance?.autoplay])
 
   const Card = (card: CardInterface) => (
-    <div className="bg-surface-100 hover:border-strong border-overlay rounded-2xl border p-6 drop-shadow-sm flex flex-col gap-4">
+    <div className="bg-surface-100 hover:border-strong border-overlay rounded-2xl border p-6 drop-shadow-xs flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <div className="h-10 w-10 overflow-hidden rounded-full border border-control">
           <Image src={card.avatar!} layout="responsive" width="64" height="64" alt={card.author} />
@@ -146,7 +146,7 @@ const CommunitySlider = () => {
           objectFit={isSm ? 'cover' : 'contain'}
         />
       </div>
-      <SectionContainer className="!py-0">
+      <SectionContainer className="py-0!">
         <div className="col-span-12 text-center relative z-10">
           <h3 className="text-3xl md:text-4xl heading-gradient">
             Join a growing <br />

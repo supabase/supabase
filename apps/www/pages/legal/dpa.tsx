@@ -19,10 +19,10 @@ const DPA = () => {
                   part of this commitment, we have prepared a Data Processing Addendum ("DPA"). You
                   can review a static PDF version of our latest DPA document{' '}
                   <a
-                    href="https://supabase.com/downloads/docs/Supabase+DPA+250805.pdf"
+                    href="https://supabase.com/downloads/docs/Supabase+DPA+260317.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline"
+                    className="text-brand-link hover:underline"
                     onClick={() =>
                       sendTelemetryEvent({
                         action: 'dpa_pdf_opened',
@@ -42,7 +42,7 @@ const DPA = () => {
                     href="https://supabase.com/dashboard/org/_/documents"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline"
+                    className="text-brand-link hover:underline"
                   >
                     request it from the legal documents page
                   </a>{' '}

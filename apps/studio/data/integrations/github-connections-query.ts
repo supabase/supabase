@@ -1,8 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GitHubConnectionsVariables = {
   organizationId?: number
@@ -37,15 +39,27 @@ export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<GitHubConnectionsData, GitHubConnectionsError, TData> = {}
+  }: UseCustomQueryOptions<GitHubConnectionsData, GitHubConnectionsError, TData> = {}
 ) => {
-  return useQuery<GitHubConnectionsData, GitHubConnectionsError, TData>(
-    integrationKeys.githubConnectionsList(organizationId),
-    ({ signal }) => getGitHubConnections({ organizationId }, signal),
-    {
-      enabled: enabled && typeof organizationId !== 'undefined',
-      staleTime: 30 * 60 * 1000, // 30 minutes
-      ...options,
-    }
+  return useQuery<GitHubConnectionsData, GitHubConnectionsError, TData>({
+    queryKey: integrationKeys.githubConnectionsList(organizationId),
+    queryFn: ({ signal }) => getGitHubConnections({ organizationId }, signal),
+    enabled: enabled && typeof organizationId !== 'undefined',
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  })
+}
+
+export const useProjectGitHubConnectionQuery = ({ ref }: { ref?: string }) => {
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: connections, ...props } = useGitHubConnectionsQuery(
+    { organizationId: organization?.id },
+    { enabled: !!ref && !!organization?.id }
   )
+
+  const existingConnection = useMemo(
+    () => connections?.find((c) => c.project.ref === ref),
+    [connections, ref]
+  )
+  return { data: existingConnection, ...props }
 }

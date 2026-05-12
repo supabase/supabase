@@ -1,11 +1,13 @@
-import React, { ReactNode } from 'react'
+import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
+import React, { ReactNode } from 'react'
 import { Badge, cn } from 'ui'
-import { ArrowNarrowRightIcon } from '@heroicons/react/outline'
 
 interface Props {
   url: string
   announcement: string | ReactNode
+  /* Text or node to display on mobile */
+  announcementMobile?: string | ReactNode
   badge?: string | ReactNode
   target?: '_self' | '_blank' | string
   className?: string
@@ -16,6 +18,7 @@ interface Props {
 const AnnouncementBadge = ({
   url,
   announcement,
+  announcementMobile,
   badge,
   target = '_self',
   className,
@@ -29,39 +32,51 @@ const AnnouncementBadge = ({
       className={cn(
         `
           announcement-link
+          text-nowrap
           group/announcement
           relative
           flex flex-row
           items-center
-          p-1 pr-3
+          p-1 pr-0.5
           text-sm
           w-auto
-          gap-2
+          gap-1.5
           text-left
           rounded-full
-          bg-opacity-20
           border
           border-background-surface-300
-          hover:border-foreground-muted
-          hover:border-opacity-30
+          hover:border-foreground-muted/30
           shadow-md
           overflow-hidden
-          focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
+          focus-visible:outline-hidden focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
           `,
-        !badge && 'px-4'
+        !badge && 'pl-5'
       )}
     >
       {badge && (
-        <Badge variant="brand" size="large" className="py-1 announcement-badge">
+        <Badge variant="success" className="py-1 announcement-badge">
           {badge}
         </Badge>
       )}
-      <span className="text-foreground announcement-text">{announcement}</span>
+      <span
+        className={cn('text-foreground announcement-text line-clamp-1 w-full', {
+          // only hide if announcementMobile is provided
+          'hidden md:[display:-webkit-box]': announcementMobile,
+        })}
+      >
+        {announcement}
+      </span>
+      {announcementMobile && (
+        <span className="text-foreground announcement-text-mobile md:hidden line-clamp-1">
+          {announcementMobile}
+        </span>
+      )}
+
       {hasArrow && (
-        <ArrowNarrowRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
+        <ChevronRightIcon className="announcement-icon h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}
       <div
-        className="announcement-overlay absolute inset-0 -z-10 bg-gradient-to-br
+        className="announcement-overlay absolute inset-0 -z-10 bg-linear-to-br
             opacity-70
             group-hover/announcement:opacity-100
             transition-opacity

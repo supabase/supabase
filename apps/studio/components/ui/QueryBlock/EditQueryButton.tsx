@@ -1,16 +1,7 @@
+import { useParams } from 'common'
 import { Edit } from 'lucide-react'
 import { useRouter } from 'next/router'
-
-import { useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import useNewQuery from 'components/interfaces/SQLEditor/hooks'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import Link from 'next/link'
 import { ComponentProps } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   cn,
   DropdownMenu,
@@ -19,7 +10,17 @@ import {
   DropdownMenuTrigger,
   TooltipContent,
 } from 'ui'
+
 import { ButtonTooltip } from '../ButtonTooltip'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import useNewQuery from '@/components/interfaces/SQLEditor/hooks'
+import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { editorPanelState } from '@/state/editor-panel-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 interface EditQueryButtonProps {
   id?: string
@@ -41,7 +42,7 @@ export const EditQueryButton = ({
   const { newQuery } = useNewQuery()
 
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
-  const snap = useAiAssistantStateSnapshot()
+  const { closeSidebar, openSidebar } = useSidebarManagerSnapshot()
 
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
@@ -56,15 +57,16 @@ export const EditQueryButton = ({
   if (id !== undefined) {
     return (
       <ButtonTooltip
-        asChild
         type={type}
         size="tiny"
         className={cn('w-7 h-7', className)}
         icon={<Edit size={14} strokeWidth={1.5} />}
         tooltip={tooltip}
-      >
-        <Link href={`/project/${ref}/sql/${id}`} />
-      </ButtonTooltip>
+        onClick={() => {
+          editorPanelState.setActiveSnippetId(id)
+          openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+        }}
+      />
     )
   }
 
@@ -79,7 +81,7 @@ export const EditQueryButton = ({
           // This component needs to be updated to work with local EditorPanel state
           // For now, fall back to creating a new query
           if (sql) newQuery(sql, title)
-          snap.closeAssistant()
+          closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         } else {
           if (sql) newQuery(sql, title)
         }

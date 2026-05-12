@@ -1,16 +1,17 @@
 import { useIsLoggedIn, useParams } from 'common'
-import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import CopyButton from 'components/ui/CopyButton'
-import { Loading } from 'components/ui/Loading'
-import { createCliLoginSession } from 'data/cli/login'
-import { withAuth } from 'hooks/misc/withAuth'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { NextPageWithLayout } from 'types'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from 'ui'
+import { InputOTP, InputOTPGroup, InputOTPSlot, LogoLoader } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { APIAuthorizationLayout } from '@/components/layouts/APIAuthorizationLayout'
+import CopyButton from '@/components/ui/CopyButton'
+import { createCliLoginSession } from '@/data/cli/login'
+import { withAuth } from '@/hooks/misc/withAuth'
+import type { NextPageWithLayout } from '@/types'
 
 const CliLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -46,17 +47,17 @@ const CliLoginPage: NextPageWithLayout = () => {
   }, [isLoggedIn, router, router.isReady, session_id, public_key, token_name, device_code])
 
   return (
-    <APIAuthorizationLayout>
+    <APIAuthorizationLayout HeadProvider={Head}>
       <div className={`flex flex-col items-center justify-center h-full`}>
         {device_code ? (
           <>
-            <h2 className="py-2">Your Supabase Account is being used to login on Supabase CLI.</h2>
+            <h2 className="py-2">Your Supabase account is being used to login on Supabase CLI</h2>
             <p>Enter this verification code on Supabase CLI to authorize login.</p>
             <div className="flex flex-row gap-2 py-10">
               <InputOTP maxLength={8} value={device_code} disabled>
                 <InputOTPGroup>
                   {Array.from({ length: 8 }, (_, i) => (
-                    <InputOTPSlot className="text-xl" index={i} />
+                    <InputOTPSlot key={i} className="text-xl" index={i} />
                   ))}
                 </InputOTPGroup>
               </InputOTP>
@@ -77,7 +78,7 @@ const CliLoginPage: NextPageWithLayout = () => {
             />
           </>
         ) : (
-          <Loading />
+          <LogoLoader />
         )}
       </div>
     </APIAuthorizationLayout>

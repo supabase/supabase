@@ -1,13 +1,6 @@
 import { cva } from 'class-variance-authority'
-import { motion } from 'framer-motion'
 import React from 'react'
-import {
-  FormDescription_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Label_Shadcn_,
-  cn,
-} from 'ui'
+import { cn, FormDescription, FormLabel, FormMessage, Label_Shadcn_ } from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
 
 type Props = {
@@ -31,8 +24,8 @@ const ContainerVariants = cva('relative grid gap-10', {
   variants: {
     size: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -45,7 +38,8 @@ const ContainerVariants = cva('relative grid gap-10', {
       horizontal: 'flex flex-col gap-2 md:grid md:grid-cols-12',
       vertical: 'flex flex-col gap-2',
       flex: 'flex flex-row gap-3',
-      'flex-row-reverse': 'flex flex-row gap-6 flex-row-reverse justify-between',
+      'flex-row-reverse':
+        'flex flex-col-reverse gap-2 md:gap-6 md:flex-row-reverse md:justify-between',
     },
     flex: {
       true: '',
@@ -80,8 +74,8 @@ const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
     layout: {
       horizontal: 'flex flex-col gap-2 col-span-4',
       vertical: 'flex flex-row gap-2 justify-between',
-      flex: 'flex flex-col gap-0',
-      'flex-row-reverse': 'flex flex-col',
+      flex: 'flex flex-col gap-0 min-w-0',
+      'flex-row-reverse': 'flex flex-col min-w-0 grow',
     },
     labelLayout: {
       horizontal: '',
@@ -232,7 +226,8 @@ const FlexContainer = cva('', {
     },
     {
       layout: 'flex-row-reverse',
-      className: 'flex flex-col justify-center items-end shrink-0',
+      className:
+        'flex flex-col justify-center items-start md:items-end shrink-0 md:w-1/2 xl:w-2/5 [&>div]:md:w-full',
     },
   ],
 })
@@ -297,33 +292,26 @@ export const FormLayout = React.forwardRef<
   ) => {
     const flex = layout === 'flex' || layout === 'flex-row-reverse'
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
-    const renderError = isReactForm && !hideMessage && (
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className={cn(layout === 'flex-row-reverse' ? 'mt-0' : 'mt-2')}
-      >
-        <FormMessage_Shadcn_
+    const renderError =
+      isReactForm && !hideMessage ? (
+        <FormMessage
           className={cn(
-            'mt-2 transition-opacity duration-300 ease-in-out',
+            'mt-2 transition-all duration-300 ease-in-out',
             layout === 'flex-row-reverse' && 'mt-0'
           )}
-          data-formlayout-id={'message'}
+          data-formlayout-id="message"
         />
-      </motion.div>
-    )
+      ) : null
 
     const renderDescription =
       description && isReactForm ? (
-        <FormDescription_Shadcn_
+        <FormDescription
           className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
           id={`${id}-description`}
         >
           {description}
-        </FormDescription_Shadcn_>
+        </FormDescription>
       ) : description ? (
         <p
           className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
@@ -376,16 +364,16 @@ export const FormLayout = React.forwardRef<
               data-formlayout-id={'labelContainer'}
             >
               {hasLabel && isReactForm ? (
-                <FormLabel_Shadcn_
-                  className="text-foreground flex gap-2 items-center break-all"
+                <FormLabel
+                  className="text-foreground flex gap-2 items-center wrap-break-word"
                   data-formlayout-id="formLabel"
                   htmlFor={props.name || id}
                 >
                   <LabelContents />
-                </FormLabel_Shadcn_>
+                </FormLabel>
               ) : (
                 <Label_Shadcn_
-                  className="text-foreground flex gap-2 items-center break-all leading-normal"
+                  className="text-foreground flex gap-2 items-center wrap-break-word leading-normal"
                   data-formlayout-id="label"
                   htmlFor={props.name || id}
                 >

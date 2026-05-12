@@ -1,28 +1,34 @@
-import { ChevronDown, Database, Plus, RefreshCw, X } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import { useParams } from 'common'
+import { Auth, Realtime, Storage } from 'icons'
+import { ChevronDown, Database, Network, Plus, RefreshCw, X } from 'lucide-react'
 import { ComponentProps, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Auth, Realtime, Storage } from 'icons'
-import { BASE_PATH } from 'lib/constants'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
-  Select,
-  cn,
+  Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { BASE_PATH } from '@/lib/constants'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
@@ -46,8 +52,7 @@ const PRODUCT_FILTERS = [
     key: 'rest',
     filterKey: 'request.path',
     filterValue: '/rest',
-    label: 'REST',
-    description: 'Requests made to PostgREST',
+    label: 'Data API (PostgREST)',
     icon: Database,
   },
   {
@@ -55,7 +60,6 @@ const PRODUCT_FILTERS = [
     filterKey: 'request.path',
     filterValue: '/auth',
     label: 'Auth',
-    description: 'Auth and authorization requests',
     icon: Auth,
   },
   {
@@ -63,7 +67,6 @@ const PRODUCT_FILTERS = [
     filterKey: 'request.path',
     filterValue: '/storage',
     label: 'Storage',
-    description: 'Storage asset requests',
     icon: Storage,
   },
   {
@@ -71,15 +74,13 @@ const PRODUCT_FILTERS = [
     filterKey: 'request.path',
     filterValue: '/realtime',
     label: 'Realtime',
-    description: 'Realtime connection requests',
     icon: Realtime,
   },
   {
     key: 'graphql',
     filterKey: 'request.path',
     filterValue: '/graphql',
-    label: 'GraphQL',
-    description: 'Requests made to pg_graphql',
+    label: 'GraphQL (pg_graphql)',
     icon: null,
   },
 ]
@@ -115,14 +116,14 @@ const ReportFilterBar = ({
   >(null)
   const [addFilterValues, setAddFilterValues] = useState<ReportFilterItem>({
     key: filterKeys[0],
-    compare: 'matches',
+    compare: 'is',
     value: '',
   })
 
   const resetFilterValues = () => {
     setAddFilterValues({
       key: filterKeys[0],
-      compare: 'matches',
+      compare: 'is',
       value: '',
     })
   }
@@ -175,6 +176,13 @@ const ReportFilterBar = ({
 
   const [selectedRange, setSelectedRange] = useState<DatePickerValue>(getInitialDatePickerValue())
 
+  // Sync selectedRange when initialDatePickerValue changes
+  useEffect(() => {
+    if (initialDatePickerValue) {
+      setSelectedRange(initialDatePickerValue)
+    }
+  }, [initialDatePickerValue])
+
   return (
     <div className={cn('flex items-center justify-between', className)}>
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
@@ -210,7 +218,8 @@ const ReportFilterBar = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start">
               <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
-                <p>All Requests</p>
+                <Network size={14} strokeWidth={1.5} className="mr-2" />
+                All Requests
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {PRODUCT_FILTERS.map((productFilter) => {
@@ -226,13 +235,13 @@ const ReportFilterBar = ({
                     {productFilter.key === 'graphql' ? (
                       <SVG
                         src={`${BASE_PATH}/img/graphql.svg`}
-                        className="w-[20px] h-[20px] mr-2"
+                        className="w-[14px] h-[14px] mr-2"
                         preProcessor={(code) =>
                           code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
                         }
                       />
                     ) : Icon !== null ? (
-                      <Icon size={20} strokeWidth={1.5} className="mr-2" />
+                      <Icon size={14} strokeWidth={1.5} className="mr-2" />
                     ) : null}
                     <div className="flex flex-col">
                       <p
@@ -242,9 +251,6 @@ const ReportFilterBar = ({
                         )}
                       >
                         {productFilter.label}
-                      </p>
-                      <p className=" text-left text-foreground-light inline-block w-[180px]">
-                        {productFilter.description}
                       </p>
                     </div>
                   </DropdownMenuItem>
@@ -270,7 +276,7 @@ const ReportFilterBar = ({
               <Button
                 type="text"
                 size="tiny"
-                className="!p-0 !space-x-0"
+                className="p-0! space-x-0!"
                 onClick={() => onRemoveFilters([filter])}
                 icon={<X className="text-foreground-light" />}
               >
@@ -289,58 +295,84 @@ const ReportFilterBar = ({
               <span>Add filter</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent
-            align={filters.length > 0 ? 'end' : 'start'}
-            portal={true}
-            className="p-0 w-60"
-          >
+          <PopoverContent align={filters.length > 0 ? 'end' : 'start'} className="p-0 w-60">
             <div className="flex flex-col gap-3 p-3">
-              <Select
-                size="tiny"
-                value={addFilterValues.key}
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({ ...prev, key: e.target.value }))
-                }}
+              <FormItemLayout
+                isReactForm={false}
+                layout="vertical"
                 label="Attribute Filter"
                 className="gap-[2px]"
-              >
-                {filterKeys.map((key) => (
-                  <Select.Option key={key} value={key}>
-                    {key}
-                  </Select.Option>
-                ))}
-              </Select>
-              <Select
                 size="tiny"
-                value={addFilterValues.compare}
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({
-                    ...prev,
-                    compare: e.target.value as ReportFilterItem['compare'],
-                  }))
-                }}
+              >
+                <Select_Shadcn_
+                  value={addFilterValues.key}
+                  onValueChange={(value: string) =>
+                    setAddFilterValues((prev) => ({ ...prev, key: value }))
+                  }
+                >
+                  <SelectTrigger_Shadcn_>
+                    <SelectValue_Shadcn_ placeholder="---" />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      {filterKeys.map((key) => (
+                        <SelectItem_Shadcn_ key={key} value={key}>
+                          {key}
+                        </SelectItem_Shadcn_>
+                      ))}
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormItemLayout>
+              <FormItemLayout
+                isReactForm={false}
+                layout="vertical"
                 label="Comparison"
                 className="gap-[2px]"
-              >
-                {['matches', 'is'].map((value) => (
-                  <Select.Option key={value} value={value}>
-                    {value}
-                  </Select.Option>
-                ))}
-              </Select>
-              <Input
                 size="tiny"
+              >
+                <Select_Shadcn_
+                  value={addFilterValues.compare}
+                  onValueChange={(value: string) =>
+                    setAddFilterValues((prev) => ({
+                      ...prev,
+                      compare: value as ReportFilterItem['compare'],
+                    }))
+                  }
+                >
+                  <SelectTrigger_Shadcn_>
+                    <SelectValue_Shadcn_ placeholder="---" />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      {['is', 'matches'].map((value) => (
+                        <SelectItem_Shadcn_ key={value} value={value}>
+                          {value}
+                        </SelectItem_Shadcn_>
+                      ))}
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormItemLayout>
+              <FormItemLayout
+                isReactForm={false}
+                layout="vertical"
                 label="Value"
                 className="gap-[2px]"
-                placeholder={
-                  addFilterValues.compare === 'matches'
-                    ? 'Provide a regex expression'
-                    : 'Provide a string'
-                }
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
-                }}
-              />
+                size="tiny"
+              >
+                <Input_Shadcn_
+                  placeholder={
+                    addFilterValues.compare === 'matches'
+                      ? 'Provide a regex expression'
+                      : 'Provide a string'
+                  }
+                  value={addFilterValues.value}
+                  onChange={(e) => {
+                    setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
+                  }}
+                />
+              </FormItemLayout>
             </div>
 
             <div className="flex items-center justify-end gap-2 border-t border-default p-2">

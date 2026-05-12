@@ -1,8 +1,6 @@
 import { BarChart2, Settings2, Table } from 'lucide-react'
-
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -15,7 +13,9 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
+
 import { ButtonTooltip } from '../ButtonTooltip'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 interface BlockViewConfigurationProps {
   columns: string[]
@@ -109,7 +109,7 @@ export const BlockViewConfiguration = ({
 
               <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
                 <Label_Shadcn_ htmlFor="cumulative">
-                  <Checkbox_Shadcn_
+                  <Checkbox
                     id="cumulative"
                     checked={chartConfig?.cumulative}
                     onClick={() =>
@@ -120,6 +120,19 @@ export const BlockViewConfiguration = ({
                     }
                   />
                   Cumulative
+                </Label_Shadcn_>
+                <Label_Shadcn_ htmlFor="logScale">
+                  <Checkbox
+                    id="logScale"
+                    checked={chartConfig?.logScale}
+                    onClick={() =>
+                      updateChartConfig({
+                        ...chartConfig,
+                        logScale: !chartConfig?.logScale,
+                      })
+                    }
+                  />
+                  Log scale
                 </Label_Shadcn_>
               </div>
             </>

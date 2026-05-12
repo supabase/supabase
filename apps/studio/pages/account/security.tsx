@@ -1,12 +1,4 @@
 import { Smartphone } from 'lucide-react'
-
-import { TOTPFactors } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   cn,
@@ -14,11 +6,23 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+
+import { TOTPFactors } from '@/components/interfaces/Account/TOTPFactors'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
 
 const collapsibleClasses = [
   'bg-surface-100',
@@ -26,29 +30,40 @@ const collapsibleClasses = [
   'data-open:bg-surface-200',
   'border-default',
   'hover:border-strong data-open:border-strong',
-  'data-open:pb-px col-span-12 rounded',
+  'data-open:pb-px col-span-12 rounded-sm',
   '-space-y-px overflow-hidden',
-  'border shadow',
+  'border shadow-sm',
   'transition',
   'hover:z-50',
 ]
 
 const Security: NextPageWithLayout = () => {
-  const { data } = useMfaListFactorsQuery()
+  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
+
+  const { data } = useMfaListFactorsQuery({ enabled: showSecuritySettings })
+
+  if (!showSecuritySettings) {
+    return <UnknownInterface urlBack={`/account/me`} />
+  }
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader className="pt-0">
-          <ScaffoldSectionTitle>Security</ScaffoldSectionTitle>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer bottomPadding>
-        <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
+      <PageHeader size="small">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Security</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage your account security settings and authentication methods.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="small">
+        <Collapsible_Shadcn_ className={cn('mt-8', collapsibleClasses)}>
           <CollapsibleTrigger_Shadcn_ asChild>
             <button
               type="button"
-              className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
+              className="group flex w-full items-center justify-between rounded-sm py-3 px-4 md:px-6 text-foreground"
             >
               <div className="flex flex-row gap-4 items-center py-1">
                 <Smartphone strokeWidth={1.5} />
@@ -56,7 +71,7 @@ const Security: NextPageWithLayout = () => {
               </div>
 
               {data ? (
-                <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
+                <Badge variant={data.totp.length === 0 ? 'default' : 'success'}>
                   {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
                 </Badge>
               ) : null}
@@ -66,7 +81,7 @@ const Security: NextPageWithLayout = () => {
             <TOTPFactors />
           </CollapsibleContent_Shadcn_>
         </Collapsible_Shadcn_>
-      </ScaffoldContainer>
+      </PageContainer>
     </>
   )
 }
@@ -74,9 +89,7 @@ const Security: NextPageWithLayout = () => {
 Security.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
-      <OrganizationLayout>
-        <AccountLayout title="Security">{page}</AccountLayout>
-      </OrganizationLayout>
+      <AccountLayout title="Security">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
 )

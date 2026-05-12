@@ -1,32 +1,32 @@
 import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
-
-import { useProjectCreationPostgresVersionsQuery } from 'data/config/project-creation-postgres-versions-query'
-import { useProjectUnpausePostgresVersionsQuery } from 'data/config/project-unpause-postgres-versions-query'
-import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { smartRegionToExactRegion } from './ProjectCreation.utils'
+import { useProjectCreationPostgresVersionsQuery } from '@/data/config/project-creation-postgres-versions-query'
+import { useProjectUnpausePostgresVersionsQuery } from '@/data/config/project-unpause-postgres-versions-query'
+import { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PostgresVersionDetails {
-  postgresEngine: PostgresEngine | undefined
-  releaseChannel: ReleaseChannel | undefined
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
+  releaseChannel?: ReleaseChannel
 }
 
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
   dbRegion: string
-  organizationSlug: string | undefined
+  organizationSlug?: string
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
   type?: 'create' | 'unpause'
@@ -61,7 +61,7 @@ export const PostgresVersionSelector = ({
   form,
   type = 'create',
   layout = 'horizontal',
-  label = 'Postgres Version',
+  label = 'Postgres version',
 }: PostgresVersionSelectorProps) => {
   const { data: project } = useSelectedProjectQuery()
 
@@ -69,7 +69,7 @@ export const PostgresVersionSelector = ({
 
   const {
     data: createVersions,
-    isLoading: isLoadingProjectCreateVersions,
+    isPending: isLoadingProjectCreateVersions,
     isSuccess,
   } = useProjectCreationPostgresVersionsQuery(
     {
@@ -80,7 +80,7 @@ export const PostgresVersionSelector = ({
     { enabled: type === 'create' }
   )
 
-  const { data: unpauseVersions, isLoading: isLoadingProjectUnpauseVersions } =
+  const { data: unpauseVersions, isPending: isLoadingProjectUnpauseVersions } =
     useProjectUnpausePostgresVersionsQuery(
       { projectRef: project?.ref },
       { enabled: type === 'unpause' }
@@ -88,8 +88,8 @@ export const PostgresVersionSelector = ({
 
   const versions =
     type === 'create'
-      ? createVersions?.available_versions ?? []
-      : unpauseVersions?.available_versions ?? []
+      ? (createVersions?.available_versions ?? [])
+      : (unpauseVersions?.available_versions ?? [])
   const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
   const { postgresVersionSelection } = form.watch()
 
@@ -129,16 +129,12 @@ export const PostgresVersionSelector = ({
                 >
                   <div className="flex flex-row items-center justify-between w-full">
                     <span className="text-foreground">{postgresVersion}</span>
-                    <div>
+                    <div className="flex flex-row gap-x-2">
                       {value.release_channel !== 'ga' && (
-                        <Badge variant="warning" className="mr-1 capitalize">
-                          {value.release_channel}
-                        </Badge>
+                        <Badge variant="warning">{value.release_channel}</Badge>
                       )}
                       {value.postgres_engine.includes('oriole') && (
-                        <Badge variant="default" className="mr-1">
-                          OrioleDB
-                        </Badge>
+                        <Badge variant="default">OrioleDB</Badge>
                       )}
                     </div>
                   </div>

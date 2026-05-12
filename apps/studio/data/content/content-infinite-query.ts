@@ -1,12 +1,14 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
 import { Content, ContentType } from './content-query'
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomInfiniteQueryOptions } from '@/types'
 
 interface GetContentVariables {
   projectRef?: string
-  cursor?: string
+  cursor?: string | undefined
   type: ContentType
   name?: string
   limit?: number
@@ -39,7 +41,7 @@ export async function getContent(
 
   return {
     cursor: data.cursor,
-    content: data.data as unknown as Content[],
+    content: remapSqlContentFields(data.data as unknown as Content[]),
   }
 }
 
@@ -48,16 +50,24 @@ export type ContentError = unknown
 
 export const useContentInfiniteQuery = <TData = ContentData>(
   { projectRef, type, name, limit, sort }: GetContentVariables,
-  { enabled = true, ...options }: UseInfiniteQueryOptions<ContentData, ContentError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomInfiniteQueryOptions<
+    ContentData,
+    ContentError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) => {
-  return useInfiniteQuery<ContentData, ContentError, TData>(
-    contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
-    ({ signal, pageParam }) =>
+  return useInfiniteQuery({
+    queryKey: contentKeys.infiniteList(projectRef, { type, name, limit, sort }),
+    queryFn: ({ signal, pageParam }) =>
       getContent({ projectRef, type, name, limit, sort, cursor: pageParam }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam: (lastPage) => lastPage.cursor,
-      ...options,
-    }
-  )
+    enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.cursor,
+    ...options,
+  })
 }

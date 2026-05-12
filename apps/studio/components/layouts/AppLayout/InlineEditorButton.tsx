@@ -1,27 +1,53 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SqlEditor } from 'icons'
-import { KeyboardShortcut } from 'ui'
+import { cn, KeyboardShortcut } from 'ui'
 
-export const InlineEditorButton = ({ onClick }: { onClick: () => void }) => {
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+
+const InlineEditorKeyboardTooltip = () => {
+  const hotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE)
+
+  return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'E']} /> : null
+}
+
+export const InlineEditorButton = () => {
+  const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
+  const isOpen = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
+  const track = useTrack()
+
+  const handleClick = () => {
+    track('header_inline_editor_button_clicked')
+    toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+  }
+
   return (
     <ButtonTooltip
-      type="text"
+      type="outline"
       size="tiny"
       id="editor-trigger"
-      className="rounded-none w-[32px] h-[30px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground"
-      onClick={onClick}
+      className={cn(
+        'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground',
+        isOpen && 'bg-foreground text-background hover:text-background'
+      )}
+      onClick={handleClick}
       tooltip={{
         content: {
+          className: 'p-1 pl-2.5',
           text: (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2.5">
               <span>SQL Editor</span>
-              <KeyboardShortcut keys={['Meta', 'e']} />
+              <InlineEditorKeyboardTooltip />
             </div>
           ),
         },
       }}
     >
-      <SqlEditor size={18} strokeWidth={1.5} />
+      <SqlEditor size={16} strokeWidth={1.5} />
+      <span className="sr-only">SQL Editor</span>
     </ButtonTooltip>
   )
 }

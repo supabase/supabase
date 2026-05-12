@@ -1,15 +1,19 @@
 import { AlertOctagon, Lock, ShieldOff } from 'lucide-react'
-
-import { DocsButton } from 'components/ui/DocsButton'
 import { Alert } from 'ui'
 
-export default function RLSDisableModalContent() {
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { DOCS_URL } from '@/lib/constants'
+
+export function RLSDisableModalContent() {
+  const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
+
   return (
     <div className="text-sm text-foreground-light grid gap-4">
       <div className="grid gap-1">
         <Alert
           variant="warning"
-          className="!px-4 !py-3"
+          className="px-4! py-3!"
           title="This table will be publicly readable and writable"
           withIcon
         >
@@ -17,17 +21,17 @@ export default function RLSDisableModalContent() {
         </Alert>
         <ul className="mt-4 space-y-5">
           <li className="flex gap-3">
-            <AlertOctagon />
+            <AlertOctagon size={14} />
             <span>All requests to this table will be accepted.</span>
           </li>
 
           <li className="flex gap-3">
-            <ShieldOff />
+            <ShieldOff size={14} />
             <span>Auth policies will not be enforced.</span>
           </li>
 
           <li className="flex gap-3">
-            <Lock size={14} className="flex-shrink-0" />
+            <Lock size={14} className="shrink-0" />
             <div>
               <strong>Before you turn off Row Level Security, consider:</strong>
               <ul className="space-y-2 mt-2">
@@ -46,7 +50,7 @@ export default function RLSDisableModalContent() {
       <DocsButton
         abbrev={false}
         className="w-min mt-3"
-        href="https://supabase.com/docs/guides/auth/row-level-security"
+        href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
       />
     </div>
   )

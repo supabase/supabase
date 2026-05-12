@@ -1,6 +1,7 @@
-import { expect, test, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, expect, test } from 'vitest'
+
 import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -1078,6 +1079,12 @@ withTestDatabase('update table - replica identity', async ({ executeQuery }) => 
   expect(res!.replica_identity).toBe('NOTHING')
 })
 
+withTestDatabase('update table - replica identity INDEX requires index name', async () => {
+  expect(() =>
+    pgMeta.tables.update({ id: 1, name: 'test', schema: 'public' }, { replica_identity: 'INDEX' })
+  ).toThrow('replica_identity_index is required')
+})
+
 withTestDatabase('update table - primary keys', async ({ executeQuery }) => {
   // Create test table with a column
   const { sql: createSql } = await pgMeta.tables.create({ name: 'test_pk' })
@@ -1427,7 +1434,6 @@ for (const testCase of tableCreationTests) {
       await testCase.beforeTest(executeQuery)
     }
 
-    //@ts-expect-error
     const { sql } = pgMeta.tables.create(testCase.input)
     await executeQuery(sql)
 

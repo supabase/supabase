@@ -1,10 +1,10 @@
+import { IS_PLATFORM, useParams } from 'common'
 import saveAs from 'file-saver'
-import { ChevronDown, Clipboard, Download } from 'lucide-react'
-import { markdownTable } from 'markdown-table'
-import Papa from 'papaparse'
+import { ChevronDown, Copy, Download, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-
 import {
   Button,
   copyToClipboard,
@@ -12,7 +12,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  KeyboardShortcut,
 } from 'ui'
+
+import {
+  convertResultsToCSV,
+  convertResultsToJSON,
+  convertResultsToMarkdown,
+} from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface DownloadResultsButtonProps {
   iconOnly?: boolean
@@ -24,6 +33,7 @@ interface DownloadResultsButtonProps {
   onDownloadAsCSV?: () => void
   onCopyAsMarkdown?: () => void
   onCopyAsJSON?: () => void
+  onCopyAsCSV?: () => void
 }
 
 export const DownloadResultsButton = ({
@@ -36,26 +46,20 @@ export const DownloadResultsButton = ({
   onDownloadAsCSV,
   onCopyAsMarkdown,
   onCopyAsJSON,
+  onCopyAsCSV,
 }: DownloadResultsButtonProps) => {
-  // [Joshen] Ensure JSON values are stringified for CSV and Markdown
-  const formattedResults = results.map((row) => {
-    const r = { ...row }
-    Object.keys(row).forEach((x) => {
-      if (typeof row[x] === 'object') r[x] = JSON.stringify(row[x])
-    })
-    return r
-  })
-
-  const headers = useMemo(() => {
-    if (results) {
-      const firstRow = Array.from(results)[0]
-      if (firstRow) return Object.keys(firstRow)
-    }
-    return undefined
-  }, [results])
+  const { ref } = useParams()
+  const pathname = usePathname()
+  const isLogs = pathname?.includes?.('/logs') ?? false
+  const isEmpty = useMemo(() => results.length === 0, [results])
 
   const downloadAsCSV = () => {
-    const csv = Papa.unparse(formattedResults, { columns: headers })
+    const csv = convertResultsToCSV(results)
+    if (!csv) {
+      toast('Results are empty')
+      return
+    }
+
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     saveAs(blob, `${fileName}.csv`)
     toast.success('Downloading results as CSV')
@@ -63,34 +67,57 @@ export const DownloadResultsButton = ({
   }
 
   const copyAsMarkdown = () => {
-    if (navigator) {
-      if (formattedResults.length == 0) toast('Results are empty')
-
-      const columns = Object.keys(formattedResults[0])
-      const rows = formattedResults.map((x) => {
-        let temp: any[] = []
-        columns.forEach((col) => temp.push(x[col]))
-        return temp
-      })
-      const table = [columns].concat(rows)
-      const markdownData = markdownTable(table)
-
-      copyToClipboard(markdownData, () => {
-        toast.success('Copied results to clipboard')
-        onCopyAsMarkdown?.()
-      })
+    const markdownData = convertResultsToMarkdown(results)
+    if (!markdownData) {
+      toast('Results are empty')
+      return
     }
+    copyToClipboard(markdownData, () => {
+      toast.success('Copied Markdown to clipboard')
+      onCopyAsMarkdown?.()
+    })
   }
 
   const copyAsJSON = () => {
-    if (navigator) {
-      if (results.length === 0) return toast('Results are empty')
-      copyToClipboard(JSON.stringify(results, null, 2), () => {
-        toast.success('Copied results to clipboard')
-        onCopyAsJSON?.()
-      })
+    const jsonData = convertResultsToJSON(results)
+    if (!jsonData) {
+      toast('Results are empty')
+      return
     }
+    copyToClipboard(jsonData, () => {
+      toast.success('Copied JSON to clipboard')
+      onCopyAsJSON?.()
+    })
   }
+
+  const copyAsCSV = () => {
+    const csv = convertResultsToCSV(results)
+    if (!csv) {
+      toast('Results are empty')
+      return
+    }
+    copyToClipboard(csv, () => {
+      toast.success('Copied CSV to clipboard')
+      onCopyAsCSV?.()
+    })
+  }
+
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, copyAsMarkdown, {
+    enabled: !isEmpty,
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_JSON, copyAsJSON, {
+    enabled: !isEmpty,
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_CSV, copyAsCSV, {
+    enabled: !isEmpty,
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV, downloadAsCSV, {
+    enabled: !isEmpty,
+    registerInCommandMenu: true,
+  })
 
   return (
     <DropdownMenu>
@@ -105,18 +132,42 @@ export const DownloadResultsButton = ({
           {!iconOnly && text}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align} className="w-44">
+      <DropdownMenuContent align={align} className="w-60">
+        {isLogs && IS_PLATFORM && (
+          <DropdownMenuItem asChild className="gap-x-2">
+            <Link href={`/project/${ref}/settings/log-drains`}>
+              <Settings size={14} />
+              <p>Add a Log Drain</p>
+            </Link>
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
+          <Copy size={14} />
+          <p>Copy as Markdown</p>
+          <span className="ml-auto">
+            <KeyboardShortcut keys={['Shift', 'Meta', 'm']} />
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={copyAsJSON} className="gap-x-2">
+          <Copy size={14} />
+          <p>Copy as JSON</p>
+          <span className="ml-auto">
+            <KeyboardShortcut keys={['Shift', 'Meta', 'j']} />
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={copyAsCSV} className="gap-x-2">
+          <Copy size={14} />
+          <p>Copy as CSV</p>
+          <span className="ml-auto">
+            <KeyboardShortcut keys={['Shift', 'Meta', 'c']} />
+          </span>
+        </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsCSV()}>
           <Download size={14} />
           <p>Download CSV</p>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
-          <Clipboard size={14} />
-          <p>Copy as markdown</p>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={copyAsJSON} className="gap-x-2">
-          <Clipboard size={14} />
-          <p>Copy as JSON</p>
+          <span className="ml-auto">
+            <KeyboardShortcut keys={['Shift', 'Meta', 'd']} />
+          </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,16 +1,15 @@
 'use client'
 
-import { Index } from '@/__registry__'
-import * as React from 'react'
-
-import { useConfig } from '@/hooks/use-config'
-import { CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_, Collapsible_Shadcn_, cn } from 'ui'
-
-import { styles } from '@/registry/styles'
 import { ChevronRight } from 'lucide-react'
+import * as React from 'react'
+import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
+
+import { Index } from '@/__registry__'
+import { useConfig } from '@/hooks/use-config'
+import { styles } from '@/registry/styles'
 
 interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
-  name: string
+  name: keyof (typeof Index)['default']
   extractClassname?: boolean
   extractedClassNames?: string
   align?: 'center' | 'start' | 'end'
@@ -36,8 +35,6 @@ export function ComponentPreview({
   const [config] = useConfig()
   const index = styles.findIndex((style) => style.name === config.style)
 
-  const [expand, setExpandState] = React.useState(false)
-
   const Preview = React.useMemo(() => {
     const Component = Index['default'][name]?.component
 
@@ -45,7 +42,7 @@ export function ComponentPreview({
       return (
         <p className="text-sm text-muted-foreground">
           Component{' '}
-          <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
+          <code className="relative rounded-sm bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
             {name}
           </code>{' '}
           not found in registry.
@@ -92,10 +89,10 @@ export function ComponentPreview({
         )}
       >
         {showGrid && (
-          <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,hsla(var(--foreground-default)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+          <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,hsla(var(--foreground-default)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
         )}
         {showDottedGrid && (
-          <div className="z-0 pointer-events-none absolute h-full w-full bg-[radial-gradient(hsla(var(--foreground-default)/0.02)_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+          <div className="z-0 pointer-events-none absolute h-full w-full bg-[radial-gradient(hsla(var(--foreground-default)/0.02)_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
         )}
         <div className="z-10 relative">{ComponentPreview}</div>
       </div>
@@ -112,12 +109,12 @@ export function ComponentPreview({
             px-4 py-4 
             border border-r 
             group
-            data-[state=closed]:rounded-bl-md data-[state=closed]:rounded-br-md
+            data-closed:rounded-bl-md data-closed:rounded-br-md
             
         `}
           >
             <ChevronRight
-              className="transition-all group-data-[state=open]:rotate-90 text-foreground-lighter"
+              className="transition-all group-data-open:rotate-90 text-foreground-lighter"
               size={14}
             />
             View code

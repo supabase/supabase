@@ -1,10 +1,11 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { getModel } from 'lib/ai/model'
-import apiWrapper from 'lib/api/apiWrapper'
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import apiWrapper from '@/lib/api/apiWrapper'
 
 const titleSchema = z.object({
   title: z
@@ -39,15 +40,18 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { model, error: modelError } = await getModel()
+    const { modelParams, error: modelError } = await getModel({
+      provider: 'openai',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
+    })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const result = await generateObject({
-      model,
-      schema: titleSchema,
+    const result = await generateText({
+      ...modelParams,
+      output: Output.object({ schema: titleSchema }),
       prompt: source`
         Generate a short title and summarized description for this Postgres SQL snippet:
 
@@ -55,10 +59,9 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         The description should describe why this table was created (eg. "Table to track todos") or what the query does.
       `,
-      temperature: 0,
     })
 
-    return res.json(result.object)
+    return res.json(result.output)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI title generation failed: ${error.message}`)

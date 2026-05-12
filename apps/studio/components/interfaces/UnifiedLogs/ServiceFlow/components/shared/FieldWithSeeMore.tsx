@@ -1,8 +1,6 @@
 import { Table } from '@tanstack/react-table'
 import { X } from 'lucide-react'
 import { useState } from 'react'
-
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
 import {
   Badge,
   Collapsible_Shadcn_ as Collapsible,
@@ -10,11 +8,13 @@ import {
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
   Skeleton,
 } from 'ui'
+
 import { BlockFieldConfig } from '../../types'
 import { BlockField } from './BlockField'
+import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 // Single source of truth for field row styling
-const FieldRow = ({
+export const FieldRow = ({
   label,
   value,
   expandButton,
@@ -44,7 +44,7 @@ interface FieldWithSeeMoreProps {
 }
 
 // Primary field with expandable additional details
-const FieldWithSeeMore = ({
+export const FieldWithSeeMore = ({
   primaryField,
   additionalFields,
   data,
@@ -71,18 +71,14 @@ const FieldWithSeeMore = ({
 
     if (isApiKeyField && primaryValue && primaryValue !== 'N/A') {
       return (
-        <span className="border border-border rounded px-2 py-1 bg-surface-100 text-xs font-mono text-foreground">
+        <span className="border border-border rounded-sm px-2 py-1 bg-surface-100 text-xs font-mono text-foreground">
           {primaryValue}
         </span>
       )
     }
 
     if (showValueAsBadge && primaryValue && primaryValue !== 'N/A') {
-      return (
-        <Badge variant="secondary" size="small">
-          {primaryValue}
-        </Badge>
-      )
+      return <Badge variant="secondary">{primaryValue}</Badge>
     }
 
     return (
@@ -98,7 +94,7 @@ const FieldWithSeeMore = ({
 
   const expandButton = hasAdditionalData ? (
     <CollapsibleTrigger asChild>
-      <button className="w-3 h-3 flex items-center justify-center selection:font-mono text-foreground-lighter text-xs hover:text-foreground-light bg-foreground-muted/75 rounded [&[data-state=open]>svg]:rotate-180 hover:bg-foreground-lighter">
+      <button className="w-3 h-3 flex items-center justify-center selection:font-mono text-foreground-lighter text-xs hover:text-foreground-light bg-foreground-muted/75 rounded-sm [&[data-state=open]>svg]:rotate-180 hover:bg-foreground-lighter">
         <X size={10} className="text-background-surface-400 rotate-45" strokeWidth={3} />
       </button>
     </CollapsibleTrigger>
@@ -109,7 +105,7 @@ const FieldWithSeeMore = ({
       {hasAdditionalData ? (
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <FieldRow label={primaryField.label} value={renderValue()} expandButton={expandButton} />
-          <CollapsibleContent className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+          <CollapsibleContent className="transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
             <div className="mt-1">
               {additionalFields.map((field) => (
                 <BlockField
@@ -131,5 +127,3 @@ const FieldWithSeeMore = ({
     </div>
   )
 }
-
-export { FieldRow, FieldWithSeeMore }

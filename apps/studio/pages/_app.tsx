@@ -1,63 +1,107 @@
 import 'react-data-grid/lib/styles.css'
-import 'styles/code.scss'
-import 'styles/contextMenu.scss'
-import 'styles/date-picker.scss'
-import 'styles/editor.scss'
-import 'styles/graphiql-base.scss'
-import 'styles/grid.scss'
-import 'styles/main.scss'
-import 'styles/markdown-preview.scss'
-import 'styles/monaco.scss'
-import 'styles/react-data-grid-logs.scss'
-import 'styles/reactflow.scss'
-import 'styles/storage.scss'
-import 'styles/stripe.scss'
-import 'styles/toast.scss'
-import 'styles/typography.scss'
-import 'styles/ui.scss'
-import 'ui/build/css/themes/dark.css'
-import 'ui/build/css/themes/light.css'
+import '@/styles/code.css'
+import '@/styles/editor.css'
+import '@/styles/focus.css'
+import '@/styles/graphiql-base.css'
+import '@/styles/grid.css'
+import '@/styles/globals.css'
+import '@/styles/markdown-preview.css'
+import '@/styles/monaco.css'
+import '@/styles/react-data-grid-logs.css'
+import '@/styles/reactflow.css'
+import '@/styles/storage.css'
+import '@/styles/stripe.css'
+import '@/styles/ui.css'
+import 'ui-patterns/ShimmeringLoader/index.css'
 
 import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
-import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
+import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import {
+  FeatureFlagProvider,
+  getFlags,
+  TelemetryTagManager,
+  ThemeProvider,
+  useThemeSandbox,
+} from 'common'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
+import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { ErrorInfo } from 'react'
+import { ErrorInfo, useCallback, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { TooltipProvider } from 'ui'
+import { TimestampInfoProvider } from 'ui-patterns'
 
-import { FeatureFlagProvider, TelemetryTagManager, ThemeProvider, useThemeSandbox } from 'common'
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { RouteValidationWrapper } from 'components/interfaces/App'
-import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
-import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
-import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
-import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
-import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState'
-import { useRootQueryClient } from 'data/query-client'
-import { customFont, sourceCodePro } from 'fonts'
-import { AuthProvider } from 'lib/auth'
-import { getFlags as getConfigCatFlags } from 'lib/configcat'
-import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { ProfileProvider } from 'lib/profile'
-import { Telemetry } from 'lib/telemetry'
-import { AppPropsWithLayout } from 'types'
-import { SonnerToaster, TooltipProvider } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
+import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
+import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
+import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
+import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
+import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
+import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
+import { useRootQueryClient } from '@/data/query-client'
+import { customFont, sourceCodePro } from '@/fonts'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { AuthProvider } from '@/lib/auth'
+import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { ProfileProvider } from '@/lib/profile'
+import { Telemetry } from '@/lib/telemetry'
+import { Toaster } from '@/lib/toaster'
+import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
+import type { AppPropsWithLayout } from '@/types'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
+
+// Keep dev-only components out of the production bundle
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const IS_DEV_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
+
+const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ResourceWarningsTab').then((m) => m.ResourceWarningsTab)
+    )
+  : () => null
+
+const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
+  ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
+  : []
+
+const FeatureFlagProviderWithOrgContext = ({
+  children,
+  ...props
+}: ComponentProps<typeof FeatureFlagProvider>) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+
+  return (
+    <FeatureFlagProvider {...props} organizationSlug={selectedOrganization?.slug ?? undefined}>
+      {children}
+    </FeatureFlagProvider>
+  )
+}
+
+const TimestampInfoTimezoneBridge = ({ children }: { children: React.ReactNode }) => {
+  const { timezone } = useTimezone()
+  return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
+}
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -79,13 +123,18 @@ loader.config({
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
+  const { appTitle } = useCustomContent(['app:title'])
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
-  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+  const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
-      Sentry.captureException(error)
+      const eventId = Sentry.captureException(error)
+      // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
+      if (eventId && error && typeof error === 'object') {
+        ;(error as any).sentryId = eventId
+      }
     })
 
     console.error(error.stack)
@@ -95,60 +144,88 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
+  const cloudProvider = useDefaultProvider()
+
+  const getConfigCatFlags = useCallback(
+    (userEmail?: string) => {
+      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
+      return getFlags(userEmail, customAttributes)
+    },
+    [cloudProvider]
+  )
+
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
         <NuqsAdapter>
-          <Hydrate state={pageProps.dehydratedState}>
+          <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
-              <FeatureFlagProvider
+              <FeatureFlagProviderWithOrgContext
                 API_URL={API_URL}
                 enabled={IS_PLATFORM}
                 getConfigCatFlags={getConfigCatFlags}
               >
                 <ProfileProvider>
-                  <Head>
-                    <title>Supabase</title>
-                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                    <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
-                    {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
-                    <style
-                      dangerouslySetInnerHTML={{
-                        __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
-                      }}
-                    />
-                  </Head>
-                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                  <TooltipProvider delayDuration={0}>
-                    <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
-                        <AppBannerContextProvider>
-                          <CommandProvider>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <StudioCommandMenu />
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                            <SonnerToaster position="top-right" />
-                            <MonacoThemeProvider />
-                          </CommandProvider>
-                        </AppBannerContextProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                  <Telemetry />
-                  {!isTestEnv && (
-                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-                  )}
+                  <TimezoneProvider>
+                    <TimestampInfoTimezoneBridge>
+                      <Head>
+                        <title>{appTitle ?? 'Supabase'}</title>
+                        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                        <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
+                        <meta name="googlebot" content="notranslate" />
+                        {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                        <style
+                          dangerouslySetInnerHTML={{
+                            __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                          }}
+                        />
+                        {/* Speed up initial API loading times by pre-connecting to the API domain */}
+                        {IS_PLATFORM && (
+                          <link
+                            rel="preconnect"
+                            href={new URL(API_URL).origin}
+                            crossOrigin="use-credentials"
+                          />
+                        )}
+                      </Head>
+                      <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
+                      <TooltipProvider delayDuration={0}>
+                        <RouteValidationWrapper>
+                          <ThemeProvider>
+                            <DevToolbarProvider apiUrl={API_URL}>
+                              <AiAssistantStateContextProvider>
+                                <CommandProvider>
+                                  <BannerStackProvider>
+                                    <FeaturePreviewContextProvider>
+                                      <MainScrollContainerProvider>
+                                        {getLayout(<Component {...pageProps} />)}
+                                      </MainScrollContainerProvider>
+                                      <GlobalShortcuts />
+                                      <StudioCommandMenu />
+                                      <FeaturePreviewModal />
+                                      <UpdateBillingAddressModal />
+                                    </FeaturePreviewContextProvider>
+                                  </BannerStackProvider>
+                                  <Toaster />
+                                  <MonacoThemeProvider />
+                                </CommandProvider>
+                              </AiAssistantStateContextProvider>
+                              <DevToolbar extraTabs={devToolbarExtraTabs} />
+                              <DevToolbarTrigger />
+                            </DevToolbarProvider>
+                          </ThemeProvider>
+                        </RouteValidationWrapper>
+                      </TooltipProvider>
+                      <Telemetry />
+                      {!isTestEnv && (
+                        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+                      )}
+                    </TimestampInfoTimezoneBridge>
+                  </TimezoneProvider>
                 </ProfileProvider>
-              </FeatureFlagProvider>
+              </FeatureFlagProviderWithOrgContext>
             </AuthProvider>
-          </Hydrate>
+          </HydrationBoundary>
         </NuqsAdapter>
       </QueryClientProvider>
       <TelemetryTagManager />

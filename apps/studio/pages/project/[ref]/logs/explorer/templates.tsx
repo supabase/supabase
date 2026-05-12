@@ -1,31 +1,37 @@
 import { useParams } from 'common'
 import { CodeIcon } from 'lucide-react'
 import { useState } from 'react'
+import { Button, cn, Popover } from 'ui'
 
-import { TEMPLATES } from 'components/interfaces/Settings/Logs/Logs.constants'
-import type { LogTemplate } from 'components/interfaces/Settings/Logs/Logs.types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import CardButton from 'components/ui/CardButton'
-import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
-import { Button, Popover, cn } from 'ui'
+import { TEMPLATES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import type { LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
+import CardButton from '@/components/ui/CardButton'
+import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
 
 export const LogsTemplatesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
-  const isTemplatesEnabled = useIsFeatureEnabled('logs:templates')
+  const { logsTemplates: isTemplatesEnabled, logsShowMetadataIpTemplate: showMetadataIpTemplate } =
+    useIsFeatureEnabled(['logs:templates', 'logs:show_metadata_ip_template'])
 
   if (!isTemplatesEnabled) {
     return <UnknownInterface urlBack={`/project/${projectRef}/logs/explorer`} />
   }
 
+  const allTemplates = showMetadataIpTemplate
+    ? TEMPLATES
+    : TEMPLATES.filter((template) => template.label !== 'Metadata IP')
+
   return (
     <div className="mx-auto h-full w-full px-5 py-6">
       <LogsExplorerHeader subtitle="Templates" />
       <div className="grid lg:grid-cols-3 gap-6 mt-4 pb-24">
-        {TEMPLATES.sort((a, b) => a.label!.localeCompare(b.label!))
+        {allTemplates
+          .sort((a, b) => a.label!.localeCompare(b.label!))
           .filter((template) => template.mode === 'custom')
           .map((template, i) => {
             return <Template key={i} projectRef={projectRef} template={template} />
@@ -37,7 +43,7 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
 
 LogsTemplatesPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Templates">{page}</LogsLayout>
   </DefaultLayout>
 )
 
@@ -52,7 +58,7 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
       icon={
         <div
           className={cn(
-            'duration-400 flex h-6 w-6 items-center justify-center rounded transition-colors',
+            'duration-400 flex h-6 w-6 items-center justify-center rounded-sm transition-colors',
             'border bg-background-200',
             'group-hover:bg-brand-300 group-hover:text-brand-600 group-hover:border-brand-500',
             'dark:border-background-selection dark:bg-background-200 dark:text-foreground',
@@ -75,7 +81,7 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
             className="rounded-lg bg-alternative"
             size="content"
             overlay={
-              <pre className="whitespace-pre-line break-words rounded-lg bg-alternative p-4 text-sm">
+              <pre className="whitespace-pre-line wrap-break-word rounded-lg bg-alternative p-4 text-sm">
                 {template.searchString}
               </pre>
             }

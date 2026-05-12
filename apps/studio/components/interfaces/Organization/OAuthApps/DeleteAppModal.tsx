@@ -1,11 +1,11 @@
+import { useParams } from 'common'
 import { Lock } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useOAuthAppDeleteMutation } from 'data/oauth/oauth-app-delete-mutation'
-import type { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { Modal } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { useOAuthAppDeleteMutation } from '@/data/oauth/oauth-app-delete-mutation'
+import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
 
 export interface DeleteAppModalProps {
   selectedApp?: OAuthApp
@@ -14,7 +14,7 @@ export interface DeleteAppModalProps {
 
 export const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
   const { slug } = useParams()
-  const { mutate: deleteOAuthApp, isLoading: isDeleting } = useOAuthAppDeleteMutation({
+  const { mutate: deleteOAuthApp, isPending: isDeleting } = useOAuthAppDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted the app "${selectedApp?.name}"`)
       onClose()
@@ -48,7 +48,7 @@ export const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) =>
       <Modal.Content>
         <ul className="space-y-5">
           <li className="flex gap-3 text-sm">
-            <Lock size={14} className="flex-shrink-0" />
+            <Lock size={14} className="shrink-0" />
             <div>
               <strong>Before you remove this application, consider:</strong>
               <ul className="space-y-2 mt-2">

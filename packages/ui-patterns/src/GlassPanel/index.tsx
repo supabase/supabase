@@ -40,7 +40,7 @@ export const GlassPanel = ({
     <div
       className={cn(
         'shrink-0',
-        showIconBg ? 'bg-surface-75 border w-8 h-8 flex items-center justify-center rounded' : ''
+        showIconBg ? 'bg-surface-75 border w-8 h-8 flex items-center justify-center rounded-sm' : ''
       )}
     >
       {props.children}
@@ -118,8 +118,8 @@ export const GlassPanel = ({
           <p className="text-base text-foreground">{title}</p>
         </div>
 
-        {children && <span className="text-sm text-foreground-light flex-grow">{children}</span>}
-        {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
+        {children && <span className="text-sm text-foreground-light grow">{children}</span>}
+        {showLink && <span className="text-brand-link justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

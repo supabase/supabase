@@ -1,10 +1,6 @@
-import { useRouter } from 'next/router'
+import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useLintRuleDeleteMutation } from 'data/lint/delete-lint-rule-mutation'
-import { LintException } from 'data/lint/lint-rules-query'
 import {
   Button,
   Dialog,
@@ -16,7 +12,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+
 import { LintInfo } from '../Linter/Linter.constants'
+import { useLintRuleDeleteMutation } from '@/data/lint/delete-lint-rule-mutation'
+import { LintException } from '@/data/lint/lint-rules-query'
 
 interface EnableRuleModalProps {
   lint: LintInfo
@@ -25,11 +24,10 @@ interface EnableRuleModalProps {
 
 export const EnableRuleModal = ({ lint, rule }: EnableRuleModalProps) => {
   const { ref } = useParams()
-  const router = useRouter()
 
   const [open, setOpen] = useState(false)
 
-  const { mutate: deleteRule, isLoading: isDeleting } = useLintRuleDeleteMutation({
+  const { mutate: deleteRule, isPending: isDeleting } = useLintRuleDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled the "${lint.title}" rule`)
       setOpen(false)
@@ -48,7 +46,7 @@ export const EnableRuleModal = ({ lint, rule }: EnableRuleModalProps) => {
       </DialogTrigger>
       <DialogContent size="small">
         <DialogHeader>
-          <DialogTitle>Confirm to enable rule</DialogTitle>
+          <DialogTitle>Enable rule</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection>

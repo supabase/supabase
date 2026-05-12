@@ -1,13 +1,14 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { NextPage } from 'next'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSignOut } from 'lib/auth'
 import { Button } from 'ui'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSignOut } from '@/lib/auth'
 
 const Error500: NextPage = () => {
   const router = useRouter()
@@ -29,7 +30,7 @@ const Error500: NextPage = () => {
     <div className="relative mx-auto flex flex-1 w-full flex-col items-center justify-center space-y-6">
       <div className="absolute top-0 mx-auto w-full max-w-7xl px-8 pt-6 sm:px-6 lg:px-8">
         <nav className="relative flex items-center justify-between sm:h-10">
-          <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
+          <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
               <Link href="/projects">
                 <Image
@@ -69,7 +70,7 @@ const Error500: NextPage = () => {
           <Button onClick={onClickLogout}>Head back</Button>
         )}
         <Button type="secondary" asChild>
-          <Link href="/support/new">Submit a support request</Link>
+          <SupportLink>Submit a support request</SupportLink>
         </Button>
       </div>
     </div>

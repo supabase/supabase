@@ -1,36 +1,21 @@
-import { isEqual } from 'lodash'
-import { X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { isEqual } from 'lodash'
+import { ChevronDown, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  ScrollArea,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Select_Shadcn_,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -41,14 +26,28 @@ import {
   TooltipContent,
   TooltipTrigger,
   WarningIcon,
-  cn,
 } from 'ui'
+
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
-  ProjectRoleConfiguration,
   formatMemberRoleToProjectRoleConfiguration,
+  ProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import {
+  OrgProject,
+  useOrgProjectsInfiniteQuery,
+} from '@/data/projects/org-projects-infinite-query'
+import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -61,9 +60,13 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: organization } = useSelectedOrganizationQuery()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
-  const { data: projects } = useProjectsQuery()
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
+
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const totalNumOrgProjects = projectsData?.pages[0].pagination.count ?? 0
+  const orgProjects =
+    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -75,6 +78,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     permissions ?? []
   )
   const cannotAddAnyRoles = orgScopedRoles.every((r) => !rolesAddable.includes(r.id))
+  const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [showProjectDropdown, setShowProjectDropdown] = useState(false)
@@ -83,16 +87,13 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   >([])
 
   const originalConfiguration =
-    allRoles !== undefined
-      ? formatMemberRoleToProjectRoleConfiguration(member, allRoles, projects ?? [])
-      : []
+    allRoles !== undefined ? formatMemberRoleToProjectRoleConfiguration(member, allRoles) : []
   const originalConfigurationType =
     originalConfiguration.length === 1 &&
     !!orgScopedRoles.find((r) => r.id === originalConfiguration[0].roleId)
       ? 'org-scope'
       : 'project-scope'
 
-  const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const isApplyingRoleToAllProjects =
     projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0]?.ref === undefined
   const canSaveRoles = projectsRoleConfiguration.length > 0
@@ -101,15 +102,16 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const noAccessProjects = orgProjects.filter((project) => {
     return !projectsRoleConfiguration.some((p) => p.ref === project.ref)
   })
-  const numberOfProjectsWithAccess = orgProjects.length - noAccessProjects.length
-  const numberOfAccessHasChanges = originalConfiguration.length !== noAccessProjects.length
-
+  const numberOfProjectsWithAccess = projectsRoleConfiguration.filter(
+    (p) => p.ref !== undefined
+  ).length
   const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
 
-  const onSelectProject = (ref: string) => {
+  const onSelectProject = (project: OrgProject) => {
     setProjectsRoleConfiguration(
       projectsRoleConfiguration.concat({
-        ref,
+        ref: project.ref,
+        name: project.name,
         roleId: lowerPermissionsRole ?? orgScopedRoles[0].id,
       })
     )
@@ -126,7 +128,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       setProjectsRoleConfiguration(
         projectsRoleConfiguration.map((p) => {
           if (p.ref === project.ref) {
-            return { ref: p.ref, projectId: p.projectId, roleId: Number(value) }
+            return { ref: p.ref, name: p.name, roleId: Number(value) }
           } else {
             return p
           }
@@ -144,7 +146,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       if (originalConfigurationType === 'org-scope') {
         setProjectsRoleConfiguration(originalConfiguration)
       } else {
-        setProjectsRoleConfiguration([{ ref: undefined, roleId: roleIdToApply }])
+        setProjectsRoleConfiguration([{ ref: undefined, name: undefined, roleId: roleIdToApply }])
       }
     } else {
       if (originalConfigurationType === 'project-scope') {
@@ -152,7 +154,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       } else {
         setProjectsRoleConfiguration(
           orgProjects.map((p) => {
-            return { ref: p.ref, projectId: p.id, roleId: roleIdToApply }
+            return { ref: p.ref, name: p.name, roleId: roleIdToApply }
           })
         )
       }
@@ -161,13 +163,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
   useEffect(() => {
     if (visible && isSuccessRoles) {
-      const roleConfiguration = formatMemberRoleToProjectRoleConfiguration(
-        member,
-        allRoles,
-        projects ?? []
-      )
+      const roleConfiguration = formatMemberRoleToProjectRoleConfiguration(member, allRoles)
       setProjectsRoleConfiguration(roleConfiguration)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isSuccessRoles])
 
   return (
@@ -176,21 +175,19 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
         <SheetContent
           showClose={false}
           size="default"
-          className={cn('bg-surface-200 p-0 flex flex-row gap-0 !min-w-[400px]')}
+          className="bg-surface-200 p-0 flex flex-row gap-0 md:w-[600px] lg:w-[600px] w-full"
         >
-          <div className={cn('flex flex-col grow w-full')}>
-            <SheetHeader
-              className={cn('py-3 flex flex-row justify-between gap-x-4 items-center border-b')}
-            >
+          <div className="flex flex-col grow w-full">
+            <SheetHeader className="py-3 flex flex-row justify-between gap-x-4 items-center border-b bg-transparent">
               <p className="truncate" title={`Manage access for ${member.username}`}>
                 Manage access for {member.username}
               </p>
-              <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
+              <DocsButton href={`${DOCS_URL}/guides/platform/access-control`} />
             </SheetHeader>
 
-            <SheetSection className="h-full overflow-auto flex flex-col gap-y-4">
+            <SheetSection className="h-full overflow-auto flex flex-col">
               {isOptedIntoProjectLevelPermissions && (
-                <div className="flex items-center gap-x-4">
+                <div className="flex items-center gap-x-4 border-b border-border pb-4">
                   <Switch
                     disabled={cannotAddAnyRoles}
                     checked={isApplyingRoleToAllProjects}
@@ -214,163 +211,161 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
               {!isApplyingRoleToAllProjects &&
                 projectsRoleConfiguration.length > 0 &&
-                projectsRoleConfiguration.length !== orgProjects.length && (
-                  <Alert_Shadcn_>
-                    <AlertTitle_Shadcn_>
-                      {numberOfAccessHasChanges
-                        ? `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
-                        : `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      {member.username} {numberOfAccessHasChanges ? 'will' : 'does'} not have access
-                      to the following {noAccessProjects.length} project
-                      {noAccessProjects.length > 1 ? 's' : ''}:
+                projectsRoleConfiguration.length < totalNumOrgProjects && (
+                  <Collapsible_Shadcn_ className="bg-alternative border rounded-lg py-4 group">
+                    <CollapsibleTrigger_Shadcn_ className="w-full text-left px-4 flex items-center justify-between">
+                      <span className="text-sm">
+                        {hasNoChanges
+                          ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
+                          : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
+                      </span>
+                      <ChevronDown size={14} className="transition group-data-open:-rotate-180" />
+                    </CollapsibleTrigger_Shadcn_>
+                    <CollapsibleContent_Shadcn_ className="text-foreground-light text-sm px-4">
+                      <p>
+                        {member.username} {hasNoChanges ? 'does' : 'will'} not have access to the
+                        following {noAccessProjects.length} project
+                        {noAccessProjects.length > 1 ? 's' : ''}:
+                      </p>
                       <ul className="list-disc pl-6">
                         {noAccessProjects.map((project) => {
-                          return <li key={project.id}>{project.name}</li>
+                          return <li key={project.ref}>{project.name}</li>
                         })}
                       </ul>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                    </CollapsibleContent_Shadcn_>
+                  </Collapsible_Shadcn_>
                 )}
 
-              <div className="flex flex-col gap-y-2">
-                {projectsRoleConfiguration
-                  .sort((a, b) => (a?.projectId ?? 0) - (b?.projectId ?? 0))
-                  .map((project) => {
-                    const name =
-                      project.ref === undefined
-                        ? 'All projects'
-                        : projects?.find((p) => p.ref === project.ref)?.name
-                    const role = orgScopedRoles.find((r) => {
-                      if (project.baseRoleId !== undefined) return r.id === project.baseRoleId
-                      else return r.id === project.roleId
-                    })
-                    const canRemoveRole = rolesRemovable.includes(role?.id ?? 0)
+              <div className="flex flex-col divide-y divide-border">
+                {projectsRoleConfiguration.map((project) => {
+                  const name = project.ref === undefined ? 'All projects' : project.name
+                  const role = orgScopedRoles.find((r) => {
+                    if (project.baseRoleId !== undefined) return r.id === project.baseRoleId
+                    else return r.id === project.roleId
+                  })
+                  const canRemoveRole = rolesRemovable.includes(role?.id ?? 0)
 
-                    return (
-                      <div
-                        key={`${project.ref}-${project.roleId}`}
-                        className="flex items-center justify-between"
-                      >
-                        <p className="text-sm">{name}</p>
+                  return (
+                    <div
+                      key={`${project.ref}-${project.roleId}`}
+                      className="flex items-center justify-between py-2"
+                    >
+                      <p className="text-sm">{name}</p>
 
-                        <div className="flex items-center gap-x-2">
-                          {cannotAddAnyRoles ? (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className="flex items-center justify-between rounded-md border border-button bg-button px-3 py-2 text-sm h-10 w-56 text-foreground-light">
-                                  {role?.name ?? 'Unknown'}
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom">
-                                Additional permissions required to update role
-                              </TooltipContent>
-                            </Tooltip>
-                          ) : (
-                            <Select_Shadcn_
-                              value={(project?.baseRoleId ?? project.roleId).toString()}
-                              onValueChange={(value) => onSelectRole(value, project)}
+                      <div className="flex items-center gap-x-2">
+                        {cannotAddAnyRoles ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center justify-between rounded-md border border-button bg-button px-3 py-2 text-sm h-10 w-56 text-foreground-light">
+                                {role?.name ?? 'Unknown'}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              Additional permissions required to update role
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <Select_Shadcn_
+                            value={(project?.baseRoleId ?? project.roleId).toString()}
+                            onValueChange={(value) => onSelectRole(value, project)}
+                          >
+                            <SelectTrigger_Shadcn_
+                              className={cn(
+                                ' w-40',
+                                role?.name === undefined && 'text-foreground-light'
+                              )}
                             >
-                              <SelectTrigger_Shadcn_
-                                className={cn(
-                                  'text-sm h-10 w-56',
-                                  role?.name === undefined && 'text-foreground-light'
-                                )}
-                              >
-                                {role?.name ?? 'Please select a role'}
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  {(orgScopedRoles ?? []).map((role) => {
-                                    const canAssignRole = rolesAddable.includes(role.id)
+                              {role?.name ?? 'Please select a role'}
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_ align="end">
+                              <SelectGroup_Shadcn_>
+                                {(orgScopedRoles ?? []).map((role) => {
+                                  const canAssignRole = rolesAddable.includes(role.id)
+                                  const isOwnerRole = role.name === 'Owner'
+                                  const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                                  const disabled = !canAssignRole || disabledForStripe
+                                  const disabledReason = disabledForStripe
+                                    ? 'Cannot be assigned in Stripe Projects organizations'
+                                    : !canAssignRole
+                                      ? 'Additional permissions required to assign role'
+                                      : undefined
 
-                                    return (
-                                      <SelectItem_Shadcn_
-                                        key={role.id}
-                                        value={role.id.toString()}
-                                        className="text-sm hover:bg-selection cursor-pointer"
-                                        disabled={!canAssignRole}
-                                      >
-                                        {role.name}
-                                      </SelectItem_Shadcn_>
-                                    )
-                                  })}
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
-                          )}
+                                  return (
+                                    <SelectItem_Shadcn_
+                                      key={role.id}
+                                      value={role.id.toString()}
+                                      className="text-sm hover:bg-selection cursor-pointer"
+                                      disabled={disabled}
+                                    >
+                                      <div className="flex flex-col gap-0.5">
+                                        <span>{role.name}</span>
+                                        {disabledReason && (
+                                          <span className="text-xs text-foreground-lighter">
+                                            {disabledReason}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </SelectItem_Shadcn_>
+                                  )
+                                })}
+                              </SelectGroup_Shadcn_>
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        )}
 
-                          {!isApplyingRoleToAllProjects && (
-                            <ButtonTooltip
-                              type="text"
-                              disabled={!canRemoveRole}
-                              className="px-1"
-                              icon={<X />}
-                              onClick={() => onRemoveProject(project?.ref)}
-                              tooltip={{
-                                content: {
-                                  side: 'bottom',
-                                  text: !canRemoveRole
-                                    ? 'Additional permission required to remove role from member'
-                                    : 'Remove access to project',
-                                },
-                              }}
-                            />
-                          )}
-                        </div>
+                        {!isApplyingRoleToAllProjects && (
+                          <ButtonTooltip
+                            type="text"
+                            disabled={!canRemoveRole}
+                            className="px-1"
+                            icon={<X />}
+                            onClick={() => onRemoveProject(project?.ref)}
+                            tooltip={{
+                              content: {
+                                side: 'bottom',
+                                text: !canRemoveRole
+                                  ? 'Additional permission required to remove role from member'
+                                  : 'Remove access to project',
+                              },
+                            }}
+                          />
+                        )}
                       </div>
-                    )
-                  })}
+                    </div>
+                  )
+                })}
               </div>
 
               {!isApplyingRoleToAllProjects && (
-                <Popover_Shadcn_
+                <OrganizationProjectSelector
                   open={showProjectDropdown}
-                  onOpenChange={setShowProjectDropdown}
-                  modal={false}
-                >
-                  <PopoverTrigger_Shadcn_ asChild>
+                  setOpen={setShowProjectDropdown}
+                  modal={true}
+                  onSelect={onSelectProject}
+                  renderTrigger={() => (
                     <Button type="default" className="w-min">
                       Add project
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-                    <Command_Shadcn_>
-                      <CommandInput_Shadcn_ placeholder="Find project..." />
-                      <CommandList_Shadcn_>
-                        <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
-                        <CommandGroup_Shadcn_>
-                          <ScrollArea className={(projects || []).length > 7 ? 'h-[210px]' : ''}>
-                            {orgProjects.map((project) => {
-                              const hasRoleAssigned = projectsRoleConfiguration.some(
-                                (p) => p.ref === project.ref
-                              )
-                              return (
-                                <CommandItem_Shadcn_
-                                  key={project.ref}
-                                  disabled={hasRoleAssigned}
-                                  className="cursor-pointer w-full justify-between"
-                                  onSelect={() => onSelectProject(project.ref)}
-                                  onClick={() => onSelectProject(project.ref)}
-                                >
-                                  <p className="truncate">{project.name}</p>
-                                  {hasRoleAssigned && (
-                                    <p className="w-[45%] text-right">Already assigned</p>
-                                  )}
-                                </CommandItem_Shadcn_>
-                              )
-                            })}
-                          </ScrollArea>
-                        </CommandGroup_Shadcn_>
-                      </CommandList_Shadcn_>
-                    </Command_Shadcn_>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  )}
+                  renderRow={(project) => {
+                    const hasRoleAssigned = projectsRoleConfiguration.some(
+                      (p) => p.ref === project.ref
+                    )
+                    return (
+                      <div className="w-full flex items-center justify-between">
+                        <span className="truncate">{project.name}</span>
+                        {hasRoleAssigned && <p className="w-[45%] text-right">Already assigned</p>}
+                      </div>
+                    )
+                  }}
+                  isOptionDisabled={(project) =>
+                    projectsRoleConfiguration.some((p) => p.ref === project.ref)
+                  }
+                />
               )}
             </SheetSection>
 
-            <SheetFooter className="flex items-center !justify-end px-5 py-4 w-full border-t">
+            <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
               <Button type="default" disabled={false} onClick={() => onClose()}>
                 Cancel
               </Button>

@@ -1,10 +1,9 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-
-import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { User } from 'data/auth/users-infinite-query'
-import { timeout } from 'lib/helpers'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useUserDeleteMutation } from '@/data/auth/user-delete-mutation'
+import { User } from '@/data/auth/users-infinite-query'
 
 interface DeleteUserModalProps {
   visible: boolean
@@ -21,7 +20,7 @@ export const DeleteUserModal = ({
 }: DeleteUserModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const { mutate: deleteUser, isLoading: isDeleting } = useUserDeleteMutation({
+  const { mutate: deleteUser, isPending: isDeleting } = useUserDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${selectedUser?.email}`)
       onDeleteSuccess?.()
@@ -29,7 +28,6 @@ export const DeleteUserModal = ({
   })
 
   const handleDeleteUser = async () => {
-    await timeout(200)
     if (!projectRef) return console.error('Project ref is required')
     if (selectedUser?.id === undefined) {
       return toast.error(`Failed to delete user: User ID not found`)

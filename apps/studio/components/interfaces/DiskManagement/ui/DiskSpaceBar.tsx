@@ -1,25 +1,25 @@
 import MotionNumber from '@number-flow/react'
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { UseFormReturn } from 'react-hook-form'
-
-import { useParams } from 'common'
-import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
-import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { GB } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import { useMemo } from 'react'
-import { badgeVariants, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { UseFormReturn } from 'react-hook-form'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
+import { useDiskBreakdownQuery } from '@/data/config/disk-breakdown-query'
+import { useDiskUtilizationQuery } from '@/data/config/disk-utilization-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { GB } from '@/lib/constants'
+import { formatBytes } from '@/lib/helpers'
 
 interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
 }
 
-export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
+export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { formState, watch } = form
@@ -84,7 +84,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
           {usedSizeTotal.toFixed(2)}
           <span>GB used of </span>
-          <span className="text-foreground font-semibold -mt-[2px]">
+          <span className="text-foreground font-semibold mt-[-2px]">
             <MotionNumber value={newTotalSize} style={{ lineHeight: 0.8 }} className="font-mono" />
           </span>{' '}
           GB
@@ -93,8 +93,8 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
       <div className="relative">
         <div
           className={cn(
-            'h-[35px] relative border rounded-sm w-full transition',
-            showNewSize ? 'bg-selection border border-brand-button' : 'bg-surface-300'
+            'h-[35px] relative border rounded-xs w-full transition overflow-visible',
+            showNewSize ? 'bg-selection border border-brand' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>
@@ -105,7 +105,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
               exit={{ rotateY: -90, zIndex: 2 }}
               transition={{ duration: 0.3 }}
               style={{ transformOrigin: 'left center', backfaceVisibility: 'hidden' }}
-              className="absolute inset-0 rounded-sm overflow-hidden"
+              className="absolute inset-0 rounded-xs overflow-hidden"
             >
               <div className="h-full flex">
                 <div
@@ -129,7 +129,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                 </div>
 
                 <div
-                  className="relative overflow-hidden transition-all duration-500 ease-in-out bg-_secondary"
+                  className="relative overflow-hidden transition-all duration-500 ease-in-out bg-[hsl(var(--secondary-default))]"
                   style={{
                     width: `${showNewSize ? newUsedPercentageWAL : usedPercentageWAL}%`,
                   }}
@@ -155,15 +155,15 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
           </AnimatePresence>
           <AnimatePresence>
             {showNewSize && (
-              <motion.span
+              <motion.div
                 initial={{ opacity: 0, x: 4 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 4 }}
                 transition={{ duration: 0.12, delay: 0.12 }}
-                className={cn(badgeVariants({ variant: 'success' }), 'absolute right-1 top-[5px]')}
+                className="absolute right-2 top-0 flex items-center h-full"
               >
-                New disk size
-              </motion.span>
+                <Badge variant="success">New disk size</Badge>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
@@ -175,15 +175,15 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.1 }}
-              className="absolute h-8 w-full -mx-[2px]"
+              className="absolute h-8 w-full mx-[-2px]"
             >
               <div
-                className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
+                className="absolute top-0 left-0 h-full flex items-center transition-all duration-500 ease-in-out"
                 style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
               >
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
+                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded-sm text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
                       Autoscaling <Info size={12} />
                     </div>
                   </TooltipTrigger>
@@ -191,10 +191,10 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                     <p>
                       Supabase expands your disk storage automatically when the database reached 90%
                       of the disk size. However, any disk modifications, including auto-scaling, can
-                      only take place once every 6 hours.
+                      only take place once every 4 hours.
                     </p>
                     <p>
-                      If within those 6 hours you reach 95% of the disk space, your project{' '}
+                      If within those 4 hours you reach 95% of the disk space, your project{' '}
                       <span className="text-destructive-600">will enter read-only mode.</span>
                     </p>
                   </TooltipContent>
@@ -216,7 +216,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
           <LegendItem
             name="WAL"
             size={diskBreakdownBytes.walSizeBytes}
-            color="bg-_secondary"
+            color="bg-[hsl(var(--secondary-default))]"
             description="Total space on disk used by the write-ahead log."
           />
 

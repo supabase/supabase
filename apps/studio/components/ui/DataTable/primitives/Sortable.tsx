@@ -29,11 +29,11 @@ import {
   type SortableContextProps,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Slot, type SlotProps } from '@radix-ui/react-slot'
+import { Slot } from 'radix-ui'
 import { createContext, forwardRef, useContext, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-
 import { Button, cn, type ButtonProps } from 'ui'
+
 import { composeRefs } from '../hooks/useComposedRefs'
 
 const orientationConfig = {
@@ -120,7 +120,7 @@ interface SortableProps<TData extends { id: UniqueIdentifier }> extends DndConte
   overlay?: React.ReactNode | null
 }
 
-function Sortable<TData extends { id: UniqueIdentifier }>({
+export function Sortable<TData extends { id: UniqueIdentifier }>({
   value,
   onValueChange,
   onDragStart,
@@ -202,7 +202,7 @@ interface SortableOverlayProps extends React.ComponentPropsWithRef<typeof DragOv
   activeId?: UniqueIdentifier | null
 }
 
-const SortableOverlay = forwardRef<HTMLDivElement, SortableOverlayProps>(
+export const SortableOverlay = forwardRef<HTMLDivElement, SortableOverlayProps>(
   ({ activeId, dropAnimation = dropAnimationOpts, children, ...props }, ref) => {
     return (
       <DragOverlay dropAnimation={dropAnimation} {...props}>
@@ -239,7 +239,7 @@ function useSortableItem() {
   return context
 }
 
-interface SortableItemProps extends SlotProps {
+interface SortableItemProps extends Slot.SlotProps {
   /**
    * The unique identifier of the item.
    * @example "item-1"
@@ -262,7 +262,7 @@ interface SortableItemProps extends SlotProps {
   asChild?: boolean
 }
 
-const SortableItem = forwardRef<HTMLDivElement, SortableItemProps>(
+export const SortableItem = forwardRef<HTMLDivElement, SortableItemProps>(
   ({ value, asTrigger, asChild, className, ...props }, ref) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
       id: value,
@@ -282,7 +282,7 @@ const SortableItem = forwardRef<HTMLDivElement, SortableItemProps>(
       transition,
     }
 
-    const Comp = asChild ? Slot : 'div'
+    const Comp = asChild ? Slot.Slot : 'div'
 
     return (
       <SortableItemContext.Provider value={context}>
@@ -309,7 +309,7 @@ interface SortableDragHandleProps extends ButtonProps {
   withHandle?: boolean
 }
 
-const SortableDragHandle = forwardRef<HTMLButtonElement, SortableDragHandleProps>(
+export const SortableDragHandle = forwardRef<HTMLButtonElement, SortableDragHandleProps>(
   ({ className, ...props }, ref) => {
     const { attributes, listeners, isDragging } = useSortableItem()
 
@@ -326,5 +326,3 @@ const SortableDragHandle = forwardRef<HTMLButtonElement, SortableDragHandleProps
   }
 )
 SortableDragHandle.displayName = 'SortableDragHandle'
-
-export { Sortable, SortableDragHandle, SortableItem, SortableOverlay }

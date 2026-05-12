@@ -1,13 +1,13 @@
 'use client'
 
-import * as Accordion from '@radix-ui/react-accordion'
+import { usePathname } from 'next/navigation'
+import { Accordion } from 'radix-ui'
+import { PropsWithChildren } from 'react'
 
 import { type NavMenuSection } from '../Navigation.types'
+import { MenuId } from './NavigationMenu'
 import * as NavItems from './NavigationMenu.constants'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
-import { usePathname } from 'next/navigation'
-import { PropsWithChildren } from 'react'
-import { MenuId } from './NavigationMenu'
 
 const NavigationMenuGuideList = ({
   id,
@@ -94,7 +94,7 @@ export function NavigationMenuGuideListWrapper({
       key={id}
       type="single"
       value={firstLevelRoute}
-      className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150"
+      className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150 w-full"
     >
       {children}
     </Accordion.Root>

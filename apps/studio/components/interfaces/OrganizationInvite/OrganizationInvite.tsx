@@ -1,36 +1,91 @@
-import { CheckSquare } from 'lucide-react'
+import { useIsLoggedIn, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import type { ReactNode } from 'react'
 import { toast } from 'sonner'
+import { Button, Card, CardContent } from 'ui'
+import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
-import { useParams } from 'common'
-import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
-import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
-import { useProfile } from 'lib/profile'
-import { ResponseError } from 'types'
-import { Button, Loading, cn } from 'ui'
 import { OrganizationInviteError } from './OrganizationInviteError'
+import {
+  InterstitialAccountRow,
+  InterstitialLayout,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
+import { useOrganizationAcceptInvitationMutation } from '@/data/organization-members/organization-invitation-accept-mutation'
+import { useOrganizationInvitationTokenQuery } from '@/data/organization-members/organization-invitation-token-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useProfile, useProfileNameAndPicture } from '@/lib/profile'
 
 export const OrganizationInvite = () => {
   const router = useRouter()
-  const { profile } = useProfile()
-  const { slug, token, name } = useParams()
+  const isLoggedIn = useIsLoggedIn()
+  const { profile, isLoading: isLoadingProfile } = useProfile()
+  const { username, avatarUrl, primaryEmail } = useProfileNameAndPicture()
+  const { slug, token } = useParams()
 
-  const { data, error, isSuccess, isError, isLoading } = useOrganizationInvitationTokenQuery(
+  const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
+
+  const {
+    data,
+    error,
+    isSuccess: isSuccessInvitation,
+    isError: isErrorInvitation,
+    isPending: isLoadingInvitation,
+  } = useOrganizationInvitationTokenQuery(
     { slug, token },
     {
       retry: false,
       refetchOnWindowFocus: false,
+      enabled: !!profile && !!slug && !!token,
     }
   )
+  const inviteIsNoLongerValid =
+    error?.code === 401 && error?.message.includes('Failed to retrieve organization')
+  const inviteIsInvalid =
+    (isSuccessInvitation && !!data?.token_does_not_exist) ||
+    (isErrorInvitation && error?.code === 404)
   const hasError =
-    isError || (isSuccess && (data.token_does_not_exist || data.expired_token || !data.email_match))
-  const isNotSignedInError = error?.message.includes('No authorization token was found')
+    isErrorInvitation ||
+    (isSuccessInvitation && (data.token_does_not_exist || data.expired_token || !data.email_match))
 
-  const organizationName = isSuccess ? data?.organization_name : 'an organization'
+  const isWrongAccount = isSuccessInvitation && !!data && !data.email_match
+  const showOrganizationHeader =
+    isSuccessInvitation &&
+    !!data &&
+    !data.token_does_not_exist &&
+    !data.expired_token &&
+    !isWrongAccount
+  const organizationName = data?.organization_name ?? 'an organization'
+  const isSignedOut = !isLoggedIn || (!profile && !isLoadingProfile)
+  const isInvitationLoading =
+    !isSignedOut && (isLoadingProfile || isLoadingInvitation || !router.isReady)
   const loginRedirectLink = `/sign-in?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
+  const signupRedirectLink = `/sign-up?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
+  const interstitialTitle = inviteIsNoLongerValid
+    ? 'Invite no longer available'
+    : isSignedOut
+      ? 'View invitation'
+      : isWrongAccount
+        ? 'Wrong account'
+        : inviteIsInvalid
+          ? 'Invite invalid'
+          : isErrorInvitation
+            ? 'Unable to load invitation'
+            : data?.expired_token
+              ? 'Invite expired'
+              : showOrganizationHeader
+                ? `Join ${organizationName}`
+                : undefined
+  const interstitialDescription = showOrganizationHeader
+    ? isSignedOut
+      ? `Sign in${isSignUpEnabled ? ' or create an account' : ''} to view this invitation`
+      : 'You have been invited to join this Supabase organization'
+    : isSignedOut
+      ? `Sign in${isSignUpEnabled ? ' or create an account' : ''} to view this invitation`
+      : undefined
 
-  const { mutate: joinOrganization, isLoading: isJoining } =
+  const { mutate: joinOrganization, isPending: isJoining } =
     useOrganizationAcceptInvitationMutation({
       onSuccess: () => {
         router.push('/organizations')
@@ -46,58 +101,107 @@ export const OrganizationInvite = () => {
     joinOrganization({ slug, token })
   }
 
-  return (
-    <Loading active={profile !== undefined && isLoading}>
-      <div className="flex flex-col gap-2 px-6 py-8">
-        <p className="text-sm text-foreground">You have been invited to join </p>
-        <p className="text-3xl text-foreground">{organizationName}</p>
-        {isSuccess && slug && (
-          <p className="text-xs text-foreground-lighter">{`organization slug: ${slug}`}</p>
+  const withLayout = (children: ReactNode) => (
+    <InterstitialLayout
+      logo={<SupabaseLogo />}
+      title={
+        isInvitationLoading ? (
+          <ShimmeringLoader className="mx-auto h-7 w-36 max-w-full py-0" />
+        ) : interstitialTitle ? (
+          interstitialTitle
+        ) : undefined
+      }
+      description={
+        isInvitationLoading ? (
+          <ShimmeringLoader className="mx-auto h-4 w-48 max-w-full py-0" />
+        ) : interstitialDescription ? (
+          interstitialDescription
+        ) : undefined
+      }
+      titleClassName="text-xl"
+    >
+      <div className="px-6 pb-6">{children}</div>
+    </InterstitialLayout>
+  )
+
+  if (isSignedOut) {
+    return withLayout(
+      <div className="flex flex-col gap-2">
+        <Button asChild type="primary" block>
+          <Link href={loginRedirectLink}>Sign in</Link>
+        </Button>
+        {isSignUpEnabled && (
+          <Button asChild type="default" block>
+            <Link href={signupRedirectLink}>Create an account</Link>
+          </Button>
         )}
       </div>
+    )
+  }
 
-      <div className={cn('border-t border-muted', hasError ? 'bg-alternative' : 'bg-transparent')}>
-        {profile === undefined && (
-          <div className="flex flex-col gap-3 py-4">
-            <p className="text-xs text-foreground-lighter">
-              You will need to sign in to accept this invitation
-            </p>
-            <div className="flex justify-center gap-3">
-              <Button asChild type="default">
-                <Link href={loginRedirectLink}>Sign in</Link>
-              </Button>
-              <Button asChild type="default">
-                <Link href={loginRedirectLink}>Create an account</Link>
-              </Button>
+  if (isInvitationLoading) {
+    return withLayout(
+      <div className="flex flex-col gap-6">
+        <Card className="shadow-none">
+          <CardContent className="flex items-center gap-3 border-none px-4 py-3">
+            <ShimmeringLoader className="size-8 flex-shrink-0 rounded-full py-0" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <ShimmeringLoader className="h-3 w-20 py-0" />
+              <ShimmeringLoader className="h-4 w-40 max-w-full py-0" />
             </div>
-          </div>
-        )}
-        <div className={cn('flex flex-col gap-4', !isLoading && !hasError && 'px-6 py-4')}>
-          {hasError && !isNotSignedInError && (
-            <OrganizationInviteError
-              data={data}
-              error={error as unknown as ResponseError}
-              isError={isError}
-            />
-          )}
-          {isSuccess && !hasError && (
-            <div className="flex flex-row items-center justify-center gap-3">
-              <Button type="default" disabled={isJoining} asChild>
-                <Link href="/projects">Decline</Link>
-              </Button>
-              <Button
-                type="primary"
-                loading={isJoining}
-                disabled={isJoining}
-                onClick={handleJoinOrganization}
-                icon={<CheckSquare />}
-              >
-                Join organization
-              </Button>
-            </div>
-          )}
+          </CardContent>
+        </Card>
+        <div className="flex flex-col gap-2">
+          <ShimmeringLoader className="h-10 w-full py-0" />
+          <ShimmeringLoader className="h-10 w-full py-0" />
         </div>
       </div>
-    </Loading>
+    )
+  }
+
+  if (inviteIsNoLongerValid) {
+    return withLayout(
+      <div className="flex flex-col gap-3">
+        <Admonition
+          type="warning"
+          description="This invite has already been accepted or declined."
+        />
+        <Button type="default" block asChild>
+          <Link href="/">Back to dashboard</Link>
+        </Button>
+      </div>
+    )
+  }
+
+  if (hasError) {
+    return withLayout(
+      <OrganizationInviteError
+        data={data}
+        error={error}
+        isError={isErrorInvitation}
+        isInvalidInvite={inviteIsInvalid}
+      />
+    )
+  }
+
+  return withLayout(
+    <div className="flex flex-col gap-6">
+      <InterstitialAccountRow avatarUrl={avatarUrl} displayName={primaryEmail ?? username ?? ''} />
+
+      <div className="flex flex-col gap-2">
+        <Button
+          type="primary"
+          block
+          loading={isJoining}
+          disabled={isJoining}
+          onClick={handleJoinOrganization}
+        >
+          Accept invite
+        </Button>
+        <Button asChild type="text" block>
+          <Link href="/projects">Decline</Link>
+        </Button>
+      </div>
+    </div>
   )
 }

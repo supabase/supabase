@@ -1,14 +1,14 @@
+import { getEntityDefinitionsSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
+// import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
+import { IS_PLATFORM } from 'common'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
-// import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
-import { IS_PLATFORM } from 'common'
-import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
-import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
-import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { getDatabaseFunctions } from '@/data/database-functions/database-functions-query'
+import { getDatabasePolicies } from '@/data/database-policies/database-policies-query'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeQuery } from '@/lib/api/self-hosted/query'
 
 export const getFallbackTools = ({
   projectRef,
@@ -37,7 +37,7 @@ export const getFallbackTools = ({
       }),
       execute: async ({ schemas }) => {
         try {
-          const result = includeSchemaMetadata
+          const { result } = includeSchemaMetadata
             ? await executeSql(
                 {
                   projectRef,
@@ -46,7 +46,7 @@ export const getFallbackTools = ({
                 },
                 undefined,
                 headers,
-                IS_PLATFORM ? undefined : queryPgMetaSelfHosted
+                IS_PLATFORM ? undefined : executeQuery
               )
             : { result: [] }
 
@@ -370,8 +370,10 @@ export const getFallbackTools = ({
               )
             : []
 
+          const dataArray = Array.isArray(data) ? data : []
+
           // Filter functions by requested schemas
-          const filteredFunctions = data.filter((func) => schemas.includes(func.schema))
+          const filteredFunctions = dataArray.filter((func) => schemas.includes(func.schema))
 
           const formattedFunctions = filteredFunctions
             .map(

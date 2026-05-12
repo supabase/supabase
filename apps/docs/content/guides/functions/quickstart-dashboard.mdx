@@ -27,7 +27,7 @@ You'll need a Supabase project to get started. If you don't have one yet, create
 
 Navigate to your Supabase project dashboard and locate the Edge Functions section:
 
-1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
+1. Go to your [Supabase Dashboard](/dashboard)
 2. Select your project
 3. In the left sidebar, click on **Edge Functions**
 
@@ -45,7 +45,9 @@ Click the **"Deploy a new function"** button and select **"Via Editor"** to crea
     light: '/docs/img/guides/functions/dashboard/create-edge-function--light.png',
     dark: '/docs/img/guides/functions/dashboard/create-edge-function--dark.png',
   }}
-  zoomable
+
+width={2338}
+height={926}
 />
 
 <Admonition type="note" label="Pre-built templates">
@@ -68,7 +70,9 @@ The dashboard will load your chosen template in the code editor. Here's what the
     light: '/docs/img/guides/functions/dashboard/edge-function-template--light.png',
     dark: '/docs/img/guides/functions/dashboard/edge-function-template--dark.png',
   }}
-  zoomable
+
+width={2430}
+height={1248}
 />
 
 If needed, you can modify this code directly in the browser editor. The function accepts a JSON payload with a `name` field and returns a greeting message.
@@ -109,7 +113,9 @@ Click **"Send Request"** to test your function.
     light: '/docs/img/guides/functions/dashboard/edge-function-test--light.png',
     dark: '/docs/img/guides/functions/dashboard/edge-function-test--dark.png',
   }}
-  zoomable
+
+width={2430}
+height={1350}
 />
 
 In this example, we successfully tested our Hello World function by sending a JSON payload with a name field, and received the expected greeting message back.
@@ -126,8 +132,8 @@ https://YOUR_PROJECT_ID.supabase.co/functions/v1/hello-world
 
 To invoke this Edge Function from within your application, you'll need API keys. Navigate to **Settings > API Keys** in your dashboard to find:
 
-- **Anon Key** - For client-side requests (safe to use in browsers with RLS enabled)
-- **Service Role Key** - For server-side requests (keep this secret! bypasses RLS)
+- **Publishable Keys** - For client-side requests (safe to use in browsers with RLS enabled)
+- **Secret Keys** - For server-side requests (keep this secret! bypasses RLS)
 
 ---
 
@@ -157,7 +163,7 @@ Now that your function is deployed, you can invoke it from within your app:
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://[YOUR_PROJECT_ID].supabase.co', 'YOUR_ANON_KEY')
+const supabase = createClient('https://[YOUR_PROJECT_ID].supabase.co', 'YOUR_PUBLISHABLE_KEY')
 
 const { data, error } = await supabase.functions.invoke('hello-world', {
   body: { name: 'JavaScript' },
@@ -174,7 +180,7 @@ console.log(data) // { message: "Hello JavaScript!" }
 const response = await fetch('https://[YOUR_PROJECT_ID].supabase.co/functions/v1/hello-world', {
   method: 'POST',
   headers: {
-    Authorization: 'Bearer YOUR_ANON_KEY',
+    Authorization: 'Bearer YOUR_PUBLISHABLE_KEY',
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({ name: 'Fetch' }),
@@ -202,7 +208,9 @@ Go to your project > **Deploy a new function** > **Via AI Assistant**.
     light: '/docs/img/guides/functions/dashboard/create-ai-edge-function--light.png',
     dark: '/docs/img/guides/functions/dashboard/create-ai-edge-function--dark.png',
   }}
-  zoomable
+
+width={2604}
+height={926}
 />
 
 Describe what you want your function to do in the prompt
@@ -213,7 +221,9 @@ Describe what you want your function to do in the prompt
     light: '/docs/img/guides/functions/dashboard/ai-edge-function--light.png',
     dark: '/docs/img/guides/functions/dashboard/ai-edge-function--dark.png',
   }}
-  zoomable
+
+width={2768}
+height={1836}
 />
 
 Click **Deploy** and the Assistant will create and deploy the function for you.

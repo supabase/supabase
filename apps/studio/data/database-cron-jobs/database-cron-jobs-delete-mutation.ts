@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { databaseCronJobsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseCronJobDeleteVariables = {
   projectRef: string
@@ -20,7 +21,7 @@ export async function deleteDatabaseCronJob({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT cron.unschedule(${jobId});`,
+    sql: safeSql`SELECT cron.unschedule(${literal(jobId)});`,
     queryKey: databaseCronJobsKeys.delete(),
   })
 
@@ -34,29 +35,31 @@ export const useDatabaseCronJobDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseCronJobDeleteData, ResponseError, DatabaseCronJobDeleteVariables>,
+  UseCustomMutationOptions<
+    DatabaseCronJobDeleteData,
+    ResponseError,
+    DatabaseCronJobDeleteVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseCronJobDeleteData, ResponseError, DatabaseCronJobDeleteVariables>(
-    (vars) => deleteDatabaseCronJob(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, searchTerm } = variables
-        await queryClient.invalidateQueries(
-          databaseCronJobsKeys.listInfinite(projectRef, searchTerm)
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete database cron job: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseCronJobDeleteData, ResponseError, DatabaseCronJobDeleteVariables>({
+    mutationFn: (vars) => deleteDatabaseCronJob(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, searchTerm } = variables
+      await queryClient.invalidateQueries({
+        queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete database cron job: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

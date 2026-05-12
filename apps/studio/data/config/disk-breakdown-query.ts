@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useQuery } from '@tanstack/react-query'
 
-import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DiskBreakdownVariables = {
   projectRef?: string
@@ -25,7 +26,7 @@ export async function getDiskBreakdown(
     {
       projectRef,
       connectionString,
-      sql: `
+      sql: safeSql`
     SELECT
   (
     SELECT
@@ -50,10 +51,14 @@ export type DiskBreakdownError = ResponseError
 
 export const useDiskBreakdownQuery = <TData = DiskBreakdownData>(
   { projectRef, connectionString }: DiskBreakdownVariables,
-  { enabled = true, ...options }: UseQueryOptions<DiskBreakdownData, DiskBreakdownError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DiskBreakdownData, DiskBreakdownError, TData> = {}
 ) =>
-  useQuery<DiskBreakdownData, DiskBreakdownError, TData>(
-    configKeys.diskBreakdown(projectRef),
-    ({ signal }) => getDiskBreakdown({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DiskBreakdownData, DiskBreakdownError, TData>({
+    queryKey: configKeys.diskBreakdown(projectRef),
+    queryFn: ({ signal }) => getDiskBreakdown({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

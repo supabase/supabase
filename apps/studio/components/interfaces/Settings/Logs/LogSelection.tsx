@@ -1,21 +1,21 @@
-import { Check, Clipboard, MousePointerClick, X } from 'lucide-react'
+import { Check, Copy, MousePointerClick, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
-  CodeBlock,
+  cn,
+  copyToClipboard,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
-  copyToClipboard,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+
 import type { LogData, QueryType } from './Logs.types'
-import { jwtAPIKey, apiKey, role as extractRole } from './Logs.utils'
+import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
+import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -87,8 +87,8 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   }
 
   return (
-    <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100 border-t">
-      <div className="relative flex-grow flex flex-col h-full">
+    <div className="relative flex h-full grow flex-col overflow-y-scroll bg-surface-100 border-t">
+      <div className="relative grow flex flex-col h-full">
         <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full">
           <TabsList_Shadcn_ className="px-2 pt-2 relative">
             <TabsTrigger_Shadcn_ className="px-3" value="details">
@@ -97,26 +97,23 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
             <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
               Raw
             </TabsTrigger_Shadcn_>
+
             <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
               <ButtonTooltip
                 disabled={!log || isLoading}
                 type="text"
                 tooltip={{
                   content: {
+                    side: 'left',
                     text: isLoading ? 'Loading log...' : 'Copy as JSON',
                   },
                 }}
+                icon={showCopied ? <Check /> : <Copy />}
                 onClick={() => {
                   setShowCopied(true)
                   copyToClipboard(JSON.stringify(log, null, 2))
                 }}
-              >
-                {showCopied ? (
-                  <Check size={14} strokeWidth={2} />
-                ) : (
-                  <Clipboard size={14} strokeWidth={2} />
-                )}
-              </ButtonTooltip>
+              />
 
               <Button type="text" onClick={onClose}>
                 <X size={14} strokeWidth={2} />
@@ -171,7 +168,7 @@ function LogDetailEmptyState({
           'flex w-full max-w-sm flex-col items-center justify-center gap-6 text-center transition-all delay-300 duration-500'
         )}
       >
-        <div className="relative flex h-4 w-32 items-center rounded border border-control px-2">
+        <div className="relative flex h-4 w-32 items-center rounded-sm border border-control px-2">
           <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
           <div className="absolute right-1 -bottom-4">
             <MousePointerClick size="24" strokeWidth={1} />

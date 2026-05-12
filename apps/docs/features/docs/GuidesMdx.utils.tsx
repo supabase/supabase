@@ -1,21 +1,25 @@
-import * as Sentry from '@sentry/nextjs'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { gfmFromMarkdown } from 'mdast-util-gfm'
-import { gfm } from 'micromark-extension-gfm'
-import { type Metadata, type ResolvingMetadata } from 'next'
-import { notFound } from 'next/navigation'
 import { readdir } from 'node:fs/promises'
 import { extname, join, relative, sep } from 'node:path'
-
+import * as Sentry from '@sentry/nextjs'
 import { extractMessageFromAnyError, FileNotFoundError } from '~/app/api/utils'
 import { pluckPromise } from '~/features/helpers.fn'
 import { cache_fullProcess_withDevCacheBust, existsFile } from '~/features/helpers.fs'
 import type { OrPromise } from '~/features/helpers.types'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { gfmFromMarkdown } from 'mdast-util-gfm'
+import { gfm } from 'micromark-extension-gfm'
+import { type Metadata, type ResolvingMetadata } from 'next'
+import { notFound } from 'next/navigation'
+
 import { newEditLink } from './GuidesMdx.template'
+import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
+
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 const PUBLISHED_SECTIONS = [
   'ai',
@@ -42,6 +46,8 @@ const PUBLISHED_SECTIONS = [
 const getGuidesMarkdownInternal = async (slug: string[]) => {
   const relPath = slug.join(sep).replace(/\/$/, '')
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
+  const guidesPath = `/guides/${slug.join('/')}`
+
   /**
    * SAFETY CHECK:
    * Prevent accessing anything outside of published sections and GUIDES_DIRECTORY
@@ -50,6 +56,15 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
     !fullPath.startsWith(GUIDES_DIRECTORY) ||
     !PUBLISHED_SECTIONS.some((section) => relPath.startsWith(section))
   ) {
+    notFound()
+  }
+
+  /**
+   * DISABLED PAGE CHECK:
+   * Check if this page is disabled in the navigation configuration
+   */
+  if (!checkGuidePageEnabled(guidesPath)) {
+    console.log('Page is disabled: %s', guidesPath)
     notFound()
   }
 
@@ -121,12 +136,25 @@ const genGuidesStaticParams = (directory?: string) => async () => {
           )
       )
 
+  // Flattening earlier will not work because there is nothing to flatten
+  // until the promises resolve.
+  const allParams = (await Promise.all(promises)).flat()
+
   /**
-   * Flattening earlier will not work because there is nothing to flatten
-   * until the promises resolve.
+   * Filter out disabled pages from static generation
    */
-  const result = (await Promise.all(promises)).flat()
-  return result
+  const enabledParams = allParams.filter((param) => {
+    const guidesPath = `/guides/${directory ? `${directory}/` : ''}${param.slug.join('/')}`
+    const isEnabled = checkGuidePageEnabled(guidesPath)
+
+    if (!isEnabled) {
+      console.log('Excluding disabled page from static generation: %s', guidesPath)
+    }
+
+    return isEnabled
+  })
+
+  return enabledParams
 }
 
 const genGuideMeta =
@@ -145,12 +173,16 @@ const genGuideMeta =
     const ogType = pathname.split('/')[2]
 
     return {
-      title: `${meta.title} | Supabase Docs`,
+      title: `${meta.title} | ${metadataTitle || 'Supabase'}`,
       description: meta.description || meta.subtitle,
       // @ts-ignore
       alternates: {
         ...parentAlternates,
         canonical: meta.canonical || `${BASE_PATH}${pathname}`,
+        types: {
+          ...(parentAlternates?.types ?? {}),
+          'text/markdown': `${BASE_PATH}${pathname}.md`,
+        },
       },
       openGraph: {
         ...parentOg,

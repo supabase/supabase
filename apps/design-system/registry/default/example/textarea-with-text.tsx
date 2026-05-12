@@ -1,5 +1,4 @@
-import { Textarea } from 'ui'
-import { Label_Shadcn_ } from 'ui'
+import { Label_Shadcn_, Textarea } from 'ui'
 
 export default function TextareaWithText() {
   return (

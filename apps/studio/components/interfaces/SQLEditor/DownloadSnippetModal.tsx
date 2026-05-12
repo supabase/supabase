@@ -1,18 +1,20 @@
+import type { ModalProps } from '@ui/components/Modal/Modal'
 import { snakeCase } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { Button, Modal, Tabs } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import type { ModalProps } from '@ui/components/Modal/Modal'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { Button, CodeBlock, Modal, Tabs } from 'ui'
 import { Markdown } from '../Markdown'
 import {
   generateFileCliCommand,
   generateMigrationCliCommand,
   generateSeedCliCommand,
 } from './SQLEditor.utils'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
+import { DOCS_URL } from '@/lib/constants'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export interface DownloadSnippetModalProps extends ModalProps {
   id: string
@@ -67,12 +69,12 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
           {SNIPPETS.map((snippet) => {
             return (
               <Tabs.Panel key={snippet.id} id={snippet.id} label={snippet.label}>
-                <Modal.Content className="!py-0">
+                <Modal.Content className="py-0!">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex flex-col gap-y-1">
                       <p className="text-base">{snippet.title}</p>
                       <Markdown
-                        className="text-sm text-scale-1000 [&>p>code]:!break-normal"
+                        className="text-sm text-scale-1000 [&>p>code]:break-normal!"
                         content={snippet.description}
                       />
                     </div>
@@ -104,7 +106,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
           <div className="flex justify-between items-center gap-x-2">
             <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
-                href="https://supabase.com/docs/guides/deployment/database-migrations"
+                href={`${DOCS_URL}/guides/deployment/database-migrations`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -114,7 +116,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
 
             <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
-                href="https://supabase.com/docs/guides/cli/local-development"
+                href={`${DOCS_URL}/guides/cli/local-development`}
                 target="_blank"
                 rel="noreferrer"
               >

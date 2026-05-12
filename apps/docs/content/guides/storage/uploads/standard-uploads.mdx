@@ -48,6 +48,7 @@ async function uploadFile(file) {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -58,6 +59,8 @@ Future<void> uploadFile(File file) async {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -70,6 +73,8 @@ try await supabase.storage.from("bucket_name").upload(path: "file_path", file: f
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -80,10 +85,23 @@ supabase.storage.from("bucket_name").upload("file_path", file)
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
 response = supabase.storage.from_('bucket_name').upload('file_path', file)
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}" \
+  --data-binary "@/local/path/to/your/file.ext"
 ```
 
 </TabPanel>
@@ -117,6 +135,7 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -128,6 +147,8 @@ await supabase.storage.from('bucket_name').upload(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -147,6 +168,8 @@ try await supabase.storage.from("bucket_name")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -156,12 +179,26 @@ supabase.storage.from("bucket_name").upload("file_path", bytes) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
 response = supabase.storage.from_('bucket_name').upload('file_path', file, {
   'upsert': 'true',
 })
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}" \
+  -H "x-upsert: true" \
+  --data-binary "@/local/path/to/your/file.ext"
 ```
 
 </TabPanel>
@@ -197,6 +234,7 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -208,6 +246,8 @@ await supabase.storage.from('bucket_name').upload(
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -227,6 +267,8 @@ try await supabase.storage.from("bucket_name")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -236,12 +278,26 @@ supabase.storage.from("bucket_name").upload("file_path", bytes) {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
 response = supabase.storage.from_('bucket_name').upload('file_path', file, {
   'content-type': 'image/jpeg',
 })
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}" \
+  -H "Content-Type: {Content-Type}" \
+  --data-binary "@/local/path/to/your/file.ext"
 ```
 
 </TabPanel>

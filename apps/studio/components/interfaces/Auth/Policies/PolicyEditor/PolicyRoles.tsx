@@ -1,11 +1,17 @@
-import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
-import AlertError from 'components/ui/AlertError'
-
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { sortBy } from 'lodash'
-import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { SYSTEM_ROLES } from '@/components/interfaces/Database/Roles/Roles.constants'
+import AlertError from '@/components/ui/AlertError'
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PolicyRolesProps {
   selectedRoles: string[]
@@ -13,9 +19,15 @@ interface PolicyRolesProps {
 }
 type SystemRole = (typeof SYSTEM_ROLES)[number]
 
-const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
+export const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data, error, isLoading, isError, isSuccess } = useDatabaseRolesQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -34,7 +46,7 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
   })
 
   return (
-    <div className="flex flex-col md:flew-row gap-4 md:gap-12">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-12">
       <div className="flex md:w-1/3 flex-col space-y-2">
         <label className="text-foreground-light text-base" htmlFor="policy-name">
           Target roles
@@ -45,17 +57,30 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
         {isLoading && <ShimmeringLoader className="py-4" />}
         {isError && <AlertError error={error as any} subject="Failed to retrieve database roles" />}
         {isSuccess && (
-          <MultiSelect
-            options={formattedRoles}
-            value={selectedRoles}
-            placeholder="Defaults to all (public) roles if none selected"
-            searchPlaceholder="Search for a role"
-            onChange={onUpdateSelectedRoles}
-          />
+          <MultiSelector values={selectedRoles} onValuesChange={onUpdateSelectedRoles}>
+            <MultiSelectorTrigger
+              mode="inline-combobox"
+              label={
+                selectedRoles.length === 0
+                  ? 'Defaults to all (public) roles if none selected'
+                  : 'Search for a role'
+              }
+              deletableBadge
+              badgeLimit="wrap"
+              showIcon={false}
+            />
+            <MultiSelectorContent>
+              <MultiSelectorList>
+                {formattedRoles.map((role) => (
+                  <MultiSelectorItem key={role.id} value={role.value} disabled={role.disabled}>
+                    {role.name}
+                  </MultiSelectorItem>
+                ))}
+              </MultiSelectorList>
+            </MultiSelectorContent>
+          </MultiSelector>
         )}
       </div>
     </div>
   )
 }
-
-export default PolicyRoles

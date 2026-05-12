@@ -1,26 +1,30 @@
+import { Hotkey } from '@tanstack/react-hotkeys'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { IS_PLATFORM } from 'lib/constants'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  KeyboardShortcut,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
+
 import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
+import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { IS_PLATFORM } from '@/lib/constants'
+import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityActionsProps = {
   id: string
@@ -31,7 +35,7 @@ export type UtilityActionsProps = {
   executeQuery: () => void
 }
 
-const UtilityActions = ({
+export const UtilityActions = ({
   id,
   isExecuting = false,
   isDisabled = false,
@@ -55,6 +59,10 @@ const UtilityActions = ({
   const snippet = snapV2.snippets[id]
   const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
 
+  const hotkeySequnece: Hotkey | undefined =
+    SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
+  const formatKeys = hotkeySequnece ? hotkeyToKeys(hotkeySequnece) : undefined
+
   const toggleIntellisense = () => {
     setIntellisenseEnabled(!intellisenseEnabled)
     toast.success(
@@ -67,7 +75,7 @@ const UtilityActions = ({
   const removeFavorite = () => snapV2.removeFavorite(id)
 
   const onSelectDatabase = (databaseId: string) => {
-    snapV2.resetResult(id)
+    snapV2.resetResults(id)
     setLastSelectedDb(databaseId)
   }
 
@@ -78,7 +86,7 @@ const UtilityActions = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            data-testId="sql-editor-utility-actions"
+            data-testid="sql-editor-utility-actions"
             type="default"
             className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
             icon={<MoreVertical className="text-foreground-light" />}
@@ -92,26 +100,33 @@ const UtilityActions = ({
             </span>
             {intellisenseEnabled && <Check className="text-brand" size={16} />}
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="gap-x-2"
-            onClick={() => {
-              if (isFavorite) removeFavorite()
-              else addFavorite()
-            }}
-          >
-            <Heart
-              size={14}
-              strokeWidth={2}
-              className={
-                isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
-              }
-            />
-            {isFavorite ? 'Remove from' : 'Add to'} favorites
-          </DropdownMenuItem>
-          <DropdownMenuItem className="gap-x-2" onClick={prettifyQuery}>
-            <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
-            Prettify SQL
+          {IS_PLATFORM && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="gap-x-2"
+                onClick={() => {
+                  if (isFavorite) removeFavorite()
+                  else addFavorite()
+                }}
+              >
+                <Heart
+                  size={14}
+                  strokeWidth={2}
+                  className={
+                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                  }
+                />
+                {isFavorite ? 'Remove from' : 'Add to'} favorites
+              </DropdownMenuItem>
+            </>
+          )}
+          <DropdownMenuItem className="justify-between" onClick={prettifyQuery}>
+            <span className="flex items-center gap-x-2">
+              <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
+              Prettify SQL
+            </span>
+            {formatKeys && <KeyboardShortcut keys={formatKeys} />}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -169,7 +184,12 @@ const UtilityActions = ({
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
             />
           </TooltipTrigger>
-          <TooltipContent side="bottom">Prettify SQL</TooltipContent>
+          <TooltipContent side="bottom" className="p-1 pl-2.5">
+            <div className="flex items-center gap-2.5">
+              <span>Prettify SQL</span>
+              {formatKeys && <KeyboardShortcut keys={formatKeys} />}
+            </div>
+          </TooltipContent>
         </Tooltip>
       </div>
 
@@ -184,13 +204,14 @@ const UtilityActions = ({
           )}
           <RoleImpersonationPopover
             serviceRoleLabel="postgres"
+            header="Run SQL query as a role"
             variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
           />
           <SqlRunButton
             hasSelection={hasSelection}
             isDisabled={isDisabled || isExecuting}
             isExecuting={isExecuting}
-            className="rounded-l-none min-w-[82px]"
+            className="rounded-l-none"
             onClick={executeQuery}
           />
         </div>
@@ -198,5 +219,3 @@ const UtilityActions = ({
     </div>
   )
 }
-
-export default UtilityActions

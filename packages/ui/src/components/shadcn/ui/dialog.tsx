@@ -1,11 +1,10 @@
 'use client'
 
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { DialogProps } from '@radix-ui/react-dialog'
+import { cva, VariantProps } from 'class-variance-authority'
 import { X } from 'lucide-react'
+import { Dialog as DialogPrimitive } from 'radix-ui'
 import * as React from 'react'
 
-import { VariantProps, cva } from 'class-variance-authority'
 import { cn } from '../../../lib/utils/cn'
 
 export const DIALOG_PADDING_Y_SMALL = 'py-4'
@@ -42,7 +41,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'bg-black/40 backdrop-blur-sm',
+      'bg-black/40 backdrop-blur-xs',
       'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide py-8',
       !centered && 'flex flex-col flex-start pb-8 sm:pt-12 md:pt-20 lg:pt-32 xl:pt-40 px-5',
       className
@@ -54,7 +53,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const DialogContentVariants = cva(
   cn(
-    'relative z-50 w-full max-w-screen border shadow-md dark:shadow-sm',
+    'relative z-50 w-full max-w-screen border shadow-md dark:shadow-xs',
     'data-[state=open]:animate-in data-[state=closed]:animate-out',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
@@ -102,8 +101,13 @@ const DialogContent = React.forwardRef<
         >
           {children}
           {!hideClose && (
-            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted">
-              <X className="h-4 w-4" />
+            <DialogPrimitive.Close
+              className={cn(
+                'absolute p-0.5 right-3.5 top-3.5 rounded-xs opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+                'hit-area-6'
+              )}
+            >
+              <X size={16} />
               <span className="sr-only">Close</span>
             </DialogPrimitive.Close>
           )}
@@ -156,7 +160,8 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-base leading-none font-normal', className)}
+    // [Danny] max-w to make space for the close button
+    className={cn('text-base leading-none font-normal max-w-[calc(100%-1rem)]', className)}
     {...props}
   />
 ))
@@ -181,7 +186,7 @@ const DialogClose = React.forwardRef<
   <DialogPrimitive.Close
     ref={ref}
     className={cn(
-      'opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+      'opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
       className
     )}
     {...props}
@@ -213,6 +218,7 @@ const DialogSectionSeparator = React.forwardRef<
 ))
 DialogSectionSeparator.displayName = 'DialogSectionSeparator'
 
+type DialogProps = DialogPrimitive.DialogProps
 export {
   Dialog,
   DialogClose,

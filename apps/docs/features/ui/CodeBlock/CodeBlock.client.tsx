@@ -1,10 +1,11 @@
 'use client'
 
-import { Check, Copy } from 'lucide-react'
-import { type MouseEvent, useCallback, useEffect, useState } from 'react'
+import { Check, Copy, WrapText, ArrowRightFromLine } from 'lucide-react'
+import { type MouseEvent, useCallback, useEffect, useState, useRef } from 'react'
 import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
 import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { getFontStyle } from './CodeBlock.utils'
 
 export function AnnotatedSpan({
   token,
@@ -47,7 +48,7 @@ export function AnnotatedSpan({
           style={token.htmlStyle}
           className={cn(
             isTouchDevice &&
-              'underline underline-offset-4 decoration-dashed [text-decoration-color:rgba(from_currentColor_r_g_b_/_0.5)]'
+              'underline underline-offset-4 decoration-dashed decoration-[rgba(from_currentColor_r_g_b/0.5)]'
           )}
         >
           {token.content}
@@ -111,5 +112,48 @@ export function CodeCopyButton({ className, content }: { className?: string; con
         <Copy size={14} className="text-lighter" />
       )}
     </button>
+  )
+}
+
+export function CodeBlockControls({ content }: { content: string }) {
+  const [isWrapped, setIsWrapped] = useState(false)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  const toggleWrap = useCallback(() => {
+    setIsWrapped((prev) => {
+      const newValue = !prev
+      // Find the parent code block and toggle the wrap data attribute
+      const codeBlock = wrapperRef.current?.closest('.shiki')
+      if (codeBlock) {
+        if (newValue) {
+          codeBlock.setAttribute('data-wrapped', 'true')
+        } else {
+          codeBlock.removeAttribute('data-wrapped')
+        }
+      }
+      return newValue
+    })
+  }, [])
+
+  return (
+    <div ref={wrapperRef} className="hidden group-hover:flex absolute top-2 right-2 gap-1">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={toggleWrap}
+            className={cn('border rounded-md p-1', 'hover:bg-selection transition')}
+            aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
+          >
+            {isWrapped ? (
+              <ArrowRightFromLine size={14} className="text-lighter" />
+            ) : (
+              <WrapText size={14} className="text-lighter" />
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>{isWrapped ? 'Disable word wrap' : 'Enable word wrap'}</TooltipContent>
+      </Tooltip>
+      <CodeCopyButton content={content} />
+    </div>
   )
 }

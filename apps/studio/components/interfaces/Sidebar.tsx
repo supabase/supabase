@@ -1,26 +1,11 @@
+import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
+import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
-
-import { LOCAL_STORAGE_KEYS, useIsMFAEnabled, useParams } from 'common'
-import {
-  generateOtherRoutes,
-  generateProductRoutes,
-  generateSettingsRoutes,
-  generateToolRoutes,
-} from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
-import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { useHideSidebar } from 'hooks/misc/useHideSidebar'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLints } from 'hooks/misc/useLints'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Home } from 'icons'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   cn,
@@ -41,17 +26,31 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
+
+import { Shortcut } from '../ui/Shortcut'
+import { Route } from '../ui/ui.types'
+import { useUnifiedLogsPreview } from './App/FeaturePreview/FeaturePreviewContext'
 import {
-  useIsAPIDocsSidePanelEnabled,
-  useUnifiedLogsPreview,
-} from './App/FeaturePreview/FeaturePreviewContext'
+  generateOtherRoutes,
+  generateProductRoutes,
+  generateSettingsRoutes,
+  generateToolRoutes,
+} from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
+import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLints } from '@/hooks/misc/useLints'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
 export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
 export const DEFAULT_SIDEBAR_BEHAVIOR = 'expandable'
 
-const SidebarMotion = motion(SidebarPrimitive) as FC<
+const SidebarMotion = motion.create(SidebarPrimitive) as FC<
   ComponentProps<typeof SidebarPrimitive> & {
     transition?: MotionProps['transition']
   }
@@ -79,6 +78,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
       {!hideSideBar && (
         <SidebarMotion
           {...props}
+          className={cn('z-50', className)}
           transition={{ delay: 0.4, duration: 0.4 }}
           overflowing={sidebarBehaviour === 'expandable'}
           collapsible="icon"
@@ -96,7 +96,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     type="text"
-                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
+                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
                     icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                   />
                 </DropdownMenuTrigger>
@@ -158,24 +158,31 @@ export function SideBarNavLink({
   route,
   active,
   onClick,
-  disabled,
   ...props
 }: {
-  route: any
+  route: Route
   active?: boolean
-  disabled?: boolean
   onClick?: () => void
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
+  const router = useRouter()
+  const { state: sidebarState } = useSidebar()
   const [sidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
   )
 
+  const isActiveLink = !!(route.link && !route.disabled)
+  const hasShortcut = !!(route.shortcutId && isActiveLink)
+
+  // Collapsed: show immediately (replaces the old label-only tooltip
+  // that used to surface the name of an icon-only item). Expanded:
+  // slight delay so the tooltip doesn't flash while skimming the nav.
+  const shortcutPopoverDelay = sidebarState === 'collapsed' ? 0 : 1000
+
   const buttonProps = {
-    disabled,
-    tooltip: sidebarBehaviour === 'closed' ? route.label : '',
+    disabled: route.disabled,
     isActive: active,
-    className: cn('text-sm', sidebarBehaviour === 'open' ? '!px-2' : ''),
+    className: cn('text-sm', sidebarBehaviour === 'open' ? 'px-2!' : ''),
     size: 'default' as const,
     onClick: onClick,
   }
@@ -189,29 +196,38 @@ export function SideBarNavLink({
     </>
   )
 
+  const button = isActiveLink ? (
+    <SidebarMenuButton {...buttonProps} asChild>
+      <Link href={route.link!}>{content}</Link>
+    </SidebarMenuButton>
+  ) : (
+    <SidebarMenuButton {...buttonProps}>{content}</SidebarMenuButton>
+  )
+
   return (
     <SidebarMenuItem>
-      {route.link && !disabled ? (
-        <SidebarMenuButton {...buttonProps} asChild>
-          <Link href={route.link}>{content}</Link>
-        </SidebarMenuButton>
+      {hasShortcut ? (
+        <Shortcut
+          id={route.shortcutId!}
+          onTrigger={() => router.push(route.link!)}
+          side="right"
+          delayDuration={shortcutPopoverDelay}
+        >
+          {button}
+        </Shortcut>
       ) : (
-        <SidebarMenuButton {...buttonProps}>{content}</SidebarMenuButton>
+        button
       )}
     </SidebarMenuItem>
   )
 }
 
-const ActiveDot = (errorArray: any[], warningArray: any[]) => {
+const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings: boolean }) => {
   return (
     <div
       className={cn(
         'absolute pointer-events-none flex h-2 w-2 left-[18px] group-data-[state=expanded]:left-[20px] top-2 z-10 rounded-full',
-        errorArray.length > 0
-          ? 'bg-destructive-600'
-          : warningArray.length > 0
-            ? 'bg-warning-600'
-            : 'bg-transparent'
+        hasErrors ? 'bg-destructive-600' : hasWarnings ? 'bg-warning-600' : 'bg-transparent'
       )}
     />
   )
@@ -221,10 +237,11 @@ const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const snap = useAppStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
+  const showLogs = useIsFeatureEnabled('logs:all')
+
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -240,21 +257,22 @@ const ProjectLinks = () => {
     'realtime:all',
   ])
 
+  const authOverviewPageEnabled = useFlag('authOverviewPage')
+
   const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
+    authOverviewPage: authOverviewPageEnabled,
   })
-
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
-
   const otherRoutes = generateOtherRoutes(ref, project, {
     unifiedLogs: isUnifiedLogsEnabled,
     showReports,
+    showLogs,
   })
-  const settingsRoutes = generateSettingsRoutes(ref, project)
+  const settingsRoutes = generateSettingsRoutes(ref)
 
   return (
     <SidebarMenu>
@@ -264,10 +282,11 @@ const ProjectLinks = () => {
           active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
             key: 'HOME',
-            label: 'Project overview',
+            label: 'Project Overview',
             icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: `/project/${ref}`,
             linkElement: <ProjectIndexPageLink projectRef={ref} />,
+            shortcutId: SHORTCUT_IDS.NAV_HOME,
           }}
         />
         {toolRoutes.map((route, i) => (
@@ -290,51 +309,27 @@ const ProjectLinks = () => {
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
-        {otherRoutes.map((route, i) => {
-          if (route.key === 'api' && isNewAPIDocsEnabled) {
-            return (
-              <SideBarNavLink
-                key={`other-routes-${i}`}
-                route={{
-                  label: route.label,
-                  icon: route.icon,
-                  key: route.key,
-                }}
-                onClick={() => {
-                  snap.setShowProjectApiDocs(true)
-                }}
-              />
-            )
-          } else if (route.key === 'advisors') {
+        {otherRoutes.map((route) => {
+          if (route.key === 'advisors') {
             return (
               <div className="relative" key={route.key}>
-                {ActiveDot(errorLints, securityLints)}
-                <SideBarNavLink
-                  key={`other-routes-${i}`}
-                  route={route}
-                  active={activeRoute === route.key}
-                />
+                {!route.disabled && (
+                  <ActiveDot
+                    hasErrors={errorLints.length > 0}
+                    hasWarnings={securityLints.length > 0}
+                  />
+                )}
+                <SideBarNavLink key={route.key} route={route} active={activeRoute === route.key} />
               </div>
-            )
-          } else if (route.key === 'logs') {
-            return (
-              <SideBarNavLink
-                key={`other-routes-${i}`}
-                route={route}
-                active={activeRoute === route.key}
-              />
             )
           } else {
             return (
-              <SideBarNavLink
-                key={`other-routes-${i}`}
-                route={route}
-                active={activeRoute === route.key}
-              />
+              <SideBarNavLink key={route.key} route={route} active={activeRoute === route.key} />
             )
           }
         })}
       </SidebarGroup>
+      <Separator className="w-[calc(100%-1rem)] mx-auto" />
       {/* Settings routes to be added in with project/org nav */}
       <SidebarGroup className="gap-0.5">
         {settingsRoutes.map((route, i) => (
@@ -353,6 +348,8 @@ const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
 
+  const organizationSlug: string = slug ?? (router.query.orgSlug as string) ?? ''
+
   const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
@@ -360,49 +357,65 @@ const OrganizationLinks = () => {
   const showBilling = useIsFeatureEnabled('billing:all')
 
   const activeRoute = router.pathname.split('/')[3]
+  const organizationSettingsRoutes = new Set([
+    'general',
+    'security',
+    'sso',
+    'apps',
+    'audit',
+    'documents',
+  ])
 
   const navMenuItems = [
     {
       label: 'Projects',
-      href: `/org/${slug}`,
+      href: `/org/${organizationSlug}`,
       key: 'projects',
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_PROJECTS,
     },
     {
       label: 'Team',
-      href: `/org/${slug}/team`,
+      href: `/org/${organizationSlug}/team`,
       key: 'team',
       icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_TEAM,
     },
     {
       label: 'Integrations',
-      href: `/org/${slug}/integrations`,
+      href: `/org/${organizationSlug}/integrations`,
       key: 'integrations',
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_INTEGRATIONS,
     },
     {
       label: 'Usage',
-      href: `/org/${slug}/usage`,
+      href: `/org/${organizationSlug}/usage`,
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_USAGE,
     },
     ...(showBilling
       ? [
           {
             label: 'Billing',
-            href: `/org/${slug}/billing`,
+            href: `/org/${organizationSlug}/billing`,
             key: 'billing',
             icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_BILLING,
           },
         ]
       : []),
     {
-      label: 'Organization settings',
-      href: `/org/${slug}/general`,
+      label: 'Organization Settings',
+      href: `/org/${organizationSlug}/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     },
   ]
+
+  if (!organizationSlug) return null
 
   return (
     <SidebarMenu className="flex flex-col gap-1 items-start">
@@ -410,16 +423,11 @@ const OrganizationLinks = () => {
         {navMenuItems.map((item, i) => (
           <SideBarNavLink
             key={item.key}
-            disabled={disableAccessMfa}
             active={
               i === 0
                 ? activeRoute === undefined
                 : item.key === 'settings'
-                  ? router.pathname.includes('/general') ||
-                    router.pathname.includes('/apps') ||
-                    router.pathname.includes('/audit') ||
-                    router.pathname.includes('/documents') ||
-                    router.pathname.includes('/security')
+                  ? organizationSettingsRoutes.has(activeRoute ?? '')
                   : activeRoute === item.key
             }
             route={{
@@ -427,6 +435,8 @@ const OrganizationLinks = () => {
               link: item.href,
               key: item.label,
               icon: item.icon,
+              disabled: disableAccessMfa,
+              shortcutId: item.shortcutId,
             }}
           />
         ))}

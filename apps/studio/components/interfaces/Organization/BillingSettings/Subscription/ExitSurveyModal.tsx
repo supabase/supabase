@@ -1,18 +1,18 @@
+import { useFlag, useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button, cn, Modal, TextArea_Shadcn_ as TextArea } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
-import { useParams } from 'common'
-import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
-import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
-import { ProjectInfo } from 'data/projects/projects-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useFlag } from 'hooks/ui/useFlag'
-import { Alert, Button, cn, Input, Modal } from 'ui'
-import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
+import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
+import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
+import { useSendDowngradeFeedbackMutation } from '@/data/feedback/exit-survey-send'
+import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
+import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
 
 export interface ExitSurveyModalProps {
   visible: boolean
-  projects: ProjectInfo[]
+  projects: OrgProject[]
   onClose: (success?: boolean) => void
 }
 
@@ -24,20 +24,21 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   const [selectedReason, setSelectedReason] = useState<string[]>([])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+  const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onError: (error) => {
         toast.error(`Failed to downgrade project: ${error.message}`)
       },
     }
   )
-  const { mutateAsync: sendExitSurvey, isLoading: isSubmittingFeedback } =
+  const { mutateAsync: sendExitSurvey, isPending: isSubmittingFeedback } =
     useSendDowngradeFeedbackMutation()
   const isSubmitting = isUpdating || isSubmittingFeedback
 
-  const projectsWithComputeDowngrade = projects.filter(
-    (project) => project.infra_compute_size !== 'nano'
-  )
+  const projectsWithComputeDowngrade = projects.filter((project) => {
+    const computeSize = getComputeSize(project)
+    return computeSize !== 'nano'
+  })
 
   const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
 
@@ -104,7 +105,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
       <Modal.Content>
         <div className="space-y-4">
           <p className="text-sm text-foreground-light">
-            Share with us why you're downgrading your plan.
+            What made you decide to downgrade your plan?
           </p>
           <div className="space-y-8 mt-6">
             <div className="flex flex-wrap gap-2" data-toggle="buttons">
@@ -116,9 +117,9 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
                     className={cn(
                       'flex cursor-pointer items-center space-x-2 rounded-md py-1',
                       'pl-2 pr-3 text-center text-sm',
-                      'shadow-sm transition-all duration-100',
+                      'shadow-xs transition-all duration-100',
                       active
-                        ? `bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                        ? `bg-foreground text-background opacity-100 hover:bg-foreground/75`
                         : `bg-border-strong text-foreground opacity-75 hover:opacity-100`
                     )}
                   >
@@ -136,8 +137,10 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
               })}
             </div>
             <div className="text-area-text-sm flex flex-col gap-y-2">
-              <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
-              <Input.TextArea
+              <label htmlFor="message" className="text-sm whitespace-pre-line wrap-break-word">
+                {textareaLabel}
+              </label>
+              <TextArea
                 id="message"
                 name="message"
                 value={message}
@@ -147,14 +150,17 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
             </div>
           </div>
           {hasProjectsWithComputeDowngrade && (
-            <Alert
-              withIcon
-              variant="warning"
+            <Admonition
+              layout="horizontal"
+              type="warning"
               title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
-            >
-              This is due to changes in compute instances from the downgrade. Affected projects
-              include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
-            </Alert>
+              description={
+                <>
+                  This is due to changes in compute instances from the downgrade. Affected projects
+                  include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
+                </>
+              }
+            />
           )}
         </div>
       </Modal.Content>

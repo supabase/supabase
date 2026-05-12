@@ -1,15 +1,14 @@
+import { CubeIcon } from '@heroicons/react/outline'
+import { useBreakpoint } from 'common'
+import { Check, Sparkles, Timer } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { Check, Sparkles, Timer } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
-import { Button, cn, Image } from 'ui'
+import { topTweets } from 'shared-data'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Button, cn, IconDiscord } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
 import MainProducts from '../MainProducts'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { TwitterSocialSectionProps } from 'components/TwitterSocialSection'
 import {
   FrameworkLink,
   getEditors,
@@ -17,12 +16,12 @@ import {
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { tweets } from 'shared-data'
-import { useBreakpoint } from 'common'
-import { useSendTelemetryEvent } from 'lib/telemetry'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import type { TwitterSocialSectionProps } from '@/components/TwitterSocialSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const ComputePricingCalculator = dynamic(
@@ -66,18 +65,7 @@ const data: () => {
           infrastructure a lot less overwhelming. Ship faster and learn by doing with Supabase.
         </>,
       ],
-      image: (
-        <Image
-          src={{
-            dark: '/images/solutions/beginners/beginners-hero-dark.svg',
-            light: '/images/solutions/beginners/beginners-hero-light.svg',
-          }}
-          alt="Supabase for Beginners"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
-        />
-      ),
+      image: undefined,
       ctas: [
         {
           label: 'Start your project',
@@ -157,10 +145,10 @@ const data: () => {
         'Supabase includes everything you need to create the perfect app for your brand, business, or just for fun.',
       className: cn(
         '[&_div.grid]:sm:divide-x [&_div.grid]:divide-y',
-        '[&_div.grid>div:nth-child(2n+2)]:sm:!border-l-0',
-        '[&_div.grid>div:nth-child(2n+2)]:lg:!border-l',
-        '[&_div.grid>div:nth-child(3n+3)]:lg:!border-l-0',
-        '[&_div.grid>div:nth-child(2)]:lg:!border-t-0'
+        '[&_div.grid>div:nth-child(2n+2)]:sm:border-l-0!',
+        '[&_div.grid>div:nth-child(2n+2)]:lg:border-l!',
+        '[&_div.grid>div:nth-child(3n+3)]:lg:border-l-0!',
+        '[&_div.grid>div:nth-child(2)]:lg:border-t-0!'
       ),
       features: [
         {
@@ -289,7 +277,7 @@ const data: () => {
               more. Secure and trusted.
             </>
           ),
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'storage',
@@ -491,24 +479,22 @@ const data: () => {
       heading: 'Fun projects built with Supabase',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
-        <>
-          <Button asChild size="small" type="default">
-            <Link
-              href="https://github.com/supabase/supabase/discussions"
-              target="_blank"
-              tabIndex={-1}
-            >
-              GitHub discussions
-            </Link>
-          </Button>
-          <Button asChild type="default" size="small">
-            <Link href={'https://discord.supabase.com/'} target="_blank" tabIndex={-1}>
-              Discord
-            </Link>
-          </Button>
-        </>
+        <Button asChild type="default" size="small" icon={<IconDiscord />}>
+          <Link
+            href={'https://discord.supabase.com/'}
+            target="_blank"
+            tabIndex={-1}
+            onClick={() =>
+              sendTelemetryEvent({
+                action: 'homepage_discord_button_clicked',
+              })
+            }
+          >
+            Join us on Discord
+          </Link>
+        </Button>
       ),
-      tweets: tweets.slice(0, 18),
+      tweets: topTweets,
     },
     platformStarterSection: {
       id: 'platform-starter',

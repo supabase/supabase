@@ -1,18 +1,10 @@
-import { Command, FlaskConical, Loader2, Settings } from 'lucide-react'
+import { useFlag } from 'common'
+import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
-import { getGitHubProfileImgUrl } from 'lib/github'
-import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
-  Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -22,75 +14,86 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Theme,
   singleThemes,
+  Theme,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
-export function UserDropdown() {
+import { ButtonTooltip } from '../ui/ButtonTooltip'
+import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
+import { ProfileImage } from '@/components/ui/ProfileImage'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfileNameAndPicture } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
+
+export function UserDropdown({
+  triggerClassName,
+  contentClassName,
+}: {
+  triggerClassName?: string
+  contentClassName?: string
+}) {
   const router = useRouter()
-  const signOut = useSignOut()
-  const { profile, isLoading: isLoadingProfile } = useProfile()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
-  const setCommandMenuOpen = useSetCommandMenuOpen()
-  const { openFeaturePreviewModal } = useFeaturePreviewModal()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
+  const timezonePickerEnabled = useFlag('timezonePicker')
+  const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
-  const { username, primary_email } = profile ?? {}
-
-  const { data, isLoading: isLoadingIdentities } = useProfileIdentitiesQuery()
-  const isGitHubProfile = profile?.auth0_id.startsWith('github')
-  const gitHubUsername = isGitHubProfile
-    ? (data?.identities ?? []).find((x) => x.provider === 'github')?.identity_data?.user_name
-    : undefined
-  const profileImageUrl = isGitHubProfile ? getGitHubProfileImgUrl(gitHubUsername) : undefined
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const track = useTrack()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="border flex-shrink-0 px-3" asChild>
-        <Button
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (open) track('header_user_dropdown_opened')
+      }}
+    >
+      <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
+        <ButtonTooltip
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+          tooltip={{ content: { text: 'Account settings' } }}
         >
-          {isLoadingProfile || isLoadingIdentities ? (
+          {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
               <Loader2 className="animate-spin text-foreground-lighter" size={16} />
             </div>
           ) : (
-            <ProfileImage
-              alt={profile?.username}
-              src={profileImageUrl}
-              className="w-8 h-8 rounded-md"
-            />
+            <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
           )}
-        </Button>
+        </ButtonTooltip>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="bottom" align="end">
+      <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-              {profile && (
+              {!!username ? (
                 <>
                   <span title={username} className="w-full text-left text-foreground truncate">
                     {username}
                   </span>
-                  {primary_email !== username && profileShowEmailEnabled && (
+                  {primaryEmail !== username && profileShowEmailEnabled && (
                     <span
-                      title={primary_email}
+                      title={primaryEmail}
                       className="w-full text-left text-foreground-light text-xs truncate"
                     >
-                      {primary_email}
+                      {primaryEmail}
                     </span>
                   )}
                 </>
+              ) : (
+                <span title={primaryEmail} className="w-full text-left text-foreground truncate">
+                  {primaryEmail}
+                </span>
               )}
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="/account/me"
                   onClick={() => {
@@ -104,16 +107,22 @@ export function UserDropdown() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="flex gap-2"
-                onClick={openFeaturePreviewModal}
-                onSelect={openFeaturePreviewModal}
+                className="flex gap-2 cursor-pointer"
+                onClick={() => toggleFeaturePreviewModal(true)}
+                // onSelect={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
-                <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Command menu
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
+                <Link
+                  href="https://supabase.com/changelog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ScrollText size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  Changelog
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </DropdownMenuGroup>
@@ -128,19 +137,32 @@ export function UserDropdown() {
             }}
           >
             {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+              <DropdownMenuRadioItem
+                key={theme.value}
+                value={theme.value}
+                className="cursor-pointer"
+              >
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
+        {timezonePickerEnabled && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <TimezoneDropdown />
+            </DropdownMenuGroup>
+          </>
+        )}
         {IS_PLATFORM && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onSelect={async () => {
-                  await signOut()
+                className="cursor-pointer"
+                onSelect={() => {
+                  router.push('/logout')
                 }}
               >
                 Log out

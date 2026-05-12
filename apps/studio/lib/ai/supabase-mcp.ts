@@ -1,8 +1,9 @@
-import { createSupabaseApiPlatform, createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
-import { StreamTransport } from '@supabase/mcp-utils'
-import { experimental_createMCPClient as createMCPClient } from 'ai'
+import { createMCPClient } from '@ai-sdk/mcp'
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
+import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
+import { createSupabaseApiPlatform } from '@supabase/mcp-server-supabase/platform/api'
 
-import { API_URL } from 'lib/constants'
+import { API_URL } from '@/lib/constants'
 
 export async function createSupabaseMCPClient({
   accessToken,
@@ -11,11 +12,7 @@ export async function createSupabaseMCPClient({
   accessToken: string
   projectId: string
 }) {
-  // Create an in-memory transport pair
-  const clientTransport = new StreamTransport()
-  const serverTransport = new StreamTransport()
-  clientTransport.readable.pipeTo(serverTransport.writable)
-  serverTransport.readable.pipeTo(clientTransport.writable)
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
 
   // Instantiate the MCP server and connect to its transport
   const apiUrl = API_URL?.replace('/platform', '')
@@ -24,6 +21,7 @@ export async function createSupabaseMCPClient({
       accessToken,
       apiUrl,
     }),
+    contentApiUrl: process.env.NEXT_PUBLIC_CONTENT_API_URL,
     projectId,
     readOnly: true,
   })

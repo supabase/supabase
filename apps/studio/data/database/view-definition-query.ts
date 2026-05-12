@@ -1,32 +1,13 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { getViewDefinitionSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
+
 import { databaseKeys } from './keys'
+import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 type GetViewDefinitionArgs = {
   id?: number
-}
-
-// [Joshen] Eventually move this into entity-definition-query
-export const getViewDefinitionSql = ({ id }: GetViewDefinitionArgs) => {
-  if (!id) {
-    throw new Error('id is required')
-  }
-
-  const sql = /* SQL */ `
-    with table_info as (
-      select 
-        n.nspname::text as schema,
-        c.relname::text as name,
-        to_regclass(concat('"', n.nspname, '"."', c.relname, '"')) as regclass
-      from pg_class c
-      join pg_namespace n on n.oid = c.relnamespace
-      where c.oid = ${id}
-    )
-    select pg_get_viewdef(t.regclass, true) as definition
-    from table_info t
-  `.trim()
-
-  return sql
+  includeCreateStatement?: boolean
 }
 
 export type ViewDefinitionVariables = GetViewDefinitionArgs & {
@@ -35,16 +16,18 @@ export type ViewDefinitionVariables = GetViewDefinitionArgs & {
 }
 
 export async function getViewDefinition(
-  { projectRef, connectionString, id }: ViewDefinitionVariables,
+  { projectRef, connectionString, id, includeCreateStatement }: ViewDefinitionVariables,
   signal?: AbortSignal
 ) {
-  const sql = getViewDefinitionSql({ id })
+  if (!id) throw new Error('View ID is required')
+
+  const sql = getViewDefinitionSql({ id, includeCreateStatement })
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
       sql,
-      queryKey: ['view-definition', id],
+      queryKey: ['view-definition', id, includeCreateStatement ?? false],
     },
     signal
   )
@@ -56,18 +39,17 @@ export type ViewDefinitionData = string
 export type ViewDefinitionError = ExecuteSqlError
 
 export const useViewDefinitionQuery = <TData = ViewDefinitionData>(
-  { projectRef, connectionString, id }: ViewDefinitionVariables,
+  { projectRef, connectionString, id, includeCreateStatement }: ViewDefinitionVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ViewDefinitionData, ViewDefinitionError, TData> = {}
+  }: UseCustomQueryOptions<ViewDefinitionData, ViewDefinitionError, TData> = {}
 ) =>
-  useQuery<ViewDefinitionData, ViewDefinitionError, TData>(
-    databaseKeys.viewDefinition(projectRef, id),
-    ({ signal }) => getViewDefinition({ projectRef, connectionString, id }, signal),
-    {
-      enabled:
-        enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
-      ...options,
-    }
-  )
+  useQuery<ViewDefinitionData, ViewDefinitionError, TData>({
+    queryKey: databaseKeys.viewDefinition(projectRef, id, includeCreateStatement),
+    queryFn: ({ signal }) =>
+      getViewDefinition({ projectRef, connectionString, id, includeCreateStatement }, signal),
+    enabled:
+      enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
+    ...options,
+  })

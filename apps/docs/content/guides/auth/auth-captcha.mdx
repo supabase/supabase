@@ -5,7 +5,7 @@ description: 'Add CAPTCHA Protection to your Supabase project'
 tocVideo: 'em1cpOAXknM'
 ---
 
-Supabase provides you with the option of adding CAPTCHA to your sign-in, sign-up, and password reset forms. This keeps your website safe from bots and malicious scripts. Supabase authentication has support for [hCaptcha](https://www.hcaptcha.com/) and [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/).
+Supabase provides you with the option of adding CAPTCHA to your sign-in, sign-up, and password reset forms. This keeps your website safe from bots and malicious scripts. Supabase authentication has support for [hCaptcha](https://www.hcaptcha.com/) and [Cloudflare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/).
 
 ## Sign up for CAPTCHA
 
@@ -34,14 +34,17 @@ In the Settings page, look for the **Sitekey** section and copy the key.
 </TabPanel>
 
 <TabPanel id="turnstile-1" label="Turnstile">
- Go to the [Cloudflare website](https://dash.cloudflare.com/login) and sign up for an account. On the Welcome page, head to the Turnstile section and add a new site. Create a site and take note of the **Sitekey** and **Secret Key** as shown below
-      ![cloudflare_settings.png](/docs/img/guides/auth-captcha/cloudflare_settings.png)
+
+Sign in to the [Cloudflare dashboard](https://dash.cloudflare.com/login) and create a Turnstile widget by following Cloudflare's [Create a widget](https://developers.cloudflare.com/turnstile/get-started/widget-management/dashboard/) guide.
+
+Once the widget is created, copy the **Sitekey** and **Secret Key** — you need them in the next steps.
+
 </TabPanel>
 </Tabs>
 
 ## Enable CAPTCHA protection for your Supabase project
 
-Navigate to the **[Auth](https://supabase.com/dashboard/project/_/settings/auth)** section of your Project Settings in the Supabase Dashboard and find the **Enable CAPTCHA protection** toggle under Settings > Authentication > Bot and Abuse Protection > Enable CAPTCHA protection.
+Navigate to the **[Auth](/dashboard/project/_/auth/protection)** section of your Project Settings in the Supabase Dashboard and find the **Enable CAPTCHA protection** toggle under Settings > Authentication > Bot and Abuse Protection > Enable CAPTCHA protection.
 
 Select your CAPTCHA provider from the dropdown, enter your CAPTCHA **Secret key**, and click **Save**.
 

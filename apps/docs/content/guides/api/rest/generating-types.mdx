@@ -10,7 +10,7 @@ Supabase APIs are generated from your database, which means that we can use data
 
 ## Generating types from project dashboard
 
-Supabase allows you to generate and download TypeScript types directly from the [project dashboard](https://supabase.com/dashboard/project/_/api?page=tables-intro).
+Supabase allows you to generate and download TypeScript types directly from the [project dashboard](/dashboard/project/_/api?page=tables-intro).
 
 ## Generating types using Supabase CLI
 
@@ -44,6 +44,12 @@ or in case of local development:
 
 ```bash
 npx supabase gen types typescript --local > database.types.ts
+```
+
+or in case of a self-hosted instance (see [Accessing Postgres](/docs/guides/self-hosting/docker#accessing-postgres) for more information):
+
+```bash
+npx supabase gen types typescript --db-url postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain-or-ip]:5432/postgres --schema public > database.types.ts
 ```
 
 These types are generated from your database schema. Given a table `public.movies`, the generated types will look like:

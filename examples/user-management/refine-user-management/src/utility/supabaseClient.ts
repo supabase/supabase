@@ -1,14 +1,13 @@
-import { createClient } from "@refinedev/supabase";
+import { createClient } from '@refinedev/supabase'
 
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabasePublishableKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
 export const supabaseClient = createClient(supabaseUrl, supabasePublishableKey, {
   db: {
-    schema: "public",
+    schema: 'public',
   },
   auth: {
     persistSession: true,
   },
-});
+})

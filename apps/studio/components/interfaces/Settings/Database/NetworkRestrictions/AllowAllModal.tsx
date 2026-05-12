@@ -1,7 +1,7 @@
+import { useParams } from 'common/hooks'
 import { Button, Modal } from 'ui'
 
-import { useParams } from 'common/hooks'
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
 
 interface AllowAllModalProps {
   visible: boolean
@@ -10,7 +10,7 @@ interface AllowAllModalProps {
 
 const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   const { ref } = useParams()
-  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
     })

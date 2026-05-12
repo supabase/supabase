@@ -13,13 +13,19 @@ In the Supabase Dashboard:
 2. Under **GitHub Integration**, click **Authorize GitHub**.
 3. You are redirected to a GitHub authorization page. Click **Authorize Supabase**.
 4. You are redirected back to the Integrations page. Choose a GitHub repository to connect your project to.
-5. Fill in the relative path to the Supabase directory from your repository root.
+5. Set the **Working directory** field.
 6. Configure the other options as needed to automate your GitHub connection.
 7. Click **Enable integration**.
 
+### Set the working directory
+
+The working directory is the path from your repository root to the directory that contains the `supabase/` folder. Enter `.` when `supabase/` is at the repository root.
+
+If `supabase/` is nested deeper in your repository, enter its parent directory instead. For example, if your layout is `apps/web/supabase/`, enter `apps/web`.
+
 ## Preparing your Git repository
 
-You will be using the [Supabase CLI](/docs/guides/cli) to initialise your local `./supabase` directory:
+You will be using the [Supabase CLI](/docs/guides/cli) to initialize your local `./supabase` directory:
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
@@ -37,7 +43,7 @@ You will be using the [Supabase CLI](/docs/guides/cli) to initialise your local 
     <StepHikeCompact.Step step={2}>
         <StepHikeCompact.Details title="Pull your database migration" fullWidth>
 
-            Pull your database changes using `supabase db pull`. To get your database connection string, go to your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true) and look for the Session pooler connection string.
+            Pull your database changes using `supabase db pull`. To get your database connection string, go to your project dashboard, click [Connect](/dashboard/project/_?showConnect=true&method=session) and look for the Session pooler connection string.
 
             ```markdown
             supabase db pull --db-url <db_connection_string>
@@ -112,11 +118,13 @@ All other configurations, including API, Auth, and seed files, are ignored by de
 We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
 
 <Image
-  zoomable
-  className="max-w-[700px] !mx-auto"
-  alt='Check the "Require status checks to pass before merging" option.'
-  caption='Check the "Require status checks to pass before merging" option.'
-  src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1"
+
+className="max-w-[700px] mx-auto!"
+alt='Check the "Require status checks to pass before merging" option.'
+caption='Check the "Require status checks to pass before merging" option.'
+src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1"
+width={1140}
+height={979}
 />
 
 ### Email notifications

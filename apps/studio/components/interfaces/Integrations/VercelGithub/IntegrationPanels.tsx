@@ -3,17 +3,17 @@ import { ArrowRight, ExternalLink, Github } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
+import { Badge, Button, cn } from 'ui'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type {
   Integration,
   IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { BASE_PATH } from 'lib/constants'
-import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { Badge, Button, cn } from 'ui'
+} from '@/data/integrations/integrations.types'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { BASE_PATH } from '@/lib/constants'
+import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -72,11 +72,11 @@ const Avatar = ({ src }: { src: string | undefined }) => {
   )
 }
 
-const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallationProps>(
+export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallationProps>(
   ({ integration, disabled, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
-        <div className="bg-black text-white w-8 h-8 rounded flex items-center justify-center">
+        <div className="bg-black text-white w-8 h-8 rounded-sm flex items-center justify-center">
           <HandleIcon type={integration.integration.name} />
         </div>
       )
@@ -86,7 +86,7 @@ const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallatio
       <li
         ref={ref}
         key={integration.id}
-        className="bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg"
+        className="bg-surface-100 border shadow-xs flex justify-between items-center px-8 py-4 rounded-lg"
         {...props}
       >
         <div className="flex gap-6 items-center">
@@ -105,7 +105,7 @@ const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallatio
                     integration.metadata?.gitHubConnectionOwner)}
               </span>
 
-              <Badge className="capitalize">{integration.metadata?.account.type}</Badge>
+              <Badge>{integration.metadata?.account.type}</Badge>
             </div>
             <div className="flex flex-col gap-0">
               <span className="text-foreground-lighter text-xs">
@@ -144,13 +144,12 @@ export interface IntegrationConnectionProps extends HTMLAttributes<HTMLLIElement
   orientation?: 'horizontal' | 'vertical'
 }
 
-const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
+export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   (
     { connection, type, actions, showNode = true, orientation = 'horizontal', className, ...props },
     ref
   ) => {
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data: project } = useProjectDetailQuery({ ref: connection.supabase_project_ref })
 
     return (
       <li
@@ -167,13 +166,13 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
             orientation === 'horizontal'
               ? 'flex items-center justify-between gap-2'
               : 'flex flex-col gap-3',
-            'bg-surface-100 border shadow-sm px-6 py-4 rounded-lg',
+            'bg-surface-100 border shadow-xs px-6 py-4 rounded-lg',
             className
           )}
         >
           <div className="flex flex-col gap-1 min-w-0">
             <div className="flex items-center gap-2">
-              <div className="flex-shrink-0 flex gap-x-2 items-center max-w-40 ">
+              <div className="shrink-0 flex gap-x-2 items-center max-w-40 ">
                 <HandleIcon type={'Supabase'} />
                 <span title={project?.name} className="text-sm truncate">
                   {project?.name}
@@ -182,14 +181,14 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
 
               <ArrowRight
                 size={14}
-                className="flex-shrink-0 text-foreground-lighter"
+                className="shrink-0 text-foreground-lighter"
                 strokeWidth={1.5}
               />
 
               <div className="flex-1 min-w-0 flex gap-2 items-center">
                 {!connection?.metadata?.framework ? (
-                  <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
-                    <HandleIcon type={type} className={'!w-2.5'} />
+                  <div className="bg-black text-white w-4 h-4 rounded-sm flex items-center justify-center">
+                    <HandleIcon type={type} className={'w-2.5!'} />
                   </div>
                 ) : (
                   <img
@@ -227,17 +226,16 @@ const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionPro
             </div>
           </div>
 
-          <div className="flex-shrink-0">{actions}</div>
+          <div className="shrink-0">{actions}</div>
         </div>
       </li>
     )
   }
 )
 
-const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
+export const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   ({ connection, type, ...props }, ref) => {
-    const { data: projects } = useProjectsQuery()
-    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const { data: project } = useProjectDetailQuery({ ref: connection.supabase_project_ref })
 
     return (
       <li
@@ -245,7 +243,7 @@ const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnect
         key={connection.id}
         {...props}
         className={cn(
-          'bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg'
+          'bg-surface-100 border shadow-xs flex justify-between items-center px-8 py-4 rounded-lg'
         )}
       >
         <div className="flex flex-col gap-1">
@@ -268,7 +266,7 @@ const IntegrationConnectionOption = forwardRef<HTMLLIElement, IntegrationConnect
   }
 )
 
-const EmptyIntegrationConnection = forwardRef<
+export const EmptyIntegrationConnection = forwardRef<
   HTMLDivElement,
   HTMLAttributes<HTMLDivElement> & {
     showNode?: boolean
@@ -321,7 +319,7 @@ interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElemen
   showNode?: boolean
 }
 
-const IntegrationConnectionHeader = forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
+export const IntegrationConnectionHeader = forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
   ({ className, markdown = '', showNode = true, ...props }, ref) => {
     return (
       <div
@@ -345,11 +343,3 @@ IntegrationConnection.displayName = 'IntegrationConnection'
 IntegrationConnectionHeader.displayName = 'IntegrationConnectionHeader'
 EmptyIntegrationConnection.displayName = 'EmptyIntegrationConnection'
 IntegrationConnectionOption.displayName = 'IntegrationConnectionOption'
-
-export {
-  EmptyIntegrationConnection,
-  IntegrationConnection,
-  IntegrationConnectionHeader,
-  IntegrationConnectionOption,
-  IntegrationInstallation,
-}

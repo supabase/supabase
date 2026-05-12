@@ -1,58 +1,74 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { BarChart2 } from 'lucide-react'
-import Link from 'next/link'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRefQuery, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  Card,
+  CardContent,
+  CardFooter,
   Form,
-  Input,
-  WarningIcon,
+  FormControl,
+  FormField,
+  Input_Shadcn_,
 } from 'ui'
-import PauseProjectButton from './Infrastructure/PauseProjectButton'
-import RestartServerButton from './Infrastructure/RestartServerButton'
+import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
 
-const General = () => {
+import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { ProjectAccessSection } from './ProjectAccessSection'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+export const General = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const isBranch = Boolean(project?.parent_project_ref)
 
-  const { data: parentProject } = useProjectByRefQuery(project?.parent_project_ref)
-  const isBranch = parentProject !== undefined
+  const { can: canUpdateProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
-  const formId = 'project-general-settings'
-  const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const { can: canUpdateProject } = useAsyncCheckProjectPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { mutate: updateProject, isPending: isUpdating } = useProjectUpdateMutation()
+
+  const formSchema = z.object({
+    name: z.string().trim().min(3, 'Project name must be at least 3 characters long'),
+  })
+
+  const defaultValues = { name: project?.name ?? '' }
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues,
+    values: defaultValues,
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
+  })
+
+  const regionLabel = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    project?.region?.includes(region.region)
   )
 
-  const { mutate: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
-
-  const onSubmit = async (values: any, { resetForm }: any) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project?.ref) return console.error('Ref is required')
 
     updateProject(
       { ref: project.ref, name: values.name.trim() },
       {
         onSuccess: ({ name }) => {
-          resetForm({ values: { name }, initialValues: { name } })
+          form.reset({ name })
           toast.success('Successfully saved settings')
         },
       }
@@ -60,126 +76,118 @@ const General = () => {
   }
 
   return (
-    <div>
-      {isBranch && (
-        <Alert_Shadcn_ variant="default" className="mb-6">
-          <WarningIcon />
-          <AlertTitle_Shadcn_>
-            You are currently on a preview branch of your project
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            Certain settings are not available while you're on a preview branch. To adjust your
-            project settings, you may return to your{' '}
-            <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
-              main branch
-            </Link>
-            .
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      )}
+    <>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>General settings</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          {isBranch && (
+            <Admonition
+              type="default"
+              className="mb-4"
+              title="You are currently on a preview branch of your project"
+            >
+              Certain settings are not available while you're on a preview branch. To adjust your
+              project settings, you may return to your{' '}
+              <InlineLink href={`/project/${project?.parent_project_ref}/settings/general`}>
+                main branch
+              </InlineLink>
+              .
+            </Admonition>
+          )}
 
-      {project === undefined ? (
-        <GenericSkeletonLoader />
-      ) : (
-        <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-          {({ handleReset, values, initialValues }: any) => {
-            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-            return (
-              <FormPanel
-                disabled={!canUpdateProject}
-                footer={
-                  <div className="flex py-4 px-8">
-                    <FormActions
-                      form={formId}
-                      isSubmitting={isUpdating}
-                      hasChanges={hasChanges}
-                      handleReset={handleReset}
-                      helper={
-                        !canUpdateProject
-                          ? "You need additional permissions to manage this project's settings"
-                          : undefined
+          {project === undefined ? (
+            <Card>
+              <CardContent>
+                <GenericSkeletonLoader />
+              </CardContent>
+            </Card>
+          ) : (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <Card>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Project name"
+                          description="Displayed throughout the dashboard."
+                          className="[&>div]:md:w-1/2"
+                        >
+                          <FormControl>
+                            <Input_Shadcn_
+                              {...field}
+                              disabled={isBranch || !canUpdateProject}
+                              autoComplete="off"
+                            />
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </CardContent>
+
+                  <CardContent>
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Project ID"
+                      description="Reference used in APIs and URLs."
+                      className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                    >
+                      <FormControl>
+                        <Input copy readOnly size="small" value={project.ref} />
+                      </FormControl>
+                    </FormItemLayout>
+                  </CardContent>
+
+                  <CardContent>
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Project region"
+                      description={regionLabel?.name}
+                      className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                    >
+                      <FormControl>
+                        <Input copy readOnly size="small" value={project.region} />
+                      </FormControl>
+                    </FormItemLayout>
+                  </CardContent>
+
+                  <CardFooter className="justify-end space-x-2">
+                    {form.formState.isDirty && (
+                      <Button
+                        type="default"
+                        htmlType="button"
+                        disabled={isUpdating}
+                        onClick={() => form.reset({ name: project?.name ?? '' })}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      disabled={
+                        !form.formState.isDirty || isUpdating || !canUpdateProject || isBranch
                       }
-                    />
-                  </div>
-                }
-              >
-                <FormSection header={<FormSectionLabel>General settings</FormSectionLabel>}>
-                  <FormSectionContent loading={false}>
-                    <Input
-                      id="name"
-                      size="small"
-                      label="Project name"
-                      disabled={isBranch || !canUpdateProject}
-                    />
-                    <Input copy disabled id="ref" size="small" label="Project ID" />
-                  </FormSectionContent>
-                </FormSection>
-              </FormPanel>
-            )
-          }}
-        </Form>
-      )}
-      {!isBranch && (
-        <>
-          <div className="mt-6" id="restart-project">
-            <FormPanel>
-              <div className="flex flex-col px-8 py-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm">Restart project</p>
-                    <div className="max-w-[420px]">
-                      <p className="text-sm text-foreground-light">
-                        Your project will not be available for a few minutes.
-                      </p>
-                    </div>
-                  </div>
-                  <RestartServerButton />
-                </div>
-              </div>
-              <div
-                className="flex w-full items-center justify-between px-8 py-4"
-                id="pause-project"
-              >
-                <div>
-                  <p className="text-sm">Pause project</p>
-                  <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">
-                      Your project will not be accessible while it is paused.
-                    </p>
-                  </div>
-                </div>
-                <PauseProjectButton />
-              </div>
-            </FormPanel>
-          </div>
-          <div className="mt-6">
-            <Panel>
-              <Panel.Content>
-                <div className="flex justify-between">
-                  <div className="flex space-x-4">
-                    <BarChart2 strokeWidth={2} />
-                    <div>
-                      <p className="text-sm">Project usage statistics have been moved</p>
-                      <p className="text-foreground-light text-sm">
-                        You may view your project's usage under your organization's settings
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <Button asChild type="default">
-                      <Link href={`/org/${organization?.slug}/usage?projectRef=${project?.ref}`}>
-                        View project usage
-                      </Link>
+                      loading={isUpdating}
+                    >
+                      Save changes
                     </Button>
-                  </div>
-                </div>
-              </Panel.Content>
-            </Panel>
-          </div>
-        </>
-      )}
-    </div>
+                  </CardFooter>
+                </Card>
+              </form>
+            </Form>
+          )}
+        </PageSectionContent>
+      </PageSection>
+
+      <ProjectAccessSection />
+    </>
   )
 }
-
-export default General

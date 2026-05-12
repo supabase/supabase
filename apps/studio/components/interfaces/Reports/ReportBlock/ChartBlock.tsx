@@ -1,28 +1,35 @@
 import dayjs from 'dayjs'
+import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { ReactNode, useCallback, useEffect, useState } from 'react'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
 
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import { AnalyticsInterval } from 'data/analytics/constants'
+import { METRIC_THRESHOLDS } from './ReportBlock.constants'
+import { ReportBlockContainer } from './ReportBlockContainer'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import {
+  checkHasNonPositiveValues,
+  computeYAxisWidth,
+  formatLogTick,
+  formatYAxisTick,
+} from '@/components/ui/QueryBlock/QueryBlock.utils'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
-  useInfraMonitoringQuery,
-} from 'data/analytics/infra-monitoring-query'
+  useInfraMonitoringAttributesQuery,
+} from '@/data/analytics/infra-monitoring-query'
 import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
-} from 'data/analytics/project-daily-stats-query'
-import { METRICS } from 'lib/constants/metrics'
-import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
-import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Dashboards } from 'types'
-import { WarningIcon } from 'ui'
-import { METRIC_THRESHOLDS } from './ReportBlock.constants'
-import { ReportBlockContainer } from './ReportBlockContainer'
+} from '@/data/analytics/project-daily-stats-query'
+import { METRICS } from '@/lib/constants/metrics'
+import { useFormatDateTime } from '@/lib/datetime'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import type { Dashboards } from '@/types'
 
 interface ChartBlockProps {
   label: string
@@ -32,6 +39,7 @@ interface ChartBlockProps {
   endDate: string
   interval?: AnalyticsInterval
   defaultChartStyle?: 'bar' | 'line'
+  defaultLogScale?: boolean
   isLoading?: boolean
   actions?: ReactNode
   maxHeight?: number
@@ -52,6 +60,7 @@ export const ChartBlock = ({
   endDate,
   interval = '1d',
   defaultChartStyle = 'bar',
+  defaultLogScale = false,
   isLoading = false,
   actions,
   maxHeight,
@@ -62,34 +71,34 @@ export const ChartBlock = ({
 
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
+  const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
+  const formatChartDate = useFormatDateTime()
 
   const databaseIdentifier = state.selectedDatabaseId
 
   const {
     data: dailyStatsData,
     isFetching: isFetchingDailyStats,
-    isLoading: isLoadingDailyStats,
+    isPending: isLoadingDailyStats,
   } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
       attribute: attribute as ProjectDailyStatsAttribute,
-      startDate,
-      endDate,
-      interval: interval as AnalyticsInterval,
-      databaseIdentifier,
+      startDate: dayjs(startDate).format('YYYY-MM-DD'),
+      endDate: dayjs(endDate).format('YYYY-MM-DD'),
     },
     { enabled: provider === 'daily-stats' }
   )
 
   const {
-    data: infraMonitoringData,
+    data: infraMonitoringRawData,
     isFetching: isFetchingInfraMonitoring,
-    isLoading: isLoadingInfraMonitoring,
-  } = useInfraMonitoringQuery(
+    isPending: isLoadingInfraMonitoring,
+  } = useInfraMonitoringAttributesQuery(
     {
       projectRef: ref as string,
-      attribute: attribute as InfraMonitoringAttribute,
+      attributes: [attribute as InfraMonitoringAttribute],
       startDate,
       endDate,
       interval: interval as AnalyticsInterval,
@@ -97,6 +106,14 @@ export const ChartBlock = ({
     },
     { enabled: provider === 'infra-monitoring' }
   )
+
+  const infraMonitoringData = useMemo(() => {
+    if (!infraMonitoringRawData) return undefined
+    const mapped = mapMultiResponseToAnalyticsData(infraMonitoringRawData, [
+      attribute as InfraMonitoringAttribute,
+    ])
+    return mapped[attribute]
+  }, [infraMonitoringRawData, attribute])
 
   const chartData =
     provider === 'infra-monitoring'
@@ -156,6 +173,18 @@ export const ChartBlock = ({
     }
   })
 
+  const hasNonPositiveValues = useMemo(() => {
+    if (!logScale || !data.length) return false
+    return checkHasNonPositiveValues(data, metricLabel)
+  }, [logScale, data, metricLabel])
+
+  const effectiveLogScale = logScale && !hasNonPositiveValues
+
+  const yAxisWidth = computeYAxisWidth(data, metricLabel, {
+    isLogScale: effectiveLogScale,
+    isPercentage,
+  })
+
   const getInitialHighlightedValue = useCallback(() => {
     if (!chartData?.data?.length) return undefined
     const lastDataPoint = chartData.data[chartData.data.length - 1]
@@ -203,24 +232,42 @@ export const ChartBlock = ({
               },
             }}
           />
+          <ButtonTooltip
+            type={logScale ? 'default' : 'text'}
+            size="tiny"
+            disabled={loading}
+            className="h-7 px-1.5 font-mono text-[10px]"
+            icon={<span className="font-mono text-[10px] leading-none">Log</span>}
+            onClick={() => {
+              const next = !logScale
+              if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { logScale: next } })
+            }}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                className: 'max-w-56 text-center',
+                text: `Switch to ${logScale ? 'linear' : 'logarithmic'} scale`,
+              },
+            }}
+          />
           {actions}
         </>
       }
     >
       {loading ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <Loader2 size={18} className="animate-spin text-border-strong" />
           <p className="text-xs text-foreground-lighter text-center">Loading data for {label}</p>
         </div>
       ) : chartData === undefined ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <WarningIcon />
           <p className="text-xs text-foreground-lighter text-center">
             Unable to load data for {label}
           </p>
         </div>
       ) : data.length === 0 ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
+        <div className="flex grow w-full flex-col items-center justify-center gap-y-2">
           <NoDataPlaceholder
             size="small"
             className="border-0"
@@ -236,6 +283,11 @@ export const ChartBlock = ({
               </span>
               <p className="text-lg text">{latestValue}</p>
             </div>
+          )}
+          {hasNonPositiveValues && (
+            <p className="px-3 pt-1 text-xs text-foreground-light">
+              Log scale is unavailable because the data contains zero or negative values.
+            </p>
           )}
           <ChartContainer
             className="w-full aspect-auto px-3 py-2"
@@ -254,13 +306,19 @@ export const ChartBlock = ({
                   tickMargin={8}
                   minTickGap={32}
                 />
-                <YAxis hide domain={isPercentage ? [0, 100] : undefined} />
+                <YAxis
+                  scale={effectiveLogScale ? 'log' : 'auto'}
+                  domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
+                  allowDataOverflow={effectiveLogScale}
+                  width={yAxisWidth}
+                  tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
+                />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="w-[200px]"
+                      className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => formatChartDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />
@@ -276,13 +334,18 @@ export const ChartBlock = ({
                   tickMargin={8}
                   minTickGap={32}
                 />
-                <YAxis hide domain={isPercentage ? [0, 100] : undefined} />
+                <YAxis
+                  scale={effectiveLogScale ? 'log' : 'auto'}
+                  domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
+                  allowDataOverflow={effectiveLogScale}
+                  width={yAxisWidth}
+                  tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
+                />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="w-[200px]"
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => formatChartDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />

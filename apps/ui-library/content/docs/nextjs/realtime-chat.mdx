@@ -20,6 +20,19 @@ description: Real-time chat component for collaborative applications
 
 The Realtime Chat component provides a complete chat interface that enables users to exchange messages in real-time within a shared room.
 
+## How it works under the hood
+
+This chat component uses **Supabase Realtime Broadcast** to send and receive messages between connected clients.
+
+Messages sent through Broadcast are:
+
+- delivered in real time to other connected clients
+- **not stored** unless you handle persistence yourself
+- **not guaranteed** to arrive if the client disconnects
+- scoped to a specific `roomName`, which corresponds to a broadcast channel
+
+This design keeps latency extremely low, but it means you should use the `onMessage` callback if you want to store messages permanently or show chat history on page load.
+
 ## Usage
 
 ### Basic usage

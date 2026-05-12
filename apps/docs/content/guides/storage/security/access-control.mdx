@@ -6,7 +6,7 @@ sidebar_label: 'Uploads'
 tocVideo: '4ERX__Y908k'
 ---
 
-Supabase Storage is designed to work perfectly with Postgres [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS).
+Supabase Storage is designed to work perfectly with Postgres [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS).
 
 You can use RLS to create [Security Access Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) that are incredibly powerful and flexible, allowing you to restrict access based on your business needs.
 
@@ -15,6 +15,8 @@ You can use RLS to create [Security Access Policies](https://www.postgresql.org/
 By default Storage does not allow any uploads to buckets without RLS policies. You selectively allow certain operations by creating RLS policies on the `storage.objects` table.
 
 You can find the documentation for the storage schema [here](/docs/guides/storage/schema/design) , and to simplify the process of crafting your policies, you can utilize these [helper functions](/docs/guides/storage/schema/helper-functions) .
+
+If you need different `SELECT` policies for different Storage actions, such as listing objects versus reading authenticated objects, use the operation-aware helpers `storage.allow_only_operation()` and `storage.allow_any_operation()` documented in [Storage Helper Functions](/docs/guides/storage/schema/helper-functions).
 
 <Admonition type="note">
 
@@ -70,7 +72,7 @@ for insert
 to authenticated
 with check (
   bucket_id = 'my_bucket_id' and
-  (storage.foldername(name))[1] = (select auth.uid()::text)
+  (storage.foldername(name))[1] = (select auth.jwt()->>'sub')
 );
 ```
 
@@ -80,7 +82,7 @@ Allow a user to access a file that was previously uploaded by the same user:
 create policy "Individual user Access"
 on storage.objects for select
 to authenticated
-using ( (select auth.uid()) = owner_id::uuid );
+using ( (select auth.jwt()->>'sub') = owner_id );
 ```
 
 ---

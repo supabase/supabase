@@ -1,28 +1,30 @@
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { type GetStaticPaths, type GetStaticProps } from 'next'
-import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import { serialize } from 'next-mdx-remote-client/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { type Dispatch, type SetStateAction, useState } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import remarkGfm from 'remark-gfm'
-import 'swiper/css'
-import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { useBreakpoint } from 'common'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import 'swiper/css'
 
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
+import { useBreakpoint } from 'common'
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+
 import Error404 from '../../404'
 
 /**
@@ -79,7 +81,7 @@ function Partner({
           visible
           onCancel={() => setFocusedImage(null)}
           size="xxlarge"
-          className="w-full outline-none"
+          className="w-full outline-hidden"
         >
           <Image
             layout="responsive"
@@ -108,7 +110,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-surface-200 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface-200 shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -118,10 +120,10 @@ function Partner({
             </div>
 
             <div
-              className="bg-gradient-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
+              className="bg-linear-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
-              <SectionContainer className="!py-0 !px-3 lg:!px-12 xl:!p-0 mx-auto max-w-5xl">
+              <SectionContainer className="py-0! px-3! lg:px-12! xl:p-0! mx-auto max-w-5xl">
                 <Swiper
                   initialSlide={0}
                   spaceBetween={20}
@@ -188,14 +190,18 @@ function Partner({
                 </h2>
 
                 <div className="prose">
-                  <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
+                  {'error' in overview ? (
+                    <p>Error rendering integration page: {overview.error.message}</p>
+                  ) : (
+                    <MDXClient {...overview} components={mdxComponents(setFocusedImage)} />
+                  )}
                 </div>
               </div>
 
               {!isNarrow && <PartnerDetails partner={partner} />}
             </div>
             {partner.call_to_action_link && (
-              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-xs max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.
@@ -248,7 +254,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
             <span className="text-lighter">Category</span>
             <Link
               href={`/partners/integrations#${partner.category.toLowerCase()}`}
-              className="text-brand hover:underline transition-colors"
+              className="text-brand-link hover:underline transition-colors"
             >
               {partner.category}
             </Link>
@@ -260,7 +266,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
               href={partner.website}
               target="_blank"
               rel="noreferrer"
-              className="text-brand hover:underline transition-colors"
+              className="text-brand-link hover:underline transition-colors"
             >
               {new URL(partner.website).host}
             </a>
@@ -273,7 +279,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
                 href={partner.docs}
                 target="_blank"
                 rel="noreferrer"
-                className="text-brand hover:underline transition-colors"
+                className="text-brand-link hover:underline transition-colors"
               >
                 <span className="flex items-center space-x-1">
                   <span>Learn</span>
@@ -339,10 +345,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  const overview = await serialize(partner.overview, {
-    mdxOptions: {
-      useDynamicImport: true,
-      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+  const overview = await serialize({
+    source: partner.overview,
+    options: {
+      mdxOptions: {
+        remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+      },
     },
   })
 

@@ -1,15 +1,15 @@
-import Link from 'next/link'
-
 import { useParams } from 'common'
-import RecentQueriesItem from 'components/interfaces/Settings/Logs/RecentQueriesItem'
-import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import Table from 'components/to-be-cleaned/Table'
-import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import { Button } from 'ui'
 import { Clock } from 'lucide-react'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import Link from 'next/link'
+import { Button } from 'ui'
+
+import RecentQueriesItem from '@/components/interfaces/Settings/Logs/RecentQueriesItem'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
+import Table from '@/components/to-be-cleaned/Table'
+import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import type { LogSqlSnippets, NextPageWithLayout } from '@/types'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -42,7 +42,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
       )}
       {recent.length === 0 && (
         <>
-          <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
+          <div className="my-auto flex h-full grow flex-col items-center justify-center gap-1">
             <Clock className="animate-bounce" />
             <h3 className="text-lg text-foreground">No Recent Queries Yet</h3>
             <p className="text-sm text-foreground-lighter">
@@ -61,7 +61,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
 
 LogsSavedPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Recent">{page}</LogsLayout>
   </DefaultLayout>
 )
 

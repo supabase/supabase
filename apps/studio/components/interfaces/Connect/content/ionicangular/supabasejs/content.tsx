@@ -1,12 +1,12 @@
-import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
+import type { ContentFileProps } from '@/components/interfaces/Connect/Connect.types'
 import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
   ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from 'ui'
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+} from '@/components/interfaces/Connect/ConnectTabs'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -24,7 +24,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
           {`
 export const environment = {
   supabaseUrl: '${projectKeys.apiUrl ?? 'your-project-url'}',
-  supabaseKey: '${projectKeys.publishableKey ?? '<prefer publishabke key instead of anon key for mobile apps>'}',
+  supabaseKey: '${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile apps>'}',
 };
 `}
         </SimpleCodeBlock>

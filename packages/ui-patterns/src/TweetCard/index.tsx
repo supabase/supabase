@@ -15,7 +15,7 @@ export function TweetCard(props: TweetCard) {
         'bg-surface-75',
         'border group-hover/tweet-card:border-foreground-muted transition-colors',
         'rounded-2xl p-6',
-        'drop-shadow-sm',
+        'drop-shadow-xs',
         props.className
       )}
     >
@@ -42,7 +42,7 @@ export function TweetCard(props: TweetCard) {
         </div>
       </div>
 
-      <p className="text-foreground-lighter mt-3 text-base">"{props.quote}"</p>
+      <p className="text-foreground-lighter mt-3 text-base whitespace-pre-line">{props.quote}</p>
     </div>
   )
 }

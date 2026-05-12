@@ -1,6 +1,7 @@
-import { useInvoicePaymentLinkGetMutation } from 'data/invoices/invoice-payment-link-mutation'
 import { toast } from 'sonner'
 import { Button } from 'ui'
+
+import { useInvoicePaymentLinkGetMutation } from '@/data/invoices/invoice-payment-link-mutation'
 
 interface InvoicePayButtonProps {
   slug?: string
@@ -8,7 +9,7 @@ interface InvoicePayButtonProps {
 }
 
 const InvoicePayButton = ({ slug, invoiceId }: InvoicePayButtonProps) => {
-  const { mutate, isLoading } = useInvoicePaymentLinkGetMutation({
+  const { mutate, isPending } = useInvoicePaymentLinkGetMutation({
     onSuccess(data) {
       toast.success('Redirecting to payment gateway...')
 
@@ -21,8 +22,8 @@ const InvoicePayButton = ({ slug, invoiceId }: InvoicePayButtonProps) => {
   }
 
   return (
-    <Button onClick={onPayNow} loading={isLoading} disabled={isLoading}>
-      Pay Now
+    <Button onClick={onPayNow} loading={isPending} disabled={isPending}>
+      Pay now
     </Button>
   )
 }

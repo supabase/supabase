@@ -30,8 +30,6 @@ There are some limitations you should be aware of when using third-party authent
 2. The JWT signing keys from the third-party provider are stored in the configuration of your project, and are checked for changes periodically. If you are rotating your keys (when supported) allow up to 30 minutes for the change to be picked up.
 3. It is not possible to disable Supabase Auth at this time.
 
-## Pricing
-
+<$Show if="billing:all">
 <$Partial path="billing/pricing/pricing_mau_third_party.mdx" />
-
-For a detailed breakdown of how charges are calculated, refer to [Manage Monthly Active Third-Party Users usage](/docs/guides/platform/manage-your-usage/monthly-active-users-third-party).
+</$Show>

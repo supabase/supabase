@@ -1,11 +1,13 @@
 import { ExternalLink } from 'lucide-react'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
+
+import { DOCS_URL } from '@/lib/constants'
 
 export const RestorePaidPlanProjectNotice = () => {
   return (
@@ -21,7 +23,7 @@ export const RestorePaidPlanProjectNotice = () => {
       <AlertDescription_Shadcn_ className="mt-3">
         <Button asChild type="default" icon={<ExternalLink />}>
           <a
-            href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
+            href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
             target="_blank"
             rel="noreferrer"
           >

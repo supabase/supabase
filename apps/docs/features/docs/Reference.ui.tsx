@@ -1,10 +1,3 @@
-import { isEqual } from 'lodash-es'
-import { ChevronRight, XCircle } from 'lucide-react'
-import type { HTMLAttributes, PropsWithChildren } from 'react'
-import ReactMarkdown from 'react-markdown'
-
-import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
-
 import ApiSchema from '~/components/ApiSchema'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { MDXRemoteRefs } from '~/features/docs/Reference.mdx'
@@ -17,6 +10,18 @@ import type {
 import { TYPESPEC_NODE_ANONYMOUS } from '~/features/docs/Reference.typeSpec'
 import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
+import { isEqual } from 'lodash-es'
+import { ChevronRight, XCircle } from 'lucide-react'
+import type { HTMLAttributes, PropsWithChildren } from 'react'
+import ReactMarkdown from 'react-markdown'
+import {
+  Badge,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+} from 'ui'
+
 import { getTypeDisplayFromSchema, IApiEndPoint, type ISchema } from './Reference.api.utils'
 import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
 
@@ -35,7 +40,7 @@ function Section({ slug, link, columns = 'single', children }: SectionProps) {
       link={link}
       className={cn(
         'grid grid-cols-[1fr] gap-x-16 gap-y-8',
-        singleColumn ? 'max-w-3xl' : '@4xl/article:grid-cols-[1fr,1fr]'
+        singleColumn ? 'max-w-3xl' : '@4xl/article:grid-cols-[1fr_1fr]'
       )}
     >
       {children}
@@ -94,7 +99,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
     <h2
       tabIndex={-1} // For programmatic focus on auto-scroll to section
       className={cn(
-        'sticky top-0 z-[1]',
+        'sticky top-0 z-1',
         'w-full',
         // Enough padding to cover the background when stuck to the top,
         // then readjust with negative margin to prevent it looking too
@@ -102,10 +107,10 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         'pt-[calc(var(--header-height)+1rem)] -mt-[calc(var(--header-height)+1rem-2px)]',
         // Same for bottom
         'pb-8 -mb-3',
-        'bg-gradient-to-b from-background from-85% to-transparent to-100%',
+        'bg-linear-to-b from-background from-85% to-transparent to-100%',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
-        'focus:outline-none',
+        'focus:outline-hidden',
         monoFont && 'font-mono',
         className
       )}
@@ -122,19 +127,16 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
         className={cn(
           'group',
           'w-full h-8',
-          'border bg-surface-100 rounded',
+          'border bg-surface-100 rounded-sm',
           'px-5',
           'flex items-center gap-3',
           'text-xs text-foreground-light',
-          'data-[state=open]:bg-surface-200',
-          'data-[state=open]:rounded-b-none data-[state=open]:border-b-0',
+          'data-open:bg-surface-200',
+          'data-open:rounded-b-none data-open:border-b-0',
           'transition-safe-all ease-out'
         )}
       >
-        <ChevronRight
-          size={12}
-          className="group-data-[state=open]:rotate-90 transition-transform"
-        />
+        <ChevronRight size={12} className="group-data-open:rotate-90 transition-transform" />
         {title}
       </CollapsibleTrigger_Shadcn_>
       <CollapsibleContent_Shadcn_
@@ -194,7 +196,7 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
     'description' in paramOrType
       ? (paramOrType.description as string)
       : isFromTypespec(paramOrType)
-        ? paramOrType.comment?.shortText ?? ''
+        ? (paramOrType.comment?.shortText ?? '')
         : ''
 
   const subContent =
@@ -214,14 +216,14 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
             ? '[Anonymous]'
             : (paramOrType.name as string)}
         </span>
-        <RequiredBadge
-          isOptional={
-            'isOptional' in paramOrType ? (paramOrType.isOptional as boolean | 'NA') : false
-          }
-        />
+        {'isOptional' in paramOrType && paramOrType.isOptional === true ? (
+          <Badge variant="default">Optional</Badge>
+        ) : 'isOptional' in paramOrType && paramOrType.isOptional === false ? (
+          <Badge variant="warning">Required</Badge>
+        ) : null}
         {/* @ts-ignore */}
         {paramOrType?.comment?.tags?.some((tag) => tag.tag === 'deprecated') && (
-          <span className="text-xs text-warning-600">Deprecated</span>
+          <span className="text-xs text-warning">Deprecated</span>
         )}
         <span className="text-xs text-foreground-muted">{getTypeName(paramOrType)}</span>
       </div>
@@ -289,8 +291,8 @@ function TypeSubDetails({
           'flex items-center gap-2',
           'text-left text-sm text-foreground-light',
           'hover:bg-surface-100',
-          'data-[state=open]:w-full',
-          'data-[state=open]:rounded-b-none data-[state=open]:rounded-tl-lg data-[state=open]:rounded-tr-lg',
+          'data-open:w-full',
+          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
           'transition [transition-property:width,background-color]',
           className
         )}
@@ -299,7 +301,7 @@ function TypeSubDetails({
           size={14}
           className={cn(
             'text-foreground-muted',
-            'group-data-[state=closed]:rotate-45',
+            'group-data-closed:rotate-45',
             'transition-transform'
           )}
         />
@@ -327,24 +329,6 @@ function TypeSubDetails({
   )
 }
 
-export function RequiredBadge({ isOptional }: { isOptional: boolean | 'NA' }) {
-  return isOptional === true ? (
-    <span className="font-mono text-[10px] text-foreground-lighter tracking-wide">Optional</span>
-  ) : isOptional === false ? (
-    <span
-      className={cn(
-        'inline-block',
-        'px-2 py-0.25 rounded-full',
-        '-translate-y-[0.125rem]', // retranslate to undo visual misalignment from the y-padding
-        'border border-amber-700 bg-amber-300',
-        'font-mono text-[10px] text-amber-900 uppercase tracking-wide'
-      )}
-    >
-      Required
-    </span>
-  ) : undefined
-}
-
 export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['parameters'][number] }) {
   return (
     <li className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
@@ -352,8 +336,12 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
         <span className="font-mono text-sm font-medium text-foreground break-all">
           {param.name}
         </span>
-        <RequiredBadge isOptional={!param.required} />
-        {param.schema?.deprecated && <span className="text-xs text-warning-600">Deprecated</span>}
+        {param.required ? (
+          <Badge variant="warning">Required</Badge>
+        ) : (
+          <Badge variant="default">Optional</Badge>
+        )}
+        {param.schema?.deprecated && <span className="text-xs text-warning">Deprecated</span>}
         {param.schema && (
           <span className="text-xs text-foreground-muted">
             {getTypeDisplayFromSchema(param.schema)?.displayName ?? ''}
@@ -361,7 +349,9 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
         )}
       </div>
       {param.description && (
-        <ReactMarkdown className="prose break-words text-sm">{param.description}</ReactMarkdown>
+        <div className="prose wrap-break-word text-sm">
+          <ReactMarkdown>{param.description}</ReactMarkdown>
+        </div>
       )}
       {param.schema && <ApiSchemaParamSubdetails schema={param.schema} />}
     </li>
@@ -442,9 +432,11 @@ function ApiOperationRequestBodyDetailsInternal({
   ) {
     return <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
   } else if (schema.type === 'array') {
+    const itemTypeDisplay = getTypeDisplayFromSchema(schema.items)
+    const displayName = itemTypeDisplay?.displayName ?? 'unknown'
     return (
       <>
-        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${getTypeDisplayFromSchema(schema.items).displayName}`}</span>
+        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${displayName}`}</span>
         {!(
           'type' in schema.items &&
           ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)
@@ -518,8 +510,8 @@ export function ApiSchemaParamSubdetails({
           'flex items-center gap-2',
           'text-left text-sm text-foreground-light',
           'hover:bg-surface-100',
-          'data-[state=open]:w-full',
-          'data-[state=open]:rounded-b-none data-[state=open]:rounded-tl-lg data-[state=open]:rounded-tr-lg',
+          'data-open:w-full',
+          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
           'transition [transition-property:width,background-color]',
           className
         )}
@@ -528,7 +520,7 @@ export function ApiSchemaParamSubdetails({
           size={14}
           className={cn(
             'text-foreground-muted',
-            'group-data-[state=closed]:rotate-45',
+            'group-data-closed:rotate-45',
             'transition-transform'
           )}
         />

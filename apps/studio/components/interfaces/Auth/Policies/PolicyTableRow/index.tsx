@@ -1,157 +1,187 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { useParams } from 'common'
 import { noop } from 'lodash'
-import { Info } from 'lucide-react'
+import { memo, useMemo } from 'react'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  cn,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { Admonition } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AlertError from 'components/ui/AlertError'
-import Panel from 'components/ui/Panel'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useTableRolesAccessQuery } from 'data/tables/table-roles-access-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import PolicyRow from './PolicyRow'
-import PolicyTableRowHeader from './PolicyTableRowHeader'
+import { usePoliciesData } from '../PoliciesDataContext'
+import { PolicyRow } from './PolicyRow'
+import type { PolicyTable } from './PolicyTableRow.types'
+import type { Policy } from './PolicyTableRow.utils'
+import { getTableAdmonitionMessage, getTableDataApiStatus } from './PolicyTableRow.utils'
+import { PolicyTableRowHeader } from './PolicyTableRowHeader'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface PolicyTableRowProps {
-  table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }
+  table: PolicyTable
   isLocked: boolean
-  onSelectToggleRLS: (table: {
-    id: number
-    schema: string
-    name: string
-    rls_enabled: boolean
-  }) => void
-  onSelectCreatePolicy: () => void
-  onSelectEditPolicy: (policy: PostgresPolicy) => void
-  onSelectDeletePolicy: (policy: PostgresPolicy) => void
+  onSelectToggleRLS: (table: PolicyTable) => void
+  onSelectCreatePolicy: (table: PolicyTable) => void
+  onSelectEditPolicy: (policy: Policy) => void
+  onSelectDeletePolicy: (policy: Policy) => void
 }
 
-export const PolicyTableRow = ({
+const PolicyTableRowComponent = ({
   table,
   isLocked,
   onSelectToggleRLS = noop,
-  onSelectCreatePolicy,
+  onSelectCreatePolicy = noop,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
+  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { getPoliciesForTable, isPoliciesLoading, isPoliciesError, policiesError, exposedSchemas } =
+    usePoliciesData()
 
-  // [Joshen] Changes here are so that warnings are more accurate and granular instead of purely relying if RLS is disabled or enabled
-  // The following scenarios are technically okay if the table has RLS disabled, in which it won't be publicly readable / writable
-  // - If the schema is not exposed through the API via Postgrest
-  // - If the anon and authenticated roles do not have access to the table
-  // Ideally we should just rely on the security lints as the source of truth, but the security lints currently have limitations
-  // - They only consider the public schema
-  // - They do not consider roles
-  // Eventually if the security lints are able to cover those, we can look to using them as the source of truth instead then
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
-  const exposedSchemas = config?.db_schema ? config?.db_schema.replace(/ /g, '').split(',') : []
-  const isRLSEnabled = table.rls_enabled
-  const isTableExposedThroughAPI = exposedSchemas.includes(table.schema)
+  const policies = useMemo(
+    () => getPoliciesForTable(table.schema, table.name),
+    [getPoliciesForTable, table.schema, table.name]
+  )
 
-  const { data: roles = [] } = useTableRolesAccessQuery({
+  // [Joshen] Classification is more granular than "RLS on/off" alone — it also considers
+  // schema exposure and whether anon/authenticated/service_role actually have grants.
+  // Ideally we'd rely on the security lints, but they only look at the public schema and
+  // ignore roles. Once the lints cover both, we can switch to them as the source of truth.
+  const tableNames = useMemo(() => [table.name], [table.name])
+  const {
+    data: apiAccessMap,
+    isPending: isLoadingRolesAccess,
+    isError: isRolesAccessError,
+  } = useTableApiAccessQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: table.schema,
-    table: table.name,
+    schemaName: table.schema,
+    tableNames,
   })
-  const hasAnonAuthenticatedRolesAccess = roles.length !== 0
-  const isPubliclyReadableWritable =
-    !isRLSEnabled && isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
 
-  const { data, error, isLoading, isError, isSuccess } = useDatabasePoliciesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const policies = (data ?? [])
-    .filter((policy) => policy.schema === table.schema && policy.table === table.name)
-    .sort((a, b) => a.name.localeCompare(b.name))
-  const rlsEnabledNoPolicies = isRLSEnabled && policies.length === 0
+  const status = useMemo(
+    () =>
+      getTableDataApiStatus({
+        isSchemaExposed: exposedSchemas.has(table.schema),
+        apiAccessData: apiAccessMap?.[table.name],
+        isRLSEnabled: table.rls_enabled,
+        policiesCount: policies.length,
+      }),
+    [exposedSchemas, apiAccessMap, table.schema, table.name, table.rls_enabled, policies.length]
+  )
+
+  const hasApiAccess =
+    status === 'publicly-readable' || status === 'locked-by-rls' || status === 'secured'
+  const isPubliclyReadable = status === 'publicly-readable'
+
+  const isRealtimeSchema = table.schema === 'realtime'
+  const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
+  const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
+
+  const showPolicies = !isPoliciesLoading && !isPoliciesError && !isLoadingRolesAccess
+
+  const admonitionMessage = useMemo(() => getTableAdmonitionMessage(status), [status])
 
   return (
-    <Panel
-      className="!m-0"
-      title={
+    <Card className={cn(isPubliclyReadable && 'border-warning-500')}>
+      <CardHeader className={cn('py-3 px-4', status !== 'secured' && 'border-b-0')}>
         <PolicyTableRowHeader
           table={table}
           isLocked={isLocked}
+          hasApiAccess={hasApiAccess}
+          isLoadingApiAccess={isLoadingRolesAccess}
           onSelectToggleRLS={onSelectToggleRLS}
           onSelectCreatePolicy={onSelectCreatePolicy}
         />
-      }
-    >
-      {(isPubliclyReadableWritable || rlsEnabledNoPolicies) && (
-        <div
-          className={cn(
-            'dark:bg-alternative-200 bg-surface-200 px-6 py-2 text-xs flex items-center gap-2',
-            policies.length === 0 ? '' : 'border-b'
-          )}
+      </CardHeader>
+
+      {!isLoadingRolesAccess && !isRolesAccessError && status === 'schema-not-exposed' && (
+        <Admonition
+          showIcon={false}
+          type="warning"
+          className="border-0 border-y rounded-none min-h-12 flex items-center"
         >
-          <div
-            className={cn(
-              'w-1.5 h-1.5 rounded-full bg-warning-600 ',
-              rlsEnabledNoPolicies && 'bg-selection'
-            )}
-          />
-          <span
-            className={cn('font-bold text-warning-600', rlsEnabledNoPolicies && 'text-foreground')}
-          >
-            {isPubliclyReadableWritable ? 'Warning' : 'Note'}:
-          </span>{' '}
-          <span className="text-foreground-light">
-            {isPubliclyReadableWritable
-              ? 'Row Level Security is disabled. Your table is publicly readable and writable.'
-              : 'Row Level Security is enabled, but no policies exist. No data will be selectable via Supabase APIs.'}
-          </span>
-          {isPubliclyReadableWritable && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="w-3 h-3" />
-              </TooltipTrigger>
-              <TooltipContent className="w-[400px]">
-                Anyone with the project's anonymous key can modify or delete your data. Enable RLS
-                and create access policies to keep your data secure.
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </div>
+          <p className="text-foreground-light">
+            No data will be selectable via Supabase APIs as this schema is not exposed. You may
+            configure this in your project’s{' '}
+            <InlineLink href={`/project/${ref}/integrations/data_api/settings`}>
+              API settings
+            </InlineLink>
+            .
+          </p>
+        </Admonition>
       )}
-      {isLoading && (
-        <div className="px-6 py-4">
+
+      {!isLoadingRolesAccess && !isRolesAccessError && admonitionMessage !== null && (
+        <Admonition
+          showIcon={false}
+          type={isPubliclyReadable ? 'warning' : 'default'}
+          className="border-0 border-y rounded-none min-h-12 flex items-center"
+        >
+          <p>{admonitionMessage}</p>
+        </Admonition>
+      )}
+
+      {(isPoliciesLoading || isLoadingRolesAccess) && (
+        <CardContent>
           <ShimmeringLoader />
-        </div>
+        </CardContent>
       )}
-      {isError && (
-        <AlertError
-          className="border-0 rounded-none"
-          error={error}
-          subject="Failed to retrieve policies"
-        />
+
+      {isPoliciesError && (
+        <CardContent>
+          <AlertError
+            className="border-0 rounded-none"
+            error={policiesError}
+            subject="Failed to retrieve policies"
+          />
+        </CardContent>
       )}
-      {isSuccess && (
-        <>
-          {policies.length === 0 && (
-            <div className="px-6 py-4 flex flex-col gap-y-3">
-              <p className="text-foreground-lighter text-sm">No policies created yet</p>
-            </div>
+
+      {showPolicies && (
+        <CardContent className="p-0">
+          {policies.length === 0 ? (
+            <p className="text-foreground-lighter text-sm p-4">No policies created yet</p>
+          ) : (
+            <Table className="table-fixed">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">Name</TableHead>
+                  <TableHead className="w-[20%]">Command</TableHead>
+                  <TableHead className="w-[30%]">Applied to</TableHead>
+                  <TableHead className="text-right">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {policies.map((policy) => (
+                  <PolicyRow
+                    key={policy.id}
+                    policy={policy}
+                    isLocked={isTableLocked}
+                    onSelectEditPolicy={onSelectEditPolicy}
+                    onSelectDeletePolicy={onSelectDeletePolicy}
+                  />
+                ))}
+              </TableBody>
+            </Table>
           )}
-          {policies?.map((policy) => (
-            <PolicyRow
-              key={policy.id}
-              isLocked={isLocked}
-              policy={policy}
-              onSelectEditPolicy={onSelectEditPolicy}
-              onSelectDeletePolicy={onSelectDeletePolicy}
-            />
-          ))}
-        </>
+        </CardContent>
       )}
-    </Panel>
+    </Card>
   )
 }
+
+export const PolicyTableRow = memo(PolicyTableRowComponent)
+PolicyTableRow.displayName = 'PolicyTableRow'

@@ -1,12 +1,12 @@
-import { MessageCircle } from 'lucide-react'
+import VideoWithHighlights from 'components/VideoWithHighlights'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import Link from 'next/link'
 import { Button } from 'ui'
-import VideoWithHighlights from 'components/VideoWithHighlights'
 import ProductModules from '../ProductModules'
-import { useSendTelemetryEvent } from 'lib/telemetry'
 
-import Tweets from 'data/tweets/Tweets.json'
 import MainProducts from 'data/MainProducts'
+import { topTweets } from 'shared-data/tweets'
+import { IconDiscord } from 'ui'
 
 export default () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -15,10 +15,10 @@ export default () => {
     heroSection: {
       heading: (
         <>
-          <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground-light">
+          <span className="block text-[#F4FFFA00] bg-clip-text bg-linear-to-b from-foreground to-foreground-light">
             Build in a weekend
           </span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] block md:ml-0">
+          <span className="text-transparent bg-clip-text bg-linear-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] block md:ml-0">
             Scale to millions
           </span>
         </>
@@ -173,38 +173,22 @@ export default () => {
       heading: 'Join the community',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
-        <>
-          <Button asChild size="small" iconRight={<MessageCircle size={14} />} type="default">
-            <Link
-              href={'https://github.com/supabase/supabase/discussions'}
-              target="_blank"
-              tabIndex={-1}
-              onClick={() =>
-                sendTelemetryEvent({
-                  action: 'homepage_github_discussions_button_clicked',
-                })
-              }
-            >
-              GitHub discussions
-            </Link>
-          </Button>
-          <Button asChild type="default" size="small" iconRight={<MessageCircle size={14} />}>
-            <Link
-              href={'https://discord.supabase.com/'}
-              target="_blank"
-              tabIndex={-1}
-              onClick={() =>
-                sendTelemetryEvent({
-                  action: 'homepage_discord_button_clicked',
-                })
-              }
-            >
-              Discord
-            </Link>
-          </Button>
-        </>
+        <Button asChild type="default" size="small" icon={<IconDiscord />}>
+          <Link
+            href={'https://discord.supabase.com/'}
+            target="_blank"
+            tabIndex={-1}
+            onClick={() =>
+              sendTelemetryEvent({
+                action: 'homepage_discord_button_clicked',
+              })
+            }
+          >
+            Join us on Discord
+          </Link>
+        </Button>
       ),
-      tweets: Tweets.slice(0, 18),
+      tweets: topTweets,
     },
   }
 }

@@ -32,7 +32,7 @@ const Neon: NextPage = () => {
         nofollow={true}
       />
       <Layout className="overflow-visible">
-        <SolutionsStickyNav activeItem={Solutions.neon} type="use-case" />
+        <SolutionsStickyNav activeItem={Solutions.neon} type="migration" />
         <ProductHeader {...content.heroSection} />
         <SingleQuote
           quote={{

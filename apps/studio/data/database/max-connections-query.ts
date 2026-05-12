@@ -1,12 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { getMaxConnectionsSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
+
 import { databaseKeys } from './keys'
-
-export const getMaxConnectionsSql = () => {
-  const sql = /* SQL */ `show max_connections`
-
-  return sql
-}
+import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 export type MaxConnectionsVariables = {
   projectRef?: string
@@ -39,13 +36,11 @@ export const useMaxConnectionsQuery = <TData = MaxConnectionsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<MaxConnectionsData, MaxConnectionsError, TData> = {}
+  }: UseCustomQueryOptions<MaxConnectionsData, MaxConnectionsError, TData> = {}
 ) =>
-  useQuery<MaxConnectionsData, MaxConnectionsError, TData>(
-    databaseKeys.maxConnections(projectRef),
-    ({ signal }) => getMaxConnections({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<MaxConnectionsData, MaxConnectionsError, TData>({
+    queryKey: databaseKeys.maxConnections(projectRef),
+    queryFn: ({ signal }) => getMaxConnections({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -1,6 +1,6 @@
 import { X } from 'lucide-react'
-
 import { Button } from 'ui'
+
 import type { DataTableFilterField } from '../DataTable.types'
 import { useDataTable } from '../providers/DataTableProvider'
 
@@ -17,14 +17,14 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
     <Button
       type="outline"
       icon={<X />}
-      className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:-translate-y-[0.6px] space-x-1"
+      className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:translate-y-[-0.6px] space-x-1"
       onClick={(e) => {
         e.stopPropagation()
         column?.setFilterValue(undefined)
       }}
       onKeyDown={(e) => {
         e.stopPropagation()
-        if (e.code === 'Enter') {
+        if (e.code === 'Enter' || e.code === 'NumpadEnter') {
           column?.setFilterValue(undefined)
         }
       }}

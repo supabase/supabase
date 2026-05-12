@@ -1,15 +1,16 @@
-import { Loader, Search } from 'lucide-react'
-import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { Input } from 'ui'
-import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
+import { Loader, Search } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import { useDebounce } from 'use-debounce'
+
 import TileGrid from '../../../components/Partners/TileGrid'
 
 export async function getStaticProps() {
@@ -115,22 +116,26 @@ function IntegrationPartnersPage(props: Props) {
               {/* Horizontal link menu */}
               <div className="space-y-6">
                 {/* Search Bar */}
-
-                <Input
-                  size="small"
-                  icon={<Search />}
-                  placeholder="Search..."
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  actions={
-                    isSearching && (
+                <InputGroup className="w-full">
+                  <InputGroupInput
+                    size="small"
+                    autoComplete="off"
+                    type="search"
+                    placeholder="Search..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <InputGroupAddon>
+                    <Search />
+                  </InputGroupAddon>
+                  {isSearching && (
+                    <InputGroupAddon align="inline-end">
                       <span className="mr-1 animate-spin text-white">
                         <Loader />
                       </span>
-                    )
-                  }
-                />
+                    </InputGroupAddon>
+                  )}
+                </InputGroup>
                 <div className="hidden lg:block">
                   <div className="text-foreground-lighter mb-2 text-sm">Categories</div>
                   <div className="space-y-1">

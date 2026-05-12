@@ -1,0 +1,9 @@
+{
+  "homepage:heading": "Supabase Documentation",
+  "metadata:application_name": "Supabase Docs",
+  "metadata:title": "Supabase Docs",
+  "navigation:logo": {
+    "light": "/docs/supabase-light.svg",
+    "dark": "/docs/supabase-dark.svg"
+  }
+}

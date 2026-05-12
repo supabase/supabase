@@ -1,18 +1,14 @@
+import { remarkCodeHike } from '@code-hike/mdx'
 import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 import { withSentryConfig } from '@sentry/nextjs'
-
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import redirects from './lib/redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
-
-import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-
-import { withContentlayer } from 'next-contentlayer2'
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -53,12 +49,27 @@ const nextConfig = {
     'shared-data',
     'icons',
     'api-types',
+    'marketing',
     // needed to make the octokit packages work in /changelog
     '@octokit/plugin-paginate-graphql',
   ],
   experimental: {
     // needed to make the octokit packages work in /changelog
     esmExternals: 'loose',
+  },
+  /**
+   * Exclude huge directories from being traced into serverless functions
+   * to avoid the max size limit for Serverless Functions on Vercel:
+   * https://vercel.com/guides/troubleshooting-function-250mb-limit
+   */
+  outputFileTracingExcludes: {
+    '*': [
+      // Next.js build artifacts
+      '.next/cache/**/*',
+      '.next/static/**/*',
+      // Static assets
+      'public/**/*',
+    ],
   },
   reactStrictMode: true,
   images: {
@@ -68,16 +79,53 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: '/changelog-rss.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog-rss/:slug.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog/:slug.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/changelog.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/',
         headers: [
           {
-            key: 'X-Robots-Tag',
-            value: 'all',
+            key: 'Link',
+            value: '</.well-known/api-catalog>; rel="api-catalog"',
           },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
+        ],
+      },
+      {
+        source: '/.well-known/api-catalog',
+        headers: [
+          { key: 'content-type', value: 'application/linkset+json' },
+          { key: 'access-control-allow-origin', value: '*' },
         ],
       },
       {
@@ -105,18 +153,57 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/(docs|blog)/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+        ],
+      },
+      {
+        source: '/dashboard/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
+        ],
+      },
+      {
+        source: '/enterprise-terms',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
     return rewrites
   },
   async redirects() {
-    return redirects
+    // For /docs/guides/ redirects, auto-generate .md variants so renamed/deleted pages
+    // redirect correctly when fetched as markdown
+    const docsMdRedirects = redirects
+      .filter(
+        (r) =>
+          r.source.startsWith('/docs/guides/') &&
+          typeof r.destination === 'string' &&
+          r.destination.startsWith('/')
+      )
+      .map((r) => ({ ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }))
+
+    return [...docsMdRedirects, ...redirects]
   },
   typescript: {
-    // WARNING: production builds can successfully complete even there are type errors
-    // Typechecking is checked separately via .github/workflows/typecheck.yml
-    ignoreBuildErrors: true,
+    // On previews, typechecking is run via GitHub Action only for efficiency
+    // On production, we turn it on to prevent errors from conflicting PRs getting into
+    // prod
+    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
   },
   eslint: {
     // We are already running linting via GH action, this will skip linting during production build on Vercel.
@@ -126,7 +213,7 @@ const nextConfig = {
 
 // next.config.js.
 const configExport = () => {
-  const plugins = [withContentlayer, withMDX, withBundleAnalyzer]
+  const plugins = [withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
 

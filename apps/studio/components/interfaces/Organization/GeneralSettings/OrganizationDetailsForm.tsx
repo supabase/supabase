@@ -1,30 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Card, CardContent, CardFooter, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { ResponseError } from 'types'
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_ as Input,
-  PrePostTab,
-} from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { FormActions } from '@/components/ui/Forms/FormActions'
+import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
+import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { ResponseError } from '@/types'
 
 const OrgDetailsSchema = z.object({
   name: z.string().min(1, 'Organization name is required'),
@@ -34,9 +25,13 @@ export const OrganizationDetailsForm = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
-  const { mutate: updateOrganization, isLoading: isUpdatingDetails } =
+  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
+
+  const { mutate: updateOrganization, isPending: isUpdatingDetails } =
     useOrganizationUpdateMutation()
 
   const orgDetailsForm = useForm<z.infer<typeof OrgDetailsSchema>>({
@@ -75,43 +70,31 @@ export const OrganizationDetailsForm = () => {
   }, [selectedOrganization, orgDetailsForm, isUpdatingDetails])
 
   return (
-    <Form_Shadcn_ {...orgDetailsForm}>
+    <Form {...orgDetailsForm}>
       <form
         id="org-details-form"
         onSubmit={orgDetailsForm.handleSubmit(onUpdateOrganizationDetails)}
       >
         <Card>
-          <CardContent className="pt-6">
-            <FormField_Shadcn_
+          <CardContent>
+            <FormField
               control={orgDetailsForm.control}
               name="name"
               render={({ field }) => (
                 <FormItemLayout label="Organization name" layout="flex-row-reverse">
-                  <FormControl_Shadcn_>
-                    <Input
+                  <FormControl>
+                    <Input_Shadcn_
                       {...field}
-                      className="w-96 max-w-full"
                       disabled={!canUpdateOrganization || isUpdatingDetails}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
           </CardContent>
           <CardContent>
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
-              <PrePostTab
-                postTab={
-                  <CopyButton type="text" iconOnly text={selectedOrganization?.slug ?? ''} />
-                }
-              >
-                <Input
-                  disabled
-                  className="w-64 max-w-full"
-                  id="slug"
-                  value={selectedOrganization?.slug ?? ''}
-                />
-              </PrePostTab>
+              <Input copy disabled id="slug" value={selectedOrganization?.slug ?? ''} />
             </FormItemLayout>
           </CardContent>
           <CardFooter className="flex justify-end p-4 md:px-8">
@@ -126,6 +109,6 @@ export const OrganizationDetailsForm = () => {
           </CardFooter>
         </Card>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

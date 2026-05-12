@@ -1,44 +1,46 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Edit, MoreVertical, Trash } from 'lucide-react'
-
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import Panel from 'components/ui/Panel'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
-  Badge,
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import { generatePolicyUpdateSQL } from './PolicyTableRow.utils'
+import type { Policy } from './PolicyTableRow.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface PolicyRowProps {
-  policy: PostgresPolicy
-  onSelectEditPolicy: (policy: PostgresPolicy) => void
-  onSelectDeletePolicy: (policy: PostgresPolicy) => void
-  isLocked: boolean
+  policy: Policy
+  onSelectEditPolicy: (policy: Policy) => void
+  onSelectDeletePolicy: (policy: Policy) => void
+  isLocked?: boolean
 }
 
-const PolicyRow = ({
+export const PolicyRow = ({
   policy,
-  isLocked: isLockedDefault,
+  isLocked: isLockedDefault = false,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
-  const { can: canUpdatePolicies } = useAsyncCheckProjectPermissions(
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'policies'
   )
@@ -56,63 +58,76 @@ const PolicyRow = ({
     authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED &&
     (policy.roles.includes('authenticated') || policy.roles.includes('public'))
 
+  const displayedRoles = (() => {
+    const rolesWithAnonymous = appliesToAnonymousUsers
+      ? [...policy.roles, 'anonymous sign-ins']
+      : policy.roles
+    return rolesWithAnonymous
+  })()
+
   return (
-    <Panel.Content
-      className={cn(
-        'flex border-overlay',
-        'w-full last:border-0 space-x-4 border-b py-4 lg:items-center'
-      )}
-    >
-      <div className="flex grow flex-col gap-y-1">
-        <div className="flex items-start gap-x-4">
-          <p className="font-mono text-xs text-foreground-light translate-y-[2px] min-w-12">
-            {policy.command}
-          </p>
-
-          <div className="flex flex-col gap-y-1">
-            <Button
-              type="text"
-              className="h-auto text-foreground text-sm border-none p-0 hover:bg-transparent justify-start"
-              onClick={() => onSelectEditPolicy(policy)}
-            >
-              {policy.name}
-            </Button>
-            <div className="flex items-center gap-x-1">
-              <div className="text-foreground-lighter text-sm">
-                Applied to:{' '}
-                {policy.roles.slice(0, 3).map((role, i) => (
-                  <span key={`policy-${role}-${i}`}>
-                    <code className="text-foreground-light text-xs">{role}</code>
-                    {i < Math.min(policy.roles.length, 3) - 1 ? ', ' : ' '}
-                  </span>
-                ))}
-                {policy.roles.length > 1 ? 'roles' : 'role'}
-              </div>
-              {policy.roles.length > 3 && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <code key="policy-etc" className="text-foreground-light text-xs">
-                      + {policy.roles.length - 3} more roles
-                    </code>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" align="center">
-                    {policy.roles.slice(3).join(', ')}
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </div>
-          </div>
-
-          {appliesToAnonymousUsers ? (
-            <Badge color="yellow">Applies to anonymous users</Badge>
-          ) : null}
+    <TableRow>
+      <TableCell className="w-[40%] truncate">
+        <div className="flex items-center gap-x-2 min-w-0">
+          <Button
+            type="text"
+            className="text-foreground text-sm p-0 hover:bg-transparent w-full truncate justify-start"
+            onClick={() => onSelectEditPolicy(policy)}
+          >
+            {policy.name}
+          </Button>
         </div>
-      </div>
-      <div>
+      </TableCell>
+      <TableCell className="w-[20%] truncate">
+        <code className="text-code-inline">{policy.command}</code>
+      </TableCell>
+      <TableCell className="w-[30%] truncate">
+        <div className="flex items-center gap-x-1">
+          <div className="text-foreground-lighter text-sm truncate">
+            {displayedRoles.slice(0, 2).map((role, i) => (
+              <span key={`policy-${role}-${i}`}>
+                <code className="text-code-inline">{role}</code>
+                {i < Math.min(displayedRoles.length, 2) - 1 ? ', ' : ' '}
+              </span>
+            ))}
+          </div>
+          {displayedRoles.length > 2 && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <span key="policy-etc" className="text-foreground-light text-xs">
+                    + {displayedRoles.length - 2} more
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                align="center"
+                className="max-w-80 font-mono flex flex-wrap justify-center gap-y-1"
+              >
+                {displayedRoles.slice(2).map((role, i, arr) => (
+                  <>
+                    <code key={role} className="text-code-inline break-keep!">
+                      {role}
+                    </code>
+                    {i < arr.length - 1 && ', '}
+                  </>
+                ))}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+      </TableCell>
+      <TableCell className="text-right whitespace-nowrap">
         {!isLocked && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+              <Button
+                type="default"
+                className="px-1.5"
+                icon={<MoreVertical />}
+                data-testid={`policy-${policy.name}-actions-button`}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
@@ -123,13 +138,13 @@ const PolicyRow = ({
                 className="space-x-2"
                 onClick={() => {
                   const sql = generatePolicyUpdateSQL(policy)
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                   aiSnap.newChat({
                     name: `Update policy ${policy.name}`,
-                    open: true,
                     sqlSnippets: [sql],
-                    initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
+                    initialInput: `Update the policy with name \"${policy.name}\" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
                     suggestions: {
-                      title: `I can help you make a change to the policy "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table, here are a few example prompts to get you started:`,
+                      title: `I can help you make a change to the policy \"${policy.name}\" in the ${policy.schema} schema on the ${policy.table} table, here are a few example prompts to get you started:`,
                       prompts: [
                         {
                           label: 'Improve Policy',
@@ -169,9 +184,7 @@ const PolicyRow = ({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </div>
-    </Panel.Content>
+      </TableCell>
+    </TableRow>
   )
 }
-
-export default PolicyRow

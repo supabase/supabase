@@ -1,18 +1,9 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
-import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
-import { useOrganizationProjectClaimMutation } from 'data/organizations/organization-project-claim-mutation'
-import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
-import { projectKeys } from 'data/projects/keys'
-import { BASE_PATH } from 'lib/constants'
-import { Organization } from 'types'
 import {
   Button,
   cn,
@@ -21,9 +12,17 @@ import {
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps/OAuthApps.constants'
 import { ProjectClaimLayout } from './layout'
+import { useApiAuthorizationApproveMutation } from '@/data/api-authorization/api-authorization-approve-mutation'
+import { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
+import { useOrganizationProjectClaimMutation } from '@/data/organizations/organization-project-claim-mutation'
+import { OrganizationProjectClaimResponse } from '@/data/organizations/organization-project-claim-query'
+import { useInvalidateProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { BASE_PATH } from '@/lib/constants'
+import type { Organization } from '@/types'
 
 export const ProjectClaimConfirm = ({
   selectedOrganization,
@@ -38,25 +37,32 @@ export const ProjectClaimConfirm = ({
 }) => {
   const router = useRouter()
   const { auth_id, token: claimToken } = useParams()
-  const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
-  const { mutateAsync: approveRequest, isLoading: isApproving } =
-    useApiAuthorizationApproveMutation()
+  const { mutateAsync: approveRequest, isPending: isApproving } =
+    useApiAuthorizationApproveMutation({ onError: () => {} })
 
-  const { mutateAsync: claimProject, isLoading: isClaiming } = useOrganizationProjectClaimMutation()
+  const { mutateAsync: claimProject, isPending: isClaiming } = useOrganizationProjectClaimMutation()
 
   const onClaimProject = async () => {
     try {
-      await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
+      const response = await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
+
       await claimProject({
         slug: selectedOrganization.slug,
         token: claimToken!,
       })
 
       toast.success('Project claimed successfully')
-      // invalidate the org projects to force them to be refetched
-      queryClient.invalidateQueries(projectKeys.list())
-      router.push(`/org/${selectedOrganization.slug}`)
+      try {
+        // check if the redirect url is valid. If not, redirect the user to the org dashboard
+        const url = new URL(response.url)
+        window.location.href = url.toString()
+      } catch {
+        // invalidate the org projects to force them to be refetched
+        await invalidateProjectsQuery()
+        router.push(`/org/${selectedOrganization.slug}`)
+      }
     } catch (error: any) {
       toast.error(`Failed to claim project ${error.message}`)
     }
@@ -91,7 +97,7 @@ export const ProjectClaimConfirm = ({
 
             <div className="flex items-center justify-center w-28 relative">
               <div className="h-0.5 w-full border-2 border-dashed border-stronger" />
-              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-sm">
+              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-xs">
                 <ChevronsLeftRight className="text-muted-foreground" size={24} />
               </div>
               <div className="h-0.5 w-full border-2 border-dashed border-stronger z-10" />
@@ -177,14 +183,14 @@ export const ProjectClaimConfirm = ({
 
                 <ChevronRight
                   size={16}
-                  className="text-foreground-light transition-all group-data-[state=open]:rotate-90 w-20"
+                  className="text-foreground-light transition-all group-data-open:rotate-90 w-20"
                   strokeWidth={1}
                 />
               </CollapsibleTrigger_Shadcn_>
               <CollapsibleContent_Shadcn_
                 className={cn(
                   'flex flex-col gap-8 transition-all',
-                  'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                  'data-closed:animate-collapsible-up data-open:animate-collapsible-down'
                 )}
               >
                 <div>
@@ -192,6 +198,11 @@ export const ProjectClaimConfirm = ({
                     description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
                     hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_WRITE)}
+                  />
+                  <ScopeSection
+                    description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
+                    hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_READ)}
+                    hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_WRITE)}
                   />
                   <ScopeSection
                     description={PERMISSIONS_DESCRIPTIONS.AUTH}

@@ -1,4 +1,4 @@
-import { HTMLAttributes, forwardRef } from 'react'
+import { forwardRef, HTMLAttributes } from 'react'
 import { cn } from 'ui'
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 }
 
 /** @deprecated Use Card instead, refer to BasicAuthSettingsForm.tsx for reference */
-const FormPanel = ({ children, header, footer }: Props) => (
+export const FormPanel = ({ children, header, footer }: Props) => (
   <FormPanelContainer>
     {header && <FormPanelHeader>{header}</FormPanelHeader>}
     <FormPanelContent className="divide-y">{children}</FormPanelContent>
@@ -20,13 +20,13 @@ const FormPanel = ({ children, header, footer }: Props) => (
   </FormPanelContainer>
 )
 
-const FormPanelContainer = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+export const FormPanelContainer = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ children, ...props }, ref) => (
     <div
       ref={ref}
       {...props}
       className={cn(
-        'bg-surface-100 border overflow-hidden rounded-md shadow max-w-full',
+        'bg-surface-100 border overflow-hidden rounded-md shadow-sm max-w-full',
         props.className
       )}
     >
@@ -37,7 +37,7 @@ const FormPanelContainer = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
 
 FormPanelContainer.displayName = FormPanelContainer.displayName
 
-const FormPanelHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+export const FormPanelHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ children, ...props }, ref) => (
     <div ref={ref} {...props} className={cn('border-default border-b px-8 py-4', props.className)}>
       {children}
@@ -47,7 +47,7 @@ const FormPanelHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement
 
 FormPanelHeader.displayName = FormPanelHeader.displayName
 
-const FormPanelContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+export const FormPanelContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ children, ...props }, ref) => (
     <div ref={ref} {...props} className={cn('divide-border flex flex-col gap-0', props.className)}>
       {children}
@@ -57,7 +57,7 @@ const FormPanelContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElemen
 
 FormPanelContent.displayName = FormPanelContent.displayName
 
-const FormPanelFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+export const FormPanelFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ children, ...props }, ref) => (
     <div ref={ref} {...props} className={cn('border-t', props.className)}>
       {children}
@@ -66,5 +66,3 @@ const FormPanelFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement
 )
 
 FormPanelFooter.displayName = FormPanelFooter.displayName
-
-export { FormPanel, FormPanelContainer, FormPanelContent, FormPanelFooter, FormPanelHeader }

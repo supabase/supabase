@@ -1,32 +1,36 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+// Audit log timestamps are returned in microseconds, not milliseconds.
+// Divide by this constant before passing to dayjs/Date to get a valid date.
+export const TIMESTAMP_MICROS_PER_MS = 1000
 
 export type AuditLog = {
+  organization_slug?: string
+  project_ref?: string
+  request_id: string
   action: {
-    metadata: {
-      method?: string
-      status?: number
-    }[]
     name: string
+    method: string
+    route: string
+    status: number
+    metadata?: Record<string, unknown>
   }
   actor: {
-    id: string
-    type: 'user' | string
-    metadata: {
-      email?: string
-    }[]
+    token_type: string
+    token_hash?: string
+    user_id?: string
+    email?: string
+    oauth_app_id?: string
+    oauth_app_name?: string
+    app_id?: string
+    app_name?: string
+    ip?: string
   }
-  target: {
-    description: string
-    metadata: {
-      org_slug?: string
-      project_ref?: string
-    }
-  }
-  occurred_at: string
+  timestamp: number
 }
 
 export type OrganizationAuditLogsResponse = {
@@ -64,19 +68,17 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
 ) => {
   const { slug, iso_timestamp_start, iso_timestamp_end } = vars
 
-  return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>(
-    organizationKeys.auditLogs(slug, {
+  return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>({
+    queryKey: organizationKeys.auditLogs(slug, {
       date_start: iso_timestamp_start,
       date_end: iso_timestamp_end,
     }),
-    ({ signal }) => getOrganizationAuditLogs(vars, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) => getOrganizationAuditLogs(vars, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })
 }

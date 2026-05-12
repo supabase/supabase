@@ -2,10 +2,10 @@ import { useParams } from 'common'
 import { Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
-
-import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
-import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import { Admonition } from 'ui-patterns'
+
+import { useAuthorizedAppRevokeMutation } from '@/data/oauth/authorized-app-revoke-mutation'
+import type { AuthorizedApp } from '@/data/oauth/authorized-apps-query'
 
 export interface RevokeAppModalProps {
   selectedApp?: AuthorizedApp
@@ -14,7 +14,7 @@ export interface RevokeAppModalProps {
 
 export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
   const { slug } = useParams()
-  const { mutate: revokeAuthorizedApp, isLoading: isDeleting } = useAuthorizedAppRevokeMutation({
+  const { mutate: revokeAuthorizedApp, isPending: isDeleting } = useAuthorizedAppRevokeMutation({
     onSuccess: () => {
       toast.success(`Successfully revoked the app "${selectedApp?.name}"`)
       onClose()
@@ -48,7 +48,7 @@ export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) =>
       <Modal.Content>
         <ul className="space-y-5">
           <li className="flex gap-3 text-sm">
-            <Lock size={14} className="flex-shrink-0" />
+            <Lock size={14} className="shrink-0" />
             <div>
               <strong>Before you remove this app, consider:</strong>
               <ul className="space-y-2 mt-2">

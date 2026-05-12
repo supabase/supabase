@@ -1,25 +1,13 @@
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
 import { proxy, snapshot, useSnapshot } from 'valtio'
-
-import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from 'common'
-type DashboardHistoryType = {
-  sql?: string
-  editor?: string
-}
-
-const EMPTY_DASHBOARD_HISTORY: DashboardHistoryType = {
-  sql: undefined,
-  editor: undefined,
-}
 
 const getInitialState = () => {
   return {
-    dashboardHistory: EMPTY_DASHBOARD_HISTORY,
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
     showProjectApiDocs: false,
     showCreateBranchModal: false,
     showAiSettingsModal: false,
-    showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
     showSidebar: true,
@@ -30,16 +18,6 @@ const getInitialState = () => {
 
 export const appState = proxy({
   ...getInitialState(),
-
-  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string | undefined) => {
-    if (appState.dashboardHistory[key] !== id) {
-      appState.dashboardHistory[key] = id
-      localStorage.setItem(
-        LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref),
-        JSON.stringify(appState.dashboardHistory)
-      )
-    }
-  },
 
   activeDocsSection: ['introduction'],
   docsLanguage: 'js' as 'js' | 'bash',
@@ -90,6 +68,11 @@ export const appState = proxy({
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
+  },
+
+  connectSheetSource: 'header_button' as 'header_button' | 'connect_section',
+  setConnectSheetSource: (value: 'header_button' | 'connect_section') => {
+    appState.connectSheetSource = value
   },
 
   lastRouteBeforeVisitingAccountPage: '',

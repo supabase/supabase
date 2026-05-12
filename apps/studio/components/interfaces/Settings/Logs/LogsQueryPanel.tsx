@@ -1,11 +1,7 @@
-import dayjs from 'dayjs'
-import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode, useState } from 'react'
-
 import { IS_PLATFORM } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
+import Link from 'next/link'
+import { ReactNode, useEffect, useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Badge,
@@ -21,6 +17,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LOGS_SOURCE_DESCRIPTION,
@@ -28,11 +25,13 @@ import {
 } from './Logs.constants'
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
+import Table from '@/components/to-be-cleaned/Table'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
-  defaultFrom: string
-  defaultTo: string
+  value: DatePickerValue
   warnings: LogsWarning[]
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: string) => void
@@ -50,8 +49,7 @@ function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: strin
 
 const LogsQueryPanel = ({
   templates = [],
-  defaultFrom,
-  defaultTo,
+  value,
   warnings,
   onSelectTemplate,
   onSelectSource,
@@ -76,29 +74,14 @@ const LogsQueryPanel = ({
     })
     .map(([, value]) => value)
 
-  function getDefaultDatePickerValue() {
-    if (defaultFrom && defaultTo) {
-      return {
-        to: defaultTo,
-        from: defaultFrom,
-        text: `${dayjs(defaultFrom).format('DD MMM, HH:mm')} - ${dayjs(defaultTo).format('DD MMM, HH:mm')}`,
-        isHelper: false,
-      }
-    }
-    return {
-      to: EXPLORER_DATEPICKER_HELPERS[0].calcTo(),
-      from: EXPLORER_DATEPICKER_HELPERS[0].calcFrom(),
-      text: EXPLORER_DATEPICKER_HELPERS[0].text,
-      isHelper: true,
-    }
-  }
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(value)
 
-  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
-    getDefaultDatePickerValue()
-  )
+  useEffect(() => {
+    setSelectedDatePickerValue(value)
+  }, [value.from, value.to, value.text, value.isHelper])
 
   return (
-    <div className="border-b bg-surface-100">
+    <div className="flex items-center border-b bg-surface-100 h-(--header-height)">
       <div className="flex w-full items-center justify-between px-4 md:px-5 py-2 overflow-x-scroll no-scrollbar">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
@@ -111,7 +94,7 @@ const LogsQueryPanel = ({
               <DropdownMenuContent
                 side="bottom"
                 align="start"
-                className="max-h-[70vh] overflow-auto"
+                className="max-h-[390px] overflow-auto"
               >
                 {logsTableNames
                   .sort((a, b) => a.localeCompare(b))
@@ -205,7 +188,6 @@ const LogsQueryPanel = ({
             hideFooter
             triggerElement={
               <Button
-                asChild // ?: we don't want a button inside a button
                 type="text"
                 onClick={() => setShowReference(true)}
                 icon={<BookOpen />}
@@ -222,7 +204,7 @@ const LogsQueryPanel = ({
                   respective source. Do note that to access nested keys, you would need to perform
                   the necessary{' '}
                   <Link
-                    href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                    href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                     target="_blank"
                     rel="noreferrer"
                     className="text-brand"
@@ -230,7 +212,7 @@ const LogsQueryPanel = ({
                     unnesting joins
                     <ExternalLink
                       size="14"
-                      className="ml-1 inline -translate-y-[2px]"
+                      className="ml-1 inline translate-y-[-2px]"
                       strokeWidth={1.5}
                     />
                   </Link>
@@ -254,10 +236,10 @@ const LogsQueryPanel = ({
                 >
                   <Table
                     head={[
-                      <Table.th className="text-xs !p-2" key="path">
+                      <Table.th className="text-xs p-2!" key="path">
                         Path
                       </Table.th>,
-                      <Table.th key="type" className="text-xs !p-2">
+                      <Table.th key="type" className="text-xs p-2!">
                         Type
                       </Table.th>,
                     ]}
@@ -290,7 +272,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
+        className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -309,13 +291,13 @@ const Field = ({
         ) : (
           <Tooltip>
             <TooltipTrigger>
-              <Clipboard size={14} strokeWidth={1.5} />
+              <Copy size={14} strokeWidth={1.5} />
             </TooltipTrigger>
             <TooltipContent side="bottom">Copy value</TooltipContent>
           </Tooltip>
         )}
       </Table.td>
-      <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
+      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
     </Table.tr>
   )
 }

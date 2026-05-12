@@ -112,7 +112,6 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 1.  To sign in your migrated users, use the Supabase Auth [sign in methods](/docs/reference/javascript/auth-signinwithpassword).
 
     To check for edge cases where users aren't successfully migrated, use a fallback strategy. This ensures that users can continue to sign in seamlessly:
-
     1.  Try to sign in the user with Supabase Auth.
     1.  If the signin fails, try to sign in with Auth0.
     1.  If Auth0 signin succeeds, call the admin create user method again to create the user in Supabase Auth.
@@ -140,7 +139,7 @@ Once you have imported your users, you can sign them in using the [`signInWithOt
 
 Configure your OAuth providers in Supabase by following the [Social login guides](/docs/guides/auth/social-login).
 
-For both new and existing users, sign in the user using the [`signInWithOAuth`](https://supabase.com/docs/reference/javascript/auth-signinwithoauth) method. This works without pre-migrating existing users, since the user always needs to sign in through the OAuth provider before being redirected to your service.
+For both new and existing users, sign in the user using the [`signInWithOAuth`](/docs/reference/javascript/auth-signinwithoauth) method. This works without pre-migrating existing users, since the user always needs to sign in through the OAuth provider before being redirected to your service.
 
 After the user has completed the OAuth flow successfully, you can check if the user is a new or existing user in Auth0 by mapping their social provider id to Auth0. Auth0 stores the social provider ID in the user ID, which has the format `provider_name|provider_id` (for example, `github|123456`). See the [Auth0 identity docs](https://auth0.com/docs/manage-users/user-accounts/identify-users) to learn more.
 

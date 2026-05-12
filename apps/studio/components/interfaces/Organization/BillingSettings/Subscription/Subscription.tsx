@@ -1,37 +1,39 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { useFlag, useParams } from 'common'
 import Link from 'next/link'
+import { Alert, Button } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
+import { Restriction } from '../Restriction'
+import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
-import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
-import { Restriction } from '../Restriction'
-import PlanUpdateSidePanel from './PlanUpdateSidePanel'
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const Subscription = () => {
   const { slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   const {
     data: subscription,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
@@ -39,7 +41,8 @@ const Subscription = () => {
   const currentPlan = subscription?.plan
   const planName = currentPlan?.name ?? 'Unknown'
 
-  const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
+  const canChangeTier =
+    !projectUpdateDisabled && !['enterprise', 'platform'].includes(currentPlan?.id ?? '')
 
   return (
     <>
@@ -80,48 +83,49 @@ const Subscription = () => {
                   </div>
 
                   <div>
-                    <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
-                      <Button
-                        type="default"
-                        className="pointer-events-auto"
-                        disabled={!canChangeTier}
-                        onClick={() => snap.setPanelKey('subscriptionPlan')}
+                    {canChangeTier ? (
+                      <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                        <Button
+                          type="default"
+                          className="pointer-events-auto"
+                          disabled={!canChangeTier}
+                          onClick={() => snap.setPanelKey('subscriptionPlan')}
+                        >
+                          Change subscription plan
+                        </Button>
+                      </ProjectUpdateDisabledTooltip>
+                    ) : projectUpdateDisabled ? (
+                      <Alert
+                        className="mt-2"
+                        withIcon
+                        variant="info"
+                        title={`Unable to update plan from ${planName}`}
                       >
-                        Change subscription plan
-                      </Button>
-                    </ProjectUpdateDisabledTooltip>
-                    {!canChangeTier &&
-                      (projectUpdateDisabled ? (
-                        <Alert
-                          className="mt-2"
-                          withIcon
-                          variant="info"
-                          title={`Unable to update plan from ${planName}`}
-                        >
-                          We have temporarily disabled project and subscription changes - our
-                          engineers are working on a fix.
-                        </Alert>
-                      ) : (
-                        <Alert
-                          withIcon
-                          className="mt-2"
-                          variant="info"
-                          title={`Unable to update plan from ${planName}`}
-                          actions={[
-                            <div key="contact-support">
-                              <Button asChild type="default">
-                                <Link
-                                  href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
-                                >
-                                  Contact support
-                                </Link>
-                              </Button>
-                            </div>,
-                          ]}
-                        >
-                          Please contact us if you'd like to change your plan.
-                        </Alert>
-                      ))}
+                        We have temporarily disabled project and subscription changes - our
+                        engineers are working on a fix.
+                      </Alert>
+                    ) : (
+                      <Alert
+                        withIcon
+                        className="mt-2"
+                        variant="info"
+                        title={`Unable to update plan from ${planName}`}
+                        actions={[
+                          <Button asChild key="contact-support" type="default">
+                            <SupportLink
+                              queryParams={{
+                                category: SupportCategories.SALES_ENQUIRY,
+                                subject: `Change plan away from ${planName}`,
+                              }}
+                            >
+                              Contact support
+                            </SupportLink>
+                          </Button>,
+                        ]}
+                      >
+                        Please contact us if you'd like to change your plan.
+                      </Alert>
+                    )}
                   </div>
 
                   {!subscription?.usage_billing_enabled && (
@@ -129,7 +133,7 @@ const Subscription = () => {
                       type="default"
                       title="This organization is limited by the included usage"
                     >
-                      <div className="[&>p]:!leading-normal prose text-sm">
+                      <div className="[&>p]:leading-normal! prose text-sm">
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
                         seamlessly,{' '}

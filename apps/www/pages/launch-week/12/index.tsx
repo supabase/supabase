@@ -73,7 +73,7 @@ export default function LaunchWeekIndex() {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: LW_URL,
+          url: `${LW_URL}/12`,
           images: [
             {
               url: OG_IMAGE,
@@ -101,7 +101,7 @@ export default function LaunchWeekIndex() {
           <SectionContainer id="meetups" className="scroll-mt-[60px] lw-nav-anchor">
             <LW12Meetups meetups={[]} />
           </SectionContainer>
-          <SectionContainer className="!pt-8 scroll-mt-[60px] lw-nav-anchor" id="awards">
+          <SectionContainer className="pt-8! scroll-mt-[60px] lw-nav-anchor" id="awards">
             <LaunchWeekPrizeSection />
           </SectionContainer>
           <CTABanner />

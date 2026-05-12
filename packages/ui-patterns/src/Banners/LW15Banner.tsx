@@ -1,9 +1,10 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { Button } from 'ui/src/components/Button'
+
 import announcement from '../Banners/data.json'
 
 export function LW15Banner() {
@@ -56,7 +57,7 @@ export function LW15Banner() {
             {announcement.text}
           </p>
           <p className="text-sm hidden sm:block">{announcement.launch}</p>
-          <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
+          <Button size="tiny" type="default" className="px-2 leading-none! text-xs" asChild>
             <Link href={announcement.link}>{announcement.cta}</Link>
           </Button>
         </div>

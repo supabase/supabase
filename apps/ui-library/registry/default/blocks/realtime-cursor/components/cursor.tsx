@@ -1,5 +1,6 @@
-import { cn } from '@/lib/utils'
 import { MousePointer2 } from 'lucide-react'
+
+import { cn } from '@/lib/utils'
 
 export const Cursor = ({
   className,
@@ -17,7 +18,7 @@ export const Cursor = ({
       <MousePointer2 color={color} fill={color} size={30} />
 
       <div
-        className="mt-1 px-2 py-1 rounded text-xs font-bold text-white text-center"
+        className="mt-1 px-2 py-1 rounded-sm text-xs font-bold text-white text-center"
         style={{ backgroundColor: color }}
       >
         {name}

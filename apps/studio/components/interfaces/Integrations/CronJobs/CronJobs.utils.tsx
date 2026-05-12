@@ -1,17 +1,20 @@
-import parser from 'cron-parser'
+import { keyword, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { toString as CronToString } from 'cronstrue'
-import dayjs from 'dayjs'
 import { Column } from 'react-data-grid'
-
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { cn } from 'ui'
-import { CronJobType } from './CreateCronJobSheet'
-import { CRON_TABLE_COLUMNS, HTTPHeader } from './CronJobs.constants'
-import { CronJobTableCell } from './CronJobTableCell'
 
-export function buildCronQuery(name: string, schedule: string, command: string) {
-  const escapedName = name.replace(/'/g, "''")
-  return `select cron.schedule('${escapedName}', '${schedule}', ${command});`
+import { CronJobType } from './CreateCronJobSheet/CreateCronJobSheet.constants'
+import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.constants'
+import { CronJobTableCell } from './CronJobTableCell'
+import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+
+const unescapeSqlLiteral = (value = '', isEscapeString = false) => {
+  const unescaped = value.replaceAll("''", "'")
+  return isEscapeString ? unescaped.replaceAll('\\\\', '\\') : unescaped
+}
+
+export function buildCronQuery(name: string, schedule: string, command: string): SafeSqlFragment {
+  return safeSql`select cron.schedule(${literal(name)}, ${literal(schedule)}, ${literal(command)});`
 }
 
 export const buildHttpRequestCommand = (
@@ -20,16 +23,18 @@ export const buildHttpRequestCommand = (
   headers: HTTPHeader[] = [],
   body: string | undefined,
   timeout: number
-) => {
-  return `
+): SafeSqlFragment => {
+  const funcName = keyword(method === 'GET' ? 'http_get' : 'http_post')
+  const headersJson = JSON.stringify(
+    Object.fromEntries(headers.filter((v) => v.name && v.value).map((v) => [v.name, v.value]))
+  )
+  const bodyPart = method === 'POST' && body ? safeSql`\n      body:=${literal(body)},` : safeSql``
+  return safeSql`
 select
-  net.${method === 'GET' ? 'http_get' : 'http_post'}(
-      url:='${url}',
-      headers:=jsonb_build_object(${headers
-        .filter((v) => v.name && v.value)
-        .map((v) => `'${v.name}', '${v.value}'`)
-        .join(', ')}), ${method === 'POST' && body ? `\n      body:='${body}',` : ''}
-      timeout_milliseconds:=${timeout}
+  net.${funcName}(
+      url:=${literal(url)},
+      headers:=${literal(headersJson)}::jsonb, ${bodyPart}
+      timeout_milliseconds:=${literal(timeout)}
   );`
 }
 
@@ -43,21 +48,17 @@ const DEFAULT_CRONJOB_COMMAND = {
 } as const
 
 export const parseCronJobCommand = (originalCommand: string, projectRef: string): CronJobType => {
-  const command = originalCommand
-    .replaceAll('$$', ' ')
-    .replaceAll(/\n/g, ' ')
-    .replaceAll(/\s+/g, ' ')
-    .trim()
+  const command = originalCommand.replaceAll('$$', ' ').replaceAll(/\n/g, ' ').trim()
 
-  if (command.toLocaleLowerCase().startsWith('select net.')) {
-    const methodMatch = command.match(/select net\.([^']+)\(\s*url:=/i)
+  if (command.toLocaleLowerCase().match(/^select\s+net\./)) {
+    const methodMatch = command.match(/select\s+net\.([^']+)\(\s*url:=/i)
     const method = methodMatch?.[1] || ''
 
-    const urlMatch = command.match(/url:='([^']+)'/i)
-    const url = urlMatch?.[1] || ''
+    const urlMatch = command.match(/url:=(E)?'((?:''|[^'])*)'/i)
+    const url = unescapeSqlLiteral(urlMatch?.[2], Boolean(urlMatch?.[1]))
 
-    const bodyMatch = command.match(/body:='(.*)'/i)
-    const body = bodyMatch?.[1] || ''
+    const bodyMatch = command.match(/body:=(E)?'((?:''|[^'])*)'/i)
+    const body = unescapeSqlLiteral(bodyMatch?.[2], Boolean(bodyMatch?.[1]))
 
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
     const timeout = timeoutMatch?.[1] || ''
@@ -67,8 +68,9 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
 
     let headersObjs: { name: string; value: string }[] = []
     if (headersJsonBuildObject) {
-      // convert the header string to array of objects, clean up the values, trim them of spaces and remove the quotation marks at start and end
-      const headers = headersJsonBuildObject.split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
+      const headers = headersJsonBuildObject
+        .split(',')
+        .map((s) => unescapeSqlLiteral(s.trim().replace(/^'|'$/g, '')))
 
       for (let i = 0; i < headers.length; i += 2) {
         if (headers[i] && headers[i].length > 0) {
@@ -76,8 +78,9 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         }
       }
     } else {
-      const headersStringMatch = command.match(/headers:='([^']*)'/i)
-      const headersString = headersStringMatch?.[1] || '{}'
+      const headersStringMatch = command.match(/headers:=(E)?'((?:''|[^'])*)'/i)
+      const headersString =
+        unescapeSqlLiteral(headersStringMatch?.[2], Boolean(headersStringMatch?.[1])) || '{}'
       try {
         const parsedHeaders = JSON.parse(headersString)
         headersObjs = Object.entries(parsedHeaders).map(([name, value]) => ({
@@ -129,7 +132,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     }
   }
 
-  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(\)/g
+  const regexDBFunction = /select\s+[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\s*\(\)/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
       .replace('SELECT ', '')
@@ -186,12 +189,6 @@ export function formatDate(dateString: string): string {
   return date.toLocaleString(undefined, options)
 }
 
-export const cronPattern =
-  /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
-
-// detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
-export const secondsPattern = /^\d+\s+seconds*$/
-
 export function isSecondsFormat(schedule: string): boolean {
   return secondsPattern.test(schedule.trim().toLocaleLowerCase())
 }
@@ -230,59 +227,21 @@ export const formatScheduleString = (value: string) => {
   }
 }
 
-export const convertCronToString = (schedule: string) => {
-  // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
-  // original schedule when cronstrue throws
-  try {
-    return CronToString(schedule)
-  } catch (error) {
-    return schedule
-  }
-}
-
-export const getNextRun = (schedule: string, lastRun?: string) => {
-  // cron-parser can only deal with the traditional cron syntax but technically users can also
-  // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
-  // (can't guarantee as scope is quite big)
-  if (schedule.includes('*')) {
-    try {
-      const interval = parser.parseExpression(schedule, { tz: 'UTC' })
-      return interval.next().getTime()
-    } catch (error) {
-      return undefined
-    }
-  } else {
-    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n second" or "n seconds"
-    // Returned undefined otherwise - we can revisit this perhaps if we get feedback about this
-    const [value, unit] = schedule.toLocaleLowerCase().split(' ')
-    if (
-      ['second', 'seconds'].includes(unit) &&
-      !Number.isNaN(Number(value)) &&
-      lastRun !== undefined
-    ) {
-      const parsedLastRun = dayjs(lastRun).add(Number(value), unit as dayjs.ManipulateType)
-      return parsedLastRun.valueOf()
-    } else {
-      return undefined
-    }
-  }
-}
-
 export const formatCronJobColumns = ({
   onSelectEdit,
   onSelectDelete,
 }: {
   onSelectEdit: (job: CronJob) => void
   onSelectDelete: (job: CronJob) => void
-}) => {
+}): Array<Column<CronJob>> => {
   return CRON_TABLE_COLUMNS.map((col) => {
-    const res: Column<any> = {
+    const res: Column<CronJob> = {
       key: col.id,
       name: col.name,
       minWidth: col.minWidth ?? 100,
       maxWidth: col.maxWidth,
       width: col.width,
-      resizable: false,
+      resizable: col.resizable ?? false,
       sortable: false,
       draggable: false,
       headerCellClass: undefined,
@@ -294,7 +253,7 @@ export const formatCronJobColumns = ({
               col.id === 'jobname' && 'ml-8'
             )}
           >
-            <p className="!text-foreground">{col.name}</p>
+            <p className="text-foreground!">{col.name}</p>
           </div>
         )
       },

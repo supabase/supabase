@@ -1,146 +1,344 @@
-import { Plus, Search } from 'lucide-react'
-import { useState } from 'react'
-
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
-import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { Button, cn, Input_Shadcn_ } from 'ui'
+import { MoreVertical, Plus, Search, X } from 'lucide-react'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Button,
+  Card,
+  CardContent,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import NewDestinationPanel from './DestinationPanel'
+import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { DestinationPanel } from './DestinationPanel/DestinationPanel'
+import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
+import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+} from './useIsETLPrivateAlpha'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { replicationKeys } from '@/data/replication/keys'
+import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
+import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const Destinations = () => {
-  const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
-  const [filterString, setFilterString] = useState<string>('')
+  const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
 
-  const {
-    data: sourcesData,
-    error: sourcesError,
-    isLoading: isSourcesLoading,
-    isError: isSourcesError,
-  } = useReplicationSourcesQuery({
-    projectRef,
-  })
+  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
+  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
+  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+  const newDestinationDefaultType = infrastructureReadReplicas
+    ? 'Read Replica'
+    : etlEnableBigQuery
+      ? 'BigQuery'
+      : etlEnableIceberg
+        ? 'Analytics Bucket'
+        : etlEnableDucklake
+          ? 'DuckLake'
+          : null
+
+  const prefetchedRef = useRef(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const [filterString, setFilterString] = useState<string>('')
+  const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+  const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
+    useState(false)
+
+  const [_, setDestinationType] = useQueryState(
+    'destinationType',
+    parseAsStringEnum<DestinationType>([
+      'Read Replica',
+      'BigQuery',
+      'Analytics Bucket',
+      'DuckLake',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
+
+  const {
+    data: databases = [],
+    error: databasesError,
+    isPending: isDatabasesLoading,
+    isError: isDatabasesError,
+    isSuccess: isDatabasesSuccess,
+  } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
+  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
+  const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
+  const filteredReplicas =
+    filterString.length === 0
+      ? readReplicas
+      : readReplicas.filter((replica) => replica.identifier.includes(filterString.toLowerCase()))
 
   const {
     data: destinationsData,
     error: destinationsError,
-    isLoading: isDestinationsLoading,
+    isPending: isDestinationsLoading,
     isError: isDestinationsError,
     isSuccess: isDestinationsSuccess,
   } = useReplicationDestinationsQuery({
     projectRef,
   })
-
-  const {
-    data: pipelinesData,
-    error: pipelinesError,
-    isLoading: isPipelinesLoading,
-    isError: isPipelinesError,
-    isSuccess: isPipelinesSuccess,
-  } = useReplicationPipelinesQuery({
-    projectRef,
-  })
-
-  const anyDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
-
+  const destinations = destinationsData?.destinations ?? []
+  const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
   const filteredDestinations =
     filterString.length === 0
-      ? destinationsData?.destinations ?? []
-      : (destinationsData?.destinations ?? []).filter((destination) =>
+      ? (destinations ?? [])
+      : (destinations ?? []).filter((destination) =>
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )
+
+  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
+    projectRef,
+  })
+  const pipelines = pipelinesData?.pipelines ?? []
+
+  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
+    projectRef,
+  })
+  const externalReplicationSource = useMemo(
+    () => sourcesData?.sources.find((source) => source.name === projectRef),
+    [projectRef, sourcesData?.sources]
+  )
+  const canDisableExternalReplication =
+    isSourcesSuccess &&
+    isDestinationsSuccess &&
+    isPipelinesSuccess &&
+    !!externalReplicationSource &&
+    destinations.length === 0 &&
+    pipelines.length === 0
+
+  const isLoading = isDestinationsLoading || isDatabasesLoading
+  const hasErrorsFetchingData = isDestinationsError || isDatabasesError
+
+  const openDestinationPanel = () => {
+    if (!newDestinationDefaultType) return
+    setDestinationType(newDestinationDefaultType)
+  }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search destinations' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
+
+  useEffect(() => {
+    if (
+      projectRef &&
+      !prefetchedRef.current &&
+      pipelinesData?.pipelines &&
+      pipelinesData.pipelines.length > 0 &&
+      isPipelinesSuccess
+    ) {
+      prefetchedRef.current = true
+      pipelinesData.pipelines.forEach((p) => {
+        if (!p?.id) return
+        queryClient.prefetchQuery({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id),
+          queryFn: ({ signal }) =>
+            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id }, signal),
+          staleTime: Infinity,
+        })
+      })
+    }
+  }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
+
+  useEffect(() => {
+    if (!isDatabasesSuccess) return
+
+    const pollReplicas = async () => {
+      const fixedStatuses = [
+        REPLICA_STATUS.ACTIVE_HEALTHY,
+        REPLICA_STATUS.ACTIVE_UNHEALTHY,
+        REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
+      ]
+
+      const replicasInTransition = readReplicas.filter((db) => !fixedStatuses.includes(db.status))
+      const hasTransientStatus = replicasInTransition.length > 0
+
+      // If all replicas are active healthy, stop fetching statuses
+      if (!hasTransientStatus) setStatusRefetchInterval(false)
+    }
+
+    pollReplicas()
+  }, [isDatabasesSuccess, readReplicas])
 
   return (
     <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-                size={14}
-              />
-              <Input_Shadcn_
-                className="pl-9 h-7"
-                placeholder={'Filter destinations'}
-                value={filterString}
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-            </div>
+            <Input
+              ref={searchInputRef}
+              placeholder="Filter destinations"
+              size="tiny"
+              icon={<Search />}
+              value={filterString}
+              className="w-full lg:w-52"
+              onChange={(e) => setFilterString(e.target.value)}
+              actions={
+                filterString.length > 0 && (
+                  <Button
+                    type="text"
+                    icon={<X />}
+                    className="p-0 h-5 w-5"
+                    onClick={() => setFilterString('')}
+                  />
+                )
+              }
+            />
           </div>
-          <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
-            Add destination
-          </Button>
+          <div className="flex items-center gap-x-2">
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Add destination"
+              onTrigger={openDestinationPanel}
+              options={{ enabled: !!newDestinationDefaultType }}
+              side="bottom"
+            >
+              <Button
+                type="default"
+                icon={<Plus />}
+                disabled={!newDestinationDefaultType}
+                onClick={openDestinationPanel}
+              >
+                Add destination
+              </Button>
+            </Shortcut>
+            <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+            {canDisableExternalReplication && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" icon={<MoreVertical />} className="w-7" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
+                    Disable external replication
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="w-full overflow-hidden overflow-x-auto">
-        {(isSourcesLoading || isDestinationsLoading) && <GenericSkeletonLoader />}
-
-        {(isSourcesError || isDestinationsError) && (
+      <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
+        {hasErrorsFetchingData && (
           <AlertError
-            error={sourcesError || destinationsError}
+            error={destinationsError || databasesError}
             subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
           />
         )}
 
-        {anyDestinations ? (
-          <Table
-            head={[
-              <Table.th key="name">Name</Table.th>,
-              <Table.th key="type">Type</Table.th>,
-              <Table.th key="status">Status</Table.th>,
-              <Table.th key="publication">Publication</Table.th>,
-              <Table.th key="actions"></Table.th>,
-            ]}
-            body={filteredDestinations.map((destination) => {
-              const pipeline = pipelinesData?.pipelines.find(
-                (p) => p.destination_id === destination.id
-              )
-              return (
-                <DestinationRow
-                  key={destination.id}
-                  sourceId={sourceId}
-                  destinationId={destination.id}
-                  destinationName={destination.name}
-                  type={destination.config.big_query ? 'BigQuery' : 'Other'}
-                  pipeline={pipeline}
-                  error={pipelinesError}
-                  isLoading={isPipelinesLoading}
-                  isError={isPipelinesError}
-                  isSuccess={isPipelinesSuccess}
-                />
-              )
-            })}
-          ></Table>
+        {isLoading ? (
+          <GenericSkeletonLoader />
+        ) : hasReplicas || hasDestinations ? (
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead key="type" className="w-[20px]" />
+                    <TableHead key="name" className="w-[250px]">
+                      Name
+                    </TableHead>
+                    <TableHead key="status" className="w-[150px]">
+                      Status
+                    </TableHead>
+                    <TableHead key="lag" className="w-[80px]">
+                      Lag
+                    </TableHead>
+                    <TableHead key="publication">Publication</TableHead>
+                    <TableHead key="actions" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredReplicas.map((replica) => {
+                    return (
+                      <ReadReplicaRow
+                        key={replica.identifier}
+                        replica={replica}
+                        onUpdateReplica={() => setStatusRefetchInterval(5000)}
+                      />
+                    )
+                  })}
+
+                  {filteredDestinations.map((destination) => (
+                    <DestinationRow key={destination.id} destinationId={destination.id} />
+                  ))}
+
+                  {!isLoading &&
+                    filteredDestinations.length === 0 &&
+                    filteredReplicas.length === 0 &&
+                    (hasReplicas || hasDestinations) && (
+                      <TableRow>
+                        <TableCell colSpan={5}>
+                          <p>No results found</p>
+                          <p className="text-foreground-light">
+                            Your search for "{filterString}" did not return any results
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         ) : (
-          !isSourcesLoading &&
-          !isDestinationsLoading &&
-          !isSourcesError &&
-          !isDestinationsError && (
+          !isLoading &&
+          !hasErrorsFetchingData && (
             <div
               className={cn(
                 'w-full',
                 'border border-dashed bg-surface-100 border-overlay',
-                'flex flex-col px-10 rounded-lg justify-center items-center py-8 mt-4'
+                'flex flex-col px-16 rounded-lg justify-center items-center py-8 mt-4'
               )}
             >
-              <h4>Send data to your first destination</h4>
-              <p className="prose text-sm text-center mt-1 max-w-full">
-                Use destinations to improve performance or run analysis on your data via
-                integrations like BigQuery
+              <h4>Replication keeps your data in sync across systems</h4>
+              <p className="text-foreground-light text-sm text-balance text-center mt-1">
+                Deploy read replicas for lower latency and better resource management, or capture
+                database changes to external platforms for real-time data pipelines.
               </p>
               <Button
                 icon={<Plus />}
-                onClick={() => setShowNewDestinationPanel(true)}
+                disabled={!newDestinationDefaultType}
+                onClick={openDestinationPanel}
                 className="mt-4"
               >
                 Add destination
@@ -150,19 +348,11 @@ export const Destinations = () => {
         )}
       </div>
 
-      {!isSourcesLoading &&
-        !isDestinationsLoading &&
-        filteredDestinations.length === 0 &&
-        anyDestinations && (
-          <div className="text-center py-8 text-foreground-light">
-            <p>No destinations match "{filterString}"</p>
-          </div>
-        )}
+      <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
 
-      <NewDestinationPanel
-        visible={showNewDestinationPanel}
-        sourceId={sourceId}
-        onClose={() => setShowNewDestinationPanel(false)}
+      <DisableExternalReplicationDialog
+        open={showDisableExternalReplicationDialog}
+        setOpen={setShowDisableExternalReplicationDialog}
       />
     </>
   )

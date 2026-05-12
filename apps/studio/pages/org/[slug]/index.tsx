@@ -1,62 +1,47 @@
-import { useState } from 'react'
-
 import { useIsMFAEnabled } from 'common'
-import { ProjectList } from 'components/interfaces/Home/ProjectList/ProjectList'
-import { HomePageActions } from 'components/interfaces/HomePageActions'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { PROJECT_STATUS } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+import Link from 'next/link'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
+import { HomePageActions } from '@/components/interfaces/HomePageActions'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { NextPageWithLayout } from '@/types'
+
 const ProjectsPage: NextPageWithLayout = () => {
-  const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
+  const { data: org } = useSelectedOrganizationQuery()
+
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
-  const [search, setSearch] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string[]>([
-    PROJECT_STATUS.ACTIVE_HEALTHY,
-    PROJECT_STATUS.INACTIVE,
-  ])
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
-
-  useAutoProjectsPrefetch()
-
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection isFullWidth>
+    <ScaffoldContainer className="grow flex">
+      <ScaffoldSection isFullWidth className="pb-0">
         {disableAccessMfa ? (
-          <Admonition type="note" title={`The organization "${org?.name}" has MFA enforced`}>
-            <p className="!m-0">
-              Set up MFA on your account through your{' '}
-              <InlineLink href="/account/security">account preferences</InlineLink> to access this
-              organization
-            </p>
-          </Admonition>
+          <Admonition
+            type="note"
+            layout="horizontal"
+            title={`${org?.name} requires MFA`}
+            description={
+              <>
+                Set up multi-factor authentication (MFA) on your account to access this
+                organization’s projects.
+              </>
+            }
+            actions={
+              <Button asChild type="default">
+                <Link href="/account/security">Set up MFA</Link>
+              </Button>
+            }
+          />
         ) : (
           <div className="flex flex-col gap-y-4">
-            <HomePageActions
-              search={search}
-              setSearch={setSearch}
-              filterStatus={filterStatus}
-              setFilterStatus={setFilterStatus}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              showViewToggle={true}
-            />
-
-            <ProjectList
-              search={search}
-              filterStatus={filterStatus}
-              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
-              viewMode={viewMode}
-            />
+            <HomePageActions />
+            <ProjectList />
           </div>
         )}
       </ScaffoldSection>
@@ -66,7 +51,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
 ProjectsPage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
+    <OrganizationLayout title="Projects">
       <PageLayout title="Projects">{page}</PageLayout>
     </OrganizationLayout>
   </DefaultLayout>

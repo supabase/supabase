@@ -37,7 +37,9 @@ We'll be saving the Postgres documentation in Postgres, and ChatGPT will be retr
     light: '/docs/img/ai/chatgpt-plugins/chatgpt-plugin-scheme--light.png',
     dark: '/docs/img/ai/chatgpt-plugins/chatgpt-plugin-scheme--dark.png',
   }}
-  zoomable
+
+width={1196}
+height={1194}
 />
 
 ### Step 1: Fork the ChatGPT Retrieval Plugin repository
@@ -54,13 +56,13 @@ poetry install
 
 ### Step 3: Create a Supabase project
 
-Create a [Supabase project](https://supabase.com/dashboard) and database by following the instructions [here](https://supabase.com/docs/guides/platform). Export the environment variables required for the retrieval plugin to work:
+Create a [Supabase project](/dashboard) and database by following the instructions [here](/docs/guides/platform). Export the environment variables required for the retrieval plugin to work:
 
 ```bash
 export OPENAI_API_KEY=<open_ai_api_key>
 export DATASTORE=supabase
 export SUPABASE_URL=<supabase_url>
-export SUPABASE_SERVICE_ROLE_KEY=<supabase_key>
+export SUPABASE_SECRET_KEY=<supabase_secret_key>
 ```
 
 For Postgres datastore, you'll need to export these environment variables instead:

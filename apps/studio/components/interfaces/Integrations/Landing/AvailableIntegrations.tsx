@@ -1,14 +1,15 @@
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-
-import AlertError from 'components/ui/AlertError'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { buttonVariants, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
+import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
+import AlertError from '@/components/ui/AlertError'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
 const CATEGORIES = [
@@ -18,9 +19,7 @@ const CATEGORIES = [
 ] as const
 
 export const AvailableIntegrations = () => {
-  const { integrationsShowStripeWrapper } = useIsFeatureEnabled([
-    'integrations:show_stripe_wrapper',
-  ])
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
   const [selectedCategory, setSelectedCategory] = useQueryState(
     'category',
@@ -31,21 +30,15 @@ export const AvailableIntegrations = () => {
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
 
-  const {
-    availableIntegrations: allIntegrations,
-    installedIntegrations,
-    error,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useInstalledIntegrations()
+  const { data: allIntegrations = [] } = useAvailableIntegrations()
+  const { installedIntegrations, error, isError, isLoading, isSuccess } = useInstalledIntegrations()
 
   const installedIds = installedIntegrations.map((i) => i.id)
 
   // available integrations for install
-  const availableIntegrations = integrationsShowStripeWrapper
+  const availableIntegrations = integrationsWrappers
     ? allIntegrations
-    : allIntegrations.filter((x) => x.id !== 'stripe_wrapper')
+    : allIntegrations.filter((x) => !x.id.endsWith('_wrapper'))
   const integrationsByCategory =
     selectedCategory === 'all'
       ? availableIntegrations
@@ -76,7 +69,7 @@ export const AvailableIntegrations = () => {
                   type: selectedCategory === category.key ? 'default' : 'outline',
                 }),
                 selectedCategory === category.key ? 'text-foreground' : 'text-foreground-lighter',
-                '!rounded-full px-3'
+                'rounded-full! px-3'
               )}
             >
               {category.label}
@@ -96,7 +89,7 @@ export const AvailableIntegrations = () => {
               />
             }
             iconContainerClassName="p-0"
-            className="pl-7 rounded-none !border-0 border-transparent bg-transparent !shadow-none !ring-0 !ring-offset-0"
+            className="pl-7 rounded-none border-0! border-transparent bg-transparent shadow-none! ring-0! ring-offset-0!"
             placeholder="Search..."
           />
         </TabsList_Shadcn_>

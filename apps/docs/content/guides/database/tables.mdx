@@ -29,11 +29,13 @@ When creating a table, it's best practice to add columns at the same time.
 
 <Image
   alt="Tables and columns"
-  zoomable
-  src={{
+
+src={{
     dark: '/docs/img/database/managing-tables/creating-tables.png',
     light: '/docs/img/database/managing-tables/creating-tables--light.png',
   }}
+width={1600}
+height={1145}
 />
 
 You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table.
@@ -58,7 +60,7 @@ and run the SQL queries yourself.
   />
 </video>
 
-1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table Editor](/dashboard/project/_/editor) page in the Dashboard.
 2. Click **New Table** and create a table with the name `todos`.
 3. Click **Save**.
 4. Click **New Column** and create a column with the name `task` and type `text`.
@@ -226,6 +228,7 @@ const { data, error } = await supabase.from('movies').insert([
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -241,6 +244,8 @@ await supabase
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -263,6 +268,8 @@ try await supabase.from("movies")
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -279,6 +286,8 @@ client.from_("movies").insert([
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -299,11 +308,12 @@ supabase
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ### Bulk data loading
 
-When inserting large data sets it's best to use PostgreSQL's [COPY](https://www.postgresql.org/docs/current/sql-copy.html) command.
+When inserting large data sets it's best to use Postgres's [COPY](https://www.postgresql.org/docs/current/sql-copy.html) command.
 This loads data directly from a file into a table. There are several file formats available for copying data: text, CSV, binary, JSON, etc.
 
 For example, if you wanted to load a CSV file into your movies table:
@@ -335,11 +345,13 @@ Tables can be "joined" together using Foreign Keys.
 
 <Image
   alt="Foreign Keys"
-  zoomable
-  src={{
+
+src={{
     dark: '/docs/img/database/managing-tables/joining-tables.png',
     light: '/docs/img/database/managing-tables/joining-tables--light.png',
   }}
+width={1600}
+height={1145}
 />
 
 This is where the "Relational" naming comes from, as data typically forms some sort of relationship.
@@ -413,11 +425,13 @@ Tables belong to `schemas`. Schemas are a way of organizing your tables, often f
 
 <Image
   alt="Schemas and tables"
-  zoomable
-  src={{
+
+src={{
     dark: '/docs/img/database/managing-tables/schemas.png',
     light: '/docs/img/database/managing-tables/schemas--light.png',
   }}
+width={1600}
+height={1145}
 />
 
 If you don't explicitly pass a schema when creating a table, Postgres will assume that you want to create the table in the `public` schema.
@@ -515,7 +529,7 @@ create view <view name> with(security_invoker=true) as (
 
 ### When to use views
 
-Views provide the several benefits:
+Views provide several benefits:
 
 - Simplicity
 - Consistency

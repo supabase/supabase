@@ -1,20 +1,21 @@
+import { keepPreviousData } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
-import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
-import { useContentCountQuery } from 'data/content/content-count-query'
-import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
-import { Snippet, SNIPPET_PAGE_LIMIT } from 'data/content/sql-folders-query'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { TreeView } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
+import { ShareSnippetModal } from './ShareSnippetModal'
 import { formatFolderResponseForTreeView, getLastItemIds } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { ShareSnippetModal } from './ShareSnippetModal'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
+import DownloadSnippetModal from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
+import RenameQueryModal from '@/components/interfaces/SQLEditor/RenameQueryModal'
+import { useContentCountQuery } from '@/data/content/content-count-query'
+import { useContentInfiniteQuery } from '@/data/content/content-infinite-query'
+import { Snippet, SNIPPET_PAGE_LIMIT } from '@/data/content/sql-folders-query'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SearchListProps {
   search: string
@@ -31,36 +32,44 @@ export const SearchList = ({ search }: SearchListProps) => {
   const [selectedSnippetToRename, setSelectedSnippetToRename] = useState<Snippet>()
   const [selectedSnippetToDelete, setSelectedSnippetToDelete] = useState<Snippet>()
 
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useContentInfiniteQuery(
-      {
-        projectRef,
-        type: 'sql',
-        limit: SNIPPET_PAGE_LIMIT,
-        name: search.length === 0 ? undefined : search,
-      },
-      { keepPreviousData: true }
-    )
-
-  const { data: count, isLoading: isLoadingCount } = useContentCountQuery(
+  const {
+    data,
+    isPending: isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useContentInfiniteQuery(
     {
       projectRef,
-      cumulative: true,
+      type: 'sql',
+      limit: SNIPPET_PAGE_LIMIT,
+      name: search.length === 0 ? undefined : search,
+    },
+    { placeholderData: keepPreviousData }
+  )
+
+  const { data: count, isPending: isLoadingCount } = useContentCountQuery(
+    {
+      projectRef,
       type: 'sql',
       name: search,
     },
-    { keepPreviousData: true }
+    { placeholderData: keepPreviousData }
   )
-  const totalNumber = (count as unknown as { count: number })?.count ?? 0
+  const totalNumber = count ? count.private + count.shared : 0
 
-  const snippets = useMemo(() => data?.pages.flatMap((page) => page.content), [data?.pages])
+  const snippets = useMemo(
+    // [Joshen] Set folder_id to null to ensure flat list
+    () => data?.pages.flatMap((page) => page.content.map((x) => ({ ...x, folder_id: null }))),
+    [data?.pages]
+  )
   const treeState = formatFolderResponseForTreeView({ folders: [], contents: snippets as any })
 
   const snippetsLastItemIds = useMemo(() => getLastItemIds(treeState), [treeState])
 
   return (
     <>
-      <div className="flex flex-col flex-grow">
+      <div className="flex flex-col grow">
         {isLoadingCount ? (
           <div className="px-4 py-1 pb-2.5">
             <Loader2 className="animate-spin" size={14} />
@@ -106,17 +115,15 @@ export const SearchList = ({ search }: SearchListProps) => {
                     ...element,
                     name: (
                       <span className="flex flex-col py-0.5">
-                        <span title={element.name} className="truncate">
-                          {element.name}
-                        </span>
+                        <span className="truncate">{element.name}</span>
                         {!!visibility && (
-                          <span title={visibility} className="text-foreground-lighter text-xs">
-                            {visibility}
-                          </span>
+                          <span className="text-foreground-lighter text-xs">{visibility}</span>
                         )}
                       </span>
                     ),
                   }}
+                  nameForTitle={element.name}
+                  isBranch={false}
                   isOpened={isOpened && !isPreview}
                   isSelected={isActive}
                   isPreview={isPreview}

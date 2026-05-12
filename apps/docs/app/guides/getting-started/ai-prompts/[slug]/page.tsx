@@ -1,9 +1,13 @@
-import { notFound } from 'next/navigation'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { source } from 'common-tags'
+import { notFound } from 'next/navigation'
+
 import {
   generateAiPromptMetadata,
   generateAiPromptsStaticParams,
+  generateCursorPromptDeepLink,
   getAiPrompt,
+  wrapInMarkdownCodeBlock,
 } from './AiPrompts.utils'
 
 export const dynamicParams = false
@@ -19,23 +23,35 @@ export default async function AiPromptsPage(props: { params: Promise<{ slug: str
   }
 
   let { heading, content } = prompt
-  content = `
-## How to use
+  const { url: cursorUrl } = generateCursorPromptDeepLink(content)
 
-Copy the prompt to a file in your repo.
+  content = source`
+    ## How to use
 
-Use the "include file" feature from your AI tool to include the prompt when chatting with your AI assistant. For example, with GitHub Copilot, use \`#<filename>\`, in Cursor, use \`@Files\`, and in Zed, use \`/file\`.
+    Copy the prompt to a file in your repo.
 
-## Prompt
+    Use the "include file" feature from your AI tool to include the prompt when chatting with your AI assistant. For example, with GitHub Copilot, use \`#<filename>\`, in Cursor, use \`@Files\`, and in Zed, use \`/file\`.
 
-${content}
-`.trim()
+    ${
+      cursorUrl
+        ? source`
+            You can also load the prompt directly into your IDE via the following links:
+              - [Open in Cursor](${cursorUrl})
+          `
+        : ''
+    }
+
+    ## Prompt
+
+    ${wrapInMarkdownCodeBlock(content)}
+  `
 
   return (
     <GuideTemplate
       meta={{ title: `AI Prompt: ${heading}` }}
       content={content}
       editLink={newEditLink(`supabase/supabase/blob/master/examples/prompts/${slug}.md`)}
+      pathname={`/guides/getting-started/ai-prompts/${slug}`}
     />
   )
 }

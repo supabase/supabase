@@ -1,12 +1,12 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { getDatabaseTriggerUpdateSQL, type SafeSqlFragment } from '@supabase/pg-meta'
+import { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
+import { PostgresTrigger } from '@supabase/postgres-meta'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import { quoteLiteral } from 'lib/pg-format'
-import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
-import { PostgresTrigger } from '@supabase/postgres-meta'
-import { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating
 // trigger name and enabled mode. So we'll delete and create the trigger, within a single transaction
@@ -16,23 +16,8 @@ export type DatabaseTriggerUpdateVariables = {
   projectRef: string
   connectionString?: string | null
   originalTrigger: PostgresTrigger
-  updatedTrigger: PGTriggerCreate & Pick<PGTrigger, 'enabled_mode'>
-}
-
-export function getDatabaseTriggerUpdateSQL({
-  originalTrigger,
-  updatedTrigger,
-}: Pick<DatabaseTriggerUpdateVariables, 'originalTrigger' | 'updatedTrigger'>) {
-  const { name, activation, events, schema, table, function_schema, function_name, function_args } =
-    updatedTrigger
-  return /* SQL */ `
-BEGIN;
-DROP TRIGGER "${originalTrigger.name}" ON "${originalTrigger.schema}"."${originalTrigger.table}";
-CREATE TRIGGER "${name}" ${activation} ${events.join(' OR ')} ON "${schema}"."${table}" 
-  FOR EACH ROW EXECUTE FUNCTION 
-  "${function_schema}"."${function_name}"(${function_args?.map(quoteLiteral).join(',') ?? ''});
-COMMIT;
-`.trim()
+  updatedTrigger: Omit<PGTriggerCreate, 'events'> &
+    Pick<PGTrigger, 'enabled_mode'> & { events: Array<SafeSqlFragment> }
 }
 
 export async function updateDatabaseTrigger({
@@ -58,27 +43,29 @@ export const useDatabaseTriggerUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseTriggerUpdateTxnData, ResponseError, DatabaseTriggerUpdateVariables>,
+  UseCustomMutationOptions<
+    DatabaseTriggerUpdateTxnData,
+    ResponseError,
+    DatabaseTriggerUpdateVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerUpdateTxnData, ResponseError, DatabaseTriggerUpdateVariables>(
-    (vars) => updateDatabaseTrigger(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseTriggerKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update database trigger: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseTriggerUpdateTxnData, ResponseError, DatabaseTriggerUpdateVariables>({
+    mutationFn: (vars) => updateDatabaseTrigger(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: databaseTriggerKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update database trigger: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

@@ -1,3 +1,4 @@
+import { AlertTriangle } from 'lucide-react'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -10,10 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from 'ui'
-import { useErrorCodesQuery } from 'data/content-api/docs-error-codes-query'
-import { type ErrorCodeQueryQuery, Service } from 'data/graphql/graphql'
-import { AlertTriangle } from 'lucide-react'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { useErrorCodesQuery } from '@/data/content-api/docs-error-codes-query'
+import { Service, type ErrorCodeQueryQuery } from '@/data/graphql/graphql'
 
 interface ErrorCodeDialogProps {
   open: boolean
@@ -28,10 +29,12 @@ export const ErrorCodeDialog = ({
   errorCode,
   service,
 }: ErrorCodeDialogProps) => {
-  const { data, isLoading, isSuccess, refetch } = useErrorCodesQuery(
-    { code: errorCode, service },
-    { enabled: open }
-  )
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    refetch,
+  } = useErrorCodesQuery({ code: errorCode, service }, { enabled: open })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -77,7 +80,6 @@ const SuccessState = ({ data }: { data: ErrorCodeQueryQuery | undefined }) => {
 }
 
 const ErrorExplanation = ({
-  code,
   service,
   message,
 }: {

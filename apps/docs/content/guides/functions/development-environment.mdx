@@ -8,7 +8,7 @@ tocVideo: 'lFhU3L8VoSQ'
 
 <Admonition type="note">
 
-Before getting started, make sure you have the Supabase CLI installed. Check out the [CLI installation guide](https://supabase.com/docs/guides/cli) for installation methods and troubleshooting.
+Before getting started, make sure you have the Supabase CLI installed. Check out the [CLI installation guide](/docs/guides/cli) for installation methods and troubleshooting.
 
 </Admonition>
 
@@ -78,8 +78,8 @@ It's recommended to organize your functions according to the following structure
     ├── functions
     │   ├── import_map.json     # Top-level import map
     │   ├── _shared             # Shared code (underscore prefix)
-    │   │   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key
-    │   │   ├── supabaseClient.ts # Supabase client with ANON key
+    │   │   ├── supabaseAdmin.ts # Supabase client with SECRET key
+    │   │   ├── supabaseClient.ts # Supabase client with PUBLISHABLE key
     │   │   └── cors.ts         # Reusable CORS headers
     │   ├── function-one        # Use hyphens for function names
     │   │   └── index.ts
@@ -95,7 +95,7 @@ It's recommended to organize your functions according to the following structure
 - **Use "fat functions"**. Develop few, large functions by combining related functionality. This minimizes cold starts.
 - **Name functions with hyphens (`-`)**. This is the most URL-friendly approach
 - **Store shared code in `_shared`**. Store any shared code in a folder prefixed with an underscore (`_`).
-- **Separate tests**. Use a separate folder for [Unit Tests](https://supabase.com/docs/guides/functions/unit-test) that includes the name of the function followed by a `-test` suffix.
+- **Separate tests**. Use a separate folder for [Unit Tests](/docs/guides/functions/unit-test) that includes the name of the function followed by a `-test` suffix.
 
 ---
 
@@ -112,16 +112,6 @@ This command spins up your entire Supabase stack locally: database, auth, storag
 Develop a specific function with hot reloading. Your functions run at `http://localhost:54321/functions/v1/[function-name]`. When you save your file, you’ll see the changes instantly without having to wait.
 
 Alternatively, use `supabase functions serve` to serve all functions at once.
-
-### `supabase functions serve hello-world --no-verify-jwt`
-
-If you want to serve an Edge Function without the default JWT verification. This is important for webhooks from Stripe, GitHub, etc. These services don't have your JWT tokens, so you need to skip auth verification.
-
-<Admonition type="caution">
-
-Be careful when disabling JWT verification, as it allows anyone to call your function, so only use it for functions that are meant to be publicly accessible.
-
-</Admonition>
 
 ### `supabase functions deploy hello-world`
 
