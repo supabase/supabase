@@ -85,7 +85,9 @@ Once configured, replication to BigQuery:
 
 ## Source table requirements
 
-BigQuery replication requires each source table to have a primary key. BigQuery uses the source primary key to apply CDC upserts and deletes.
+BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. Supabase ETL declares those columns as the BigQuery destination primary key so BigQuery CDC can apply `UPSERT` and `DELETE` rows.
+
+BigQuery primary keys are `NOT ENFORCED`, and BigQuery CDC supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
 
 Source tables must also use a compatible Postgres `REPLICA IDENTITY` setting:
 
@@ -148,7 +150,7 @@ We plan to expand schema change support over time as the feature evolves.
 ## Limitations
 
 - **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
-- **Primary keys**: Source tables must have a primary key
+- **Primary keys**: Source tables must have a primary key, the replicated primary key can contain at most 16 columns, and BigQuery does not enforce key uniqueness
 - **Replica identity**: Source tables must use primary-key replica identity or `REPLICA IDENTITY FULL`
 - **Table names**: Source table names cannot start or end with `_` when replicating to BigQuery
 - **Schema changes**: Limited to the supported schema changes listed above
@@ -156,3 +158,4 @@ We plan to expand schema change support over time as the feature evolves.
 ## Additional resources
 
 - [BigQuery documentation](https://cloud.google.com/bigquery/docs) - Official Google BigQuery documentation
+- [BigQuery change data capture](https://cloud.google.com/bigquery/docs/change-data-capture) - BigQuery CDC requirements and limitations
