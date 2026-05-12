@@ -16,7 +16,6 @@ import {
   getStatusName,
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
-  PIPELINE_ERROR_MESSAGES,
 } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import AlertError from '@/components/ui/AlertError'
@@ -88,46 +87,46 @@ export const RowMenu = ({
 
   const onEnablePipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
     try {
       // Only show 'enabling' when transitioning from allowed states
-      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
+      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
         setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
       }
       await startPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+      toast.error(`Failed to start pipeline: ${(error as ResponseError).message}`)
     }
   }
 
   const onDisablePipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
     try {
       // Only show 'disabling' when transitioning from allowed states
-      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
+      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
         setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
       }
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.DISABLE_DESTINATION)
+      toast.error(`Failed to stop pipeline: ${(error as ResponseError).message}`)
     }
   }
 
   const onRestartPipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
     try {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
       await restartPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+      toast.error(`Failed to restart pipeline: ${(error as ResponseError).message}`)
     }
   }
 
@@ -135,9 +134,7 @@ export const RowMenu = ({
     <div className="flex justify-end items-center space-x-2">
       {isLoading && <ShimmeringLoader />}
 
-      {isError && (
-        <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
-      )}
+      {isError && <AlertError error={error} subject="Failed to retrieve pipeline status" />}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

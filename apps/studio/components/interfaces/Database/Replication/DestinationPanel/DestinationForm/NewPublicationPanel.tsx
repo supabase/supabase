@@ -33,12 +33,18 @@ interface NewPublicationPanelProps {
 export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { mutateAsync: createPublication, isPending: creatingPublication } =
-    useCreatePublicationMutation()
-  const { data: tables } = useReplicationTablesQuery({
-    projectRef,
-    sourceId,
-  })
+
+  const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId })
+
+  const { mutate: createPublication, isPending: creatingPublication } =
+    useCreatePublicationMutation({
+      onSuccess: () => {
+        toast.success('Successfully created publication')
+        form.reset(defaultValues)
+        onClose()
+      },
+    })
+
   const formId = 'publication-editor'
   const FormSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -59,23 +65,19 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
     if (!projectRef) return console.error('Project ref is required')
     if (!project) return console.error('Project is required')
     if (!sourceId) return console.error('Source id is required')
-    try {
-      await createPublication({
-        projectRef,
-        sourceId,
-        name: data.name,
-        tables: data.tables.map((table) => {
-          const [schema, name] = table.split('.')
-          return { schema, name }
-        }),
-        connectionString: project.connectionString,
-      })
-      toast.success('Successfully created publication')
-      onClose()
-    } catch (error) {
-      toast.error('Failed to create publication')
-    }
-    form.reset(defaultValues)
+
+    const tables = data.tables.map((table) => {
+      const [schema, name] = table.split('.')
+      return { schema, name }
+    })
+
+    createPublication({
+      projectRef,
+      sourceId,
+      name: data.name,
+      tables,
+      connectionString: project.connectionString,
+    })
   }
 
   return (
