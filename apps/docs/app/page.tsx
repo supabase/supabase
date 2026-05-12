@@ -179,19 +179,19 @@ const clientLibraries = [
 ]
 
 const additionalResources = [
-    {
+  {
     title: 'AI tools',
     description: 'Develop with Supabase AI-first using plugins, MCP, and skills.',
     icon: 'ai-tools',
     href: '/guides/ai',
   },
-    {
+  {
     title: 'Platform guides',
     description: 'Learn more about the tools and services powering Supabase.',
     icon: 'platform',
     href: '/guides/platform',
   },
-    {
+  {
     title: 'Supabase CLI',
     description: 'Use the CLI to develop, manage and deploy your projects.',
     icon: 'reference-cli',
