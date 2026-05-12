@@ -182,9 +182,25 @@ export const ChartHeader = ({
         <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
           {title}
         </h3>
-        {titleTooltip && <InfoTooltip>{titleTooltip}</InfoTooltip>}
+        {titleTooltip && (
+          <InfoTooltip side="top" className="max-w-xs">
+            {titleTooltip}
+            {docsUrl && (
+              <>
+                {' '}
+                <Link
+                  href={docsUrl}
+                  target="_blank"
+                  className="underline text-foreground hover:text-foreground-light"
+                >
+                  Read docs
+                </Link>
+              </>
+            )}
+          </InfoTooltip>
+        )}
       </div>
-      {docsUrl && (
+      {!titleTooltip && docsUrl && (
         <ButtonTooltip
           type="text"
           className="px-1"
