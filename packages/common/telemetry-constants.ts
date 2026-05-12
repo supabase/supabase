@@ -3445,8 +3445,8 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
  * @group Events
  * @source studio
  */
-export interface RLSTesterQueryRanEvent {
-  action: 'rls_tester_query_ran'
+export interface RLSTesterRunQueryClickedEvent {
+  action: 'rls_tester_run_query_clicked'
   properties: { type: 'raw' | 'inferred' }
   groups: Partial<TelemetryGroups>
 }
@@ -3650,4 +3650,4 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
-  | RLSTesterQueryRanEvent
+  | RLSTesterRunQueryClickedEvent
