@@ -307,14 +307,14 @@ export const PlanUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
-                    ) : !canUpdateSubscription && plan.name !== 'Free' ? (
+                    ) : !canUpdateSubscription && !isDowngradeOption ? (
                       <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
                     ) : (
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
-                          !canUpdateSubscription ||
+                          (!canUpdateSubscription && isDowngradeOption) ||
                           subscription?.plan?.id === 'enterprise' ||
                           subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
@@ -339,7 +339,7 @@ export const PlanUpdateSidePanel = () => {
                             side: 'bottom',
                             className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
-                              !canUpdateSubscription && plan.name === 'Free'
+                              !canUpdateSubscription && isDowngradeOption
                                 ? "You need additional permissions to change your organization's plan"
                                 : subscription?.plan?.id === 'enterprise' ||
                                     subscription?.plan?.id === 'platform'
