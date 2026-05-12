@@ -270,7 +270,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
                   ? 'Create your first organization'
                   : 'Create new organization'
               }
-              onCreate={() => router.push(createOrganizationHref)}
+              createHref={createOrganizationHref}
             />
 
             {organizationOptions.length === 0 && (

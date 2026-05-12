@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
@@ -124,7 +124,6 @@ describe('RedeemCreditsScreen', () => {
   })
 
   test('routes new organization creation back to the current redeem URL', async () => {
-    const user = userEvent.setup()
     routerMock.setCurrentUrl('/redeem?code=SUPA-CREDIT-123')
     addAPIMock({
       method: 'get',
@@ -134,13 +133,13 @@ describe('RedeemCreditsScreen', () => {
 
     renderScreen()
 
-    await user.click(await screen.findByRole('button', { name: /Create new organization/ }))
-
-    await waitFor(() => {
-      expect(routerMock.pathname).toBe('/new')
+    const createOrganizationLink = await screen.findByRole('link', {
+      name: /Create new organization/,
     })
-    expect(new URLSearchParams(routerMock.asPath.split('?')[1]).get('returnTo')).toBe(
-      '/redeem?code=SUPA-CREDIT-123'
+
+    expect(createOrganizationLink).toHaveAttribute(
+      'href',
+      '/new?returnTo=%2Fredeem%3Fcode%3DSUPA-CREDIT-123'
     )
   })
 })

@@ -1,4 +1,5 @@
 import { Check, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
 import { useMemo, useState, type ReactNode } from 'react'
 import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
 
@@ -19,6 +20,7 @@ export const ConnectOrganizationSelector = ({
   getUnavailableOrganizationDescription,
   createLabel,
   createDescription,
+  createHref,
   onCreate,
 }: {
   organizations: Organization[]
@@ -32,6 +34,7 @@ export const ConnectOrganizationSelector = ({
   getUnavailableOrganizationDescription?: (organization: Organization) => ReactNode
   createLabel?: string
   createDescription?: string
+  createHref?: string
   onCreate?: () => void
 }) => {
   const [showMore, setShowMore] = useState(false)
@@ -85,24 +88,41 @@ export const ConnectOrganizationSelector = ({
           />
         ))}
 
-        {createLabel && onCreate && (
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={onCreate}
-            className={cn(
-              'group block w-full text-left disabled:cursor-not-allowed disabled:opacity-50',
-              disabled && 'pointer-events-none'
-            )}
-          >
-            <OrganizationCard
-              isLink={false}
-              organization={createOrganizationCardModel(createLabel)}
-              description={createDescription ?? null}
-              className="pointer-events-none border-dashed shadow-none"
-            />
-          </button>
-        )}
+        {createLabel &&
+          (createHref ? (
+            <Link
+              href={createHref}
+              className={cn(
+                'group block w-full cursor-pointer text-left',
+                disabled && 'pointer-events-none opacity-50'
+              )}
+              aria-disabled={disabled}
+            >
+              <OrganizationCard
+                isLink={false}
+                organization={createOrganizationCardModel(createLabel)}
+                description={createDescription ?? null}
+                className="pointer-events-none border-dashed shadow-none"
+              />
+            </Link>
+          ) : onCreate ? (
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={onCreate}
+              className={cn(
+                'group block w-full cursor-pointer text-left disabled:cursor-not-allowed disabled:opacity-50',
+                disabled && 'pointer-events-none'
+              )}
+            >
+              <OrganizationCard
+                isLink={false}
+                organization={createOrganizationCardModel(createLabel)}
+                description={createDescription ?? null}
+                className="pointer-events-none border-dashed shadow-none"
+              />
+            </button>
+          ) : null)}
 
         {hasOverflow && (
           <Collapsible_Shadcn_ open={showMore} onOpenChange={setShowMore}>
