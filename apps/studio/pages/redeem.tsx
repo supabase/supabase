@@ -206,7 +206,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
       description: 'The credit code could not be redeemed',
       children: (
         <div className="flex flex-col gap-3">
-          <Admonition type="warning" title={notice.title} description={notice.description} />
+          <Admonition type="warning" description={notice.description} />
         </div>
       ),
     })
