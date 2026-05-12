@@ -329,8 +329,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                             {variable.name === 'Token' &&
                               template.variables.some((x) => x.name === 'ConfirmationURL') && (
                                 <>
-                                  {' '}
-                                  Can be used instead of{' '}
+                                  , which can be used instead of{' '}
                                   <code className="text-code-inline">ConfirmationURL</code>
                                 </>
                               )}
