@@ -54,15 +54,15 @@ const HELP_LINKS: Array<{ icon: React.ReactNode; label: string; href: string }> 
     label: 'Integrations docs',
     href: `${DOCS_URL}/guides/integrations`,
   },
-  {
-    icon: <Terminal className="text-foreground-lighter" size={13} />,
-    label: 'CLI reference',
-    href: `${DOCS_URL}/reference/cli`,
-  },
+  // {
+  //   icon: <Terminal className="text-foreground-lighter" size={13} />,
+  //   label: 'CLI reference',
+  //   href: `${DOCS_URL}/reference/cli`,
+  // },
   {
     icon: <PlusSquare className="text-foreground-lighter" size={13} />,
     label: 'Build an integration',
-    href: 'https://supabase.com/partners/integrations',
+    href: `${DOCS_URL}/guides/integrations/build-a-supabase-oauth-integration`,
   },
 ]
 
@@ -176,7 +176,7 @@ export const MarketplaceSidebar = () => {
         </>
       )}
 
-      <div className={sectionLabelCls}>Help</div>
+      <div className={sectionLabelCls}>Resources</div>
       {HELP_LINKS.map(({ icon, label, href }) => (
         <a
           key={label}
