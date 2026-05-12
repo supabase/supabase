@@ -1,6 +1,6 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
-import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -158,7 +158,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     error,
     sendMessage,
     setMessages,
-    addToolResult,
+    addToolApprovalResponse,
     stop,
     regenerate,
   } = useChat({
@@ -166,7 +166,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     ...(snap.activeChatId && snap.chatInstances[snap.activeChatId]
       ? { chat: snap.chatInstances[snap.activeChatId] }
       : {}),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onError: onErrorChat,
   })
 
@@ -281,7 +281,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
             readOnly={message.role === 'user'}
-            addToolResult={addToolResult}
+            addToolApprovalResponse={addToolApprovalResponse}
             onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
@@ -300,7 +300,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       cancelEdit,
       editingMessageId,
       chatStatus,
-      addToolResult,
+      addToolApprovalResponse,
       handleRateMessage,
       messageRatings,
     ]
