@@ -89,10 +89,12 @@ export function ServiceFlowPanel({
 
   if (!selectedRowKey || !selectedRow) return null
 
-  const timestampMs = selectedRow.timestamp
-    ? selectedRow.timestamp / 1000
-    : selectedRow.date
-      ? selectedRow.date.getTime()
+  // Prefer the already-parsed Date the row mapper attaches (works for both
+  // BQ microsecond timestamps and OTEL ISO strings).
+  const timestampMs = selectedRow.date
+    ? selectedRow.date.getTime()
+    : typeof selectedRow.timestamp === 'number'
+      ? selectedRow.timestamp / 1000
       : null
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 

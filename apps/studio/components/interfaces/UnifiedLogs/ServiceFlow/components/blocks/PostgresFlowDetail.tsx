@@ -61,10 +61,13 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   filterFields,
   table,
 }: PostgresFlowDetailProps) {
-  const timestampMs = data?.timestamp
-    ? data.timestamp / 1000
-    : data?.date
-      ? data.date.getTime()
+  // Prefer the already-parsed Date the row mapper attaches (works for both
+  // BQ microsecond timestamps and OTEL ISO strings). Fall back to the raw
+  // numeric microseconds for older callers that don't pass `date`.
+  const timestampMs = data?.date
+    ? data.date.getTime()
+    : typeof data?.timestamp === 'number'
+      ? data.timestamp / 1000
       : null
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
@@ -75,7 +78,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   return (
     <div className="[&>*:nth-child(even)]:bg-surface-100/50">
       <DetailSectionHeader
-        title="Requested started"
+        title="Request started"
         icon={Clock}
         summary={formattedTime ?? undefined}
       />
