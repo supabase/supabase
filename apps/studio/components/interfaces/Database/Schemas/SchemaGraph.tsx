@@ -1,4 +1,4 @@
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PGSchema, PGTable } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Background,
@@ -75,7 +75,7 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [selectedTable, setSelectedTable] = useState<PostgresTable | null>(null)
+  const [selectedTable, setSelectedTable] = useState<PGTable | null>(null)
   const snap = useTableEditorStateSnapshot()
   const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 
@@ -241,7 +241,7 @@ export const SchemaGraph = () => {
   const isFirstLoad = useRef(true)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
-      const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
+      const schema = schemas.find((s) => s.name === selectedSchema) as PGSchema
       getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)

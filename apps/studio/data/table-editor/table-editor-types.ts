@@ -1,15 +1,15 @@
 import type {
-  PostgresColumn,
-  PostgresMaterializedView,
-  PostgresRelationship,
-  PostgresTable,
-  PostgresView,
-} from '@supabase/postgres-meta'
+  PGColumn,
+  PGMaterializedView,
+  PGTable,
+  PGTableRelationship,
+  PGView,
+} from '@supabase/pg-meta'
 
 import { WRAPPER_HANDLERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
-interface TableRelationship extends PostgresRelationship {
+interface TableRelationship extends PGTableRelationship {
   deletion_action: 'a' | 'r' | 'c' | 'n' | 'd'
   update_action: 'a' | 'r' | 'c' | 'n' | 'd'
 }
@@ -21,28 +21,28 @@ interface TableUniqueIndex {
   columns: string[]
 }
 
-export interface Table extends PostgresTable {
+export interface Table extends PGTable {
   entity_type: ENTITY_TYPE.TABLE
-  columns: PostgresColumn[]
+  columns: PGColumn[]
   relationships: TableRelationship[]
   unique_indexes?: TableUniqueIndex[]
 }
 
-export interface PartitionedTable extends PostgresTable {
+export interface PartitionedTable extends PGTable {
   entity_type: ENTITY_TYPE.PARTITIONED_TABLE
-  columns: PostgresColumn[]
+  columns: PGColumn[]
   relationships: TableRelationship[]
   unique_indexes?: TableUniqueIndex[]
 }
 
-export interface View extends PostgresView {
+export interface View extends PGView {
   entity_type: ENTITY_TYPE.VIEW
-  columns: PostgresColumn[]
+  columns: PGColumn[]
 }
 
-export interface MaterializedView extends PostgresMaterializedView {
+export interface MaterializedView extends PGMaterializedView {
   entity_type: ENTITY_TYPE.MATERIALIZED_VIEW
-  columns: PostgresColumn[]
+  columns: PGColumn[]
 }
 
 export interface ForeignTable {
@@ -54,7 +54,7 @@ export interface ForeignTable {
   foreign_server_name: string
   foreign_data_wrapper_name: string
   foreign_data_wrapper_handler: string
-  columns: PostgresColumn[]
+  columns: PGColumn[]
 }
 
 export type Entity = Table | PartitionedTable | View | MaterializedView | ForeignTable
@@ -100,7 +100,7 @@ export function isViewLike(entity?: Entity): entity is View | MaterializedView {
   return isView(entity) || isMaterializedView(entity)
 }
 
-export function postgresTableToEntity(table: PostgresTable): Entity | undefined {
+export function postgresTableToEntity(table: PGTable): Entity | undefined {
   if (table.columns === undefined || table.relationships === undefined) {
     console.error(
       'Unable to convert PostgresTable to Entity type: columns and relationships must not be undefined.'

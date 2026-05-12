@@ -1,4 +1,4 @@
-import { PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -58,7 +58,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
-const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
+const getColumnTypeAffordancePresentation = (column: PGColumn) => {
   const { kind, label } = getColumnTypeAffordance(column.format)
   const iconClassName = 'text-foreground-muted'
 
@@ -98,8 +98,8 @@ const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
 
 interface ColumnListProps {
   onAddColumn: () => void
-  onEditColumn: (column: PostgresColumn) => void
-  onDeleteColumn: (column: PostgresColumn) => void
+  onEditColumn: (column: PGColumn) => void
+  onDeleteColumn: (column: PGColumn) => void
 }
 
 export const ColumnList = ({

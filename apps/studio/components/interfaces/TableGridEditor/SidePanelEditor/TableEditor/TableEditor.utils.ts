@@ -1,4 +1,4 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { some } from 'lodash'
 
 import {
@@ -40,8 +40,8 @@ export const generateTableField = (): TableField => {
   }
 }
 
-export const generateTableFieldFromPostgresTable = (
-  table: PostgresTable,
+export const generateTableFieldFromPGTable = (
+  table: PGTable,
   foreignKeys: ForeignKeyConstraint[],
   isDuplicating = false,
   isRealtimeEnabled = false
