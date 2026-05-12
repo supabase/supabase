@@ -2,7 +2,7 @@ import { FeatureFlagContext } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
@@ -40,6 +40,7 @@ export type RedeemCreditsMockState = (typeof REDEEM_CREDITS_MOCK_STATES)[number]
 
 const MOCK_SELECTED_ORG_SLUG = 'acme-production'
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Redeem Credits', brand: 'Supabase' })
+const RETURN_TO_SELECTED_ORG_PARAM = 'selected_org'
 
 const createMockOrganization = (details: Partial<Organization>): Organization => ({
   id: 1,
@@ -116,6 +117,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
     mock === 'redeeming' ? MOCK_SELECTED_ORG_SLUG : null
   )
   const [redemptionModalOrgSlug, setRedemptionModalOrgSlug] = useState<string | null>(null)
+  const appliedReturnSelectedOrgRef = useRef<string | null>(null)
 
   useEffect(() => {
     setSelectedOrgSlug(mock === 'redeeming' ? MOCK_SELECTED_ORG_SLUG : null)
@@ -136,10 +138,28 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
   const organizationOptions = useMemo(() => {
     return effectiveOrganizations.slice().sort((a, b) => a.name.localeCompare(b.name))
   }, [effectiveOrganizations])
+  const returnSelectedOrgSlug =
+    router.isReady && typeof router.query[RETURN_TO_SELECTED_ORG_PARAM] === 'string'
+      ? router.query[RETURN_TO_SELECTED_ORG_PARAM]
+      : null
   const displayName = profile?.primary_email ?? profile?.username
   const isLoading =
     mock === 'loading' ||
     (!isMockMode && (isLoadingProfile || isLoadingOrganizations || !hasLoaded))
+
+  useEffect(() => {
+    if (isMockMode || !returnSelectedOrgSlug) return
+    if (appliedReturnSelectedOrgRef.current === returnSelectedOrgSlug) return
+
+    const hasReturnedOrganization = organizationOptions.some(
+      (organization) => organization.slug === returnSelectedOrgSlug
+    )
+
+    if (hasReturnedOrganization) {
+      setSelectedOrgSlug(returnSelectedOrgSlug)
+      appliedReturnSelectedOrgRef.current = returnSelectedOrgSlug
+    }
+  }, [isMockMode, organizationOptions, returnSelectedOrgSlug])
 
   const withInterstitial = ({
     title,
@@ -237,7 +257,10 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
   }
 
   const isRedeeming = mock === 'redeeming'
-  const createOrganizationHref = `/new?returnTo=${encodeURIComponent(router.asPath || '/redeem')}`
+  const createOrganizationHref = `/new?${new URLSearchParams({
+    returnTo: router.asPath || '/redeem',
+    returnToOrgParam: RETURN_TO_SELECTED_ORG_PARAM,
+  }).toString()}`
   const openRedemption = () => {
     if (!selectedOrgSlug || isRedeeming) return
     if (isMockMode) return

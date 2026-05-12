@@ -148,6 +148,7 @@ export const NewOrgForm = ({
 
   const [searchParams] = useQueryStates({
     returnTo: parseAsString.withDefault(''),
+    returnToOrgParam: parseAsString.withDefault(''),
     auth_id: parseAsString.withDefault(''),
     token: parseAsString.withDefault(''),
   })
@@ -294,10 +295,13 @@ export const NewOrgForm = ({
     }
   }
 
-  const getReturnToUrl = () => {
+  const getReturnToUrl = (org: { slug: string }) => {
     if (!searchParams.returnTo) return undefined
 
     const url = new URL(validateReturnTo(searchParams.returnTo), window.location.origin)
+    if (searchParams.returnToOrgParam) {
+      url.searchParams.set(searchParams.returnToOrgParam, org.slug)
+    }
     if (searchParams.auth_id) {
       url.searchParams.set('auth_id', searchParams.auth_id)
     }
@@ -313,7 +317,7 @@ export const NewOrgForm = ({
       ? user.profile.username + `'s Project`
       : 'My Project'
 
-    const returnToUrl = getReturnToUrl()
+    const returnToUrl = getReturnToUrl(org)
 
     if (returnToUrl) {
       router.push(returnToUrl, undefined, { shallow: false })

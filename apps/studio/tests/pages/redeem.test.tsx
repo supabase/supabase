@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
@@ -139,7 +139,29 @@ describe('RedeemCreditsScreen', () => {
 
     expect(createOrganizationLink).toHaveAttribute(
       'href',
-      '/new?returnTo=%2Fredeem%3Fcode%3DSUPA-CREDIT-123'
+      '/new?returnTo=%2Fredeem%3Fcode%3DSUPA-CREDIT-123&returnToOrgParam=selected_org'
+    )
+  })
+
+  test('preselects an organization returned from new organization creation', async () => {
+    const user = userEvent.setup()
+    routerMock.setCurrentUrl('/redeem?code=SUPA-CREDIT-123&selected_org=acme-production')
+    creditRedemptionQueryCode.current = 'SUPA-CREDIT-123'
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations',
+      response: () => HttpResponse.json([ORGANIZATION]),
+    })
+
+    renderScreen()
+
+    const redeemButton = await screen.findByRole('button', { name: 'Redeem credits' })
+
+    await waitFor(() => expect(redeemButton).toBeEnabled())
+    await user.click(redeemButton)
+
+    expect(await screen.findByTestId('credit-redemption')).toHaveTextContent(
+      'Credit redemption for acme-production with code SUPA-CREDIT-123'
     )
   })
 })
