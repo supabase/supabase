@@ -55,6 +55,7 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  - '@electric-sql/pglite'
   - braintrust # Included for bugfix in v3.9.0
   - '@next/*'
   - next

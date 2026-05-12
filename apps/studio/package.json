@@ -31,6 +31,8 @@
     "scorers:deploy": "IS_BRAINTRUST_PUSH=true braintrust push evals/scorer-online.ts"
   },
   "dependencies": {
+    "@electric-sql/pglite": "0.4.5",
+    "@electric-sql/pglite-tools": "^0.3.4",
     "@ai-sdk/amazon-bedrock": "^4.0.81",
     "@ai-sdk/mcp": "^1.0.25",
     "@ai-sdk/openai": "^3.0.41",

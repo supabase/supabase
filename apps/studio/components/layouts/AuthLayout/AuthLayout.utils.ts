@@ -91,6 +91,13 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           items: [],
           shortcutId: SHORTCUT_IDS.NAV_AUTH_POLICIES,
         },
+        {
+          name: 'RLS Playground',
+          key: 'rls-playground',
+          url: `${baseUrl}/rls-playground`,
+          items: [],
+          label: 'Beta',
+        },
         ...(isPlatform
           ? [
               ...(features.signInProviders
