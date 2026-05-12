@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import type { Control } from 'react-hook-form'
 import {
   Checkbox,
-  cn,
   Select,
   SelectContent,
   SelectItem,
@@ -148,21 +147,21 @@ export function JitDbAccessRoleGrantFields({
                 </p>
               }
             >
-              <Select_Shadcn_
+              <Select
                 value={grant.branchesOnly ? 'preview' : 'all'}
                 onValueChange={(value) => onChange({ ...grant, branchesOnly: value === 'preview' })}
               >
-                <SelectTrigger_Shadcn_ className="w-full">
-                  <SelectValue_Shadcn_ placeholder="Select database scope" />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select database scope" />
+                </SelectTrigger>
+                <SelectContent>
                   {BRANCH_SCOPE_OPTIONS.map((option) => (
-                    <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                    <SelectItem key={option.value} value={option.value}>
                       {option.label}
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                </SelectContent>
+              </Select>
             </FormItemLayout>
 
             <FormItemLayout

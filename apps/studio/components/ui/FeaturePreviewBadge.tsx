@@ -26,7 +26,7 @@ export const FeaturePreviewBadge = ({ featureKey, className }: FeaturePreviewBad
         )}
       >
         <FlaskConical size={8} strokeWidth={1.5} />
-        Feature preview
+        Preview
       </Badge>
     </button>
   )
