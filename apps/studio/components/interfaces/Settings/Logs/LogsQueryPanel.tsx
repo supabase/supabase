@@ -285,11 +285,9 @@ const LogsQueryPanel = ({
                     Type
                   </Table.th>,
                 ]}
-                body={selectedSchema.fields
-                  .sort((a: any, b: any) => a.path - b.path)
-                  .map((field) => (
-                    <Field key={field.path} field={field} />
-                  ))}
+                body={selectedSchema.fields.map((field) => (
+                  <Field key={field.path} field={field} />
+                ))}
               />
             </div>
           </SidePanel>
