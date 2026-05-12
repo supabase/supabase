@@ -67,6 +67,37 @@ Common reasons:
 
 Check your publication settings and verify your table meets the requirements.
 
+## Why are updates not being replicated?
+
+If inserts replicate but updates fail or the pipeline reports an error about a partial update row, check the table's `REPLICA IDENTITY` setting.
+
+Postgres logical replication uses `REPLICA IDENTITY` to decide what old-row data to include for `UPDATE` and `DELETE` events. With the default setting, Postgres usually sends only the primary-key identity when it needs to identify the old row. This is enough for most tables with a primary key.
+
+Large values such as `text`, `jsonb`, and `bytea` can be stored out-of-line by Postgres using TOAST. During an update, if a toasted value did not change, Postgres may send a marker that means "the value is unchanged" instead of sending the value again. Supabase ETL can only reconstruct that value when the logical replication event includes enough old-row data. For BigQuery, updates require a complete new row so the destination can apply a CDC upsert. If ETL cannot reconstruct an unchanged toasted value, the update is treated as partial and BigQuery replication fails for that table.
+
+For tables with toasted columns that need reliable updates, set `REPLICA IDENTITY FULL`:
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+You can check the current setting with:
+
+```sql
+select
+  n.nspname as schema_name,
+  c.relname as table_name,
+  c.relreplident as replica_identity
+from
+  pg_class as c
+  join pg_namespace as n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relname = 'your_table';
+```
+
+The `replica_identity` value is `d` for default, `f` for full, `i` for index, and `n` for nothing.
+
+`REPLICA IDENTITY FULL` logs the full old row for updates and deletes, which increases WAL volume. Use it for tables where update correctness matters and the table has large values that may be toasted. If the pipeline is already failed, change the replica identity and then restart the pipeline.
+
 ## Why aren't publication changes reflected after adding or removing tables?
 
 After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/external-replication-setup#adding-or-removing-tables) for instructions.

@@ -83,6 +83,41 @@ Once configured, replication to BigQuery:
 3. Creates BigQuery tables automatically to match your Postgres schema
 4. Streams data to BigQuery
 
+## Source table requirements
+
+BigQuery replication requires each source table to have a primary key. BigQuery uses the source primary key to apply CDC upserts and deletes.
+
+Source tables must also use a compatible Postgres `REPLICA IDENTITY` setting:
+
+- `DEFAULT` with a primary key is supported and works for most tables.
+- `FULL` is supported and is recommended for tables with large `text`, `jsonb`, `bytea`, or other values that Postgres may store out-of-line using TOAST.
+- `USING INDEX`, `NOTHING`, or `DEFAULT` without a primary key are not supported for BigQuery replication.
+
+For updates, Postgres does not always send a complete old row through logical replication. It can also mark unchanged toasted values as `unchanged toast` instead of resending the value. Supabase ETL can reconstruct a complete update when the old row image contains the missing value, which is reliable with `REPLICA IDENTITY FULL`. BigQuery CDC upserts require a complete new row, so updates can fail for tables with toasted columns if ETL receives only a partial update row.
+
+Check a table's current replica identity:
+
+```sql
+select
+  n.nspname as schema_name,
+  c.relname as table_name,
+  c.relreplident as replica_identity
+from
+  pg_class as c
+  join pg_namespace as n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relname = 'your_table';
+```
+
+The `replica_identity` value is `d` for default, `f` for full, `i` for index, and `n` for nothing.
+
+Set full replica identity when a table has toasted columns and update replication must be reliable:
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+`REPLICA IDENTITY FULL` increases WAL volume because Postgres logs the full old row for updates and deletes. Use it on tables where update correctness is more important than the extra replication overhead.
+
 ## How tables are structured
 
 Due to BigQuery limitations, replicated tables use a versioned structure:
@@ -113,6 +148,8 @@ We plan to expand schema change support over time as the feature evolves.
 ## Limitations
 
 - **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
+- **Primary keys**: Source tables must have a primary key
+- **Replica identity**: Source tables must use primary-key replica identity or `REPLICA IDENTITY FULL`
 - **Table names**: Source table names cannot start or end with `_` when replicating to BigQuery
 - **Schema changes**: Limited to the supported schema changes listed above
 
