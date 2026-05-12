@@ -14,8 +14,7 @@ export function RLSDisableModalContent() {
         <Admonition
           type="warning"
           layout="horizontal"
-          title="This table will be publicly readable and writable"
-          description="Anyone can edit or delete data in this table."
+          description="This table will be publicly readable and writable. Anyone can edit or delete data in this table."
         />
         <ul className="mt-4 space-y-5">
           <li className="flex gap-3">
