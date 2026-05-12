@@ -9,6 +9,7 @@ import { AdvisorSection } from './AdvisorSection'
 import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
+import { PlanUsageCard } from './PlanUsageCard'
 import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
 import { ProjectUsageSection as ProjectUsageSectionV1 } from '@/components/interfaces/Home/ProjectUsageSection'
 import { SortableSection } from '@/components/interfaces/ProjectHome/SortableSection'
@@ -96,6 +97,13 @@ export const ProjectHome = () => {
             <TopSection />
           </ScaffoldSection>
         </ScaffoldContainer>
+        {!isPaused && (
+          <ScaffoldContainer size="large">
+            <ScaffoldSection isFullWidth className="pt-6 pb-0">
+              <PlanUsageCard />
+            </ScaffoldSection>
+          </ScaffoldContainer>
+        )}
         {!isPaused && (
           <ScaffoldContainer size="large">
             <ScaffoldSection isFullWidth className="gap-12 pb-32">

@@ -3,6 +3,7 @@ import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -22,7 +23,9 @@ import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
@@ -45,9 +48,16 @@ export function UserDropdown({
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const track = useTrack()
 
+  const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
+  const showUpgradeCta = upgradeCtaVariant === 'user_dropdown'
+
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <DropdownMenu
+      open={isOpen}
       onOpenChange={(open) => {
+        setIsOpen(open)
         if (open) track('header_user_dropdown_opened')
       }}
     >
@@ -153,6 +163,22 @@ export function UserDropdown({
             <DropdownMenuGroup>
               <TimezoneDropdown />
             </DropdownMenuGroup>
+          </>
+        )}
+        {showUpgradeCta && (
+          <>
+            <DropdownMenuSeparator />
+            <div className="p-1">
+              <UpgradePlanButton
+                source="user_dropdown"
+                plan="Pro"
+                className="w-full justify-center"
+                onClick={() => {
+                  track('upgrade_cta_clicked', { placement: 'user_dropdown' })
+                  setIsOpen(false)
+                }}
+              />
+            </div>
           </>
         )}
         {IS_PLATFORM && (
