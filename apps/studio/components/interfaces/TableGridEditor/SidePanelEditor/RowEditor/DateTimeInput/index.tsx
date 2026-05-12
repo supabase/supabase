@@ -21,7 +21,7 @@ interface DateTimeInputProps {
   value: string
   isNullable: boolean
   description: string | ReactNode
-  onChange: (value: string) => void
+  onChange: (value: string | null) => void
   disabled?: boolean
 }
 
@@ -73,7 +73,7 @@ export const DateTimeInput = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-28 pointer-events-auto">
                 {isNullable && (
-                  <DropdownMenuItem onClick={() => onChange('')}>Set to NULL</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onChange(null)}>Set to NULL</DropdownMenuItem>
                 )}
                 <DropdownMenuItem
                   onClick={() =>
