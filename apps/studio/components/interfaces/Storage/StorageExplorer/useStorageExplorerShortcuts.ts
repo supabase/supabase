@@ -27,13 +27,13 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
     setSelectedFilePreview,
     downloadFile,
     downloadSelectedFiles,
-    refetchAllOpenedFolders,
+    refreshAll,
   } = useStorageExplorerStateSnapshot()
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH, () => {
-    refetchAllOpenedFolders()
+    refreshAll()
   })
 
   useShortcut(

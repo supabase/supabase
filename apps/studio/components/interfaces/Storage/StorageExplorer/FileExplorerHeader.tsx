@@ -214,7 +214,6 @@ export const FileExplorerHeader = ({
   const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   const [isPathDialogOpen, setIsPathDialogOpen] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -229,6 +228,8 @@ export const FileExplorerHeader = ({
     popOpenedFoldersAtIndex,
     fetchFoldersByPath,
     refetchAllOpenedFolders,
+    refreshAll,
+    isRefreshing,
     addNewFolderPlaceholder,
     clearOpenedFolders,
     setSelectedFilePreview,
@@ -354,9 +355,7 @@ export const FileExplorerHeader = ({
   }
 
   const refreshData = async () => {
-    setIsRefreshing(true)
-    await refetchAllOpenedFolders()
-    setIsRefreshing(false)
+    await refreshAll()
   }
 
   const onOpenNavigate = () => {
