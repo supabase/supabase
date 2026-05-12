@@ -1,8 +1,8 @@
 ---
 id: 'partner-integration-guide'
 title: 'Supabase Partner Integration Guide'
-subtitle: 'TBD'
-description: 'TBD'
+subtitle: 'Integrate Supabase with your platform or product.'
+description: 'This guide explains how a Supabase partner can integrate with the Supabase platform via OAuth.'
 ---
 
 This guide assumes you have already followed [the Build a Supabase Integration guide](/docs/guides/integrations/build-a-supabase-oauth-integration) and have a working OAuth client.
@@ -199,10 +199,10 @@ The token is a JWT signed with the ES256 private key.
 
 **Protected header (JOSE header)**
 
-| Field | Required | Description                                                                                               |
-| ----- | -------- | --------------------------------------------------------------------------------------------------------- |
-| `alg` | Yes      | Always `ES256` — the only signing algorithm currently supported.                                          |
-| `kid` | Yes      | The key ID identifying the keypair. Use this to pick the correct public key when verifying the signature. |
+| Field | Required | Description                                                                                                |
+| ----- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `alg` | Yes      | Always `ES256` — the only signing algorithm currently supported.                                           |
+| `kid` | Yes      | The key ID identifying the key pair. Use this to pick the correct public key when verifying the signature. |
 
 **Payload (claims)**
 

@@ -3075,7 +3075,7 @@ export const integrations: NavMenuConstant = {
           name: 'Supabase for Platforms',
           url: '/guides/integrations/supabase-for-platforms',
         },
-                {
+        {
           name: 'Supabase partner integration guide',
           url: '/guides/integrations/partner-integration-guide',
         },
