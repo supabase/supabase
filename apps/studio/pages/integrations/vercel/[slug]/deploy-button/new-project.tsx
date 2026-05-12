@@ -1,10 +1,8 @@
-import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import {
-  Alert,
   Button,
   Checkbox,
   Input,
@@ -14,6 +12,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
@@ -54,11 +53,12 @@ const VercelIntegration: NextPageWithLayout = () => {
             />
           </header>
           <CreateProject />
-          <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
-            <Markdown
-              content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
-            />
-          </Alert>
+          <Admonition
+            type="default"
+            layout="horizontal"
+            title="You can uninstall this Integration at any time."
+            description="You can remove this integration at any time via Vercel or the Supabase dashboard"
+          />
         </ScaffoldColumn>
       </ScaffoldContainer>
     </>
@@ -176,15 +176,12 @@ const CreateProject = () => {
 
     snapshot.setLoading(true)
 
-    let dbSqlParts: string[] = []
+    let dbSql: string | undefined
     if (shouldRunMigrations) {
       const id = toast(`Fetching initial migrations from GitHub repo`)
       const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
-      if (migrationSql) dbSqlParts.push(migrationSql)
+      if (migrationSql) dbSql = migrationSql
       toast.success(`Done fetching initial migrations`, { id })
-    }
-    if (!dataApiDefaultPrivileges) {
-      dbSqlParts.push(buildDefaultPrivilegesSql('revoke'))
     }
 
     createProject({
@@ -192,7 +189,8 @@ const CreateProject = () => {
       name: projectName,
       dbPass,
       dbRegion,
-      dbSql: dbSqlParts.length > 0 ? dbSqlParts.join('\n') : undefined,
+      dbSql,
+      dataApiRevokeDefaultPrivileges: !dataApiDefaultPrivileges,
     })
   }
 

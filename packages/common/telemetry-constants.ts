@@ -265,6 +265,28 @@ export interface FeaturePreviewDisabledEvent {
 }
 
 /**
+ * The user picked a timezone in the dashboard timezone picker (in the user
+ * avatar dropdown). Setting an explicit IANA value or returning to the auto
+ * detected default both fire this event.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface TimezonePickerClickedEvent {
+  action: 'timezone_picker_clicked'
+  properties: {
+    /** IANA name resolved before the change. */
+    previousTimezone: string
+    /** IANA name resolved after the change. */
+    nextTimezone: string
+    /** True when the user opted back into the browser-detected default. */
+    isAutoDetected: boolean
+    /** Where the picker was rendered. */
+    source: 'user_dropdown' | 'account_preferences'
+  }
+  groups: TelemetryGroups
+}
+/**
  * User was exposed to the project creation form (exposure event for RLS option experiment).
  *
  * @group Events
@@ -376,6 +398,18 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
     dataApiRevokeOnCreateDefaultEnabled?: boolean
   }
   groups: TelemetryGroups
+}
+
+/**
+ * User clicked to connect GitHub during project creation.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationGithubConnectClickedEvent {
+  action: 'project_creation_github_connect_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -2706,6 +2740,7 @@ export type AiAssistantSource =
   | 'log_explorer'
   | 'error_code'
   | 'advisor_signal_detail'
+  | 'rls_tester'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3035,6 +3070,36 @@ export interface ComputeBadgeUpgradeClickedEvent {
     upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
   }
   groups: TelemetryGroups
+}
+
+/**
+ * Fly.io deprecation banner rendered for a user with at least one Fly.io project or branch.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FlyDeprecationBannerExposedEvent {
+  action: 'fly_deprecation_banner_exposed'
+  groups: TelemetryGroups
+  properties: {
+    primaryCount: number
+    branchCount: number
+  }
+}
+
+/**
+ * User dismissed the Fly.io deprecation banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FlyDeprecationBannerDismissedEvent {
+  action: 'fly_deprecation_banner_dismissed'
+  groups: TelemetryGroups
+  properties: {
+    primaryCount: number
+    branchCount: number
+  }
 }
 
 /**
@@ -3393,8 +3458,10 @@ export type TelemetryEvent =
   | CronJobHistoryClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
+  | TimezonePickerClickedEvent
   | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationDefaultPrivilegesExposedEvent
+  | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | TableApiAccessToggleClickedEvent
@@ -3546,6 +3613,8 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
+  | FlyDeprecationBannerExposedEvent
+  | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | HeaderUpgradeCtaClickedEvent

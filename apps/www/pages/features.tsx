@@ -1,18 +1,27 @@
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
-import { features } from '~/data/features'
-import { breadcrumbs } from '~/lib/breadcrumbs'
-import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import { motion } from 'framer-motion'
 import { debounce } from 'lib/helpers'
-import { Search } from 'lucide-react'
+import { LayoutGrid, Search, Table2 } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/compat/router'
 import Head from 'next/head'
 import Link from 'next/link'
-import React, { useCallback, useEffect, useState } from 'react'
-import { Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
+import { Badge, Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+
+import {
+  FeaturesMatrix,
+  productLabel,
+  stageBadgeVariant,
+  stageLabel,
+} from '@/components/FeaturesMatrix'
+import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import Panel from '@/components/Panel'
+import { features } from '@/data/features'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
+
+type ViewMode = 'grid' | 'matrix'
 
 function FeaturesPage() {
   const router = useRouter()
@@ -23,6 +32,9 @@ function FeaturesPage() {
   const [showSelfHostedOnly, setShowSelfHostedOnly] = useState<boolean>(
     router?.query.selfHosted === 'true'
   )
+  const [viewMode, setViewMode] = useState<ViewMode>(
+    (router?.query.view as ViewMode) === 'matrix' ? 'matrix' : 'grid'
+  )
 
   const HAS_ACTIVE_FILTERS = selectedProducts.length || searchTerm.length || showSelfHostedOnly
 
@@ -31,7 +43,7 @@ function FeaturesPage() {
   // Debounced function to update URL params
   const updateQueryParamsDebounced = useCallback(
     debounce(() => updateQueryParams(), 300),
-    [searchTerm, selectedProducts, showSelfHostedOnly]
+    [searchTerm, selectedProducts, showSelfHostedOnly, viewMode]
   )
 
   const updateQueryParams = () => {
@@ -39,6 +51,7 @@ function FeaturesPage() {
     if (searchTerm) params.set('q', searchTerm)
     if (selectedProducts.length > 0) params.set('products', selectedProducts.join(','))
     if (showSelfHostedOnly) params.set('selfHosted', 'true')
+    if (viewMode === 'matrix') params.set('view', 'matrix')
 
     router?.replace({ pathname: '/features', query: params.toString() }, undefined, {
       shallow: true,
@@ -59,10 +72,12 @@ function FeaturesPage() {
     }
     const selfHostedParam = router?.query.selfHosted === 'true'
     if (selfHostedParam !== showSelfHostedOnly) setShowSelfHostedOnly(selfHostedParam)
-  }, [router?.query.q, router?.query.products, router?.query.selfHosted])
+    const viewParam = (router?.query.view as ViewMode) === 'matrix' ? 'matrix' : 'grid'
+    if (viewParam !== viewMode) setViewMode(viewParam)
+  }, [router?.query.q, router?.query.products, router?.query.selfHosted, router?.query.view])
 
   // Handle search input change
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
   }
 
@@ -209,8 +224,42 @@ function FeaturesPage() {
               </Button>
             </div>
           </div>
-          <div className="md:col-span-3 flex flex-col gap-4 md:gap-8">
-            {!filteredFeatures?.length ? (
+          <div className="md:col-span-3 min-w-0 flex flex-col gap-4 md:gap-6">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-foreground-muted text-xs">
+                {filteredFeatures.length} feature{filteredFeatures.length !== 1 ? 's' : ''}
+              </span>
+              <div className="flex items-center rounded-lg border border-muted">
+                <button
+                  title="Grid view"
+                  onClick={() => setViewMode('grid')}
+                  className={cn(
+                    'relative flex items-center justify-center w-8 h-8 transition-colors rounded-l-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+                    viewMode === 'grid'
+                      ? 'bg-surface-300 text-foreground'
+                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                  )}
+                >
+                  <LayoutGrid size={14} />
+                </button>
+                <button
+                  title="Matrix view"
+                  onClick={() => setViewMode('matrix')}
+                  className={cn(
+                    'relative flex items-center justify-center w-8 h-8 transition-colors border-l border-muted rounded-r-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+                    viewMode === 'matrix'
+                      ? 'bg-surface-300 text-foreground'
+                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                  )}
+                >
+                  <Table2 size={14} />
+                </button>
+              </div>
+            </div>
+
+            {viewMode === 'matrix' ? (
+              <FeaturesMatrix features={filteredFeatures} />
+            ) : !filteredFeatures?.length ? (
               <p className="text-foreground-lighter text-sm">
                 No features found with these filters
               </p>
@@ -222,7 +271,7 @@ function FeaturesPage() {
                     <Link
                       key={`feat-${feature.title}`}
                       href={`/features/${feature.slug}`}
-                      className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600"
+                      className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
                     >
                       <Panel
                         hasActiveOnHover
@@ -231,6 +280,16 @@ function FeaturesPage() {
                       >
                         <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted">
                           <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
+                          {feature.status && (
+                            <div className="hidden md:block absolute bottom-1.5 left-1.5">
+                              <Badge
+                                variant={stageBadgeVariant(feature.status.stage)}
+                                className="text-[10px] py-0 px-1.5 h-4 rounded-sm"
+                              >
+                                {stageLabel(feature.status.stage)}
+                              </Badge>
+                            </div>
+                          )}
                         </div>
                         <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
                           <h3 className="text-sm md:text-base text-foreground leading-5!">
@@ -239,6 +298,24 @@ function FeaturesPage() {
                           <p className="text-foreground-light text-sm line-clamp-2">
                             {feature.subtitle}
                           </p>
+                          <div className="flex flex-wrap items-center gap-1 mb-0.5">
+                            {feature.status && (
+                              <Badge
+                                variant={stageBadgeVariant(feature.status.stage)}
+                                className="md:hidden text-[10px] py-0 px-1.5 h-4 rounded-sm"
+                              >
+                                {stageLabel(feature.status.stage)}
+                              </Badge>
+                            )}
+                            {feature.products.map((product) => (
+                              <span
+                                key={product}
+                                className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
+                              >
+                                {productLabel(product)}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </Panel>
                     </Link>

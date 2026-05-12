@@ -501,6 +501,10 @@ export const gettingstarted: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Supabase Plugin for AI Coding Agents',
+          url: '/guides/getting-started/plugins' as `/${string}`,
+        },
+        {
           name: 'Prompts',
           url: '/guides/getting-started/ai-prompts' as `/${string}`,
         },
@@ -680,6 +684,7 @@ export const PhoneLoginsItems = [
 export const auth: NavMenuConstant = {
   icon: 'auth',
   title: 'Auth',
+  url: '/guides/auth',
   items: [
     {
       name: 'Overview',

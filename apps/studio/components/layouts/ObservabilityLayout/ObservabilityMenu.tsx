@@ -1,12 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { Plus } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { Fragment, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { cn, Menu } from 'ui'
+import { Menu } from 'ui'
 import { InnerSideBarEmptyPanel } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -17,6 +16,7 @@ import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/h
 import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ProductMenu } from '@/components/ui/ProductMenu'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { Content, ContentBase, useContentQuery } from '@/data/content/content-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -134,7 +134,7 @@ const ObservabilityMenu = () => {
   })
 
   return (
-    <Menu type="pills" className="mt-6">
+    <div>
       {isLoading ? (
         <div className="px-5 my-4 space-y-2">
           <ShimmeringLoader />
@@ -143,71 +143,62 @@ const ObservabilityMenu = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-y-6">
-          {menuItems.map((item, idx) => (
-            <Fragment key={idx}>
-              <div className="h-px w-full bg-border-overlay first:hidden" />
-              <div>
-                {item.items && item.items.length > 0 ? (
-                  <div className="px-2">
-                    <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
-                    <div key={item.key} className="flex flex-col">
-                      {item.items.map((subItem) => (
-                        <li
-                          key={subItem.key}
-                          className={cn(
-                            'pr-2 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-                            'flex items-center justify-between rounded-md group relative',
-                            subItem.key === pageKey
-                              ? 'bg-surface-300 text-foreground'
-                              : 'hover:text-foreground'
-                          )}
-                        >
-                          <Link
-                            href={subItem.url}
-                            className="grow h-7 flex justify-between items-center pl-3"
-                          >
-                            <span>{subItem.name}</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            </Fragment>
-          ))}
+          <ProductMenu
+            page={pageKey}
+            menu={menuItems.map((item) => ({
+              ...item,
+              items: item.items.map((subItem) => ({ ...subItem, items: [] })),
+            }))}
+          />
 
           {IS_PLATFORM && (
-            <Fragment>
+            <>
               <div className="h-px w-full bg-border-overlay" />
               <div className="mx-2">
-                <Menu.Group
-                  title={
-                    <span className="flex w-full items-center justify-between relative h-6">
-                      <span className="uppercase font-mono">Custom Reports</span>
-                      {reportMenuItems.length > 0 && (
-                        <ButtonTooltip
-                          type="default"
-                          size="tiny"
-                          icon={<Plus />}
-                          disabled={!canCreateCustomReport}
-                          className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
-                          onClick={() => {
-                            setShowNewReportModal(true)
-                          }}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: !canCreateCustomReport
-                                ? 'You need additional permissions to create custom reports'
-                                : undefined,
-                            },
-                          }}
-                        />
-                      )}
-                    </span>
-                  }
-                />
+                <Menu type="pills">
+                  <Menu.Group
+                    title={
+                      <span className="flex w-full items-center justify-between relative h-6">
+                        <span className="uppercase font-mono">Custom Reports</span>
+                        {reportMenuItems.length > 0 && (
+                          <ButtonTooltip
+                            type="default"
+                            size="tiny"
+                            icon={<Plus />}
+                            disabled={!canCreateCustomReport}
+                            className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
+                            onClick={() => {
+                              setShowNewReportModal(true)
+                            }}
+                            tooltip={{
+                              content: {
+                                side: 'bottom',
+                                text: !canCreateCustomReport
+                                  ? 'You need additional permissions to create custom reports'
+                                  : undefined,
+                              },
+                            }}
+                          />
+                        )}
+                      </span>
+                    }
+                  />
+                  {reportMenuItems.length > 0 &&
+                    reportMenuItems.map((item) => (
+                      <ObservabilityMenuItem
+                        key={item.id}
+                        item={item}
+                        pageKey={pageKey}
+                        onSelectEdit={() => {
+                          setSelectedReportToUpdate(item.report)
+                        }}
+                        onSelectDelete={() => {
+                          setSelectedReportToDelete(item.report)
+                          setDeleteModalOpen(true)
+                        }}
+                      />
+                    ))}
+                </Menu>
                 {reportMenuItems.length === 0 ? (
                   <div className="px-2">
                     <InnerSideBarEmptyPanel
@@ -235,26 +226,9 @@ const ObservabilityMenu = () => {
                       }
                     />
                   </div>
-                ) : (
-                  <>
-                    {reportMenuItems.map((item) => (
-                      <ObservabilityMenuItem
-                        key={item.id}
-                        item={item}
-                        pageKey={pageKey}
-                        onSelectEdit={() => {
-                          setSelectedReportToUpdate(item.report)
-                        }}
-                        onSelectDelete={() => {
-                          setSelectedReportToDelete(item.report)
-                          setDeleteModalOpen(true)
-                        }}
-                      />
-                    ))}
-                  </>
-                )}
+                ) : null}
               </div>
-            </Fragment>
+            </>
           )}
 
           <UpdateCustomReportModal
@@ -290,7 +264,7 @@ const ObservabilityMenu = () => {
           />
         </div>
       )}
-    </Menu>
+    </div>
   )
 }
 

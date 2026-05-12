@@ -5,7 +5,7 @@ import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
-import { SupportFormPage } from '../SupportFormPage'
+import { SupportForm, SupportFormPage, SupportFormStatusButton } from '../SupportFormPage'
 // End of third-party imports
 
 import { API_URL, BASE_PATH } from '@/lib/constants'
@@ -184,6 +184,21 @@ vi.mock(import('@/lib/constants'), async (importOriginal) => {
 
 const renderSupportFormPage = (options?: Parameters<typeof customRender>[1]) =>
   customRender(<SupportFormPage />, {
+    profileContext: createMockProfileContext(),
+    ...options,
+  })
+
+const renderSupportForm = (
+  props?: Parameters<typeof SupportForm>[0],
+  options?: Parameters<typeof customRender>[1]
+) =>
+  customRender(<SupportForm {...props} />, {
+    profileContext: createMockProfileContext(),
+    ...options,
+  })
+
+const renderSupportFormStatusButton = (options?: Parameters<typeof customRender>[1]) =>
+  customRender(<SupportFormStatusButton />, {
     profileContext: createMockProfileContext(),
     ...options,
   })
@@ -458,7 +473,7 @@ describe('SupportFormPage', () => {
   })
 
   test('shows system status: healthy', async () => {
-    renderSupportFormPage()
+    renderSupportFormStatusButton()
 
     await waitFor(() => {
       expect(getStatusLink(screen)).toHaveTextContent('All systems operational')
@@ -483,7 +498,7 @@ describe('SupportFormPage', () => {
       )
     )
 
-    renderSupportFormPage()
+    renderSupportFormStatusButton()
 
     await waitFor(() => {
       expect(getStatusLink(screen)).toHaveTextContent('Active incident ongoing')
@@ -497,10 +512,21 @@ describe('SupportFormPage', () => {
       )
     )
 
-    renderSupportFormPage()
+    renderSupportFormStatusButton()
 
     await waitFor(() => {
       expect(getStatusLink(screen)).toHaveTextContent('Failed to check status')
+    })
+  })
+
+  test('loading with initial params prefills the organization and project', async () => {
+    renderSupportForm({ initialParams: { projectRef: 'project-3' } })
+
+    await waitFor(() => {
+      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      expect(screen.getByRole('combobox', { name: 'Select a project' })).toHaveTextContent(
+        'Project 3'
+      )
     })
   })
 

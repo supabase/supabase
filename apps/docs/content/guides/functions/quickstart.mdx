@@ -63,7 +63,7 @@ This creates a new function at `supabase/functions/hello-world/index.ts` with th
 
 ```tsx
 export default {
-  fetch: withSupabase({ allow: ['public', 'secret'] }, async (req, ctx) => {
+  fetch: withSupabase({ auth: ['publishable', 'secret'] }, async (req, ctx) => {
     const { name } = await req.json()
 
     return Response.json({

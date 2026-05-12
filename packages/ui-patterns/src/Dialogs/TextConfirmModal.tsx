@@ -128,6 +128,9 @@ export const TextConfirmModal = forwardRef<
       return () => clearTimeout(timer)
     }, [showCopied])
 
+    const { title: _alertBaseTitle, children: _alertBaseChildren, ...alertBase } = alert?.base ?? {}
+    const alertTitleProps = alert?.title ? { label: alert.title } : {}
+
     return (
       <Dialog
         open={visible}
@@ -145,10 +148,10 @@ export const TextConfirmModal = forwardRef<
           {alert && (
             <Admonition
               type={variant as 'default' | 'destructive' | 'warning'}
-              label={alert.title}
               description={alert.description}
+              {...alertTitleProps}
               className="border-x-0 rounded-none -mt-px"
-              {...alert?.base}
+              {...alertBase}
             />
           )}
           {children && (

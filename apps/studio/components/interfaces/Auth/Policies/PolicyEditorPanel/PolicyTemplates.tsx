@@ -105,7 +105,7 @@ export const PolicyTemplates = ({
                         className={cn(
                           'rounded-sm! font-mono',
                           template.command === 'UPDATE'
-                            ? 'bg-blue-400 text-blue-900 border border-blue-800'
+                            ? 'bg-blue-900/50 text-blue-200 border border-blue-800'
                             : ''
                         )}
                         variant={

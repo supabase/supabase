@@ -15,6 +15,7 @@ export const LOCAL_STORAGE_KEYS = {
   MAINTENANCE_BANNER_DISMISSED: (id: string) => `maintenance-banner-dismissed-${id}`,
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
 
+  UI_TIMEZONE: 'supabase-ui-timezone',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_PREVIEW_UNIFIED_LOGS: 'supabase-ui-preview-unified-logs',
@@ -70,9 +71,9 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
+  FLY_DEPRECATION_2026_05_31: 'fly-deprecation-2026-05-31-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2026-01-16',
+  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-06-06',
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
   PROJECT_RESTORING_STARTED_AT: (ref: string) => `supabase-project-restoring-started-at-${ref}`,
@@ -161,6 +162,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+  LOCAL_STORAGE_KEYS.UI_TIMEZONE,
 ]
 
 export function clearLocalStorage() {
