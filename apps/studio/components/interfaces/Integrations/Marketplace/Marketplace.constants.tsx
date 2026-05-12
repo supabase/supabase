@@ -78,6 +78,28 @@ export const getCategoryIcon = (slug: string | null | undefined): LucideIcon => 
   return CATEGORY_ICONS[slug] ?? Boxes
 }
 
+// Resolve a category slug (e.g. `observability`, `ai_vectors`) to its human
+// label. Pinned categories in `FEATURED_CATEGORIES` win first so curated
+// labels like `AI & Vectors`/`DevTools` survive title-casing; unknown slugs
+// fall back to a generic title-case derived from the slug itself. Pass an
+// optional `categoryOptions` (e.g. from the marketplaceDB) to bias toward
+// upstream names when available.
+export const formatCategoryLabel = (
+  slug: string | null | undefined,
+  categoryOptions?: Array<{ slug: string; name: string }>
+): string => {
+  if (!slug) return ''
+  const pinned = FEATURED_CATEGORIES.find((c) => c.slug === slug)
+  if (pinned) return pinned.name
+  const remote = categoryOptions?.find((c) => c.slug === slug)
+  if (remote) return remote.name
+  return slug
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
+}
+
 // Classify an integration into one of the four marketplace install mechanisms.
 // Existing IntegrationDefinition.type covers oauth/postgres_extension/wrapper;
 // 'template' is a heuristic — anything that ships a managed schema (e.g.

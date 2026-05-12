@@ -1,8 +1,9 @@
 import { ArrowRight, Pause, Settings } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Badge, Button, cn } from 'ui'
 
+import { formatCategoryLabel, getMarketplaceTier } from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -15,23 +16,16 @@ interface MarketplaceFeaturedHeroProps {
   categoryOptions: Array<{ slug: string; name: string }>
 }
 
-const formatCategorySlug = (slug: string) =>
-  slug
-    .split(/[-_]/)
-    .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
-
 // Splits the description into a short title (first sentence) and the rest of
 // the body. Falls back to the full description for the title when no sentence
 // break is found.
-const splitDescription = (description: string | null) => {
-  if (!description) return { title: '', body: '' }
-  const trimmed = description.trim()
-  const match = trimmed.match(/^(.+?[.!?])(\s+)(.*)$/s)
-  if (!match) return { title: trimmed, body: '' }
-  return { title: match[1].trim(), body: match[3].trim() }
-}
+// const splitDescription = (description: string | null) => {
+//   if (!description) return { title: '', body: '' }
+//   const trimmed = description.trim()
+//   const match = trimmed.match(/^(.+?[.!?])(\s+)(.*)$/s)
+//   if (!match) return { title: trimmed, body: '' }
+//   return { title: match[1].trim(), body: match[3].trim() }
+// }
 
 export const MarketplaceFeaturedHero = ({
   integrations,
@@ -74,21 +68,15 @@ export const MarketplaceFeaturedHero = ({
     }
   }, [])
 
-  const categoryNameBySlug = useMemo(() => {
-    const map = new Map<string, string>()
-    for (const c of categoryOptions) map.set(c.slug, c.name)
-    return map
-  }, [categoryOptions])
-
   if (integrations.length === 0) return null
 
   const active = integrations[Math.min(activeIndex, integrations.length - 1)]
   const activeCategorySlug = active.categories?.[0]
   const activeCategoryName = activeCategorySlug
-    ? (categoryNameBySlug.get(activeCategorySlug) ?? formatCategorySlug(activeCategorySlug))
+    ? formatCategoryLabel(activeCategorySlug, categoryOptions)
     : null
   const isActiveInstalled = installedIds.includes(active.id)
-  const { title, body } = splitDescription(active.description)
+  // const { title, body } = splitDescription(active.description)
 
   const handleTabClick = (idx: number) => {
     setActiveIndex(idx)
@@ -96,34 +84,6 @@ export const MarketplaceFeaturedHero = ({
 
   return (
     <section>
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-          <h2 className="text-sm font-medium">Featured partners</h2>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsPaused((p) => !p)}
-          className="flex items-center gap-1.5 text-[11.5px] text-foreground-lighter transition-colors hover:text-foreground-light"
-          aria-label={isPaused ? 'Resume auto-rotation' : 'Pause auto-rotation'}
-        >
-          {isPaused ? (
-            <>
-              <Pause size={10} />
-              <span>paused</span>
-            </>
-          ) : (
-            <>
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand" />
-              </span>
-              <span>auto</span>
-            </>
-          )}
-        </button>
-      </div>
-
       <div ref={cardRef} className="overflow-hidden rounded-lg border bg-surface-100">
         <div className="grid gap-0 @3xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
           <div className="relative hidden @3xl:block">
@@ -131,26 +91,41 @@ export const MarketplaceFeaturedHero = ({
           </div>
 
           <div className="flex flex-col gap-4 p-5 @3xl:p-6">
-            <div className="flex items-center gap-2">
-              <MarketplaceLogo integration={active} size="h-7 w-7" />
-              <span className="text-[13px] font-medium text-foreground">{active.name}</span>
-              {isActiveInstalled && (
-                <Badge variant="success" className="px-1.5 py-0 text-[10px]">
-                  Installed
-                </Badge>
-              )}
-              {activeCategoryName && (
-                <span className="text-[12px] text-foreground-lighter">· {activeCategoryName}</span>
-              )}
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <MarketplaceLogo integration={active} size="h-7 w-7" />
+                <span className="text-lg font-medium text-foreground">{active.name}</span>
+                {active.status && (
+                  <Badge variant="warning" className="capitalize">
+                    {active.status}
+                  </Badge>
+                )}
+                {getMarketplaceTier(active) === 'Partner' ? (
+                  <Badge variant="success">Partner</Badge>
+                ) : (
+                  <Badge>Official</Badge>
+                )}
+                {isActiveInstalled && (
+                  <Badge variant="success" className="px-1.5 py-0 text-[10px]">
+                    Installed
+                  </Badge>
+                )}
+                {activeCategoryName && (
+                  <span className="text-[12px] text-foreground-lighter">
+                    · {activeCategoryName}
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-              {title && (
+            <div className="grow flex flex-col gap-2">
+              <p className="text-base text-foreground-light">{active.description}</p>
+              {/* {title && (
                 <h3 className="text-lg font-medium leading-snug text-foreground @3xl:text-xl">
                   {title}
                 </h3>
               )}
-              {body && <p className="text-[13px] leading-relaxed text-foreground-light">{body}</p>}
+              {body && <p className="text-[13px] leading-relaxed text-foreground-light">{body}</p>} */}
             </div>
 
             <div className="mt-1 flex items-center gap-4">
@@ -179,9 +154,7 @@ export const MarketplaceFeaturedHero = ({
           {integrations.map((integration, idx) => {
             const isActive = idx === activeIndex
             const slug = integration.categories?.[0]
-            const categoryLabel = slug
-              ? (categoryNameBySlug.get(slug) ?? formatCategorySlug(slug))
-              : null
+            const categoryLabel = slug ? formatCategoryLabel(slug, categoryOptions) : null
             return (
               <button
                 key={integration.id}
@@ -225,6 +198,33 @@ export const MarketplaceFeaturedHero = ({
           })}
         </div>
       </div>
+      <div className="mt-2 -mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {/* <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+          <h2 className="text-sm font-medium">Featured partners</h2> */}
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsPaused((p) => !p)}
+          className="flex items-center gap-1.5 p-1 text-[11px] text-foreground-lighter transition-colors hover:text-foreground-light"
+          aria-label={isPaused ? 'Resume auto-rotation' : 'Pause auto-rotation'}
+        >
+          {isPaused ? (
+            <>
+              <Pause size={10} />
+              <span>Paused</span>
+            </>
+          ) : (
+            <>
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand" />
+              </span>
+              <span>Auto Play</span>
+            </>
+          )}
+        </button>
+      </div>
     </section>
   )
 }
@@ -240,7 +240,7 @@ interface FeaturedCoverProps {
 const FeaturedCover = ({ integration, categoryLabel }: FeaturedCoverProps) => (
   <div
     key={integration.id}
-    className="relative h-full min-h-[260px] w-full overflow-hidden bg-linear-to-br from-surface-200 via-surface-100 to-surface-300"
+    className="relative h-full min-h-[200px] w-full overflow-hidden bg-linear-to-br from-surface-200 via-surface-100 to-surface-300"
   >
     <div
       aria-hidden

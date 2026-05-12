@@ -1,8 +1,7 @@
-import { Settings } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button, Card } from 'ui'
+import { Badge, Card } from 'ui'
 
-import { getMarketplaceTier } from './Marketplace.constants'
+import { formatCategoryLabel, getMarketplaceTier } from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -19,16 +18,9 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
   return (
     <Link href={`/project/${project?.ref}/integrations/${integration.id}/overview`}>
       <Card className="flex min-h-[168px] h-full flex-col gap-2.5 hover:border-stronger p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <MarketplaceLogo integration={integration} size="h-9 w-9" />
-          <div className="flex gap-1">
-            {tier === 'Partner' ? (
-              <Badge variant="success">Partner</Badge>
-            ) : (
-              <Badge>Official</Badge>
-            )}
-            {isInstalled && <Badge variant="success">Installed</Badge>}
-          </div>
+          {isInstalled && <Badge variant="success">Installed</Badge>}
         </div>
         <div>
           <div className="mb-1 text-sm font-medium">{integration.name}</div>
@@ -39,19 +31,22 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
           )}
         </div>
         <div className="flex-1" />
-        <div className="flex items-center justify-between border-t pt-2.5">
+        <div className="flex items-center justify-between gap-2 pt-2.5">
+          <div className="flex flex-wrap items-center gap-1">
+            {integration.status && (
+              <Badge variant="warning" className="capitalize">
+                {integration.status}
+              </Badge>
+            )}
+            {tier === 'Partner' ? (
+              <Badge variant="success">Partner</Badge>
+            ) : (
+              <Badge>Official</Badge>
+            )}
+          </div>
           <span className="text-[11.5px] text-foreground-lighter">
-            {integration.categories?.[0] ?? ''}
+            {formatCategoryLabel(integration.categories?.[0])}
           </span>
-          <Button
-            type={isInstalled ? 'outline' : 'default'}
-            size="tiny"
-            icon={isInstalled ? <Settings size={13} /> : undefined}
-            tabIndex={-1}
-            asChild
-          >
-            <span>{isInstalled ? 'Manage' : 'Install'}</span>
-          </Button>
         </div>
       </Card>
     </Link>

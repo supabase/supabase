@@ -1,8 +1,8 @@
-import { BadgeCheck, Settings } from 'lucide-react'
-import Link from 'next/link'
-import { Badge, Button } from 'ui'
+import { useRouter } from 'next/router'
+import { Badge, TableCell, TableHead, TableRow } from 'ui'
 
 import {
+  formatCategoryLabel,
   getMarketplaceTier,
   getMarketplaceType,
   getMarketplaceTypeLabel,
@@ -16,50 +16,65 @@ interface MarketplaceListRowProps {
   isInstalled: boolean
 }
 
-const ROW_TEMPLATE = '40px minmax(0,1fr) 100px 130px 110px'
+// Drop columns on narrow viewports. The surrounding `PageContainer` exposes a
+// `@container` context (see how the grid uses `@lg:grid-cols-2`), so these
+// `@…:` prefixes track its width rather than the document viewport.
+const HIDE_BELOW_MD = 'hidden @md:table-cell'
+const HIDE_BELOW_LG = 'hidden @lg:table-cell'
 
 export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceListRowProps) => {
+  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const tier = getMarketplaceTier(integration)
   const installMechanism = getMarketplaceTypeLabel(getMarketplaceType(integration))
+  const href = `/project/${project?.ref}/integrations/${integration.id}/overview`
 
   return (
-    <Link
-      href={`/project/${project?.ref}/integrations/${integration.id}/overview`}
-      className="grid items-center gap-4 border-b px-4 py-3 transition-colors last:border-b-0 hover:bg-surface-100"
-      style={{ gridTemplateColumns: ROW_TEMPLATE }}
+    <TableRow
+      onClick={() => router.push(href)}
+      className="cursor-pointer transition-colors hover:bg-surface-100 [&>td]:py-2 @lg:[&>td]:py-2.5"
     >
-      <MarketplaceLogo integration={integration} size="h-8 w-8" />
-      <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-[13.5px] font-medium">{integration.name}</span>
-          {tier === 'Partner' ? <Badge variant="success">Partner</Badge> : <Badge>Official</Badge>}
+      <TableCell className="w-10 pr-0 @lg:w-12">
+        <MarketplaceLogo integration={integration} size="h-7 w-7 @lg:h-8 @lg:w-8" />
+      </TableCell>
+
+      <TableCell>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+            <span className="text-[13px] font-medium @lg:text-[13.5px]">{integration.name}</span>
+            {integration.status && (
+              <Badge variant="warning" className="capitalize">
+                {integration.status}
+              </Badge>
+            )}
+            {tier === 'Partner' ? (
+              <Badge variant="success">Partner</Badge>
+            ) : (
+              <Badge>Official</Badge>
+            )}
+          </div>
+          {integration.description && (
+            <p className="mt-0.5 line-clamp-1 max-w-[600px] text-xs text-foreground-light">
+              {integration.description}
+            </p>
+          )}
         </div>
-        {integration.description && (
-          <p className="mt-0.5 line-clamp-1 max-w-[600px] text-xs text-foreground-light">
-            {integration.description}
-          </p>
-        )}
-      </div>
-      <span className="text-[11.5px] text-foreground-lighter">
-        {integration.categories?.[0] ?? '—'}
-      </span>
-      <span className="font-mono text-[11.5px] text-foreground-lighter">{installMechanism}</span>
-      <div className="flex items-center justify-end gap-2">
-        {isInstalled && <BadgeCheck size={14} className="text-brand" />}
-        <Button
-          type={isInstalled ? 'outline' : 'default'}
-          size="tiny"
-          icon={isInstalled ? <Settings size={13} /> : undefined}
-          // The whole row is a link — keep the button visually consistent but
-          // non-interactive so we don't get nested navigation.
-          tabIndex={-1}
-          asChild
-        >
-          <span>{isInstalled ? 'Manage' : 'Install'}</span>
-        </Button>
-      </div>
-    </Link>
+      </TableCell>
+
+      <TableCell className={`w-28 text-[11.5px] text-foreground-lighter ${HIDE_BELOW_MD}`}>
+        {formatCategoryLabel(integration.categories?.[0]) || '—'}
+      </TableCell>
+
+      <TableCell
+        className={`w-32 font-mono text-[11.5px] text-foreground-lighter ${HIDE_BELOW_LG}`}
+      >
+        {installMechanism}
+      </TableCell>
+
+      <TableCell className="w-24">
+        {isInstalled ? <Badge variant="success">Installed</Badge> : null}
+      </TableCell>
+    </TableRow>
   )
 }
 
@@ -70,14 +85,11 @@ interface MarketplaceListHeaderProps {
 export const MarketplaceListHeader = ({
   integrationsLabel = 'Integration',
 }: MarketplaceListHeaderProps) => (
-  <div
-    className="grid gap-4 border-b bg-surface-100 px-4 py-2 font-mono text-[10.5px] uppercase tracking-wider text-foreground-lighter"
-    style={{ gridTemplateColumns: ROW_TEMPLATE }}
-  >
-    <span />
-    <span>{integrationsLabel}</span>
-    <span>Category</span>
-    <span>Type</span>
-    <span />
-  </div>
+  <TableRow>
+    <TableHead className="w-10 pr-0 @lg:w-12" />
+    <TableHead>{integrationsLabel}</TableHead>
+    <TableHead className={`w-28 ${HIDE_BELOW_MD}`}>Category</TableHead>
+    <TableHead className={`w-40 ${HIDE_BELOW_LG}`}>Type</TableHead>
+    <TableHead className="w-32"></TableHead>
+  </TableRow>
 )

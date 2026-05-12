@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
+import { Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
 import {
   PageContainer,
   PageHeader,
@@ -12,12 +13,10 @@ import {
 
 import {
   FEATURED_INTEGRATION_IDS,
-  getMarketplaceTier,
   getMarketplaceType,
   type MarketplaceIntegrationType,
 } from './Marketplace.constants'
 import { MarketplaceCard } from './MarketplaceCard'
-import { MarketplaceCategoryGrid } from './MarketplaceCategoryGrid'
 import { MarketplaceFeaturedHero } from './MarketplaceFeaturedHero'
 import { MarketplaceFilterBar, type ViewMode } from './MarketplaceFilterBar'
 import { MarketplaceListHeader, MarketplaceListRow } from './MarketplaceListRow'
@@ -50,12 +49,6 @@ export const MarketplaceIndex = () => {
       'template',
       'wrapper',
     ]).withOptions({ clearOnDefault: true })
-  )
-  const [tier, setTier] = useQueryState(
-    'tier',
-    parseAsStringEnum<'Partner' | 'Official'>(['Partner', 'Official']).withOptions({
-      clearOnDefault: true,
-    })
   )
   // View mode lives in localStorage rather than the URL so it survives sidebar
   // navigation (which replaces the URL with `?category=…`/`?type=…`). Grid is
@@ -93,7 +86,7 @@ export const MarketplaceIndex = () => {
     [marketplaceCategories]
   )
 
-  const hasActiveFilter = !!(category || type || tier)
+  const hasActiveFilter = !!(category || type)
   const hasSearchOrFilter = hasActiveFilter || search.length > 0
 
   const filtered = useMemo(() => {
@@ -104,9 +97,6 @@ export const MarketplaceIndex = () => {
     }
     if (type) {
       result = result.filter((i) => getMarketplaceType(i) === type)
-    }
-    if (tier) {
-      result = result.filter((i) => getMarketplaceTier(i) === tier)
     }
     if (search.length > 0) {
       const needle = search.toLowerCase()
@@ -120,7 +110,7 @@ export const MarketplaceIndex = () => {
       if (!aInstalled && bInstalled) return 1
       return a.name.localeCompare(b.name)
     })
-  }, [availableIntegrations, category, type, tier, search, installedIds])
+  }, [availableIntegrations, category, type, search, installedIds])
 
   const featured = useMemo(() => {
     if (hasSearchOrFilter) return []
@@ -133,7 +123,7 @@ export const MarketplaceIndex = () => {
   const clearAll = () => {
     setCategory(null)
     setType(null)
-    setTier(null)
+    setSearch('')
   }
 
   return (
@@ -155,7 +145,7 @@ export const MarketplaceIndex = () => {
         </PageHeaderMeta>
       </PageHeader>
 
-      <PageContainer size="large" className="flex flex-col gap-7 py-6">
+      <PageContainer size="large" className="flex flex-col gap-4 py-6">
         {isLoading && (
           <div className="grid gap-4 xl:grid-cols-3 2xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, idx) => (
@@ -170,15 +160,23 @@ export const MarketplaceIndex = () => {
 
         {isSuccess && (
           <>
-            {!hasSearchOrFilter && featured.length > 0 && (
+            {featured.length > 0 && (
               <MarketplaceFeaturedHero
                 integrations={featured}
                 installedIds={installedIds}
                 categoryOptions={categoryOptions}
               />
             )}
+            {/* {!hasSearchOrFilter && featured.length > 0 && (
+              <MarketplaceFeaturedHero
+                integrations={featured}
+                installedIds={installedIds}
+                categoryOptions={categoryOptions}
+              />
+            )} */}
 
-            {!hasSearchOrFilter && <MarketplaceCategoryGrid integrations={availableIntegrations} />}
+            {/* {!hasSearchOrFilter && <MarketplaceCategoryGrid integrations={availableIntegrations} />} */}
+            {/* <MarketplaceCategoryGrid integrations={availableIntegrations} /> */}
 
             <MarketplaceFilterBar
               resultCount={filtered.length}
@@ -189,8 +187,6 @@ export const MarketplaceIndex = () => {
               categoryOptions={categoryOptions}
               type={type}
               onTypeChange={(v) => setType(v)}
-              tier={tier}
-              onTierChange={(v) => setTier(v)}
               viewMode={viewMode}
               onViewModeChange={(v) => setViewMode(v)}
               hasActiveFilter={hasActiveFilter}
@@ -203,7 +199,7 @@ export const MarketplaceIndex = () => {
 
             {filtered.length > 0 &&
               (viewMode === 'grid' ? (
-                <div className="grid grid-cols-2 gap-3 @4xl:grid-cols-3">
+                <div className="grid @lg:grid-cols-2 gap-3 @4xl:grid-cols-3">
                   {filtered.map((integration) => (
                     <MarketplaceCard
                       key={integration.id}
@@ -213,16 +209,24 @@ export const MarketplaceIndex = () => {
                   ))}
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-md border bg-surface-75">
-                  <MarketplaceListHeader />
-                  {filtered.map((integration) => (
-                    <MarketplaceListRow
-                      key={integration.id}
-                      integration={integration}
-                      isInstalled={installedIds.includes(integration.id)}
-                    />
-                  ))}
-                </div>
+                <Card>
+                  <ShadowScrollArea>
+                    <Table>
+                      <TableHeader>
+                        <MarketplaceListHeader />
+                      </TableHeader>
+                      <TableBody>
+                        {filtered.map((integration) => (
+                          <MarketplaceListRow
+                            key={integration.id}
+                            integration={integration}
+                            isInstalled={installedIds.includes(integration.id)}
+                          />
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </ShadowScrollArea>
+                </Card>
               ))}
           </>
         )}

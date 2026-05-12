@@ -6,32 +6,16 @@ import { Button } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { formatCategoryLabel } from './Marketplace.constants'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
 import { MarketplaceDetailTopBar } from './MarketplaceDetailTopBar'
-import { HealthTab } from './tabs/HealthTab'
 import { OverviewTab } from './tabs/OverviewTab'
-import { PermissionsTab } from './tabs/PermissionsTab'
-import { VersionsTab } from './tabs/VersionsTab'
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-
-// The new detail page always shows the same 4 tabs regardless of installation
-// state — placeholders explain the gap until data wiring lands.
-const TABS = [
-  { route: 'overview', label: 'Overview' },
-  { route: 'permissions', label: 'Permissions' },
-  { route: 'health', label: 'Health' },
-  { route: 'versions', label: 'Versions' },
-] as const
-
-type TabRoute = (typeof TABS)[number]['route']
-
-const isTabRoute = (value: string | undefined): value is TabRoute =>
-  TABS.some((tab) => tab.route === value)
 
 export const MarketplaceDetail = () => {
   const router = useRouter()
@@ -49,15 +33,40 @@ export const MarketplaceDetail = () => {
   )
 
   const isInstalled = !!integration && !!installation
-  const activeTab: TabRoute = isTabRoute(pageId) ? pageId : 'overview'
+
+  // Tabs come from each integration's own navigation definition (e.g. Cron → Jobs,
+  // Vault → Secrets). Before install we only expose Overview; the custom subviews
+  // unlock once the integration is installed.
+  const navigationItems = useMemo(() => {
+    if (!integration?.navigation) return []
+    return isInstalled
+      ? integration.navigation
+      : integration.navigation.filter((nav) => nav.route === 'overview')
+  }, [integration, isInstalled])
+
+  const activeRoute = pageId ?? 'overview'
+  const isKnownRoute = navigationItems.some((nav) => nav.route === activeRoute)
+
+  const CustomPageComponent = useMemo(
+    () =>
+      activeRoute !== 'overview' && isKnownRoute
+        ? integration?.navigate({ id, pageId, childId: undefined })
+        : null,
+    [integration, activeRoute, isKnownRoute, id, pageId]
+  )
 
   useEffect(() => {
-    // Bounce unknown subroutes back to Overview so the URL is always one of the
-    // four advertised tabs.
-    if (router?.isReady && pageId && !isTabRoute(pageId)) {
+    if (
+      router?.isReady &&
+      !isAvailableLoading &&
+      !isInstalledLoading &&
+      !!integration &&
+      pageId &&
+      !isKnownRoute
+    ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-  }, [router, pageId, ref, id])
+  }, [router, pageId, ref, id, integration, isKnownRoute, isAvailableLoading, isInstalledLoading])
 
   if (!router?.isReady) return null
   if (!integrationsWrappers && id?.endsWith('_wrapper')) {
@@ -94,13 +103,14 @@ export const MarketplaceDetail = () => {
     )
   }
 
+  const categoryLabel = formatCategoryLabel(integration.categories?.[0])
   const subtitle = (
     <>
       {integration.author?.name && <>By {integration.author.name}</>}
-      {integration.author?.name && integration.categories?.[0] && (
+      {integration.author?.name && categoryLabel && (
         <span className="text-foreground-muted"> · </span>
       )}
-      {integration.categories?.[0]}
+      {categoryLabel}
     </>
   )
 
@@ -118,10 +128,10 @@ export const MarketplaceDetail = () => {
     return <InstallIntegrationSheet integration={integration} />
   }
 
-  const tabs = TABS.map((tab) => ({
-    label: tab.label,
-    href: `/project/${ref}/integrations/${id}/${tab.route}`,
-    active: tab.route === activeTab,
+  const tabs = navigationItems.map((nav) => ({
+    label: nav.label,
+    href: `/project/${ref}/integrations/${id}/${nav.route}`,
+    active: nav.route === activeRoute,
   }))
 
   return (
@@ -156,12 +166,11 @@ export const MarketplaceDetail = () => {
         isInstalled={isInstalled}
       />
 
-      {activeTab === 'overview' && (
+      {activeRoute === 'overview' ? (
         <OverviewTab integration={integration} isInstalled={isInstalled} />
-      )}
-      {activeTab === 'permissions' && <PermissionsTab />}
-      {activeTab === 'health' && <HealthTab />}
-      {activeTab === 'versions' && <VersionsTab />}
+      ) : CustomPageComponent ? (
+        <CustomPageComponent />
+      ) : null}
     </>
   )
 }

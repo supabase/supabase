@@ -28,7 +28,7 @@ export const MarketplaceCategoryGrid = ({ integrations }: MarketplaceCategoryGri
   return (
     <section>
       <h2 className="mb-3 text-sm font-medium">Browse by category</h2>
-      <div className="grid grid-cols-2 gap-2.5 @2xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2.5 @xl:grid-cols-3 @5xl:grid-cols-6">
         {withCounts.map((category) => {
           const Icon = getCategoryIcon(category.slug)
           return (

@@ -5,11 +5,14 @@ import {
   SelectContent_Shadcn_ as SelectContent,
   SelectItem_Shadcn_ as SelectItem,
   SelectTrigger_Shadcn_ as SelectTrigger,
-  SelectValue_Shadcn_ as SelectValue,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { INTEGRATION_TYPES, type MarketplaceIntegrationType } from './Marketplace.constants'
+import {
+  formatCategoryLabel,
+  INTEGRATION_TYPES,
+  type MarketplaceIntegrationType,
+} from './Marketplace.constants'
 
 export type ViewMode = 'list' | 'grid'
 
@@ -22,8 +25,6 @@ interface MarketplaceFilterBarProps {
   categoryOptions: Array<{ slug: string; name: string }>
   type: MarketplaceIntegrationType | null
   onTypeChange: (value: MarketplaceIntegrationType | null) => void
-  tier: 'Partner' | 'Official' | null
-  onTierChange: (value: 'Partner' | 'Official' | null) => void
   viewMode: ViewMode
   onViewModeChange: (value: ViewMode) => void
   hasActiveFilter: boolean
@@ -43,19 +44,21 @@ export const MarketplaceFilterBar = ({
   categoryOptions,
   type,
   onTypeChange,
-  tier,
-  onTierChange,
   viewMode,
   onViewModeChange,
   hasActiveFilter,
   onClearFilters,
 }: MarketplaceFilterBarProps) => {
+  const showClear = hasActiveFilter || search.length > 0
+  const categoryLabel = category ? formatCategoryLabel(category, categoryOptions) : 'All'
+  const typeLabel = type ? (INTEGRATION_TYPES.find((t) => t.key === type)?.label ?? type) : 'All'
+
   return (
     <div
       className={cn(
         'sticky top-0 z-5 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
         'bg-dash-sidebar/95 backdrop-blur',
-        hasActiveFilter ? 'border-b border-muted' : 'border-b border-transparent'
+        showClear ? 'border-b border-muted' : 'border-b border-transparent'
       )}
     >
       <Input
@@ -69,13 +72,13 @@ export const MarketplaceFilterBar = ({
 
       <Select value={category ?? ALL} onValueChange={(v) => onCategoryChange(v === ALL ? null : v)}>
         <SelectTrigger size="tiny" className={triggerCls}>
-          <SelectValue placeholder="Category: All" />
+          <span className="truncate">Category: {categoryLabel}</span>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL}>Category: All</SelectItem>
+          <SelectItem value={ALL}>All</SelectItem>
           {categoryOptions.map((c) => (
             <SelectItem key={c.slug} value={c.slug}>
-              Category: {c.name}
+              {c.name}
             </SelectItem>
           ))}
         </SelectContent>
@@ -86,33 +89,19 @@ export const MarketplaceFilterBar = ({
         onValueChange={(v) => onTypeChange(v === ALL ? null : (v as MarketplaceIntegrationType))}
       >
         <SelectTrigger size="tiny" className={triggerCls}>
-          <SelectValue placeholder="Type: All" />
+          <span className="truncate">Type: {typeLabel}</span>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL}>Type: All</SelectItem>
+          <SelectItem value={ALL}>All</SelectItem>
           {INTEGRATION_TYPES.map((t) => (
             <SelectItem key={t.key} value={t.key}>
-              Type: {t.label}
+              {t.label}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Select
-        value={tier ?? ALL}
-        onValueChange={(v) => onTierChange(v === ALL ? null : (v as 'Partner' | 'Official'))}
-      >
-        <SelectTrigger size="tiny" className="w-[130px]">
-          <SelectValue placeholder="Tier: All" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>Tier: All</SelectItem>
-          <SelectItem value="Partner">Tier: Partner</SelectItem>
-          <SelectItem value="Official">Tier: Official</SelectItem>
-        </SelectContent>
-      </Select>
-
-      {hasActiveFilter && (
+      {showClear && (
         <button
           type="button"
           onClick={onClearFilters}
