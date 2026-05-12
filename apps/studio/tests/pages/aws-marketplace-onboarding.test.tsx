@@ -1,18 +1,18 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { HttpResponse, http } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import {
-  AwsMarketplaceOnboardingScreen,
-  type AwsMarketplaceMockState,
-} from '@/pages/aws-marketplace-onboarding'
 import type {
   CloudMarketplaceContractLinkingEligibility,
   CloudMarketplaceOnboardingInfo,
 } from '@/components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
 import { API_URL } from '@/lib/constants'
 import type { ProfileContextType } from '@/lib/profile'
+import {
+  AwsMarketplaceOnboardingScreen,
+  type AwsMarketplaceMockState,
+} from '@/pages/aws-marketplace-onboarding'
 import { createMockOrganization } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
@@ -138,16 +138,16 @@ describe('AwsMarketplaceOnboardingScreen', () => {
 
     mockAwsEndpoints()
     mswServer.use(
-      http.put(`${API_URL}/platform/organizations/:slug/cloud-marketplace/link`, async ({
-        params,
-        request,
-      }) => {
-        linkRequest = {
-          slug: String(params.slug),
-          body: await request.json(),
+      http.put(
+        `${API_URL}/platform/organizations/:slug/cloud-marketplace/link`,
+        async ({ params, request }) => {
+          linkRequest = {
+            slug: String(params.slug),
+            body: await request.json(),
+          }
+          return HttpResponse.json({})
         }
-        return HttpResponse.json({})
-      })
+      )
     )
 
     renderScreen()
@@ -176,4 +176,20 @@ describe('AwsMarketplaceOnboardingScreen', () => {
       expect(await screen.findByText(expectedText)).toBeInTheDocument()
     }
   )
+
+  test('shows what happens when creating an organization in the AWS mock flow', async () => {
+    const user = userEvent.setup()
+    renderScreen({ mock: 'create-new' })
+
+    await user.click(await screen.findByRole('button', { name: /Create new organization/ }))
+
+    expect(await screen.findByText('Create and link organization')).toBeInTheDocument()
+    expect(
+      screen.getByText(/create an AWS-managed organization, then links it/i)
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Show linked state' }))
+
+    expect(await screen.findByText('Organization linked')).toBeInTheDocument()
+  })
 })

@@ -1,11 +1,11 @@
-import { FeatureFlagContext } from 'common'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { RedeemCreditsScreen, type RedeemCreditsMockState } from '@/pages/redeem'
 import type { ProfileContextType } from '@/lib/profile'
+import { RedeemCreditsScreen, type RedeemCreditsMockState } from '@/pages/redeem'
 import { createMockOrganization } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -83,16 +83,19 @@ describe('RedeemCreditsScreen', () => {
     ['invalid', 'Invalid code'],
     ['wrong-account', 'Wrong account'],
     ['error', 'Unable to load credit redemption'],
-  ] satisfies Array<[RedeemCreditsMockState, string]>)('renders %s mock state', (mock, expected) => {
-    const { container } = renderScreen({ mock })
+  ] satisfies Array<[RedeemCreditsMockState, string]>)(
+    'renders %s mock state',
+    (mock, expected) => {
+      const { container } = renderScreen({ mock })
 
-    if (expected === 'shimmering-loader') {
-      expect(container.querySelectorAll('.shimmering-loader').length).toBeGreaterThan(0)
-      return
+      if (expected === 'shimmering-loader') {
+        expect(container.querySelectorAll('.shimmering-loader').length).toBeGreaterThan(0)
+        return
+      }
+
+      expect(screen.getAllByText(expected).length).toBeGreaterThan(0)
     }
-
-    expect(screen.getAllByText(expected).length).toBeGreaterThan(0)
-  })
+  )
 
   test('renders ready state from organizations query and opens redemption for selected organization', async () => {
     const user = userEvent.setup()
@@ -117,6 +120,27 @@ describe('RedeemCreditsScreen', () => {
         slug: 'acme-production',
         queryCode: 'SUPA-CREDIT-123',
       })
+    )
+  })
+
+  test('routes new organization creation back to the current redeem URL', async () => {
+    const user = userEvent.setup()
+    routerMock.setCurrentUrl('/redeem?code=SUPA-CREDIT-123')
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations',
+      response: () => HttpResponse.json([ORGANIZATION]),
+    })
+
+    renderScreen()
+
+    await user.click(await screen.findByRole('button', { name: /Create new organization/ }))
+
+    await waitFor(() => {
+      expect(routerMock.pathname).toBe('/new')
+    })
+    expect(new URLSearchParams(routerMock.asPath.split('?')[1]).get('returnTo')).toBe(
+      '/redeem?code=SUPA-CREDIT-123'
     )
   })
 })

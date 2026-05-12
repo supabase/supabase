@@ -3,7 +3,17 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardContent } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
 import {
@@ -531,9 +541,50 @@ export const AwsMarketplaceOnboardingScreen = ({
           }}
         />
       )}
+
+      {isMockMode && (
+        <MockAwsMarketplaceOrgDialog
+          visible={showOrgCreationDialog}
+          onClose={() => setShowOrgCreationDialog(false)}
+          onShowLinkedState={() => {
+            setShowOrgCreationDialog(false)
+            setLinkedOrgSlug('mock-created-organization')
+          }}
+        />
+      )}
     </>
   )
 }
+
+const MockAwsMarketplaceOrgDialog = ({
+  visible,
+  onClose,
+  onShowLinkedState,
+}: {
+  visible: boolean
+  onClose: () => void
+  onShowLinkedState: () => void
+}) => (
+  <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
+    <DialogContent size="medium">
+      <DialogHeader>
+        <DialogTitle>Create and link organization</DialogTitle>
+        <DialogDescription>
+          In production, this opens a form to create an AWS-managed organization, then links it to
+          the Marketplace subscription automatically
+        </DialogDescription>
+      </DialogHeader>
+      <DialogFooter>
+        <Button type="default" onClick={onClose}>
+          Close
+        </Button>
+        <Button type="primary" onClick={onShowLinkedState}>
+          Show linked state
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+)
 
 const ConnectLoadingCards = () => (
   <div className="flex flex-col gap-5">

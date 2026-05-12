@@ -107,6 +107,7 @@ const RedeemCreditsPage: NextPageWithLayout = () => {
 }
 
 export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState }) => {
+  const router = useRouter()
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { hasLoaded } = useContext(FeatureFlagContext)
   const isMockMode = !!mock
@@ -236,6 +237,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
   }
 
   const isRedeeming = mock === 'redeeming'
+  const createOrganizationHref = `/new?returnTo=${encodeURIComponent(router.asPath || '/redeem')}`
   const openRedemption = () => {
     if (!selectedOrgSlug || isRedeeming) return
     if (isMockMode) return
@@ -263,11 +265,12 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
               disabled={isRedeeming}
               onSelect={setSelectedOrgSlug}
               getOrganizationDescription={(organization) => `${organization.plan.name} Plan`}
-              createLabel="Create new organization"
-              createDescription="Create an organization first, then revisit this redemption link."
-              onCreate={() => {
-                if (!isMockMode) window.location.assign('/new')
-              }}
+              createLabel={
+                organizationOptions.length === 0
+                  ? 'Create your first organization'
+                  : 'Create new organization'
+              }
+              onCreate={() => router.push(createOrganizationHref)}
             />
 
             {organizationOptions.length === 0 && (
