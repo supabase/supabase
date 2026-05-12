@@ -46,10 +46,9 @@ function useSupportFormTelemetry() {
 
 interface SupportFormProps {
   initialParams?: Partial<SupportFormUrlKeys>
-  onFinish?: () => void
 }
 
-export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
+export function SupportForm({ initialParams }: SupportFormProps) {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
   const { form, initialError, projectRef } = useSupportForm(dispatch, initialParams)
 
@@ -78,11 +77,11 @@ export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
-  const isSuccess = state.type === 'success'
+  const successState = state.type === 'success' ? state : null
   const showAssistantSuccessCard =
-    isSuccess &&
-    state.submittedRequest.projectRef !== undefined &&
-    state.submittedRequest.projectRef !== NO_PROJECT_MARKER
+    successState !== null &&
+    successState.submittedRequest.projectRef !== undefined &&
+    successState.submittedRequest.projectRef !== NO_PROJECT_MARKER
 
   return (
     <div className="relative h-full overflow-y-auto overflow-x-hidden">
@@ -92,20 +91,19 @@ export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
       />
       <div className="min-h-full px-5 pt-5">
         <div className="flex flex-col gap-y-8">
-          {isSuccess ? (
+          {successState ? (
             <div className="flex flex-col gap-y-8 pt-2">
               <Success
                 selectedProject={
-                  state.sentProjectRef === undefined
+                  successState.sentProjectRef === undefined
                     ? (projectRef ?? undefined)
-                    : state.sentProjectRef
+                    : successState.sentProjectRef
                 }
-                sentCategory={state.sentCategory}
-                onFinish={onFinish}
-                finishLabel={onFinish ? 'Back to support' : undefined}
+                sentCategory={successState.sentCategory}
+                showFinishAction={false}
               />
               {showAssistantSuccessCard && (
-                <SupportAssistantSuccessCard request={state.submittedRequest} />
+                <SupportAssistantSuccessCard request={successState.submittedRequest} />
               )}
             </div>
           ) : (

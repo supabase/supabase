@@ -11,6 +11,7 @@ interface SuccessProps {
   selectedProject?: string
   onFinish?: () => void
   finishLabel?: string
+  showFinishAction?: boolean
 }
 
 export const Success = ({
@@ -18,6 +19,7 @@ export const Success = ({
   selectedProject = NO_PROJECT_MARKER,
   onFinish,
   finishLabel = 'Finish',
+  showFinishAction = true,
 }: SuccessProps) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
@@ -28,15 +30,17 @@ export const Success = ({
   )
   const projectName = project ? project.name : 'No specific project'
 
-  const finishAction = onFinish ? (
-    <Button type="default" onClick={onFinish}>
-      {finishLabel}
-    </Button>
-  ) : (
-    <Button asChild type="default">
-      <Link href="/">{finishLabel}</Link>
-    </Button>
-  )
+  const finishAction = showFinishAction ? (
+    onFinish ? (
+      <Button type="default" onClick={onFinish}>
+        {finishLabel}
+      </Button>
+    ) : (
+      <Button asChild type="default">
+        <Link href="/">{finishLabel}</Link>
+      </Button>
+    )
+  ) : null
 
   return (
     <div className="flex w-full flex-col items-center gap-4 px-4 pt-4 text-center">

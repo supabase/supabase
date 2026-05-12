@@ -108,7 +108,8 @@ describe('SupportAssistantSuccessCard', () => {
   it('shows a loading preview before the assistant responds', async () => {
     const { container } = render(<SupportAssistantSuccessCard request={supportRequest} />)
 
-    expect(await screen.findByRole('button', { name: /see reply/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'While you wait' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /open assistant response/i })).toBeInTheDocument()
     expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
   })
 
@@ -136,7 +137,7 @@ describe('SupportAssistantSuccessCard', () => {
     const user = userEvent.setup()
     render(<SupportAssistantSuccessCard request={supportRequest} />)
 
-    const button = await screen.findByRole('button', { name: /see reply/i })
+    const button = await screen.findByRole('button', { name: /open assistant response/i })
     await user.click(button)
 
     expect(mockSelectChat).toHaveBeenCalledWith('chat-1')
@@ -147,7 +148,7 @@ describe('SupportAssistantSuccessCard', () => {
     const user = userEvent.setup()
     render(<SupportAssistantSuccessCard request={supportRequest} />)
 
-    const button = await screen.findByRole('button', { name: /see reply/i })
+    const button = await screen.findByRole('button', { name: /open assistant response/i })
     button.focus()
     await user.keyboard('{Enter}')
 
