@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Code, ExternalLink } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -42,6 +42,7 @@ import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRo
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -51,9 +52,12 @@ interface RLSTesterSheetProps {
 }
 
 export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
+  const { ref } = useParams()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { setRole } = useRoleImpersonationStateSnapshot()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [open, setOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'anon' | 'authenticated'>('anon')
@@ -103,8 +107,18 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
     if (format === 'lib') {
       if (!inferredSQL) return
       await testQuery({ value: acceptUntrustedSql(inferredSQL), ...executionCallbacks })
+      sendEvent({
+        action: 'rls_tester_query_ran',
+        properties: { type: 'inferred' },
+        groups: { project: ref ?? 'Unknown' },
+      })
     } else {
       await testQuery({ value, ...executionCallbacks })
+      sendEvent({
+        action: 'rls_tester_query_ran',
+        properties: { type: 'raw' },
+        groups: { project: ref ?? 'Unknown' },
+      })
     }
   }
 
