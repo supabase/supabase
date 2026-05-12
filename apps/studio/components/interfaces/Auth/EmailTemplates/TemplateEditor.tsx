@@ -1,9 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Book, BookOpen } from 'lucide-react'
 import type { editor } from 'monaco-editor'
-import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -28,7 +26,6 @@ import type { AuthTemplate } from './EmailTemplates.types'
 import { ResetTemplateDialog } from './ResetTemplateDialog'
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
@@ -288,27 +285,17 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     />
                   </div>
 
-                  <div className="flex flex-col gap-y-1">
-                    <div className="flex items-center gap-x-1">
+                  <div className="flex flex-col gap-y-2">
+                    <div className="flex flex-col">
                       <p className="text-sm">Template variables</p>
-                      <ButtonTooltip
-                        asChild
-                        type="text"
-                        className="w-7"
-                        icon={<BookOpen />}
-                        tooltip={{
-                          content: {
-                            side: 'right',
-                            text: 'Documentation',
-                          },
-                        }}
-                      >
-                        <Link
-                          target="_blank"
-                          rel="noopener noreferrer"
+                      <p className="text-sm text-foreground-lighter">
+                        Data placeholders that can be inserted in the subject line or email body.{' '}
+                        <InlineLink
                           href={`${DOCS_URL}/guides/local-development/customizing-email-templates#template-variables`}
-                        />
-                      </ButtonTooltip>
+                        >
+                          Learn more
+                        </InlineLink>
+                      </p>
                     </div>
                     <div className="flex flex-wrap gap-x-1">
                       {template.variables.map((variable) => (
