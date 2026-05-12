@@ -29,16 +29,18 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
 
     // Handle array filters (IN clause)
     if (Array.isArray(value) && value.length > 0) {
-      whereConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      whereConditions.push(
+        `${key} IN (${value.map((v) => `'${String(v).replace(/'/g, "''")}'`).join(',')})`
+      )
       return
     }
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
       if (['host', 'pathname'].includes(key)) {
-        whereConditions.push(`${key} LIKE '%${value}%'`)
+        whereConditions.push(`${key} LIKE '%${String(value).replace(/'/g, "''")}%'`)
       } else {
-        whereConditions.push(`${key} = '${value}'`)
+        whereConditions.push(`${key} = '${String(value).replace(/'/g, "''")}'`)
       }
     }
   })
@@ -379,16 +381,18 @@ const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): s
 
     // Handle array filters (IN clause)
     if (Array.isArray(value) && value.length > 0) {
-      conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      conditions.push(
+        `${key} IN (${value.map((v) => `'${String(v).replace(/'/g, "''")}'`).join(',')})`
+      )
       return
     }
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
       if (['host', 'pathname'].includes(key)) {
-        conditions.push(`${key} LIKE '%${value}%'`)
+        conditions.push(`${key} LIKE '%${String(value).replace(/'/g, "''")}%'`)
       } else {
-        conditions.push(`${key} = '${value}'`)
+        conditions.push(`${key} = '${String(value).replace(/'/g, "''")}'`)
       }
     }
   })
@@ -413,7 +417,7 @@ ${facet}_count AS (
   FROM unified_logs
   ${buildFacetWhere(search, `${facet}`) || `WHERE ${facet} IS NOT NULL`}
   ${buildFacetWhere(search, `${facet}`) ? ` AND ${facet} IS NOT NULL` : ''}
-  ${!!facetSearch ? `AND ${facet} LIKE '%${facetSearch}%'` : ''}
+  ${!!facetSearch ? `AND ${facet} LIKE '%${facetSearch.replace(/'/g, "''")}%'` : ''}
   GROUP BY ${facet}
   LIMIT ${MAX_FACETS_QUANTITY}
 )
