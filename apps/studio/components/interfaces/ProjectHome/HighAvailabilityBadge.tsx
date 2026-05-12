@@ -15,7 +15,7 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
       <HoverCardTrigger asChild>
         <div
           className={cn(
-            'inline-flex items-center justify-center rounded-md text-center font-mono uppercase',
+            'relative inline-flex items-center justify-center overflow-hidden rounded-md text-center font-mono uppercase',
             'cursor-default whitespace-nowrap font-medium tracking-[0.06em] text-[11px] leading-[1.1] px-[5.5px] py-[3px]',
             'transition-all',
             'border border-purple-700 dark:border-purple-600/50',
@@ -23,19 +23,19 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
           )}
         >
           {size === 'small' ? 'HA' : 'High Availability'}
+          <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-white/35 to-transparent blur-md" />
         </div>
       </HoverCardTrigger>
       <HoverCardContent side="bottom" align="start" className="w-72 overflow-hidden p-0">
-        <div className="p-2 px-5 text-xs text-foreground-lighter">Multigres</div>
-        <Separator />
         <div className="h-24 bg-surface-75">
           <ServerLightGrid />
         </div>
         <Separator />
         <div className="flex flex-col gap-1 p-3 px-5">
           <p className="text-sm text-foreground-light">
-            A horizontally scalable Postgres architecture that supports highly-available and
-            globally distributed deployments.
+            Driven by <span className="text-foreground">Multigres</span>, a horizontally scalable
+            Postgres architecture that supports highly-available and globally distributed
+            deployments.
           </p>
           <Link
             href={`${DOCS_URL}/guides/deployment/high-availability`}

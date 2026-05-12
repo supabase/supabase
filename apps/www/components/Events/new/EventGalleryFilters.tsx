@@ -1,13 +1,13 @@
 'use client'
 
-import { Input_Shadcn_ as Input } from 'ui'
-import { SearchIcon } from 'lucide-react'
-import { Badge } from 'ui'
 import { useEvents } from '~/app/events/context'
+import { SearchIcon } from 'lucide-react'
+import { Badge, Input_Shadcn_ as Input } from 'ui'
 
 const CATEGORIES_FILTERS = [
   { name: 'All', value: 'all' },
   { name: 'Conference', value: 'conference' },
+  { name: 'Community Event', value: 'community' },
   { name: 'Meetup', value: 'meetup' },
   { name: 'Workshop', value: 'workshop' },
   { name: 'Hackathon', value: 'hackathon' },

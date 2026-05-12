@@ -1,4 +1,4 @@
-@reference "./main.css";
+@reference "./globals.css";
 
 .table-editor-columns .sbui-formlayout--responsive {
   gap: 0rem !important;

@@ -39,6 +39,7 @@ Brad Gyger
 Brendan Stephens
 Brent Newson
 Brian Cullen
+Brent Schroeter
 Carel de Waal
 Cameron Blackwood
 Cameron Michie
@@ -54,6 +55,7 @@ Chris Gwilliams
 Chris Martin
 Chris Stockton
 Chris Ward
+Christian Funkhouser
 Clayton Kast
 Colin Goodheart-Smithe
 Colin Murray
@@ -70,6 +72,7 @@ David Alvarez
 David Birdsong
 David Camacho Cateura
 David Weitzman
+David Whittington
 Davide Pellegatta
 Deepthi Sigireddi
 Deji I
@@ -142,6 +145,7 @@ Jordan McQueen
 Jordi Enric
 José Luis Ledesma
 Joshen Lim
+Julian Domke
 Julien Goux
 Kai M
 Kalleby Santos
@@ -183,6 +187,7 @@ Matthias Luft
 Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
+Michelle Jubrey
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
@@ -260,6 +265,7 @@ Tyler Shukert
 TzeYiing L
 Utkarash Singh
 Victor Farazdagi
+Warwick Mitchell
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova

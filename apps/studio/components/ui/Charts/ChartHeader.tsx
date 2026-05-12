@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import dayjs from 'dayjs'
 import {
   Activity,
   BarChartIcon,
@@ -15,6 +14,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
 import { formatBytes } from '@/lib/helpers'
 
 export interface ChartHeaderProps {
@@ -83,6 +83,10 @@ export const ChartHeader = ({
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
 
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker.
+  const formatPickerDate = useFormatDateTime()
+
   const formatHighlightedValue = (value: any) => {
     if (typeof value !== 'number') {
       return value
@@ -146,11 +150,11 @@ export const ChartHeader = ({
         // Update highlighted label based on sync state
         let newLabel = highlightedLabel
         if (xAxisIsDate && activeDataPoint[xAxisKey]) {
-          const day = (value: number | string) =>
-            displayDateInUtc ? dayjs(value).utc() : dayjs(value)
-          newLabel = day(activeDataPoint[xAxisKey]).format(
-            customDateFormat || 'YYYY-MM-DD HH:mm:ss'
-          )
+          const value = activeDataPoint[xAxisKey] as number | string
+          const fmt = customDateFormat || 'YYYY-MM-DD HH:mm:ss'
+          newLabel = displayDateInUtc
+            ? formatDateTime(value, { tz: 'UTC', format: fmt })
+            : formatPickerDate(value, fmt)
         } else if (activeDataPoint[xAxisKey]) {
           newLabel = activeDataPoint[xAxisKey]
         }
@@ -174,6 +178,7 @@ export const ChartHeader = ({
     highlightedValue,
     highlightedLabel,
     attributes,
+    formatPickerDate,
   ])
 
   const chartTitle = (

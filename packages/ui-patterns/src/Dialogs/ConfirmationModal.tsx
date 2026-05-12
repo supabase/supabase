@@ -85,6 +85,9 @@ export const ConfirmationModal = forwardRef<
       if (loading_ !== undefined) setLoading(loading_)
     }, [loading_])
 
+    const { title: _alertBaseTitle, children: _alertBaseChildren, ...alertBase } = alert?.base ?? {}
+    const alertTitleProps = alert?.title ? { label: alert.title } : {}
+
     return (
       <Dialog
         open={visible}
@@ -108,10 +111,10 @@ export const ConfirmationModal = forwardRef<
           {alert && (
             <Admonition
               type={variant as 'default' | 'destructive' | 'warning'}
-              label={alert.title}
               description={alert.description}
+              {...alertTitleProps}
               className="border-x-0 rounded-none -mt-px"
-              {...alert?.base}
+              {...alertBase}
             />
           )}
           {children && (

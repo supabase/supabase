@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
@@ -7,10 +6,9 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { useRevealedSecret } from './useRevealedSecret'
 import CopyButton from '@/components/ui/CopyButton'
-import { useAPIKeyIdQuery } from '@/data/api-keys/api-key-id-query'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { apiKeysKeys } from '@/data/api-keys/keys'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export function ApiKeyPill({
@@ -18,94 +16,70 @@ export function ApiKeyPill({
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
 }) {
-  const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-
-  // State that controls whether to show the full API key
-  const [show, setShowState] = useState(false)
+  const [show, setShow] = useState(false)
 
   const isSecret = apiKey.type === 'secret'
 
-  // Permission check for revealing/copying secret API keys
   const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )
 
-  // This query only runs when show=true (enabled: show)
-  // It fetches the fully revealed API key when needed
   const {
-    data,
-    error,
-    isPending: isLoading,
-    refetch: refetchApiKey,
-  } = useAPIKeyIdQuery(
-    {
-      projectRef,
-      id: apiKey.id as string,
-      reveal: true, // Request the unmasked key
-    },
-    {
-      enabled: show, // Only run query when show is true
-      staleTime: 0, // Always consider data stale
-      gcTime: 0, // Don't cache the key data
-    }
-  )
+    data: revealedKey,
+    isLoading,
+    reveal,
+    clear,
+  } = useRevealedSecret({
+    projectRef,
+    id: apiKey.id as string,
+  })
 
   // Auto-hide timer for the API key (security feature)
   useEffect(() => {
-    if (show && data?.api_key) {
-      // Auto-hide the key after 10 seconds
+    if (show && revealedKey) {
       const timer = setTimeout(() => {
-        setShowState(false)
-        // Clear the cached key from memory
-        queryClient.removeQueries({
-          queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
-          exact: true,
-        })
-      }, 10000) // Hide after 10 seconds
+        setShow(false)
+        clear()
+      }, 10000)
 
       return () => clearTimeout(timer)
     }
-  }, [show, data?.api_key, projectRef, queryClient, apiKey.id])
+  }, [show, revealedKey, clear])
 
-  async function onSubmitToggle() {
-    // Don't reveal key if not allowed or loading
+  async function onToggleShow() {
     if (isSecret && !canManageSecretKeys) return
     if (isLoadingPermission) return
 
-    // Toggle the show state
-    setShowState(!show)
+    if (show) {
+      setShow(false)
+      clear()
+    } else {
+      setShow(true)
+      try {
+        await reveal()
+      } catch {
+        toast.error('Failed to reveal secret API key')
+        setShow(false)
+      }
+    }
   }
 
   async function onCopy() {
-    // If key is already revealed, use that value
-    if (data?.api_key) return data?.api_key ?? ''
+    if (!isSecret) return apiKey.api_key
+    if (revealedKey) return revealedKey
 
     try {
-      // Fetch full key and immediately clear from cache after copying
-      const result = await refetchApiKey()
-      queryClient.removeQueries({
-        queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
-        exact: true,
-      })
-
-      if (result.isSuccess) return result.data.api_key ?? ''
-
-      if (error) {
-        toast.error('Failed to copy secret API key')
-        return ''
-      }
-    } catch (error) {
-      console.error('Failed to fetch API key:', error)
-      return ''
+      const key = await reveal()
+      clear()
+      return key ?? ''
+    } catch {
+      toast.error('Failed to copy secret API key')
+      return apiKey.api_key
     }
-
-    // Fallback to the masked version if fetch fails
-    return apiKey.api_key
   }
 
-  // States for disabling buttons/showing tooltips
   const isRestricted = isSecret && !canManageSecretKeys
 
   return (
@@ -123,7 +97,7 @@ export function ApiKeyPill({
         {isSecret ? (
           <>
             <span>{apiKey?.api_key.slice(0, 15)}</span>
-            <span>{show && data?.api_key ? data?.api_key.slice(15) : '••••••••••••••••'}</span>
+            <span>{show && revealedKey ? revealedKey.slice(15) : '••••••••••••••••'}</span>
           </>
         ) : (
           <span title={apiKey.api_key} className="truncate">
@@ -141,7 +115,7 @@ export function ApiKeyPill({
               className="rounded-full px-2 pointer-events-auto"
               loading={show && isLoading}
               icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
-              onClick={onSubmitToggle}
+              onClick={onToggleShow}
               disabled={isRestricted}
             />
           </TooltipTrigger>

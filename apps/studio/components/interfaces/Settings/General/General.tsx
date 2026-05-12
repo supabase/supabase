@@ -25,6 +25,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { ProjectAccessSection } from './ProjectAccessSection'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
@@ -55,6 +56,10 @@ export const General = () => {
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
   })
+
+  const regionLabel = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    project?.region?.includes(region.region)
+  )
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project?.ref) return console.error('Ref is required')
@@ -126,6 +131,7 @@ export const General = () => {
                       )}
                     />
                   </CardContent>
+
                   <CardContent>
                     <FormItemLayout
                       layout="flex-row-reverse"
@@ -134,10 +140,24 @@ export const General = () => {
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
                       <FormControl>
-                        <Input copy readOnly size="small" value={project?.ref ?? ''} />
+                        <Input copy readOnly size="small" value={project.ref} />
                       </FormControl>
                     </FormItemLayout>
                   </CardContent>
+
+                  <CardContent>
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Project region"
+                      description={regionLabel?.name}
+                      className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                    >
+                      <FormControl>
+                        <Input copy readOnly size="small" value={project.region} />
+                      </FormControl>
+                    </FormItemLayout>
+                  </CardContent>
+
                   <CardFooter className="justify-end space-x-2">
                     {form.formState.isDirty && (
                       <Button

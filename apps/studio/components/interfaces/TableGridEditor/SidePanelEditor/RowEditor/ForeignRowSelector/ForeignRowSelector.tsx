@@ -209,13 +209,13 @@ export const ForeignRowSelector = ({
             >
               <div className="h-full flex flex-col">
                 <div className="flex items-center justify-between my-2 mx-3">
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-x-1">
                     <RefreshButton tableId={table?.id} isRefetching={isRefetching} />
                     <FilterPopoverPrimitive filters={filters} onApplyFilters={onApplyFilters} />
                     <SortPopoverPrimitive sorts={sorts} onApplySorts={onApplySorts} />
                   </div>
 
-                  <div className="flex items-center gap-x-3 divide-x">
+                  <div className="flex items-center gap-x-3">
                     <Pagination
                       page={page}
                       setPage={setPage}

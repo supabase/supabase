@@ -22,7 +22,7 @@ export const getCreateEnumeratedTypeSQL = ({
 }
 
 export const getDeleteEnumeratedTypeSQL = ({ schema, name }: { schema: string; name: string }) => {
-  return `drop type if exists ${ident(schema)}.${ident(name)}`
+  return safeSql`drop type if exists ${ident(schema)}.${ident(name)}`
 }
 
 export const getUpdateEnumeratedTypeSQL = ({
