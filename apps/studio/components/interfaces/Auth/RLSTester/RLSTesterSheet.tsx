@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { Code } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -64,6 +64,7 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { setRole } = useRoleImpersonationStateSnapshot()
+  const sandboxEnabled = useFlag('rlsTesterSandbox')
 
   const [open, setOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'anon' | 'authenticated'>('anon')
@@ -166,7 +167,7 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
         </SheetHeader>
 
         <div className="grow overflow-y-auto flex flex-col">
-          <SandboxManagement />
+          {sandboxEnabled && <SandboxManagement />}
 
           <SheetSection className="px-0 py-0 border-t">
             <div className="flex flex-col p-5 pt-4 gap-y-4">
