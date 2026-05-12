@@ -26,7 +26,7 @@ We are currently working on a new Supabase Warehouse product designed to address
 
 As a result, managed replication to Analytics Buckets through Supabase ETL is no longer available. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
 
-## What does ETL do in a database?
+## What does ETL install in the database?
 
 When you enable external replication, Supabase ETL installs database objects that help it track replication state and support schema changes:
 
@@ -47,15 +47,13 @@ Supported schema changes:
 
 External replication does not currently support changing column data types or replicating column default values. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
 
-## How do you remove ETL from a project?
+## What happens when you disable external replication?
 
-To disable external replication and remove the database objects installed by ETL:
+Disabling external replication removes the database objects that Supabase ETL installed in your source database, including the ETL state tables and DDL event trigger.
 
-1. Delete all external replication pipelines in your project.
-2. After all pipelines are removed, open the three-dot actions menu on the Replication page.
-3. Click the option to disable external replication.
+You must delete all external replication pipelines before the disable action is available. For the Dashboard steps, see [Disabling external replication](/docs/guides/database/replication/external-replication-setup#disabling-external-replication).
 
-This cleans up the ETL objects that were installed when external replication was enabled.
+Disabling external replication stops Supabase from managing external replication for the project. It does not delete tables or data that were already written to your destination.
 
 ## Why is a table not being replicated?
 
@@ -67,21 +65,26 @@ Common reasons:
 
 Check your publication settings and verify your table meets the requirements.
 
-## Why are updates not being replicated?
+## How does replica identity affect updates and deletes?
 
-If inserts replicate but updates fail or the pipeline reports an error about a partial update row, check the table's `REPLICA IDENTITY` setting.
+If inserts replicate but updates or deletes fail, check the table's `REPLICA IDENTITY` setting.
 
-Postgres logical replication uses `REPLICA IDENTITY` to decide what old-row data to include for `UPDATE` and `DELETE` events. With the default setting, Postgres usually sends only the primary-key identity when it needs to identify the old row. This is enough for most tables with a primary key.
+Postgres logical replication uses `REPLICA IDENTITY` to decide what old-row data to include in WAL for `UPDATE` and `DELETE` events. This is based on logical WAL being enabled, not whether a replication consumer is connected at that moment. Replica identity does not affect the row data Postgres logs for `INSERT` events.
 
-Large values such as `text`, `jsonb`, and `bytea` can be stored out-of-line by Postgres using TOAST. During an update, if a toasted value did not change, Postgres may send a marker that means "the value is unchanged" instead of sending the value again. Supabase ETL can only reconstruct that value when the logical replication event includes enough old-row data. For BigQuery, updates require a complete new row so the destination can apply a CDC upsert. If ETL cannot reconstruct an unchanged toasted value, the update is treated as partial and BigQuery replication fails for that table.
+Downstream destinations use old-row data to find the row that changed, handle primary-key changes, and apply deletes.
 
-For tables with toasted columns that need reliable updates, set `REPLICA IDENTITY FULL`:
+Postgres supports these replica identity modes:
 
-```sql
-alter table public.your_table replica identity full;
-```
+- `DEFAULT`: uses the table's primary key. Updates and deletes require a primary key when those operations are published.
+- `FULL`: logs the full old row for updates and deletes. Postgres flattens toasted old values when needed.
+- `USING INDEX`: uses a selected unique index as the replica identity.
+- `NOTHING`: logs no old-row identity. If the table is in a publication that publishes updates or deletes, Postgres rejects those statements because there is no row identity to publish.
 
-You can check the current setting with:
+With `DEFAULT` or `USING INDEX`, Postgres logs only the replica-identity columns. For updates, Postgres includes that old identity when it needs it, such as when an identity column changes or an identity column contains external toasted data. For deletes, Postgres includes the old identity so consumers can identify the deleted row.
+
+Large values such as `text`, `jsonb`, and `bytea` can be stored out-of-line by Postgres using TOAST. During an update, if a toasted value did not change, Postgres may send a marker that means "the value is unchanged" instead of sending the value again. Supabase ETL can only reconstruct that value when the logical replication event includes enough old-row data. If ETL cannot reconstruct an unchanged toasted value, the update is treated as partial.
+
+You can check a table's current setting with:
 
 ```sql
 select
@@ -96,7 +99,19 @@ where n.nspname = 'public' and c.relname = 'your_table';
 
 The `replica_identity` value is `d` for default, `f` for full, `i` for index, and `n` for nothing.
 
-`REPLICA IDENTITY FULL` logs the full old row for updates and deletes, which increases WAL volume. Use it for tables where update correctness matters and the table has large values that may be toasted. If the pipeline is already failed, change the replica identity and then restart the pipeline.
+For tables with toasted columns that need reliable updates, or for destinations that need complete old-row images, set `REPLICA IDENTITY FULL`:
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+`REPLICA IDENTITY FULL` increases WAL volume because Postgres logs the full old row for updates and deletes. Use it when correctness for updates and deletes is more important than the extra replication overhead.
+
+Changing replica identity only affects WAL records generated after the change. If a retained update was written while the table used `DEFAULT`, restarting replication does not decode that older record as `FULL`. Postgres logical decoding uses historic catalog snapshots, and the old tuple or key data must already be present in the WAL record.
+
+Destination-specific requirements can be stricter than Postgres itself. For BigQuery, see [BigQuery source table requirements](/docs/guides/database/replication/bigquery#source-table-requirements).
+
+After changing replica identity, restart each pipeline that includes the affected tables so the pipeline refreshes relation metadata and applies the new setting to future changes. If the pipeline is already failed, change the replica identity and then restart the pipeline.
 
 ## Why aren't publication changes reflected after adding or removing tables?
 

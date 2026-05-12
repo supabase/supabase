@@ -89,11 +89,13 @@ BigQuery replication requires each source table to have a primary key, and the p
 
 BigQuery primary keys are `NOT ENFORCED`, and BigQuery CDC supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
 
-Source tables must also use a compatible Postgres `REPLICA IDENTITY` setting:
+Source tables must also use a BigQuery-compatible Postgres `REPLICA IDENTITY` setting:
 
 - `DEFAULT` with a primary key is supported and works for most tables.
 - `FULL` is supported and is recommended for tables with large `text`, `jsonb`, `bytea`, or other values that Postgres may store out-of-line using TOAST.
 - `USING INDEX`, `NOTHING`, or `DEFAULT` without a primary key are not supported for BigQuery replication.
+
+For a general explanation of how replica identity affects update and delete events, see [How does replica identity affect updates and deletes?](/docs/guides/database/replication/external-replication-faq#how-does-replica-identity-affect-updates-and-deletes).
 
 For updates, Postgres does not always send a complete old row through logical replication. It can also mark unchanged toasted values as `unchanged toast` instead of resending the value. Supabase ETL can reconstruct a complete update when the old row image contains the missing value, which is reliable with `REPLICA IDENTITY FULL`. BigQuery CDC upserts require a complete new row, so updates can fail for tables with toasted columns if ETL receives only a partial update row.
 

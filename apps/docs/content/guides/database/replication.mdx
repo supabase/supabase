@@ -24,7 +24,7 @@ Supabase supports three replication methods. Choose based on whether you need an
 
 Read Replicas are additional Supabase Postgres databases kept in sync with your Primary database. Use them when you want read-only query capacity, lower latency in another region, or to isolate analytical reads from application writes while staying inside Supabase Postgres.
 
-- [Set up Read Replicas](/docs/guides/platform/read-replicas)
+- [Set Up Read Replicas](/docs/guides/platform/read-replicas)
 
 ### External replication
 
@@ -36,14 +36,19 @@ External replication is currently in private alpha. Access is limited and featur
 
 External replication is powered by [Supabase ETL](https://github.com/supabase/etl). It uses Postgres logical replication under the hood and provides a managed Dashboard workflow for replicating data from Supabase Postgres to external data systems.
 
-- [Set up external replication](/docs/guides/database/replication/external-replication-setup)
-- [Configure BigQuery](/docs/guides/database/replication/bigquery)
+- [Set Up External Replication](/docs/guides/database/replication/external-replication-setup)
+
+#### Supported destinations
+
+| Destination                                            | Insert       | Update       | Delete       | Truncate     | Schema change | Description                                                         |
+| ------------------------------------------------------ | ------------ | ------------ | ------------ | ------------ | ------------- | ------------------------------------------------------------------- |
+| [BigQuery](/docs/guides/database/replication/bigquery) | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported  | Managed replication to Google BigQuery for analytics and reporting. |
 
 ### Manual replication
 
 Manual replication uses the same underlying Postgres logical replication features as external replication, but you configure and operate the pieces yourself. Use this path when you want to connect tools such as Airbyte, Estuary, Fivetran, Materialize, Stitch, AWS DMS, or another system that supports Postgres logical replication.
 
-- [Set up manual replication](/docs/guides/database/replication/manual-replication-setup)
+- [Set Up Manual Replication](/docs/guides/database/replication/manual-replication-setup)
 
 ## Related features
 

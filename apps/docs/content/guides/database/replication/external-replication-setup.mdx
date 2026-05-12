@@ -1,9 +1,9 @@
 ---
 id: 'external-replication-setup'
-title: 'External Replication Setup'
+title: 'Set Up External Replication'
 description: 'Set up external replication using Supabase ETL and Postgres logical replication.'
 subtitle: 'Configure publications and destinations for external replication.'
-sidebar_label: 'Setting up'
+sidebar_label: 'Setting Up'
 ---
 
 <Admonition type="caution" label="Private Alpha">
@@ -180,6 +180,19 @@ Available actions:
 - **Edit destination**: Modify destination settings like credentials or advanced options
 - **Delete**: Remove the destination and permanently stop replication
 
+### Disabling external replication
+
+To turn off external replication for a project, delete all external replication pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable external replication**.
+
+<Image
+  alt="Disable external replication from the Replication page actions menu"
+  src="/docs/img/database/replication/replication-disable-external-replication.png"
+  width={3560}
+  height={2156}
+/>
+
+For cleanup details, see [What happens when you disable external replication?](/docs/guides/database/replication/external-replication-faq#what-happens-when-you-disable-external-replication).
+
 ### Adding or removing tables
 
 If you need to modify which tables are replicated after your replication pipeline is already running, follow these steps:
@@ -263,6 +276,6 @@ Destination-specific limitations, such as BigQuery's row size limits, are docume
 
 ### Next steps
 
-- [Set up BigQuery](/docs/guides/database/replication/bigquery)
+- [Set Up BigQuery](/docs/guides/database/replication/bigquery)
 - [Monitor external replication](/docs/guides/database/replication/external-replication-monitoring)
 - [View external replication FAQ](/docs/guides/database/replication/external-replication-faq)
