@@ -349,10 +349,13 @@ export function DiskManagementForm() {
         fieldErrors.includes('maxSizeGb')
       ) {
         setAdvancedSettingsOpenState(true)
+
         // [Joshen] The timeout is to let the collapsible open prior to scrolling
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
           advancedSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }, 100)
+
+        return () => clearTimeout(timeoutId)
       }
     }
   }, [errors])
