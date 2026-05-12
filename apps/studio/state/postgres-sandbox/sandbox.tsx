@@ -40,6 +40,7 @@ export const PostgresSandboxProvider = ({ children }: PropsWithChildren) => {
   const [isSyncing, setIsSyncing] = useState(false)
 
   const destroySandbox = async () => {
+    if (isSyncing) return
     if (!sandbox) return console.error('Sandbox is not set up')
 
     await sandbox.destroy()
@@ -100,11 +101,14 @@ export const PostgresSandboxProvider = ({ children }: PropsWithChildren) => {
     getSandboxCore()
       .then(async (core) => {
         if (cancelled) return
+
         await applyToCore(core)
         setSandbox(core)
         setStatus('ready')
       })
       .catch((error) => {
+        if (cancelled) return
+
         setError(getErrorMessage(error) ?? '')
         setStatus('error')
         setStart(false)

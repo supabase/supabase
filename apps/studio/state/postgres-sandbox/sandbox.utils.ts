@@ -1,4 +1,4 @@
-import { ident } from '@supabase/pg-meta'
+import { ident, literal } from '@supabase/pg-meta'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 
 import { DatabaseSchemaDDL } from '@/data/rls-tester/get-schema-ddl'
@@ -94,23 +94,22 @@ export async function applySchema(
   // Reset each user schema so re-syncs pick up renames/drops/column changes and
   // CREATE statements don't collide with the previous run's objects.
   for (const schema of schemas) {
-    const safe = schema.replace(/"/g, '""')
-    await tryExec(sandbox, `DROP SCHEMA IF EXISTS "${safe}" CASCADE`, `drop schema ${schema}`)
-    await tryExec(sandbox, `CREATE SCHEMA "${safe}"`, `create schema ${schema}`)
+    const schemaId = ident(schema)
+    await tryExec(sandbox, `DROP SCHEMA IF EXISTS ${schemaId} CASCADE`, `drop schema ${schema}`)
+    await tryExec(sandbox, `CREATE SCHEMA ${schemaId}`, `create schema ${schema}`)
     await tryExec(
       sandbox,
-      `GRANT USAGE ON SCHEMA "${safe}" TO anon, authenticated, service_role`,
+      `GRANT USAGE ON SCHEMA ${schemaId} TO anon, authenticated, service_role`,
       `grant schema ${schema}`
     )
   }
 
   if (customRoles.length > 0) {
     const checks = customRoles
-      .map(({ name }) => {
-        const safeLiteral = name.replace(/'/g, "''")
-        const safeIdent = name.replace(/"/g, '""')
-        return `IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '${safeLiteral}') THEN CREATE ROLE "${safeIdent}" NOLOGIN; END IF;`
-      })
+      .map(
+        ({ name }) =>
+          `IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = ${literal(name)}) THEN CREATE ROLE ${ident(name)} NOLOGIN; END IF;`
+      )
       .join('\n')
     await tryExec(sandbox, `DO $$ BEGIN\n${checks}\nEND $$`, 'custom roles')
   }
@@ -119,10 +118,9 @@ export async function applySchema(
   await applyDDLWithRetries(sandbox, entityDefinitions)
 
   for (const schema of [...new Set(rlsStatuses.map((t) => t.schema))]) {
-    const safe = schema.replace(/"/g, '""')
     await tryExec(
       sandbox,
-      `GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "${safe}" TO anon, authenticated, service_role`,
+      `GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA ${ident(schema)} TO anon, authenticated, service_role`,
       `grant tables in schema ${schema}`
     )
   }
@@ -134,7 +132,7 @@ export async function applySchema(
     if (actions.length === 0) continue
     await tryExec(
       sandbox,
-      `ALTER TABLE "${schema}"."${table}" ${actions.join(', ')}`,
+      `ALTER TABLE ${ident(schema)}.${ident(table)} ${actions.join(', ')}`,
       `RLS on ${schema}.${table}`
     )
   }
@@ -169,11 +167,11 @@ function serializeValue(val: unknown): string {
 function buildInsertSQL(schema: string, table: string, rows: Record<string, unknown>[]): string {
   if (rows.length === 0) throw new Error(`buildInsertSQL requires at least one row`)
   const columns = Object.keys(rows[0])
-  const colList = columns.map((c) => `"${c}"`).join(', ')
+  const colList = columns.map((c) => ident(c)).join(', ')
   const valuesList = rows
     .map((row) => `(${columns.map((c) => serializeValue(row[c])).join(', ')})`)
     .join(',\n  ')
-  return `INSERT INTO "${schema}"."${table}" (${colList}) VALUES\n  ${valuesList};`
+  return `INSERT INTO ${ident(schema)}.${ident(table)} (${colList}) VALUES\n  ${valuesList};`
 }
 
 export async function applySeed(sandbox: Executor, tables: TableSeedData[]): Promise<void> {
@@ -192,7 +190,7 @@ export async function applySeed(sandbox: Executor, tables: TableSeedData[]): Pro
     // Always clear before inserting so re-seed reflects the latest data.
     for (const { schema, table } of tables) {
       try {
-        await sandbox.execSql(`DELETE FROM "${schema}"."${table}"`)
+        await sandbox.execSql(`DELETE FROM ${ident(schema)}.${ident(table)}`)
       } catch {
         // table may not exist yet — ignore
       }

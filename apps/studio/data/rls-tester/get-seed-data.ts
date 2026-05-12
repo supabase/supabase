@@ -1,3 +1,5 @@
+import { ident } from '@supabase/pg-meta'
+
 import { RlsTableStatus } from './get-schema-ddl'
 import { executeSql } from '@/data/sql/execute-sql-query'
 
@@ -35,12 +37,13 @@ async function fetchTableSeed(
   signal?: AbortSignal
 ): Promise<TableSeedData> {
   try {
-    const projection = columns && columns.length > 0 ? columns.map((c) => `"${c}"`).join(', ') : '*'
+    const projection =
+      columns && columns.length > 0 ? columns.map((c) => ident(c)).join(', ') : '*'
     const { result } = await executeSql(
       {
         projectRef,
         connectionString,
-        sql: `SELECT ${projection} FROM "${schema}"."${table}" LIMIT ${rowLimit}`,
+        sql: `SELECT ${projection} FROM ${ident(schema)}.${ident(table)} LIMIT ${Number(rowLimit)}`,
         queryKey: ['rls-sandbox-seed', schema, table],
       },
       signal
