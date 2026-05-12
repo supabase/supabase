@@ -323,11 +323,7 @@ export const NewOrgForm = ({
   }
 
   const onCancel = () => {
-    const returnToUrl = getReturnToUrl()
-
-    if (returnToUrl) {
-      router.push(returnToUrl, undefined, { shallow: false })
-    } else if (!!lastVisitedOrganization) {
+    if (!!lastVisitedOrganization) {
       router.push(`/org/${lastVisitedOrganization}`)
     } else {
       router.push('/organizations')

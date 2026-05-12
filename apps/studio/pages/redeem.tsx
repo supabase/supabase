@@ -248,7 +248,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
     <>
       {withInterstitial({
         title: 'Redeem credits',
-        description: 'Select the organization that should receive these credits',
+        description: 'Choose an organization to redeem this code',
         children: (
           <div className="flex flex-col gap-5">
             <InterstitialAccountRow displayName={displayName} />
@@ -258,7 +258,6 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
               selectedSlug={selectedOrgSlug}
               disabled={isRedeeming}
               onSelect={setSelectedOrgSlug}
-              description="Credits apply to one organization and are used toward future invoices before your payment method is charged."
               getOrganizationDescription={(organization) => `${organization.plan.name} Plan`}
               createLabel={
                 organizationOptions.length === 0
@@ -285,6 +284,10 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
               >
                 Redeem credits
               </Button>
+              <p className="text-center text-xs text-foreground-lighter text-balance">
+                Credits apply to one organization and are used toward future invoices before your
+                payment method is charged.
+              </p>
             </div>
           </div>
         ),
