@@ -53,13 +53,18 @@ const LOG_TYPE_EXPR = `CASE
 // SQL expression for derived `level`. Used inline (not as alias reference)
 // because the OTEL endpoint can't resolve aliases inside countIf when the
 // alias is not in GROUP BY.
+//
+// HTTP status is checked first so gateway rows (which always carry an
+// `severity_text` of `INFO` regardless of response code) bucket as
+// success/warning/error by status. Postgres-style severity is the
+// fallback for rows without a status code.
 const LEVEL_EXPR = `CASE
-      WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'
-      WHEN severity_text IN ('WARN','WARNING') THEN 'warning'
-      WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'
-      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 200 AND 299 THEN 'success'
-      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 400 AND 499 THEN 'warning'
       WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) >= 500 THEN 'error'
+      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 400 AND 499 THEN 'warning'
+      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 200 AND 299 THEN 'success'
+      WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'
+      WHEN severity_text IN ('WARN','WARNING') THEN 'warning'
+      WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'
       ELSE 'success'
     END`
 
