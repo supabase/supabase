@@ -1,7 +1,7 @@
 ---
 id: 'external-replication-setup'
 title: 'Set Up External Replication'
-description: 'Set up external replication using Supabase ETL and Postgres logical replication.'
+description: 'Set up external replication using Postgres logical replication.'
 subtitle: 'Configure publications and destinations for external replication.'
 sidebar_label: 'Setting Up'
 ---
@@ -12,7 +12,7 @@ External replication is currently in private alpha. Access is limited and featur
 
 </Admonition>
 
-External replication uses **Postgres logical replication** to stream changes from your database to external data systems. Powered by [Supabase ETL](https://github.com/supabase/etl), an open source tool built for Postgres logical replication, it provides a managed interface through the Dashboard to configure and monitor replication pipelines.
+External replication is powered by [Supabase ETL](https://github.com/supabase/etl) and uses **Postgres logical replication** to stream changes from your database to external data systems. It provides a managed interface through the Dashboard to configure and monitor replication pipelines.
 
 ## Setup overview
 
@@ -249,7 +249,7 @@ Once configured, external replication:
 2. **Streams** the changes through the replication pipeline
 3. **Loads** the data to your destination
 
-Supabase ETL automatically optimizes how changes are delivered to the destination. The replication pipeline currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
+External replication automatically optimizes how changes are delivered to the destination. The replication pipeline currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
 
 ### Troubleshooting
 

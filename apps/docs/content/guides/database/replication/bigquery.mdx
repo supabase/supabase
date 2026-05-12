@@ -85,7 +85,7 @@ Once configured, replication to BigQuery:
 
 ## Source table requirements
 
-BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. Supabase ETL declares those columns as the BigQuery destination primary key so BigQuery CDC can apply `UPSERT` and `DELETE` rows.
+BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. External replication declares those columns as the BigQuery destination primary key so BigQuery CDC can apply `UPSERT` and `DELETE` rows.
 
 BigQuery primary keys are `NOT ENFORCED`, and BigQuery CDC supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
 
@@ -97,7 +97,7 @@ Source tables must also use a BigQuery-compatible Postgres `REPLICA IDENTITY` se
 
 For a general explanation of how replica identity affects update and delete events, see [How does replica identity affect updates and deletes?](/docs/guides/database/replication/external-replication-faq#how-does-replica-identity-affect-updates-and-deletes).
 
-For updates, Postgres does not always send a complete old row through logical replication. It can also mark unchanged toasted values as `unchanged toast` instead of resending the value. Supabase ETL can reconstruct a complete update when the old row image contains the missing value, which is reliable with `REPLICA IDENTITY FULL`. BigQuery CDC upserts require a complete new row, so updates can fail for tables with toasted columns if ETL receives only a partial update row.
+For updates, Postgres does not always send a complete old row through logical replication. It can also mark unchanged toasted values as `unchanged toast` instead of resending the value. The replication pipeline can reconstruct a complete update when the old row image contains the missing value, which is reliable with `REPLICA IDENTITY FULL`. BigQuery CDC upserts require a complete new row, so updates can fail for tables with toasted columns if the pipeline receives only a partial update row.
 
 Check a table's current replica identity:
 
@@ -134,7 +134,7 @@ This structure handles table truncations while maintaining query compatibility.
 
 ## Schema change support
 
-Schema change support for BigQuery is currently in beta. ETL supports a limited set of schema changes while the feature is developed further.
+Schema change support for BigQuery is currently in beta. External replication supports a limited set of schema changes while the feature is developed further.
 
 Supported schema changes:
 

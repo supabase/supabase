@@ -24,16 +24,16 @@ New destinations are in the works. Availability may continue to vary based on th
 
 We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
 
-As a result, managed replication to Analytics Buckets through Supabase ETL is no longer available. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
+As a result, managed replication to Analytics Buckets is no longer available. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
 
-## What does ETL install in the database?
+## What does external replication install in the database?
 
-When you enable external replication, Supabase ETL installs database objects that help it track replication state and support schema changes:
+When you enable external replication, Supabase installs database objects that help track replication state and support schema changes:
 
-- An event trigger that runs on every `ALTER TABLE` statement. ETL uses this to support schema change handling.
-- A set of tables in the `etl` schema. These tables track ETL state for your pipelines.
+- An event trigger that runs on every `ALTER TABLE` statement. External replication uses this to support schema change handling.
+- A set of tables in the `etl` schema. These tables track replication state for your pipelines.
 
-The ETL state tables are not updated very often, especially after the initial copy phase is complete.
+The replication state tables are not updated very often, especially after the initial copy phase is complete.
 
 ## What schema changes are supported?
 
@@ -49,7 +49,7 @@ External replication does not currently support changing column data types or re
 
 ## What happens when you disable external replication?
 
-Disabling external replication removes the database objects that Supabase ETL installed in your source database, including the ETL state tables and DDL event trigger.
+Disabling external replication removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
 
 You must delete all external replication pipelines before the disable action is available. For the Dashboard steps, see [Disabling external replication](/docs/guides/database/replication/external-replication-setup#disabling-external-replication).
 
@@ -82,7 +82,7 @@ Postgres supports these replica identity modes:
 
 With `DEFAULT` or `USING INDEX`, Postgres logs only the replica-identity columns. For updates, Postgres includes that old identity when it needs it, such as when an identity column changes or an identity column contains external toasted data. For deletes, Postgres includes the old identity so consumers can identify the deleted row.
 
-Large values such as `text`, `jsonb`, and `bytea` can be stored out-of-line by Postgres using TOAST. During an update, if a toasted value did not change, Postgres may send a marker that means "the value is unchanged" instead of sending the value again. Supabase ETL can only reconstruct that value when the logical replication event includes enough old-row data. If ETL cannot reconstruct an unchanged toasted value, the update is treated as partial.
+Large values such as `text`, `jsonb`, and `bytea` can be stored out-of-line by Postgres using TOAST. During an update, if a toasted value did not change, Postgres may send a marker that means "the value is unchanged" instead of sending the value again. The replication pipeline can only reconstruct that value when the logical replication event includes enough old-row data. If the pipeline cannot reconstruct an unchanged toasted value, the update is treated as partial.
 
 You can check a table's current setting with:
 
