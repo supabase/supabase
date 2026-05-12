@@ -62,7 +62,7 @@ const MobileNavigationBar = ({
           {isProjectScope ? (
             <>
               <ProjectBranchSelector />
-              <ConnectButton className="[&_span]:hidden h-8 w-8" />
+              <ConnectButton iconOnly className="w-8 h-8" />
             </>
           ) : IS_PLATFORM && showOrgSelection ? (
             <OrgSelector />

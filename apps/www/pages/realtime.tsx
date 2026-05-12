@@ -20,7 +20,8 @@ import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
 import { Button } from 'ui'
 
-import { serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 
@@ -80,6 +81,12 @@ function RealtimePage() {
                 image: `https://supabase.com${basePath}/images/realtime/og.jpg`,
               })
             ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.realtime)),
           }}
         />
       </Head>

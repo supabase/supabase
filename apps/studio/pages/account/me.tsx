@@ -25,6 +25,7 @@ import { DashboardSettings } from '@/components/interfaces/Account/Preferences/D
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
 import { ProfileInformation } from '@/components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from '@/components/interfaces/Account/Preferences/ThemeSettings'
+import { TimezoneSettings } from '@/components/interfaces/Account/Preferences/TimezoneSettings'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -94,6 +95,8 @@ const PlatformPreferences = () => {
             <AccountConnections />
 
             <ThemeSettings />
+
+            <TimezoneSettings />
 
             <HotkeySettings />
 
@@ -190,6 +193,8 @@ const SelfHostedPreferences = () => {
       <PreferencesPageHeader description="Manage how the dashboard looks and behaves on this browser and device." />
       <PageContainer size="small">
         <ThemeSettings />
+
+        <TimezoneSettings />
 
         <HotkeySettings />
 

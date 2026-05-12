@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { checkIfAppendLimitRequired, suffixWithLimit } from '../../SQLEditor/SQLEditor.utils'
 import { type ParseQueryResults } from './RLSTester.types'
+import { filterTablePolicies } from './useTestQueryRLS.utils'
 import { useParseClientCodeMutation } from '@/data/ai/parse-client-code-mutation'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useCheckTableRLSStatusMutation } from '@/data/database/table-check-rls-mutation'
@@ -124,14 +125,13 @@ export const useTestQueryRLS = () => {
 
       const tables = response
         .map(({ table, schema, rls_enabled }) => {
-          const tablePolicies = policies.filter(
-            (x) =>
-              x.schema === schema &&
-              x.table === table &&
-              (x.roles.includes(role?.role ?? '') ||
-                (x.roles.length === 1 && x.roles[0] === 'public')) &&
-              x.command === data.operation
-          )
+          const tablePolicies = filterTablePolicies({
+            policies,
+            schema,
+            table,
+            role: role?.role,
+            operation: data.operation,
+          })
           return {
             table,
             schema,

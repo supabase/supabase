@@ -17,7 +17,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -192,12 +195,12 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
         name="values.timeoutMs"
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Timeout" layout="vertical" className="gap-1">
-            <Input
-              {...rest}
-              type="number"
-              placeholder="1000"
-              actions={<p className="text-foreground-light pr-2">ms</p>}
-            />
+            <InputGroup>
+              <InputGroupInput {...rest} type="number" placeholder="1000" />
+              <InputGroupAddon align="inline-end">
+                <InputGroupText> ms</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
           </FormItemLayout>
         )}
       />

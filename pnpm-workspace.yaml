@@ -4,13 +4,15 @@ packages:
   - blocks/*
   - e2e/*
 
+blockExoticSubdeps: true
+
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.104.1
-  '@supabase/postgrest-js': 2.104.1
-  '@supabase/realtime-js': 2.104.1
+  '@supabase/auth-js': 2.105.4
+  '@supabase/postgrest-js': 2.105.4
+  '@supabase/realtime-js': 2.105.4
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.104.1
+  '@supabase/supabase-js': 2.105.4
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
@@ -19,7 +21,8 @@ catalog:
   '@vitest/ui': ^4.1.4
   lodash: ^4.18.1
   lodash-es: ^4.18.1
-  next: 16.2.3
+  next: 16.2.6
+  next-themes: ^0.4.6
   postcss: ^8.5.10
   radix-ui: ^1.4.3
   react: ^18.3.0
@@ -53,9 +56,8 @@ minimumReleaseAgeExclude:
   - '@supabase/*'
   - '@supabase-labs/*'
   - braintrust # Included for bugfix in v3.9.0
-  # The following packages are excluded from the minimum release age check because they had a vulneralibity
-  # Delete them the next time you update this list
-  - follow-redirects
+  - '@next/*'
+  - next
 
 onlyBuiltDependencies:
   - node-pty
@@ -63,7 +65,6 @@ onlyBuiltDependencies:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
-  '@aws-sdk/core>fast-xml-parser': ^4.5.5
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
@@ -71,6 +72,7 @@ overrides:
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   esbuild: ^0.25.2
+  express-rate-limit>ip-address: ^10.1.1
   lodash: 'catalog:'
   lodash-es: 'catalog:'
   node-gyp>tar: ^7.5.11

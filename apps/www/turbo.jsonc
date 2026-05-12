@@ -62,6 +62,7 @@
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
         "LUMA_API_KEY",
+        "LUMA_HACKATHONS_API_KEY",
         "NEXT_RUNTIME",
         // These env vars are used by some community and marketing integrations
         "SENTRY_DSN_COMMUNITY",
