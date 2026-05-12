@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { Code } from 'lucide-react'
+import { Code, ExternalLink } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -272,11 +272,10 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
         </div>
 
         <SheetFooter className="sm:justify-between">
-          <Button asChild type="text">
+          <Button asChild type="default" icon={<ExternalLink />}>
             <a
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground-light hover:text-foreground"
               href="https://github.com/orgs/supabase/discussions/45233"
             >
               Give feedback
