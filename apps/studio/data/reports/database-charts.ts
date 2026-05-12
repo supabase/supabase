@@ -1,4 +1,4 @@
-import { COMPUTE_MAX_IOPS } from 'shared-data'
+import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
 
 import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
@@ -48,6 +48,9 @@ export const getReportAttributesV2: (
       : provisionedDiskIops
   const hasBurstableIO = BURSTABLE_IO_VARIANTS.has(computeVariantId)
   const showBurstBalanceChart = !!showDiskIOBurstBalanceChart && hasBurstableIO
+  const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
+  const baselineThroughputLabel =
+    typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
 
   return [
     {
@@ -273,8 +276,7 @@ export const getReportAttributesV2: (
     {
       id: 'disk-io-burst-balance',
       label: 'Disk IO Burst Balance',
-      titleTooltip:
-        'Distinct from IOPS and throughput. This is the burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput is throttled to 5 MB/s until it refills.',
+      titleTooltip: `Distinct from IOPS and throughput. This is the burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput is throttled to ${baselineThroughputLabel} (the baseline for this compute size) until it refills.`,
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
       syncId: 'database-reports',
       hide: !showBurstBalanceChart,
@@ -298,8 +300,7 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'Burst credits remaining',
           format: '%',
-          tooltip:
-            'Percentage of EBS burst credits remaining. Drops only matter while the instance is bursting above its baseline IO. Reaching 0% throttles sustained throughput to 5 MB/s until it refills.',
+          tooltip: `Percentage of EBS burst credits remaining. Drops only matter while the instance is bursting above its baseline IO. Reaching 0% throttles sustained throughput to ${baselineThroughputLabel} until it refills.`,
         },
       ],
     },
