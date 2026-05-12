@@ -9,6 +9,8 @@ import type { Organization } from '@/types'
 const VISIBLE_ORGANIZATIONS_LIMIT = 3
 const CREATE_ORGANIZATION_CARD_CLASSNAME =
   'pointer-events-none border-dashed shadow-none transition-colors group-hover:border-default group-hover:bg-surface-200'
+const CONNECT_DISCLOSURE_TRIGGER_CLASSNAME =
+  'mx-auto flex h-7 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground'
 
 export const ConnectOrganizationSelector = ({
   organizations,
@@ -128,7 +130,7 @@ export const ConnectOrganizationSelector = ({
 
         {hasOverflow && (
           <Collapsible_Shadcn_ open={showMore} onOpenChange={setShowMore}>
-            <CollapsibleTrigger_Shadcn_ className="flex w-full items-center justify-center gap-1.5 py-2 text-xs text-foreground-light transition hover:text-foreground">
+            <CollapsibleTrigger_Shadcn_ className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
               <span>{showMore ? 'Show fewer' : `Show ${overflowOrganizations.length} more`}</span>
               <ChevronDown
                 className={cn('size-3.5 transition-transform', showMore && 'rotate-180')}
@@ -155,7 +157,7 @@ export const ConnectOrganizationSelector = ({
 
         {hasUnavailable && (
           <Collapsible_Shadcn_ open={showUnavailable} onOpenChange={setShowUnavailable}>
-            <CollapsibleTrigger_Shadcn_ className="mx-auto flex cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 py-1 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground">
+            <CollapsibleTrigger_Shadcn_ className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
               <span>Organizations that can't be linked</span>
               <ChevronDown
                 className={cn('size-3.5 transition-transform', showUnavailable && 'rotate-180')}
@@ -174,7 +176,9 @@ export const ConnectOrganizationSelector = ({
                   ))}
                 </div>
                 {unavailableReason && (
-                  <p className="text-center text-xs text-foreground-light">{unavailableReason}</p>
+                  <p className="mx-auto max-w-sm text-center text-xs text-foreground-lighter text-balance">
+                    {unavailableReason}
+                  </p>
                 )}
               </div>
             </CollapsibleContent_Shadcn_>

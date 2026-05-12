@@ -21,6 +21,8 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { DOCS_URL } from '@/lib/constants'
 
 const OAUTH_SCOPES_DOCS_URL = `${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`
+const PERMISSION_DETAILS_TRIGGER_CLASSNAME =
+  'mx-auto flex h-7 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground'
 
 export interface AuthorizeRequesterDetailsProps {
   icon: string | null
@@ -187,7 +189,7 @@ export const AuthorizeRequesterDetails = ({
   const readOnlyPermissions = requestedPermissions.filter(({ level }) => level === 'read')
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col">
       {requestedPermissions.length === 0 ? (
         <Card className="shadow-none">
           <CardContent className="border-none px-4 py-3 text-sm text-foreground-lighter">
@@ -224,8 +226,12 @@ export const AuthorizeRequesterDetails = ({
             </>
           )}
 
-          <Collapsible_Shadcn_ open={showDetails} onOpenChange={setShowDetails}>
-            <CollapsibleTrigger_Shadcn_ className="mx-auto flex cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 py-1 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground">
+          <Collapsible_Shadcn_
+            open={showDetails}
+            onOpenChange={setShowDetails}
+            className="space-y-2"
+          >
+            <CollapsibleTrigger_Shadcn_ className={PERMISSION_DETAILS_TRIGGER_CLASSNAME}>
               <span>{showDetails ? 'Hide detailed permissions' : 'Show detailed permissions'}</span>
               <ChevronDown
                 className={cn('size-3.5 transition-transform', showDetails && 'rotate-180')}
