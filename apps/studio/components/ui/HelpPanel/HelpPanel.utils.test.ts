@@ -13,7 +13,13 @@ describe('getSupportLinkQueryParams', () => {
     ).toEqual({ projectRef: 'main-project' })
   })
 
-  it('returns { projectRef } from routerRef when project has no parent_project_ref', () => {
+  it('returns { projectRef } from project.ref when project has no parent_project_ref', () => {
+    expect(getSupportLinkQueryParams({ ref: 'project-ref' }, { slug: 'my-org' }, 'router-ref')).toEqual({
+      projectRef: 'project-ref',
+    })
+  })
+
+  it('returns { projectRef } from routerRef when project has no parent_project_ref or ref', () => {
     expect(getSupportLinkQueryParams({}, { slug: 'my-org' }, 'router-ref')).toEqual({
       projectRef: 'router-ref',
     })
@@ -49,9 +55,19 @@ describe('getSupportLinkQueryParams', () => {
     expect(getSupportLinkQueryParams(undefined, undefined, undefined)).toBeUndefined()
   })
 
-  it('prefers parent_project_ref over routerRef when both are present', () => {
+  it('prefers parent_project_ref over ref and routerRef when all are present', () => {
     expect(
-      getSupportLinkQueryParams({ parent_project_ref: 'parent-ref' }, { slug: 'org' }, 'router-ref')
+      getSupportLinkQueryParams(
+        { parent_project_ref: 'parent-ref', ref: 'project-ref' },
+        { slug: 'org' },
+        'router-ref'
+      )
     ).toEqual({ projectRef: 'parent-ref' })
+  })
+
+  it('prefers project.ref over routerRef when parent_project_ref is missing', () => {
+    expect(
+      getSupportLinkQueryParams({ ref: 'project-ref' }, { slug: 'org' }, 'router-ref')
+    ).toEqual({ projectRef: 'project-ref' })
   })
 })
