@@ -7,6 +7,8 @@ import { OrganizationCard } from '@/components/interfaces/Organization/Organizat
 import type { Organization } from '@/types'
 
 const VISIBLE_ORGANIZATIONS_LIMIT = 3
+const CREATE_ORGANIZATION_CARD_CLASSNAME =
+  'pointer-events-none border-dashed shadow-none transition-colors group-hover:border-default group-hover:bg-surface-200'
 
 export const ConnectOrganizationSelector = ({
   organizations,
@@ -102,7 +104,7 @@ export const ConnectOrganizationSelector = ({
                 isLink={false}
                 organization={createOrganizationCardModel(createLabel)}
                 description={createDescription ?? null}
-                className="pointer-events-none border-dashed shadow-none"
+                className={CREATE_ORGANIZATION_CARD_CLASSNAME}
               />
             </Link>
           ) : onCreate ? (
@@ -119,7 +121,7 @@ export const ConnectOrganizationSelector = ({
                 isLink={false}
                 organization={createOrganizationCardModel(createLabel)}
                 description={createDescription ?? null}
-                className="pointer-events-none border-dashed shadow-none"
+                className={CREATE_ORGANIZATION_CARD_CLASSNAME}
               />
             </button>
           ) : null)}
