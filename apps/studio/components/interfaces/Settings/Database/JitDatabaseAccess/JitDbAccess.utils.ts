@@ -34,11 +34,11 @@ export function createEmptyGrant(roleId: string): JitRoleGrantDraft {
   return {
     roleId,
     enabled: false,
+    branchesOnly: false,
     expiryMode: '1h',
     hasExpiry: true,
     expiry: getRelativeDatetimeByMode('1h'),
     ipRanges: [createEmptyIpRange()],
-    branchesOnly: false,
   }
 }
 
@@ -260,6 +260,7 @@ export function mapJitMembersToUserRules(
   return (jitMembers ?? []).map((item) => {
     const mappedMember = memberMap.get(item.user_id)
     const assignedRoles: JitRoleGrantDraft[] = (item.user_roles ?? []).map((roleObj) => {
+      const roleWithBranchRestriction = roleObj as typeof roleObj & { branches_only?: boolean }
       const expiresAt = typeof roleObj.expires_at === 'number' ? roleObj.expires_at : undefined
       const hasExpiry = typeof expiresAt === 'number'
       const allowedNetworks = serializeAllowedNetworks(roleObj)
@@ -268,6 +269,7 @@ export function mapJitMembersToUserRules(
         ...createEmptyGrant(roleObj.role),
         roleId: roleObj.role,
         enabled: true,
+        branchesOnly: roleWithBranchRestriction.branches_only ?? false,
         hasExpiry,
         expiryMode: hasExpiry ? 'custom' : 'never',
         expiry: hasExpiry ? new Date(expiresAt * 1000).toISOString() : '',
@@ -275,7 +277,6 @@ export function mapJitMembersToUserRules(
           allowedNetworks.length > 0
             ? allowedNetworks.map((cidr) => ({ value: cidr }))
             : [createEmptyIpRange()],
-        branchesOnly: (roleObj as any).branches_only === true,
       }
     })
 
@@ -325,9 +326,9 @@ export function serializeDraftRolesForGrantMutation(draft: JitUserRuleDraft) {
       const allowed_networks = serializeAllowedNetworks(grant.ipRanges)
       return {
         role: grant.roleId,
+        ...(grant.branchesOnly ? { branches_only: true } : {}),
         ...(typeof expires_at === 'number' ? { expires_at } : {}),
         ...(allowed_networks ? { allowed_networks } : {}),
-        ...(grant.branchesOnly ? { branches_only: true } : {}),
       }
     })
 }

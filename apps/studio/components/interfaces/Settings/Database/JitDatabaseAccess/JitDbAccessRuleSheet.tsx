@@ -54,11 +54,11 @@ import { DOCS_URL } from '@/lib/constants'
 const grantSchema = z.object({
   roleId: z.string(),
   enabled: z.boolean(),
+  branchesOnly: z.boolean(),
   expiryMode: z.custom<JitExpiryMode>(),
   hasExpiry: z.boolean(),
   expiry: z.string(),
   ipRanges: z.array(z.object({ value: z.string() })),
-  branchesOnly: z.boolean(),
 })
 
 function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {

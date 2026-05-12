@@ -10,12 +10,12 @@ type JitDbAccessGrantVariables = {
   userId: string
   roles: Array<{
     role: string
+    branches_only?: boolean
     expires_at?: number // Unix timestamp in seconds per role
     allowed_networks?: {
       allowed_cidrs?: Array<{ cidr: string }>
       allowed_cidrs_v6?: Array<{ cidr: string }>
     }
-    branches_only?: boolean
   }>
 }
 

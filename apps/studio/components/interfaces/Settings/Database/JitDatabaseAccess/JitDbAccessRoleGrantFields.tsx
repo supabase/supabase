@@ -8,7 +8,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Switch,
   WarningIcon,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
@@ -31,6 +30,10 @@ const EXPIRY_MODE_OPTIONS: Array<{ value: JitRoleGrantDraft['expiryMode']; label
 ]
 
 const MAX_CUSTOM_EXPIRY_YEARS = 1
+const BRANCH_SCOPE_OPTIONS = [
+  { value: 'all', label: 'All project databases' },
+  { value: 'preview', label: 'Preview branches only' },
+] as const
 
 interface JitDbAccessRoleGrantFieldsProps {
   control: Control<JitUserRuleDraft>
@@ -56,9 +59,7 @@ export function JitDbAccessRoleGrantFields({
     <div className={grant.enabled ? 'bg-surface-100' : 'bg-background'}>
       <label
         htmlFor={checkboxId}
-        className={`grid w-full cursor-pointer select-none grid-cols-[16px_minmax(0,1fr)] items-start gap-x-3 px-4 py-3 transition-colors ${
-          grant.enabled ? 'hover:bg-surface-200/40' : 'hover:bg-surface-100/50'
-        }`}
+        className="grid w-full cursor-pointer select-none grid-cols-[16px_minmax(0,1fr)] items-start gap-x-3 px-4 py-3 transition-colors hover:bg-surface-200/40"
       >
         <Checkbox
           id={checkboxId}
@@ -102,10 +103,8 @@ export function JitDbAccessRoleGrantFields({
             {isSuperuserRole && (
               <Admonition
                 type="warning"
-                showIcon={false}
                 layout="vertical"
-                className="rounded-md mb-2"
-                title="Grants full database control"
+                className="mb-3"
                 description={
                   <>
                     The selected role has unrestricted access and bypasses row-level security.
@@ -122,9 +121,7 @@ export function JitDbAccessRoleGrantFields({
             {isReadOnlyRole && (
               <Admonition
                 type="warning"
-                showIcon={false}
                 layout="vertical"
-                title="Grants read-only access to all schemas"
                 description={
                   <>
                     The selected role has read-only access to all schemas. Consider using a{' '}
@@ -134,23 +131,35 @@ export function JitDbAccessRoleGrantFields({
                     with only the permissions required.
                   </>
                 }
-                className="rounded-md mb-2"
+                className="mb-3"
               />
             )}
 
+            <div className="space-y-2">
+              <p className="text-sm text-foreground">Applies to</p>
+              <Select_Shadcn_
+                value={grant.branchesOnly ? 'preview' : 'all'}
+                onValueChange={(value) => onChange({ ...grant, branchesOnly: value === 'preview' })}
+              >
+                <SelectTrigger_Shadcn_ className="w-full">
+                  <SelectValue_Shadcn_ placeholder="Select database scope" />
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  {BRANCH_SCOPE_OPTIONS.map((option) => (
+                    <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem_Shadcn_>
+                  ))}
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+              <p className="text-xs text-foreground-lighter">
+                {grant.branchesOnly
+                  ? 'Can only be requested from preview branch databases.'
+                  : 'Can be requested from production and preview branch databases.'}
+              </p>
+            </div>
+
             <div className={cn('space-y-2', !showRoleAdmonition && 'border-t border-muted pt-3')}>
-              <div className="flex items-center justify-between gap-x-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-foreground">Branches only</p>
-                  <p className="text-xs text-foreground-lighter">
-                    Restrict access to preview branch databases only.
-                  </p>
-                </div>
-                <Switch
-                  checked={grant.branchesOnly}
-                  onCheckedChange={(checked) => onChange({ ...grant, branchesOnly: checked })}
-                />
-              </div>
               <p className="text-sm text-foreground">Expires in</p>
               <div className="flex gap-2">
                 <div className="flex-1">
