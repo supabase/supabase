@@ -207,60 +207,6 @@ export default {
   },
 
   /*
-   * Alert
-   *
-   */
-
-  alert: {
-    base: `
-      relative rounded-md border py-4 px-6
-      flex space-x-4 items-start
-    `,
-    header: 'block text-sm font-normal mb-1',
-    description: `text-xs`,
-    variant: {
-      danger: {
-        base: `bg-red-200 text-red-1200 border-red-700`,
-        icon: `text-red-900`,
-        header: `text-red-1200`,
-        description: `text-red-1100`,
-      },
-      warning: {
-        base: `bg-amber-200 border-amber-700`,
-        icon: `text-amber-900`,
-        header: `text-amber-1200`,
-        description: `text-amber-1100`,
-      },
-      info: {
-        base: `bg-alternative border`,
-        icon: `text-foreground-lighter`,
-        header: `text-foreground`,
-        description: `text-foreground-light`,
-      },
-      success: {
-        base: `bg-brand-300 border-brand-400`,
-        icon: `text-brand`,
-        header: `text-brand-600`,
-        description: `text-brand-600`,
-      },
-      neutral: {
-        base: `bg-surface-100 border-default`,
-        icon: `text-foreground-muted`,
-        header: `text-foreground`,
-        description: `text-foreground-light`,
-      },
-    },
-    close: `
-      absolute
-      right-6 top-4
-      p-0 m-0
-      text-foreground-muted
-      cursor-pointer transition ease-in-out
-      bg-transparent border-transparent focus:outline-hidden
-      opacity-50 hover:opacity-100`,
-  },
-
-  /*
    * Card
    */
 
