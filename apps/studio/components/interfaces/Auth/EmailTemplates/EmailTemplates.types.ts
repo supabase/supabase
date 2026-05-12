@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import z from 'zod'
 
 export type KebabCase<S extends string> = S extends `${infer A}_${infer B}`
@@ -23,6 +24,27 @@ const AUTH_TEMPLATE_TYPES = [
 export type AuthTemplateType = (typeof AUTH_TEMPLATE_TYPES)[number]
 export type AuthTemplateResetType = KebabCase<AuthTemplateType>
 
+export type TemplateVariableName =
+  | 'ConfirmationURL'
+  | 'Token'
+  | 'TokenHash'
+  | 'SiteURL'
+  | 'Email'
+  | 'NewEmail'
+  | 'OldEmail'
+  | 'Phone'
+  | 'OldPhone'
+  | 'Provider'
+  | 'FactorType'
+  | 'Data'
+  | 'RedirectTo'
+
+export type TemplateVariable = {
+  name: TemplateVariableName
+  value: string
+  description: string | ReactNode
+}
+
 export interface AuthTemplate {
   id: AuthTemplateType
   type: 'object'
@@ -32,10 +54,9 @@ export interface AuthTemplate {
     [x: string]: {
       title: string
       type: 'boolean' | 'string' | 'select' | 'number' | 'code'
-      description?: string
-      descriptionOptional?: string
     }
   }
+  variables: TemplateVariable[]
   validationSchema: z.AnyZodObject
   misc: { emailTemplateType: 'authentication' | 'security' }
 }
