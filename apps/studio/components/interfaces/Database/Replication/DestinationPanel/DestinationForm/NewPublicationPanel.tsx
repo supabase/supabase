@@ -23,7 +23,6 @@ import { z } from 'zod'
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { ResponseError } from '@/types'
 
 interface NewPublicationPanelProps {
   visible: boolean
