@@ -11,32 +11,32 @@ const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
   Token: {
     name: 'Token',
     value: '{{ .Token }}',
-    description: 'The 6-digit numeric email OTP.',
+    description: 'The 6-digit numeric email OTP',
   },
   TokenHash: {
     name: 'TokenHash',
     value: '{{ .TokenHash }}',
-    description: 'The hashed token used in the URL, useful for constructing your own email link.',
+    description: 'The hashed token used in the URL, useful for constructing your own email link',
   },
   SiteURL: {
     name: 'SiteURL',
     value: '{{ .SiteURL }}',
-    description: 'The URL of the site.',
+    description: "This project's redirect URL",
   },
   Email: {
     name: 'Email',
     value: '{{ .Email }}',
-    description: "The user's email address",
+    description: "The user's current email address",
   },
   NewEmail: {
     name: 'NewEmail',
     value: '{{ .NewEmail }}',
-    description: "Contains the new user's email address.",
+    description: "The user's new email address",
   },
   OldEmail: {
     name: 'OldEmail',
     value: '{{ .OldEmail }}',
-    description: "Contains the user's old email address.",
+    description: "The user's old email address",
   },
   Phone: {
     name: 'Phone',

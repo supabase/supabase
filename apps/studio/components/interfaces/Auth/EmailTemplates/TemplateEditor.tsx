@@ -338,9 +338,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                             {variable.name === 'SiteURL' && (
                               <>
                                 {' '}
-                                Configurable in your project's{' '}
+                                as defined in{' '}
                                 <InlineLink href={`/project/${projectRef}/auth/url-configuration`}>
-                                  authentication settings
+                                  URL Configuration
                                 </InlineLink>
                               </>
                             )}
