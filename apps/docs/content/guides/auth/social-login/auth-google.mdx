@@ -219,9 +219,14 @@ Follow the same configuration guide as if your app was a Web application when bu
           }
         });
 
+        const token = result.result?.accessToken?.token;
+        if (!token) {
+          throw new Error('No Google access token received from social login provider');
+        }
+
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: 'google',
-          token: result.result?.accessToken.token!,
+          token,
         });
 
         if (error) throw error;

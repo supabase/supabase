@@ -411,13 +411,13 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
     For Capacitor apps, you can use the [@capgo/capacitor-social-login](https://github.com/Cap-go/capacitor-social-login) plugin for native Apple authentication across iOS and Android platforms.
 
-    <Admonition type="info">
+    <Admonition type="note">
 
     For comprehensive setup instructions including Service ID configuration, see our [Capacitor Social Login guide](/docs/blog/setup-supabase-with-capacitor-social-login).
 
     </Admonition>
 
-    ### Installation and Setup
+    ### Installation and setup
 
     1. Install the Capacitor Social Login plugin:
 
@@ -465,9 +465,14 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
           }
         });
 
+        const token = result.result?.identityToken;
+        if (!token) {
+          throw new Error('No Apple identity token received from social login provider');
+        }
+
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
-          token: result.result?.identityToken!,
+          token,
         });
 
         if (error) throw error;
@@ -479,7 +484,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     }
     ```
 
-    ### Platform-Specific Configuration
+    ### Platform-specific configuration
 
     **iOS Configuration:**
     Add the following to your `ios/App/App/Info.plist`:

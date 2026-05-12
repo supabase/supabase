@@ -309,9 +309,14 @@ async function signInWithFacebook() {
       }
     });
 
+    const token = result.result?.accessToken?.token;
+    if (!token) {
+      throw new Error('No Facebook access token received from social login provider');
+    }
+
     const { data, error } = await supabase.auth.signInWithIdToken({
       provider: 'facebook',
-      token: result.result?.accessToken.token!,
+      token,
     });
 
     if (error) throw error;
