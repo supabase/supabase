@@ -3110,6 +3110,11 @@ module.exports = [
     source: '/docs/guides/getting-started/ai-prompts',
     destination: '/docs/guides/ai-tools/ai-prompts',
   },
+    {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
   {
     permanent: true,
     source: '/docs/guides/getting-started/ai-prompts/:slug',
