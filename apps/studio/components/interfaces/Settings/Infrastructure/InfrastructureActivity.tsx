@@ -432,7 +432,7 @@ export const InfrastructureActivity = () => {
                       </Panel.Content>
                     </Panel>
                   )}
-                  {attribute.key === 'disk_io_consumption' && (
+                  {attribute.key === 'disk_io_consumption' && !hasDedicatedIOResources && (
                     <Admonition
                       type="default"
                       title="Looking for actual disk activity?"
