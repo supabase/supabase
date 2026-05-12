@@ -52,7 +52,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
               ...(features.emails
                 ? [
                     {
-                      name: 'Email',
+                      name: 'Emails',
                       key: 'email',
                       pages: ['templates', 'smtp'],
                       url: `${baseUrl}/templates`,
