@@ -276,7 +276,7 @@ export const getReportAttributesV2: (
     {
       id: 'disk-io-burst-balance',
       label: 'Disk IO Burst Balance',
-      titleTooltip: `The burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput is throttled to ${baselineThroughputLabel} (the baseline for this compute size) until it refills.`,
+      titleTooltip: `The burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
       syncId: 'database-reports',
       hide: !showBurstBalanceChart,
@@ -300,7 +300,7 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'Burst credits remaining',
           format: '%',
-          tooltip: `Percentage of EBS burst credits remaining. Drops only matter while the instance is bursting above its baseline IO. Reaching 0% throttles sustained throughput to ${baselineThroughputLabel} until it refills.`,
+          tooltip: `Percentage of EBS burst credits remaining. Drops only matter while the instance is bursting above its baseline IO. At 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
         },
       ],
     },
