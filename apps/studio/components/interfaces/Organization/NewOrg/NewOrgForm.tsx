@@ -293,23 +293,43 @@ export const NewOrgForm = ({
     }
   }
 
+  const getReturnToUrl = () => {
+    if (!searchParams.returnTo) return undefined
+
+    const url = new URL(searchParams.returnTo, window.location.origin)
+    if (searchParams.auth_id) {
+      url.searchParams.set('auth_id', searchParams.auth_id)
+    }
+    if (searchParams.token) {
+      url.searchParams.set('token', searchParams.token)
+    }
+
+    return url.toString()
+  }
+
   const onOrganizationCreated = (org: { slug: string }) => {
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
       : 'My Project'
 
-    if (searchParams.returnTo) {
-      const url = new URL(searchParams.returnTo, window.location.origin)
-      if (searchParams.auth_id) {
-        url.searchParams.set('auth_id', searchParams.auth_id)
-      }
-      if (searchParams.token) {
-        url.searchParams.set('token', searchParams.token)
-      }
+    const returnToUrl = getReturnToUrl()
 
-      router.push(url.toString(), undefined, { shallow: false })
+    if (returnToUrl) {
+      router.push(returnToUrl, undefined, { shallow: false })
     } else {
       router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
+    }
+  }
+
+  const onCancel = () => {
+    const returnToUrl = getReturnToUrl()
+
+    if (returnToUrl) {
+      router.push(returnToUrl, undefined, { shallow: false })
+    } else if (!!lastVisitedOrganization) {
+      router.push(`/org/${lastVisitedOrganization}`)
+    } else {
+      router.push('/organizations')
     }
   }
 
@@ -394,10 +414,7 @@ export const NewOrgForm = ({
               <Button
                 type="default"
                 disabled={newOrgLoading || paymentConfirmationLoading}
-                onClick={() => {
-                  if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-                  else router.push('/organizations')
-                }}
+                onClick={onCancel}
               >
                 Cancel
               </Button>
