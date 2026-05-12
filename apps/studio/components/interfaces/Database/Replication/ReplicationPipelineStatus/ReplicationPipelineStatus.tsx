@@ -61,6 +61,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 /**
  * Component for displaying replication pipeline status and table replication details.
@@ -252,7 +253,7 @@ export const ReplicationPipelineStatus = () => {
       }
     } catch (error) {
       setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(`Failed to ${action} pipeline: ${(error as Error).message}`)
+      toast.error(`Failed to ${action} pipeline: ${(error as ResponseError).message}`)
     }
   }
 

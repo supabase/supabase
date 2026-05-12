@@ -56,6 +56,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 const formId = 'destination-editor'
 
@@ -484,7 +485,7 @@ export const DestinationForm = ({
       }
     } catch (error) {
       const action = editMode ? 'apply and run' : 'create and start'
-      toast.error(`Failed to ${action} destination: ${(error as Error).message}`)
+      toast.error(`Failed to ${action} destination: ${(error as ResponseError).message}`)
     }
   }
 

@@ -91,13 +91,13 @@ export const RowMenu = ({
 
     try {
       // Only show 'enabling' when transitioning from allowed states
-      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
+      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
         setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
       }
       await startPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(`Failed to start pipeline: ${(error as Error).message}`)
+      toast.error(`Failed to start pipeline: ${(error as ResponseError).message}`)
     }
   }
 
@@ -107,13 +107,13 @@ export const RowMenu = ({
 
     try {
       // Only show 'disabling' when transitioning from allowed states
-      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
+      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
         setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
       }
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(`Failed to stop pipeline: ${(error as Error).message}`)
+      toast.error(`Failed to stop pipeline: ${(error as ResponseError).message}`)
     }
   }
 
@@ -126,7 +126,7 @@ export const RowMenu = ({
       await restartPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(`Failed to restart pipeline: ${(error as Error).message}`)
+      toast.error(`Failed to restart pipeline: ${(error as ResponseError).message}`)
     }
   }
 

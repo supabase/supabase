@@ -31,6 +31,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 interface DestinationRowProps {
   destinationId: number
@@ -113,7 +114,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       setShowDeleteDestinationForm(false)
       toast.success(`Deleted destination "${destinationName}"`)
     } catch (error) {
-      toast.error(`Failed to delete destination: ${(error as Error).message}`)
+      toast.error(`Failed to delete destination: ${(error as ResponseError).message}`)
     } finally {
       setIsDeleting(false)
     }
