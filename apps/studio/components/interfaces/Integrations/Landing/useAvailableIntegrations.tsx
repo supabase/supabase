@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
+import { fullImageUrl } from 'common/marketplace-client'
 import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -10,11 +11,6 @@ import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integration
 import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-
-const fullImageUrl = (imagePath: string) => {
-  const API_URL = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL || ''
-  return `${API_URL}${imagePath}`
-}
 
 /**
  * [Joshen] Returns a combination of

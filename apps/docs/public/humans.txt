@@ -38,6 +38,7 @@ Bobbie Soedirgo
 Brad Gyger
 Brendan Stephens
 Brent Newson
+Brian Cullen
 Brent Schroeter
 Carel de Waal
 Cameron Blackwood
@@ -125,6 +126,7 @@ Jean-Paul Argudo
 Jeff Smick
 Jenny Kibiri
 Jeremias Menichelli
+Jess Fink
 Jess Shears
 Jim Brodeur
 Jim Chanco Jr
@@ -144,6 +146,7 @@ Jordan McQueen
 Jordi Enric
 José Luis Ledesma
 Joshen Lim
+Julian Domke
 Julien Goux
 Kai M
 Kalleby Santos
@@ -176,6 +179,7 @@ Manuel Mendez
 Manan Gupta
 Marcus Weiner
 Margarita Sandomirskaia
+Marija Milicevic
 Mark Burggraf
 Matthew Hambright
 Matt Hudson
@@ -208,11 +212,13 @@ Paweł Gulbinowicz
 Pedro Rodrigues
 Peter Lyn
 Peter Soderberg
+Pierre Ducroquet
 Qiao Han
 Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Richard Kasprzak
 Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli

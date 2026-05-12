@@ -4,7 +4,8 @@ import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Alert, Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
@@ -118,23 +119,28 @@ const CostControl = ({}: CostControlProps) => {
               {isSuccess && !costControlDisabled && (
                 <div className="space-y-6">
                   {['team', 'enterprise', 'platform'].includes(currentPlan?.id || '') ? (
-                    <Alert
-                      withIcon
-                      variant="info"
-                      title={`You will be charged for any additional usage on the ${
-                        currentPlan?.name || ''
-                      } plan`}
-                    >
-                      {currentPlan?.name || ''} plan requires you to have spend cap off at all
-                      times. Your projects will never become unresponsive. Only when your{' '}
-                      <Link
-                        href={`/org/${slug}/usage`}
-                        className="text-green-900 transition hover:text-green-1000"
-                      >
-                        included usage
-                      </Link>{' '}
-                      is exceeded will you be charged for any additional usage.
-                    </Alert>
+                    <>
+                      <Admonition
+                        type="default"
+                        layout="horizontal"
+                        title={`You will be charged for any additional usage on the ${
+                          currentPlan?.name || ''
+                        } plan`}
+                        description={
+                          <>
+                            {currentPlan?.name || ''} plan requires you to have spend cap off at all
+                            times. Your projects will never become unresponsive. Only when your{' '}
+                            <Link
+                              href={`/org/${slug}/usage`}
+                              className="text-green-900 transition hover:text-green-1000"
+                            >
+                              included usage
+                            </Link>{' '}
+                            is exceeded will you be charged for any additional usage.
+                          </>
+                        }
+                      />
+                    </>
                   ) : (
                     <p className="text-sm text-foreground-light">
                       If you need to go beyond the included quota, simply switch off your spend cap

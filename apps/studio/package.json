@@ -74,7 +74,7 @@
     "@vercel/functions": "^2.1.0",
     "@xyflow/react": "^12.10.1",
     "@zip.js/zip.js": "^2.7.29",
-    "ai": "^6.0.116",
+    "ai": "^6.0.174",
     "ai-commands": "workspace:*",
     "awesome-debounce-promise": "^2.1.0",
     "common": "workspace:*",
