@@ -289,7 +289,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     <div className="flex flex-col">
                       <p className="text-sm">Template variables</p>
                       <p className="text-sm text-foreground-lighter">
-                        Data placeholders that can be inserted in the subject line or email body.{' '}
+                        Data placeholders that can be inserted into the subject or body.{' '}
                         <InlineLink
                           href={`${DOCS_URL}/guides/local-development/customizing-email-templates#template-variables`}
                         >
