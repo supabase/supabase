@@ -157,9 +157,17 @@ export const FeatureFlagProvider = ({
             })()
           : Promise.resolve({}),
         loadCCFlags
-          ? typeof getConfigCatFlags === 'function'
-            ? getConfigCatFlags(userEmail)
-            : getDefaultConfigCatFlags(userEmail)
+          ? (() => {
+              console.log('[cc] fetching flags as', {
+                userEmail,
+                isLoading,
+                hasSession: !!session,
+                userId: session?.user?.id,
+              })
+              return typeof getConfigCatFlags === 'function'
+                ? getConfigCatFlags(userEmail)
+                : getDefaultConfigCatFlags(userEmail)
+            })()
           : Promise.resolve([]),
       ])
 

@@ -36,7 +36,10 @@ async function getClient() {
 
   try {
     const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
-    const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
+    const options = {
+      pollIntervalSeconds: 7 * 60, // 7 minutes
+      logger: configcat.createConsoleLogger(configcat.LogLevel.Info),
+    }
 
     if (response.status !== 200) {
       if (!process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY) {
@@ -77,13 +80,23 @@ export async function getFlags(userEmail: string = '', customAttributes?: Record
 
   await client.waitForReady()
 
-  if (userEmail) {
-    return client.getAllValuesAsync(
-      new configcat.User(userEmail, undefined, undefined, _customAttributes)
-    )
-  } else {
-    return client.getAllValuesAsync(
-      new configcat.User('anonymous', undefined, undefined, _customAttributes)
-    )
+  const user = userEmail
+    ? new configcat.User(userEmail, userEmail, undefined, _customAttributes)
+    : new configcat.User('anonymous', undefined, undefined, _customAttributes)
+
+  try {
+    const details = await client.getValueDetailsAsync('marketplaceIntegrations', false, user)
+    console.log('[cc:marketplaceIntegrations]', {
+      value: details.value,
+      matchedTargetingRule: details.matchedTargetingRule,
+      matchedPercentageOption: details.matchedPercentageOption,
+      errorMessage: details.errorMessage,
+      isDefaultValue: details.isDefaultValue,
+      user: { identifier: user.identifier, email: user.email, custom: user.custom },
+    })
+  } catch (e) {
+    console.error('[cc:marketplaceIntegrations] getValueDetailsAsync failed', e)
   }
+
+  return client.getAllValuesAsync(user)
 }
