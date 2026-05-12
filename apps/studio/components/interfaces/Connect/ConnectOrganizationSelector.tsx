@@ -155,7 +155,7 @@ export const ConnectOrganizationSelector = ({
 
         {hasUnavailable && (
           <Collapsible_Shadcn_ open={showUnavailable} onOpenChange={setShowUnavailable}>
-            <CollapsibleTrigger_Shadcn_ className="flex w-full items-center justify-start gap-1.5 py-2 text-left text-xs text-foreground-lighter transition hover:text-foreground-light">
+            <CollapsibleTrigger_Shadcn_ className="flex w-full cursor-pointer items-center justify-start gap-1.5 py-2 text-left text-xs text-foreground-lighter transition-colors hover:text-foreground">
               <span>Organizations that can't be linked</span>
               <ChevronDown
                 className={cn('size-3.5 transition-transform', showUnavailable && 'rotate-180')}
