@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { AlertTriangle, BookOpen, ChevronDown, Sparkles, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { COMPUTE_DISK } from 'shared-data'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -16,9 +17,11 @@ import {
 
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
+import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -34,6 +37,14 @@ export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
+  const diskIoBaselineLabel = (() => {
+    const variant = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+    const baseline = COMPUTE_DISK[variant]?.baselineThroughputMBps
+    return typeof baseline === 'number' ? `${baseline} MB/s` : 'its baseline'
+  })()
+  const applyDiskIoBaseline = (text?: string) =>
+    text ? text.replace(/\{baseline\}/g, diskIoBaselineLabel) : text
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const track = useTrack()
@@ -69,19 +80,21 @@ export const ResourceExhaustionWarningBanner = () => {
       ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')
       : undefined
 
-  const title =
+  const title = applyDiskIoBaseline(
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].title
       : warningContent?.title
+  )
 
-  const description =
+  const description = applyDiskIoBaseline(
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
       : warningContent?.description
+  )
 
   const learnMoreUrl =
     activeWarnings.length > 1
