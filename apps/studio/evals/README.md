@@ -7,6 +7,7 @@ We use [Braintrust](https://www.braintrust.dev/) to evaluate Assistant behaviors
 Add offline eval test cases to `dataset.ts`. If needed, add new scorers (see below) for the specific dimension you wish to test. Expect to update and run offline evals when adding new Assistant behaviors
 
 You may wish to run offline evals when:
+
 - You updated the eval suite with a new test case or scorer
 - You changed Assistant's behavior and want to check for improvements/regressions
 
