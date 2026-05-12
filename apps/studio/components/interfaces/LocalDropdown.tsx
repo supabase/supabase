@@ -49,6 +49,7 @@ export const LocalDropdown = ({
           tooltip={{ content: { text: 'Settings' } }}
         >
           <ProfileImage className="w-8 h-8 rounded-md" />
+          <span className="sr-only">Settings</span>
         </ButtonTooltip>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className={cn('w-44', contentClassName)}>
