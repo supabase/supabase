@@ -52,7 +52,7 @@ interface ProjectSelectorProps {
 }
 
 function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
-  const { projectRef: urlProjectRef } = useParams()
+  const { ref: urlProjectRef } = useParams()
 
   return (
     <FormField
