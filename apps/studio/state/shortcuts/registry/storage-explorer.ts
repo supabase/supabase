@@ -85,17 +85,20 @@ export const storageExplorerRegistry: RegistryDefinations<StorageExplorerShortcu
     label: 'Clear item selection',
     sequence: ['Escape'],
     showInSettings: false,
+    options: { conflictBehavior: 'allow' },
   },
   [STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_CLOSE_PREVIEW]: {
     id: STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_CLOSE_PREVIEW,
     label: 'Close file preview',
     sequence: ['Escape'],
     showInSettings: false,
+    options: { conflictBehavior: 'allow' },
   },
   [STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_CLOSE_SEARCH]: {
     id: STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_CLOSE_SEARCH,
     label: 'Close search',
     sequence: ['Escape'],
     showInSettings: false,
+    options: { conflictBehavior: 'allow' },
   },
 }
