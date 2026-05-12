@@ -487,7 +487,7 @@
   --color-hi-contrast: hsl(var(--foreground-default));
   --color-lo-contrast: hsl(var(--background-alternative-default));
 
-  /* 
+  /*
    * This will generate colors only for bg utilities.
    */
   --background-color-200: hsl(var(--background-200));
@@ -510,8 +510,8 @@
   --background-color-dash-canvas: hsl(var(--background-dash-canvas));
   --background-color-studio: hsl(var(--background-200));
 
-  /* 
-   * This will generate colors for all utilities, they'll have border in the name i.e. bg-border-overlay, text-border-muted 
+  /*
+   * This will generate colors for all utilities, they'll have border in the name i.e. bg-border-overlay, text-border-muted
    * This usage should be discouraged and deprecated.
    */
   --color-border: hsl(var(--border-default));
@@ -520,7 +520,7 @@
   --color-border-control: hsl(var(--border-control));
   --color-border-strong: hsl(var(--border-strong));
   --color-border-stronger: hsl(var(--border-stronger));
-  /* 
+  /*
    * This will generate colors only for border utilities
    * i.e. bg-muted and they'll only have border-color: var(--border-muted) rule
    */

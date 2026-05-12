@@ -1,28 +1,25 @@
 #!/usr/bin/env node
 /**
- * Emits packages/config/css/colors.css, packages/config/css/theme.css and
- * packages/config/css/aliases.css from packages/ui/build/css/tw-extend/color.js.
- * Run from packages/config/.
+ * Emits packages/config/css/colors.css and packages/config/css/theme.css
+ * from packages/config/scripts/tw-extend-color-snapshot.js. Run from
+ * packages/config/.
  *
  * - colors.css holds a :root block that declares the Radix/scale --color-*
  *   tokens, forwarding each one to its underlying --colors-{hue}{n} source
  *   var (which switches across light/dark themes via radix-vars.css). This
- *   is where the actual runtime value lives.
+ *   is where the actual runtime value lives. Brand steps 200..600 forward
+ *   to the semantic hsl(var(--brand-{step})) triplet instead of the raw
+ *   --colors-brand{n} scale value.
  * - theme.css holds the @theme inline block of --color-* design tokens
  *   that Tailwind v4 uses to generate bg-{name}, text-{name}, border-{name},
  *   ring-{name}, plus directional border variants like border-r-{name}.
  *   Semantic tokens wrap their source HSL triplet in hsl(); Radix/scale
  *   tokens self-reference the matching var declared in :root (colors.css)
  *   so theme switching works at runtime without re-registering utilities.
- *   Names use the prefixed form (e.g. --color-foreground-light) so they
- *   match the v3 extend.colors keys, plus stripped forms (--color-light,
- *   --color-strong) for stripped names that only belong to one namespace.
- * - aliases.css holds @utility blocks for stripped names that COLLIDE
- *   between text/bg/border (default, muted, alternative, control,
- *   overlay, button). Each one had a different color in v3, so we can't
- *   share a --color-* token; the @utility scopes the value to a single
- *   utility namespace. Directional variants for border-* aliases are
- *   included for the cases actually used in source code.
+ *   The file also contains hand-curated namespaced utility blocks
+ *   (--background-color-*, --border-color-*, --text-color-*) that only
+ *   generate utilities for a single Tailwind namespace, plus a deprecated
+ *   --color-border-* block.
  */
 
 const fs = require('node:fs')
@@ -32,97 +29,23 @@ const path = require('node:path')
 // Kept here as a generation source so the script remains runnable.
 const colorEntries = require('./tw-extend-color-snapshot.js')
 
-const NAMESPACE_TO_UTIL = {
-  foreground: { utility: 'text', property: 'color', cssVar: '--foreground-' },
-  background: { utility: 'bg', property: 'background-color', cssVar: '--background-' },
-  border: { utility: 'border', property: 'border-color', cssVar: '--border-' },
-}
-
-// Stripped names that exist in multiple namespaces with different colors.
-// These get static @utility blocks instead of --color-* tokens.
-const CONFLICTING_STRIPPED_NAMES = new Set([
-  'default',
-  'muted',
-  'alternative',
-  'control',
-  'overlay',
-  'button',
-])
-
-// Directional border-color variants observed in source code grep. Add to this
-// set if a future class like `border-r-default` shows up.
-const DIRECTIONAL_BORDER_VARIANTS = {
-  default: ['b'],
-  muted: ['b', 't'],
-  strong: ['r'], // strong is non-conflicting so it goes through --color-*; included here
-  // for completeness even though it'll be auto-generated.
-}
-
 const themeLines = []
 const rootLines = []
-const aliasBlocks = []
-const seenStripped = new Map() // stripped name → namespace count
 
-// First pass: classify each entry by stripped name.
+// Emit prefixed --color-* tokens for every semantic entry in the snapshot.
+// `foo-DEFAULT` becomes `--color-foo`; everything else keeps its full key.
+// `border-*` entries are intentionally skipped here — they live in the
+// deprecated --color-border-* block in `namespacedTokens` below, which is
+// curated by hand (the snapshot has more border entries than we want to
+// expose as the legacy `--color-border-*` namespace).
 for (const [key, { cssVariable }] of Object.entries(colorEntries)) {
   if (/var\(--core-/.test(cssVariable)) continue
-
-  const firstDash = key.indexOf('-')
-  if (firstDash === -1) continue
-  const ns = key.slice(0, firstDash)
-  const remainder = key.slice(firstDash + 1)
-  if (!NAMESPACE_TO_UTIL[ns]) continue
-
-  const stripped =
-    remainder === 'DEFAULT' ? 'default' : remainder.replace(/-DEFAULT$/, '').toLowerCase()
-  seenStripped.set(stripped, (seenStripped.get(stripped) ?? 0) + 1)
-}
-
-// Second pass: emit tokens / utilities.
-for (const [key, { cssVariable }] of Object.entries(colorEntries)) {
-  if (/var\(--core-/.test(cssVariable)) continue
-
-  // Always emit the prefixed --color-* token so v4 generates utilities like
-  // text-foreground-light, bg-background-surface-100, border-border-strong.
+  if (key.startsWith('border-')) continue
   const themeKey = key.replace(/-DEFAULT$/, '')
   themeLines.push(`  --color-${themeKey}: hsl(${cssVariable});`)
-
-  const firstDash = key.indexOf('-')
-  if (firstDash === -1) continue
-  const ns = key.slice(0, firstDash)
-  const remainder = key.slice(firstDash + 1)
-  const nsInfo = NAMESPACE_TO_UTIL[ns]
-  if (!nsInfo) continue
-
-  const stripped =
-    remainder === 'DEFAULT' ? 'default' : remainder.replace(/-DEFAULT$/, '').toLowerCase()
-
-  if (CONFLICTING_STRIPPED_NAMES.has(stripped) || seenStripped.get(stripped) > 1) {
-    // Static utility scoped to one namespace. The non-aliased form
-    // ({utility}-{themeKey}) is auto-generated from the --color-* token
-    // and is the preferred replacement.
-    const fullAlias = `${nsInfo.utility}-${stripped}`
-    aliasBlocks.push(`@utility ${fullAlias} {\n  ${nsInfo.property}: hsl(${cssVariable});\n}`)
-
-    // Emit directional border variants for the cases actually used in source.
-    if (ns === 'border' && DIRECTIONAL_BORDER_VARIANTS[stripped]) {
-      for (const dir of DIRECTIONAL_BORDER_VARIANTS[stripped]) {
-        const sideMap = { r: 'right', l: 'left', t: 'top', b: 'bottom' }
-        const side = sideMap[dir]
-        if (!side) continue
-        aliasBlocks.push(
-          `@utility border-${dir}-${stripped} {\n  border-${side}-color: hsl(${cssVariable});\n}`
-        )
-      }
-    }
-  } else {
-    // Non-conflicting: emit a stripped --color-{stripped} token. Tailwind
-    // auto-generates text-/bg-/border-/border-{r,l,t,b,x,y}- variants.
-    themeLines.push(`  --color-${stripped}: hsl(${cssVariable});`)
-  }
 }
 
-// --- Hand-rolled additions that don't come from tw-extend/color.js ---
+// --- Hand-rolled additions that don't come from the snapshot ---
 
 // Radix hue palettes — each --color-{hue}-{step} resolves to the raw hue var.
 const radixHues = [
@@ -152,6 +75,7 @@ for (const hue of radixHues) {
     themeLines.push(`  ${alpha}: var(${alpha});`)
   }
 }
+
 // blackA / whiteA — neutral alpha scales.
 for (let i = 1; i <= 12; i++) {
   const black = `--color-blackA-${i * 100}`
@@ -174,18 +98,21 @@ for (let i = 1; i <= 12; i++) {
   themeLines.push(`  ${alpha}: var(${alpha});`)
 }
 
-// Supabase brand scale (--colors-brand{1..12} live in brand-vars.css with
-// per-theme overrides). Steps 200..600 are deliberately skipped — those are
-// owned by the semantic --color-brand-{200..600} tokens emitted above from
-// tw-extend-color-snapshot.js, which source hsl(var(--brand-{200..600})) from
-// the theme files. Re-emitting them here would silently override semantic
-// brand colors with raw scale values.
+// Supabase brand scale. Steps 200..600 are semantic: they forward to
+// hsl(var(--brand-{step})) so light/dark themes can override the value.
+// The other steps fall back to the raw --colors-brand{n} scale and get
+// a self-referencing entry in theme.css; the semantic steps are already
+// emitted to themeLines by the snapshot pass above (brand-200..600,
+// brand-DEFAULT, brand-link), so we don't re-emit them here.
 const SEMANTIC_BRAND_STEPS = new Set([2, 3, 4, 5, 6])
 for (let i = 1; i <= 12; i++) {
-  if (SEMANTIC_BRAND_STEPS.has(i)) continue
   const solid = `--color-brand-${i * 100}`
-  rootLines.push(`  ${solid}: var(--colors-brand${i});`)
-  themeLines.push(`  ${solid}: var(${solid});`)
+  if (SEMANTIC_BRAND_STEPS.has(i)) {
+    rootLines.push(`  ${solid}: hsl(var(--brand-${i * 100}));`)
+  } else {
+    rootLines.push(`  ${solid}: var(--colors-brand${i});`)
+    themeLines.push(`  ${solid}: var(${solid});`)
+  }
 }
 
 // Sidebar shadcn semantic tokens.
@@ -201,11 +128,79 @@ themeLines.push(`  --color-sidebar-ring: hsl(var(--sidebar-ring));`)
 // Misc semantic colors.
 themeLines.push(`  --color-hi-contrast: hsl(var(--foreground-default));`)
 themeLines.push(`  --color-lo-contrast: hsl(var(--background-alternative-default));`)
-aliasBlocks.push(`@utility bg-studio {\n  background-color: hsl(var(--background-200));\n}`)
+
+// Namespaced utility blocks — these intentionally use Tailwind v4's per-
+// namespace --{property}-color-* keys so the values only generate utilities
+// for a single namespace (bg-, border-, text-) rather than all of them.
+const namespacedTokens = `  /*
+   * This will generate colors only for bg utilities.
+   */
+  --background-color-200: hsl(var(--background-200));
+  --background-color-default: hsl(var(--background-default));
+  --background-color-muted: hsl(var(--background-muted));
+  --background-color-alternative-200: hsl(var(--background-alternative-200));
+  --background-color-alternative: hsl(var(--background-alternative-default));
+  --background-color-selection: hsl(var(--background-selection));
+  --background-color-control: hsl(var(--background-control));
+  --background-color-surface-75: hsl(var(--background-surface-75));
+  --background-color-surface-100: hsl(var(--background-surface-100));
+  --background-color-surface-200: hsl(var(--background-surface-200));
+  --background-color-surface-300: hsl(var(--background-surface-300));
+  --background-color-surface-400: hsl(var(--background-surface-400));
+  --background-color-overlay: hsl(var(--background-overlay-default));
+  --background-color-overlay-hover: hsl(var(--background-overlay-hover));
+  --background-color-button: hsl(var(--background-button-default));
+  --background-color-dialog: hsl(var(--background-dialog-default));
+  --background-color-dash-sidebar: hsl(var(--background-dash-sidebar));
+  --background-color-dash-canvas: hsl(var(--background-dash-canvas));
+  --background-color-studio: hsl(var(--background-200));
+
+  /*
+   * This will generate colors for all utilities, they'll have border in the name i.e. bg-border-overlay, text-border-muted
+   * This usage should be discouraged and deprecated.
+   */
+  --color-border: hsl(var(--border-default));
+  --color-border-overlay: hsl(var(--border-overlay));
+  --color-border-muted: hsl(var(--border-muted));
+  --color-border-control: hsl(var(--border-control));
+  --color-border-strong: hsl(var(--border-strong));
+  --color-border-stronger: hsl(var(--border-stronger));
+  /*
+   * This will generate colors only for border utilities
+   * i.e. bg-muted and they'll only have border-color: var(--border-muted) rule
+   */
+  --border-color-default: hsl(var(--border-default));
+  --border-color-overlay: hsl(var(--border-overlay));
+  --border-color-muted: hsl(var(--border-muted));
+  --border-color-control: hsl(var(--border-control));
+  --border-color-strong: hsl(var(--border-strong));
+  --border-color-stronger: hsl(var(--border-stronger));
+  --border-color-secondary: hsl(var(--border-secondary));
+  --border-color-alternative: hsl(var(--border-alternative));
+  --border-color-strong: hsl(var(--border-strong));
+  --border-color-stronger: hsl(var(--border-stronger));
+  --border-color-button: hsl(var(--border-button-default));
+  --border-color-button-hover: hsl(var(--border-button-hover));
+
+  /* This will generate colors only for text utilities */
+  --text-color-default: hsl(var(--foreground-default));
+  --text-color-light: hsl(var(--foreground-light));
+  --text-color-lighter: hsl(var(--foreground-lighter));
+  --text-color-muted: hsl(var(--foreground-muted));
+  --text-color-contrast: hsl(var(--foreground-contrast));`
 
 // Misc design tokens (font, breakpoint, sizing, radius, transform-origin)
 // that lived in tailwind.config.js / ui.config.js theme blocks.
-const miscTokens = `  --font-sans: var(--font-custom, Circular, custom-font, Helvetica Neue, Helvetica, Arial, sans-serif);
+const miscTokens = `  /* misc theme tokens — typography, breakpoints, sizing, transform-origin */
+  --font-sans: var(
+    --font-custom,
+    Circular,
+    custom-font,
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    sans-serif
+  );
   --font-mono: var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace);
   --breakpoint-xs: 480px;
   --width-listbox: 320px;
@@ -245,29 +240,14 @@ const themeCss = `/*
 @theme inline {
 ${themeLines.join('\n')}
 
-  /* misc theme tokens — typography, breakpoints, sizing, transform-origin */
+${namespacedTokens}
+
 ${miscTokens}
 }
-`
-
-const aliasesCss = `/*
- * Auto-generated by scripts/generate-colors.js — do not edit by hand.
- *
- * Stripped-name aliases for utility names that COLLIDE between text/bg/border
- * with different colors in v3 (default, muted, alternative, control, overlay,
- * button). Each @utility is scoped to one utility namespace so the colors
- * stay distinct. Directional border variants (border-{r,l,t,b}-default, etc.)
- * are emitted for cases actually used in source code; add to
- * DIRECTIONAL_BORDER_VARIANTS in scripts/generate-colors.js as new ones appear.
- */
-
-${aliasBlocks.join('\n')}
 `
 
 const outDir = path.resolve(__dirname, '..', 'css')
 fs.writeFileSync(path.join(outDir, 'colors.css'), colorsCss)
 fs.writeFileSync(path.join(outDir, 'theme.css'), themeCss)
-fs.writeFileSync(path.join(outDir, 'aliases.css'), aliasesCss)
 console.log(`wrote ${path.join(outDir, 'colors.css')} (${colorsCss.split('\n').length} lines)`)
 console.log(`wrote ${path.join(outDir, 'theme.css')} (${themeCss.split('\n').length} lines)`)
-console.log(`wrote ${path.join(outDir, 'aliases.css')} (${aliasesCss.split('\n').length} lines)`)
