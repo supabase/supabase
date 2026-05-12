@@ -89,10 +89,8 @@ export const ResourceExhaustionWarningBanner = () => {
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.docsUrl
 
-  const hasSingleWarning = activeWarnings.length === 1
-  const singleWarningMessage = hasSingleWarning
-    ? RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-    : undefined
+  const singleWarningMessage =
+    activeWarnings.length === 1 ? RESOURCE_WARNING_MESSAGES[activeWarnings[0]] : undefined
   const metricsHref = singleWarningMessage?.metricsHref?.replace('[ref]', ref ?? 'default')
 
   const metric =
