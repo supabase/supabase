@@ -134,8 +134,8 @@ const INVITE: AuthTemplate = {
 const MAGIC_LINK: AuthTemplate = {
   id: 'MAGIC_LINK',
   type: 'object',
-  title: 'Magic link',
-  purpose: 'Allow users to sign in via a one-time link sent to their email',
+  title: 'Magic link or OTP',
+  purpose: 'Send a one-time sign-in link or one-time password',
   properties: {
     MAILER_SUBJECTS_MAGIC_LINK: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_MAGIC_LINK_CONTENT: { title: 'Body', type: 'code' },
