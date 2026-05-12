@@ -155,7 +155,7 @@ export const ConnectOrganizationSelector = ({
 
         {hasUnavailable && (
           <Collapsible_Shadcn_ open={showUnavailable} onOpenChange={setShowUnavailable}>
-            <CollapsibleTrigger_Shadcn_ className="flex w-full cursor-pointer items-center justify-start gap-1.5 py-2 text-left text-xs text-foreground-lighter transition-colors hover:text-foreground">
+            <CollapsibleTrigger_Shadcn_ className="mx-auto flex cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 py-1 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground">
               <span>Organizations that can't be linked</span>
               <ChevronDown
                 className={cn('size-3.5 transition-transform', showUnavailable && 'rotate-180')}
@@ -163,9 +163,6 @@ export const ConnectOrganizationSelector = ({
             </CollapsibleTrigger_Shadcn_>
             <CollapsibleContent_Shadcn_ className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
               <div className="space-y-3 pt-1">
-                {unavailableReason && (
-                  <p className="text-xs text-foreground-light">{unavailableReason}</p>
-                )}
                 <div className="space-y-2">
                   {unavailableOrganizations.map((organization) => (
                     <ConnectOrganizationButton
@@ -176,6 +173,9 @@ export const ConnectOrganizationSelector = ({
                     />
                   ))}
                 </div>
+                {unavailableReason && (
+                  <p className="text-center text-xs text-foreground-light">{unavailableReason}</p>
+                )}
               </div>
             </CollapsibleContent_Shadcn_>
           </Collapsible_Shadcn_>

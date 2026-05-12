@@ -225,7 +225,7 @@ export const AuthorizeRequesterDetails = ({
           )}
 
           <Collapsible_Shadcn_ open={showDetails} onOpenChange={setShowDetails}>
-            <CollapsibleTrigger_Shadcn_ className="flex w-full cursor-pointer items-center justify-start gap-1.5 py-2 text-left text-xs text-foreground-lighter transition-colors hover:text-foreground">
+            <CollapsibleTrigger_Shadcn_ className="mx-auto flex cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 py-1 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground">
               <span>{showDetails ? 'Hide detailed permissions' : 'Show detailed permissions'}</span>
               <ChevronDown
                 className={cn('size-3.5 transition-transform', showDetails && 'rotate-180')}
