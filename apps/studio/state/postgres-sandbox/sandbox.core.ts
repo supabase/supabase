@@ -1,23 +1,20 @@
-import { Results } from '@electric-sql/pglite'
 import { PGliteWorker } from '@electric-sql/pglite/worker'
 
 import { SANDBOX_SETUP_STATEMENTS } from './sandbox.constants'
-import { applySchema } from './sandbox.utils'
-import { DatabaseSchemaDDLData } from '@/data/database/schema-ddl-query'
+import { applySchema, applySeed } from './sandbox.utils'
+import { type DatabaseSchemaDDLData } from '@/data/rls-tester/get-schema-ddl'
+import { type TableSeedData } from '@/data/rls-tester/get-seed-data'
+import { getErrorMessage } from '@/lib/get-error-message'
+
+type RLSTestResult = Record<string, unknown>[]
 
 export interface SandboxCore {
-  // setSeed(tables: TableSeedData[]): Promise<void>
-  // broadcastSql(sql: string): Promise<void>
-  // runAll(tiles: TileConfig[], sql: string): Promise<Record<string, TileResult>>
-
   setSchema(data: DatabaseSchemaDDLData): Promise<void>
-  // [Joshen] Valid to ignore the following:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  runQuery: (sql: string) => Promise<Results<{ [key: string]: any }>[]>
+  setSeed(tables: TableSeedData[]): Promise<void>
   destroy(): Promise<void>
+  run: (props: { sql: string }) => Promise<{ result: RLSTestResult }>
 }
 
-// Singleton
 let instance: SandboxCore | null = null
 let initPromise: Promise<SandboxCore> | null = null
 
@@ -51,10 +48,27 @@ const boot = async (): Promise<SandboxCore> => {
     await applySchema(makeExecutor(), data)
   }
 
-  const runQuery = async (sql: string) => await pg.exec(sql)
+  async function setSeed(tables: TableSeedData[]): Promise<void> {
+    await applySeed(makeExecutor(), tables)
+  }
 
-  const destroy = async () => webWorker.terminate()
+  const run = async ({ sql }: { sql: string }) => {
+    try {
+      // [Joshen] First 2 results will be from role impersonation, the actual result from the
+      // query will be returned as the 3rd result.
+      const results = await pg.exec(sql)
+      return { result: results[2].rows ?? [] }
+    } catch (error) {
+      await pg.exec('ROLLBACK').catch(() => {})
+      throw error instanceof Error ? error : new Error(getErrorMessage(error) ?? String(error))
+    }
+  }
 
-  instance = { runQuery, destroy, setSchema }
+  const destroy = async () => {
+    webWorker.terminate()
+    instance = null
+  }
+
+  instance = { run, destroy, setSchema, setSeed }
   return instance
 }
