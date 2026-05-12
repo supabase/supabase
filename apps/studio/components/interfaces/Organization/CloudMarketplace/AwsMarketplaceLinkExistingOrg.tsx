@@ -241,7 +241,7 @@ export const AwsMarketplaceLinkExistingOrg = ({
                 open={isNotLinkableOrgListOpen || orgsLinkable.length === 0}
                 onOpenChange={() => setIsNotLinkableOrgListOpen((prev) => !prev)}
               >
-                <CollapsibleTrigger_Shadcn_ className="py-2 w-full flex items-center group justify-between">
+                <CollapsibleTrigger_Shadcn_ className="py-0 w-full flex items-center group justify-between">
                   <p className="text-xs font-bold text-foreground-light">
                     Organizations that can't be linked
                   </p>

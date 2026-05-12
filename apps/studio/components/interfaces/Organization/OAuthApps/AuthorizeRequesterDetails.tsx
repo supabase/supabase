@@ -211,7 +211,7 @@ export const AuthorizeRequesterDetails = ({
                 </p>
               </div>
 
-              <Card className="overflow-hidden shadow-none bg-surface-200/60 border-muted">
+              <Card className="overflow-hidden shadow-none bg-surface-200/60 border-muted mt-3">
                 <CardContent className="border-none p-0">
                   <div className="divide-y divide-muted px-4">
                     {writablePermissions.length > 0 && (
@@ -229,7 +229,7 @@ export const AuthorizeRequesterDetails = ({
           <Collapsible_Shadcn_
             open={showDetails}
             onOpenChange={setShowDetails}
-            className="space-y-2"
+            className="mt-2 space-y-2"
           >
             <CollapsibleTrigger_Shadcn_ className={PERMISSION_DETAILS_TRIGGER_CLASSNAME}>
               <span>{showDetails ? 'Hide detailed permissions' : 'Show detailed permissions'}</span>
