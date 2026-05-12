@@ -27,7 +27,6 @@
  * @theme inline so Tailwind generates the utilities. */
 @import './css/colors.css';
 @import './css/theme.css';
-@import './css/aliases.css';
 @import './css/animations.css';
 @import './css/utilities.css';
 @import './css/variants.css';
