@@ -1,4 +1,4 @@
-import { BadgeCheck, Download, Settings } from 'lucide-react'
+import { BadgeCheck, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
@@ -50,7 +50,7 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
         <Button
           type={isInstalled ? 'outline' : 'default'}
           size="tiny"
-          icon={isInstalled ? <Settings size={13} /> : <Download size={13} />}
+          icon={isInstalled ? <Settings size={13} /> : undefined}
           // The whole row is a link — keep the button visually consistent but
           // non-interactive so we don't get nested navigation.
           tabIndex={-1}

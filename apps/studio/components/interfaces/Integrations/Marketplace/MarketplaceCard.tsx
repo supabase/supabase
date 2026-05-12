@@ -1,4 +1,4 @@
-import { Download, Settings } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button, Card } from 'ui'
 
@@ -46,7 +46,7 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
           <Button
             type={isInstalled ? 'outline' : 'default'}
             size="tiny"
-            icon={isInstalled ? <Settings size={13} /> : <Download size={13} />}
+            icon={isInstalled ? <Settings size={13} /> : undefined}
             tabIndex={-1}
             asChild
           >

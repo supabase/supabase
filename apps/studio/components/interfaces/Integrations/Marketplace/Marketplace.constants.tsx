@@ -10,6 +10,7 @@ import {
   Package2,
   Plug,
   ShieldCheck,
+  Wrench,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -56,7 +57,21 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   storage: Package2,
   postgres_extension: Database,
   wrapper: Cable,
+  devtools: Wrench,
 }
+
+// Pinned list of categories shown in the marketplace index "Browse by
+// category" grid and sidebar. Order here is the order rendered. Slugs that
+// don't match a marketplaceDB category still render (count falls back to 0)
+// so the surface stays predictable while remote data evolves.
+export const FEATURED_CATEGORIES: Array<{ slug: string; name: string }> = [
+  { slug: 'observability', name: 'Observability' },
+  { slug: 'security', name: 'Security' },
+  { slug: 'billing', name: 'Billing' },
+  { slug: 'devtools', name: 'DevTools' },
+  { slug: 'ai_vectors', name: 'AI & Vectors' },
+  { slug: 'storage', name: 'Storage' },
+]
 
 export const getCategoryIcon = (slug: string | null | undefined): LucideIcon => {
   if (!slug) return Boxes

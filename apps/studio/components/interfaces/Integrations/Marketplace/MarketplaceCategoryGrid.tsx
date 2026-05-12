@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 
-import { getCategoryIcon } from './Marketplace.constants'
+import { FEATURED_CATEGORIES, getCategoryIcon } from './Marketplace.constants'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
 interface CategoryWithCount {
@@ -11,35 +11,24 @@ interface CategoryWithCount {
 }
 
 interface MarketplaceCategoryGridProps {
-  categories: Array<{ slug: string | null; name: string | null }>
   integrations: IntegrationDefinition[]
-  /** Limit to N categories — defaults to 8 to match the design */
-  limit?: number
 }
 
-export const MarketplaceCategoryGrid = ({
-  categories,
-  integrations,
-  limit = 8,
-}: MarketplaceCategoryGridProps) => {
+export const MarketplaceCategoryGrid = ({ integrations }: MarketplaceCategoryGridProps) => {
   const { ref } = useParams()
 
-  const withCounts: CategoryWithCount[] = categories
-    .filter((c): c is { slug: string; name: string } => !!c.slug && !!c.name)
-    .map((c) => ({
-      slug: c.slug,
-      name: c.name,
-      count: integrations.filter((i) => i.categories?.includes(c.slug)).length,
-    }))
-    .filter((c) => c.count > 0)
-    .slice(0, limit)
+  const withCounts: CategoryWithCount[] = FEATURED_CATEGORIES.map((c) => ({
+    slug: c.slug,
+    name: c.name,
+    count: integrations.filter((i) => i.categories?.includes(c.slug)).length,
+  }))
 
   if (withCounts.length === 0) return null
 
   return (
     <section>
       <h2 className="mb-3 text-sm font-medium">Browse by category</h2>
-      <div className="grid grid-cols-2 gap-2.5 @2xl:grid-cols-3 @4xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2.5 @2xl:grid-cols-3">
         {withCounts.map((category) => {
           const Icon = getCategoryIcon(category.slug)
           return (

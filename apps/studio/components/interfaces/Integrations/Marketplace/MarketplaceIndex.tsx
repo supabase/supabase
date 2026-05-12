@@ -18,7 +18,7 @@ import {
 } from './Marketplace.constants'
 import { MarketplaceCard } from './MarketplaceCard'
 import { MarketplaceCategoryGrid } from './MarketplaceCategoryGrid'
-import { MarketplaceFeaturedRail } from './MarketplaceFeaturedRail'
+import { MarketplaceFeaturedHero } from './MarketplaceFeaturedHero'
 import { MarketplaceFilterBar, type ViewMode } from './MarketplaceFilterBar'
 import { MarketplaceListHeader, MarketplaceListRow } from './MarketplaceListRow'
 import { IntegrationLoadingCard } from '@/components/interfaces/Integrations/Landing/IntegrationCard'
@@ -171,15 +171,14 @@ export const MarketplaceIndex = () => {
         {isSuccess && (
           <>
             {!hasSearchOrFilter && featured.length > 0 && (
-              <MarketplaceFeaturedRail integrations={featured} installedIds={installedIds} />
-            )}
-
-            {!hasSearchOrFilter && (
-              <MarketplaceCategoryGrid
-                categories={marketplaceCategories}
-                integrations={availableIntegrations}
+              <MarketplaceFeaturedHero
+                integrations={featured}
+                installedIds={installedIds}
+                categoryOptions={categoryOptions}
               />
             )}
+
+            {!hasSearchOrFilter && <MarketplaceCategoryGrid integrations={availableIntegrations} />}
 
             <MarketplaceFilterBar
               resultCount={filtered.length}

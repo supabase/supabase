@@ -19,7 +19,7 @@ export const MarketplaceDetailTopBar = ({ title, actions }: MarketplaceDetailTop
   const { ref } = useParams()
 
   return (
-    <div className="flex shrink-0 items-center gap-3 border-b bg-dash-sidebar px-6 py-2.5 xl:px-10">
+    <div className="sticky top-0 z-20 flex shrink-0 items-center gap-3 border-b bg-dash-sidebar px-6 py-2.5 xl:px-10">
       <Link
         href={`/project/${ref}/integrations`}
         className="inline-flex items-center gap-1 text-xs text-foreground-light hover:text-foreground"

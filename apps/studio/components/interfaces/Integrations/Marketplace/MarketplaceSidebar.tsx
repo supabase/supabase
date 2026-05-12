@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { ArrowUpRight, BookOpen, LayoutGrid, PlusSquare, Terminal } from 'lucide-react'
 import Link from 'next/link'
@@ -7,6 +6,7 @@ import { useMemo } from 'react'
 import { cn } from 'ui'
 
 import {
+  FEATURED_CATEGORIES,
   getCategoryIcon,
   getMarketplaceType,
   INTEGRATION_TYPES,
@@ -14,7 +14,6 @@ import {
 } from './Marketplace.constants'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
 import { DOCS_URL } from '@/lib/constants'
 
 const sectionLabelCls =
@@ -40,8 +39,8 @@ const SidebarLink = ({ href, active, icon, label, count, className }: SidebarLin
     )}
   >
     <span className="flex min-w-0 items-center gap-2">
-      {icon}
-      <span className="truncate">{label}</span>
+      <span className="text-foreground-lighter">{icon}</span>
+      {label}
     </span>
     {count !== undefined && (
       <span className="font-mono text-[10.5px] text-foreground-lighter">{count}</span>
@@ -51,13 +50,17 @@ const SidebarLink = ({ href, active, icon, label, count, className }: SidebarLin
 
 const HELP_LINKS: Array<{ icon: React.ReactNode; label: string; href: string }> = [
   {
-    icon: <BookOpen size={13} />,
+    icon: <BookOpen className="text-foreground-lighter" size={13} />,
     label: 'Integrations docs',
     href: `${DOCS_URL}/guides/integrations`,
   },
-  { icon: <Terminal size={13} />, label: 'CLI reference', href: `${DOCS_URL}/reference/cli` },
   {
-    icon: <PlusSquare size={13} />,
+    icon: <Terminal className="text-foreground-lighter" size={13} />,
+    label: 'CLI reference',
+    href: `${DOCS_URL}/reference/cli`,
+  },
+  {
+    icon: <PlusSquare className="text-foreground-lighter" size={13} />,
     label: 'Build an integration',
     href: 'https://supabase.com/partners/integrations',
   },
@@ -75,7 +78,6 @@ export const MarketplaceSidebar = () => {
 
   const { data: availableIntegrations = [] } = useAvailableIntegrations()
   const { installedIntegrations } = useInstalledIntegrations()
-  const { data: marketplaceCategories = [] } = useQuery(marketplaceCategoriesQueryOptions())
 
   const typeCounts = useMemo(() => {
     const counts: Record<MarketplaceIntegrationType, number> = {
@@ -90,21 +92,23 @@ export const MarketplaceSidebar = () => {
     return counts
   }, [availableIntegrations])
 
-  const categoriesWithCounts = useMemo(() => {
-    return marketplaceCategories
-      .filter((category) => category.slug && category.name)
-      .map((category) => {
+  const categoriesWithCounts = useMemo(
+    () =>
+      FEATURED_CATEGORIES.map((category) => {
         const count = availableIntegrations.filter((integration) =>
-          integration.categories?.includes(category.slug!)
+          integration.categories?.includes(category.slug)
         ).length
         return { ...category, count }
-      })
-      .filter((category) => category.count > 0)
-  }, [marketplaceCategories, availableIntegrations])
+      }),
+    [availableIntegrations]
+  )
 
   const baseHref = `/project/${ref}/integrations`
   const isDiscoverActive = !activeCategory && !activeType
   const onIndexRoute = router.pathname === '/project/[ref]/integrations'
+  // The detail route is /project/[ref]/integrations/[id]/[...slug?], so the
+  // active integration id sits in the `id` URL param.
+  const activeIntegrationId = typeof router.query.id === 'string' ? router.query.id : undefined
 
   return (
     <aside className="flex h-full w-full flex-col gap-y-0.5 overflow-y-auto px-2 py-3 text-xs">
@@ -149,21 +153,26 @@ export const MarketplaceSidebar = () => {
       {installedIntegrations.length > 0 && (
         <>
           <div className={sectionLabelCls}>Installed · {installedIntegrations.length}</div>
-          {installedIntegrations.map((integration) => (
-            <Link
-              key={integration.id}
-              href={`${baseHref}/${integration.id}/overview`}
-              className={cn(
-                'flex items-center gap-2 rounded px-2 py-1 text-xs',
-                'text-foreground-light hover:bg-surface-200 hover:text-foreground'
-              )}
-            >
-              <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center overflow-hidden rounded-[4px] border bg-white">
-                {integration.icon({ className: 'p-0.5' })}
-              </span>
-              <span className="truncate">{integration.name}</span>
-            </Link>
-          ))}
+          {installedIntegrations.map((integration) => {
+            const isActive = activeIntegrationId === integration.id
+            return (
+              <Link
+                key={integration.id}
+                href={`${baseHref}/${integration.id}/overview`}
+                aria-current={isActive ? 'page' : undefined}
+                className={cn(
+                  'flex items-center gap-2 rounded px-2 py-1 text-xs',
+                  'text-foreground-light hover:bg-surface-200 hover:text-foreground',
+                  isActive && 'bg-surface-200 text-foreground'
+                )}
+              >
+                <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center overflow-hidden rounded-[4px] border bg-white">
+                  {integration.icon({ className: 'p-0.5' })}
+                </span>
+                <span className="truncate">{integration.name}</span>
+              </Link>
+            )
+          })}
         </>
       )}
 
