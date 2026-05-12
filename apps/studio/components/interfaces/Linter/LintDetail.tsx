@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Button } from 'ui'
 
 import { Markdown } from '../Markdown'
+import { asGraphqlExposureLint, GraphqlExposureCallout } from './GraphqlExposureLintCTA'
 import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
 import { createLintSummaryPrompt, lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -17,12 +18,19 @@ interface LintDetailProps {
   lint: Lint
   projectRef: string
   onAskAssistant?: () => void
+  onAfterAction?: () => void
 }
 
-const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
+export const LintDetail = ({
+  lint,
+  projectRef,
+  onAskAssistant,
+  onAfterAction,
+}: LintDetailProps) => {
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
+  const isGraphqlExposureLint = !!asGraphqlExposureLint(lint.name)
 
   const handleAskAssistant = () => {
     track('advisor_assistant_button_clicked', {
@@ -61,15 +69,28 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
         {lint.description.replace(/\\`/g, '`')}
       </Markdown>
 
+      {isGraphqlExposureLint && (
+        <div className="mb-4">
+          <GraphqlExposureCallout projectRef={projectRef} />
+        </div>
+      )}
+
       <h3 className="text-sm mb-2">Resolve</h3>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <AiAssistantDropdown
           label="Ask Assistant"
           buildPrompt={buildPromptForCopy}
           onOpenAssistant={handleAskAssistant}
           telemetrySource="lint_detail"
         />
-        <LintCTA title={lint.name} projectRef={projectRef} metadata={lint.metadata} />
+
+        <LintCTA
+          title={lint.name}
+          projectRef={projectRef}
+          metadata={lint.metadata}
+          onAfterAction={onAfterAction}
+        />
+
         <Button asChild type="text">
           <Link
             href={
@@ -89,5 +110,3 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
     </div>
   )
 }
-
-export default LintDetail

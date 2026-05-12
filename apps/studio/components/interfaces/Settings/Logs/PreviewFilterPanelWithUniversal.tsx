@@ -96,14 +96,14 @@ export const PreviewFilterPanelWithUniversal = ({
   condensedLayout,
   isShowingEventChart,
   onToggleEventChart,
-  csvData,
+  csvData: _csvData,
   onFiltersChange,
   filters,
   table,
   onSelectedDatabaseChange,
   className,
-  selectedDatePickerValue,
-  setSelectedDatePickerValue,
+  selectedDatePickerValue: _selectedDatePickerValue,
+  setSelectedDatePickerValue: _setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -154,7 +154,7 @@ export const PreviewFilterPanelWithUniversal = ({
     })
 
     // Add table-specific filters
-    Object.entries(tableFilters).forEach(([key, filterSet]) => {
+    Object.entries(tableFilters).forEach(([_key, filterSet]) => {
       properties.push({
         label: filterSet.label,
         name: filterSet.key,
@@ -292,14 +292,11 @@ export const PreviewFilterPanelWithUniversal = ({
             icon={
               <div className="relative">
                 {newCount > 0 && (
-                  <div className="absolute -top-3 right-3 flex items-center justify-center">
-                    <div className="absolute z-20">
-                      <p style={{ fontSize: '0.6rem' }} className="text-white">
-                        {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                      </p>
+                  <div className="absolute -top-3 -right-3 flex items-center justify-center">
+                    <div className="absolute h-4 w-4 animate-ping rounded-full bg-brand opacity-60"></div>
+                    <div className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-medium leading-none text-white">
+                      {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                     </div>
-                    <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
-                    <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
                   </div>
                 )}
                 <RefreshCw />

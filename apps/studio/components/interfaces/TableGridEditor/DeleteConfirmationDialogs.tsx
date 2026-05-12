@@ -1,13 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  Checkbox_Shadcn_ as Checkbox,
-} from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
@@ -270,7 +264,7 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'table'}
         title={
-          <span className="break-words">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
+          <span className="wrap-break-word">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
         }
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
@@ -331,7 +325,7 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'row'}
         title={
-          <p className="break-words">
+          <p className="wrap-break-word">
             <span>Confirm to delete the selected row</span>
             <span>{numRows > 1 && 's'}</span>
           </p>

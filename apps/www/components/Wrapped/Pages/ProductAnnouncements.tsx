@@ -340,7 +340,7 @@ const months: Month[] = [
 function MonthSection({ month }: { month: Month }) {
   return (
     <div>
-      <div className="px-6 lg:px-8 py-2.5 md:py-4 flex flex-wrap items-center gap-1 [&>*]:whitespace-nowrap [&>*]:mr-2">
+      <div className="px-6 lg:px-8 py-2.5 md:py-4 flex flex-wrap items-center gap-1 *:whitespace-nowrap *:mr-2">
         <span className="text-base font-medium">{month.name}</span>
         {month.isLaunchWeek && (
           <span className="text-xs bg-brand/10 text-brand-link dark:text-brand px-2 py-0.5 rounded-full">
@@ -376,7 +376,7 @@ function MonthSection({ month }: { month: Month }) {
 export const ProductAnnouncements = () => {
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b w-[95%] md:w-full">
+      <section className="relative max-w-240 h-[240px] md:h-[360px] mx-auto border-x border-b w-[95%] md:w-full">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
@@ -398,12 +398,12 @@ export const ProductAnnouncements = () => {
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12 w-[95%] md:w-full">
+      <div className="relative max-w-240 mx-auto border-x border-b px-4 lg:px-8 py-12 w-[95%] md:w-full">
         <h3 className="text-lg">Product Announcements — Everything we shipped in 2025.</h3>
       </div>
 
       {/* Months accordion - 2 columns, top-to-bottom flow */}
-      <div className="relative max-w-[60rem] mx-auto border-x border-b w-[95%] md:w-full">
+      <div className="relative max-w-240 mx-auto border-x border-b w-[95%] md:w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Smaller breakpoint: chronological order for one column */}
           {months.map((month, index) => (
@@ -433,7 +433,7 @@ export const ProductAnnouncements = () => {
                 key={`desktop-${month.name}`}
                 className={cn(
                   'hidden lg:block border-b border-muted lg:border-r',
-                  'lg:[&:nth-child(2n)]:border-r-0',
+                  'lg:nth-[2n]:border-r-0',
                   Math.floor(index / 2) === lastRow && 'lg:border-b-0',
                   index === reordered.length - 1 && 'border-b-0'
                 )}

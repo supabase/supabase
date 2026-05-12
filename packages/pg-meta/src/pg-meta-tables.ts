@@ -216,6 +216,9 @@ function update(
   if (replica_identity === undefined) {
     // skip
   } else if (replica_identity === 'INDEX') {
+    if (!replica_identity_index) {
+      throw new Error('replica_identity_index is required when replica_identity is INDEX')
+    }
     replicaSql = safeSql`${alter} REPLICA IDENTITY USING INDEX ${ident(replica_identity_index)};`
   } else {
     replicaSql = safeSql`${alter} REPLICA IDENTITY ${keyword(replica_identity)};`

@@ -53,15 +53,15 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
   disk_io_exhaustion: {
     bannerContent: {
       warning: {
-        title:
-          'Your project is about to deplete its Disk IO Budget, and may become unresponsive once fully exhausted',
+        title: 'Your project is about to deplete its Disk IO Budget',
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
+          'Once exhausted, disk throughput will be throttled to 5 MB/s until the budget resets. Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
       },
       critical: {
-        title: 'Your project has depleted its Disk IO Budget, and may become unresponsive',
+        title:
+          'Your project has depleted its Disk IO Budget. Disk throughput is throttled to 5 MB/s',
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
+          'Throughput will stay throttled until the budget resets. Upgrade your compute to restore full performance, or use the AI Assistant to identify and optimize disk-intensive queries.',
       },
     },
     cardContent: {

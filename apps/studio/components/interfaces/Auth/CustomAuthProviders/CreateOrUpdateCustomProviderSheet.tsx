@@ -12,7 +12,6 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
@@ -30,6 +29,7 @@ import {
   Switch,
   useWatch,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -209,7 +209,6 @@ export const CreateOrUpdateCustomProviderSheet = ({
         scopes: values.scopes.split(',').map((s) => s.trim()),
         issuer: values.issuer,
         pkce_enabled: true,
-        enabled: true,
         email_optional: values.email_optional,
         ...payload,
       })
@@ -262,7 +261,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
             <SheetClose
               className={cn(
                 'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
                 'disabled:pointer-events-none data-[state=open]:bg-secondary',
                 'transition'
               )}
@@ -276,12 +275,8 @@ export const CreateOrUpdateCustomProviderSheet = ({
           </div>
         </SheetHeader>
         <Form {...form}>
-          <form
-            className="flex-grow overflow-auto"
-            onSubmit={form.handleSubmit(onSubmit)}
-            id={FORM_ID}
-          >
-            <SheetSection className="flex-grow px-5 space-y-4">
+          <form className="grow overflow-auto" onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
+            <SheetSection className="grow px-5 space-y-4">
               <FormField
                 control={form.control}
                 name="identifier"
@@ -348,7 +343,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
               />
             </SheetSection>
             <Separator />
-            <SheetSection className="flex-grow px-5 space-y-4">
+            <SheetSection className="grow px-5 space-y-4">
               <FormSectionLabel>OAuth Endpoints</FormSectionLabel>
               <FormField
                 control={form.control}
@@ -367,7 +362,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
               />
             </SheetSection>
             {isManualConfiguration ? (
-              <SheetSection className="flex-grow px-5 pt-0 space-y-4" key="manual-config">
+              <SheetSection className="grow px-5 pt-0 space-y-4" key="manual-config">
                 <FormField
                   control={form.control}
                   name="authorization_url"
@@ -430,7 +425,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                 />
               </SheetSection>
             ) : (
-              <SheetSection className="flex-grow px-5 pt-0 space-y-4" key="discovery-config">
+              <SheetSection className="grow px-5 pt-0 space-y-4" key="discovery-config">
                 <FormField
                   control={form.control}
                   name="discovery_url"
@@ -456,7 +451,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
               </SheetSection>
             )}
             <Separator />
-            <SheetSection className="flex-grow px-5 space-y-4">
+            <SheetSection className="grow px-5 space-y-4">
               <FormField
                 control={form.control}
                 name="client_id"
@@ -481,7 +476,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
               />
             </SheetSection>
             <Separator />
-            <SheetSection className="flex-grow px-5 space-y-4">
+            <SheetSection className="grow px-5 space-y-4">
               <FormField
                 control={form.control}
                 name="scopes"
@@ -514,7 +509,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
               />
             </SheetSection>
             <Separator />
-            <SheetSection className="flex-grow px-5 space-y-4">
+            <SheetSection className="grow px-5 space-y-4">
               <FormItemLayout
                 layout="horizontal"
                 label="Callback URL"

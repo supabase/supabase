@@ -9,7 +9,7 @@ description: 'Learn how to use Supabase in your RedwoodJS App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/redwoodjs/redwoodjs-supabase-quickstart).
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/redwoodjs/redwoodjs-supabase-quickstart).
 
 </Admonition>
 
@@ -169,8 +169,8 @@ export default App
 
 ### App styling (optional)
 
-An optional step is to update the CSS file `web/src/index.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
+An optional step is to update the CSS file `web/src/index.css` to make the app look better.
+You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ### Start RedwoodJS and your first page
 
@@ -457,7 +457,7 @@ of the Supabase client to interact with your API.
 
 ### Update home page
 
-Now that we have all the components in place, let's update your `HomePage` page to use them:
+With all the components in place, update your `HomePage` page to use them:
 
 <$CodeTabs>
 
@@ -490,21 +490,9 @@ What we're doing here is showing the sign in form if you aren't logged in and yo
 
 </Admonition>
 
-### Launch!
+## Profile photos
 
-Once that's done, run this in a terminal window to launch the `dev` server:
-
-```bash
-yarn rw dev
-```
-
-And then open the browser to [localhost:8910](http://localhost:8910) and you should see the completed app.
-
-![Supabase RedwoodJS](/docs/img/supabase-redwoodjs-demo.png)
-
-## Bonus: Profile photos
-
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Next, add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
@@ -613,35 +601,17 @@ export default Avatar
 
 </$CodeTabs>
 
-### Add the new widget
+### Launch!
 
-And then we can add the widget to the Account component:
+Once that's done, run this in a terminal window to launch the `dev` server:
 
-<$CodeTabs>
-
-```jsx name=web/src/components/Account/Account.js
-// Import the new component
-import Avatar from 'src/components/Avatar'
-
-// ...
-
-return (
-  <div className="form-widget">
-    {/* Add to the body */}
-    <Avatar
-      url={avatar_url}
-      size={150}
-      onUpload={(url) => {
-        setAvatarUrl(url)
-        updateProfile({ username, website, avatar_url: url })
-      }}
-    />
-    {/* ... */}
-  </div>
-)
+```bash
+yarn rw dev
 ```
 
-</$CodeTabs>
+And then open the browser to [localhost:8910](http://localhost:8910) and you should see the completed app.
+
+![Supabase RedwoodJS](/docs/img/supabase-redwoodjs-demo.png)
 
 At this stage you have a fully functional application!
 

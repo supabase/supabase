@@ -17,8 +17,6 @@ import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
 
-const SHOW_SUPPORT_INCIDENT_ADMONITION = false
-
 function useSupportFormTelemetry() {
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -88,12 +86,10 @@ export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
 
   return (
     <div className="relative h-full overflow-y-auto overflow-x-hidden">
-      {SHOW_SUPPORT_INCIDENT_ADMONITION && (
-        <IncidentAdmonition
-          isActive={hasActiveIncidents}
-          className="rounded-none border-x-0 shadow-none"
-        />
-      )}
+      <IncidentAdmonition
+        isActive={hasActiveIncidents}
+        className="rounded-none border-x-0 shadow-none"
+      />
       <div className="min-h-full px-5 pt-5">
         <div className="flex flex-col gap-y-8">
           {isSuccess ? (

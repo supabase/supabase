@@ -5,7 +5,7 @@ import { FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 
 export const logEventBus = {
-  listeners: new Map<string, Set<(...args: any[]) => void>>(),
+  listeners: new Map<string, Set<(rowId: string) => void>>(),
 
   on(event: 'selectTraceTab', callback: (rowId: string) => void) {
     if (!this.listeners.has(event)) {
@@ -21,13 +21,13 @@ export const logEventBus = {
 }
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
-  return (table: TTable<TData>, columnId: string) => {
+  return (_table: TTable<TData>, columnId: string) => {
     return new Map(facets?.[columnId]?.rows?.map(({ value, total }) => [value, total]) || [])
   }
 }
 
 export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
-  return (table: TTable<TData>, columnId: string) => {
+  return (_table: TTable<TData>, columnId: string) => {
     const min = facets?.[columnId]?.min
     const max = facets?.[columnId]?.max
     if (typeof min === 'number' && typeof max === 'number') return [min, max]

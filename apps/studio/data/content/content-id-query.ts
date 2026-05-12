@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import type { Content } from './content-query'
+import { remapSqlContentField } from './content-remap'
 import { contentKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -26,8 +27,7 @@ export async function getContentById(
   })
 
   if (error) throw handleError(error)
-  // override content type
-  return data as unknown as GetUserContentByIdResponse
+  return remapSqlContentField(data as unknown as GetUserContentByIdResponse)
 }
 
 export type ContentIdData = Awaited<ReturnType<typeof getContentById>>

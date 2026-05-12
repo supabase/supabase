@@ -10,7 +10,6 @@ import {
   Form,
   FormControl,
   FormField,
-  Input,
   Input_Shadcn_,
   Sheet,
   SheetContent,
@@ -19,6 +18,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -80,7 +80,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
 
   return (
     <Sheet open={visible} onOpenChange={handleOpenChange}>
-      <SheetContent size="default" className={'!min-w-screen lg:!min-w-[600px] flex flex-col'}>
+      <SheetContent size="default" className={'min-w-screen! lg:min-w-[600px]! flex flex-col'}>
         <SheetHeader className="py-3 flex flex-row gap-3 items-center">
           <SheetTitle>Edit secret</SheetTitle>
         </SheetHeader>
@@ -101,7 +101,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                       <Input_Shadcn_
                         {...field}
                         readOnly
-                        className="!text-foreground-light cursor-not-allowed"
+                        className="text-foreground-light! cursor-not-allowed"
                       />
                     </FormControl>
                   </FormItemLayout>

@@ -1153,6 +1153,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/database/backups/restore': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Restores a physical backup for a database */
+    post: operations['v1-restore-physical-backup']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/database/backups/restore-pitr': {
     parameters: {
       query?: never
@@ -3144,6 +3161,21 @@ export interface components {
         }[]
       }[]
     }
+    JitStateResponse:
+      | {
+          appliedSuccessfully?: boolean
+          /** @enum {string} */
+          state: 'enabled' | 'disabled'
+        }
+      | {
+          /** @enum {string} */
+          state: 'unavailable'
+          /** @enum {string} */
+          unavailableReason:
+            | 'manual_migration_required'
+            | 'postgres_upgrade_required'
+            | 'temporarily_unavailable'
+        }
     LegacyApiKeysResponse: {
       enabled: boolean
     }
@@ -4651,6 +4683,7 @@ export interface components {
     }
     V1BackupsResponse: {
       backups: {
+        id: number
         inserted_at: string
         is_physical_backup: boolean
         /** @enum {string} */
@@ -4917,6 +4950,7 @@ export interface components {
             | 'auth.advanced_auth_settings'
             | 'auth.performance_settings'
             | 'auth.password_hibp'
+            | 'auth.custom_oauth.max_providers'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
             | 'function.max_count'
@@ -5165,6 +5199,12 @@ export interface components {
     V1ReadOnlyQueryBody: {
       parameters?: unknown[]
       query: string
+    }
+    /** @example {
+     *       "id": 12345
+     *     } */
+    V1RestoreBackupBody: {
+      id: number
     }
     /** @example {
      *       "recovery_time_target_unix": 1740787200
@@ -9586,6 +9626,51 @@ export interface operations {
       }
     }
   }
+  'v1-restore-physical-backup': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1RestoreBackupBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-restore-pitr-backup': {
     parameters: {
       query?: never
@@ -11197,7 +11282,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAccessResponse']
+          'application/json': components['schemas']['JitStateResponse']
         }
       }
       /** @description Unauthorized */
@@ -11251,7 +11336,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAccessResponse']
+          'application/json': components['schemas']['JitStateResponse']
         }
       }
       /** @description Unauthorized */

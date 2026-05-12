@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
@@ -18,7 +19,7 @@ export async function getSupamonitorEnabled({
   const { result } = await executeSql<{ libraries: string }[]>({
     projectRef,
     connectionString,
-    sql: `SELECT current_setting('shared_preload_libraries', true) AS libraries`,
+    sql: safeSql`SELECT current_setting('shared_preload_libraries', true) AS libraries`,
   })
 
   const libraries = result[0]?.libraries ?? ''

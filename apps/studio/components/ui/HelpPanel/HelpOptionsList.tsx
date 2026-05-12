@@ -1,4 +1,4 @@
-import { Activity, BookOpen, Mail, Wrench } from 'lucide-react'
+import { Activity, BookOpen, ChevronRight, Mail, Wrench } from 'lucide-react'
 import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
@@ -6,10 +6,8 @@ import { AiIconAnimation } from 'ui'
 
 import type { HelpOptionId } from './HelpPanel.constants'
 import { HELP_OPTION_IDS } from './HelpPanel.constants'
-import {
-  createSupportFormUrl,
-  type SupportFormUrlKeys,
-} from '@/components/interfaces/Support/SupportForm.utils'
+import type { SupportFormUrlKeys } from '@/components/interfaces/Support/SupportForm.utils'
+import { createSupportFormUrl } from '@/components/interfaces/Support/SupportForm.utils'
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { takeBreadcrumbSnapshot } from '@/lib/breadcrumbs'
@@ -25,6 +23,14 @@ type HelpOptionsListProps = {
   supportLinkQueryParams: Partial<SupportFormUrlKeys> | undefined
   onAssistantClick?: () => void
   onSupportClick?: () => boolean | void
+}
+
+type HelpOption = {
+  media: ReactNode
+  title: string
+  description: string
+  href?: string
+  onClick?: () => void
 }
 
 export const HelpOptionsList = ({
@@ -48,10 +54,6 @@ export const HelpOptionsList = ({
 
   const filteredIds = ids.filter(include)
 
-  const openExternal = (href: string) => {
-    window.open(href, '_blank', 'noopener,noreferrer')
-  }
-
   const handleSupportClick = () => {
     const shouldNavigate = onSupportClick?.()
     if (shouldNavigate === false) {
@@ -69,15 +71,7 @@ export const HelpOptionsList = ({
     </div>
   )
 
-  const options: Record<
-    HelpOptionId,
-    {
-      media: ReactNode
-      title: string
-      description: string
-      onClick?: () => void
-    }
-  > = {
+  const options: Record<HelpOptionId, HelpOption> = {
     assistant: {
       media: <AiIconAnimation allowHoverEffect size={14} />,
       title: 'Supabase Assistant',
@@ -88,25 +82,25 @@ export const HelpOptionsList = ({
       media: <BookOpen strokeWidth={1.5} size={14} />,
       title: 'Docs',
       description: 'Browse guides, references, and product documentation.',
-      onClick: () => openExternal(`${DOCS_URL}/`),
+      href: `${DOCS_URL}/`,
     },
     troubleshooting: {
       media: <Wrench strokeWidth={1.5} size={14} />,
       title: 'Troubleshooting',
       description: 'Find fixes for common platform issues and errors.',
-      onClick: () => openExternal(`${DOCS_URL}/guides/troubleshooting?products=platform`),
+      href: `${DOCS_URL}/guides/troubleshooting?products=platform`,
     },
     discord: {
       media: <SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />,
       title: 'Ask on Discord',
       description: 'Get help from the community on code-related questions.',
-      onClick: () => openExternal(DISCORD_URL),
+      href: DISCORD_URL,
     },
     status: {
       media: <Activity strokeWidth={1.5} size={14} />,
       title: 'Supabase status',
       description: 'Check incidents, maintenance, and uptime updates.',
-      onClick: () => openExternal(STATUS_URL),
+      href: STATUS_URL,
     },
     support: {
       media: <Mail strokeWidth={1.5} size={14} />,
@@ -120,6 +114,23 @@ export const HelpOptionsList = ({
     <ResourceList className="rounded-none border-0 bg-transparent shadow-none">
       {filteredIds.map((id) => {
         const option = options[id]
+
+        if (option.href) {
+          return (
+            <ResourceItem
+              key={id}
+              className="!border-b"
+              media={option.media}
+              meta={<ChevronRight strokeWidth={1.5} size={16} />}
+              href={option.href}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              {renderOption(option.title, option.description)}
+            </ResourceItem>
+          )
+        }
+
         return (
           <ResourceItem
             key={id}

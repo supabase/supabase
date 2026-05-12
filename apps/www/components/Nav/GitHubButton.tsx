@@ -25,7 +25,7 @@ const GitHubButton = () => {
 
   return (
     <Button
-      className="hidden group lg:flex text-foreground-light hover:text-foreground [[data-nav-transparent]_&]:text-foreground"
+      className="hidden group lg:flex text-foreground-light hover:text-foreground in-data-nav-transparent:text-foreground"
       type="text"
       asChild
       onClick={() => sendTelemetryEvent({ action: 'homepage_github_button_clicked' })}

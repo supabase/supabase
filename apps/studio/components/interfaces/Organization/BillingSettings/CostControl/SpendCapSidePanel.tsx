@@ -201,7 +201,7 @@ const SpendCapSidePanel = () => {
             />
           )}
 
-          <div className="!mt-8 pb-4">
+          <div className="mt-8! pb-4">
             <div className="flex gap-3">
               {SPEND_CAP_OPTIONS.map((option) => {
                 const isSelected = selectedOption === option.value

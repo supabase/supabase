@@ -1,3 +1,14 @@
+import { SHORTCUT_REFERENCE_GROUPS } from './referenceGroups'
+import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
+import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
+import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
+import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
+import {
+  SCHEMA_VISUALIZER_SHORTCUT_IDS,
+  schemaVisualizerRegistry,
+} from './registry/schema-visualizer'
+import { SQL_EDITOR_SHORTCUT_IDS, sqlEditorRegistry } from './registry/sql-editor'
+import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
 import { ShortcutDefinition } from './types'
 
 /**
@@ -16,10 +27,6 @@ export const SHORTCUT_IDS = {
   RESULTS_COPY_JSON: 'results.copy-json',
   RESULTS_COPY_CSV: 'results.copy-csv',
   RESULTS_DOWNLOAD_CSV: 'results.download-csv',
-  TABLE_EDITOR_JUMP_FIRST_ROW: 'table-editor.jump-first-row',
-  TABLE_EDITOR_JUMP_LAST_ROW: 'table-editor.jump-last-row',
-  TABLE_EDITOR_JUMP_FIRST_COL: 'table-editor.jump-first-col',
-  TABLE_EDITOR_JUMP_LAST_COL: 'table-editor.jump-last-col',
   DATA_TABLE_TOGGLE_FILTERS: 'data-table.toggle-filters',
   DATA_TABLE_RESET_FILTERS: 'data-table.reset-filters',
   DATA_TABLE_RESET_COLUMNS: 'data-table.reset-columns',
@@ -49,6 +56,26 @@ export const SHORTCUT_IDS = {
   NAV_ORG_BILLING: 'nav.org-billing',
   NAV_ORG_SETTINGS: 'nav.org-settings',
   SHORTCUTS_OPEN_REFERENCE: 'shortcuts.open-reference',
+
+  // Table editor shortcuts
+  ...TABLE_EDITOR_SHORTCUT_IDS,
+
+  // SQL editor shortcuts
+  ...SQL_EDITOR_SHORTCUT_IDS,
+
+  // Schema visualizer shortcuts
+  ...SCHEMA_VISUALIZER_SHORTCUT_IDS,
+
+  // Shared list-page shortcuts (database/* listing pages, etc.)
+  ...LIST_PAGE_SHORTCUT_IDS,
+
+  // Database sub-page navigation chords
+  ...DATABASE_NAV_SHORTCUT_IDS,
+
+  // Auth users page shortcuts
+  ...AUTH_USERS_SHORTCUT_IDS,
+  // Auth sub-page navigation chords
+  ...AUTH_NAV_SHORTCUT_IDS,
 } as const
 
 /**
@@ -112,34 +139,6 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV,
     label: 'Download results as CSV',
     sequence: ['Mod+Shift+D'],
-  },
-  [SHORTCUT_IDS.TABLE_EDITOR_JUMP_FIRST_ROW]: {
-    id: SHORTCUT_IDS.TABLE_EDITOR_JUMP_FIRST_ROW,
-    label: 'Jump to first row',
-    sequence: ['Mod+ArrowUp'],
-    showInSettings: false,
-    options: { ignoreInputs: true },
-  },
-  [SHORTCUT_IDS.TABLE_EDITOR_JUMP_LAST_ROW]: {
-    id: SHORTCUT_IDS.TABLE_EDITOR_JUMP_LAST_ROW,
-    label: 'Jump to last row',
-    sequence: ['Mod+ArrowDown'],
-    showInSettings: false,
-    options: { ignoreInputs: true },
-  },
-  [SHORTCUT_IDS.TABLE_EDITOR_JUMP_FIRST_COL]: {
-    id: SHORTCUT_IDS.TABLE_EDITOR_JUMP_FIRST_COL,
-    label: 'Jump to first column',
-    sequence: ['Mod+ArrowLeft'],
-    showInSettings: false,
-    options: { ignoreInputs: true },
-  },
-  [SHORTCUT_IDS.TABLE_EDITOR_JUMP_LAST_COL]: {
-    id: SHORTCUT_IDS.TABLE_EDITOR_JUMP_LAST_COL,
-    label: 'Jump to last column',
-    sequence: ['Mod+ArrowRight'],
-    showInSettings: false,
-    options: { ignoreInputs: true },
   },
   [SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT]: {
     id: SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT,
@@ -206,114 +205,133 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     label: 'Go to Project Overview',
     sequence: ['G', 'H'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_TABLE_EDITOR]: {
     id: SHORTCUT_IDS.NAV_TABLE_EDITOR,
     label: 'Go to Table Editor',
     sequence: ['G', 'T'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_SQL_EDITOR]: {
     id: SHORTCUT_IDS.NAV_SQL_EDITOR,
     label: 'Go to SQL Editor',
     sequence: ['G', 'S'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_DATABASE]: {
     id: SHORTCUT_IDS.NAV_DATABASE,
     label: 'Go to Database',
     sequence: ['G', 'D'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_AUTH]: {
     id: SHORTCUT_IDS.NAV_AUTH,
     label: 'Go to Authentication',
     sequence: ['G', 'A'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_STORAGE]: {
     id: SHORTCUT_IDS.NAV_STORAGE,
     label: 'Go to Storage',
     sequence: ['G', 'B'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_FUNCTIONS]: {
     id: SHORTCUT_IDS.NAV_FUNCTIONS,
     label: 'Go to Edge Functions',
     sequence: ['G', 'F'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_REALTIME]: {
     id: SHORTCUT_IDS.NAV_REALTIME,
     label: 'Go to Realtime',
     sequence: ['G', 'R'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ADVISORS]: {
     id: SHORTCUT_IDS.NAV_ADVISORS,
     label: 'Go to Advisors',
     sequence: ['G', 'V'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_OBSERVABILITY]: {
     id: SHORTCUT_IDS.NAV_OBSERVABILITY,
     label: 'Go to Observability',
     sequence: ['G', 'U'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_LOGS]: {
     id: SHORTCUT_IDS.NAV_LOGS,
     label: 'Go to Logs',
     sequence: ['G', 'L'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_INTEGRATIONS]: {
     id: SHORTCUT_IDS.NAV_INTEGRATIONS,
     label: 'Go to Integrations',
     sequence: ['G', 'I'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_SETTINGS]: {
     id: SHORTCUT_IDS.NAV_SETTINGS,
     label: 'Go to Project Settings',
     sequence: ['G', ','],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_PROJECTS]: {
     id: SHORTCUT_IDS.NAV_ORG_PROJECTS,
     label: 'Go to Projects',
     sequence: ['G', 'P'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_TEAM]: {
     id: SHORTCUT_IDS.NAV_ORG_TEAM,
     label: 'Go to Team',
     sequence: ['G', 'M'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_INTEGRATIONS]: {
     id: SHORTCUT_IDS.NAV_ORG_INTEGRATIONS,
     label: 'Go to Organization Integrations',
     sequence: ['G', 'I'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_USAGE]: {
     id: SHORTCUT_IDS.NAV_ORG_USAGE,
     label: 'Go to Usage',
     sequence: ['G', 'U'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_BILLING]: {
     id: SHORTCUT_IDS.NAV_ORG_BILLING,
     label: 'Go to Billing',
     sequence: ['G', 'B'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_SETTINGS]: {
     id: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     label: 'Go to Organization Settings',
     sequence: ['G', 'O'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE]: {
     id: SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
@@ -322,4 +340,24 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     showInSettings: false,
     options: { ignoreInputs: true },
   },
+
+  // Table editor shortcut registration
+  ...tableEditorRegistry,
+
+  // SQL editor shortcut registration
+  ...sqlEditorRegistry,
+
+  // Schema visualizer shortcut registration
+  ...schemaVisualizerRegistry,
+
+  // Shared list-page shortcut registration
+  ...listPageRegistry,
+
+  // Database sub-page navigation chord registration
+  ...databaseNavRegistry,
+
+  // Auth users page shortcut registration
+  ...authUsersRegistry,
+  // Auth sub-page navigation chord registration
+  ...authNavRegistry,
 }

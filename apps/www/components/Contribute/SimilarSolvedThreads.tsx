@@ -167,7 +167,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
         <button
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
-          className="flex w-full items-center gap-1.5 px-[var(--card-padding-x)] py-4 text-left text-xs font-mono uppercase text-card-foreground"
+          className="flex w-full items-center gap-1.5 px-(--card-padding-x) py-4 text-left text-xs font-mono uppercase text-card-foreground"
         >
           Related threads
           <span className="text-foreground-muted tabular-nums font-normal">({threads.length})</span>
@@ -203,7 +203,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
                         type="button"
                         onClick={() => handleThumbClick('positive')}
                         disabled={isSubmitting}
-                        className="p-1 rounded hover:bg-surface-200 transition-colors disabled:opacity-50"
+                        className="p-1 rounded-sm hover:bg-surface-200 transition-colors disabled:opacity-50"
                         aria-label="Relevant"
                       >
                         <ThumbsUp className="h-4 w-4 text-foreground-muted" />
@@ -217,7 +217,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
                         type="button"
                         onClick={() => handleThumbClick('negative')}
                         disabled={isSubmitting}
-                        className="p-1 rounded hover:bg-surface-200 transition-colors disabled:opacity-50"
+                        className="p-1 rounded-sm hover:bg-surface-200 transition-colors disabled:opacity-50"
                         aria-label="Irrelevant"
                       >
                         <ThumbsDown className="h-4 w-4 text-foreground-muted" />
@@ -245,7 +245,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
               <div className="flex items-center gap-1">
                 <label
                   className={cn(
-                    'p-2 rounded cursor-pointer transition-colors',
+                    'p-2 rounded-sm cursor-pointer transition-colors',
                     dialogReaction === 'positive'
                       ? 'bg-surface-300 text-foreground'
                       : 'hover:bg-surface-200 text-foreground-lighter'
@@ -264,7 +264,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
                 </label>
                 <label
                   className={cn(
-                    'p-2 rounded cursor-pointer transition-colors',
+                    'p-2 rounded-sm cursor-pointer transition-colors',
                     dialogReaction === 'negative'
                       ? 'bg-surface-300 text-foreground'
                       : 'hover:bg-surface-200 text-foreground-lighter'

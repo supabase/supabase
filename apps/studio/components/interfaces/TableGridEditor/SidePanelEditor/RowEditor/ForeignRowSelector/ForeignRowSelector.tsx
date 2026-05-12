@@ -27,8 +27,6 @@ import {
 } from '@/state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 
-const FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX = '__frselector'
-
 export interface ForeignRowSelectorProps {
   visible: boolean
   foreignKey?: ForeignKey
@@ -165,7 +163,7 @@ export const ForeignRowSelector = ({
         <div className="flex items-center justify-between">
           <p>
             Select a record to reference from{' '}
-            <code className="text-code-inline !text-sm">
+            <code className="text-code-inline text-sm!">
               {schemaName}.{tableName}
             </code>
           </p>
@@ -182,7 +180,7 @@ export const ForeignRowSelector = ({
       }
       onCancel={closePanel}
     >
-      <SidePanel.Content className="h-full !px-0">
+      <SidePanel.Content className="h-full px-0!">
         <div className="h-full">
           {isLoading && (
             <div className="flex h-full py-6 flex-col items-center justify-center space-y-2">
@@ -211,13 +209,13 @@ export const ForeignRowSelector = ({
             >
               <div className="h-full flex flex-col">
                 <div className="flex items-center justify-between my-2 mx-3">
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-x-1">
                     <RefreshButton tableId={table?.id} isRefetching={isRefetching} />
                     <FilterPopoverPrimitive filters={filters} onApplyFilters={onApplyFilters} />
                     <SortPopoverPrimitive sorts={sorts} onApplySorts={onApplySorts} />
                   </div>
 
-                  <div className="flex items-center gap-x-3 divide-x">
+                  <div className="flex items-center gap-x-3">
                     <Pagination
                       page={page}
                       setPage={setPage}

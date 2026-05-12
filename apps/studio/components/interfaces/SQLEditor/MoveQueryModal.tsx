@@ -140,7 +140,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           let snippetContent = (snippet as SnippetWithContent)?.content
           if (snippetContent === undefined) {
             const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-            if ('sql' in content) {
+            if ('unchecked_sql' in content) {
               snippetContent = content
             }
           }
@@ -313,7 +313,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                         <CommandGroup_Shadcn_>
                           <CommandItem_Shadcn_
                             className="cursor-pointer w-full justify-start gap-x-2"
-                            onSelect={(e) => {
+                            onSelect={(_e) => {
                               setOpen(false)
                               setSelectedId('new-folder')
                             }}

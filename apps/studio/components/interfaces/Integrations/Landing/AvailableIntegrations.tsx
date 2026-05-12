@@ -69,7 +69,7 @@ export const AvailableIntegrations = () => {
                   type: selectedCategory === category.key ? 'default' : 'outline',
                 }),
                 selectedCategory === category.key ? 'text-foreground' : 'text-foreground-lighter',
-                '!rounded-full px-3'
+                'rounded-full! px-3'
               )}
             >
               {category.label}
@@ -89,7 +89,7 @@ export const AvailableIntegrations = () => {
               />
             }
             iconContainerClassName="p-0"
-            className="pl-7 rounded-none !border-0 border-transparent bg-transparent !shadow-none !ring-0 !ring-offset-0"
+            className="pl-7 rounded-none border-0! border-transparent bg-transparent shadow-none! ring-0! ring-offset-0!"
             placeholder="Search..."
           />
         </TabsList_Shadcn_>

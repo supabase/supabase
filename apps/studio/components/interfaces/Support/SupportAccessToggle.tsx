@@ -45,7 +45,7 @@ export function SupportAccessToggle({ form, align = 'left', className }: Support
             label={
               <div className="flex items-center gap-x-2">
                 <span className="text-foreground">Allow support access to your project</span>
-                <Badge className="bg-opacity-100">Recommended</Badge>
+                <Badge>Recommended</Badge>
               </div>
             }
             description={
@@ -56,12 +56,12 @@ export function SupportAccessToggle({ form, align = 'left', className }: Support
                 <Collapsible_Shadcn_ className="mt-2">
                   <CollapsibleTrigger_Shadcn_
                     className={
-                      'group flex items-center gap-x-1 group-data-[state=open]:text-foreground hover:text-foreground transition'
+                      'group flex items-center gap-x-1 group-data-open:text-foreground hover:text-foreground transition'
                     }
                   >
                     <ChevronRight
                       size={14}
-                      className="transition-all group-data-[state=open]:rotate-90 text-foreground-muted -ml-1"
+                      className="transition-all group-data-open:rotate-90 text-foreground-muted -ml-1"
                     />
                     <span className="text-sm">More information</span>
                   </CollapsibleTrigger_Shadcn_>

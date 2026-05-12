@@ -154,13 +154,13 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                     <AccordionTrigger_Shadcn_ className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
                       View syntax chart
                     </AccordionTrigger_Shadcn_>
-                    <AccordionContent_Shadcn_ asChild className="!pb-0">
+                    <AccordionContent_Shadcn_ asChild className="pb-0!">
                       <CronSyntaxChart />
                     </AccordionContent_Shadcn_>
                   </AccordionItem_Shadcn_>
                 </Accordion_Shadcn_>
               </div>
-              <div className="bg-surface-100 p-4 rounded grid gap-y-4 border">
+              <div className="bg-surface-100 p-4 rounded-sm grid gap-y-4 border">
                 <h4 className="text-sm text-foreground">
                   Schedule {timezone ? `(${timezone})` : ''}
                 </h4>

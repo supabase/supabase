@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown, Trash2 } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -8,7 +8,7 @@ import {
   AccordionItem_Shadcn_ as AccordionItem,
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   Button,
-  Checkbox_Shadcn_ as Checkbox,
+  Checkbox,
   cn,
   Form,
   FormControl,
@@ -263,7 +263,7 @@ export const PlatformWebhooksEndpointSheet = ({
           </SheetDescription>
         </SheetHeader>
         <Separator />
-        <SheetSection className="overflow-auto flex-grow px-0 py-0">
+        <SheetSection className="overflow-auto grow px-0 py-0">
           <Form {...form}>
             <form
               id="platform-webhook-endpoint-form"
@@ -505,7 +505,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                             {allSelected ? 'Clear all' : 'Select all'}
                                           </span>
                                         )}
-                                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-open:rotate-180" />
                                       </div>
                                     </div>
                                   </AccordionTrigger>

@@ -11,7 +11,6 @@ const SPECIAL_FILTER_PARAMS = ['date'] as const
 
 // Combined list of all parameters to exclude from standard filtering
 const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
-const BASE_CONDITIONS_EXCLUDED_PARAMS = [...PAGINATION_PARAMS, 'date', 'level'] as const
 
 /**
  * Builds query conditions from search parameters and returns WHERE clause
@@ -24,7 +23,7 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
   // Process all search parameters for filtering
   Object.entries(search).forEach(([key, value]) => {
     // Skip pagination/control parameters
-    if (EXCLUDED_QUERY_PARAMS.includes(key as any)) {
+    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) {
       return
     }
 
@@ -51,128 +50,16 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
 }
 
 /**
- * Builds level-specific condition for different log types
- */
-const buildLevelConditions = (logType: string, levelFilter: string[]) => {
-  const conditions = []
-
-  switch (logType) {
-    case 'edge':
-      if (levelFilter.includes('success'))
-        conditions.push('edge_logs_response.status_code BETWEEN 200 AND 299')
-      if (levelFilter.includes('warning'))
-        conditions.push('edge_logs_response.status_code BETWEEN 400 AND 499')
-      if (levelFilter.includes('error')) conditions.push('edge_logs_response.status_code >= 500')
-      break
-    case 'postgres':
-      if (levelFilter.includes('success')) conditions.push("pgl_parsed.error_severity = 'LOG'")
-      if (levelFilter.includes('warning')) conditions.push("pgl_parsed.error_severity = 'WARNING'")
-      if (levelFilter.includes('error')) conditions.push("pgl_parsed.error_severity = 'ERROR'")
-      break
-    case 'edge function':
-      if (levelFilter.includes('success'))
-        conditions.push('fel_response.status_code BETWEEN 200 AND 299')
-      if (levelFilter.includes('warning'))
-        conditions.push('fel_response.status_code BETWEEN 400 AND 499')
-      if (levelFilter.includes('error')) conditions.push('fel_response.status_code >= 500')
-      break
-    case 'auth':
-      if (levelFilter.includes('success'))
-        conditions.push('el_in_al_response.status_code BETWEEN 200 AND 299')
-      if (levelFilter.includes('warning'))
-        conditions.push('el_in_al_response.status_code BETWEEN 400 AND 499')
-      if (levelFilter.includes('error')) conditions.push('el_in_al_response.status_code >= 500')
-      break
-    case 'supavisor':
-      if (levelFilter.includes('success'))
-        conditions.push("LOWER(svl_metadata.level) NOT IN ('error', 'warn', 'warning')")
-      if (levelFilter.includes('warning'))
-        conditions.push(
-          "(LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning')"
-        )
-      if (levelFilter.includes('error')) conditions.push("LOWER(svl_metadata.level) = 'error'")
-      break
-  }
-
-  return conditions
-}
-
-/**
- * Creates WHERE clause for a specific log type including level filtering
- */
-const createFilterWhereClause = (
-  logType: string,
-  levelFilter: string[],
-  baseConditions: string[]
-) => {
-  const hasLevelFilter = levelFilter.length > 0
-
-  let where = ''
-
-  if (hasLevelFilter) {
-    const levelConditions = buildLevelConditions(logType, levelFilter)
-
-    if (levelConditions.length > 0) {
-      if (baseConditions.length > 0) {
-        where = `WHERE (${levelConditions.join(' OR ')}) AND ${baseConditions.join(' AND ')}`
-      } else {
-        where = `WHERE (${levelConditions.join(' OR ')})`
-      }
-    } else if (baseConditions.length > 0) {
-      where = `WHERE ${baseConditions.join(' AND ')}`
-    }
-  } else if (baseConditions.length > 0) {
-    where = `WHERE ${baseConditions.join(' AND ')}`
-  }
-
-  // Special case for auth logs
-  if (logType === 'auth') {
-    if (where) {
-      where = where.replace('WHERE', 'WHERE al_metadata.request_id is not null AND')
-    } else {
-      where = 'WHERE al_metadata.request_id is not null'
-    }
-  }
-
-  return where
-}
-
-/**
- * Builds base conditions array from search params
- */
-const buildBaseConditions = (search: SearchParamsType): string[] => {
-  const baseConditions: string[] = []
-
-  Object.entries(search).forEach(([key, value]) => {
-    // Skip pagination/control parameters, date and level (handled separately)
-    if (BASE_CONDITIONS_EXCLUDED_PARAMS.includes(key as any)) {
-      return
-    }
-
-    // Handle array filters (IN clause)
-    if (Array.isArray(value) && value.length > 0) {
-      baseConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(', ')})`)
-    }
-    // Handle scalar values
-    else if (value !== null && value !== undefined) {
-      baseConditions.push(`${key} = '${value}'`)
-    }
-  })
-
-  return baseConditions
-}
-
-/**
  * Calculates how much the chart start datetime should be offset given the current datetime filter params
  * and determines the appropriate bucketing level (minute, hour, day)
  * Ported from the older implementation (apps/studio/components/interfaces/Settings/Logs/Logs.utils.ts)
  */
-const calculateChartBucketing = (search: SearchParamsType | Record<string, any>): string => {
+const calculateChartBucketing = (search: SearchParamsType | Record<string, unknown>): string => {
   // Extract start and end times from the date array if available
-  const dateRange = search.date || []
+  const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
 
   // Handle timestamps that could be in various formats
-  const convertToMillis = (timestamp: any) => {
+  const convertToMillis = (timestamp: Date | string | number | null | undefined) => {
     if (!timestamp) return null
     // If timestamp is a Date object
     if (timestamp instanceof Date) return timestamp.getTime()
@@ -203,7 +90,6 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, any>)
 
   let truncationLevel = 'MINUTE'
 
-  const minuteDiff = endTime.diff(startTime, 'minute')
   const hourDiff = endTime.diff(startTime, 'hour')
   const dayDiff = endTime.diff(startTime, 'day')
 
@@ -489,7 +375,7 @@ const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): s
 
   Object.entries(search).forEach(([key, value]) => {
     if (key === excludeField) return // Skip the field we're getting facets for
-    if (EXCLUDED_QUERY_PARAMS.includes(key as any)) return // Skip pagination and special params
+    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return // Skip pagination and special params
 
     // Handle array filters (IN clause)
     if (Array.isArray(value) && value.length > 0) {

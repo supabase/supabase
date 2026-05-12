@@ -40,7 +40,7 @@ export const HelpPanel = ({
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex h-[var(--header-height)] items-center justify-between gap-2 border-b pl-4 pr-3">
+      <div className="flex h-(--header-height) items-center justify-between gap-2 border-b pl-4 pr-3">
         <div className="flex min-w-0 items-center gap-1.5 text-xs">
           {isSupportView && (
             <ButtonTooltip
@@ -95,7 +95,7 @@ export const HelpPanel = ({
               </div>
               <div className="px-5">
                 <div
-                  className="relative space-y-2 overflow-hidden rounded px-4 py-4 pb-12 shadow-md"
+                  className="relative space-y-2 overflow-hidden rounded-sm px-4 py-4 pb-12 shadow-md"
                   style={{ background: '#404EED' }}
                 >
                   <a

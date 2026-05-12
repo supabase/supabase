@@ -1,14 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DatabaseZap, Plus, Search } from 'lucide-react'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { Button, Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EventTriggerList } from './EventTriggerList'
-import { generateEventTriggerCreateSQL } from './EventTriggerList.utils'
+import { generateEventTriggerCreateSQL, type EventTrigger } from './EventTriggerList.utils'
 import { DEFAULT_EVENT_TRIGGER_SQL, EVENT_TRIGGER_TEMPLATES } from './EventTriggers.constants'
 import { DeleteEventTrigger } from '@/components/interfaces/Database/Triggers/DeleteEventTrigger'
 import {
@@ -19,17 +19,18 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabaseEventTriggerDeleteMutation } from '@/data/database-event-triggers/database-event-trigger-delete-mutation'
-import {
-  useDatabaseEventTriggersQuery,
-  type DatabaseEventTrigger,
-} from '@/data/database-event-triggers/database-event-triggers-query'
+import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { EMPTY_ARR } from '@/lib/void'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const DEFAULT_OWNER_FILTER = ['postgres']
@@ -45,7 +46,8 @@ export const EventTriggersList = () => {
     parseAsJson(selectFilterSchema.parse)
   )
   const ownerFilterValue = ownerFilter ?? DEFAULT_OWNER_FILTER
-  const [triggerToDelete, setTriggerToDelete] = useState<DatabaseEventTrigger | null>(null)
+  const [triggerToDelete, setTriggerToDelete] = useState<EventTrigger | null>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const {
@@ -87,7 +89,7 @@ export const EventTriggersList = () => {
     openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 
-  const editEventTrigger = (trigger: DatabaseEventTrigger) => {
+  const editEventTrigger = (trigger: EventTrigger) => {
     setEditorPanelInitialPrompt(`Update the event trigger "${trigger.name}" that...`)
     const sql = generateEventTriggerCreateSQL(trigger)
     setEditorPanelValue(sql.length > 0 ? sql : DEFAULT_EVENT_TRIGGER_SQL)
@@ -95,7 +97,7 @@ export const EventTriggersList = () => {
     openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 
-  const editEventTriggerWithAssistant = (trigger: DatabaseEventTrigger) => {
+  const editEventTriggerWithAssistant = (trigger: EventTrigger) => {
     const sql = generateEventTriggerCreateSQL(trigger)
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({
@@ -123,7 +125,7 @@ export const EventTriggersList = () => {
     })
   }
 
-  const duplicateEventTrigger = (trigger: DatabaseEventTrigger) => {
+  const duplicateEventTrigger = (trigger: EventTrigger) => {
     const duplicateTrigger = { ...trigger, name: `${trigger.name}_duplicate` }
     setEditorPanelInitialPrompt('Create a new event trigger that...')
     const sql = generateEventTriggerCreateSQL(duplicateTrigger)
@@ -132,7 +134,7 @@ export const EventTriggersList = () => {
     openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 
-  const handleDeleteEventTrigger = (trigger: DatabaseEventTrigger) => {
+  const handleDeleteEventTrigger = (trigger: EventTrigger) => {
     setTriggerToDelete(trigger)
   }
 
@@ -143,6 +145,20 @@ export const EventTriggersList = () => {
 
     return uniqueOwners.includes('postgres') ? uniqueOwners : ['postgres', ...uniqueOwners]
   }, [eventTriggers])
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search event triggers' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+    setOwnerFilter(null)
+  })
 
   const showEmptyState = useMemo(() => {
     const hasPostgresOwnerTriggers = eventTriggers.some((trigger) => trigger.owner === 'postgres')
@@ -166,12 +182,14 @@ export const EventTriggersList = () => {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
         <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
           <Input
+            inputRef={searchInputRef}
             placeholder="Search for an event trigger"
             size="tiny"
             icon={<Search />}
             value={filterString}
             className="w-full lg:w-64"
             onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
           />
           <ReportsSelectFilter
             label="Owner"
@@ -186,22 +204,32 @@ export const EventTriggersList = () => {
         </div>
         <div className="flex items-center gap-2">
           <DocsButton href={`${DOCS_URL}/guides/database/postgres/event-triggers`} />
-          <ButtonTooltip
-            type="primary"
-            icon={<Plus size={12} />}
-            disabled={!canUpdateEventTriggers}
-            onClick={createEventTrigger}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canUpdateEventTriggers
-                  ? 'You need additional permissions to add a new event trigger'
-                  : undefined,
-              },
-            }}
-          >
-            New trigger
-          </ButtonTooltip>
+          {canUpdateEventTriggers ? (
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Create new event trigger"
+              onTrigger={createEventTrigger}
+              side="bottom"
+            >
+              <Button type="primary" icon={<Plus size={12} />} onClick={createEventTrigger}>
+                New trigger
+              </Button>
+            </Shortcut>
+          ) : (
+            <ButtonTooltip
+              type="primary"
+              icon={<Plus size={12} />}
+              disabled
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to add a new event trigger',
+                },
+              }}
+            >
+              New trigger
+            </ButtonTooltip>
+          )}
         </div>
       </div>
 
