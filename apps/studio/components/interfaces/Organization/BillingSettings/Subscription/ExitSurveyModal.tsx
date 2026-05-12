@@ -151,8 +151,8 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
           </div>
           {hasProjectsWithComputeDowngrade && (
             <Admonition
-              layout="horizontal"
               type="warning"
+              layout="horizontal"
               title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
               description={
                 <>
