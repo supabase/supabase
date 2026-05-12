@@ -1,4 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
+import { joinSqlFragments, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -25,7 +26,7 @@ export async function updateTableApiAccessPrivileges({
   relationId,
   privileges,
 }: TableApiAccessPrivilegesVariables) {
-  const sqlStatements: string[] = []
+  const sqlStatements: Array<SafeSqlFragment> = []
 
   for (const role of API_ACCESS_ROLES) {
     const rolePrivileges = privileges[role]
@@ -41,7 +42,7 @@ export async function updateTableApiAccessPrivileges({
         privilegeType,
         relationId,
       }))
-      const revokeSql = pgMeta.tablePrivileges.revoke(revokeGrants).sql.trim()
+      const revokeSql = pgMeta.tablePrivileges.revoke(revokeGrants).sql
       if (revokeSql) sqlStatements.push(revokeSql)
     }
 
@@ -52,7 +53,7 @@ export async function updateTableApiAccessPrivileges({
         privilegeType,
         relationId,
       }))
-      const grantSql = pgMeta.tablePrivileges.grant(grantGrants).sql.trim()
+      const grantSql = pgMeta.tablePrivileges.grant(grantGrants).sql
       if (grantSql) sqlStatements.push(grantSql)
     }
   }
@@ -64,7 +65,7 @@ export async function updateTableApiAccessPrivileges({
   const { result } = await executeSql<[]>({
     projectRef,
     connectionString,
-    sql: sqlStatements.join('\n'),
+    sql: joinSqlFragments(sqlStatements, '\n'),
     queryKey: ['table-api-access', 'update-privileges'],
   })
 

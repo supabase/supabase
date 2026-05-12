@@ -1,4 +1,3 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -39,6 +38,7 @@ import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 import { useTrack } from '@/lib/telemetry/track'
 import { type PlainObject } from '@/lib/type-helpers'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -52,7 +52,7 @@ type SaveTablePayloadFor<Action extends SaveTableParams['action']> =
   SaveTableParamsFor<Action>['payload']
 
 export interface TableEditorProps {
-  table?: PostgresTable
+  table?: SafePostgresTable
   isDuplicating: boolean
   templateData?: Partial<TableField>
   visible: boolean

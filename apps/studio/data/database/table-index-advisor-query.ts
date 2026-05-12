@@ -18,7 +18,7 @@ export type IndexAdvisorSuggestion = {
   calls: number
   total_time: number
   mean_time: number
-  index_statements: string[]
+  index_statements: SafeSqlFragment[]
   startup_cost_before: number
   startup_cost_after: number
   total_cost_before: number
@@ -66,6 +66,18 @@ function extractColumnsFromIndexStatements(indexStatements: string[]): string[] 
   return Array.from(columns)
 }
 
+interface GetTableIndexAdvisorSuggestionsResponse {
+  query: SafeSqlFragment
+  calls: number
+  total_time: number
+  mean_time: number
+  index_statements: SafeSqlFragment[]
+  startup_cost_before: number
+  startup_cost_after: number
+  total_cost_before: number
+  total_cost_after: number
+}
+
 export async function getTableIndexAdvisorSuggestions({
   projectRef,
   connectionString,
@@ -78,19 +90,7 @@ export async function getTableIndexAdvisorSuggestions({
 
   const sql = getTableIndexAdvisorSql(schema, table)
 
-  const { result } = await executeSql<
-    Array<{
-      query: string
-      calls: number
-      total_time: number
-      mean_time: number
-      index_statements: string[]
-      startup_cost_before: number
-      startup_cost_after: number
-      total_cost_before: number
-      total_cost_after: number
-    }>
-  >({
+  const { result } = await executeSql<Array<GetTableIndexAdvisorSuggestionsResponse>>({
     projectRef,
     connectionString,
     sql,
@@ -113,7 +113,7 @@ export async function getTableIndexAdvisorSuggestions({
           : 0
 
       return {
-        query: row.query as SafeSqlFragment,
+        query: row.query,
         calls: row.calls,
         total_time: row.total_time,
         mean_time: row.mean_time,

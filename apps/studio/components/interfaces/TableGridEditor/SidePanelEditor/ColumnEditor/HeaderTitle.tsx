@@ -1,8 +1,10 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
+import type { DeepReadonly } from '@/lib/type-helpers'
+
 interface Props {
   table: PostgresTable
-  column?: PostgresColumn
+  column?: DeepReadonly<PostgresColumn>
 }
 
 export const HeaderTitle = ({ table, column }: Props) => {

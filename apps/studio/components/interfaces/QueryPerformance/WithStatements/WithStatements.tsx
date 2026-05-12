@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { RefreshCw, RotateCcw, X } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
@@ -297,7 +298,7 @@ export const WithStatements = ({
             await executeSql({
               projectRef: project?.ref,
               connectionString,
-              sql: `SELECT pg_stat_statements_reset();`,
+              sql: safeSql`SELECT pg_stat_statements_reset();`,
             })
             handleRefresh()
             setShowResetgPgStatStatements(false)

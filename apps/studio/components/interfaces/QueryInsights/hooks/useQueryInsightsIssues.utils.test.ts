@@ -50,7 +50,7 @@ describe('classifyQuery', () => {
       ...baseRow,
       index_advisor_result: {
         errors: [],
-        index_statements: ['CREATE INDEX ...'],
+        index_statements: [safeSql`CREATE INDEX ...`],
         startup_cost_before: 0,
         startup_cost_after: 0,
         total_cost_before: 0,
@@ -87,7 +87,7 @@ describe('classifyQuery', () => {
       ...baseRow,
       index_advisor_result: {
         errors: ['critical error'],
-        index_statements: ['CREATE INDEX ...'],
+        index_statements: [safeSql`CREATE INDEX ...`],
         startup_cost_before: 0,
         startup_cost_after: 0,
         total_cost_before: 0,

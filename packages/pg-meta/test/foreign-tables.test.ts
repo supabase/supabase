@@ -30,8 +30,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
   const tables = listZod.parse(await executeQuery(listSql))
   const foreignTable = tables.find(({ name }) => name === 'foreign_table')
   expect(foreignTable).toMatchInlineSnapshot(
-    { id: expect.any(Number) },
-    `
+    { id: expect.any(Number) }, `
     {
       "columns": [
         {
@@ -41,6 +40,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16451.1",
           "identity_generation": null,
           "is_generated": false,
@@ -61,6 +61,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16451.2",
           "identity_generation": null,
           "is_generated": false,
@@ -84,6 +85,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
+          "format_schema": "public",
           "id": "16451.3",
           "identity_generation": null,
           "is_generated": false,
@@ -106,8 +108,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
       "name": "foreign_table",
       "schema": "public",
     }
-  `
-  )
+  `)
 })
 
 withTestDatabase('list foreign tables without columns', async ({ executeQuery }) => {
@@ -137,8 +138,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
   })
   const table = retrieveZod.parse((await executeQuery(retrieveSql))[0])
   expect(table).toMatchInlineSnapshot(
-    { id: expect.any(Number) },
-    `
+    { id: expect.any(Number) }, `
     {
       "columns": [
         {
@@ -148,6 +148,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16451.1",
           "identity_generation": null,
           "is_generated": false,
@@ -168,6 +169,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16451.2",
           "identity_generation": null,
           "is_generated": false,
@@ -191,6 +193,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
+          "format_schema": "public",
           "id": "16451.3",
           "identity_generation": null,
           "is_generated": false,
@@ -213,8 +216,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
       "name": "foreign_table",
       "schema": "public",
     }
-  `
-  )
+  `)
 })
 
 withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
@@ -223,8 +225,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
   })
   const table = retrieveZod.parse((await executeQuery(retrieveSql))[0])
   expect(table).toMatchInlineSnapshot(
-    { id: expect.any(Number) },
-    `
+    { id: expect.any(Number) }, `
     {
       "columns": [
         {
@@ -234,6 +235,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16451.1",
           "identity_generation": null,
           "is_generated": false,
@@ -254,6 +256,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16451.2",
           "identity_generation": null,
           "is_generated": false,
@@ -277,6 +280,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
+          "format_schema": "public",
           "id": "16451.3",
           "identity_generation": null,
           "is_generated": false,
@@ -299,6 +303,5 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
       "name": "foreign_table",
       "schema": "public",
     }
-  `
-  )
+  `)
 })

@@ -1,5 +1,4 @@
 import type {
-  PostgresColumn,
   PostgresMaterializedView,
   PostgresRelationship,
   PostgresTable,
@@ -8,6 +7,7 @@ import type {
 
 import { WRAPPER_HANDLERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { SafePostgresColumn, SafePostgresTable } from '@/lib/postgres-types'
 
 interface TableRelationship extends PostgresRelationship {
   deletion_action: 'a' | 'r' | 'c' | 'n' | 'd'
@@ -21,28 +21,28 @@ interface TableUniqueIndex {
   columns: string[]
 }
 
-export interface Table extends PostgresTable {
+export interface Table extends Omit<PostgresTable, 'columns'> {
   entity_type: ENTITY_TYPE.TABLE
-  columns: PostgresColumn[]
+  columns: SafePostgresColumn[]
   relationships: TableRelationship[]
   unique_indexes?: TableUniqueIndex[]
 }
 
-export interface PartitionedTable extends PostgresTable {
+export interface PartitionedTable extends Omit<PostgresTable, 'columns'> {
   entity_type: ENTITY_TYPE.PARTITIONED_TABLE
-  columns: PostgresColumn[]
+  columns: SafePostgresColumn[]
   relationships: TableRelationship[]
   unique_indexes?: TableUniqueIndex[]
 }
 
 export interface View extends PostgresView {
   entity_type: ENTITY_TYPE.VIEW
-  columns: PostgresColumn[]
+  columns: SafePostgresColumn[]
 }
 
 export interface MaterializedView extends PostgresMaterializedView {
   entity_type: ENTITY_TYPE.MATERIALIZED_VIEW
-  columns: PostgresColumn[]
+  columns: SafePostgresColumn[]
 }
 
 export interface ForeignTable {
@@ -54,7 +54,7 @@ export interface ForeignTable {
   foreign_server_name: string
   foreign_data_wrapper_name: string
   foreign_data_wrapper_handler: string
-  columns: PostgresColumn[]
+  columns: SafePostgresColumn[]
 }
 
 export type Entity = Table | PartitionedTable | View | MaterializedView | ForeignTable
@@ -100,7 +100,7 @@ export function isViewLike(entity?: Entity): entity is View | MaterializedView {
   return isView(entity) || isMaterializedView(entity)
 }
 
-export function postgresTableToEntity(table: PostgresTable): Entity | undefined {
+export function postgresTableToEntity(table: SafePostgresTable): Entity | undefined {
   if (table.columns === undefined || table.relationships === undefined) {
     console.error(
       'Unable to convert PostgresTable to Entity type: columns and relationships must not be undefined.'

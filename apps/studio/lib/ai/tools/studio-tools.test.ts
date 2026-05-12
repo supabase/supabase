@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
 import { getStudioTools } from './studio-tools'
@@ -91,7 +92,7 @@ describe('ai/tools/studio-tools', () => {
       if ('safeParse' in schema) {
         // Valid input
         const validInput = {
-          sql: 'SELECT * FROM users',
+          sql: safeSql`SELECT * FROM users`,
           label: 'Get users',
           chartConfig: { view: 'table' as const },
           isWriteQuery: false,
@@ -100,7 +101,7 @@ describe('ai/tools/studio-tools', () => {
 
         // Valid chart config
         const validChartInput = {
-          sql: 'SELECT count(*) FROM users',
+          sql: safeSql`SELECT count(*) FROM users`,
           label: 'User count',
           chartConfig: { view: 'chart' as const, xAxis: 'date', yAxis: 'count' },
           isWriteQuery: false,
@@ -109,7 +110,7 @@ describe('ai/tools/studio-tools', () => {
 
         // Missing required field
         const invalidInput = {
-          sql: 'SELECT * FROM users',
+          sql: safeSql`SELECT * FROM users`,
           // missing label, chartConfig, isWriteQuery
         }
         expect(schema.safeParse(invalidInput).success).toBe(false)

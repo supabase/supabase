@@ -1,4 +1,3 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { some } from 'lodash'
 
 import {
@@ -9,6 +8,7 @@ import type { ColumnField } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 
 type ValidateFieldsReturn = {
   name?: string
@@ -41,7 +41,7 @@ export const generateTableField = (): TableField => {
 }
 
 export const generateTableFieldFromPostgresTable = (
-  table: PostgresTable,
+  table: SafePostgresTable,
   foreignKeys: ForeignKeyConstraint[],
   isDuplicating = false,
   isRealtimeEnabled = false

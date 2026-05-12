@@ -30,8 +30,7 @@ withTestDatabase('list views', async ({ executeQuery }) => {
   const views = listZod.parse(await executeQuery(listSql))
   const todosView = views.find(({ name }) => name === 'todos_view')
   expect(todosView).toMatchInlineSnapshot(
-    { id: expect.any(Number) },
-    `
+    { id: expect.any(Number) }, `
     {
       "columns": [
         {
@@ -41,6 +40,7 @@ withTestDatabase('list views', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16423.1",
           "identity_generation": null,
           "is_generated": false,
@@ -61,6 +61,7 @@ withTestDatabase('list views', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16423.2",
           "identity_generation": null,
           "is_generated": false,
@@ -81,6 +82,7 @@ withTestDatabase('list views', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16423.3",
           "identity_generation": null,
           "is_generated": false,
@@ -101,8 +103,7 @@ withTestDatabase('list views', async ({ executeQuery }) => {
       "name": "todos_view",
       "schema": "public",
     }
-  `
-  )
+  `)
 })
 
 withTestDatabase('list views without columns', async ({ executeQuery }) => {
@@ -130,8 +131,7 @@ withTestDatabase('retrieve view by name', async ({ executeQuery }) => {
   })
   const view = retrieveZod.parse((await executeQuery(retrieveSql))[0])
   expect(view).toMatchInlineSnapshot(
-    { id: expect.any(Number) },
-    `
+    { id: expect.any(Number) }, `
     {
       "columns": [
         {
@@ -141,6 +141,7 @@ withTestDatabase('retrieve view by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16423.1",
           "identity_generation": null,
           "is_generated": false,
@@ -161,6 +162,7 @@ withTestDatabase('retrieve view by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16423.2",
           "identity_generation": null,
           "is_generated": false,
@@ -181,6 +183,7 @@ withTestDatabase('retrieve view by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16423.3",
           "identity_generation": null,
           "is_generated": false,
@@ -201,8 +204,7 @@ withTestDatabase('retrieve view by name', async ({ executeQuery }) => {
       "name": "todos_view",
       "schema": "public",
     }
-  `
-  )
+  `)
 })
 
 withTestDatabase('retrieve view by id', async ({ executeQuery }) => {
@@ -211,77 +213,78 @@ withTestDatabase('retrieve view by id', async ({ executeQuery }) => {
   })
   const view = retrieveZod.parse((await executeQuery(retrieveSql))[0])
   expect(view).toMatchInlineSnapshot(
-    { id: expect.any(Number) },
-    `
-      {
-        "columns": [
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "bigint",
-            "default_value": null,
-            "enums": [],
-            "format": "int8",
-            "id": "16423.1",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "id",
-            "ordinal_position": 1,
-            "schema": "public",
-            "table": "todos_view",
-            "table_id": 16423,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "text",
-            "default_value": null,
-            "enums": [],
-            "format": "text",
-            "id": "16423.2",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "details",
-            "ordinal_position": 2,
-            "schema": "public",
-            "table": "todos_view",
-            "table_id": 16423,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "bigint",
-            "default_value": null,
-            "enums": [],
-            "format": "int8",
-            "id": "16423.3",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "user-id",
-            "ordinal_position": 3,
-            "schema": "public",
-            "table": "todos_view",
-            "table_id": 16423,
-          },
-        ],
-        "comment": null,
-        "id": Any<Number>,
-        "is_updatable": true,
-        "name": "todos_view",
-        "schema": "public",
-      }
-    `
-  )
+    { id: expect.any(Number) }, `
+    {
+      "columns": [
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "bigint",
+          "default_value": null,
+          "enums": [],
+          "format": "int8",
+          "format_schema": "pg_catalog",
+          "id": "16423.1",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "todos_view",
+          "table_id": 16423,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "text",
+          "default_value": null,
+          "enums": [],
+          "format": "text",
+          "format_schema": "pg_catalog",
+          "id": "16423.2",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "details",
+          "ordinal_position": 2,
+          "schema": "public",
+          "table": "todos_view",
+          "table_id": 16423,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "bigint",
+          "default_value": null,
+          "enums": [],
+          "format": "int8",
+          "format_schema": "pg_catalog",
+          "id": "16423.3",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "user-id",
+          "ordinal_position": 3,
+          "schema": "public",
+          "table": "todos_view",
+          "table_id": 16423,
+        },
+      ],
+      "comment": null,
+      "id": Any<Number>,
+      "is_updatable": true,
+      "name": "todos_view",
+      "schema": "public",
+    }
+  `)
 })

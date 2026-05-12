@@ -1,4 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
+import type { SafeSqlFragment } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -10,8 +11,8 @@ export type CreatePolicyBody = {
   name: string
   table: string
   schema?: string
-  definition?: string
-  check?: string
+  definition?: SafeSqlFragment
+  check?: SafeSqlFragment
   action?: 'PERMISSIVE' | 'RESTRICTIVE'
   command?: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
   roles?: string[]

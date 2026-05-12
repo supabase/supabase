@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { UIMessage } from 'ai'
 import { expect, test, vi } from 'vitest'
 
@@ -24,7 +25,7 @@ test('generateV4 calls the tool sanitizer', async () => {
               type: 'tool-execute_sql',
               state: 'output-available',
               toolCallId: 'test-tool-call-id',
-              input: { sql: 'SELECT * FROM users' },
+              input: { sql: safeSql`SELECT * FROM users` },
               output: [{ id: 1, name: 'test-output' }],
             },
           ],

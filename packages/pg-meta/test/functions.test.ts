@@ -1,11 +1,13 @@
-import { afterAll, beforeAll, expect, test } from 'vitest'
+import { afterAll, expect, test } from 'vitest'
 
-import pgMeta from '../src/index'
+import pgMeta, { safeSql } from '../src/index'
+import type { PGFunction, PGSavedFunction } from '../src/pg-meta-functions'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
-beforeAll(async () => {
-  // Any global setup if needed
-})
+// Test fixtures originate from `executeQuery` results that match the
+// API/database boundary; brand the raw-SQL fields so they satisfy
+// `update`/`remove` parameter types.
+const asSavedFunction = (fn: PGFunction): PGSavedFunction => fn as unknown as PGSavedFunction
 
 afterAll(async () => {
   await cleanupRoot()
@@ -26,7 +28,7 @@ const withTestDatabase = (
 }
 
 withTestDatabase('list functions', async ({ executeQuery }) => {
-  const { sql, zod } = await pgMeta.functions.list()
+  const { sql, zod } = pgMeta.functions.list()
   const res = zod.parse(await executeQuery(sql))
 
   // Test for the 'add' function created in init.sql
@@ -75,7 +77,7 @@ withTestDatabase('list functions', async ({ executeQuery }) => {
 })
 
 withTestDatabase('list functions with included schemas', async ({ executeQuery }) => {
-  const { sql, zod } = await pgMeta.functions.list({
+  const { sql, zod } = pgMeta.functions.list({
     includedSchemas: ['public'],
   })
   const res = zod.parse(await executeQuery(sql))
@@ -87,7 +89,7 @@ withTestDatabase('list functions with included schemas', async ({ executeQuery }
 })
 
 withTestDatabase('list functions with excluded schemas', async ({ executeQuery }) => {
-  const { sql, zod } = await pgMeta.functions.list({
+  const { sql, zod } = pgMeta.functions.list({
     excludedSchemas: ['public'],
   })
   const res = zod.parse(await executeQuery(sql))
@@ -100,7 +102,7 @@ withTestDatabase('list functions with excluded schemas', async ({ executeQuery }
 withTestDatabase(
   'list functions with excluded schemas and include System Schemas',
   async ({ executeQuery }) => {
-    const { sql, zod } = await pgMeta.functions.list({
+    const { sql, zod } = pgMeta.functions.list({
       excludedSchemas: ['public'],
       includeSystemSchemas: true,
     })
@@ -115,21 +117,21 @@ withTestDatabase(
 
 withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) => {
   // Create function
-  const { sql: createSql } = await pgMeta.functions.create({
+  const { sql: createSql } = pgMeta.functions.create({
     name: 'test_func',
     schema: 'public',
-    args: ['a int2', 'b int2'],
+    args: [safeSql`a int2`, safeSql`b int2`],
     definition: 'select a + b',
-    return_type: 'integer',
+    return_type: safeSql`integer`,
     language: 'sql',
     behavior: 'STABLE',
     security_definer: true,
-    config_params: { search_path: 'hooks, auth', role: 'postgres' },
+    config_params: { search_path: safeSql`hooks, auth`, role: safeSql`postgres` },
   })
   await executeQuery(createSql)
 
   // // Retrieve function
-  const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.functions.retrieve({
+  const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
     name: 'test_func',
     schema: 'public',
     args: ['a int2', 'b int2'],
@@ -187,16 +189,16 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   `
   )
   // create test_schema to move the function into:
-  const { sql: createSchemaSql } = await pgMeta.schemas.create({ name: 'test_schema' })
+  const { sql: createSchemaSql } = pgMeta.schemas.create({ name: 'test_schema' })
   await executeQuery(createSchemaSql)
-  const { sql: updateSql } = await pgMeta.functions.update(res!, {
+  const { sql: updateSql } = pgMeta.functions.update(asSavedFunction(res!), {
     name: 'test_func_renamed',
     schema: 'test_schema',
     definition: 'select b - a',
   })
   await executeQuery(updateSql)
 
-  const { sql: retrieveRenamedSql } = await pgMeta.functions.retrieve({ id: functionId })
+  const { sql: retrieveRenamedSql } = pgMeta.functions.retrieve({ id: functionId })
   const retrieveRenamed = await executeQuery(retrieveRenamedSql)
   const resUpdated = retrieveZod.parse(retrieveRenamed[0])
   expect({ data: resUpdated, error: null }).toMatchInlineSnapshot(
@@ -250,17 +252,17 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   )
 
   // Remove function
-  const { sql: removeSql } = await pgMeta.functions.remove(resUpdated!)
+  const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(resUpdated!))
   await executeQuery(removeSql)
   // Verify function is removed
-  const { sql: verifyRemoveSql } = await pgMeta.functions.retrieve({ id: functionId })
+  const { sql: verifyRemoveSql } = pgMeta.functions.retrieve({ id: functionId })
   const result = await executeQuery(verifyRemoveSql)
   expect(result).toHaveLength(0)
 })
 
 withTestDatabase('retrieve set-returning function', async ({ executeQuery }) => {
   // Retrieve function
-  const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.functions.retrieve({
+  const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
     schema: 'public',
     name: 'function_returning_set_of_rows',
     args: [],
@@ -309,22 +311,22 @@ withTestDatabase('create function with various config_params values', async ({ e
   // Set initial application_name for consistent testing
   await executeQuery("SET application_name = 'current-app-name'")
 
-  const { sql: createSql1 } = await pgMeta.functions.create({
+  const { sql: createSql1 } = pgMeta.functions.create({
     name: 'test_func_config_1',
     schema: 'public',
     definition: 'select 1',
-    return_type: 'integer',
+    return_type: safeSql`integer`,
     language: 'sql',
     config_params: {
-      search_path: '""', // Should become ''
+      search_path: safeSql`''`, // Quoted empty string
       application_name: 'FROM CURRENT', // Special syntax: SET param FROM CURRENT
-      work_mem: "'8MB'", // Regular syntax: SET param TO value
+      work_mem: safeSql`'8MB'`, // Regular syntax: SET param TO value
     },
   })
   await executeQuery(createSql1)
 
   // Verify the function was created correctly
-  const { sql: retrieveSql1, zod: retrieveZod } = await pgMeta.functions.retrieve({
+  const { sql: retrieveSql1, zod: retrieveZod } = pgMeta.functions.retrieve({
     name: 'test_func_config_1',
     schema: 'public',
     args: [],
@@ -339,6 +341,38 @@ withTestDatabase('create function with various config_params values', async ({ e
   })
 
   // Clean up
-  const { sql: removeSql1 } = await pgMeta.functions.remove(result1!)
+  const { sql: removeSql1 } = pgMeta.functions.remove(asSavedFunction(result1!))
   await executeQuery(removeSql1)
 })
+
+withTestDatabase(
+  'create function with namespaced custom GUC config_params',
+  async ({ executeQuery }) => {
+    const { sql: createSql } = pgMeta.functions.create({
+      name: 'test_func_namespaced_guc',
+      schema: 'public',
+      definition: 'select 1',
+      return_type: safeSql`integer`,
+      language: 'sql',
+      config_params: {
+        'app.jwt_secret': safeSql`'top-secret'`,
+      },
+    })
+    await executeQuery(createSql)
+
+    const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+      name: 'test_func_namespaced_guc',
+      schema: 'public',
+      args: [],
+    })
+    const result = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    expect(result).toBeDefined()
+    expect(result!.config_params).toEqual({
+      'app.jwt_secret': 'top-secret',
+    })
+
+    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(result!))
+    await executeQuery(removeSql)
+  }
+)

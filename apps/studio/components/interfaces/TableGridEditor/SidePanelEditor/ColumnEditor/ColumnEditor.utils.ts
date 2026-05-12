@@ -10,9 +10,20 @@ import {
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
 import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
-import type { RetrievedTableColumn, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
+import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { uuidv4 } from '@/lib/helpers'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
+import { trimSafeSqlFragment } from '@/lib/sql'
+import type { DeepReadonly } from '@/lib/type-helpers'
 import type { Dictionary } from '@/types'
+
+// Schemas where types are considered "unqualified" — matches the ColumnType dropdown convention,
+// which omits formatSchema for built-in (pg_catalog) and public types.
+const isImplicitTypeSchema = (schema: string | undefined) =>
+  schema === 'public' || schema === 'pg_catalog'
+
+const normalizeFormatSchema = (schema: string | undefined): string | undefined =>
+  isImplicitTypeSchema(schema) ? undefined : schema
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -33,9 +44,15 @@ const isSQLExpression = (input: string) => {
 }
 
 export const generateColumnField = (
-  field: { name?: string; table?: string; schema?: string; format?: string } = {}
+  field: {
+    name?: string
+    table?: string
+    schema?: string
+    format?: string
+    formatSchema?: string
+  } = {}
 ): ColumnField => {
-  const { name, table, schema, format } = field
+  const { name, table, schema, format, formatSchema } = field
   return {
     id: uuidv4(),
     name: name || '',
@@ -43,6 +60,7 @@ export const generateColumnField = (
     schema: schema || '',
     comment: '',
     format: format || '',
+    formatSchema,
     defaultValue: null,
     foreignKey: undefined,
     check: null,
@@ -56,8 +74,15 @@ export const generateColumnField = (
   }
 }
 
+// SafePostgresColumn (the type carried through Studio state) doesn't expose the type's schema,
+// but the column row returned by pg-meta's tables.retrieve does. Look it up by id.
+const lookupFormatSchema = (
+  column: DeepReadonly<SafePostgresColumn>,
+  table: RetrieveTableResult
+): string | undefined => table.columns?.find((c) => c.id === column.id)?.format_schema
+
 export const generateColumnFieldFromPostgresColumn = (
-  column: PostgresColumn,
+  column: DeepReadonly<SafePostgresColumn>,
   table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ): ColumnField => {
@@ -74,6 +99,7 @@ export const generateColumnFieldFromPostgresColumn = (
     name: column.name,
     comment: column?.comment,
     format: isArray ? column.format.slice(1) : column.format,
+    formatSchema: normalizeFormatSchema(lookupFormatSchema(column, table)),
     defaultValue: column?.default_value as string | null,
     check: column.check,
     isArray: isArray,
@@ -99,8 +125,8 @@ export const generateCreateColumnPayload = (
     isIdentity,
     name: field.name.trim(),
     comment: field.comment?.trim(),
-    type: field.isArray ? `${field.format}[]` : field.format,
-    check: field.check?.trim() || undefined,
+    type: { schema: field.formatSchema, name: field.format, isArray: field.isArray },
+    check: trimSafeSqlFragment(field.check) ?? undefined,
     isUnique: field.isUnique,
     isPrimaryKey: field.isPrimaryKey,
     ...(!field.isPrimaryKey && !isIdentity && { isNullable: field.isNullable }),
@@ -118,7 +144,7 @@ export const generateCreateColumnPayload = (
 }
 
 export const generateUpdateColumnPayload = (
-  originalColumn: RetrievedTableColumn,
+  originalColumn: DeepReadonly<SafePostgresColumn>,
   table: RetrieveTableResult,
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
@@ -127,9 +153,8 @@ export const generateUpdateColumnPayload = (
 
   // Only append the properties which are getting updated
   const name = field.name.trim()
-  const type = field.isArray ? `${field.format}[]` : field.format
   const comment = field.comment?.trim()
-  const check = field.check?.trim()
+  const check = trimSafeSqlFragment(field.check) ?? undefined
 
   const payload: Partial<UpdateColumnPayload> = {}
   // [Joshen] Trimming on the original name as well so we don't rename columns that already
@@ -144,12 +169,17 @@ export const generateUpdateColumnPayload = (
     payload.check = check
   }
 
-  const originalFormat =
-    originalColumn.data_type === 'ARRAY'
-      ? `${originalColumn.format.replace(/^_/, '')}[]`
-      : originalColumn.format
-  if (originalFormat !== type) {
-    payload.type = type
+  const originalIsArray = originalColumn.data_type === 'ARRAY'
+  const originalFormat = originalIsArray
+    ? originalColumn.format.replace(/^_/, '')
+    : originalColumn.format
+  const originalFormatSchema = normalizeFormatSchema(lookupFormatSchema(originalColumn, table))
+  if (
+    originalFormat !== field.format ||
+    originalFormatSchema !== field.formatSchema ||
+    originalIsArray !== field.isArray
+  ) {
+    payload.type = { schema: field.formatSchema, name: field.format, isArray: field.isArray }
   }
 
   if (originalColumn.default_value !== field.defaultValue) {
@@ -213,7 +243,7 @@ export const getForeignKeyUIState = (
 }
 
 export const getColumnForeignKey = (
-  column: PostgresColumn,
+  column: DeepReadonly<PostgresColumn>,
   table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ) => {

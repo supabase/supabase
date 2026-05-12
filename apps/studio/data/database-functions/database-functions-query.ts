@@ -12,8 +12,19 @@ export type DatabaseFunctionsVariables = {
 }
 
 export type DatabaseFunction = z.infer<typeof pgMeta.functions.pgFunctionZod>
-export type SavedDatabaseFunction = Omit<DatabaseFunction, 'complete_statement'> & {
+export type SavedDatabaseFunction = Omit<
+  DatabaseFunction,
+  | 'complete_statement'
+  | 'argument_types'
+  | 'identity_argument_types'
+  | 'return_type'
+  | 'config_params'
+> & {
   complete_statement: SafeSqlFragment
+  argument_types: SafeSqlFragment
+  identity_argument_types: SafeSqlFragment
+  return_type: SafeSqlFragment
+  config_params: Record<string, SafeSqlFragment> | null
 }
 
 const pgMetaFunctionsList = pgMeta.functions.list()
