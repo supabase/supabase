@@ -65,7 +65,10 @@ export function flattenOtelInspectionRow(row: OtelLogRow): UnifiedLogInspectionE
   // Path key differs across sources: edge_logs uses `request.path`,
   // function_edge_logs uses `request.pathname`. Coalesce.
   const requestPath = attrs['request.path'] ?? attrs['request.pathname']
-  const status = attrs['response.status_code']
+  // Status: HTTP response code for gateway rows, Postgres SQL state code
+  // (e.g. `42P01`) for postgres rows.
+  const status =
+    row.source === 'postgres_logs' ? attrs['parsed.sql_state_code'] : attrs['response.status_code']
   const statusNum = typeof status === 'string' ? Number(status) : Number(status)
 
   // Derive a level: HTTP status if present, else map postgres `parsed.error_severity`.

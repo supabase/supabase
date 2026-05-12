@@ -50,6 +50,13 @@ const LOG_TYPE_EXPR = `CASE
       ELSE source
     END`
 
+// Status code is sourced from the HTTP response for gateway-style rows and
+// from the Postgres `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
+const STATUS_EXPR = `CASE
+      WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
+      ELSE toString(${ATTR.status})
+    END`
+
 // SQL expression for derived `level`. Used inline (not as alias reference)
 // because the OTEL endpoint can't resolve aliases inside countIf when the
 // alias is not in GROUP BY.
@@ -198,7 +205,7 @@ const rowProjection = () => `
     null AS source_id,
     timestamp,
     ${LOG_TYPE_EXPR} AS log_type,
-    toString(${ATTR.status}) AS status,
+    ${STATUS_EXPR} AS status,
     ${LEVEL_EXPR} AS level,
     ${ATTR.path} AS pathname,
     event_message,
@@ -251,7 +258,7 @@ export const getFacetCountQuery = ({
         : facet === 'method'
           ? ATTR.method
           : facet === 'status'
-            ? `toString(${ATTR.status})`
+            ? STATUS_EXPR
             : facet === 'pathname'
               ? ATTR.path
               : `log_attributes['${facet}']`
