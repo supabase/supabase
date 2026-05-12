@@ -257,7 +257,7 @@ const LogsQueryPanel = ({
                           <CommandItem_Shadcn_
                             key={schema.reference}
                             value={schema.reference}
-                            onSelect={(currentValue) => {
+                            onSelect={() => {
                               setSelectedSchema(schema)
                               setOpen(false)
                             }}
