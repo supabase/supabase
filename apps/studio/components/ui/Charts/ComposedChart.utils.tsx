@@ -212,9 +212,20 @@ export const CustomTooltip = ({
 
     const formatNumeric = (value: number) => {
       if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
-      return shouldFormatBytes
-        ? formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
-        : numberFormatter(value, valuePrecision)
+      if (shouldFormatBytes) {
+        return formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
+      }
+      const formatted = numberFormatter(value, valuePrecision)
+      if (
+        !isBytesFormat &&
+        format !== '%' &&
+        format !== 'ms' &&
+        typeof format === 'string' &&
+        format
+      ) {
+        return `${formatted}${format}`
+      }
+      return formatted
     }
 
     const LabelItem = ({ entry }: { entry: any }) => {
