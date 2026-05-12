@@ -11,6 +11,7 @@ import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from '@/lib/void'
 
@@ -33,6 +34,15 @@ export const useInstalledIntegrations = () => {
     )
   }, [allIntegrations])
 
+  const hasEdgeFunctionSecretNameIntegration = useMemo(() => {
+    return allIntegrations.some(
+      (integration) =>
+        integration.type === 'oauth' &&
+        integration.installIdentificationMethod === 'edge_function_secret_name' &&
+        !!integration.edgeFunctionSecretName
+    )
+  }, [allIntegrations])
+
   const {
     data: apiKeys,
     error: apiKeysError,
@@ -42,6 +52,17 @@ export const useInstalledIntegrations = () => {
   } = useAPIKeysQuery(
     { projectRef: project?.ref, reveal: false },
     { enabled: !!project?.ref && hasSecretKeyPrefixIntegration }
+  )
+
+  const {
+    data: edgeFunctionSecrets,
+    error: edgeFunctionSecretsError,
+    isError: isErrorEdgeFunctionSecrets,
+    isPending: isEdgeFunctionSecretsLoading,
+    isSuccess: isSuccessEdgeFunctionSecrets,
+  } = useSecretsQuery(
+    { projectRef: project?.ref },
+    { enabled: !!project?.ref && hasEdgeFunctionSecretNameIntegration }
   )
 
   const {
@@ -104,43 +125,57 @@ export const useInstalledIntegrations = () => {
           })
         }
         if (integration.type === 'oauth') {
-          const prefix = integration.secretKeyPrefix
+          if (integration.installIdentificationMethod === 'secret_key_prefix') {
+            const prefix = integration.secretKeyPrefix
+            if (!prefix) return false
 
-          if (integration.installIdentificationMethod !== 'secret_key_prefix' || !prefix) {
-            return false
+            return (apiKeys ?? []).some(
+              (key) => key.type === 'secret' && key.name.startsWith(prefix)
+            )
           }
 
-          return (apiKeys ?? []).some((key) => key.type === 'secret' && key.name.startsWith(prefix))
+          if (integration.installIdentificationMethod === 'edge_function_secret_name') {
+            const secretName = integration.edgeFunctionSecretName
+            if (!secretName) return false
+
+            return (edgeFunctionSecrets ?? []).some((secret) => secret.name === secretName)
+          }
+
+          return false
         }
         return false
       })
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, apiKeys])
+  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, apiKeys, edgeFunctionSecrets])
 
   const error =
     fdwError ||
     extensionsError ||
     schemasError ||
     availableIntegrationsError ||
-    (hasSecretKeyPrefixIntegration ? apiKeysError : null)
+    (hasSecretKeyPrefixIntegration ? apiKeysError : null) ||
+    (hasEdgeFunctionSecretNameIntegration ? edgeFunctionSecretsError : null)
   const isLoading =
     isSchemasLoading ||
     isFDWLoading ||
     isExtensionsLoading ||
     isAvailableIntegrationsLoading ||
-    (hasSecretKeyPrefixIntegration && isApiKeysLoading)
+    (hasSecretKeyPrefixIntegration && isApiKeysLoading) ||
+    (hasEdgeFunctionSecretNameIntegration && isEdgeFunctionSecretsLoading)
   const isError =
     isErrorFDWs ||
     isErrorExtensions ||
     isErrorSchemas ||
     isErrorAvailableIntegrations ||
-    (hasSecretKeyPrefixIntegration && isErrorApiKeys)
+    (hasSecretKeyPrefixIntegration && isErrorApiKeys) ||
+    (hasEdgeFunctionSecretNameIntegration && isErrorEdgeFunctionSecrets)
   const isSuccess =
     isSuccessFDWs &&
     isSuccessExtensions &&
     isSuccessSchemas &&
     isSuccessAvailableIntegrations &&
-    (!hasSecretKeyPrefixIntegration || isSuccessApiKeys)
+    (!hasSecretKeyPrefixIntegration || isSuccessApiKeys) &&
+    (!hasEdgeFunctionSecretNameIntegration || isSuccessEdgeFunctionSecrets)
 
   return {
     // show all integrations at once instead of showing partial results

@@ -37,7 +37,10 @@ export type Database = {
           featured: boolean | null
           id: string | null
           images: string[] | null
-          installation_identification_method: 'secret_key_prefix' | null
+          installation_identification_method:
+            | 'secret_key_prefix'
+            | 'edge_function_secret_name'
+            | null
           installation_url: string | null
           installation_url_type: 'get' | 'post' | null
           listing_logo: string | null
@@ -49,6 +52,7 @@ export type Database = {
           publish_location: 'marketplace' | 'dashboard' | 'both' | null
           publish_marketplace: boolean | null
           secret_key_prefix: string | null
+          edge_function_secret_name: string | null
           slug: string | null
           title: string | null
           website_url: string | null

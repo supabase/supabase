@@ -48,7 +48,7 @@ type IntegrationStep = {
 
 type InstallUrlType = 'get' | 'post'
 
-type InstallIdentificationMethod = 'secret_key_prefix'
+type InstallIdentificationMethod = 'secret_key_prefix' | 'edge_function_secret_name'
 
 /**
  * [Joshen] For marketplace, we probably need to revisit this definition
@@ -107,6 +107,7 @@ export type IntegrationDefinition = {
   installUrlType?: InstallUrlType
   installIdentificationMethod?: InstallIdentificationMethod
   secretKeyPrefix?: string
+  edgeFunctionSecretName?: string
   listingId?: string
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
