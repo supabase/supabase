@@ -248,22 +248,17 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
     <>
       {withInterstitial({
         title: 'Redeem credits',
-        description:
-          'Select the organization that should receive these credits. Credits cannot be transferred after redemption.',
+        description: 'Select the organization that should receive these credits',
         children: (
           <div className="flex flex-col gap-5">
             <InterstitialAccountRow displayName={displayName} />
-
-            <Admonition type="note" showIcon={false}>
-              Credits are applied to one organization only and are automatically used toward future
-              invoices before your payment method is charged.
-            </Admonition>
 
             <ConnectOrganizationSelector
               organizations={organizationOptions}
               selectedSlug={selectedOrgSlug}
               disabled={isRedeeming}
               onSelect={setSelectedOrgSlug}
+              description="Credits apply to one organization and are used toward future invoices before your payment method is charged."
               getOrganizationDescription={(organization) => `${organization.plan.name} Plan`}
               createLabel={
                 organizationOptions.length === 0

@@ -50,6 +50,7 @@ import { useConfirmPendingSubscriptionCreateMutation } from '@/data/subscription
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { validateReturnTo } from '@/lib/gotrue'
 import { useProfile } from '@/lib/profile'
 
 const ORG_KIND_TYPES = {
@@ -296,7 +297,7 @@ export const NewOrgForm = ({
   const getReturnToUrl = () => {
     if (!searchParams.returnTo) return undefined
 
-    const url = new URL(searchParams.returnTo, window.location.origin)
+    const url = new URL(validateReturnTo(searchParams.returnTo), window.location.origin)
     if (searchParams.auth_id) {
       url.searchParams.set('auth_id', searchParams.auth_id)
     }
@@ -304,7 +305,7 @@ export const NewOrgForm = ({
       url.searchParams.set('token', searchParams.token)
     }
 
-    return url.toString()
+    return `${url.pathname}${url.search}`
   }
 
   const onOrganizationCreated = (org: { slug: string }) => {
