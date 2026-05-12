@@ -276,7 +276,7 @@ export const getReportAttributesV2: (
     {
       id: 'disk-io-burst-balance',
       label: 'Disk IO Burst Balance',
-      titleTooltip: `Distinct from IOPS and throughput. This is the burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput is throttled to ${baselineThroughputLabel} (the baseline for this compute size) until it refills.`,
+      titleTooltip: `The burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput is throttled to ${baselineThroughputLabel} (the baseline for this compute size) until it refills.`,
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
       syncId: 'database-reports',
       hide: !showBurstBalanceChart,
