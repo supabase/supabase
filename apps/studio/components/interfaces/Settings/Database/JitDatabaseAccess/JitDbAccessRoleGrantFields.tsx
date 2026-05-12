@@ -12,6 +12,7 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 
 import type { JitRoleGrantDraft, JitRoleOption, JitUserRuleDraft } from './JitDbAccess.types'
@@ -52,7 +53,6 @@ export function JitDbAccessRoleGrantFields({
 }: JitDbAccessRoleGrantFieldsProps) {
   const isSuperuserRole = role.id === 'postgres'
   const isReadOnlyRole = role.id === 'supabase_read_only_user'
-  const showRoleAdmonition = isSuperuserRole || isReadOnlyRole
   const checkboxId = `jit-role-${role.id}`
 
   return (
@@ -99,15 +99,16 @@ export function JitDbAccessRoleGrantFields({
       {grant.enabled && (
         <div className="grid grid-cols-[16px_minmax(0,1fr)] gap-x-3 px-4 pb-3">
           <div aria-hidden />
+
           <div className="space-y-4">
             {isSuperuserRole && (
               <Admonition
                 type="warning"
                 layout="vertical"
                 className="mb-3"
+                title="The selected role has unrestricted access and bypasses row-level security"
                 description={
                   <>
-                    The selected role has unrestricted access and bypasses row-level security.
                     Consider using a{' '}
                     <InlineLink href={`${DOCS_URL}/guides/database/postgres/roles`}>
                       custom Postgres role
@@ -122,9 +123,10 @@ export function JitDbAccessRoleGrantFields({
               <Admonition
                 type="warning"
                 layout="vertical"
+                title="The selected role has read-only access to all schemas"
                 description={
                   <>
-                    The selected role has read-only access to all schemas. Consider using a{' '}
+                    Consider using a{' '}
                     <InlineLink href={`${DOCS_URL}/guides/database/postgres/roles`}>
                       custom Postgres role
                     </InlineLink>{' '}
@@ -135,8 +137,17 @@ export function JitDbAccessRoleGrantFields({
               />
             )}
 
-            <div className="space-y-2">
-              <p className="text-sm text-foreground">Applies to</p>
+            <FormItemLayout
+              isReactForm={false}
+              label="Applies to"
+              description={
+                <p className="text-xs text-foreground-lighter">
+                  {grant.branchesOnly
+                    ? 'Can only be requested from preview branch databases.'
+                    : 'Can be requested from production and preview branch databases.'}
+                </p>
+              }
+            >
               <Select_Shadcn_
                 value={grant.branchesOnly ? 'preview' : 'all'}
                 onValueChange={(value) => onChange({ ...grant, branchesOnly: value === 'preview' })}
@@ -152,15 +163,31 @@ export function JitDbAccessRoleGrantFields({
                   ))}
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-              <p className="text-xs text-foreground-lighter">
-                {grant.branchesOnly
-                  ? 'Can only be requested from preview branch databases.'
-                  : 'Can be requested from production and preview branch databases.'}
-              </p>
-            </div>
+            </FormItemLayout>
 
-            <div className={cn('space-y-2', !showRoleAdmonition && 'border-t border-muted pt-3')}>
-              <p className="text-sm text-foreground">Expires in</p>
+            <FormItemLayout
+              isReactForm={false}
+              label="Expires in"
+              description={
+                grant.hasExpiry && grant.expiry ? (
+                  <p className="text-xs text-foreground-lighter">
+                    Expires at{' '}
+                    <TimestampInfo
+                      utcTimestamp={grant.expiry}
+                      className="text-foreground-lighter"
+                      labelFormat="DD MMM, HH:mm"
+                    />
+                  </p>
+                ) : grant.expiryMode === 'never' ? (
+                  <div className="mt-3 mx-0.5 flex w-full items-center gap-x-2">
+                    <WarningIcon />
+                    <span className="text-left text-xs text-foreground-lighter">
+                      No expiry means ongoing database access until manually revoked.
+                    </span>
+                  </div>
+                ) : undefined
+              }
+            >
               <div className="flex gap-2">
                 <div className="flex-1">
                   <Select
@@ -229,33 +256,17 @@ export function JitDbAccessRoleGrantFields({
                   </DatePicker>
                 )}
               </div>
+            </FormItemLayout>
 
-              {grant.hasExpiry && grant.expiry && (
-                <p className="text-xs text-foreground-lighter">
-                  Expires at{' '}
-                  <TimestampInfo
-                    utcTimestamp={grant.expiry}
-                    className="text-foreground-lighter"
-                    labelFormat="DD MMM, HH:mm"
-                  />
+            <FormItemLayout
+              isReactForm={false}
+              label={
+                <p className="text-sm text-foreground">
+                  Restricted IP addresses{' '}
+                  <span className="font-normal text-foreground-lighter">(optional)</span>
                 </p>
-              )}
-
-              {grant.expiryMode === 'never' && (
-                <div className="mt-3 mx-0.5 flex w-full items-center gap-x-2">
-                  <WarningIcon />
-                  <span className="text-left text-xs text-foreground-lighter">
-                    No expiry means ongoing database access until manually revoked.
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm text-foreground">
-                Restricted IP addresses{' '}
-                <span className="font-normal text-foreground-lighter">(optional)</span>
-              </p>
+              }
+            >
               <SingleValueFieldArray
                 control={control}
                 name={`grants.${grantIndex}.ipRanges` as const}
@@ -269,7 +280,7 @@ export function JitDbAccessRoleGrantFields({
                 rowsClassName="space-y-2"
                 addButtonClassName="w-min"
               />
-            </div>
+            </FormItemLayout>
           </div>
         </div>
       )}
