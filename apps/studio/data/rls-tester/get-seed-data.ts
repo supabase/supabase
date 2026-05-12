@@ -37,8 +37,7 @@ async function fetchTableSeed(
   signal?: AbortSignal
 ): Promise<TableSeedData> {
   try {
-    const projection =
-      columns && columns.length > 0 ? columns.map((c) => ident(c)).join(', ') : '*'
+    const projection = columns && columns.length > 0 ? columns.map((c) => ident(c)).join(', ') : '*'
     const { result } = await executeSql(
       {
         projectRef,
