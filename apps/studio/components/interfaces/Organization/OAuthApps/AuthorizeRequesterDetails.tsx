@@ -1,11 +1,22 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { Check, ChevronDown } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Badge, Button, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Badge,
+  Card,
+  CardContent,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { InfoTooltipIcon } from 'ui-patterns/info-tooltip'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
-import { InterstitialExpandableContent, LogoBox } from '@/components/layouts/InterstitialLayout'
+import { LogoBox } from '@/components/layouts/InterstitialLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -213,19 +224,17 @@ export const AuthorizeRequesterDetails = ({
             </>
           )}
 
-          <Button
-            type="text"
-            size="tiny"
-            block
-            iconRight={showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            onClick={() => setShowDetails((value) => !value)}
-          >
-            {showDetails ? 'Hide detailed permissions' : 'Show detailed permissions'}
-          </Button>
-
-          <InterstitialExpandableContent show={showDetails}>
-            <PermissionDetails requestedPermissions={requestedPermissions} />
-          </InterstitialExpandableContent>
+          <Collapsible_Shadcn_ open={showDetails} onOpenChange={setShowDetails}>
+            <CollapsibleTrigger_Shadcn_ className="flex w-full items-center justify-start gap-1.5 py-2 text-left text-xs text-foreground-lighter transition hover:text-foreground-light">
+              <span>{showDetails ? 'Hide detailed permissions' : 'Show detailed permissions'}</span>
+              <ChevronDown
+                className={cn('size-3.5 transition-transform', showDetails && 'rotate-180')}
+              />
+            </CollapsibleTrigger_Shadcn_>
+            <CollapsibleContent_Shadcn_ className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
+              <PermissionDetails requestedPermissions={requestedPermissions} />
+            </CollapsibleContent_Shadcn_>
+          </Collapsible_Shadcn_>
         </>
       )}
     </section>

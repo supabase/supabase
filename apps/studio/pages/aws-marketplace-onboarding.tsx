@@ -368,7 +368,6 @@ export const AwsMarketplaceOnboardingScreen = ({
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
-            title="Wrong account"
             description="Sign in with the Supabase account that owns the organization you want to bill through AWS Marketplace, then open the onboarding link again."
           />
           <Button type="default" block asChild>
