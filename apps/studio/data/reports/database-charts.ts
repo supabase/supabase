@@ -28,14 +28,16 @@ export const getReportAttributesV2: (
   diskConfig?: DiskAttributesData,
   maxConnections?: MaxConnectionsData,
   pgBouncerMaxConnections?: number,
-  isSpendCapEnabled?: boolean
+  isSpendCapEnabled?: boolean,
+  showDiskIOBurstBalanceChart?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
   diskConfig,
   maxConnections,
   pgBouncerMaxConnections,
-  isSpendCapEnabled
+  isSpendCapEnabled,
+  showDiskIOBurstBalanceChart
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   const provisionedDiskIops = diskConfig?.attributes?.iops
@@ -45,6 +47,7 @@ export const getReportAttributesV2: (
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
   const hasBurstableIO = BURSTABLE_IO_VARIANTS.has(computeVariantId)
+  const showBurstBalanceChart = !!showDiskIOBurstBalanceChart && hasBurstableIO
 
   return [
     {
@@ -274,7 +277,7 @@ export const getReportAttributesV2: (
         'Distinct from IOPS and throughput. This is the burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput is throttled to 5 MB/s until it refills.',
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
       syncId: 'database-reports',
-      hide: !hasBurstableIO,
+      hide: !showBurstBalanceChart,
       format: '%',
       valuePrecision: 0,
       showTooltip: true,
