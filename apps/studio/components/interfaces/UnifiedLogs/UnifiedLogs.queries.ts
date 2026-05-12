@@ -11,6 +11,7 @@ const SPECIAL_FILTER_PARAMS = ['date'] as const
 
 // Combined list of all parameters to exclude from standard filtering
 const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
+const FACET_FIELDS = ['log_type', 'level', 'method', 'status', 'pathname'] as const
 
 /**
  * Builds query conditions from search parameters and returns WHERE clause
@@ -409,6 +410,10 @@ export const getFacetCountCTE = ({
   facet: string
   facetSearch?: string
 }) => {
+  if (!(FACET_FIELDS as readonly string[]).includes(facet)) {
+    throw new Error('Invalid unified logs facet')
+  }
+
   const MAX_FACETS_QUANTITY = 20
 
   return `
