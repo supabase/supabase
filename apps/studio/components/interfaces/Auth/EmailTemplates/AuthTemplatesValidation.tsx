@@ -11,59 +11,59 @@ const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
   Token: {
     name: 'Token',
     value: '{{ .Token }}',
-    description: 'The 6-digit numeric email OTP',
+    description: '6-digit numeric email OTP',
   },
   TokenHash: {
     name: 'TokenHash',
     value: '{{ .TokenHash }}',
-    description: 'The hashed token used in the URL, useful for constructing your own email link',
+    description: 'Hashed token used in the URL, useful for constructing your own email link',
   },
   SiteURL: {
     name: 'SiteURL',
     value: '{{ .SiteURL }}',
-    description: "This project's redirect URL",
+    description: 'Redirect URL',
   },
   Email: {
     name: 'Email',
     value: '{{ .Email }}',
-    description: "The user's current email address",
+    description: "User's current email address",
   },
   NewEmail: {
     name: 'NewEmail',
     value: '{{ .NewEmail }}',
-    description: "The user's new email address",
+    description: "User's new email address",
   },
   OldEmail: {
     name: 'OldEmail',
     value: '{{ .OldEmail }}',
-    description: "The user's old email address",
+    description: "User's old email address",
   },
   Phone: {
     name: 'Phone',
     value: '{{ .Phone }}',
-    description: "The user's new phone number",
+    description: "User's new phone number",
   },
   OldPhone: {
     name: 'OldPhone',
     value: '{{ .OldPhone }}',
-    description: "The user's old phone number",
+    description: "User's old phone number",
   },
   Provider: {
     name: 'Provider',
     value: '{{ .Provider }}',
-    description: 'The provider of the newly linked/unlinked identity',
+    description: 'Provider of newly linked/unlinked identity',
   },
   FactorType: {
     name: 'FactorType',
     value: '{{ .FactorType }}',
-    description: 'The type of the newly enrolled/unenrolled MFA factor',
+    description: 'Type of newly enrolled/unenrolled MFA factor',
   },
   Data: {
     name: 'Data',
     value: '{{ .Data }}',
     description: (
       <>
-        The user's <code className="text-code-inline">user_metadata</code>
+        User's <code className="text-code-inline">user_metadata</code>
       </>
     ),
   },
@@ -73,7 +73,7 @@ const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
     value: '{{ .RedirectTo }}',
     description: (
       <>
-        The URL of <code className="text-code-inline">emailRedirectTo</code> passed in options
+        URL of <code className="text-code-inline">emailRedirectTo</code> passed in options
       </>
     ),
   },
