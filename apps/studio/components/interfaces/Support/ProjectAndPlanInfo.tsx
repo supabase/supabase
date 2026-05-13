@@ -52,7 +52,7 @@ interface ProjectSelectorProps {
 }
 
 function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
-  const { ref: urlProjectRef } = useParams()
+  const { ref: routeProjectRef } = useParams()
 
   return (
     <FormField
@@ -69,8 +69,13 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
               slug={!orgSlug || orgSlug === NO_ORG_MARKER ? undefined : orgSlug}
               selectedRef={field.value}
               onInitialLoad={(projects) => {
-                if (!urlProjectRef && (!projectRef || projectRef === NO_PROJECT_MARKER))
+                const hasSelectedProject = !!projectRef && projectRef !== NO_PROJECT_MARKER
+                const hasRouteProjectInList =
+                  !!routeProjectRef && projects.some((project) => project.ref === routeProjectRef)
+
+                if (!hasRouteProjectInList && !hasSelectedProject) {
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
+                }
               }}
               onSelect={(project) => field.onChange(project.ref)}
               renderTrigger={({ isLoading, project, listboxId, open }) => {
