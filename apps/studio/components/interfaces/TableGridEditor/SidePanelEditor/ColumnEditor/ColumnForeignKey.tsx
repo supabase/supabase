@@ -58,6 +58,7 @@ const ColumnForeignKey = ({
       name: c.name,
       format: c.format || column.format,
       formatSchema: normalizeFormatSchema(c.format_schema),
+      isArray: c.data_type === 'ARRAY',
       isNewColumn: false,
     }
   })
@@ -137,6 +138,7 @@ const ColumnForeignKey = ({
                     name: column.name,
                     format: column.format,
                     formatSchema: column.formatSchema,
+                    isArray: column.isArray,
                     isNewColumn: column.isNewColumn,
                   })
                 : formattedColumnsForFkSelector.map((c) => {

@@ -9,6 +9,7 @@ export interface ForeignKey {
     source: string
     sourceType?: string
     sourceTypeSchema?: string
+    sourceIsArray?: boolean
     target: string
     targetType?: string
     targetTypeSchema?: string
@@ -29,7 +30,9 @@ export interface SelectorTypeError {
   source: string
   sourceType: string
   sourceTypeSchema?: string
+  sourceIsArray?: boolean
   target: string
   targetType: string
   targetTypeSchema?: string
+  targetIsArray?: boolean
 }

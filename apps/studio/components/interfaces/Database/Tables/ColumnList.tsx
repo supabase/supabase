@@ -323,7 +323,11 @@ export const ColumnList = ({
                               <span>{column.data_type}</span>
                               {column.format !== column.data_type && (
                                 <span className="text-xs text-foreground-light">
-                                  {displayColumnType(column.format, column.format_schema)}
+                                  {displayColumnType(
+                                    column.format,
+                                    column.format_schema,
+                                    column.data_type === 'ARRAY'
+                                  )}
                                 </span>
                               )}
                             </div>
@@ -345,7 +349,11 @@ export const ColumnList = ({
                       </TableCell>
                       <TableCell>
                         <p className="text-foreground-lighter">
-                          {displayColumnType(column.format, column.format_schema)}
+                          {displayColumnType(
+                            column.format,
+                            column.format_schema,
+                            column.data_type === 'ARRAY'
+                          )}
                         </p>
                       </TableCell>
                       <TableCell>

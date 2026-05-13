@@ -58,6 +58,7 @@ interface ForeignKeySelectorProps {
       name: string
       format: string
       formatSchema?: string
+      isArray?: boolean
       isNewColumn: boolean
     }[]
   }
@@ -167,6 +168,7 @@ export const ForeignKeySelector = ({
             [key]: value,
             sourceType: sourceCol?.format,
             sourceTypeSchema: normalizeFormatSchema(sourceCol?.formatSchema),
+            sourceIsArray: sourceCol?.isArray ?? false,
           }
         }
       } else {
@@ -209,8 +211,10 @@ export const ForeignKeySelector = ({
         target,
         sourceType: sType,
         sourceTypeSchema: sSchema,
+        sourceIsArray: sArr,
         targetType: tType,
         targetTypeSchema: tSchema,
+        targetIsArray: tArr,
       } = column
       const sourceColumn = table.columns.find((col) => col.name === source)
       const targetColumn = selectedTable?.columns?.find((col) => col.name === target)
@@ -218,30 +222,48 @@ export const ForeignKeySelector = ({
       const targetType = tType ?? targetColumn?.format ?? ''
       const sourceTypeSchema = sSchema ?? normalizeFormatSchema(sourceColumn?.formatSchema)
       const targetTypeSchema = tSchema ?? normalizeFormatSchema(targetColumn?.format_schema)
+      const sourceIsArray = sArr ?? sourceColumn?.isArray ?? false
+      const targetIsArray = tArr ?? targetColumn?.data_type === 'ARRAY'
 
       // [Joshen] Doing this way so that its more readable
       // If either source or target not selected yet, thats okay
       if (source === '' || target === '') return
 
-      // If source and target are in the same type of data types, thats okay
+      // pg-meta emits `_X` as the format string for arrays of X. Normalize before
+      // running family checks so that an array column is never accidentally classified
+      // as a member of a scalar family.
+      const bareSource =
+        sourceIsArray && sourceType.startsWith('_') ? sourceType.slice(1) : sourceType
+      const bareTarget =
+        targetIsArray && targetType.startsWith('_') ? targetType.slice(1) : targetType
+
+      // Same-family scalars are interchangeable; arrays must match exactly.
       if (
-        (NUMERICAL_TYPES.includes(sourceType) && NUMERICAL_TYPES.includes(targetType)) ||
-        (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
-        (sourceType === 'uuid' && targetType === 'uuid')
+        !sourceIsArray &&
+        !targetIsArray &&
+        ((NUMERICAL_TYPES.includes(sourceType) && NUMERICAL_TYPES.includes(targetType)) ||
+          (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
+          (sourceType === 'uuid' && targetType === 'uuid'))
       )
         return
 
-      // Otherwise check that the format AND format_schema both match — a same-name
-      // enum in different schemas is a distinct type.
-      if (sourceType === targetType && sourceTypeSchema === targetTypeSchema) return
+      // Otherwise require an exact match across the full (format, format_schema, isArray) triple.
+      if (
+        bareSource === bareTarget &&
+        sourceTypeSchema === targetTypeSchema &&
+        sourceIsArray === targetIsArray
+      )
+        return
 
       const entry: SelectorTypeError = {
         source,
         sourceType,
         sourceTypeSchema,
+        sourceIsArray,
         target,
         targetType,
         targetTypeSchema,
+        targetIsArray,
       }
       if (sourceColumn?.isNewColumn && targetType !== '') {
         return typeNotice.push(entry)
@@ -408,7 +430,11 @@ export const ForeignKeySelector = ({
                                         <span className="text-foreground-lighter">
                                           {column.format === ''
                                             ? '-'
-                                            : displayColumnType(column.format, column.formatSchema)}
+                                            : displayColumnType(
+                                                column.format,
+                                                column.formatSchema,
+                                                column.isArray
+                                              )}
                                         </span>
                                       </div>
                                     </SelectItem_Shadcn_>
@@ -437,7 +463,11 @@ export const ForeignKeySelector = ({
                                       <span className="text-foreground-lighter">
                                         {column.format === ''
                                           ? '-'
-                                          : displayColumnType(column.format, column.format_schema)}
+                                          : displayColumnType(
+                                              column.format,
+                                              column.format_schema,
+                                              column.data_type === 'ARRAY'
+                                            )}
                                       </span>
                                     </div>
                                   </SelectItem_Shadcn_>
@@ -475,9 +505,18 @@ export const ForeignKeySelector = ({
                               return (
                                 <li key={`type-error-${idx}`}>
                                   <code className="text-code-inline">{x.source}</code> (
-                                  {displayColumnType(x.sourceType, x.sourceTypeSchema)}) and{' '}
-                                  <code className="text-code-inline">{x.target}</code>(
-                                  {displayColumnType(x.targetType, x.targetTypeSchema)})
+                                  {displayColumnType(
+                                    x.sourceType,
+                                    x.sourceTypeSchema,
+                                    x.sourceIsArray
+                                  )}
+                                  ) and <code className="text-code-inline">{x.target}</code>(
+                                  {displayColumnType(
+                                    x.targetType,
+                                    x.targetTypeSchema,
+                                    x.targetIsArray
+                                  )}
+                                  )
                                 </li>
                               )
                             })}
@@ -499,7 +538,11 @@ export const ForeignKeySelector = ({
                                   <div className="flex items-center gap-x-1">
                                     <code className="text-code-inline">{x.source}</code>{' '}
                                     <ArrowRight size={14} />{' '}
-                                    {displayColumnType(x.targetType, x.targetTypeSchema)}
+                                    {displayColumnType(
+                                      x.targetType,
+                                      x.targetTypeSchema,
+                                      x.targetIsArray
+                                    )}
                                   </div>
                                 </li>
                               )

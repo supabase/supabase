@@ -25,9 +25,15 @@ const isImplicitTypeSchema = (schema: string | undefined) =>
 export const normalizeFormatSchema = (schema: string | undefined): string | undefined =>
   isImplicitTypeSchema(schema) ? undefined : schema
 
-export const displayColumnType = (format: string, formatSchema: string | undefined): string => {
+export const displayColumnType = (
+  format: string,
+  formatSchema: string | undefined,
+  isArray?: boolean
+): string => {
+  const bareFormat = isArray && format.startsWith('_') ? format.slice(1) : format
   const normalized = normalizeFormatSchema(formatSchema)
-  return normalized ? `${normalized}.${format}` : format
+  const qualified = normalized ? `${normalized}.${bareFormat}` : bareFormat
+  return isArray ? `${qualified}[]` : qualified
 }
 
 const isSQLExpression = (input: string) => {
