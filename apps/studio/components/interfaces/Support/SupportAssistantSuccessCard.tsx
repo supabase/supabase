@@ -37,8 +37,7 @@ export function SupportAssistantSuccessCard({
   request,
   className,
 }: SupportAssistantSuccessCardProps) {
-  if (!hasProjectScopedAssistantContext(request.projectRef)) return null
-
+  const hasAssistantContext = hasProjectScopedAssistantContext(request.projectRef)
   const aiAssistant = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const createdChatIdRef = useRef<string>()
@@ -48,6 +47,7 @@ export function SupportAssistantSuccessCard({
   const assistantPrompt = useMemo(() => buildSupportAssistantPrompt(request), [request])
 
   useEffect(() => {
+    if (!hasAssistantContext) return
     if (createdChatIdRef.current) return
 
     const newChatId = aiAssistant.newChat({
@@ -57,7 +57,7 @@ export function SupportAssistantSuccessCard({
 
     createdChatIdRef.current = newChatId
     setChatId(newChatId)
-  }, [aiAssistant, assistantPrompt])
+  }, [aiAssistant, assistantPrompt, hasAssistantContext])
 
   const handleOpenAssistant = () => {
     if (chatId) {
@@ -65,6 +65,8 @@ export function SupportAssistantSuccessCard({
     }
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
   }
+
+  if (!hasAssistantContext) return null
 
   return (
     <Card
