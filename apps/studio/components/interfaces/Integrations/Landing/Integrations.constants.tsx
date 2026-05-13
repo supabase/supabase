@@ -1,4 +1,5 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
+import type { Tables } from 'common/marketplace.types'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -46,9 +47,9 @@ type IntegrationStep = {
   description?: string
 }
 
-type InstallUrlType = 'get' | 'post'
-
-type InstallIdentificationMethod = 'secret_key_prefix' | 'edge_function_secret_name'
+type Listing = Tables<'listings'>
+type InstallUrlType = NonNullable<Listing['installation_url_type']>
+type InstallIdentificationMethod = NonNullable<Listing['installation_identification_method']>
 
 /**
  * [Joshen] For marketplace, we probably need to revisit this definition
