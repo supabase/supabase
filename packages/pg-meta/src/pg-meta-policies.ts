@@ -102,6 +102,30 @@ type PolicyCreateParams = {
   roles?: string[]
 }
 
+/**
+ * Validates a policy SQL expression to prevent injection via stacked queries or
+ * dangerous DDL/DCL statements. Policy expressions should only contain boolean
+ * expressions (SELECT-level SQL), not DDL or DCL commands.
+ */
+function validatePolicyExpression(expression: string, context: string): void {
+  // Block semicolons which enable stacked queries
+  if (expression.includes(';')) {
+    throw new Error(
+      `Invalid ${context} expression: semicolons are not allowed in policy expressions`
+    )
+  }
+
+  // Block dangerous DDL/DCL keywords that should never appear in a policy expression
+  const DANGEROUS_KEYWORDS =
+    /\b(DROP|TRUNCATE|CREATE\s+ROLE|ALTER\s+ROLE|GRANT|REVOKE|COPY|pg_read_file|pg_write_file|lo_import|lo_export)\b/i
+  if (DANGEROUS_KEYWORDS.test(expression)) {
+    throw new Error(
+      `Invalid ${context} expression: contains disallowed keyword. ` +
+        `Policy expressions should only contain boolean conditions.`
+    )
+  }
+}
+
 function create({
   name,
   schema = 'public',
@@ -112,6 +136,14 @@ function create({
   command = 'ALL',
   roles = ['public'],
 }: PolicyCreateParams): { sql: string } {
+  // Validate SQL expressions to prevent injection via stacked queries
+  if (definition) {
+    validatePolicyExpression(definition, 'USING')
+  }
+  if (check) {
+    validatePolicyExpression(check, 'WITH CHECK')
+  }
+
   const sql = `
 create policy ${ident(name)} on ${ident(schema)}.${ident(table)}
   as ${action}
@@ -134,6 +166,14 @@ function update(
   params: PolicyUpdateParams
 ): { sql: string } {
   const { name, definition, check, roles } = params
+
+  // Validate SQL expressions to prevent injection via stacked queries
+  if (definition) {
+    validatePolicyExpression(definition, 'USING')
+  }
+  if (check) {
+    validatePolicyExpression(check, 'WITH CHECK')
+  }
 
   const alter = `ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
   const nameSql = name === undefined ? '' : `${alter} RENAME TO ${ident(name)};`
