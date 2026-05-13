@@ -125,7 +125,7 @@ const CreditCard = ({
               </p>
             </div>
             {isSpt && spt && (
-              <div className="mt-2.5 flex items-center gap-2 border-t border-border-light pt-2.5 text-xs text-foreground-light">
+              <div className="mt-2.5 flex items-center gap-2 border-t pt-2.5 text-xs text-foreground-light">
                 <p className="m-0">
                   Managed via Stripe Projects · Token ending in{' '}
                   <code className="text-code-inline">{spt.last4}</code>

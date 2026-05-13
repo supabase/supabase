@@ -55,9 +55,9 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  - braintrust # Included for bugfix in v3.9.0
-  - '@next/*'
-  - next
+  # The following are excluded to fix vulnerablities.
+  - mermaid
+  - '@mermaid-js/parser'
 
 onlyBuiltDependencies:
   - node-pty

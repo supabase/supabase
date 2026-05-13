@@ -490,7 +490,7 @@ export const DatabaseConnectionString = () => {
                       <Collapsible_Shadcn_ className="group">
                         <CollapsibleTrigger_Shadcn_
                           asChild
-                          className="w-full justify-start !last:rounded-b group-data-open:rounded-b-none border-light px-3"
+                          className="w-full justify-start !last:rounded-b group-data-open:rounded-b-none px-3"
                         >
                           <Button
                             type="default"
