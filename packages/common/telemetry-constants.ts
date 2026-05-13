@@ -3049,6 +3049,25 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
+ * User was exposed to the upgrade CTA placement experiment.
+ * Fires once per session per free-plan user enrolled in any variant (including control),
+ * so the conversion analysis has a baseline cohort.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UpgradeCtaPlacementExperimentExposedEvent {
+  action: 'upgrade_cta_placement_experiment_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: 'control' | 'user_dropdown' | 'home_usage_card'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3447,6 +3466,7 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
+  | UpgradeCtaPlacementExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
