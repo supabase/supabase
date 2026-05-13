@@ -113,12 +113,12 @@ const MetricRow = ({ usageItem, config }: { usageItem: OrgMetricsUsage; config: 
   const isApproaching = limit > 0 && ratio >= 0.8 && !isOver
 
   return (
-    <div className="flex items-center justify-between gap-4 px-5 py-3">
-      <div className="flex items-center gap-3 min-w-0">
+    <div className="flex items-center justify-between gap-3 px-3 py-2">
+      <div className="flex items-center gap-2 min-w-0">
         <ProgressRing ratio={ratio} isOver={isOver} isApproaching={isApproaching} />
-        <span className="text-sm text-foreground truncate">{config.label}</span>
+        <span className="text-xs text-foreground truncate">{config.label}</span>
       </div>
-      <span className="text-xs font-mono tabular-nums whitespace-nowrap">
+      <span className="text-[11px] font-mono tabular-nums whitespace-nowrap">
         <span className={cn(isOver ? 'text-warning' : 'text-foreground-light')}>
           {formatValue(current, config.unit)}
         </span>
@@ -150,34 +150,34 @@ export const PlanUsageCard = () => {
   if (visibleRows.length === 0) return null
 
   return (
-    <section className="w-full">
-      <div className="mb-6 flex items-end justify-between gap-4">
-        <div>
-          <h3 className="heading-section">Usage</h3>
-          <p className="text-xs text-foreground-lighter mt-1">Current billing cycle</p>
+    <div className="absolute bottom-4 left-4 right-4 z-10">
+      <Card className="bg-surface-100/95 backdrop-blur-sm shadow-md">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border-overlay">
+          <div className="flex flex-col">
+            <span className="text-xs text-foreground">Free plan usage</span>
+            <span className="text-[11px] text-foreground-lighter">Current billing cycle</span>
+          </div>
+          <UpgradePlanButton
+            source="home_usage_card"
+            plan="Pro"
+            onClick={() => track('upgrade_cta_clicked', { placement: 'home_usage_card' })}
+          />
         </div>
-        <UpgradePlanButton
-          source="home_usage_card"
-          plan="Pro"
-          onClick={() => track('upgrade_cta_clicked', { placement: 'home_usage_card' })}
-        />
-      </div>
-      <Card className="overflow-hidden">
         <CardContent className="p-0 divide-y divide-border-overlay">
           {visibleRows.map(({ config, usageItem }) => (
             <MetricRow key={config.key} usageItem={usageItem} config={config} />
           ))}
         </CardContent>
+        <div className="px-4 py-2 border-t border-border-overlay flex justify-end">
+          <Link
+            href={`/org/${organization?.slug ?? '_'}/usage`}
+            className="text-[11px] text-foreground-light hover:text-foreground inline-flex items-center gap-1"
+          >
+            View all usage
+            <ArrowRight size={11} strokeWidth={1.5} />
+          </Link>
+        </div>
       </Card>
-      <div className="mt-3 flex justify-end">
-        <Link
-          href={`/org/${organization?.slug ?? '_'}/usage`}
-          className="text-xs text-foreground-light hover:text-foreground inline-flex items-center gap-1"
-        >
-          View all usage
-          <ArrowRight size={12} strokeWidth={1.5} />
-        </Link>
-      </div>
-    </section>
+    </div>
   )
 }

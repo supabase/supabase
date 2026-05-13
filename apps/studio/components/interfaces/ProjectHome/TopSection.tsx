@@ -4,6 +4,7 @@ import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { ActivityStats } from '@/components/interfaces/ProjectHome/ActivityStats'
+import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
 import { ProjectConnectionPopover } from '@/components/interfaces/ProjectHome/ProjectConnectionPopover'
 import { ProjectPausedState } from '@/components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -94,6 +95,7 @@ export const TopSection = () => {
               <ReactFlowProvider>
                 <InstanceConfiguration diagramOnly />
               </ReactFlowProvider>
+              <PlanUsageCard />
             </div>
           </div>
         )}
