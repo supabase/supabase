@@ -21,7 +21,7 @@ In this method, you implement a single `GET` endpoint. Supabase redirects the us
 <Mermaid
   chart={`sequenceDiagram
     autonumber
-    actor User
+    participant User
     participant Browser
     participant Partner as Partner (OAuth Client)
     participant Supabase as Supabase (OAuth Authorization Server/Protected Resource)
@@ -91,7 +91,7 @@ You will implement two endpoints:
 <Mermaid
   chart={`sequenceDiagram
     autonumber
-    actor User
+    participant User
     participant Browser
     participant Partner as Partner (OAuth Client)
     participant Supabase as Supabase (OAuth Authorization Server/Protected Resource)
