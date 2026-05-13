@@ -83,14 +83,14 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
           </div>
         </TableCell>
 
-        <TableCell className="font-mono tracking-tighter">
+        <TableCell className="w-28 font-mono tracking-tighter">
           {extension?.installed_version ?? extension.default_version}
         </TableCell>
 
         <TableCell className="truncate">{isOn ? extension.schema : '-'}</TableCell>
 
         <TableCell className="text-foreground-light">
-          <p className="block max-w-96" title={extension.comment ?? undefined}>
+          <p className="block" title={extension.comment ?? undefined}>
             {extension.comment}
           </p>
         </TableCell>

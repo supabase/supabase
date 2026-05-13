@@ -9,11 +9,15 @@ import { useProfile } from '@/lib/profile'
 interface SuccessProps {
   sentCategory?: string
   selectedProject?: string
+  onFinish?: () => void
+  finishLabel?: string
 }
 
 export const Success = ({
   sentCategory = '',
   selectedProject = NO_PROJECT_MARKER,
+  onFinish,
+  finishLabel = 'Finish',
 }: SuccessProps) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
@@ -29,8 +33,8 @@ export const Success = ({
   return (
     <div className="mt-10 max-w-[620px] flex flex-col items-center space-y-4">
       <div className="relative">
-        <Mail strokeWidth={1.5} size={60} className="text-brand" />
-        <div className="h-6 w-6 rounded-full bg-brand absolute bottom-1 -right-1.5 flex items-center justify-center">
+        <Mail strokeWidth={1.5} size={32} className="text-brand" />
+        <div className="absolute -bottom-1 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand">
           <Check strokeWidth={4} size={16} className="text-contrast" />
         </div>
       </div>
@@ -76,9 +80,15 @@ export const Success = ({
         <Separator />
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">
-        <Button asChild type="default">
-          <Link href="/">Finish</Link>
-        </Button>
+        {onFinish ? (
+          <Button type="default" onClick={onFinish}>
+            {finishLabel}
+          </Button>
+        ) : (
+          <Button asChild type="default">
+            <Link href="/">{finishLabel}</Link>
+          </Button>
+        )}
       </div>
     </div>
   )

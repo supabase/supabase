@@ -12162,6 +12162,7 @@
                         "auth.advanced_auth_settings",
                         "auth.performance_settings",
                         "auth.password_hibp",
+                        "auth.custom_oauth.max_providers",
                         "backup.retention_days",
                         "backup.restore_to_new_project",
                         "function.max_count",

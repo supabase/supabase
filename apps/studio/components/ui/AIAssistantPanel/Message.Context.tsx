@@ -1,10 +1,10 @@
 import { createContext, useContext, type PropsWithChildren } from 'react'
 
-export type AddToolResult = (args: {
-  tool: string
-  toolCallId: string
-  output: unknown
-}) => Promise<void>
+export type AddToolApprovalResponse = (args: {
+  id: string
+  approved: boolean
+  reason?: string
+}) => void | PromiseLike<void>
 
 export interface MessageInfo {
   id: string
@@ -22,7 +22,7 @@ export interface MessageInfo {
 }
 
 export interface MessageActions {
-  addToolResult?: AddToolResult
+  addToolApprovalResponse?: AddToolApprovalResponse
 
   onDelete: (id: string) => void
   onEdit: (id: string) => void

@@ -8,6 +8,7 @@ import { Badge, Button, cn } from 'ui'
 
 const CATEGORIES_FILTERS = [
   { name: 'All', value: 'all' },
+  { name: 'Community Event', value: 'community' },
   { name: 'Meetup', value: 'meetup' },
   { name: 'Conference', value: 'conference' },
   { name: 'Workshop', value: 'workshop' },
@@ -83,7 +84,7 @@ export function EventList() {
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <h3 className="leading-3">{event.title}</h3>
+                      <h3 className="leading-snug">{event.title}</h3>
                       {event.isSpeaking && (
                         <Badge variant="success" className="flex items-center gap-1">
                           Speaking
@@ -107,18 +108,20 @@ export function EventList() {
                     )}
                   </div>
 
-                  <div className="flex gap-2 items-center text-sm text-foreground-light">
-                    <div className="size-5 rounded-full border bg-linear-to-br from-background-surface-100 to-background-surface-200 relative">
-                      {event.hosts[0]?.avatar_url && (
-                        <img
-                          src={event.hosts[0].avatar_url}
-                          alt={event.hosts[0].name || 'Host image'}
-                          className="absolute inset-0 w-full h-full object-cover rounded-full"
-                        />
-                      )}
+                  {event.hosts.length > 0 && (
+                    <div className="flex gap-2 items-center text-sm text-foreground-light">
+                      <div className="size-5 rounded-full border bg-linear-to-br from-background-surface-100 to-background-surface-200 relative">
+                        {event.hosts[0]?.avatar_url && (
+                          <img
+                            src={event.hosts[0].avatar_url}
+                            alt={event.hosts[0].name || 'Host image'}
+                            className="absolute inset-0 w-full h-full object-cover rounded-full"
+                          />
+                        )}
+                      </div>
+                      Hosted by {formatHosts(event.hosts).displayText}
                     </div>
-                    Hosted by {formatHosts(event.hosts).displayText}
-                  </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 relative z-10">

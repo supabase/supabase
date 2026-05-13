@@ -33,7 +33,12 @@ vi.mock('./useIsShortcutEnabled', () => ({
 const getLastHotkeyOptions = () => {
   const call = mockUseHotkeySequence.mock.calls.at(-1)
   if (!call) throw new Error('useHotkeySequence was not called')
-  return call[2] as { enabled: boolean; timeout: number | undefined; ignoreInputs?: boolean }
+  return call[2] as {
+    enabled: boolean
+    timeout: number | undefined
+    ignoreInputs?: boolean
+    meta?: { id?: string; name?: string; referenceGroup?: string }
+  }
 }
 
 const getLastRegisterCall = () => {
@@ -306,6 +311,35 @@ describe('useShortcut', () => {
         expect(container.textContent).toContain('M')
         expect(container.textContent).toContain('⇧')
       })
+    })
+  })
+
+  describe('reference-sheet metadata', () => {
+    it('forwards id, label, and referenceGroup as registration meta', () => {
+      renderHook(() => useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn()))
+      expect(getLastHotkeyOptions().meta).toEqual({
+        id: SHORTCUT_IDS.NAV_HOME,
+        name: SHORTCUT_DEFINITIONS[SHORTCUT_IDS.NAV_HOME].label,
+        referenceGroup: SHORTCUT_DEFINITIONS[SHORTCUT_IDS.NAV_HOME].referenceGroup,
+      })
+    })
+
+    it('uses the caller label override in meta.name', () => {
+      renderHook(() => useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn(), { label: 'Go home' }))
+      expect(getLastHotkeyOptions().meta?.name).toBe('Go home')
+    })
+
+    it('keeps a stable meta reference when inputs do not change', () => {
+      const { rerender } = renderHook(
+        ({ cb }: { cb: () => void }) => useShortcut(SHORTCUT_IDS.NAV_HOME, cb),
+        { initialProps: { cb: vi.fn() } }
+      )
+
+      const first = getLastHotkeyOptions().meta
+
+      rerender({ cb: vi.fn() })
+
+      expect(getLastHotkeyOptions().meta).toBe(first)
     })
   })
 })
