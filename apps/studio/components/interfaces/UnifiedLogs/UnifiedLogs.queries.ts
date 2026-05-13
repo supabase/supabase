@@ -23,6 +23,7 @@ const SPECIAL_FILTER_PARAMS = ['date'] as const
 
 // Combined list of all parameters to exclude from standard filtering
 const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
+const FACET_FIELDS = ['log_type', 'level', 'method', 'status', 'pathname'] as const
 
 // OTEL log_attributes keys for HTTP-style fields. Centralized so they can be
 // adjusted in one place if the backend conventions change.
@@ -267,6 +268,10 @@ export const getFacetCountQuery = ({
   facet: string
   facetSearch?: string
 }) => {
+  if (!(FACET_FIELDS as readonly string[]).includes(facet)) {
+    throw new Error('Invalid unified logs facet')
+  }
+
   const MAX_FACETS_QUANTITY = 20
 
   const facetExpr =

@@ -145,6 +145,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@babel/core": "*",
     "@faker-js/faker": "^9.9.0",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-typed-document-node/core": "^3.2.0",
