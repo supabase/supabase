@@ -14,7 +14,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -183,7 +183,7 @@ export const EnableExtensionModal = ({
                     isReactForm={false}
                     label="Select a schema to enable the extension for"
                   >
-                    <Input_Shadcn_ disabled value={defaultSchema} />
+                    <Input disabled value={defaultSchema} />
                   </FormItemLayout>
                   <p className="text-sm text-foreground-light">
                     Extension must be installed in the "{defaultSchema}" schema.
@@ -251,7 +251,7 @@ export const EnableExtensionModal = ({
                       render={({ field }) => (
                         <FormItemLayout name="name" label="Schema name">
                           <FormControl>
-                            <Input_Shadcn_ {...field} />
+                            <Input {...field} />
                           </FormControl>
                         </FormItemLayout>
                       )}

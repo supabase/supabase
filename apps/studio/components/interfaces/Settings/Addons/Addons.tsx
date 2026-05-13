@@ -5,9 +5,9 @@ import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
   Tooltip,
@@ -144,24 +144,24 @@ export const Addons = () => {
 
   if (pitrAlertState === 'hipaa') {
     pitrAlert = (
-      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-        <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
+      <Alert className="rounded-none border-0 border-b px-6">
+        <AlertTitle>PITR cannot be changed with HIPAA</AlertTitle>
+        <AlertDescription>
           All projects should have PITR enabled by default and cannot be changed with HIPAA enabled.
           Contact support for further assistance.
-        </AlertDescription_Shadcn_>
+        </AlertDescription>
         <div className="mt-4">
           <Button type="default" asChild>
             <SupportLink>Contact support</SupportLink>
           </Button>
         </div>
-      </Alert_Shadcn_>
+      </Alert>
     )
   } else if (pitrAlertState === 'legacy-project') {
     pitrAlert = (
-      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-        <AlertTitle_Shadcn_>Your project is too old to enable PITR</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
+      <Alert className="rounded-none border-0 border-b px-6">
+        <AlertTitle>Your project is too old to enable PITR</AlertTitle>
+        <AlertDescription>
           <p className="text-sm leading-normal mb-2">
             Reach out to us via support if you're interested
           </p>
@@ -176,17 +176,15 @@ export const Addons = () => {
               Contact support
             </SupportLink>
           </Button>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        </AlertDescription>
+      </Alert>
     )
   } else if (pitrAlertState === 'orioledb') {
     pitrAlert = (
-      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-        <AlertTitle_Shadcn_>PITR not supported</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
-          Point in time recovery is not supported with OrioleDB
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <Alert className="rounded-none border-0 border-b px-6">
+        <AlertTitle>PITR not supported</AlertTitle>
+        <AlertDescription>Point in time recovery is not supported with OrioleDB</AlertDescription>
+      </Alert>
     )
   }
 

@@ -2,8 +2,8 @@ import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { cn, FormControl, FormField, Input_Shadcn_, Textarea } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { cn, FormControl, FormField, Input, Textarea } from 'ui'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { ServerOption } from './Wrappers.types'
@@ -57,9 +57,9 @@ const InputField = <
             ) : option.isTextArea ? (
               <Textarea {...field} id={option.name} rows={6} className="input-mono resize-none" />
             ) : option.secureEntry ? (
-              <Input copy reveal {...field} id={option.name} />
+              <PasswordInput copy reveal {...field} id={option.name} />
             ) : (
-              <Input_Shadcn_ {...field} id={option.name} />
+              <Input {...field} id={option.name} />
             )}
           </FormControl>
         </FormItemLayout>

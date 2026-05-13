@@ -2,7 +2,7 @@ import { X } from 'lucide-react'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { extensions } from 'shared-data'
-import { Badge, Input_Shadcn_ as Input } from 'ui'
+import { Badge, Input } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 
 type Extension = {

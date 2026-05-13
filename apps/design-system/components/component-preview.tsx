@@ -2,13 +2,7 @@
 
 import { ChevronRight, Expand } from 'lucide-react'
 import * as React from 'react'
-import {
-  Button,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { Index } from '@/__registry__'
 import { useConfig } from '@/hooks/use-config'
@@ -152,20 +146,20 @@ export function ComponentPreview({
         <div className="z-10 relative">{ComponentPreview}</div>
       </div>
       {!hideCode && (
-        <Collapsible_Shadcn_>
-          <CollapsibleTrigger_Shadcn_
+        <Collapsible>
+          <CollapsibleTrigger
             className={`
-              flex 
-              gap-3 items-center 
+              flex
+              gap-3 items-center
               w-full
               font-mono
-              text-xs 
+              text-xs
               text-foreground-light
-              px-4 py-4 
-              border border-r 
+              px-4 py-4
+              border border-r
               group
               data-closed:rounded-bl-md data-closed:rounded-br-md
-              
+
           `}
           >
             <ChevronRight
@@ -173,8 +167,8 @@ export function ComponentPreview({
               size={14}
             />
             View code
-          </CollapsibleTrigger_Shadcn_>
-          <CollapsibleContent_Shadcn_ className="transition-all">
+          </CollapsibleTrigger>
+          <CollapsibleContent className="transition-all">
             <div
               className={cn(
                 'relative',
@@ -186,8 +180,8 @@ export function ComponentPreview({
             >
               {Code}
             </div>
-          </CollapsibleContent_Shadcn_>
-        </Collapsible_Shadcn_>
+          </CollapsibleContent>
+        </Collapsible>
       )}
     </div>
   )

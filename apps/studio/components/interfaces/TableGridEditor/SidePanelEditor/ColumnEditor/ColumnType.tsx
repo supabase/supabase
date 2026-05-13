@@ -12,9 +12,9 @@ import {
 import Link from 'next/link'
 import { ReactNode, useId, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   Command_Shadcn_,
@@ -25,7 +25,7 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   CriticalIcon,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -291,14 +291,14 @@ const ColumnType = ({
       </Popover_Shadcn_>
 
       {showRecommendation && recommendation !== undefined && (
-        <Alert_Shadcn_ variant="warning" className="mt-2">
+        <Alert variant="warning" className="mt-2">
           <CriticalIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             {' '}
             It is recommended to use{' '}
             <code className="text-code-inline">{recommendation.alternative}</code> instead
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          </AlertTitle>
+          <AlertDescription>
             <p>
               Postgres recommends against using the data type{' '}
               <code className="text-code-inline">{value}</code> unless you have a very specific use
@@ -314,8 +314,8 @@ const ColumnType = ({
                 Use {recommendation.alternative}
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   )

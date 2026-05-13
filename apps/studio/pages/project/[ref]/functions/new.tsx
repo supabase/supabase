@@ -20,7 +20,7 @@ import {
   FormControl,
   FormField,
   FormItem,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -388,7 +388,7 @@ const NewFunctionPage = () => {
                 <FormItem className="flex flex-col gap-0 m-0">
                   <div className="flex items-center">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="functionName"
                         type="text"
                         size={'large'}

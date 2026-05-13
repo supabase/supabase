@@ -21,7 +21,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -223,7 +223,7 @@ const Option = ({ option, control }: { option: TableOption; control: Control<Fie
       render={({ field }) => (
         <FormItemLayout layout="vertical" label={option.label} name={option.name}>
           <FormControl>
-            <Input_Shadcn_ {...field} id={option.name} placeholder={option.placeholder ?? ''} />
+            <Input {...field} id={option.name} placeholder={option.placeholder ?? ''} />
           </FormControl>
         </FormItemLayout>
       )}
@@ -382,7 +382,7 @@ const TableForm = ({
             render={({ field }) => (
               <FormItemLayout name="schema_name" layout="vertical" label="Schema name">
                 <FormControl>
-                  <Input_Shadcn_ {...field} id="schema_name" />
+                  <Input {...field} id="schema_name" />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -400,7 +400,7 @@ const TableForm = ({
               description="You can query from this table after the wrapper is enabled."
             >
               <FormControl>
-                <Input_Shadcn_ {...field} id="table_name" />
+                <Input {...field} id="table_name" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -478,7 +478,7 @@ const TableForm = ({
                       label="Name"
                     >
                       <FormControl>
-                        <Input_Shadcn_ {...field} id={`columns.${columnIndex}.name`} />
+                        <Input {...field} id={`columns.${columnIndex}.name`} />
                       </FormControl>
                     </FormItemLayout>
                   )}

@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
@@ -18,7 +18,7 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  TextArea_Shadcn_ as TextArea,
+  TextArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 

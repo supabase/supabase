@@ -2,7 +2,7 @@ import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import { Badge, Button, Card, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
+import { Badge, Button, Card, CardHeader, CardTitle, Input } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ButtonTooltip } from './ButtonTooltip'
@@ -136,7 +136,7 @@ export function OrganizationSelector({
         </span>
       ) : (
         <>
-          <Input_Shadcn_
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}

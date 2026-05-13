@@ -5,13 +5,13 @@ import ReactMarkdown from 'react-markdown'
 import {
   Button,
   Checkbox,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  TextArea_Shadcn_,
+  TextArea,
 } from 'ui'
 import type { z } from 'zod'
 
@@ -76,7 +76,7 @@ function FieldInput({
     case 'email':
     case 'url':
       return (
-        <Input_Shadcn_
+        <Input
           type={field.type}
           placeholder={field.placeholder}
           required={field.required}
@@ -86,7 +86,7 @@ function FieldInput({
       )
     case 'textarea':
       return (
-        <TextArea_Shadcn_
+        <TextArea
           placeholder={field.placeholder}
           required={field.required}
           rows={field.rows}

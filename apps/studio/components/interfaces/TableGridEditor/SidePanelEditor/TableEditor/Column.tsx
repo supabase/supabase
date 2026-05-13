@@ -12,7 +12,7 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Input_Shadcn_ as Input,
+  Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,

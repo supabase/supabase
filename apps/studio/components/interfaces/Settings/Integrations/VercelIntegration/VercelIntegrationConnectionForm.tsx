@@ -3,9 +3,9 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Form,
   FormControl,
   FormDescription,
@@ -13,7 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Switch,
 } from 'ui'
 import * as z from 'zod'
@@ -100,11 +100,9 @@ const VercelIntegrationConnectionForm = ({
         <div className="px-6 py-4 flex flex-col gap-y-4">
           <div className="flex flex-col gap-4">
             {org?.managed_by === 'vercel-marketplace' ? (
-              <Alert_Shadcn_>
-                <AlertTitle_Shadcn_ className="text-sm">
-                  Vercel Marketplace managed project
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="text-xs">
+              <Alert>
+                <AlertTitle className="text-sm">Vercel Marketplace managed project</AlertTitle>
+                <AlertDescription className="text-xs">
                   This project is managed via Vercel Marketplace. Environment variables are
                   automatically synchronized for your connected Vercel projects. This integration
                   purpose is synchronizing preview deployments environment variables with our{' '}
@@ -117,8 +115,8 @@ const VercelIntegrationConnectionForm = ({
                     Branching
                   </Link>{' '}
                   feature.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             ) : (
               <div>
                 <h5 className="text-foreground ">
@@ -205,7 +203,7 @@ const VercelIntegrationConnectionForm = ({
                     Prefix
                   </FormLabel>
                   <FormControl className="col-span-8">
-                    <Input_Shadcn_
+                    <Input
                       {...field}
                       className="w-full"
                       disabled={disabled}

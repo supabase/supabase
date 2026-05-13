@@ -11,7 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -218,7 +218,7 @@ export const TriggerSheet = ({
                     description="Do not use spaces/whitespace."
                   >
                     <FormControl>
-                      <Input_Shadcn_ {...field} placeholder="Name of trigger" />
+                      <Input {...field} placeholder="Name of trigger" />
                     </FormControl>
                   </FormItemLayout>
                 )}

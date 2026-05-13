@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Input_Shadcn_, Label_Shadcn_ } from 'ui'
+import { Button, Input, Label_Shadcn_ } from 'ui'
 
 const isValidEmail = (email: string): boolean => {
   const emailPattern = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/
@@ -67,7 +67,7 @@ const SecurityNewsletterForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label_Shadcn_ htmlFor="security-first-name">First Name</Label_Shadcn_>
-                <Input_Shadcn_
+                <Input
                   id="security-first-name"
                   type="text"
                   value={firstName}
@@ -78,7 +78,7 @@ const SecurityNewsletterForm = () => {
               </div>
               <div className="flex flex-col gap-2">
                 <Label_Shadcn_ htmlFor="security-last-name">Last Name</Label_Shadcn_>
-                <Input_Shadcn_
+                <Input
                   id="security-last-name"
                   type="text"
                   value={lastName}
@@ -90,7 +90,7 @@ const SecurityNewsletterForm = () => {
             </div>
             <div className="flex flex-col gap-2">
               <Label_Shadcn_ htmlFor="security-email">Email Address</Label_Shadcn_>
-              <Input_Shadcn_
+              <Input
                 id="security-email"
                 type="email"
                 value={email}

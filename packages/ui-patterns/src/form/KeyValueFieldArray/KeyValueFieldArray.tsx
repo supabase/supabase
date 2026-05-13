@@ -21,7 +21,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 
 export type KeyValueFieldArrayAction<TItem> = {
@@ -50,7 +50,7 @@ export interface KeyValueFieldArrayProps<
   addLabel: string
   addActions?: KeyValueFieldArrayAction<TItem>[]
   disabled?: boolean
-  inputSize?: React.ComponentProps<typeof Input_Shadcn_>['size']
+  inputSize?: React.ComponentProps<typeof Input>['size']
   className?: string
   rowsClassName?: string
   rowClassName?: string
@@ -132,7 +132,7 @@ export const KeyValueFieldArray = <
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       {...field}
                       size={inputSize}
                       className={cn('w-full', keyInputClassName)}
@@ -151,7 +151,7 @@ export const KeyValueFieldArray = <
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       {...field}
                       size={inputSize}
                       className={cn('w-full', valueInputClassName)}

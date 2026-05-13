@@ -1,6 +1,6 @@
 import { useFlag, useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
+import { Alert, AlertTitle, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
@@ -20,12 +20,10 @@ const DataApiOverview = () => {
   return (
     <div className="max-w-4xl flex flex-col">
       {!isProjectLoading && project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <AlertCircle size={16} />
-          <AlertTitle_Shadcn_>
-            API settings are unavailable as the project is not active
-          </AlertTitle_Shadcn_>
-        </Alert_Shadcn_>
+          <AlertTitle>API settings are unavailable as the project is not active</AlertTitle>
+        </Alert>
       ) : (
         <>
           <div

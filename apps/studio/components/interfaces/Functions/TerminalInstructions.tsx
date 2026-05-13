@@ -3,12 +3,7 @@ import { useParams } from 'common'
 import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
-import {
-  Button,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import type { Commands } from './Functions.types'
 import CommandRender from '@/components/interfaces/Functions/CommandRender'
@@ -19,13 +14,13 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
 
-interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
+interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible> {
   closable?: boolean
   removeBorder?: boolean
 }
 
 export const TerminalInstructions = forwardRef<
-  ElementRef<typeof Collapsible_Shadcn_>,
+  ElementRef<typeof Collapsible>,
   TerminalInstructionsProps
 >(({ closable = false, removeBorder = false, ...props }, ref) => {
   const router = useRouter()
@@ -90,14 +85,14 @@ export const TerminalInstructions = forwardRef<
   ]
 
   return (
-    <Collapsible_Shadcn_
+    <Collapsible
       ref={ref}
       open={showInstructions}
       className="w-full"
       onOpenChange={() => setShowInstructions(!showInstructions)}
       {...props}
     >
-      <CollapsibleTrigger_Shadcn_ className="flex w-full justify-between" disabled={!closable}>
+      <CollapsibleTrigger className="flex w-full justify-between" disabled={!closable}>
         <div className="flex items-center gap-x-3">
           <div className="flex items-center justify-center w-8 h-8 p-2 border rounded-sm bg-alternative">
             <Terminal strokeWidth={2} />
@@ -113,8 +108,8 @@ export const TerminalInstructions = forwardRef<
             )}
           </div>
         )}
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="w-full transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
+      </CollapsibleTrigger>
+      <CollapsibleContent className="w-full transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
         <CommandRender commands={commands} className="my-4" />
         {tokens && tokens.length === 0 ? (
           <div className="py-4 space-y-3 border-t">
@@ -150,8 +145,8 @@ export const TerminalInstructions = forwardRef<
             </div>
           </div>
         )}
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleContent>
+    </Collapsible>
   )
 })
 

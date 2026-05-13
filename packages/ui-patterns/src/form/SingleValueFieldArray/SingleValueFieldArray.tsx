@@ -8,7 +8,7 @@ import {
   FieldValues,
   useFieldArray,
 } from 'react-hook-form'
-import { Button, cn, FormControl, FormField, FormItem, FormMessage, Input_Shadcn_ } from 'ui'
+import { Button, cn, FormControl, FormField, FormItem, FormMessage, Input } from 'ui'
 
 export interface SingleValueFieldArrayProps<
   TFieldValues extends FieldValues,
@@ -27,7 +27,7 @@ export interface SingleValueFieldArrayProps<
   removeLabel?: string
   disabled?: boolean
   minimumRows?: number
-  inputSize?: React.ComponentProps<typeof Input_Shadcn_>['size']
+  inputSize?: React.ComponentProps<typeof Input>['size']
   inputAutoComplete?: string
   className?: string
   rowsClassName?: string
@@ -95,7 +95,7 @@ export const SingleValueFieldArray = <
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       {...field}
                       size={inputSize}
                       autoComplete={inputAutoComplete}

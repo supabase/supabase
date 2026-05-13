@@ -1,9 +1,9 @@
 import { useParams } from 'common'
 import { AlertTriangleIcon } from 'lucide-react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Dialog,
   DialogClose,
@@ -77,12 +77,10 @@ This mode is similar to connecting to your database directly. There is full supp
         </DialogSection>
         {primaryConfig?.pool_mode === 'session' && (
           <div className="px-6">
-            <Alert_Shadcn_ variant="warning">
+            <Alert variant="warning">
               <AlertTriangleIcon strokeWidth={2} />
-              <AlertTitle_Shadcn_>
-                Pooling mode is currently configured to use session mode
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Pooling mode is currently configured to use session mode</AlertTitle>
+              <AlertDescription>
                 To use transaction mode concurrently with session mode, change the pooling mode to
                 transaction first in the{' '}
                 <span
@@ -97,8 +95,8 @@ This mode is similar to connecting to your database directly. There is full supp
                 </span>
                 . After this, you can use transaction mode on port 6543 and session mode on port
                 5432.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           </div>
         )}
         <DialogFooter>
