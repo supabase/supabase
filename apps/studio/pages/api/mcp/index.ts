@@ -9,6 +9,7 @@ import {
   fromNodeHeaders,
   zBooleanString,
 } from '@/lib/api/apiHelpers'
+import apiWrapper from '@/lib/api/apiWrapper'
 import {
   getDatabaseOperations,
   getDebuggingOperations,
@@ -32,13 +33,13 @@ const mcpQuerySchema = z.object({
     )
     .pipe(z.array(supportedFeatureGroupSchema).optional()),
   read_only: zBooleanString()
-    .default('false')
+    .default('true')
     .describe(
-      'Indicates whether or not the MCP server should operate in read-only mode. This prevents write operations on any of your databases by executing SQL as a read-only Postgres user.'
+      'Indicates whether or not the MCP server should operate in read-only mode. Defaults to true for safety. Set to false to enable write operations.'
     ),
 })
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case 'POST':
       return handlePost(req, res)
@@ -47,6 +48,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(405).json({ error: { message: `Method ${req.method} Not Allowed` } })
   }
 }
+
+export default (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { error, data } = mcpQuerySchema.safeParse(req.query)
@@ -89,5 +93,3 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: 'Unable to process MCP request', cause: error })
   }
 }
-
-export default handler
