@@ -3,12 +3,8 @@
 // `otelUnifiedLogs` feature flag can route traffic between the two paths
 // during the migration. This file should be deleted once the flag is
 // removed.
-//
-// TODO(safeSQL): every interpolation here (filter values, log types, facet
-// names) is concatenated directly into a SQL string. The platform's
-// safeSQL helper isn't available for the analytics endpoint dialect yet;
-// when it is, this module should pass through it (cc: @charislam).
 
+import { literal } from '@supabase/pg-meta/src/pg-format'
 import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
@@ -22,6 +18,12 @@ const SPECIAL_FILTER_PARAMS = ['date'] as const
 
 // Combined list of all parameters to exclude from standard filtering
 const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
+
+// Strips `literal()`'s surrounding quotes so the value can be concatenated
+// inside a `LIKE '%...%'` clause without re-escaping; quotes and back-
+// slashes are already escaped by literal().
+const likeValue = (value: unknown): string =>
+  literal(String(value)).replace(/^E?'/, '').replace(/'$/, '')
 
 /**
  * Builds query conditions from search parameters and returns WHERE clause
@@ -40,16 +42,16 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
 
     // Handle array filters (IN clause)
     if (Array.isArray(value) && value.length > 0) {
-      whereConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      whereConditions.push(`${key} IN (${value.map((v) => literal(String(v))).join(',')})`)
       return
     }
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
       if (['host', 'pathname'].includes(key)) {
-        whereConditions.push(`${key} LIKE '%${value}%'`)
+        whereConditions.push(`${key} LIKE '%${likeValue(value)}%'`)
       } else {
-        whereConditions.push(`${key} = '${value}'`)
+        whereConditions.push(`${key} = ${literal(String(value))}`)
       }
     }
   })
@@ -390,16 +392,16 @@ const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): s
 
     // Handle array filters (IN clause)
     if (Array.isArray(value) && value.length > 0) {
-      conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      conditions.push(`${key} IN (${value.map((v) => literal(String(v))).join(',')})`)
       return
     }
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
       if (['host', 'pathname'].includes(key)) {
-        conditions.push(`${key} LIKE '%${value}%'`)
+        conditions.push(`${key} LIKE '%${likeValue(value)}%'`)
       } else {
-        conditions.push(`${key} = '${value}'`)
+        conditions.push(`${key} = ${literal(String(value))}`)
       }
     }
   })
@@ -424,7 +426,7 @@ ${facet}_count AS (
   FROM unified_logs
   ${buildFacetWhere(search, `${facet}`) || `WHERE ${facet} IS NOT NULL`}
   ${buildFacetWhere(search, `${facet}`) ? ` AND ${facet} IS NOT NULL` : ''}
-  ${!!facetSearch ? `AND ${facet} LIKE '%${facetSearch}%'` : ''}
+  ${!!facetSearch ? `AND ${facet} LIKE '%${likeValue(facetSearch)}%'` : ''}
   GROUP BY ${facet}
   LIMIT ${MAX_FACETS_QUANTITY}
 )

@@ -37,6 +37,19 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
     })
 
+    it('escapes single quotes in filter values to prevent SQL injection', () => {
+      const sql = getUnifiedLogsQuery({
+        ...baseSearch,
+        method: [`G'ET`],
+        pathname: `/customers'; DROP TABLE logs --`,
+      } as any)
+      // Single quotes are doubled (SQL-standard escaping) by pg-meta's
+      // literal(); a raw single quote from user input never closes its
+      // string literal early.
+      expect(sql).toContain(`'G''ET'`)
+      expect(sql).toContain(`%/customers''; DROP TABLE logs --%`)
+    })
+
     it('translates method/status/pathname filters to log_attributes predicates', () => {
       const sql = getUnifiedLogsQuery({
         ...baseSearch,

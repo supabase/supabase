@@ -1,3 +1,4 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
@@ -21,11 +22,6 @@ import {
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
-
-// Matches uuid-shaped strings (hex + dashes, up to 64 chars). Used to
-// validate user-supplied ids before interpolating them into the OTEL SQL
-// templates — see TODO(safeSQL) in getUnifiedLogInspection.
-const UUID_LIKE_PATTERN = /^[0-9a-fA-F-]{1,64}$/
 
 // Service flow types — subset of LOG_TYPES that support service flows.
 export const SERVICE_FLOW_TYPES = [
@@ -188,18 +184,15 @@ export async function getUnifiedLogInspection(
   // so existing panel components that read `enrichedData['request.path']`
   // etc. keep working without per service flow SQL.
   //
-  // TODO(safeSQL): drop the regex guard once the platform's safeSQL helper
-  // is available for the analytics endpoint and we can parameterise `id`
-  // through it (cc: @charislam). For now `logId` comes from a URL query
-  // parameter, so we reject anything that isn't a uuid-shape before
-  // interpolating it into the ClickHouse string literal.
-  if (!UUID_LIKE_PATTERN.test(logId)) {
-    throw new Error('Invalid logId')
-  }
-  const sql = `
+  // `logId` ultimately originates from a URL query parameter, so we route
+  // every interpolation through pg-meta's `literal()` / `safeSql` helpers.
+  // The analytics endpoint uses ClickHouse SQL string literal escaping
+  // rules (single quotes doubled), which matches Postgres and what
+  // `literal()` produces.
+  const sql = safeSql`
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
-WHERE id = '${logId}'
+WHERE id = ${literal(logId)}
 LIMIT 1
 `.trim()
 
@@ -230,11 +223,11 @@ LIMIT 1
   // cross-source join in the legacy BigQuery service-flow queries.
   if (row.source === 'function_edge_logs') {
     const executionId = row.log_attributes?.['execution_id'] ?? row.log_attributes?.['request_id']
-    if (typeof executionId === 'string' && UUID_LIKE_PATTERN.test(executionId)) {
-      const fnSql = `
+    if (typeof executionId === 'string') {
+      const fnSql = safeSql`
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
-WHERE source = 'function_logs' AND log_attributes['execution_id'] = '${executionId}'
+WHERE source = 'function_logs' AND log_attributes['execution_id'] = ${literal(executionId)}
 ORDER BY timestamp ASC
 LIMIT 100
 `.trim()

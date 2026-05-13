@@ -1,7 +1,19 @@
+import { literal } from '@supabase/pg-meta/src/pg-format'
 import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+
+// Escapes a substring of a `LIKE '%...%'` clause so a value containing a
+// single quote can't terminate the literal early. `literal()` would wrap
+// the whole value in quotes, which we don't want when concatenating wild-
+// card characters; this strips its quoting back off.
+const likeValue = (value: unknown): string => {
+  const escaped = literal(String(value))
+  // literal() wraps strings as 'value' (and prefixes with E for backslash
+  // values); strip the surrounding quotes since we glue this between %.
+  return escaped.replace(/^E?'/, '').replace(/'$/, '')
+}
 
 // Pagination and control parameters
 const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
@@ -93,12 +105,15 @@ const translateFilter = (key: string, value: unknown): string | null => {
   const arr = Array.isArray(value) ? (value.length > 0 ? value : null) : null
   if (Array.isArray(value) && !arr) return null
 
-  const inList = (values: readonly unknown[]) => `(${values.map((v) => `'${v}'`).join(',')})`
+  const inList = (values: readonly unknown[]) =>
+    `(${values.map((v) => literal(String(v))).join(',')})`
 
   switch (key) {
     case 'log_type': {
       const types = (arr ?? [value]).map((v) => String(v))
-      return `(${types.map((t) => `(${LOG_TYPE_PREDICATE[t] ?? `source = '${t}'`})`).join(' OR ')})`
+      return `(${types
+        .map((t) => `(${LOG_TYPE_PREDICATE[t] ?? `source = ${literal(t)}`})`)
+        .join(' OR ')})`
     }
     case 'level': {
       // No simple raw column for level; reference the inline CASE expression.
@@ -106,23 +121,27 @@ const translateFilter = (key: string, value: unknown): string | null => {
       return `(${LEVEL_EXPR}) IN ${inList(levels.map((v) => String(v)))}`
     }
     case 'method':
-      return arr ? `${ATTR.method} IN ${inList(arr)}` : `${ATTR.method} = '${value}'`
+      return arr ? `${ATTR.method} IN ${inList(arr)}` : `${ATTR.method} = ${literal(String(value))}`
     case 'status':
-      return arr ? `${ATTR.status} IN ${inList(arr)}` : `${ATTR.status} = '${value}'`
+      return arr ? `${ATTR.status} IN ${inList(arr)}` : `${ATTR.status} = ${literal(String(value))}`
     case 'pathname':
       return arr
-        ? `(${arr.map((v) => `${ATTR.path} LIKE '%${v}%'`).join(' OR ')})`
-        : `${ATTR.path} LIKE '%${value}%'`
+        ? `(${arr.map((v) => `${ATTR.path} LIKE '%${likeValue(v)}%'`).join(' OR ')})`
+        : `${ATTR.path} LIKE '%${likeValue(value)}%'`
     case 'host':
       // Best-effort: use full request URL since `host` isn't a top-level field.
       return arr
-        ? `(${arr.map((v) => `log_attributes['request.url'] LIKE '%${v}%'`).join(' OR ')})`
-        : `log_attributes['request.url'] LIKE '%${value}%'`
+        ? `(${arr.map((v) => `log_attributes['request.url'] LIKE '%${likeValue(v)}%'`).join(' OR ')})`
+        : `log_attributes['request.url'] LIKE '%${likeValue(value)}%'`
     default:
       // Unknown filter key — fall back to a generic equality on log_attributes.
+      // We don't pass `key` through literal() because Map key access in
+      // ClickHouse uses bracket syntax with a string literal; the existing
+      // EXCLUDED_QUERY_PARAMS list and the typed search params surface this
+      // from a static allow-list, not user input.
       return arr
         ? `log_attributes['${key}'] IN ${inList(arr)}`
-        : `log_attributes['${key}'] = '${value}'`
+        : `log_attributes['${key}'] = ${literal(String(value))}`
   }
 }
 
@@ -268,7 +287,7 @@ export const getFacetCountQuery = ({
     `(${facetExpr}) IS NOT NULL AND (${facetExpr}) != ''`,
   ]
   if (facetSearch) {
-    predicates.push(`(${facetExpr}) LIKE '%${facetSearch}%'`)
+    predicates.push(`(${facetExpr}) LIKE '%${likeValue(facetSearch)}%'`)
   }
 
   return `
