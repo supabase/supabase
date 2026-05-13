@@ -148,6 +148,13 @@ export const formatBytes = (
   return isNegative ? '-' + formattedValue : formattedValue
 }
 
+export const formatBytesMinMB = (bytes: any, decimals = 2) => {
+  if (bytes === 0 || bytes === undefined) return '0 MB'
+  const MB = 1024 * 1024
+  if (Math.abs(bytes) < MB) return formatBytes(bytes, decimals, 'MB')
+  return formatBytes(bytes, decimals)
+}
+
 export const snakeToCamel = (str: string) =>
   str.replace(/([-_][a-z])/g, (group: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')

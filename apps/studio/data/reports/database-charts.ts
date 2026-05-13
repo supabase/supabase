@@ -7,7 +7,7 @@ import { DiskAttributesData } from '@/data/config/disk-attributes-query'
 import { MaxConnectionsData } from '@/data/database/max-connections-query'
 import { Project } from '@/data/projects/project-detail-query'
 import { DOCS_URL } from '@/lib/constants'
-import { formatBytes } from '@/lib/helpers'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 // Compute variants below 4XL run on EBS instances that draw on a burst
 // credit pool for disk IO, so the burst balance chart only makes sense for
@@ -68,7 +68,7 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: number) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
       },
       attributes: [
         {
@@ -109,7 +109,8 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: number) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+        domain: [0, (dataMax: number) => Math.max(dataMax, 512 * 1024 * 1024)],
       },
       attributes: [
         {
