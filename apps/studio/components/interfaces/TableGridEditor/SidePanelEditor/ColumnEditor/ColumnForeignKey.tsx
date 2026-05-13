@@ -17,7 +17,11 @@ interface ColumnForeignKeyProps {
   relations: ForeignKey[]
   closePanel: () => void
   onOpenChange?: (open: boolean) => void
-  onUpdateColumnType: (type: string) => void
+  onUpdateColumnType: (selection: {
+    format: string
+    formatSchema?: string
+    isArray: boolean
+  }) => void
   onUpdateFkRelations: (fks: ForeignKey[]) => void
 }
 
@@ -149,8 +153,14 @@ const ColumnForeignKey = ({
             } else {
               onUpdateFkRelations(relations.concat([fk]))
             }
-            const targetType = fk.columns.find((col) => col.source === column.name)?.targetType
-            if (targetType) onUpdateColumnType(targetType)
+            const matched = fk.columns.find((col) => col.source === column.name)
+            if (matched?.targetType) {
+              onUpdateColumnType({
+                format: matched.targetType,
+                formatSchema: matched.targetTypeSchema,
+                isArray: matched.targetIsArray ?? false,
+              })
+            }
           }}
         />
       )}

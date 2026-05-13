@@ -18,6 +18,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
+import { normalizeFormatSchema } from '../ColumnEditor/ColumnEditor.utils'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
@@ -145,8 +146,14 @@ export const ForeignKeySelector = ({
     const updatedRelations = fk.columns.map((x, i) => {
       if (i === idx) {
         if (key === 'target') {
-          const targetType = selectedTable?.columns?.find((col) => col.name === value)?.format
-          return { ...x, [key]: value, targetType }
+          const targetCol = selectedTable?.columns?.find((col) => col.name === value)
+          return {
+            ...x,
+            [key]: value,
+            targetType: targetCol?.format,
+            targetTypeSchema: normalizeFormatSchema(targetCol?.format_schema),
+            targetIsArray: targetCol?.data_type === 'ARRAY',
+          }
         } else {
           const sourceType = table.columns.find((col) => col.name === value)?.format as string
           return { ...x, [key]: value, sourceType }

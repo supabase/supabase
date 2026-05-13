@@ -164,7 +164,17 @@ export const TableEditor = ({
       relation.columns.forEach((column) => {
         const sourceColumn = tableFields.columns.find((col) => col.name === column.source)
         if (sourceColumn?.isNewColumn && column.targetType) {
-          updatedColumns.push({ ...sourceColumn, format: column.targetType })
+          const isArray = column.targetIsArray ?? false
+          const bareFormat =
+            isArray && column.targetType.startsWith('_')
+              ? column.targetType.slice(1)
+              : column.targetType
+          updatedColumns.push({
+            ...sourceColumn,
+            format: bareFormat,
+            formatSchema: column.targetTypeSchema,
+            isArray,
+          })
         }
       })
     })

@@ -22,7 +22,7 @@ import type { Dictionary } from '@/types'
 const isImplicitTypeSchema = (schema: string | undefined) =>
   schema === 'public' || schema === 'pg_catalog'
 
-const normalizeFormatSchema = (schema: string | undefined): string | undefined =>
+export const normalizeFormatSchema = (schema: string | undefined): string | undefined =>
   isImplicitTypeSchema(schema) ? undefined : schema
 
 const isSQLExpression = (input: string) => {

@@ -406,17 +406,14 @@ export const ColumnEditor = ({
                 column={columnFields}
                 relations={fkRelations}
                 closePanel={closePanel}
-                onUpdateColumnType={(format: string) => {
-                  if (format[0] === '_') {
-                    onUpdateField({
-                      format: format.slice(1),
-                      formatSchema: undefined,
-                      isArray: true,
-                      isIdentity: false,
-                    })
-                  } else {
-                    onUpdateField({ format, formatSchema: undefined })
-                  }
+                onUpdateColumnType={({ format, formatSchema, isArray }) => {
+                  const bareFormat = isArray && format.startsWith('_') ? format.slice(1) : format
+                  onUpdateField({
+                    format: bareFormat,
+                    formatSchema,
+                    isArray,
+                    isIdentity: isArray ? false : columnFields.isIdentity,
+                  })
                 }}
                 onOpenChange={setForeignKeySelectorOpen}
                 onUpdateFkRelations={setFkRelations}
