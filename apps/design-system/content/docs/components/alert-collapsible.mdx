@@ -1,0 +1,39 @@
+---
+title: Alert Collapsible
+description: An alert-styled block with a collapsible content section, toggled by an icon button.
+component: true
+---
+
+Alert Collapsible combines an Alert-style container with a collapsible content section. Use it when the callout itself needs to stay visible while optional detail can be expanded.
+
+<ComponentPreview name="alert-collapsible-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { AlertCollapsible } from 'ui'
+```
+
+```tsx
+<AlertCollapsible trigger="Need help?">
+  <p>Content revealed when expanded.</p>
+</AlertCollapsible>
+```
+
+### Default open
+
+```tsx
+<AlertCollapsible trigger="Details" defaultOpen>
+  <p>This section is expanded by default.</p>
+</AlertCollapsible>
+```
+
+### Variants
+
+Supports the same `variant` prop as Alert: `default`, `destructive`, and `warning`.
+
+```tsx
+<AlertCollapsible trigger="Warning" variant="warning">
+  <p>Something needs attention.</p>
+</AlertCollapsible>
+```

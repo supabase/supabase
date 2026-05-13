@@ -245,6 +245,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Alert Collapsible',
+          href: '/docs/components/alert-collapsible',
+          items: [],
+        },
+        {
           title: 'Alert Dialog',
           href: '/docs/components/alert-dialog',
           items: [],
