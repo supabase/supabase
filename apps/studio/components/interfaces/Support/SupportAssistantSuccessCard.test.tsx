@@ -7,15 +7,15 @@ import { SupportAssistantSuccessCard } from './SupportAssistantSuccessCard'
 import type { SubmittedSupportRequest } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 
-const { chatInstances, mockNewChat, mockOpenSidebar, mockSelectChat, mockUseChat } = vi.hoisted(
-  () => ({
+const { chatInstances, mockNewChat, mockOpenSidebar, mockSelectChat, mockTrack, mockUseChat } =
+  vi.hoisted(() => ({
     chatInstances: {} as Record<string, unknown>,
     mockNewChat: vi.fn(),
     mockOpenSidebar: vi.fn(),
     mockSelectChat: vi.fn(),
+    mockTrack: vi.fn(),
     mockUseChat: vi.fn(),
-  })
-)
+  }))
 
 vi.mock('@ai-sdk/react', () => ({
   useChat: mockUseChat,
@@ -43,6 +43,10 @@ vi.mock('@/state/sidebar-manager-state', () => ({
   useSidebarManagerSnapshot: () => ({
     openSidebar: mockOpenSidebar,
   }),
+}))
+
+vi.mock('@/lib/telemetry/track', () => ({
+  useTrack: () => mockTrack,
 }))
 
 vi.mock('@/components/ui/AIAssistantPanel/Message', () => ({
@@ -75,6 +79,7 @@ describe('SupportAssistantSuccessCard', () => {
     mockNewChat.mockReset()
     mockOpenSidebar.mockReset()
     mockSelectChat.mockReset()
+    mockTrack.mockReset()
     mockUseChat.mockReset()
 
     mockNewChat.mockImplementation(() => {
@@ -140,6 +145,14 @@ describe('SupportAssistantSuccessCard', () => {
     const button = await screen.findByRole('button', { name: /open assistant response/i })
     await user.click(button)
 
+    expect(mockTrack).toHaveBeenCalledWith(
+      'support_assistant_follow_up_card_clicked',
+      { ticketCategory: SupportCategories.PROBLEM },
+      {
+        project: 'project-1',
+        organization: 'org-1',
+      }
+    )
     expect(mockSelectChat).toHaveBeenCalledWith('chat-1')
     expect(mockOpenSidebar).toHaveBeenCalledWith('ai-assistant')
   })

@@ -18,6 +18,7 @@ import type { SubmittedSupportRequest } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Message } from '@/components/ui/AIAssistantPanel/Message'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot, type AiAssistantState } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -40,6 +41,7 @@ export function SupportAssistantSuccessCard({
   const hasAssistantContext = hasProjectScopedAssistantContext(request.projectRef)
   const aiAssistant = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
+  const track = useTrack()
   const createdChatIdRef = useRef<string>()
   const [chatId, setChatId] = useState<string>()
   const chat = chatId ? aiAssistant.chatInstances[chatId] : undefined
@@ -60,6 +62,15 @@ export function SupportAssistantSuccessCard({
   }, [aiAssistant, assistantPrompt, hasAssistantContext])
 
   const handleOpenAssistant = () => {
+    track(
+      'support_assistant_follow_up_card_clicked',
+      { ticketCategory: request.category },
+      {
+        project: request.projectRef,
+        organization: request.organizationSlug,
+      }
+    )
+
     if (chatId) {
       aiAssistant.selectChat(chatId)
     }

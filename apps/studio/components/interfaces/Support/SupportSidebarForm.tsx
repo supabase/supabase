@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+import { useFlag } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useReducer } from 'react'
@@ -51,6 +52,7 @@ interface SupportFormProps {
 export function SupportForm({ initialParams }: SupportFormProps) {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
   const { form, initialError, projectRef } = useSupportForm(dispatch, initialParams)
+  const showSupportAssistantFollowUp = useFlag('supportAssistantFollowUp') === true
 
   const {
     data: allStatusPageEvents,
@@ -79,6 +81,7 @@ export function SupportForm({ initialParams }: SupportFormProps) {
 
   const successState = state.type === 'success' ? state : null
   const showAssistantSuccessCard =
+    showSupportAssistantFollowUp &&
     successState !== null &&
     successState.submittedRequest.projectRef !== undefined &&
     successState.submittedRequest.projectRef !== NO_PROJECT_MARKER
