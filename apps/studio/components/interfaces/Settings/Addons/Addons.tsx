@@ -3,7 +3,6 @@ import { useFlag, useParams } from 'common'
 import { Lock } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
-import Link from 'next/link'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -268,15 +267,13 @@ export const Addons = () => {
                   <p className="m-0 text-foreground-light text-sm">
                     Reserve a dedicated IPv4 address for your project.
                   </p>
-                  <Link
+                  <InlineLink
+                    className="text-foreground-light"
                     href={`${DOCS_URL}/guides/platform/ipv4-address`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-link text-sm"
-                    onClick={(event) => event.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     About IPv4 deprecation
-                  </Link>
+                  </InlineLink>
                 </div>
               </ResourceItem>
             )}
@@ -320,15 +317,13 @@ export const Addons = () => {
                 <p className="m-0 text-foreground-light text-sm">
                   Restore your database to a specific moment in the past.
                 </p>
-                <Link
+                <InlineLink
                   href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-link text-sm"
-                  onClick={(event) => event.stopPropagation()}
+                  className="text-foreground-light"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   About PITR backups
-                </Link>
+                </InlineLink>
               </div>
             </ResourceItem>
 
@@ -378,15 +373,13 @@ export const Addons = () => {
                   <p className="m-0 text-foreground-light text-sm">
                     Serve your project on your own domain name.
                   </p>
-                  <Link
+                  <InlineLink
                     href={`${DOCS_URL}/guides/platform/custom-domains`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-link text-sm"
-                    onClick={(event) => event.stopPropagation()}
+                    className="text-foreground-light"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     About custom domains
-                  </Link>
+                  </InlineLink>
                 </div>
               </ResourceItem>
             )}

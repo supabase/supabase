@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -16,6 +15,7 @@ import {
 
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
@@ -144,9 +144,9 @@ const CustomDomainSidePanel = () => {
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
-            <Link href={`/project/${projectRef}/settings/general`} className="text-brand">
+            <InlineLink href={`/project/${projectRef}/settings/general#custom-domains`}>
               General Settings
-            </Link>{' '}
+            </InlineLink>{' '}
             page after enabling the add-on.
           </p>
 
