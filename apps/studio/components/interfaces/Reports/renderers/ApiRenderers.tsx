@@ -9,7 +9,6 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  Collapsible,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -179,7 +178,7 @@ export const TopApiRoutesRenderer = (
   if (props.data.length === 0) return null
 
   return (
-    <Collapsible>
+    <>
       <Table
         className="rounded-t-none"
         head={
@@ -223,22 +222,20 @@ export const TopApiRoutesRenderer = (
           </>
         }
       />
-      <Collapsible.Trigger asChild>
-        <div className="flex flex-row justify-end w-full gap-2 p-1">
-          <Button
-            type="text"
-            onClick={() => setShowMore(!showMore)}
-            className={[
-              'transition',
-              showMore ? 'text-foreground' : 'text-foreground-lighter',
-              props.data.length <= 3 ? 'hidden' : '',
-            ].join(' ')}
-          >
-            {!showMore ? 'Show more' : 'Show less'}
-          </Button>
-        </div>
-      </Collapsible.Trigger>
-    </Collapsible>
+      <div className="flex flex-row justify-end w-full gap-2 p-1">
+        <Button
+          type="text"
+          onClick={() => setShowMore(!showMore)}
+          className={[
+            'transition',
+            showMore ? 'text-foreground' : 'text-foreground-lighter',
+            props.data.length <= 3 ? 'hidden' : '',
+          ].join(' ')}
+        >
+          {!showMore ? 'Show more' : 'Show less'}
+        </Button>
+      </div>
+    </>
   )
 }
 

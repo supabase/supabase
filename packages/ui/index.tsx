@@ -7,7 +7,6 @@ export * from './src/components/Icon/IconBackground'
 
 export * from './src/components/Tabs'
 export * from './src/components/Accordion'
-export * from './src/components/Collapsible'
 
 // NAV
 

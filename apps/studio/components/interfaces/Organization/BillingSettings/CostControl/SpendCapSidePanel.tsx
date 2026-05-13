@@ -7,7 +7,14 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { pricing } from 'shared-data/pricing'
 import { toast } from 'sonner'
-import { Button, cn, Collapsible, SidePanel } from 'ui'
+import {
+  Button,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  SidePanel,
+} from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import Table from '@/components/to-be-cleaned/Table'
@@ -104,7 +111,7 @@ const SpendCapSidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       header={
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between w-full">
           <h4>Spend cap</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
@@ -126,8 +133,8 @@ const SpendCapSidePanel = () => {
             exceed the included quota allowance of any billed line item in a billing cycle
           </p>
 
-          <Collapsible open={showUsageCosts} onOpenChange={setShowUsageCosts}>
-            <Collapsible.Trigger asChild>
+          <Collapsible_Shadcn_ open={showUsageCosts} onOpenChange={setShowUsageCosts}>
+            <CollapsibleTrigger_Shadcn_ asChild>
               <div className="flex items-center space-x-2 cursor-pointer">
                 <ChevronRight
                   strokeWidth={1.5}
@@ -138,8 +145,8 @@ const SpendCapSidePanel = () => {
                   How are each resource charged after exceeding the included quota?
                 </p>
               </div>
-            </Collapsible.Trigger>
-            <Collapsible.Content asChild>
+            </CollapsibleTrigger_Shadcn_>
+            <CollapsibleContent_Shadcn_ asChild>
               <Table
                 className="mt-4"
                 head={
@@ -184,8 +191,8 @@ const SpendCapSidePanel = () => {
                   )
                 })}
               />
-            </Collapsible.Content>
-          </Collapsible>
+            </CollapsibleContent_Shadcn_>
+          </Collapsible_Shadcn_>
 
           {isFreePlan && (
             <Admonition
