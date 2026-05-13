@@ -1,14 +1,14 @@
-import type { PGTable } from '@supabase/pg-meta'
 import { some } from 'lodash'
 
 import {
   generateColumnField,
-  generateColumnFieldFromPostgresColumn,
+  generateColumnFieldFromPGColumn,
 } from '../ColumnEditor/ColumnEditor.utils'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 
 type ValidateFieldsReturn = {
   name?: string
@@ -41,7 +41,7 @@ export const generateTableField = (): TableField => {
 }
 
 export const generateTableFieldFromPGTable = (
-  table: PGTable,
+  table: SafePostgresTable,
   foreignKeys: ForeignKeyConstraint[],
   isDuplicating = false,
   isRealtimeEnabled = false
@@ -51,7 +51,7 @@ export const generateTableFieldFromPGTable = (
     name: isDuplicating ? `${table.name}_duplicate` : table.name,
     comment: isDuplicating ? `This is a duplicate of ${table.name}` : table?.comment,
     columns: (table.columns ?? []).map((column) => {
-      return generateColumnFieldFromPostgresColumn(column, table, foreignKeys)
+      return generateColumnFieldFromPGColumn(column, table, foreignKeys)
     }),
     isRLSEnabled: table.rls_enabled,
     isRealtimeEnabled,

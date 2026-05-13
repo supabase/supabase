@@ -1,4 +1,3 @@
-import type { PGTable } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -55,14 +54,15 @@ import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface TableListProps {
   onAddTable: () => void
-  onEditTable: (table: PGTable) => void
-  onDeleteTable: (table: PGTable) => void
-  onDuplicateTable: (table: PGTable) => void
+  onEditTable: (table: SafePostgresTable) => void
+  onDeleteTable: (table: SafePostgresTable) => void
+  onDuplicateTable: (table: SafePostgresTable) => void
 }
 
 export const TableList = ({

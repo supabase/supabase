@@ -1,8 +1,10 @@
 import type { PGColumn, PGTable } from '@supabase/pg-meta'
 
+import type { DeepReadonly } from '@/lib/type-helpers'
+
 interface Props {
   table: PGTable
-  column?: PGColumn
+  column?: DeepReadonly<PGColumn>
 }
 
 export const HeaderTitle = ({ table, column }: Props) => {

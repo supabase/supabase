@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 
 import pgMeta from '../src/index'
+import { rawSql } from '../src/pg-format'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
@@ -43,6 +44,7 @@ withTestDatabase('list columns', async ({ executeQuery }) => {
       "default_value": null,
       "enums": [],
       "format": "int8",
+      "format_schema": "pg_catalog",
       "id": StringMatching /\\^\\\\d\\+\\\\\\.3\\$/,
       "identity_generation": null,
       "is_generated": false,
@@ -98,6 +100,7 @@ withTestDatabase('list columns from a single table', async ({ executeQuery }) =>
         "default_value": null,
         "enums": [],
         "format": "text",
+        "format_schema": "pg_catalog",
         "id": StringMatching /\\^\\\\d\\+\\\\\\.\\\\d\\+\\$/,
         "identity_generation": null,
         "is_generated": false,
@@ -118,6 +121,7 @@ withTestDatabase('list columns from a single table', async ({ executeQuery }) =>
         "default_value": null,
         "enums": [],
         "format": "text",
+        "format_schema": "pg_catalog",
         "id": StringMatching /\\^\\\\d\\+\\\\\\.\\\\d\\+\\$/,
         "identity_generation": null,
         "is_generated": false,
@@ -184,7 +188,7 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
     schema: 'public',
     table: 't',
     name: 'c',
-    type: 'int2',
+    type: { name: 'int2' },
     default_value: 42,
     comment: 'foo',
   })
@@ -210,6 +214,7 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
       "default_value": "42",
       "enums": [],
       "format": "int2",
+      "format_schema": "pg_catalog",
       "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
       "identity_generation": null,
       "is_generated": false,
@@ -229,7 +234,7 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
   // Update column
   const { sql: updateSql } = await pgMeta.columns.update(column!, {
     name: 'c1',
-    type: 'int4',
+    type: { name: 'int4' },
     drop_default: true,
     is_identity: true,
     identity_generation: 'ALWAYS',
@@ -258,6 +263,7 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
       "default_value": null,
       "enums": [],
       "format": "int4",
+      "format_schema": "pg_catalog",
       "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
       "identity_generation": "ALWAYS",
       "is_generated": false,
@@ -309,6 +315,7 @@ withTestDatabase('enum column with quoted name', async ({ executeQuery }) => {
         "v",
       ],
       "format": "T",
+      "format_schema": "public",
       "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
       "identity_generation": null,
       "is_generated": false,
@@ -335,7 +342,7 @@ withTestDatabase('primary key column', async ({ executeQuery }) => {
     schema: 'public',
     table: 't',
     name: 'c',
-    type: 'int2',
+    type: { name: 'int2' },
     is_primary_key: true,
   })
   await executeQuery(createColumnSql)
@@ -368,7 +375,7 @@ withTestDatabase('unique column', async ({ executeQuery }) => {
     schema: 'public',
     table: 't',
     name: 'c',
-    type: 'int2',
+    type: { name: 'int2' },
     is_unique: true,
   })
   await executeQuery(createColumnSql)
@@ -403,35 +410,35 @@ describe('array column', async () => {
 
   test.concurrent.for([
     // numerical types
-    { type: 'int2[]', etype: '_int2' },
-    { type: 'int4[]', etype: '_int4' },
-    { type: 'int8[]', etype: '_int8' },
-    { type: 'float4[]', etype: '_float4' },
-    { type: 'float8[]', etype: '_float8' },
-    { type: 'numeric[]', etype: '_numeric' },
+    { type: 'int2', etype: '_int2' },
+    { type: 'int4', etype: '_int4' },
+    { type: 'int8', etype: '_int8' },
+    { type: 'float4', etype: '_float4' },
+    { type: 'float8', etype: '_float8' },
+    { type: 'numeric', etype: '_numeric' },
     // json types
-    { type: 'json[]', etype: '_json' },
-    { type: 'jsonb[]', etype: '_jsonb' },
+    { type: 'json', etype: '_json' },
+    { type: 'jsonb', etype: '_jsonb' },
     // text types
-    { type: 'text[]', etype: '_text' },
-    { type: 'varchar[]', etype: '_varchar' },
+    { type: 'text', etype: '_text' },
+    { type: 'varchar', etype: '_varchar' },
     // datetime types
-    { type: 'timestamp[]', etype: '_timestamp' },
-    { type: 'timestamptz[]', etype: '_timestamptz' },
-    { type: 'date[]', etype: '_date' },
-    { type: 'time[]', etype: '_time' },
-    { type: 'timetz[]', etype: '_timetz' },
+    { type: 'timestamp', etype: '_timestamp' },
+    { type: 'timestamptz', etype: '_timestamptz' },
+    { type: 'date', etype: '_date' },
+    { type: 'time', etype: '_time' },
+    { type: 'timetz', etype: '_timetz' },
     // other types
-    { type: 'uuid[]', etype: '_uuid' },
-    { type: 'bool[]', etype: '_bool' },
-    { type: 'bytea[]', etype: '_bytea' },
-  ])('$type -> $etype', async (c, { expect, task }) => {
+    { type: 'uuid', etype: '_uuid' },
+    { type: 'bool', etype: '_bool' },
+    { type: 'bytea', etype: '_bytea' },
+  ])('$type[] -> $etype', async (c, { expect, task }) => {
     const id = { schema: 'public', table: 't', name: `c${task.id}` }
 
     // Create column with default value
     const { sql } = pgMeta.columns.create({
       ...id,
-      type: c.type,
+      type: { name: c.type, isArray: true },
       default_value: null,
     })
     await db.executeQuery(sql)
@@ -446,6 +453,7 @@ describe('array column', async () => {
       data_type: 'ARRAY',
       default_value: null,
       format: c.etype,
+      format_schema: 'pg_catalog',
       id: expect.stringMatching(/^\d+\.\d+$/),
       ordinal_position: expect.any(Number),
       table_id: expect.any(Number),
@@ -533,12 +541,16 @@ describe('column with default value', async () => {
     const id = { schema: 'public', table: 't', name: `c${task.id}` }
 
     // Create column with default value
-    const { sql } = pgMeta.columns.create({
-      ...id,
-      type: c.type,
-      default_value: c.value,
-      default_value_format: c.exp ? 'expression' : 'literal',
-    })
+    const { sql } = pgMeta.columns.create(
+      c.exp
+        ? {
+            ...id,
+            type: { name: c.type },
+            default_value_format: 'expression',
+            default_value: rawSql(String(c.value)),
+          }
+        : { ...id, type: { name: c.type }, default_value_format: 'literal', default_value: c.value }
+    )
     await db.executeQuery(sql)
 
     // Retrieve and verify the created column
@@ -551,6 +563,7 @@ describe('column with default value', async () => {
       data_type: c.etype,
       default_value: c.evalue,
       format: c.type,
+      format_schema: 'pg_catalog',
       id: expect.stringMatching(/^\d+\.\d+$/),
       ordinal_position: expect.any(Number),
       table_id: expect.any(Number),
@@ -578,7 +591,7 @@ withTestDatabase('alter column to type with uppercase', async ({ executeQuery })
     schema: 'public',
     table: 't',
     name: 'c',
-    type: 'text',
+    type: { name: 'text' },
     is_unique: false,
   })
   await executeQuery(createSql)
@@ -592,7 +605,7 @@ withTestDatabase('alter column to type with uppercase', async ({ executeQuery })
   const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update column
-  const { sql: updateSql } = await pgMeta.columns.update(column!, { type: 'T' })
+  const { sql: updateSql } = await pgMeta.columns.update(column!, { type: { name: 'T' } })
   await executeQuery(updateSql)
 
   // Verify updated column
@@ -616,6 +629,7 @@ withTestDatabase('alter column to type with uppercase', async ({ executeQuery })
       "default_value": null,
       "enums": [],
       "format": "T",
+      "format_schema": "public",
       "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
       "identity_generation": null,
       "is_generated": false,
@@ -639,16 +653,16 @@ withTestDatabase('enums are populated in enum array columns', async ({ executeQu
   await executeQuery('CREATE TABLE t ()')
 
   // Create column
-  const { sql: createSql } = await pgMeta.columns.create({
+  const { sql: createSql } = pgMeta.columns.create({
     schema: 'public',
     table: 't',
     name: 'c',
-    type: '_test_enum',
+    type: { name: 'test_enum', isArray: true },
   })
   await executeQuery(createSql)
 
   // Verify created column
-  const { sql: verifySql, zod: verifyZod } = await pgMeta.columns.retrieve({
+  const { sql: verifySql, zod: verifyZod } = pgMeta.columns.retrieve({
     schema: 'public',
     table: 't',
     name: 'c',
@@ -670,6 +684,7 @@ withTestDatabase('enums are populated in enum array columns', async ({ executeQu
         "a",
       ],
       "format": "_test_enum",
+      "format_schema": "public",
       "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
       "identity_generation": null,
       "is_generated": false,
@@ -697,7 +712,7 @@ withTestDatabase('drop with cascade', async ({ executeQuery }) => {
   `)
 
   // Retrieve column
-  const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
+  const { sql: retrieveSql, zod: retrieveZod } = pgMeta.columns.retrieve({
     schema: 'public',
     table: 't',
     name: 'id',
@@ -705,11 +720,11 @@ withTestDatabase('drop with cascade', async ({ executeQuery }) => {
   const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Remove column with cascade
-  const { sql: removeSql } = await pgMeta.columns.remove(column!, { cascade: true })
+  const { sql: removeSql } = pgMeta.columns.remove(column!, { cascade: true })
   await executeQuery(removeSql)
 
   // Verify original column was removed
-  const { sql: verifyIdSql, zod: verifyIdZod } = await pgMeta.columns.retrieve({
+  const { sql: verifyIdSql, zod: verifyIdZod } = pgMeta.columns.retrieve({
     schema: 'public',
     table: 't',
     name: 'id',
@@ -718,7 +733,7 @@ withTestDatabase('drop with cascade', async ({ executeQuery }) => {
   expect(removedColumn).toBeUndefined()
 
   // Verify dependent column was also removed
-  const { sql: verifyTIdSql, zod: verifyTIdZod } = await pgMeta.columns.retrieve({
+  const { sql: verifyTIdSql, zod: verifyTIdZod } = pgMeta.columns.retrieve({
     schema: 'public',
     table: 't',
     name: 't_id',
@@ -732,7 +747,7 @@ withTestDatabase('column with multiple checks', async ({ executeQuery }) => {
   await executeQuery('create table t(c int8 check (c != 0) check (c != -1))')
 
   // List columns
-  const { sql, zod } = await pgMeta.columns.list()
+  const { sql, zod } = pgMeta.columns.list()
   const res = zod.parse(await executeQuery(sql))
 
   const columns = res
@@ -748,6 +763,7 @@ withTestDatabase('column with multiple checks', async ({ executeQuery }) => {
         "default_value": null,
         "enums": [],
         "format": "int8",
+        "format_schema": "pg_catalog",
         "identity_generation": null,
         "is_generated": false,
         "is_identity": false,
@@ -784,6 +800,7 @@ withTestDatabase('column with multiple unique constraints', async ({ executeQuer
         "default_value": null,
         "enums": [],
         "format": "int8",
+        "format_schema": "pg_catalog",
         "identity_generation": null,
         "is_generated": false,
         "is_identity": false,
@@ -839,7 +856,7 @@ withTestDatabase('column with fully-qualified type', async ({ executeQuery }) =>
     schema: 'public',
     table: 't',
     name: 'c',
-    type: 's.my_type',
+    type: { schema: 's', name: 'my_type' },
   })
   await executeQuery(createColumnSql)
 
@@ -864,6 +881,7 @@ withTestDatabase('column with fully-qualified type', async ({ executeQuery }) =>
       "default_value": null,
       "enums": [],
       "format": "my_type",
+      "format_schema": "s",
       "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
       "identity_generation": null,
       "is_generated": false,
@@ -880,3 +898,70 @@ withTestDatabase('column with fully-qualified type', async ({ executeQuery }) =>
   `
   )
 })
+
+withTestDatabase('format_schema for built-in type', async ({ executeQuery }) => {
+  await executeQuery(`create table t (c int4)`)
+
+  const { sql, zod } = pgMeta.columns.retrieve({ schema: 'public', table: 't', name: 'c' })
+  const column = zod.parse((await executeQuery(sql))[0])
+
+  expect(column?.format).toBe('int4')
+  expect(column?.format_schema).toBe('pg_catalog')
+})
+
+withTestDatabase('format_schema for public-schema enum', async ({ executeQuery }) => {
+  await executeQuery(`create type public_enum as enum ('a'); create table t (c public_enum);`)
+
+  const { sql, zod } = pgMeta.columns.retrieve({ schema: 'public', table: 't', name: 'c' })
+  const column = zod.parse((await executeQuery(sql))[0])
+
+  expect(column?.format).toBe('public_enum')
+  expect(column?.format_schema).toBe('public')
+})
+
+withTestDatabase('format_schema for non-public-schema enum', async ({ executeQuery }) => {
+  await executeQuery(`
+    create schema s;
+    create type s.my_enum as enum ('a');
+    create table t (c s.my_enum);
+  `)
+
+  const { sql, zod } = pgMeta.columns.retrieve({ schema: 'public', table: 't', name: 'c' })
+  const column = zod.parse((await executeQuery(sql))[0])
+
+  expect(column?.format).toBe('my_enum')
+  expect(column?.format_schema).toBe('s')
+})
+
+withTestDatabase('format_schema for array of non-public-schema enum', async ({ executeQuery }) => {
+  await executeQuery(`
+    create schema s;
+    create type s.my_enum as enum ('a');
+    create table t (c s.my_enum[]);
+  `)
+
+  const { sql, zod } = pgMeta.columns.retrieve({ schema: 'public', table: 't', name: 'c' })
+  const column = zod.parse((await executeQuery(sql))[0])
+
+  expect(column?.data_type).toBe('ARRAY')
+  expect(column?.format).toBe('_my_enum')
+  expect(column?.format_schema).toBe('s')
+})
+
+withTestDatabase(
+  'format_schema for domain over non-public-schema base type',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+    create schema s;
+    create domain s.my_domain as int4;
+    create table t (c s.my_domain);
+  `)
+
+    const { sql, zod } = pgMeta.columns.retrieve({ schema: 'public', table: 't', name: 'c' })
+    const column = zod.parse((await executeQuery(sql))[0])
+
+    // Domain's `format` resolves to the base type, so `format_schema` follows the base type.
+    expect(column?.format).toBe('int4')
+    expect(column?.format_schema).toBe('pg_catalog')
+  }
+)
