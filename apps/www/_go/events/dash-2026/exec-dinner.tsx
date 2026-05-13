@@ -11,7 +11,7 @@ const page: GoPageInput = {
   metadata: {
     title: 'Executive Dinner | Supabase',
     description:
-      'Join Supabase leaders for an intimate dinner at Manhatta Restaurant on June 10, 2026. Cocktails at 7:00 PM, dinner at 7:30 PM.',
+      'Join Supabase leaders for an intimate dinner at Manhatta Restaurant on June 10, 2026. Cocktails at 6:30 PM, dinner at 7:00 PM.',
   },
   hero: {
     title: 'The future of scalable databases',
@@ -44,8 +44,8 @@ const page: GoPageInput = {
           <p>Manhatta Restaurant</p>
           <p>28 Liberty St, 60th Floor</p>
           <p className="mt-4 text-lg font-medium text-foreground">Schedule</p>
-          <p>7:00 PM — Cocktails and introductions</p>
-          <p>7:30 PM — Dinner and discussion</p>
+          <p>6:30 PM — Cocktails and introductions</p>
+          <p>7:00 PM — Dinner and discussion</p>
         </div>
       ),
     },
