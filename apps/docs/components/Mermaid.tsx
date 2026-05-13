@@ -5,23 +5,16 @@ interface MermaidProps {
 }
 
 export function Mermaid({ chart }: MermaidProps) {
-  let svg: string
-  try {
-    svg = renderMermaidSVG(chart, {
-      bg: 'hsl(var(--background-default))',
-      fg: 'hsl(var(--foreground-default))',
-      accent: 'hsl(var(--brand-default))',
-      muted: 'hsl(var(--foreground-light))',
-      line: 'hsl(var(--border-strong))',
-      border: 'hsl(var(--border-strong))',
-      surface: 'hsl(var(--background-surface-200))',
-      transparent: true,
-    })
-  } catch (err) {
-    return (
-      <pre className="text-warning text-sm">{err instanceof Error ? err.message : String(err)}</pre>
-    )
-  }
+  const svg = renderMermaidSVG(chart, {
+    bg: 'hsl(var(--background-default))',
+    fg: 'hsl(var(--foreground-default))',
+    accent: 'hsl(var(--brand-default))',
+    muted: 'hsl(var(--foreground-light))',
+    line: 'hsl(var(--border-strong))',
+    border: 'hsl(var(--border-strong))',
+    surface: 'hsl(var(--background-surface-200))',
+    transparent: true,
+  })
 
   return (
     <div
