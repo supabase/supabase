@@ -30,6 +30,24 @@ const CliLogo = () => (
   </LogoBox>
 )
 
+const CliLoginInterstitial = ({
+  title,
+  description,
+  children,
+}: {
+  title: ReactNode
+  description?: ReactNode
+  children: ReactNode
+}) => (
+  <InterstitialLayout
+    logo={<LogoPair left={<CliLogo />} right={<SupabaseLogo />} />}
+    title={title}
+    description={description}
+  >
+    <div className="px-6 pb-6">{children}</div>
+  </InterstitialLayout>
+)
+
 const CliLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { session_id, public_key, token_name, device_code } = useParams()
@@ -129,29 +147,12 @@ export const CliLoginScreen = ({
     }
   }, [deviceCode, isLoggedIn, navigate, publicKey, routerReady, sessionId, tokenName])
 
-  const withInterstitial = ({
-    title,
-    description,
-    children,
-  }: {
-    title: ReactNode
-    description?: ReactNode
-    children: ReactNode
-  }) => (
-    <InterstitialLayout
-      logo={<LogoPair left={<CliLogo />} right={<SupabaseLogo />} />}
-      title={title}
-      description={description}
-    >
-      <div className="px-6 pb-6">{children}</div>
-    </InterstitialLayout>
-  )
-
   if (status._tag === 'loading') {
-    return withInterstitial({
-      title: <ShimmeringLoader className="mx-auto h-7 w-32 max-w-full py-0" />,
-      description: <ShimmeringLoader className="mx-auto h-4 w-56 max-w-full py-0" />,
-      children: (
+    return (
+      <CliLoginInterstitial
+        title={<ShimmeringLoader className="mx-auto h-7 w-32 max-w-full py-0" />}
+        description={<ShimmeringLoader className="mx-auto h-4 w-56 max-w-full py-0" />}
+      >
         <div className="flex flex-col gap-5">
           <Card className="shadow-none">
             <CardContent className="flex items-center gap-3 border-none px-4 py-3">
@@ -164,17 +165,18 @@ export const CliLoginScreen = ({
           </Card>
           <ShimmeringLoader className="h-20 w-full rounded-lg py-0" />
         </div>
-      ),
-    })
+      </CliLoginInterstitial>
+    )
   }
 
   if (status._tag === 'missing-params') {
     const isPlural = status.missingParameters.length > 1
 
-    return withInterstitial({
-      title: 'Missing sign-in parameters',
-      description: 'This Supabase CLI sign-in request cannot be authorized',
-      children: (
+    return (
+      <CliLoginInterstitial
+        title="Missing sign-in parameters"
+        description="This Supabase CLI sign-in request cannot be authorized"
+      >
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
@@ -186,15 +188,16 @@ export const CliLoginScreen = ({
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
-      ),
-    })
+      </CliLoginInterstitial>
+    )
   }
 
   if (status._tag === 'error') {
-    return withInterstitial({
-      title: 'Unable to create CLI sign-in',
-      description: 'Retry the sign-in command from Supabase CLI',
-      children: (
+    return (
+      <CliLoginInterstitial
+        title="Unable to create CLI sign-in"
+        description="Retry the sign-in command from Supabase CLI"
+      >
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
@@ -213,14 +216,15 @@ export const CliLoginScreen = ({
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
-      ),
-    })
+      </CliLoginInterstitial>
+    )
   }
 
-  return withInterstitial({
-    title: 'Authorize Supabase CLI',
-    description: 'Enter this verification code in Supabase CLI to finish signing in',
-    children: (
+  return (
+    <CliLoginInterstitial
+      title="Authorize Supabase CLI"
+      description="Enter this verification code in Supabase CLI to finish signing in"
+    >
       <div className="flex flex-col gap-5">
         <div className="flex flex-col items-center gap-3">
           <div
@@ -257,8 +261,8 @@ export const CliLoginScreen = ({
           <InlineLink href="/account/tokens">Access Tokens</InlineLink>.
         </p>
       </div>
-    ),
-  })
+    </CliLoginInterstitial>
+  )
 }
 
 export default withAuth(CliLoginPage)
