@@ -28,7 +28,7 @@ interface Props {
 }
 
 function IntegrationPartnersPage(props: Props) {
-  const initialPartners = props.partners ?? []
+  const initialPartners = props.partners
   const [partners, setPartners] = useState(initialPartners)
 
   const categoryMap: { [slug: string]: Category } = {}
@@ -53,25 +53,21 @@ function IntegrationPartnersPage(props: Props) {
   const [isSearching, setIsSearching] = useState(false)
 
   useEffect(() => {
-    const doSearch = async () => {
-      setIsSearching(true)
-      return await searchPartners(search)
-    }
-
-    if (search.trim() === '') {
+    if (debouncedSearchTerm.trim() === '') {
       setIsSearching(false)
       setPartners(initialPartners)
       return
     }
 
-    doSearch().then((partners) => {
+    setIsSearching(true)
+    searchPartners(debouncedSearchTerm).then((partners) => {
       if (partners) {
         setPartners(partners)
       }
 
       setIsSearching(false)
     })
-  }, [debouncedSearchTerm, router])
+  }, [debouncedSearchTerm, initialPartners])
 
   return (
     <>
