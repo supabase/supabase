@@ -8,6 +8,7 @@ export interface ForeignKey {
   columns: {
     source: string
     sourceType?: string
+    sourceTypeSchema?: string
     target: string
     targetType?: string
     targetTypeSchema?: string
@@ -27,6 +28,8 @@ export interface SelectorErrors {
 export interface SelectorTypeError {
   source: string
   sourceType: string
+  sourceTypeSchema?: string
   target: string
   targetType: string
+  targetTypeSchema?: string
 }

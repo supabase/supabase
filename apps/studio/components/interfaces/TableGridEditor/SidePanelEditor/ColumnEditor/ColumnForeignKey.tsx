@@ -7,6 +7,7 @@ import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { ForeignKeyRow } from '../TableEditor/ForeignKeysManagement/ForeignKeyRow'
 import { checkIfRelationChanged } from '../TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
+import { normalizeFormatSchema } from './ColumnEditor.utils'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -56,6 +57,7 @@ const ColumnForeignKey = ({
       id: c.id,
       name: c.name,
       format: c.format || column.format,
+      formatSchema: normalizeFormatSchema(c.format_schema),
       isNewColumn: false,
     }
   })
@@ -130,7 +132,13 @@ const ColumnForeignKey = ({
             name: table.name,
             columns:
               column.isNewColumn && column.name
-                ? formattedColumnsForFkSelector.concat(column)
+                ? formattedColumnsForFkSelector.concat({
+                    id: column.id,
+                    name: column.name,
+                    format: column.format,
+                    formatSchema: column.formatSchema,
+                    isNewColumn: column.isNewColumn,
+                  })
                 : formattedColumnsForFkSelector.map((c) => {
                     if (c.id === column.id) return { ...c, name: column.name }
                     else return c

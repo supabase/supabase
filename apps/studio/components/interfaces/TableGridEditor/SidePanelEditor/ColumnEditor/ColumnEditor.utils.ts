@@ -25,6 +25,11 @@ const isImplicitTypeSchema = (schema: string | undefined) =>
 export const normalizeFormatSchema = (schema: string | undefined): string | undefined =>
   isImplicitTypeSchema(schema) ? undefined : schema
 
+export const displayColumnType = (format: string, formatSchema: string | undefined): string => {
+  const normalized = normalizeFormatSchema(formatSchema)
+  return normalized ? `${normalized}.${format}` : format
+}
+
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
 

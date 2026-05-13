@@ -186,15 +186,8 @@ export const getTableEditorSql = ({ id }: { id?: number }): SafeSqlFragment => {
                             else 'USER-DEFINED'
                         end
                 end,
-                'format', case
-                    when t.typtype = 'e' then
-                        case
-                            when nt.nspname <> 'public' then concat(nt.nspname, '.', coalesce(bt.typname, t.typname))
-                            else coalesce(bt.typname, t.typname)
-                        end
-                    else
-                        coalesce(bt.typname, t.typname)
-                end,
+                'format', coalesce(bt.typname, t.typname),
+                'format_schema', coalesce(nbt.nspname, nt.nspname),
                 'is_identity', a.attidentity in ('a', 'd'),
                 'identity_generation', case a.attidentity
                     when 'a' then 'ALWAYS'

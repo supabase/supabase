@@ -47,6 +47,7 @@ import {
   getUniqueIndexColumnNames,
 } from './ColumnList.utils'
 import { ConstraintToken } from './ConstraintToken'
+import { displayColumnType } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -322,7 +323,7 @@ export const ColumnList = ({
                               <span>{column.data_type}</span>
                               {column.format !== column.data_type && (
                                 <span className="text-xs text-foreground-light">
-                                  {column.format}
+                                  {displayColumnType(column.format, column.format_schema)}
                                 </span>
                               )}
                             </div>
@@ -343,7 +344,9 @@ export const ColumnList = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <p className="text-foreground-lighter">{column.format}</p>
+                        <p className="text-foreground-lighter">
+                          {displayColumnType(column.format, column.format_schema)}
+                        </p>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1.5">{constraintTokens}</div>

@@ -18,7 +18,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
-import { normalizeFormatSchema } from '../ColumnEditor/ColumnEditor.utils'
+import { displayColumnType, normalizeFormatSchema } from '../ColumnEditor/ColumnEditor.utils'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
@@ -53,7 +53,13 @@ interface ForeignKeySelectorProps {
   table: {
     id: number
     name: string
-    columns: { id: string; name: string; format: string; isNewColumn: boolean }[]
+    columns: {
+      id: string
+      name: string
+      format: string
+      formatSchema?: string
+      isNewColumn: boolean
+    }[]
   }
   column?: ColumnField // For ColumnEditor, to prefill when adding a new foreign key
   foreignKey?: ForeignKey
@@ -155,8 +161,13 @@ export const ForeignKeySelector = ({
             targetIsArray: targetCol?.data_type === 'ARRAY',
           }
         } else {
-          const sourceType = table.columns.find((col) => col.name === value)?.format as string
-          return { ...x, [key]: value, sourceType }
+          const sourceCol = table.columns.find((col) => col.name === value)
+          return {
+            ...x,
+            [key]: value,
+            sourceType: sourceCol?.format,
+            sourceTypeSchema: normalizeFormatSchema(sourceCol?.formatSchema),
+          }
         }
       } else {
         return x
@@ -193,11 +204,20 @@ export const ForeignKeySelector = ({
     const typeErrors: SelectorTypeError[] = []
 
     fk.columns.forEach((column) => {
-      const { source, target, sourceType: sType, targetType: tType } = column
+      const {
+        source,
+        target,
+        sourceType: sType,
+        sourceTypeSchema: sSchema,
+        targetType: tType,
+        targetTypeSchema: tSchema,
+      } = column
       const sourceColumn = table.columns.find((col) => col.name === source)
+      const targetColumn = selectedTable?.columns?.find((col) => col.name === target)
       const sourceType = sType ?? sourceColumn?.format ?? ''
-      const targetType =
-        tType ?? selectedTable?.columns?.find((col) => col.name === target)?.format ?? ''
+      const targetType = tType ?? targetColumn?.format ?? ''
+      const sourceTypeSchema = sSchema ?? normalizeFormatSchema(sourceColumn?.formatSchema)
+      const targetTypeSchema = tSchema ?? normalizeFormatSchema(targetColumn?.format_schema)
 
       // [Joshen] Doing this way so that its more readable
       // If either source or target not selected yet, thats okay
@@ -211,14 +231,23 @@ export const ForeignKeySelector = ({
       )
         return
 
-      // Otherwise just check if the format is equal to each other
-      if (sourceType === targetType) return
+      // Otherwise check that the format AND format_schema both match — a same-name
+      // enum in different schemas is a distinct type.
+      if (sourceType === targetType && sourceTypeSchema === targetTypeSchema) return
 
+      const entry: SelectorTypeError = {
+        source,
+        sourceType,
+        sourceTypeSchema,
+        target,
+        targetType,
+        targetTypeSchema,
+      }
       if (sourceColumn?.isNewColumn && targetType !== '') {
-        return typeNotice.push({ source, sourceType, target, targetType })
+        return typeNotice.push(entry)
       }
 
-      typeErrors.push({ source, sourceType, target, targetType })
+      typeErrors.push(entry)
     })
 
     setErrors({ types: typeErrors, typeNotice })
@@ -377,7 +406,9 @@ export const ForeignKeySelector = ({
                                       <div className="flex items-center gap-2">
                                         <span className="text-foreground">{column.name}</span>
                                         <span className="text-foreground-lighter">
-                                          {column.format === '' ? '-' : column.format}
+                                          {column.format === ''
+                                            ? '-'
+                                            : displayColumnType(column.format, column.formatSchema)}
                                         </span>
                                       </div>
                                     </SelectItem_Shadcn_>
@@ -404,7 +435,9 @@ export const ForeignKeySelector = ({
                                     <div className="flex items-center gap-2">
                                       <span className="text-foreground">{column.name}</span>
                                       <span className="text-foreground-lighter">
-                                        {column.format === '' ? '-' : column.format}
+                                        {column.format === ''
+                                          ? '-'
+                                          : displayColumnType(column.format, column.format_schema)}
                                       </span>
                                     </div>
                                   </SelectItem_Shadcn_>
@@ -442,9 +475,9 @@ export const ForeignKeySelector = ({
                               return (
                                 <li key={`type-error-${idx}`}>
                                   <code className="text-code-inline">{x.source}</code> (
-                                  {x.sourceType}) and{' '}
+                                  {displayColumnType(x.sourceType, x.sourceTypeSchema)}) and{' '}
                                   <code className="text-code-inline">{x.target}</code>(
-                                  {x.targetType})
+                                  {displayColumnType(x.targetType, x.targetTypeSchema)})
                                 </li>
                               )
                             })}
@@ -465,7 +498,8 @@ export const ForeignKeySelector = ({
                                 <li key={`type-error-${idx}`}>
                                   <div className="flex items-center gap-x-1">
                                     <code className="text-code-inline">{x.source}</code>{' '}
-                                    <ArrowRight size={14} /> {x.targetType}
+                                    <ArrowRight size={14} />{' '}
+                                    {displayColumnType(x.targetType, x.targetTypeSchema)}
                                   </div>
                                 </li>
                               )
