@@ -22,12 +22,12 @@ import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/Unifi
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-// Service flow types - subset of LOG_TYPES that support service flows
 // Matches uuid-shaped strings (hex + dashes, up to 64 chars). Used to
 // validate user-supplied ids before interpolating them into the OTEL SQL
 // templates — see TODO(safeSQL) in getUnifiedLogInspection.
 const UUID_LIKE_PATTERN = /^[0-9a-fA-F-]{1,64}$/
 
+// Service flow types — subset of LOG_TYPES that support service flows.
 export const SERVICE_FLOW_TYPES = [
   'postgrest',
   'auth',
