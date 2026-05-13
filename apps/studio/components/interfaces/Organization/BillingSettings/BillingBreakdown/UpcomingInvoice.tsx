@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import React from 'react'
 import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -12,6 +11,7 @@ import {
   UpcomingInvoiceResponse,
   useOrgUpcomingInvoiceQuery,
 } from '@/data/invoices/org-invoice-upcoming-query'
+import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import { DOCS_URL } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 
@@ -58,6 +58,8 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
     isSuccess,
   } = useOrgUpcomingInvoiceQuery({ orgSlug: slug })
 
+  const { data: organization } = useOrganizationQuery({ slug })
+
   // For non-platform customers, compute is broken down per project and contains a breakdown array
   const computeItems =
     upcomingInvoice?.lines?.filter(
@@ -100,6 +102,9 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
     upcomingInvoice?.tax_status === 'calculated' && (upcomingInvoice?.tax?.tax_amount ?? 0) > 0
   const taxFailed = upcomingInvoice?.tax_status === 'failed'
 
+  const planFeePaidInAdvance =
+    !planItem && upcomingInvoice?.fixed_fees_billing_mode === 'in_arrears'
+
   return (
     <>
       {isLoading && (
@@ -117,19 +122,21 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
           <div>
             <Table className="w-full text-sm">
               <TableBody>
-                <TableRow>
-                  <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
-                  <TableCell className="text-right py-2 px-0">
-                    {planItem == null ? (
-                      '-'
-                    ) : (
-                      <InvoiceLineItemAmount
-                        amount={planItem.amount}
-                        amountBeforeDiscount={planItem.amount_before_discount}
-                      />
-                    )}
-                  </TableCell>
-                </TableRow>
+                {!planFeePaidInAdvance && (
+                  <TableRow>
+                    <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
+                    <TableCell className="text-right py-2 px-0">
+                      {!planItem ? (
+                        '-'
+                      ) : (
+                        <InvoiceLineItemAmount
+                          amount={planItem.amount}
+                          amountBeforeDiscount={planItem.amount_before_discount}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )}
 
                 {/* Compute section */}
                 <ComputeLineItem
@@ -141,12 +148,9 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       The first project is covered by Compute Credits. Additional projects incur
                       compute costs starting at <span translate="no">$10</span>/month, independent
                       of activity. See{' '}
-                      <Link
-                        href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-                        target="_blank"
-                      >
+                      <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}>
                         docs
-                      </Link>
+                      </InlineLink>
                       .
                     </p>
                   }
@@ -161,12 +165,11 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       Each Read Replica is a dedicated database. You are charged for its resources:
                       Compute, Disk Size, provisioned Disk IOPS, provisioned Disk Throughput, and
                       IPv4. See{' '}
-                      <Link
+                      <InlineLink
                         href={`${DOCS_URL}/guides/platform/manage-your-usage/read-replicas`}
-                        target="_blank"
                       >
                         docs
-                      </Link>
+                      </InlineLink>
                       .
                     </p>
                   }
@@ -366,6 +369,19 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           ? upcomingInvoice.tax!.total_amount_including_tax
                           : upcomingInvoice.amount_projected
                       ) ?? '-'}
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {planFeePaidInAdvance && (
+                  <TableRow className="border-0 hover:bg-transparent">
+                    <TableCell
+                      className="pt-2! pb-0! px-0 text-foreground-light text-xs text-right"
+                      colSpan={2}
+                    >
+                      Your {organization?.plan?.name && `${organization.plan.name} `}Plan fee for
+                      this period has already been paid. This invoice will only reflect usage
+                      charges.
                     </TableCell>
                   </TableRow>
                 )}

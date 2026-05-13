@@ -20,6 +20,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 interface UpdateVersionModalProps {
   visible: boolean
@@ -65,9 +66,9 @@ export const UpdateVersionModal = ({
     // Step 1: Update to the new version
     try {
       await updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
-    } catch (e: any) {
+    } catch (e) {
       // 404: default changed; version cache will refresh via mutation onError. Keep dialog open.
-      if (e?.code === 404) return
+      if ((e as ResponseError)?.code === 404) return
       // Other errors are already toasted by the mutation; do not double-toast here.
       return
     }
@@ -80,10 +81,10 @@ export const UpdateVersionModal = ({
       try {
         await restartPipeline({ projectRef, pipelineId: pipeline.id })
         toast.success('Pipeline successfully updated and is currently restarting')
-      } catch (e: any) {
+      } catch (e) {
         // Clear optimistic state and surface a single concise error
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-        toast.error('Failed to restart pipeline')
+        toast.error(`Failed to restart pipeline: ${(e as ResponseError).message}`)
       }
     } else {
       toast.success('Pipeline successfully updated')

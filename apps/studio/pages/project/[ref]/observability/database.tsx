@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
@@ -132,13 +132,16 @@ const DatabaseUsage = () => {
     !org?.usage_billing_enabled &&
     project?.cloud_provider !== 'FLY'
 
+  const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
+
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
     project!,
     diskConfig,
     maxConnections,
     defaultMaxClientConn,
-    isSpendCapEnabled
+    isSpendCapEnabled,
+    showDiskIOBurstBalanceChart
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({

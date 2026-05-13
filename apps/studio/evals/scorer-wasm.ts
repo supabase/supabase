@@ -1,22 +1,33 @@
-import { EvalScorer } from 'braintrust'
+import { EvalScorer, Trace } from 'braintrust'
 import { parse } from 'libpg-query'
 
 import { AssistantEvalInput, AssistantEvalOutput, Expected } from './scorer'
+import { getParsedToolSpans } from './trace-utils'
+import { executeSqlInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-identifier-quoting'
+
+/** Extracts SQL strings from all `execute_sql` tool spans in the trace. */
+async function getSqlQueries(trace: Trace): Promise<string[]> {
+  const spans = await getParsedToolSpans(trace, 'execute_sql', {
+    inputSchema: executeSqlInputSchema,
+  })
+  return spans.map((s) => s.input.sql)
+}
 
 export const sqlSyntaxScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output }) => {
-  if (output.sqlQueries === undefined || output.sqlQueries.length === 0) {
-    return null
-  }
+> = async ({ trace }) => {
+  if (!trace) return null
+
+  const sqlQueries = await getSqlQueries(trace)
+  if (sqlQueries.length === 0) return null
 
   const errors: string[] = []
   let validQueries = 0
 
-  for (const sql of output.sqlQueries) {
+  for (const sql of sqlQueries) {
     try {
       await parse(sql)
       validQueries++
@@ -28,7 +39,7 @@ export const sqlSyntaxScorer: EvalScorer<
 
   return {
     name: 'SQL Validity',
-    score: validQueries / output.sqlQueries.length,
+    score: validQueries / sqlQueries.length,
     metadata: errors.length > 0 ? { errors } : undefined,
   }
 }
@@ -37,17 +48,17 @@ export const sqlIdentifierQuotingScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output }) => {
-  // Skip if no SQL queries
-  if (!output.sqlQueries?.length) {
-    return null
-  }
+> = async ({ trace }) => {
+  if (!trace) return null
+
+  const sqlQueries = await getSqlQueries(trace)
+  if (sqlQueries.length === 0) return null
 
   const errors: string[] = []
   let totalNeedingQuotes = 0
   let properlyQuoted = 0
 
-  for (const sql of output.sqlQueries) {
+  for (const sql of sqlQueries) {
     try {
       const ast = await parse(sql)
       const identifiers = extractIdentifiers(ast)
