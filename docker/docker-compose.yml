@@ -25,6 +25,7 @@ services:
       timeout: 10s
       interval: 5s
       retries: 3
+      start_period: 60s
     depends_on:
       analytics:
         condition: service_healthy
@@ -86,6 +87,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
     depends_on:
       studio:
         condition: service_healthy
@@ -137,6 +139,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+      start_period: 10s
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -548,6 +551,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 30s
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
@@ -587,6 +591,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+      start_period: 10s
     environment:
       LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
     command:
