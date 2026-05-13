@@ -177,8 +177,6 @@ const namespacedTokens = `  /*
   --border-color-stronger: hsl(var(--border-stronger));
   --border-color-secondary: hsl(var(--border-secondary));
   --border-color-alternative: hsl(var(--border-alternative));
-  --border-color-strong: hsl(var(--border-strong));
-  --border-color-stronger: hsl(var(--border-stronger));
   --border-color-button: hsl(var(--border-button-default));
   --border-color-button-hover: hsl(var(--border-button-hover));
 
