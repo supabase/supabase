@@ -1,3 +1,4 @@
+import { LW15_TWEET_TEXT, LW15_URL } from '~/lib/constants'
 import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
 import { Check } from 'lucide-react'
@@ -5,8 +6,8 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
+
 import useConfData from '../hooks/use-conf-data'
-import { LW15_TWEET_TEXT, LW15_URL } from '~/lib/constants'
 import supabase from '../supabase'
 
 export default function LW15TicketShare() {
@@ -17,7 +18,7 @@ export default function LW15TicketShare() {
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
   const isLessThanMd = useBreakpoint()
-  const downloadLink = useRef<HTMLAnchorElement>()
+  const downloadLink = useRef<HTMLAnchorElement | undefined>(undefined)
   const link = `${LW15_URL}/tickets/${username}?lw=15&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)
   const text = LW15_TWEET_TEXT

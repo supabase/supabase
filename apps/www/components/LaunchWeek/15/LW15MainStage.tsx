@@ -2,20 +2,21 @@ import 'swiper/css'
 import 'swiper/css/a11y'
 import 'swiper/css/navigation'
 import 'swiper/css/controller'
-import React, { useEffect, useRef, useState } from 'react'
+
+import { useBreakpoint } from 'common'
+import SectionContainer from 'components/Layouts/SectionContainer'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button, cn } from 'ui'
-import { useTheme } from 'next-themes'
-import { Swiper, SwiperClass, SwiperRef, SwiperSlide } from 'swiper/react'
-import { Controller, Navigation, A11y } from 'swiper/modules'
-
-import SectionContainer from 'components/Layouts/SectionContainer'
-import { mainDays, WeekDayProps } from './data'
+import React, { useEffect, useRef, useState } from 'react'
 import { useWindowSize } from 'react-use'
-import { useBreakpoint } from 'common'
+import { A11y, Controller, Navigation } from 'swiper/modules'
+import { Swiper, SwiperClass, SwiperRef, SwiperSlide } from 'swiper/react'
+import { Button, cn } from 'ui'
+
+import { mainDays, WeekDayProps } from './data'
 import { DayLink } from './lw15.components'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const LW15MainStage = ({ className }: { className?: string }) => {
   const { resolvedTheme } = useTheme()
@@ -181,7 +182,7 @@ const CardBG = ({ day }: { day: WeekDayProps }) => (
 interface Props {
   className?: string
   slides: WeekDayProps[]
-  swiperRef: React.RefObject<SwiperRef>
+  swiperRef: React.RefObject<SwiperRef | null>
   setControlledSwiper: (swiper: SwiperClass) => void
   controlledSwiper: SwiperClass | null
 }

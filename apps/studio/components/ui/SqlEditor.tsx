@@ -28,7 +28,7 @@ const SqlEditor = ({
   onInputChange = noop,
 }: SqlEditorProps) => {
   const monaco = useMonaco()
-  const editorRef = useRef<any>()
+  const editorRef = useRef<any>(null)
 
   useEffect(() => {
     if (monaco) {

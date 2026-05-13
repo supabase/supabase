@@ -15,7 +15,7 @@ function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) 
   const isBelowSmSynchronous = useRef(isBelowSm)
   isBelowSmSynchronous.current = isBelowSm
 
-  const internalRef = useRef<HTMLInputElement>()
+  const internalRef = useRef<HTMLInputElement | null>(null)
   const combinedRef = (element: HTMLInputElement) => {
     if (ref instanceof Function) {
       ref(element)
