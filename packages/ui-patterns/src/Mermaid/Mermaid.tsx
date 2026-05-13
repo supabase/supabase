@@ -127,6 +127,7 @@ export function Mermaid({ chart, className }: MermaidProps) {
     // Re-initialize mermaid with current theme
     mermaid.initialize({
       startOnLoad: false,
+      securityLevel: 'strict', // Prevent XSS via click directives, javascript: URLs, and %%{init}%% overrides
       theme: 'base',
       themeVariables: isDark ? darkThemeVariables : lightThemeVariables,
       sequence: {
