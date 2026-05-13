@@ -1,6 +1,6 @@
 ---
 id: 'bigquery-destination'
-title: 'BigQuery Destination'
+title: 'BigQuery destination'
 description: 'Configure BigQuery as an external replication destination.'
 subtitle: 'Replicate Supabase Postgres tables to BigQuery.'
 sidebar_label: 'BigQuery'
@@ -23,13 +23,13 @@ Before configuring BigQuery as a destination, set up the following in Google Clo
 2. **BigQuery dataset**: Create a [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
    - Open the BigQuery console in GCP
    - Select your project
-   - Click "Create Dataset"
+   - Click **Create Dataset**
    - Provide a dataset ID, for example `supabase_replication`
 
 3. **GCP service account key**: Create a [service account](https://cloud.google.com/iam/docs/keys-create-delete) with appropriate permissions
-   - Go to IAM & Admin → Service Accounts
-   - Click "Create Service Account"
-   - Grant the **BigQuery Data Editor** role
+   - Go to **IAM & Admin > Service Accounts**
+   - Click **Create Service Account**
+   - Grant the "BigQuery Data Editor" role
    - Create and download the JSON key file
 
 Required permissions:
@@ -43,7 +43,7 @@ Required permissions:
 
 ## Configure BigQuery as a destination
 
-1. Navigate to [Database](/dashboard/project/_/database/replication) → **Replication** in your Supabase Dashboard
+1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination**
 
 3. Configure the general settings:
@@ -72,7 +72,7 @@ Required permissions:
 
 6. Click **Create and start** to begin replication
 
-Your replication pipeline will now start copying data from your database to BigQuery.
+Your replication pipeline now starts copying data from your database to BigQuery.
 
 ## How it works
 

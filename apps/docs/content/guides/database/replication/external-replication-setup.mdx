@@ -1,9 +1,9 @@
 ---
 id: 'external-replication-setup'
-title: 'Set Up External Replication'
+title: 'Set up external replication'
 description: 'Set up external replication using Postgres logical replication.'
 subtitle: 'Configure publications and destinations for external replication.'
-sidebar_label: 'Setting Up'
+sidebar_label: 'Setting up'
 ---
 
 <Admonition type="caution" label="Private Alpha">
@@ -40,7 +40,7 @@ create publication pub_users_orders
 for table users, orders;
 ```
 
-This publication will track all changes (INSERT, UPDATE, DELETE, TRUNCATE) for both the `users` and `orders` tables.
+This publication tracks all changes (INSERT, UPDATE, DELETE, TRUNCATE) for both the `users` and `orders` tables.
 
 ##### Publication for all tables in a schema
 
@@ -49,7 +49,7 @@ This publication will track all changes (INSERT, UPDATE, DELETE, TRUNCATE) for b
 create publication pub_all_public for tables in schema public;
 ```
 
-This will track changes for all existing and future tables in the `public` schema.
+This tracks changes for all existing and future tables in the `public` schema.
 
 ##### Publication for all tables
 
@@ -58,7 +58,7 @@ This will track changes for all existing and future tables in the `public` schem
 create publication pub_all_tables for all tables;
 ```
 
-This will track changes for all tables in your database.
+This tracks changes for all tables in your database.
 
 #### Advanced publication options
 
@@ -72,11 +72,11 @@ create publication pub_users_subset
 for table users (id, email, created_at);
 ```
 
-This will only replicate the `id`, `email`, and `created_at` columns from the `users` table.
+This only replicates the `id`, `email`, and `created_at` columns from the `users` table.
 
 ##### Filtering rows with a predicate
 
-You can filter which rows to replicate using a WHERE clause:
+You can filter which rows to replicate using a `WHERE` clause:
 
 ```sql
 -- Only replicate active users
@@ -90,20 +90,19 @@ for table orders where (created_at > '2024-01-01');
 
 #### Viewing publications in the Dashboard
 
-After creating a publication via SQL, you can view it in the Supabase Dashboard:
+After creating a publication via SQL, you can view it in the Dashboard:
 
-1. Navigate to **Database** → [Publications](/dashboard/project/_/database/publications) in your Supabase Dashboard
+1. Navigate to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Dashboard
 2. You'll see all your publications listed with their tables
 
 ### Step 2: Enable external replication
 
 Before creating an external replication pipeline, enable external replication for your project:
 
-1. Navigate to the [Database](/dashboard/project/_/database/replication) section in your Supabase Dashboard
-2. Select the **Replication** tab
-3. Click **Add destination** to show the replication side panel
-4. Select an external replication destination, such as **BigQuery**
-5. Click **Enable external replication**
+1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
+2. Click **Add destination** to show the replication side panel
+3. Select an external replication destination, such as **BigQuery**
+4. Click **Enable external replication**
 
 <Image
   alt="Enable external replication"
@@ -118,9 +117,9 @@ Once external replication is enabled and you have a Postgres publication, config
 
 #### Choose and configure your destination
 
-Follow these steps to configure your destination. Each destination has its own setup requirements and behavior. **BigQuery** is currently available, and new destinations are in the works.
+Follow these steps to configure your destination. Each destination has its own setup requirements and behavior. **BigQuery** is currently available, and we are working on new destinations.
 
-1. Navigate to [Database](/dashboard/project/_/database/replication) → **Replication** in your Supabase Dashboard
+1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination** if the destination side panel isn't already open
 
 3. Configure the general settings:
@@ -144,11 +143,11 @@ Follow these steps to configure your destination. Each destination has its own s
 
 6. Click **Create and start** to begin replication
 
-Your replication pipeline will now start copying data from your database to your destination.
+Your replication pipeline now starts copying data from your database to your destination.
 
 ### Step 4: Monitor your pipeline
 
-After creating a destination, the replication pipeline will start and appear in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
+After creating a destination, the replication pipeline starts and appears in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
 
 <Image
   alt="External replication destinations list"
@@ -276,6 +275,6 @@ Destination-specific limitations, such as BigQuery's row size limits, are docume
 
 ### Next steps
 
-- [Set Up BigQuery](/docs/guides/database/replication/bigquery)
+- [Set up BigQuery](/docs/guides/database/replication/bigquery)
 - [Monitor external replication](/docs/guides/database/replication/external-replication-monitoring)
 - [View external replication FAQ](/docs/guides/database/replication/external-replication-faq)

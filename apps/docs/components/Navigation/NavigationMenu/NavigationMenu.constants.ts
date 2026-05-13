@@ -1174,16 +1174,16 @@ export const database: NavMenuConstant = {
     ormQuickstarts,
     guiQuickstarts,
     {
-      name: 'Database Replication',
+      name: 'Database replication',
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'External Replication',
+          name: 'External replication',
           url: '/guides/database/replication/external-replication-setup' as `/${string}`,
           items: [
             {
-              name: 'Setting Up',
+              name: 'Setting up',
               url: '/guides/database/replication/external-replication-setup' as `/${string}`,
               items: [
                 {
@@ -1200,11 +1200,11 @@ export const database: NavMenuConstant = {
           ],
         },
         {
-          name: 'Manual Replication',
+          name: 'Manual replication',
           url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
           items: [
             {
-              name: 'Setting Up',
+              name: 'Setting up',
               url: '/guides/database/replication/manual-replication-setup' as `/${string}`,
             },
             {
