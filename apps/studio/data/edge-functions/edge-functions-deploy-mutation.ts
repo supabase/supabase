@@ -17,6 +17,7 @@ type EdgeFunctionsDeployVariables = {
   slug: string
   metadata: Partial<EdgeFunctionsDeployBodyMetadata>
   files: { name: string; content: string }[]
+  authorization?: string
 }
 
 export async function deployEdgeFunction({
@@ -24,6 +25,7 @@ export async function deployEdgeFunction({
   slug,
   metadata: _metadata,
   files,
+  authorization,
 }: EdgeFunctionsDeployVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -36,6 +38,7 @@ export async function deployEdgeFunction({
 
   const { data, error } = await post(`/v1/projects/{ref}/functions/deploy`, {
     params: { path: { ref: projectRef }, query: { slug: slug } },
+    ...(authorization && { headers: { Authorization: authorization } }),
     body: {
       file: files as any,
       metadata: metadata as EdgeFunctionsDeployBodyMetadata,

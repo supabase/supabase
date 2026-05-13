@@ -58,6 +58,8 @@ const {
   'sdk:swift',
 ])
 
+const aiToolsEnabled = true
+
 const jsOnly =
   !sdkCsharpEnabled && !sdkDartEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
 
@@ -148,6 +150,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Build',
       menuItems: [
         [
+          {
+            label: 'AI Tools',
+            icon: 'ai-tools',
+            href: '/guides/ai-tools' as `/${string}`,
+            level: 'ai_tools',
+            enabled: aiToolsEnabled,
+          },
           {
             label: 'Local Development & CLI',
             icon: 'dev-cli',
@@ -327,8 +336,9 @@ export const gettingstarted: NavMenuConstant = {
   title: 'Start with Supabase',
   url: '/guides/getting-started',
   items: [
-    { name: 'Features', url: '/guides/getting-started/features' },
+    { name: 'Build with AI tools', url: '/guides/ai-tools' },
     { name: 'API Keys', url: '/guides/getting-started/api-keys' },
+    { name: 'Local Development', url: '/guides/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
       name: 'Framework Quickstarts',
@@ -493,32 +503,6 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Swift',
           url: '/guides/getting-started/tutorials/with-swift' as `/${string}`,
           enabled: sdkSwiftEnabled,
-        },
-      ],
-    },
-    {
-      name: 'AI Tools',
-      url: undefined,
-      items: [
-        {
-          name: 'Supabase Plugin for AI Coding Agents',
-          url: '/guides/getting-started/plugins' as `/${string}`,
-        },
-        {
-          name: 'Prompts',
-          url: '/guides/getting-started/ai-prompts' as `/${string}`,
-        },
-        {
-          name: 'Agent Skills',
-          url: '/guides/getting-started/ai-skills' as `/${string}`,
-        },
-        {
-          name: 'Supabase MCP server',
-          url: '/guides/getting-started/mcp' as `/${string}`,
-        },
-        {
-          name: 'Deploy MCP servers',
-          url: '/guides/getting-started/byo-mcp' as `/${string}`,
         },
       ],
     },
@@ -2301,6 +2285,47 @@ export const ai: NavMenuConstant = {
         {
           name: 'Mixpeek',
           url: '/guides/ai/examples/mixpeek-video-search' as `/${string}`,
+        },
+      ],
+    },
+  ],
+}
+
+export const ai_tools: NavMenuConstant = {
+  icon: 'ai-tools',
+  title: 'AI Tools',
+  url: '/guides/ai-tools',
+  enabled: aiToolsEnabled,
+  items: [
+    { name: 'Overview', url: '/guides/ai-tools' },
+    {
+      name: 'Agent Plugin',
+      url: '/guides/ai-tools/plugins' as `/${string}`,
+    },
+    {
+      name: 'MCP server',
+      url: '/guides/ai-tools/mcp' as `/${string}`,
+    },
+    {
+      name: 'Agent Skills',
+      url: '/guides/ai-tools/ai-skills' as `/${string}`,
+    },
+    {
+      name: 'Prompts',
+      url: '/guides/ai-tools/ai-prompts' as `/${string}`,
+    },
+
+    {
+      name: 'Build AI features',
+      url: undefined,
+      items: [
+        {
+          name: 'Deploy MCP servers',
+          url: '/guides/ai-tools/byo-mcp' as `/${string}`,
+        },
+        {
+          name: 'Vectors / Embeddings ',
+          url: '/guides/ai' as `/${string}`,
         },
       ],
     },

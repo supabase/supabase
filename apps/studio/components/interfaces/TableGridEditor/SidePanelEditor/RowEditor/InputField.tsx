@@ -276,7 +276,7 @@ export const InputField = ({
             {field.comment && <p>{field.comment}</p>}
           </>
         }
-        onChange={(value: any) => onUpdateField({ [field.name]: value })}
+        onChange={(value: string | null) => onUpdateField({ [field.name]: value })}
         disabled={!isEditable}
       />
     )

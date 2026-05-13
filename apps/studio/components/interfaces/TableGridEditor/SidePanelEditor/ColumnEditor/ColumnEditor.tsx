@@ -98,6 +98,7 @@ export const ColumnEditor = ({
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  const [foreignKeySelectorOpen, setForeignKeySelectorOpen] = useState(false)
   const [createMore, setCreateMore] = useState(false)
   const [placeholder, setPlaceholder] = useState(
     getPlaceholderText(columnFields?.format, columnFields?.name)
@@ -141,6 +142,7 @@ export const ColumnEditor = ({
   useEffect(() => {
     if (visible) {
       setErrors({})
+      setForeignKeySelectorOpen(false)
       const columnFields = isNewRecord
         ? generateColumnField({ schema: selectedTable.schema, table: selectedTable.name })
         : generateColumnFieldFromPostgresColumn(column, selectedTable, foreignKeyMeta)
@@ -402,6 +404,7 @@ export const ColumnEditor = ({
                     onUpdateField({ format })
                   }
                 }}
+                onOpenChange={setForeignKeySelectorOpen}
                 onUpdateFkRelations={setFkRelations}
               />
             </FormSectionContent>
@@ -500,7 +503,7 @@ export const ColumnEditor = ({
             applyButtonLabel="Save"
             closePanel={closePanel}
             applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
-            visible={visible}
+            visible={visible && !foreignKeySelectorOpen}
           >
             {isNewRecord && (
               <div className="flex items-center gap-x-2">

@@ -1,14 +1,13 @@
-import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { source } from 'common-tags'
-import { notFound } from 'next/navigation'
-
 import {
   generateAiPromptMetadata,
   generateAiPromptsStaticParams,
   generateCursorPromptDeepLink,
   getAiPrompt,
   wrapInMarkdownCodeBlock,
-} from './AiPrompts.utils'
+} from '~/app/guides/getting-started/ai-prompts/[slug]/AiPrompts.utils'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { source } from 'common-tags'
+import { notFound } from 'next/navigation'
 
 export const dynamicParams = false
 
@@ -51,7 +50,7 @@ export default async function AiPromptsPage(props: { params: Promise<{ slug: str
       meta={{ title: `AI Prompt: ${heading}` }}
       content={content}
       editLink={newEditLink(`supabase/supabase/blob/master/examples/prompts/${slug}.md`)}
-      pathname={`/guides/getting-started/ai-prompts/${slug}`}
+      pathname={`/guides/ai-tools/ai-prompts/${slug}`}
     />
   )
 }
