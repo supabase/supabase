@@ -206,7 +206,7 @@ const stateOfStartupsData = {
       title: 'The Stack Consolidated',
       shortTitle: 'Tech Stack',
       description:
-        'Supabase gained ground as a primary database, landed strong in its first year as an auth provider, and Postgres became the default analytics store. AWS, GCP, and Azure all lost share to Supabase, Vercel, and Cloudflare. A quieter story: the frontend layer is diversifying fast.',
+        'Supabase gained ground as a primary database, landed strong in its first year as an auth provider, and overtook AWS in hosting. Every hyperscaler lost share. A quieter story: the frontend layer is diversifying fast.',
       pullQuote: {
         quote:
           'We’re building an end-to-end system for wedding planners, all running as one SvelteKit / Supabase instance.',
@@ -239,6 +239,34 @@ const stateOfStartupsData = {
             { percent: 14, label: 'Startups using NextAuth or Auth.js' },
           ],
           charts: ['AuthProviderChart'],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+        {
+          title: 'Hosting and Cloud',
+          description:
+            'Supabase held its lead. Vercel was already ahead of AWS in 2025, and in 2026 it extended that lead by 9 points. Cloudflare grew fastest of all, crossing 27% and passing AWS on the way up. Every hyperscaler lost share.',
+          stats: [
+            { percent: 27, label: 'Startups hosting on Cloudflare' },
+            { percent: 9, label: 'Increase in Vercel hosting share over AWS' },
+            { percent: 0, label: 'Hyperscaler that gained share this year' },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+        {
+          title: 'Frontend Diversifies',
+          description:
+            'React and Next.js both grew. But the quieter story is that four tools went from effectively zero to real share in 12 months: Expo 10%, TanStack 8%, HTMX 4%, Astro 3%. Native mobile also picked up 3 points. The React-Next monoculture cracked.',
+          stats: [
+            { percent: 10, label: 'Startups using Expo (new in 2026)' },
+            { percent: 8, label: 'Startups using TanStack (new in 2026)' },
+            { percent: 3, label: 'Increase in native iOS / Android adoption' },
+          ],
+          charts: [],
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -287,13 +315,41 @@ const stateOfStartupsData = {
           rankedAnswersPair: undefined,
         },
         {
-          title: 'Multi-agent and MCP',
+          title: 'Multi-agent Systems',
           description:
-            '25% of agent builders say multi-agent is in production. 21% in development. 36% planning. Only 16% said no. A year after MCP launched, 57% of respondents have hands on it. Only 14% say they are unfamiliar.',
+            'Three in four agent-builders are already doing multi-agent work. 25% say it is in production. 21% in development. 36% are planning. Only 16% said no. This question was new in 2026; the on-ramp is already steeper than the "are you building agents at all" question was in 2025.',
           stats: [
             { percent: 25, label: 'Agent builders running multi-agent systems in production' },
+            { percent: 21, label: 'Agent builders with multi-agent systems in development' },
+            { percent: 36, label: 'Agent builders planning multi-agent systems' },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+        {
+          title: 'The Operational Gap',
+          description:
+            'Prompt management, evaluation, and AI observability questions were new in 2026. Every answer points to the same thing: most teams ship agents without the operator stack underneath them. Whoever builds the operator tools for the next 500k AI startups has an open market.',
+          stats: [
+            { percent: 33, label: 'Startups with no formal AI evaluation process' },
+            { percent: 0, label: 'Standardized prompt-versioning workflow named by a plurality' },
+            { percent: 0, label: 'AI observability tools used by a majority' },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+        {
+          title: 'MCP Adoption',
+          description:
+            'A year after the protocol launched, 57% of respondents have hands on it. Only 14% say they are unfamiliar. This question is new in 2026 so there is no year-over-year comparison; the speed of the on-ramp is what stands out.',
+          stats: [
             { percent: 57, label: 'Respondents with hands on MCP servers or tools' },
             { percent: 14, label: 'Respondents unfamiliar with MCP' },
+            { percent: 29, label: 'Respondents still evaluating MCP' },
           ],
           charts: ['MCPAdoptionChart'],
           wordCloud: undefined,
@@ -324,13 +380,41 @@ const stateOfStartupsData = {
           rankedAnswersPair: undefined,
         },
         {
-          title: 'The Operator Stack Startups Wish Existed',
+          title: 'Observability',
           description:
-            '56% still don’t use observability tools. “Custom solution” is the fastest-growing answer in observability, up 2.5pp. Custom-built dashboards grew 6 points for growth analytics. “I don’t track this yet” grew 5pp.',
+            '56% still don’t use observability tools. “Custom solution” is the fastest-growing answer, up 2.5pp. Datadog and Prometheus both lost share. Sentry kept its lead and grew slightly. The observability market is bifurcating between Sentry for errors and custom dashboards for everything else.',
           stats: [
             { percent: 56, label: 'Startups that don’t use observability tools' },
+            { percent: 2.5, label: 'Year-over-year growth in custom observability solutions' },
+            { percent: 0, label: 'Hyperscaler observability vendor that gained share' },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+        {
+          title: 'Analytics and Growth Tools',
+          description:
+            '“I don’t track this yet” grew 5pp. HubSpot, Salesforce, Mixpanel, Segment all lost share. Custom-built dashboards grew 6 points. The pattern repeats: skip the vendor, ship something internal, or don’t track at all.',
+          stats: [
+            { percent: 5, label: 'Year-over-year growth in “I don’t track this yet”' },
+            { percent: 6, label: 'Year-over-year growth in custom-built dashboards' },
+            { percent: 0, label: 'Named analytics vendor that gained share this year' },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+        {
+          title: 'Developer Communities',
+          description:
+            '“No, we haven’t built a community” grew 4 points to 48%. “In progress / planning to” shrank. The “yes, we built one” share is flat at 11%. Dev-community-led marketing has a smaller top-of-funnel this year than last.',
+          stats: [
             { percent: 48, label: 'Startups that have not built a developer community' },
             { percent: 11, label: 'Startups that have built a developer community' },
+            { percent: 4, label: 'Year-over-year growth in “no community” share' },
           ],
           charts: [],
           wordCloud: undefined,
@@ -362,7 +446,7 @@ const stateOfStartupsData = {
       title: 'Founder-led. No CRM. Mostly Bootstrapped.',
       shortTitle: 'Go-To-Market',
       description:
-        'Founders still do sales themselves. Two in three have never tried paid acquisition. Pricing is settling on tiered feature plans for the first time. And founders are broadcasting less: X lost six points, conferences emptied out, and one in three respondents now says they have no online persona at all.',
+        'Founders still do sales themselves. Two in three have never tried paid acquisition. Pricing is settling on tiered feature plans for the first time.',
       pullQuote: undefined,
       sections: [
         {
@@ -384,7 +468,44 @@ const stateOfStartupsData = {
           rankedAnswersPair: undefined,
         },
         {
-          title: 'Where Founders Show Up Online',
+          title: 'Sales Motion',
+          description:
+            'Dedicated full-time sales hires usually do not arrive until after the tenth employee. Product-led growth as a motion climbed 4 points to half of respondents. “Not sure yet” is shrinking.',
+          stats: [
+            { percent: 50, label: 'Startups using a product-led growth motion' },
+            { percent: 4, label: 'Year-over-year growth in product-led motion adoption' },
+            { percent: 0, label: 'Startups with a full-time sales team before headcount 10' },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+        {
+          title: 'Pricing Settles',
+          description:
+            'For the first time in the survey, startups are picking a pricing shape earlier in their lifecycle, and they are picking the same one. Tiered feature plans went from 23% to 36% of respondents. The “still experimenting” cohort shrank.',
+          stats: [
+            { percent: 36, label: 'Startups using tiered feature plans' },
+            { percent: 12, label: 'Year-over-year growth in tiered-plan adoption' },
+            { percent: 23, label: 'Tiered-plan share in 2025' },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+      ],
+    },
+    {
+      title: 'Founders Are Broadcasting Less',
+      shortTitle: 'Where they show up',
+      description:
+        'Conferences emptied out. Social media lost users across every major platform except TikTok. 1 in 10 respondents now says they have given up on social media entirely. 1 in 3 says they have no online persona at all.',
+      pullQuote: undefined,
+      sections: [
+        {
+          title: 'The Quiet Exit From Social',
           description:
             'X lost 6 points. LinkedIn lost 3. Reddit and Discord lost 3–4. TikTok was the only platform that grew. The “I have no online persona” share grew 5 points to 33%. One in three respondents is fully offline.',
           stats: [
@@ -405,6 +526,20 @@ const stateOfStartupsData = {
               answers: ['TLDR', 'Lenny’s Newsletter', 'The Pragmatic Engineer'],
             },
           ],
+        },
+        {
+          title: 'Conferences Fell Off',
+          description:
+            '2 in 3 respondents are not attending any industry conference. The “none of the above” cohort jumped 10 points. Google Cloud Next, AWS re:Invent, Microsoft Build, and Y Combinator Demo Day all lost share. Conference-led developer marketing is working for a smaller slice of the market every year.',
+          stats: [
+            { percent: 67, label: 'Respondents not attending any industry conference' },
+            { percent: 10, label: 'Year-over-year growth in “none of the above” share' },
+            { percent: 0, label: 'Named conference that gained share this year' },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
         },
       ],
     },
