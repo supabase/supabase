@@ -71,6 +71,20 @@ const MOCK_ORGANIZATIONS = [
 ]
 const EMPTY_ORGANIZATIONS: Organization[] = []
 
+const RedeemCreditsInterstitial = ({
+  title,
+  description,
+  children,
+}: {
+  title: ReactNode
+  description?: ReactNode
+  children: ReactNode
+}) => (
+  <InterstitialLayout logo={<SupabaseLogo />} title={title} description={description}>
+    <div className="px-6 pb-6">{children}</div>
+  </InterstitialLayout>
+)
+
 const RedeemCreditsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const mock =
@@ -161,33 +175,23 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
     }
   }, [isMockMode, organizationOptions, returnSelectedOrgSlug])
 
-  const withInterstitial = ({
-    title,
-    description,
-    children,
-  }: {
-    title: ReactNode
-    description?: ReactNode
-    children: ReactNode
-  }) => (
-    <InterstitialLayout logo={<SupabaseLogo />} title={title} description={description}>
-      <div className="px-6 pb-6">{children}</div>
-    </InterstitialLayout>
-  )
-
   if (isLoading) {
-    return withInterstitial({
-      title: <ShimmeringLoader className="mx-auto h-7 w-32 max-w-full py-0" />,
-      description: <ShimmeringLoader className="mx-auto h-4 w-56 max-w-full py-0" />,
-      children: <ConnectLoadingCards />,
-    })
+    return (
+      <RedeemCreditsInterstitial
+        title={<ShimmeringLoader className="mx-auto h-7 w-32 max-w-full py-0" />}
+        description={<ShimmeringLoader className="mx-auto h-4 w-56 max-w-full py-0" />}
+      >
+        <ConnectLoadingCards />
+      </RedeemCreditsInterstitial>
+    )
   }
 
   if (mock === 'redeemed') {
-    return withInterstitial({
-      title: 'Credits redeemed',
-      description: 'Your credits were applied to the selected organization',
-      children: (
+    return (
+      <RedeemCreditsInterstitial
+        title="Credits redeemed"
+        description="Your credits were applied to the selected organization"
+      >
         <div className="flex flex-col gap-3">
           <Admonition
             type="success"
@@ -198,8 +202,8 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
             <Link href={`/org/${MOCK_SELECTED_ORG_SLUG}`}>Go to organization</Link>
           </Button>
         </div>
-      ),
-    })
+      </RedeemCreditsInterstitial>
+    )
   }
 
   if (mock === 'already-redeemed' || mock === 'invalid' || mock === 'wrong-account') {
@@ -221,22 +225,24 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
               description: 'Check the code and try again. Codes are case sensitive.',
             }
 
-    return withInterstitial({
-      title: notice.title,
-      description: 'The credit code could not be redeemed',
-      children: (
+    return (
+      <RedeemCreditsInterstitial
+        title={notice.title}
+        description="The credit code could not be redeemed"
+      >
         <div className="flex flex-col gap-3">
           <Admonition type="warning" description={notice.description} />
         </div>
-      ),
-    })
+      </RedeemCreditsInterstitial>
+    )
   }
 
   if (mock === 'error' || isOrganizationsError) {
-    return withInterstitial({
-      title: 'Unable to load credit redemption',
-      description: 'Please try again before redeeming this code',
-      children: (
+    return (
+      <RedeemCreditsInterstitial
+        title="Unable to load credit redemption"
+        description="Please try again before redeeming this code"
+      >
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
@@ -252,8 +258,8 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
             }
           />
         </div>
-      ),
-    })
+      </RedeemCreditsInterstitial>
+    )
   }
 
   const isRedeeming = mock === 'redeeming'
@@ -269,52 +275,51 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
 
   return (
     <>
-      {withInterstitial({
-        title: 'Redeem credits',
-        description: 'Choose an organization to redeem this code',
-        children: (
-          <div className="flex flex-col gap-5">
-            <InterstitialAccountRow displayName={displayName} />
+      <RedeemCreditsInterstitial
+        title="Redeem credits"
+        description="Choose an organization to redeem this code"
+      >
+        <div className="flex flex-col gap-5">
+          <InterstitialAccountRow displayName={displayName} />
 
-            <ConnectOrganizationSelector
-              organizations={organizationOptions}
-              selectedSlug={selectedOrgSlug}
-              disabled={isRedeeming}
-              onSelect={setSelectedOrgSlug}
-              getOrganizationDescription={(organization) => `${organization.plan.name} Plan`}
-              createLabel={
-                organizationOptions.length === 0
-                  ? 'Create your first organization'
-                  : 'Create new organization'
-              }
-              createHref={createOrganizationHref}
+          <ConnectOrganizationSelector
+            organizations={organizationOptions}
+            selectedSlug={selectedOrgSlug}
+            disabled={isRedeeming}
+            onSelect={setSelectedOrgSlug}
+            getOrganizationDescription={(organization) => `${organization.plan.name} Plan`}
+            createLabel={
+              organizationOptions.length === 0
+                ? 'Create your first organization'
+                : 'Create new organization'
+            }
+            createHref={createOrganizationHref}
+          />
+
+          {organizationOptions.length === 0 && (
+            <Admonition
+              type="warning"
+              description="Create an organization before redeeming this credit code."
             />
+          )}
 
-            {organizationOptions.length === 0 && (
-              <Admonition
-                type="warning"
-                description="Create an organization before redeeming this credit code."
-              />
-            )}
-
-            <div className="flex flex-col gap-2">
-              <Button
-                type="primary"
-                block
-                loading={isRedeeming}
-                disabled={!selectedOrgSlug || organizationOptions.length === 0 || isRedeeming}
-                onClick={openRedemption}
-              >
-                Redeem credits
-              </Button>
-              <p className="text-center text-xs text-foreground-lighter text-balance">
-                Credits apply to one organization and are used toward future invoices before your
-                payment method is charged.
-              </p>
-            </div>
+          <div className="flex flex-col gap-2">
+            <Button
+              type="primary"
+              block
+              loading={isRedeeming}
+              disabled={!selectedOrgSlug || organizationOptions.length === 0 || isRedeeming}
+              onClick={openRedemption}
+            >
+              Redeem credits
+            </Button>
+            <p className="text-center text-xs text-foreground-lighter text-balance">
+              Credits apply to one organization and are used toward future invoices before your
+              payment method is charged.
+            </p>
           </div>
-        ),
-      })}
+        </div>
+      </RedeemCreditsInterstitial>
 
       {redemptionModalOrgSlug && (
         <CreditCodeRedemption

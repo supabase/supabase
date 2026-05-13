@@ -99,6 +99,22 @@ const VercelLogo = () => (
   </LogoBox>
 )
 
+const VercelInstallInterstitial = ({
+  description,
+  children,
+}: {
+  description?: ReactNode
+  children: ReactNode
+}) => (
+  <InterstitialLayout
+    logo={<LogoPair left={<VercelLogo />} right={<SupabaseLogo />} />}
+    title="Install Vercel"
+    description={description ?? 'Choose an organization to connect to Vercel'}
+  >
+    <div className="px-6 pb-6">{children}</div>
+  </InterstitialLayout>
+)
+
 const getStringParam = (value: unknown) => (typeof value === 'string' ? value : undefined)
 
 const isSupportedInstallSource = (source?: string) =>
@@ -389,32 +405,19 @@ export const VercelInstallScreen = ({
     !!unsupportedSource ||
     (hasOrganizations && (!selectedOrgSlug || !hasLinkableOrganizations))
 
-  const withInterstitial = ({
-    description,
-    children,
-  }: {
-    description?: ReactNode
-    children: ReactNode
-  }) => (
-    <InterstitialLayout
-      logo={<LogoPair left={<VercelLogo />} right={<SupabaseLogo />} />}
-      title="Install Vercel"
-      description={description ?? 'Choose an organization to connect to Vercel'}
-    >
-      <div className="px-6 pb-6">{children}</div>
-    </InterstitialLayout>
-  )
-
   if (isLoading) {
-    return withInterstitial({
-      description: <ShimmeringLoader className="mx-auto h-4 w-56 max-w-full py-0" />,
-      children: <ConnectLoadingCards />,
-    })
+    return (
+      <VercelInstallInterstitial
+        description={<ShimmeringLoader className="mx-auto h-4 w-56 max-w-full py-0" />}
+      >
+        <ConnectLoadingCards />
+      </VercelInstallInterstitial>
+    )
   }
 
   if (hasMissingParameters || unsupportedSource) {
-    return withInterstitial({
-      children: (
+    return (
+      <VercelInstallInterstitial>
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
@@ -431,13 +434,13 @@ export const VercelInstallScreen = ({
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
-      ),
-    })
+      </VercelInstallInterstitial>
+    )
   }
 
   if (isError) {
-    return withInterstitial({
-      children: (
+    return (
+      <VercelInstallInterstitial>
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
@@ -455,13 +458,13 @@ export const VercelInstallScreen = ({
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
-      ),
-    })
+      </VercelInstallInterstitial>
+    )
   }
 
   if (isInstalled) {
-    return withInterstitial({
-      children: (
+    return (
+      <VercelInstallInterstitial>
         <div className="flex flex-col gap-3">
           <Admonition
             type="success"
@@ -472,12 +475,12 @@ export const VercelInstallScreen = ({
             Continue
           </Button>
         </div>
-      ),
-    })
+      </VercelInstallInterstitial>
+    )
   }
 
-  return withInterstitial({
-    children: (
+  return (
+    <VercelInstallInterstitial>
       <div className="flex flex-col gap-5">
         <InterstitialAccountRow displayName={displayName} />
 
@@ -525,8 +528,8 @@ export const VercelInstallScreen = ({
           )}
         </div>
       </div>
-    ),
-  })
+    </VercelInstallInterstitial>
+  )
 }
 
 const ConnectLoadingCards = () => (

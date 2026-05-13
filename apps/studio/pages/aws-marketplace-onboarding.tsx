@@ -143,6 +143,22 @@ const AwsLogo = () => (
   </LogoBox>
 )
 
+const AwsMarketplaceInterstitial = ({
+  description,
+  children,
+}: {
+  description?: ReactNode
+  children: ReactNode
+}) => (
+  <InterstitialLayout
+    logo={<LogoPair left={<AwsLogo />} right={<SupabaseLogo />} />}
+    title={INTERSTITIAL_TITLE}
+    description={description ?? INTERSTITIAL_DESCRIPTION}
+  >
+    <div className="px-6 pb-6">{children}</div>
+  </InterstitialLayout>
+)
+
 const AwsMarketplaceOnboardingPage: NextPageWithLayout = () => {
   const router = useRouter()
   const buyerId = typeof router.query.buyer_id === 'string' ? router.query.buyer_id : undefined
@@ -322,25 +338,9 @@ export const AwsMarketplaceOnboardingScreen = ({
       }
     }, [effectiveOnboardingInfo, effectiveOrganizations])
 
-  const withInterstitial = ({
-    description,
-    children,
-  }: {
-    description?: ReactNode
-    children: ReactNode
-  }) => (
-    <InterstitialLayout
-      logo={<LogoPair left={<AwsLogo />} right={<SupabaseLogo />} />}
-      title={INTERSTITIAL_TITLE}
-      description={description ?? INTERSTITIAL_DESCRIPTION}
-    >
-      <div className="px-6 pb-6">{children}</div>
-    </InterstitialLayout>
-  )
-
   if (mock === 'invalid' || (!isMockMode && !effectiveBuyerId)) {
-    return withInterstitial({
-      children: (
+    return (
+      <AwsMarketplaceInterstitial>
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
@@ -351,20 +351,23 @@ export const AwsMarketplaceOnboardingScreen = ({
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
-      ),
-    })
+      </AwsMarketplaceInterstitial>
+    )
   }
 
   if (effectiveIsLoading) {
-    return withInterstitial({
-      description: <ShimmeringLoader className="mx-auto h-4 w-56 max-w-full py-0" />,
-      children: <ConnectLoadingCards />,
-    })
+    return (
+      <AwsMarketplaceInterstitial
+        description={<ShimmeringLoader className="mx-auto h-4 w-56 max-w-full py-0" />}
+      >
+        <ConnectLoadingCards />
+      </AwsMarketplaceInterstitial>
+    )
   }
 
   if (mock === 'wrong-account') {
-    return withInterstitial({
-      children: (
+    return (
+      <AwsMarketplaceInterstitial>
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
@@ -374,13 +377,13 @@ export const AwsMarketplaceOnboardingScreen = ({
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
-      ),
-    })
+      </AwsMarketplaceInterstitial>
+    )
   }
 
   if (effectiveIsError) {
-    return withInterstitial({
-      children: (
+    return (
+      <AwsMarketplaceInterstitial>
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
@@ -400,29 +403,28 @@ export const AwsMarketplaceOnboardingScreen = ({
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
-      ),
-    })
+      </AwsMarketplaceInterstitial>
+    )
   }
 
   if (!effectiveEligibility?.eligibility.is_eligible) {
     const reason = effectiveEligibility?.eligibility.reasons[0]
 
-    return withInterstitial({
-      description: getContractIneligibilityDescription(reason),
-      children: (
+    return (
+      <AwsMarketplaceInterstitial description={getContractIneligibilityDescription(reason)}>
         <div className="flex flex-col gap-3">
           <ContractIneligibilityNotice reason={reason} />
           <Button type="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
-      ),
-    })
+      </AwsMarketplaceInterstitial>
+    )
   }
 
   if (orgLinked) {
-    return withInterstitial({
-      children: (
+    return (
+      <AwsMarketplaceInterstitial>
         <div className="flex flex-col gap-3">
           <Admonition
             type="success"
@@ -441,8 +443,8 @@ export const AwsMarketplaceOnboardingScreen = ({
             </Link>
           </Button>
         </div>
-      ),
-    })
+      </AwsMarketplaceInterstitial>
+    )
   }
 
   const showAutoRenewalWarning =
@@ -466,68 +468,66 @@ export const AwsMarketplaceOnboardingScreen = ({
 
   return (
     <>
-      {withInterstitial({
-        children: (
-          <div className="flex flex-col gap-5">
-            {showAutoRenewalWarning && (
-              <AwsMarketplaceAutoRenewalWarning
-                awsContractEndDate={effectiveOnboardingInfo.aws_contract_end_date}
-                awsContractSettingsUrl={effectiveOnboardingInfo.aws_contract_settings_url}
-              />
-            )}
-
-            <InterstitialAccountRow displayName={displayName} />
-
-            <ConnectOrganizationSelector
-              organizations={linkableOrganizations}
-              unavailableOrganizations={unavailableOrganizations}
-              unavailableReason="These may have outstanding invoices or existing marketplace links."
-              getUnavailableOrganizationDescription={(organization) =>
-                getOrganizationUnavailableReason(
-                  eligibilityByOrganizationSlug.get(organization.slug)?.reasons[0]
-                )
-              }
-              selectedSlug={selectedOrgSlug}
-              disabled={isLinking}
-              onSelect={setSelectedOrgSlug}
-              createLabel="Create new organization"
-              onCreate={() => setShowOrgCreationDialog(true)}
+      <AwsMarketplaceInterstitial>
+        <div className="flex flex-col gap-5">
+          {showAutoRenewalWarning && (
+            <AwsMarketplaceAutoRenewalWarning
+              awsContractEndDate={effectiveOnboardingInfo.aws_contract_end_date}
+              awsContractSettingsUrl={effectiveOnboardingInfo.aws_contract_settings_url}
             />
+          )}
 
-            {!hasLinkableOrganizations && hasAnyOrganizations && (
-              <Admonition
-                type="warning"
-                description="None of your current organizations can be linked to this AWS Marketplace subscription."
-              />
-            )}
+          <InterstitialAccountRow displayName={displayName} />
 
-            {!hasAnyOrganizations && (
-              <Admonition
-                type="note"
-                description="Create a new organization and it will be linked to AWS Marketplace automatically."
-              />
-            )}
+          <ConnectOrganizationSelector
+            organizations={linkableOrganizations}
+            unavailableOrganizations={unavailableOrganizations}
+            unavailableReason="These may have outstanding invoices or existing marketplace links."
+            getUnavailableOrganizationDescription={(organization) =>
+              getOrganizationUnavailableReason(
+                eligibilityByOrganizationSlug.get(organization.slug)?.reasons[0]
+              )
+            }
+            selectedSlug={selectedOrgSlug}
+            disabled={isLinking}
+            onSelect={setSelectedOrgSlug}
+            createLabel="Create new organization"
+            onCreate={() => setShowOrgCreationDialog(true)}
+          />
 
-            <div className="flex flex-col gap-5">
-              <Button
-                type="primary"
-                block
-                loading={isLinking}
-                disabled={hasLinkableOrganizations && (!selectedOrgSlug || isLinking)}
-                onClick={primaryAction}
-              >
-                {primaryLabel}
-              </Button>
-              <p className="text-center text-xs text-foreground-lighter text-balance">
-                <InlineLink href={`${DOCS_URL}/guides/platform/aws-marketplace`}>
-                  Learn more
-                </InlineLink>{' '}
-                about billing through AWS.
-              </p>
-            </div>
+          {!hasLinkableOrganizations && hasAnyOrganizations && (
+            <Admonition
+              type="warning"
+              description="None of your current organizations can be linked to this AWS Marketplace subscription."
+            />
+          )}
+
+          {!hasAnyOrganizations && (
+            <Admonition
+              type="note"
+              description="Create a new organization and it will be linked to AWS Marketplace automatically."
+            />
+          )}
+
+          <div className="flex flex-col gap-5">
+            <Button
+              type="primary"
+              block
+              loading={isLinking}
+              disabled={hasLinkableOrganizations && (!selectedOrgSlug || isLinking)}
+              onClick={primaryAction}
+            >
+              {primaryLabel}
+            </Button>
+            <p className="text-center text-xs text-foreground-lighter text-balance">
+              <InlineLink href={`${DOCS_URL}/guides/platform/aws-marketplace`}>
+                Learn more
+              </InlineLink>{' '}
+              about billing through AWS.
+            </p>
           </div>
-        ),
-      })}
+        </div>
+      </AwsMarketplaceInterstitial>
 
       {!isMockMode && effectiveBuyerId && (
         <NewAwsMarketplaceOrgModal
