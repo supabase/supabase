@@ -401,6 +401,18 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
 }
 
 /**
+ * User clicked to connect GitHub during project creation.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationGithubConnectClickedEvent {
+  action: 'project_creation_github_connect_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * Existing project creation form confirm modal was triggered and opened.
  *
  * @group Events
@@ -2728,6 +2740,7 @@ export type AiAssistantSource =
   | 'log_explorer'
   | 'error_code'
   | 'advisor_signal_detail'
+  | 'rls_tester'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3057,6 +3070,36 @@ export interface ComputeBadgeUpgradeClickedEvent {
     upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
   }
   groups: TelemetryGroups
+}
+
+/**
+ * Fly.io deprecation banner rendered for a user with at least one Fly.io project or branch.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FlyDeprecationBannerExposedEvent {
+  action: 'fly_deprecation_banner_exposed'
+  groups: TelemetryGroups
+  properties: {
+    primaryCount: number
+    branchCount: number
+  }
+}
+
+/**
+ * User dismissed the Fly.io deprecation banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FlyDeprecationBannerDismissedEvent {
+  action: 'fly_deprecation_banner_dismissed'
+  groups: TelemetryGroups
+  properties: {
+    primaryCount: number
+    branchCount: number
+  }
 }
 
 /**
@@ -3418,6 +3461,7 @@ export type TelemetryEvent =
   | TimezonePickerClickedEvent
   | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationDefaultPrivilegesExposedEvent
+  | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | TableApiAccessToggleClickedEvent
@@ -3569,6 +3613,8 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
+  | FlyDeprecationBannerExposedEvent
+  | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | HeaderUpgradeCtaClickedEvent

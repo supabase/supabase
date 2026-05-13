@@ -4,9 +4,8 @@ import { noop } from 'lodash'
 import { Loader } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Button, ExpandingTextArea } from 'ui'
 
-import AutoTextArea from '@/components/to-be-cleaned/forms/AutoTextArea'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -87,9 +86,9 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
   }
 
   return (
-    <div className="space-y-2">
-      <AutoTextArea
-        className="w-full"
+    <div className="space-y-2 px-0.5">
+      <ExpandingTextArea
+        className="w-full min-h-auto"
         placeholder="Click to edit."
         value={value}
         onChange={(e: any) => setValue(e.target.value)}

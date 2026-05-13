@@ -1,3 +1,4 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -22,7 +23,7 @@ export async function toggleDatabaseCronJob({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select cron.alter_job(job_id := ${jobId}, active := ${active});`,
+    sql: safeSql`select cron.alter_job(job_id := ${literal(jobId)}, active := ${literal(active)});`,
     queryKey: databaseCronJobsKeys.alter(),
   })
 

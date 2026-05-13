@@ -2,8 +2,8 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabaseMisc'
-import type { Partner } from '~/types/partners'
+import { listPartners, searchPartners } from '~/lib/marketplaceDb'
+import { type Category, type Partner } from '~/types/partners'
 import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
@@ -13,18 +13,10 @@ import { useDebounce } from 'use-debounce'
 
 import TileGrid from '../../../components/Partners/TileGrid'
 
-export async function getStaticProps() {
-  const { data: partners } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('approved', true)
-    .eq('type', 'technology')
-    .order('category')
-    .order('title')
-
+export async function getStaticProps(): Promise<{ props: Props; revalidate: number }> {
   return {
     props: {
-      partners,
+      partners: await listPartners(),
     },
     // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
     revalidate: 1800, // 30 minutes
@@ -39,7 +31,17 @@ function IntegrationPartnersPage(props: Props) {
   const initialPartners = props.partners ?? []
   const [partners, setPartners] = useState(initialPartners)
 
-  const allCategories = Array.from(new Set(initialPartners?.map((p) => p.category)))
+  const categoryMap: { [slug: string]: Category } = {}
+  initialPartners.forEach((p) =>
+    p.categories.forEach((c) => {
+      if (!(c.slug in categoryMap)) {
+        categoryMap[c.slug] = c
+      }
+    })
+  )
+  const allCategories = Object.keys(categoryMap)
+    .toSorted()
+    .map((slug) => categoryMap[slug])
 
   const router = useRouter()
 
@@ -51,26 +53,9 @@ function IntegrationPartnersPage(props: Props) {
   const [isSearching, setIsSearching] = useState(false)
 
   useEffect(() => {
-    const searchPartners = async () => {
+    const doSearch = async () => {
       setIsSearching(true)
-
-      let query = supabase
-        .from('partners')
-        .select('*')
-        .eq('approved', true)
-        .order('category')
-        .order('title')
-
-      if (search.trim()) {
-        query = query.textSearch('tsv', `${search.trim()}`, {
-          type: 'websearch',
-          config: 'english',
-        })
-      }
-
-      const { data: partners } = await query
-
-      return partners
+      return await searchPartners(search)
     }
 
     if (search.trim() === '') {
@@ -79,7 +64,7 @@ function IntegrationPartnersPage(props: Props) {
       return
     }
 
-    searchPartners().then((partners) => {
+    doSearch().then((partners) => {
       if (partners) {
         setPartners(partners)
       }
@@ -141,11 +126,11 @@ function IntegrationPartnersPage(props: Props) {
                   <div className="space-y-1">
                     {allCategories.map((category) => (
                       <button
-                        key={category}
-                        onClick={() => router.push(`#${category.toLowerCase()}`)}
-                        className="text-foreground-light block text-base"
+                        key={category.slug}
+                        onClick={() => router.push(`#${category.slug}`)}
+                        className="text-foreground-light block text-base cursor-pointer"
                       >
-                        {category}
+                        {category.name}
                       </button>
                     ))}
                   </div>

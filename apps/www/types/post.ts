@@ -1,3 +1,5 @@
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client/serialize'
+
 import type { getSortedPosts } from '@/lib/posts'
 
 export interface PostTypes {

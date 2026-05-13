@@ -9,7 +9,7 @@ import {
   IconBroadcast,
   IconDatabaseChanges,
   IconPresence,
-  Input,
+  Input_Shadcn_ as Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -203,8 +203,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 <div className="flex flex-row gap-4 items-center">
                   <p className="w-[60px] flex justify-end text-sm">AND</p>
                   <Input
-                    size="tiny"
-                    className="grow"
+                    className="w-64"
                     placeholder="body=eq.hey"
                     value={tempConfig.filter}
                     onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}

@@ -42,6 +42,7 @@ export const HelpButton = () => {
           isOpen && 'text-background group-hover:text-background'
         )}
       />
+      <span className="sr-only">Help</span>
     </ButtonTooltip>
   )
 }
