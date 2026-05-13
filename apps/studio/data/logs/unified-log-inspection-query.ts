@@ -23,6 +23,11 @@ import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 // Service flow types - subset of LOG_TYPES that support service flows
+// Matches uuid-shaped strings (hex + dashes, up to 64 chars). Used to
+// validate user-supplied ids before interpolating them into the OTEL SQL
+// templates — see TODO(safeSQL) in getUnifiedLogInspection.
+const UUID_LIKE_PATTERN = /^[0-9a-fA-F-]{1,64}$/
+
 export const SERVICE_FLOW_TYPES = [
   'postgrest',
   'auth',
@@ -183,11 +188,12 @@ export async function getUnifiedLogInspection(
   // so existing panel components that read `enrichedData['request.path']`
   // etc. keep working without per service flow SQL.
   //
-  // logId comes from the row data we fetched (a uuid-shaped value), but it
-  // ultimately originates from a URL query parameter. Reject anything that
-  // isn't a plain uuid before interpolating it into SQL so a crafted id
-  // can't break out of the string literal.
-  if (!/^[0-9a-fA-F-]{1,64}$/.test(logId)) {
+  // TODO(safeSQL): drop the regex guard once the platform's safeSQL helper
+  // is available for the analytics endpoint and we can parameterise `id`
+  // through it (cc: @charislam). For now `logId` comes from a URL query
+  // parameter, so we reject anything that isn't a uuid-shape before
+  // interpolating it into the ClickHouse string literal.
+  if (!UUID_LIKE_PATTERN.test(logId)) {
     throw new Error('Invalid logId')
   }
   const sql = `
@@ -224,7 +230,7 @@ LIMIT 1
   // cross-source join in the legacy BigQuery service-flow queries.
   if (row.source === 'function_edge_logs') {
     const executionId = row.log_attributes?.['execution_id'] ?? row.log_attributes?.['request_id']
-    if (typeof executionId === 'string' && /^[0-9a-fA-F-]{1,64}$/.test(executionId)) {
+    if (typeof executionId === 'string' && UUID_LIKE_PATTERN.test(executionId)) {
       const fnSql = `
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
@@ -267,7 +273,7 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useFlag('otelUnifiedLogs')
   return useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
     queryKey: [...logsKeys.serviceFlow(projectRef, search, logId), { otel: useOtel }],
     queryFn: ({ signal }) =>

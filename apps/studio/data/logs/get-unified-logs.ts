@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import { toast } from 'sonner'
 
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
@@ -29,12 +30,10 @@ export async function retrieveUnifiedLogs({
     throw new Error('projectRef is required for retrieveUnifiedLogs')
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search, hoursAgo)
-  const buildQuery = useOtel ? getUnifiedLogsQuery : getUnifiedLogsQueryBq
+  const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
   const sql = `${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${limit}`
 
-  const endpoint = useOtel
-    ? (`/platform/projects/{ref}/analytics/endpoints/logs.all.otel` as const)
-    : (`/platform/projects/{ref}/analytics/endpoints/logs.all` as const)
+  const endpoint = logsAllEndpointUrl(useOtel)
   const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
@@ -84,7 +83,7 @@ export const useGetUnifiedLogsMutation = ({
   UseCustomMutationOptions<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>,
   'mutationFn'
 > = {}) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useFlag('otelUnifiedLogs')
   return useMutation<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>({
     mutationFn: (vars) => retrieveUnifiedLogs({ ...vars, useOtel: vars.useOtel ?? useOtel }),
     async onSuccess(data, variables, context) {

@@ -29,7 +29,7 @@ import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -65,10 +65,7 @@ const LogsQueryPanel = ({
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
   // Staff-only debugging affordance: only show on staging/local, never to
   // enterprise customers running against production.
-  const isStagingOrLocal =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-  const otelToggleEnabled = isStagingOrLocal && !!onUseOtelChange
+  const otelToggleEnabled = IS_STAGING_OR_LOCAL && !!onUseOtelChange
 
   const {
     projectAuthAll: authEnabled,

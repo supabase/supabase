@@ -13,6 +13,9 @@
  */
 
 import type { ServiceFlowType, UnifiedLogInspectionEntry } from './unified-log-inspection-query'
+import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
+
+type Level = (typeof LEVELS)[number]
 
 export type OtelLogRow = {
   id: string
@@ -33,13 +36,13 @@ const OTEL_SOURCE_TO_SERVICE: Record<string, ServiceFlowType | undefined> = {
   postgres_logs: 'postgres',
 }
 
-const httpStatusToLevel = (status: number): 'success' | 'warning' | 'error' => {
+const httpStatusToLevel = (status: number): Level => {
   if (status >= 500) return 'error'
   if (status >= 400) return 'warning'
   return 'success'
 }
 
-const pgSeverityToLevel = (severity: string): 'success' | 'warning' | 'error' => {
+const pgSeverityToLevel = (severity: string): Level => {
   switch (severity) {
     case 'WARNING':
       return 'warning'

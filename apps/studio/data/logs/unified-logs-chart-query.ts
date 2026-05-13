@@ -2,6 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
@@ -39,13 +40,11 @@ export async function getUnifiedLogsChart(
   }
 
   // Get SQL query from utility function (with dynamic bucketing)
-  const sql = useOtel ? getLogsChartQuery(search) : getLogsChartQueryBq(search)
+  const sql = pickLogsQueryBuilder(useOtel, getLogsChartQuery, getLogsChartQueryBq)(search)
 
   let headers = new Headers(headersInit)
 
-  const endpoint = useOtel
-    ? (`/platform/projects/{ref}/analytics/endpoints/logs.all.otel` as const)
-    : (`/platform/projects/{ref}/analytics/endpoints/logs.all` as const)
+  const endpoint = logsAllEndpointUrl(useOtel)
   const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { sql, iso_timestamp_start: dateStart, iso_timestamp_end: dateEnd },
@@ -160,7 +159,7 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useFlag('otelUnifiedLogs')
   return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
     queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),

@@ -1,6 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
 import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
+import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 export type FeaturePreview = {
   key: string
@@ -14,10 +15,6 @@ export type FeaturePreview = {
   /** Visibility in the feature preview modal (For feature flagging a feature preview) */
   enabled: boolean
 }
-
-const IS_STAGING_OR_LOCAL =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')

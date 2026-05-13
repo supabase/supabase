@@ -1,3 +1,14 @@
+// Legacy BigQuery unified-logs queries. Kept side-by-side with
+// UnifiedLogs.queries.ts (the OTEL/ClickHouse version) so the
+// `otelUnifiedLogs` feature flag can route traffic between the two paths
+// during the migration. This file should be deleted once the flag is
+// removed.
+//
+// TODO(safeSQL): every interpolation here (filter values, log types, facet
+// names) is concatenated directly into a SQL string. The platform's
+// safeSQL helper isn't available for the analytics endpoint dialect yet;
+// when it is, this module should pass through it (cc: @charislam).
+
 import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'

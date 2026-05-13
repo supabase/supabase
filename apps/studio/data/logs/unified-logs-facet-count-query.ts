@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl } from './logs-endpoint'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -40,9 +41,7 @@ ${getFacetCountCTE({ search, facet, facetSearch })}
 SELECT dimension, value, count from ${facet}_count;
 `.trim()
 
-  const endpoint = useOtel
-    ? (`/platform/projects/{ref}/analytics/endpoints/logs.all.otel` as const)
-    : (`/platform/projects/{ref}/analytics/endpoints/logs.all` as const)
+  const endpoint = logsAllEndpointUrl(useOtel)
   const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
@@ -63,7 +62,7 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useFlag('otelUnifiedLogs')
   return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: [
       ...logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, search),

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -22,12 +23,10 @@ export async function getUnifiedLogsCount(
     throw new Error('projectRef is required for getUnifiedLogsCount')
   }
 
-  const sql = useOtel ? getLogsCountQuery(search) : getLogsCountQueryBq(search)
+  const sql = pickLogsQueryBuilder(useOtel, getLogsCountQuery, getLogsCountQueryBq)(search)
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
-  const endpoint = useOtel
-    ? (`/platform/projects/{ref}/analytics/endpoints/logs.all.otel` as const)
-    : (`/platform/projects/{ref}/analytics/endpoints/logs.all` as const)
+  const endpoint = logsAllEndpointUrl(useOtel)
   const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
@@ -89,7 +88,7 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useFlag('otelUnifiedLogs')
   return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
     queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search, useOtel }, signal),

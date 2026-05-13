@@ -2,6 +2,7 @@ import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/reac
 import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
@@ -81,7 +82,7 @@ export async function getUnifiedLogs(
    */
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
-  const buildQuery = useOtel ? getUnifiedLogsQuery : getUnifiedLogsQueryBq
+  const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
   const sql = `${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
 
   const cursorValue = pageParam?.cursor
@@ -106,9 +107,7 @@ export async function getUnifiedLogs(
 
   let headers = new Headers(headersInit)
 
-  const endpoint = useOtel
-    ? (`/platform/projects/{ref}/analytics/endpoints/logs.all.otel` as const)
-    : (`/platform/projects/{ref}/analytics/endpoints/logs.all` as const)
+  const endpoint = logsAllEndpointUrl(useOtel)
   const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: timestampEnd, sql },
@@ -182,7 +181,7 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     PageParam | null
   > = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useFlag('otelUnifiedLogs')
   return useInfiniteQuery({
     queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal, pageParam }) => {

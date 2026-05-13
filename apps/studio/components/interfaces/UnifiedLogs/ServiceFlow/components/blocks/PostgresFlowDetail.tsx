@@ -3,6 +3,7 @@ import { Cable, Clock, Database } from 'lucide-react'
 import { memo } from 'react'
 
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
+import { getRowTimestampMs } from '../../../UnifiedLogs.utils'
 import { postgresDetailsFields, postgresPrimaryFields } from '../../config/serviceFlowFields'
 import { BlockFieldConfig } from '../../types'
 import { DetailRow } from '../shared/DetailRow'
@@ -61,14 +62,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   filterFields,
   table,
 }: PostgresFlowDetailProps) {
-  // Prefer the already-parsed Date the row mapper attaches (works for both
-  // BQ microsecond timestamps and OTEL ISO strings). Fall back to the raw
-  // numeric microseconds for older callers that don't pass `date`.
-  const timestampMs = data?.date
-    ? data.date.getTime()
-    : typeof data?.timestamp === 'number'
-      ? data.timestamp / 1000
-      : null
+  const timestampMs = getRowTimestampMs(data)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   const severity: string | undefined =
