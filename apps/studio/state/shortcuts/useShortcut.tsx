@@ -84,6 +84,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   const registerInCommandMenu =
     options?.registerInCommandMenu ?? def.options?.registerInCommandMenu ?? false
   const label = options?.label ?? def.label
+  const conflictBehavior = options?.conflictBehavior ?? def.options?.conflictBehavior
 
   // Stable identity so we don't churn the registration store on every render.
   // setOptions in @tanstack/hotkeys notifies subscribers each call, which
@@ -103,6 +104,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
     timeout,
     meta,
     ...(ignoreInputs !== undefined && { ignoreInputs }),
+    ...(conflictBehavior !== undefined && { conflictBehavior }),
   })
 
   // Handle overrides for command menu

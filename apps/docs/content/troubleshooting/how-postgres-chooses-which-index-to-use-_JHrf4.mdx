@@ -65,7 +65,7 @@ SELECT id FROM some_table
 WHERE data @> '[ { "itemId": "p11" } ]';
 ```
 
-In most cases, developers work with the default BTREE index. It is the most practical and performant in the majority of cases and is compatible with the following filter [operators](https://www.postgresql.org/docs/current/btree-behavior.html):
+In most cases, developers work with the default BTREE index. It is the most practical and performant in the majority of cases and is compatible with the following filter [operators](https://www.postgresql.org/docs/current/btree.html#BTREE-BEHAVIOR):
 
 | Comparison Operator |
 | ------------------- |

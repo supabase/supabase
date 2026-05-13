@@ -13,6 +13,9 @@ interface ResourceWarningMessage {
     critical: { title?: string; description?: string }
   }
   docsUrl?: string
+  // In-app destination for inspecting the metric (e.g. observability charts).
+  // [ref] is replaced with the current project ref at render time.
+  metricsHref?: string
   buttonText?: string
   aiPrompt?: string
   metric: string | null
@@ -55,13 +58,13 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
       warning: {
         title: 'Your project is about to deplete its Disk IO Budget',
         description:
-          'Once exhausted, disk throughput will be throttled to 5 MB/s until the budget resets. Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
+          'Once exhausted, disk throughput will return to its baseline of {baseline} until the budget resets. Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
       },
       critical: {
         title:
-          'Your project has depleted its Disk IO Budget. Disk throughput is throttled to 5 MB/s',
+          'Your project has depleted its Disk IO Budget. Disk throughput is at its baseline of {baseline}',
         description:
-          'Throughput will stay throttled until the budget resets. Upgrade your compute to restore full performance, or use the AI Assistant to identify and optimize disk-intensive queries.',
+          'Throughput will stay at baseline until the budget resets. Upgrade your compute to sustain higher throughput, or use the AI Assistant to identify and optimize disk-intensive queries.',
       },
     },
     cardContent: {
@@ -75,6 +78,7 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
       },
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-disk-io`,
+    metricsHref: '/project/[ref]/observability/database',
     buttonText: 'Upgrade compute',
     aiPrompt:
       'My database is running out of Disk IO budget. Can you query pg_stat_statements to find the top queries by shared blocks read and written, identify which are causing the most disk I/O, and suggest specific optimizations to reduce disk usage?',

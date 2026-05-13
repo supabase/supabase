@@ -3,7 +3,9 @@ import { Download, Move, Trash2, X } from 'lucide-react'
 import { Button } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const FileExplorerHeaderSelection = () => {
@@ -30,50 +32,66 @@ export const FileExplorerHeaderSelection = () => {
           <span style={{ fontVariantNumeric: 'tabular-nums' }}>{selectedItems.length}</span> items
           selected
         </p>
-        <Button
-          icon={<Download size={16} strokeWidth={2} />}
-          type="primary"
-          onClick={async () => {
-            if (selectedItems.length === 1) {
-              await downloadFile(selectedItems[0])
-            } else {
-              await downloadSelectedFiles(selectedItems)
-            }
-          }}
-        >
-          Download
-        </Button>
+        <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_DOWNLOAD_SELECTED} side="bottom">
+          <Button
+            icon={<Download size={16} strokeWidth={2} />}
+            type="primary"
+            onClick={async () => {
+              if (selectedItems.length === 1) {
+                await downloadFile(selectedItems[0])
+              } else {
+                await downloadSelectedFiles(selectedItems)
+              }
+            }}
+          >
+            Download
+          </Button>
+        </ShortcutTooltip>
         <div className="border-r border-green-900 py-3 opacity-50" />
 
-        <ButtonTooltip
-          icon={<Trash2 size={16} strokeWidth={2} />}
-          type="primary"
-          disabled={!canUpdateFiles}
-          onClick={() => setSelectedItemsToDelete(selectedItems)}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canUpdateFiles ? 'You need additional permissions to delete files' : undefined,
-            },
-          }}
+        <ShortcutTooltip
+          shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_DELETE_SELECTED}
+          side="bottom"
+          open={!canUpdateFiles ? false : undefined}
         >
-          Delete
-        </ButtonTooltip>
+          <ButtonTooltip
+            icon={<Trash2 size={16} strokeWidth={2} />}
+            type="primary"
+            disabled={!canUpdateFiles}
+            onClick={() => setSelectedItemsToDelete(selectedItems)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateFiles
+                  ? 'You need additional permissions to delete files'
+                  : undefined,
+              },
+            }}
+          >
+            Delete
+          </ButtonTooltip>
+        </ShortcutTooltip>
 
-        <ButtonTooltip
-          icon={<Move size={16} strokeWidth={2} />}
-          type="primary"
-          disabled={!canUpdateFiles}
-          onClick={() => setSelectedItemsToMove(selectedItems)}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canUpdateFiles ? 'You need additional permissions to move files' : undefined,
-            },
-          }}
+        <ShortcutTooltip
+          shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_MOVE_SELECTED}
+          side="bottom"
+          open={!canUpdateFiles ? false : undefined}
         >
-          Move
-        </ButtonTooltip>
+          <ButtonTooltip
+            icon={<Move size={16} strokeWidth={2} />}
+            type="primary"
+            disabled={!canUpdateFiles}
+            onClick={() => setSelectedItemsToMove(selectedItems)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateFiles ? 'You need additional permissions to move files' : undefined,
+              },
+            }}
+          >
+            Move
+          </ButtonTooltip>
+        </ShortcutTooltip>
       </div>
     </div>
   )

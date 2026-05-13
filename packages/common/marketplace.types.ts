@@ -46,7 +46,6 @@ export type Database = {
           partner_name: string | null
           partner_slug: string | null
           publish_dashboard: boolean | null
-          publish_location: 'marketplace' | 'dashboard' | 'both' | null
           publish_marketplace: boolean | null
           secret_key_prefix: string | null
           slug: string | null
@@ -97,6 +96,14 @@ export type Database = {
       get_redirect_url: {
         Args: {
           p_listing_id: string
+          p_organization_slug: string
+          p_project_id: string
+        }
+        Returns: Json
+      }
+      get_redirect_url_by_slug: {
+        Args: {
+          p_listing_slug: string
           p_organization_slug: string
           p_project_id: string
         }

@@ -65,6 +65,19 @@ export interface ShortcutOptions {
    * registry default.
    */
   label?: string
+
+  /**
+   * How the hotkey lib should behave when this shortcut's `sequence` is already
+   * registered by another mounted shortcut. Defaults to `'warn'` (the lib's
+   * default) — every duplicate registration logs a console warning.
+   *
+   * Set to `'allow'` for shortcuts that intentionally share a sequence with
+   * sibling shortcuts and are routed by mutually-exclusive `enabled` gates
+   * (e.g. an Escape ladder: clear selection → close preview → close search).
+   * Use `'replace'` only when you actually want the new registration to
+   * supplant the old one — rarely the right choice for our use cases.
+   */
+  conflictBehavior?: 'warn' | 'allow' | 'replace'
 }
 
 /**

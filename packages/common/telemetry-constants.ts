@@ -2740,6 +2740,7 @@ export type AiAssistantSource =
   | 'log_explorer'
   | 'error_code'
   | 'advisor_signal_detail'
+  | 'rls_tester'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3069,6 +3070,36 @@ export interface ComputeBadgeUpgradeClickedEvent {
     upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
   }
   groups: TelemetryGroups
+}
+
+/**
+ * Fly.io deprecation banner rendered for a user with at least one Fly.io project or branch.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FlyDeprecationBannerExposedEvent {
+  action: 'fly_deprecation_banner_exposed'
+  groups: TelemetryGroups
+  properties: {
+    primaryCount: number
+    branchCount: number
+  }
+}
+
+/**
+ * User dismissed the Fly.io deprecation banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FlyDeprecationBannerDismissedEvent {
+  action: 'fly_deprecation_banner_dismissed'
+  groups: TelemetryGroups
+  properties: {
+    primaryCount: number
+    branchCount: number
+  }
 }
 
 /**
@@ -3409,6 +3440,18 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 }
 
 /**
+ * User ran a query in the RLS tester feature preview.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RLSTesterRunQueryClickedEvent {
+  action: 'rls_tester_run_query_clicked'
+  properties: { type: 'raw' | 'inferred' }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3582,6 +3625,8 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
+  | FlyDeprecationBannerExposedEvent
+  | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | HeaderUpgradeCtaClickedEvent
@@ -3605,3 +3650,4 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | RLSTesterRunQueryClickedEvent

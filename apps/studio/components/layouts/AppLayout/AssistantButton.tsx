@@ -44,6 +44,7 @@ export const AssistantButton = () => {
         size={16}
         className={cn(isOpen && 'text-background')}
       />
+      <span className="sr-only">AI Assistant</span>
     </ButtonTooltip>
   )
 }
