@@ -33,7 +33,7 @@ const stateOfStartupsData = {
         {
           title: 'Roles and Experience',
           description:
-            'Solo founders were already the largest group in 2025 at 52%. In 2026 they are 61% of respondents, up 8 points. Technical-founder share dropped from 82% to 78%, and every age band above 40 grew by a statistically significant margin.',
+            'Solo founders are 61% of respondents — the largest group on the page. 78% of founders are technical. Every age band above 40 has grown by a statistically significant margin.',
           stats: [
             {
               percent: 61,
@@ -85,7 +85,7 @@ const stateOfStartupsData = {
         {
           title: 'Where They’re Based',
           description:
-            'The top metros are still the top metros. But AI has flattened the development gap everywhere else. Europe grew 4pp; Africa grew 2pp. Startups are setting up across Toronto, Chicago, Denver, Austin, across Europe, Asia, and Africa. The playbook no longer requires a specific zip code.',
+            'The top metros are still the top metros. But AI has flattened the development gap everywhere else. Europe grew 4%; Africa grew 2%. Startups are setting up across Toronto, Chicago, Denver, Austin, across Europe, Asia, and Africa. The playbook no longer requires a specific zip code.',
           stats: [
             {
               percent: 25,
@@ -112,7 +112,7 @@ const stateOfStartupsData = {
         {
           title: 'Must-have Dev Tools',
           description:
-            'Claude Code went from 1% in 2025 to 62% in 2026 (+61pp). Cursor dropped 19 points. v0, Bolt, and Windsurf each lost 6–9 points. VS Code held flat. Antigravity appeared for the first time and took the 4th spot in its debut year.',
+            'Cursor dropped 19%. v0, Bolt, and Windsurf each lost 6–9%. VS Code held flat. Antigravity appeared for the first time and took the 4th spot in its debut year.',
           stats: [
             {
               percent: 62,
@@ -168,7 +168,7 @@ const stateOfStartupsData = {
         {
           title: 'Paid AI Subscriptions',
           description:
-            'Paid Claude subscriptions jumped from 28% to 59% of respondents. Paid OpenAI dropped from 57% to 39%. Gemini entered the list at 27%. The money is moving faster than any lagging indicator could capture.',
+            'Paid Claude subscriptions sit at 59% of respondents. Paid OpenAI is at 39%. Gemini entered the list at 27%.',
           stats: [
             {
               percent: 59,
@@ -243,7 +243,7 @@ const stateOfStartupsData = {
         {
           title: 'Share of Codebase',
           description:
-            'This question was new in 2026. Among non-technical founders, the 76-to-100% share rises to 54%. Among 50-to-59-year-olds it rises to 80%. AI code generation is a median practice, not a fringe one.',
+            'Among non-technical founders, the 76-to-100% share rises to 54%. Among 50-to-59-year-olds it rises to 80%. AI code generation is a median practice, not a fringe one.',
           stats: [
             {
               percent: 41,
@@ -310,7 +310,7 @@ const stateOfStartupsData = {
         {
           title: 'Primary Database',
           description:
-            'Supabase went from 76% to 82%. Every legacy NoSQL option lost share: MongoDB dropped 5pp, MySQL 3pp, Firebase 2pp. Neon, DynamoDB, and Convex appeared as options for the first time and took small but measurable shares.',
+            'Supabase went from 76% to 82%. Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%. Neon, DynamoDB, and Convex appeared as options for the first time and took small but measurable shares.',
           stats: [
             {
               percent: 82,
@@ -328,7 +328,7 @@ const stateOfStartupsData = {
         {
           title: 'Auth and Identity',
           description:
-            'This question was new in 2026, so there is no prior baseline. Three in four respondents who answered the auth question picked Supabase Auth. The firm migration floor is the ~25% who picked no Supabase option at all.',
+            'Three in four respondents who answered the auth question picked Supabase Auth. The firm migration floor is the ~25% who picked no Supabase option at all.',
           stats: [
             {
               percent: 72,
@@ -362,15 +362,23 @@ const stateOfStartupsData = {
         {
           title: 'Hosting and Cloud',
           description:
-            'Supabase held its lead. Vercel was already ahead of AWS in 2025, and in 2026 it extended that lead by 9 points. Cloudflare grew fastest of all, crossing 27% and passing AWS on the way up. Every hyperscaler lost share.',
+            'Supabase held its lead. Vercel extended its lead over AWS by 9%. Cloudflare grew fastest of all, crossing 27% and passing AWS on the way up. Every hyperscaler lost share.',
           stats: [
+            {
+              percent: 50,
+              label: 'Startups hosting on Supabase',
+              source: { column: 'cloud_providers', aggregation: 'multi', target: 'Supabase' },
+            },
+            {
+              percent: 47,
+              label: 'Startups hosting on Vercel',
+              source: { column: 'cloud_providers', aggregation: 'multi', target: 'Vercel' },
+            },
             {
               percent: 27,
               label: 'Startups hosting on Cloudflare',
               source: { column: 'cloud_providers', aggregation: 'multi', target: 'Cloudflare' },
             },
-            { percent: 9, label: 'Increase in Vercel hosting share over AWS' },
-            { percent: 0, label: 'Hyperscaler that gained share this year' },
           ],
           charts: [],
           wordCloud: undefined,
@@ -384,12 +392,12 @@ const stateOfStartupsData = {
           stats: [
             {
               percent: 10,
-              label: 'Startups using Expo (new in 2026)',
+              label: 'Startups using Expo',
               source: { column: 'frontend_stack', aggregation: 'multi', target: 'Expo' },
             },
             {
               percent: 8,
-              label: 'Startups using TanStack (new in 2026)',
+              label: 'Startups using TanStack',
               source: { column: 'frontend_stack', aggregation: 'multi', target: 'TanStack' },
             },
             { percent: 3, label: 'Increase in native iOS / Android adoption' },
@@ -453,7 +461,7 @@ const stateOfStartupsData = {
         {
           title: 'Multi-agent Systems',
           description:
-            'Three in four agent-builders are already doing multi-agent work. 25% say it is in production. 21% in development. 36% are planning. Only 16% said no. This question was new in 2026; the on-ramp is already steeper than the "are you building agents at all" question was in 2025.',
+            'Three in four agent-builders are already doing multi-agent work. 25% say it is in production. 21% in development. 36% are planning. Only 16% said no.',
           stats: [
             {
               percent: 25,
@@ -491,12 +499,8 @@ const stateOfStartupsData = {
         {
           title: 'The Operational Gap',
           description:
-            'Prompt management, evaluation, and AI observability questions were new in 2026. Every answer points to the same thing: most teams ship agents without the operator stack underneath them. Whoever builds the operator tools for the next 500k AI startups has an open market.',
-          stats: [
-            { percent: 33, label: 'Startups with no formal AI evaluation process' },
-            { percent: 0, label: 'Standardized prompt-versioning workflow named by a plurality' },
-            { percent: 0, label: 'AI observability tools used by a majority' },
-          ],
+            'Prompt management, evaluation, and AI observability all paint the same picture: most teams ship agents without the operator stack underneath them. Whoever builds the operator tools for the next 500k AI startups has an open market.',
+          stats: [],
           charts: [],
           wordCloud: undefined,
           summarizedAnswer: undefined,
@@ -505,7 +509,7 @@ const stateOfStartupsData = {
         {
           title: 'MCP Adoption',
           description:
-            'A year after the protocol launched, 57% of respondents have hands on it. Only 14% say they are unfamiliar. This question is new in 2026 so there is no year-over-year comparison; the speed of the on-ramp is what stands out.',
+            'A year after the protocol launched, 57% of respondents have hands on it. Only 14% say they are unfamiliar. The speed of the on-ramp is what stands out.',
           stats: [
             { percent: 57, label: 'Respondents with hands on MCP servers or tools' },
             { percent: 14, label: 'Respondents unfamiliar with MCP' },
@@ -558,7 +562,7 @@ const stateOfStartupsData = {
         {
           title: 'Observability',
           description:
-            '56% still don’t use observability tools. “Custom solution” is the fastest-growing answer, up 2.5pp. Datadog and Prometheus both lost share. Sentry kept its lead and grew slightly. The observability market is bifurcating between Sentry for errors and custom dashboards for everything else.',
+            '56% still don’t use observability tools. “Custom solution” is the fastest-growing answer, up 2.5%. Datadog and Prometheus both lost share. Sentry kept its lead and grew slightly. The observability market is bifurcating between Sentry for errors and custom dashboards for everything else.',
           stats: [
             {
               percent: 56,
@@ -569,8 +573,6 @@ const stateOfStartupsData = {
                 target: 'We don’t use observability tools yet',
               },
             },
-            { percent: 2.5, label: 'Year-over-year growth in custom observability solutions' },
-            { percent: 0, label: 'Hyperscaler observability vendor that gained share' },
           ],
           charts: [],
           wordCloud: undefined,
@@ -580,12 +582,8 @@ const stateOfStartupsData = {
         {
           title: 'Analytics and Growth Tools',
           description:
-            '“I don’t track this yet” grew 5pp. HubSpot, Salesforce, Mixpanel, Segment all lost share. Custom-built dashboards grew 6 points. The pattern repeats: skip the vendor, ship something internal, or don’t track at all.',
-          stats: [
-            { percent: 5, label: 'Year-over-year growth in “I don’t track this yet”' },
-            { percent: 6, label: 'Year-over-year growth in custom-built dashboards' },
-            { percent: 0, label: 'Named analytics vendor that gained share this year' },
-          ],
+            '“I don’t track this yet” grew 5%. HubSpot, Salesforce, Mixpanel, Segment all lost share. Custom-built dashboards grew 6%. The pattern repeats: skip the vendor, ship something internal, or don’t track at all.',
+          stats: [],
           charts: [],
           wordCloud: undefined,
           summarizedAnswer: undefined,
@@ -606,7 +604,6 @@ const stateOfStartupsData = {
               label: 'Startups that have built a developer community',
               source: { column: 'dev_community_built', aggregation: 'single', target: 'Yes' },
             },
-            { percent: 4, label: 'Year-over-year growth in “no community” share' },
           ],
           charts: [],
           wordCloud: undefined,
@@ -678,8 +675,6 @@ const stateOfStartupsData = {
                 target: 'Product-led growth',
               },
             },
-            { percent: 4, label: 'Year-over-year growth in product-led motion adoption' },
-            { percent: 0, label: 'Startups with a full-time sales team before headcount 10' },
           ],
           charts: [],
           wordCloud: undefined,
@@ -700,8 +695,6 @@ const stateOfStartupsData = {
                 target: 'Tiered feature plans',
               },
             },
-            { percent: 12, label: 'Year-over-year growth in tiered-plan adoption' },
-            { percent: 23, label: 'Tiered-plan share in 2025' },
           ],
           charts: [],
           wordCloud: undefined,
@@ -762,8 +755,6 @@ const stateOfStartupsData = {
                 target: 'None of the above',
               },
             },
-            { percent: 10, label: 'Year-over-year growth in “none of the above” share' },
-            { percent: 0, label: 'Named conference that gained share this year' },
           ],
           charts: [],
           wordCloud: undefined,
