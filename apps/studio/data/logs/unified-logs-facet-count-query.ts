@@ -3,6 +3,7 @@ import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl } from './logs-endpoint'
+import { bqIdent, safeSql } from './safe-analytics-sql'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -35,11 +36,11 @@ export async function getUnifiedLogsFacetCount(
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
   const sql = useOtel
     ? getFacetCountQuery({ search, facet, facetSearch })
-    : `
+    : safeSql`
 ${getUnifiedLogsCTE()},
 ${getFacetCountCTE({ search, facet, facetSearch })}
-SELECT dimension, value, count from ${facet}_count;
-`.trim()
+SELECT dimension, value, count from ${bqIdent(facet + '_count')};
+`
 
   const endpoint = logsAllEndpointUrl(useOtel)
   const { data, error } = await post(endpoint, {
@@ -62,7 +63,7 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const useOtel = !!useFlag('otelUnifiedLogs')
   return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: [
       ...logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, search),

@@ -6,6 +6,7 @@ import {
   getLogsCountQuery,
   getUnifiedLogsQuery,
 } from './UnifiedLogs.queries'
+import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
 
 const baseSearch = {
   date: [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')],
@@ -133,5 +134,53 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain('GROUP BY value')
       expect(sql).toContain('LIMIT 20')
     })
+  })
+
+  describe('analyticsLiteral escaping', () => {
+    it('emits ClickHouse / BigQuery escape syntax (doubled `\\\\`, no `E` prefix)', () => {
+      // pg-meta's literal() would emit `E'a\\b'` for `a\b` — the `E` prefix is
+      // Postgres-only and rejected by both analytics engines. analyticsLiteral
+      // doubles the backslash inside plain `'…'` delimiters instead.
+      const sql = getUnifiedLogsQuery({ ...baseSearch, method: 'a\\b' } as any)
+      expect(sql).toContain(`log_attributes['request.method'] = 'a\\\\b'`)
+      expect(sql).not.toContain(`E'a`)
+    })
+
+    it("escapes single quotes by doubling them ('' rather than \\')", () => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, method: "GET' OR '1'='1" } as any)
+      expect(sql).toContain(`log_attributes['request.method'] = 'GET'' OR ''1''=''1'`)
+    })
+  })
+})
+
+describe('UnifiedLogs.queries.bq', () => {
+  it('backtick-quotes column identifiers (BigQuery syntax)', () => {
+    const sql = getUnifiedLogsQueryBQ({ ...baseSearch, method: 'GET' } as any)
+    expect(sql).toContain("`method` = 'GET'")
+  })
+
+  it('rejects keys with non-identifier characters', () => {
+    // A key like "foo; DROP TABLE" fails the bqIdent regex (the `;` is not
+    // in `[A-Za-z_][A-Za-z0-9_]*`), so the predicate is dropped entirely.
+    const sql = getUnifiedLogsQueryBQ({ ...baseSearch, 'foo; DROP TABLE x': 'y' } as any)
+    expect(sql).not.toContain('DROP TABLE')
+    expect(sql).not.toContain('foo;')
+  })
+
+  it('rejects keys containing spaces', () => {
+    const sql = getUnifiedLogsQueryBQ({
+      ...baseSearch,
+      'level OR id IS NOT NULL': 'anything',
+    } as any)
+    expect(sql).not.toContain('IS NOT NULL')
+    expect(sql).not.toContain('level OR')
+  })
+
+  it('escapes injection attempts in filter values via analyticsLiteral', () => {
+    const sql = getUnifiedLogsQueryBQ({ ...baseSearch, method: "GET' OR '1'='1" } as any)
+    // The value is single-quote-escaped, so the synthetic OR can't break out
+    // of the string literal.
+    expect(sql).toContain("`method` = 'GET'' OR ''1''=''1'")
+    expect(sql).not.toMatch(/`method` = 'GET' OR '1'='1'/)
   })
 })
