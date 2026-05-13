@@ -1,12 +1,10 @@
 @import 'tailwindcss';
 
 /* JS plugins. Tailwind v4 supports `@plugin` for both v3-style JS plugins and
- * v4-native packages. The two local plugins use theme('spacing') /
- * theme('transitionDuration') which resolve from v4's @theme tokens. */
+ * v4-native packages. */
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
 @plugin "tailwindcss-animate";
-@plugin "./tailwind-plugins/hit-area";
 @plugin "./tailwind-plugins/motion-safe-transition";
 
 /* Raw color values + per-theme overrides. Must come before colors.css so the
@@ -29,6 +27,7 @@
 @import './css/theme.css';
 @import './css/animations.css';
 @import './css/utilities.css';
+@import './tailwind-plugins/hit-area.css';
 @import './css/variants.css';
 @import './css/base.css';
 
