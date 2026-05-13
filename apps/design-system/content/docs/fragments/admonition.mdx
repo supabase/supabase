@@ -15,6 +15,8 @@ Admonition provides the standard product callout pattern for situations that req
 
 Use Admonition instead of the low-level [Alert](../components/alert) primitive unless you specifically need custom composition. If in doubt, stick with Admonition.
 
+Use [Expandable Alert](./expandable-alert) when the callout needs to remain visible while optional detail can be expanded. Use [Collapsible](../components/collapsible) for generic disclosure behaviour that is not itself a callout.
+
 Use `title` for the heading slot when the callout needs its own heading. `title` is optional: short callouts may use `description` without a title when nearby content already provides enough context.
 
 Avoid title-only Admonitions in new code. A callout with `title` should also include `description` or `children` so it does not read like an incomplete heading.

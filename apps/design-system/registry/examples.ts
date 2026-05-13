@@ -62,10 +62,10 @@ export const examples: Registry = [
     files: ['example/alert-demo.tsx'],
   },
   {
-    name: 'alert-collapsible-demo',
+    name: 'expandable-alert-demo',
     type: 'components:example',
-    registryDependencies: ['alert', 'collapsible', 'button'],
-    files: ['example/alert-collapsible-demo.tsx'],
+    registryDependencies: ['expandable-alert'],
+    files: ['example/expandable-alert-demo.tsx'],
   },
   {
     name: 'alert-dialog-demo',

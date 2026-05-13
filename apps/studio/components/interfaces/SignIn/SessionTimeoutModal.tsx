@@ -3,7 +3,6 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import {
-  AlertCollapsible,
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -14,6 +13,7 @@ import {
   AlertDialogTitle,
   Button,
 } from 'ui'
+import { ExpandableAlert } from 'ui-patterns/expandable-alert'
 
 import { SupportLink } from '../Support/SupportLink'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -61,7 +61,7 @@ export const SessionTimeoutModal = ({
           <AlertDialogDescription asChild>
             <div className="space-y-4">
               <p>Please sign in again to continue.</p>
-              <AlertCollapsible trigger="Having trouble?">
+              <ExpandableAlert trigger="Having trouble?">
                 <div className="space-y-3 text-foreground-light">
                   <p>
                     Try a different browser or disable extensions that block network requests. If
@@ -93,7 +93,7 @@ export const SessionTimeoutModal = ({
                     from your session to help us investigate.
                   </p>
                 </div>
-              </AlertCollapsible>
+              </ExpandableAlert>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>

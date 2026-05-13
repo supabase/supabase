@@ -118,6 +118,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Expandable Alert',
+          href: '/docs/fragments/expandable-alert',
+          items: [],
+        },
+        {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
           items: [],
@@ -242,11 +247,6 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Alert',
           href: '/docs/components/alert',
-          items: [],
-        },
-        {
-          title: 'Alert Collapsible',
-          href: '/docs/components/alert-collapsible',
           items: [],
         },
         {

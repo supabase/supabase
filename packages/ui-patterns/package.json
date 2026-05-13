@@ -714,6 +714,10 @@
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"
     },
+    "./expandable-alert": {
+      "import": "./src/expandable-alert.tsx",
+      "types": "./src/expandable-alert.tsx"
+    },
     "./form/FormItemLayout/FormItemLayout": {
       "import": "./src/form/FormItemLayout/FormItemLayout.tsx",
       "types": "./src/form/FormItemLayout/FormItemLayout.tsx"
