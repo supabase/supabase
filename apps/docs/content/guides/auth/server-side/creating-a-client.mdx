@@ -80,6 +80,14 @@ SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
 </TabPanel>
+<TabPanel id="solidstart" label="SolidStart">
+
+```bash .env
+VITE_SUPABASE_URL=supabase_project_url
+VITE_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
+```
+
+</TabPanel>
 <TabPanel id="react-router" label="React Router">
 
 ```bash .env
@@ -539,6 +547,75 @@ export default function Index() {
   const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY);
 
   return ...
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Congratulations
+
+You can now use any Supabase features from your client or server code!
+
+</TabPanel>
+
+<TabPanel id="solidstart" label="SolidStart">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="solidstart-server"
+  queryGroup="environment"
+>
+<TabPanel id="solidstart-server" label="Server API route">
+
+```ts routes/api/hello.ts
+import { type APIEvent } from '@solidjs/start/server'
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+
+export async function GET({ request }: APIEvent) {
+  const headers = new Headers()
+
+  const supabase = createServerClient(
+    import.meta.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          })
+        },
+      },
+    }
+  )
+
+  await supabase.auth.getUser()
+
+  return new Response(JSON.stringify({ ok: true }), {
+    headers,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="solidstart-browser" label="Browser component">
+
+```tsx routes/index.tsx
+import { createBrowserClient } from '@supabase/ssr'
+
+export default function Home() {
+  const supabase = createBrowserClient(
+    import.meta.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+  )
+
+  return <div>Supabase client ready</div>
 }
 ```
 
