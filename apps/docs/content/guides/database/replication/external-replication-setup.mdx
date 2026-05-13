@@ -232,7 +232,7 @@ If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, ne
 
 <Admonition type="note">
 
-When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [FAQ](/docs/guides/database/replication/external-replication-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
+When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [external replication FAQ](/docs/guides/database/replication/external-replication-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
 
 </Admonition>
 
@@ -269,7 +269,7 @@ External replication has the following limitations:
 - **Custom data types**: Not supported
 - **Schema changes**: Currently in beta and limited to BigQuery
 - **No data transformation**: Data is replicated as-is without transformation
-- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur?](/docs/guides/database/replication/external-replication-faq#can-data-duplicates-occur-during-pipeline-operations) for details
+- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur during pipeline operations?](/docs/guides/database/replication/external-replication-faq#can-data-duplicates-occur-during-pipeline-operations) for details
 
 Destination-specific limitations, such as BigQuery's row size limits, are documented in each destination guide.
 
