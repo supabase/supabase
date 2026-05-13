@@ -216,7 +216,7 @@ LIMIT 1
     return { result: [] }
   }
 
-  const entry = flattenOtelInspectionRow(row) as UnifiedLogInspectionEntry & Record<string, unknown>
+  const entry = flattenOtelInspectionRow(row)
 
   // For edge function rows, fetch and aggregate the related `function_logs`
   // (the per-execution console.log output) — this is the only legitimate
@@ -253,7 +253,7 @@ LIMIT 100
     }
   }
 
-  return { result: [entry as UnifiedLogInspectionEntry] }
+  return { result: [entry] }
 }
 
 export type UnifiedLogInspectionData = Awaited<ReturnType<typeof getUnifiedLogInspection>>

@@ -111,14 +111,11 @@ export async function getUnifiedLogsChart(
   const timeRangeHours = (endTimeMs - startTimeMs) / (1000 * 60 * 60)
 
   let bucketSizeMs: number
-  if (timeRangeHours > 72) {
-    // Day-level bucketing (for ranges > 3 days)
+  if (timeRangeHours >= 48) {
     bucketSizeMs = 24 * 60 * 60 * 1000
   } else if (timeRangeHours > 12) {
-    // Hour-level bucketing (for ranges > 12 hours)
     bucketSizeMs = 60 * 60 * 1000
   } else {
-    // Minute-level bucketing (for shorter ranges)
     bucketSizeMs = 60 * 1000
   }
 

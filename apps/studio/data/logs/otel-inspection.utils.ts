@@ -1,18 +1,4 @@
-/**
- * Mapping helpers for the OTEL `/logs.all.otel` inspection drawer.
- *
- * The original BigQuery service-flow SQL projected ~70 underscored field
- * aliases (`request_path`, `headers_user_agent`, `client_country`, ...) by
- * `cross join unnest`-ing the BigQuery row's nested metadata. The OTEL
- * endpoint returns a single `logs` row with a flat Map(String, String) called
- * `log_attributes` whose keys use dot notation (`request.path`,
- * `request.headers.user_agent`, `request.cf.country`, ...).
- *
- * These helpers translate a single OTEL row into the underscored shape the
- * unified-logs Overview panel components consume via `enrichedData.field`.
- */
-
-import type { ServiceFlowType, UnifiedLogInspectionEntry } from './unified-log-inspection-query'
+import type { UnifiedLogInspectionEntry } from './unified-log-inspection-query'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 
 type Level = (typeof LEVELS)[number]
@@ -24,16 +10,6 @@ export type OtelLogRow = {
   event_message: string
   severity_text?: string
   log_attributes?: Record<string, any>
-}
-
-const OTEL_SOURCE_TO_SERVICE: Record<string, ServiceFlowType | undefined> = {
-  edge_logs: 'postgrest',
-  postgrest_logs: 'postgrest',
-  function_edge_logs: 'edge-function',
-  function_logs: 'edge-function',
-  auth_logs: 'auth',
-  storage_logs: 'storage',
-  postgres_logs: 'postgres',
 }
 
 const httpStatusToLevel = (status: number): Level => {
@@ -56,25 +32,23 @@ const pgSeverityToLevel = (severity: string): Level => {
   }
 }
 
-/**
- * Flattens a single OTEL row + log_attributes Map into the underscored field
- * shape the existing service-flow panel components expect. Unknown fields
- * fall through to `null` so the UI gracefully degrades when an attribute key
- * isn't present (per-source `log_attributes` keys vary).
- */
-export function flattenOtelInspectionRow(row: OtelLogRow): UnifiedLogInspectionEntry {
+// Flattens a single OTEL row into the underscored field shape the service-flow
+// panel components expect. Per-source `log_attributes` keys vary; unknown fields
+// fall through to `null`.
+export function flattenOtelInspectionRow(
+  row: OtelLogRow
+): UnifiedLogInspectionEntry & Record<string, unknown> {
   const attrs: Record<string, any> = row.log_attributes ?? {}
 
   // Path key differs across sources: edge_logs uses `request.path`,
   // function_edge_logs uses `request.pathname`. Coalesce.
   const requestPath = attrs['request.path'] ?? attrs['request.pathname']
-  // Status: HTTP response code for gateway rows, Postgres SQL state code
-  // (e.g. `42P01`) for postgres rows.
+  // Status: HTTP response code for gateway rows, Postgres SQL state code for postgres rows.
   const status =
     row.source === 'postgres_logs' ? attrs['parsed.sql_state_code'] : attrs['response.status_code']
-  const statusNum = typeof status === 'string' ? Number(status) : Number(status)
+  const statusNum = Number(status)
 
-  // Derive a level: HTTP status if present, else map postgres `parsed.error_severity`.
+  // Derive level from HTTP status first, then postgres severity, then severity_text.
   let level = ''
   if (Number.isFinite(statusNum) && statusNum > 0) {
     level = httpStatusToLevel(statusNum)
@@ -84,9 +58,9 @@ export function flattenOtelInspectionRow(row: OtelLogRow): UnifiedLogInspectionE
     level = String(row.severity_text).toLowerCase()
   }
 
-  const entry: UnifiedLogInspectionEntry = {
-    // Spread raw attribute keys verbatim — the OTEL dotted keys
-    // (e.g. `request.path`) match some `enrichedData['…']` consumers.
+  return {
+    // Spread raw attribute keys verbatim -- the OTEL dotted keys
+    // (e.g. `request.path`) match some `enrichedData[...]` consumers.
     ...attrs,
 
     // Identity
@@ -95,8 +69,7 @@ export function flattenOtelInspectionRow(row: OtelLogRow): UnifiedLogInspectionE
     service_name: row.source ?? '',
     level,
 
-    // Network — flat aliases the panel reads as `enrichedData.request_path`
-    // etc. Both edge_logs and function_edge_logs are covered.
+    // Network -- flat aliases the panel reads as `enrichedData.request_path` etc.
     method: attrs['request.method'] ?? '',
     path: requestPath ?? '',
     host: attrs['request.host'] ?? '',
@@ -161,19 +134,11 @@ export function flattenOtelInspectionRow(row: OtelLogRow): UnifiedLogInspectionE
 
     raw_log_data: row,
     service_specific_data: {},
-  } as UnifiedLogInspectionEntry & Record<string, any>
-
-  return entry
+  } as UnifiedLogInspectionEntry & Record<string, unknown>
 }
 
-export const otelSourceToServiceFlow = (source: string | undefined) =>
-  source ? OTEL_SOURCE_TO_SERVICE[source] : undefined
-
-/**
- * Aggregates a list of OTEL `function_logs` rows into the count + sample
- * fields the edge-function service-flow panel reads
- * (`function_log_count`, `last_event_message`, `function_logs`).
- */
+// Aggregates `function_logs` rows into the count + sample fields the
+// edge-function service-flow panel reads.
 export function aggregateFunctionLogs(rows: OtelLogRow[]) {
   if (rows.length === 0) {
     return { function_log_count: 0, last_event_message: null, function_logs: [] }
