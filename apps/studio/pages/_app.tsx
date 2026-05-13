@@ -143,6 +143,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   useThemeSandbox()
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+  const isNonProdEnv = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const cloudProvider = useDefaultProvider()
 
@@ -188,7 +189,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                           />
                         )}
                       </Head>
-                      <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
+                      <MetaFaviconsPagesRouter
+                        includeManifest
+                        applicationName="Supabase Studio"
+                        route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                      />
                       <TooltipProvider delayDuration={0}>
                         <RouteValidationWrapper>
                           <ThemeProvider>
