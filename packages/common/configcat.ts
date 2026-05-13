@@ -35,7 +35,9 @@ async function getClient() {
   }
 
   try {
-    const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
+    const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint, {
+      method: 'HEAD',
+    })
     const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
 
     if (response.status !== 200) {
