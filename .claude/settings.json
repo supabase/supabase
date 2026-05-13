@@ -1,4 +1,38 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__next-devtools__init",
+      "Bash(git stash *)",
+      "mcp__next-devtools__upgrade_nextjs_16",
+      "Bash(pnpm --version)",
+      "Bash(pnpx -y @next/codemod@canary upgrade --help)",
+      "Bash(pnpm dlx *)",
+      "Bash(npm view *)",
+      "Bash(pnpm install *)",
+      "Bash(pnpm typecheck *)",
+      "mcp__next-devtools__nextjs_docs",
+      "Bash(pnpm exec *)",
+      "Bash(pnpm build *)",
+      "Read(//private/tmp/**)",
+      "Bash(tee /tmp/docs-build2.log)",
+      "Read(//tmp/**)",
+      "Bash(tee /tmp/docs-build3.log)",
+      "Bash(sed -n '60,75p' /tmp/docs-build3.log)",
+      "Bash(sed -n '100,140p' /tmp/docs-build3.log)",
+      "Bash(sed -n '150,160p' /tmp/docs-build3.log)",
+      "Bash(grep -nB2 -A5 \"'@code-hike/mdx':\" /Users/jeremias/supabase/supabase/pnpm-lock.yaml)",
+      "Bash(grep -nB10 \"'@code-hike/mdx':\" /Users/jeremias/supabase/supabase/pnpm-lock.yaml)",
+      "Bash(tsx scripts/codegen/guidesStaticParams.ts)",
+      "Bash(tee /tmp/docs-build4.log)",
+      "Bash(tee /tmp/docs-build5.log)",
+      "Bash(tee /tmp/docs-build6.log)",
+      "Bash(find /Users/jeremias/supabase/supabase/node_modules/.pnpm/next@16.2.6_*/node_modules/next/dist -name \"router-context*\")",
+      "WebSearch",
+      "Bash(tee /tmp/docs-build7.log)",
+      "Bash(grep -oE '\"text\": \".{0,200}localpatterns.{0,1500}\"' \"/Users/jeremias/.claude/projects/-Users-jeremias-supabase-supabase/f7214b50-d0d1-41ab-9932-0902d1dc9ff1/tool-results/toolu_01VyJQX5UHhurDARqRzufkxK.json\")",
+      "Bash(tee /tmp/docs-build8.log)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {

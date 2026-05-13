@@ -1,3 +1,13 @@
+import { REFERENCES } from '~/content/navigation.references'
+import {
+  getFlattenedSections,
+  getFunctionsList,
+  getTypeSpec,
+} from '~/features/docs/Reference.generated.singleton'
+import { getRefMarkdown } from '~/features/docs/Reference.mdx.fetch'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
+import { BASE_PATH } from '~/lib/constants'
 import { toHtml } from 'hast-util-to-html'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
@@ -5,17 +15,6 @@ import { toHast } from 'mdast-util-to-hast'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { notFound } from 'next/navigation'
 import { visit } from 'unist-util-visit'
-
-import { REFERENCES } from '~/content/navigation.references'
-import {
-  getFlattenedSections,
-  getFunctionsList,
-  getTypeSpec,
-} from '~/features/docs/Reference.generated.singleton'
-import { getRefMarkdown } from '~/features/docs/Reference.mdx'
-import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
-import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { BASE_PATH } from '~/lib/constants'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)

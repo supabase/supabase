@@ -1,15 +1,16 @@
 'use client'
 
+import 'graphiql/style.css'
+
+import { IS_DEV } from '~/lib/constants'
 import dynamic from 'next/dynamic'
 import { notFound } from 'next/navigation'
 import { type ComponentProps } from 'react'
-import { IS_DEV } from '~/lib/constants'
 
 const LazyGraphiQL = dynamic(
   async () => {
     const { GraphiQL: GraphiQLPrimitive } = await import('graphiql')
     const { createGraphiQLFetcher } = await import('@graphiql/toolkit')
-    await import('graphiql/style.css')
 
     return function GraphiQL(props: Omit<ComponentProps<typeof GraphiQLPrimitive>, 'fetcher'>) {
       const fetcher = createGraphiQLFetcher({

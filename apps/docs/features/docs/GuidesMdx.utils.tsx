@@ -1,9 +1,9 @@
-import { readdir } from 'node:fs/promises'
-import { extname, join, relative, sep } from 'node:path'
+import { join, relative, sep } from 'node:path'
 import * as Sentry from '@sentry/nextjs'
+import guidesStaticParamsManifest from '~/__generated__/guidesStaticParams.json'
 import { extractMessageFromAnyError, FileNotFoundError } from '~/app/api/utils'
 import { pluckPromise } from '~/features/helpers.fn'
-import { cache_fullProcess_withDevCacheBust, existsFile } from '~/features/helpers.fs'
+import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
 import type { OrPromise } from '~/features/helpers.types'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
@@ -116,29 +116,23 @@ const getGuidesMarkdown = cache_fullProcess_withDevCacheBust(
 )
 
 const genGuidesStaticParams = (directory?: string) => async () => {
-  const promises = directory
-    ? (await readdir(join(GUIDES_DIRECTORY, directory), { recursive: true }))
-        .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1)?.startsWith('_'))
-        .map((file) => ({ slug: file.replace(/\.mdx$/, '').split(sep) }))
-        .concat(
-          (await existsFile(join(GUIDES_DIRECTORY, `${directory}.mdx`))) ? [{ slug: [] }] : []
-        )
-    : PUBLISHED_SECTIONS.map(async (section) =>
-        (await readdir(join(GUIDES_DIRECTORY, section), { recursive: true }))
-          .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1)?.startsWith('_'))
-          .map((file) => ({
-            slug: [section, ...file.replace(/\.mdx$/, '').split(sep)],
-          }))
-          .concat(
-            (await existsFile(join(GUIDES_DIRECTORY, `${section}.mdx`)))
-              ? [{ slug: [section] }]
-              : []
-          )
-      )
+  const allParams: Array<{ slug: string[] }> = []
 
-  // Flattening earlier will not work because there is nothing to flatten
-  // until the promises resolve.
-  const allParams = (await Promise.all(promises)).flat()
+  for (const path of guidesStaticParamsManifest.paths) {
+    if (directory) {
+      if (path === directory) {
+        allParams.push({ slug: [] })
+      } else if (path.startsWith(`${directory}/`)) {
+        allParams.push({ slug: path.slice(directory.length + 1).split('/') })
+      }
+    } else {
+      if (
+        PUBLISHED_SECTIONS.some((section) => path === section || path.startsWith(`${section}/`))
+      ) {
+        allParams.push({ slug: path.split('/') })
+      }
+    }
+  }
 
   /**
    * Filter out disabled pages from static generation

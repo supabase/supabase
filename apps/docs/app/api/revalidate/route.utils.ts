@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
+import { VALID_REVALIDATION_TAGS } from '~/features/helpers.fetch'
 import { type Database } from 'common'
 import { revalidateTag } from 'next/cache'
 import { headers } from 'next/headers'
 import { type NextRequest } from 'next/server'
 import { z } from 'zod'
-import { VALID_REVALIDATION_TAGS } from '~/features/helpers.fetch'
 
 enum AuthorizationLevel {
   Unauthorized,
@@ -91,7 +91,7 @@ export async function _handleRevalidateRequest(request: NextRequest) {
   }
 
   result.tags.forEach((tag) => {
-    revalidateTag(tag)
+    revalidateTag(tag, 'max')
   })
 
   return new Response(null, {

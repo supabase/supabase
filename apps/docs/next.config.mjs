@@ -2,10 +2,6 @@
 import configureBundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 import { withSentryConfig } from '@sentry/nextjs'
-import withYaml from 'next-plugin-yaml'
-import rehypeSlug from 'rehype-slug'
-import remarkGfm from 'remark-gfm'
-import { parse as parseToml } from 'smol-toml'
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -15,8 +11,8 @@ const withBundleAnalyzer = configureBundleAnalyzer({
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypeSlug],
+    remarkPlugins: ['remark-gfm'],
+    rehypePlugins: ['rehype-slug'],
     providerImportSource: '@mdx-js/react',
   },
 })
@@ -31,22 +27,41 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
     dangerouslyAllowSVG: false,
+    // Next 16 requires explicit localPatterns for local images with query strings.
+    // Docs MDX uses `?v=N` cache-busting suffixes on assets under /img/. The `search`
+    // field is exact-match, so we omit it to accept any query string on our own assets.
+    localPatterns: [{ pathname: '/img/**' }],
     // @ts-ignore
     remotePatterns,
   },
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.include$/,
-      type: 'asset/source',
-    })
-    config.module.rules.push({
-      test: /\.toml$/,
-      type: 'json',
-      parser: {
-        parse: parseToml,
+  turbopack: {
+    rules: {
+      '*.include': {
+        loaders: ['raw-loader'],
+        as: '*.js',
       },
-    })
-    return config
+      '*.toml': {
+        loaders: ['./internals/toml-loader.cjs'],
+        as: '*.js',
+      },
+      '*.yaml': {
+        loaders: ['./internals/yaml-loader.cjs'],
+        as: '*.js',
+      },
+      '*.yml': {
+        loaders: ['./internals/yaml-loader.cjs'],
+        as: '*.js',
+      },
+    },
+    // Suppress false-positive context-module sweeps over server-only
+    // build scripts and the spec/ Makefile, pulled in by Turbopack's
+    // static analysis of `readFile(join(STATIC_BASE, dynamicVar))` patterns
+    // in features/docs/Reference.mdx.tsx. The paths are server-runtime
+    // only and never executed in any bundled environment.
+    ignoreIssue: [
+      { path: '**/spec/Makefile' },
+      { path: '**/spec/sections/**' },
+    ],
   },
   transpilePackages: [
     'ui',
@@ -162,14 +177,10 @@ const nextConfig = {
     // prod
     ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
   },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
-  },
 }
 
 const configExport = () => {
-  const plugins = [withMDX, withYaml, withBundleAnalyzer]
+  const plugins = [withMDX, withBundleAnalyzer]
   // @ts-ignore
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
