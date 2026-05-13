@@ -6,6 +6,10 @@ import { toast } from 'sonner'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
+import {
+  getOrganizationInviteContent,
+  getOrganizationInviteStatus,
+} from './OrganizationInvite.utils'
 import { OrganizationInviteError } from './OrganizationInviteError'
 import {
   InterstitialAccountRow,
@@ -40,50 +44,27 @@ export const OrganizationInvite = () => {
       enabled: !!profile && !!slug && !!token,
     }
   )
-  const inviteIsNoLongerValid =
-    error?.code === 401 && error?.message.includes('Failed to retrieve organization')
-  const inviteIsInvalid =
-    (isSuccessInvitation && !!data?.token_does_not_exist) ||
-    (isErrorInvitation && error?.code === 404)
-  const hasError =
-    isErrorInvitation ||
-    (isSuccessInvitation && (data.token_does_not_exist || data.expired_token || !data.email_match))
-
-  const isWrongAccount = isSuccessInvitation && !!data && !data.email_match
-  const showOrganizationHeader =
-    isSuccessInvitation &&
-    !!data &&
-    !data.token_does_not_exist &&
-    !data.expired_token &&
-    !isWrongAccount
-  const organizationName = data?.organization_name ?? 'an organization'
-  const isSignedOut = !isLoggedIn || (!profile && !isLoadingProfile)
-  const isInvitationLoading =
-    !isSignedOut && (isLoadingProfile || isLoadingInvitation || !router.isReady)
+  const inviteStatus = getOrganizationInviteStatus({
+    data,
+    error,
+    isErrorInvitation,
+    isLoadingInvitation,
+    isLoadingProfile,
+    isLoggedIn,
+    isRouterReady: router.isReady,
+    isSuccessInvitation,
+    profileExists: !!profile,
+  })
+  const isSignedOut = inviteStatus === 'signed-out'
+  const isInvitationLoading = inviteStatus === 'loading'
+  const inviteContent = getOrganizationInviteContent({
+    data,
+    isSignUpEnabled,
+    status: inviteStatus,
+  })
+  const hasError = ['wrong-account', 'expired', 'invalid', 'error'].includes(inviteStatus)
   const loginRedirectLink = `/sign-in?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
   const signupRedirectLink = `/sign-up?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
-  const interstitialTitle = inviteIsNoLongerValid
-    ? 'Invite no longer available'
-    : isSignedOut
-      ? 'View invitation'
-      : isWrongAccount
-        ? 'Wrong account'
-        : inviteIsInvalid
-          ? 'Invite invalid'
-          : isErrorInvitation
-            ? 'Unable to load invitation'
-            : data?.expired_token
-              ? 'Invite expired'
-              : showOrganizationHeader
-                ? `Join ${organizationName}`
-                : undefined
-  const interstitialDescription = showOrganizationHeader
-    ? isSignedOut
-      ? `Sign in${isSignUpEnabled ? ' or create an account' : ''} to view this invitation`
-      : 'You have been invited to join this Supabase organization'
-    : isSignedOut
-      ? `Sign in${isSignUpEnabled ? ' or create an account' : ''} to view this invitation`
-      : undefined
 
   const { mutate: joinOrganization, isPending: isJoining } =
     useOrganizationAcceptInvitationMutation({
@@ -107,15 +88,15 @@ export const OrganizationInvite = () => {
       title={
         isInvitationLoading ? (
           <ShimmeringLoader className="mx-auto h-7 w-36 max-w-full py-0" />
-        ) : interstitialTitle ? (
-          interstitialTitle
+        ) : inviteContent.title ? (
+          inviteContent.title
         ) : undefined
       }
       description={
         isInvitationLoading ? (
           <ShimmeringLoader className="mx-auto h-4 w-48 max-w-full py-0" />
-        ) : interstitialDescription ? (
-          interstitialDescription
+        ) : inviteContent.description ? (
+          inviteContent.description
         ) : undefined
       }
       titleClassName="text-xl"
@@ -159,7 +140,7 @@ export const OrganizationInvite = () => {
     )
   }
 
-  if (inviteIsNoLongerValid) {
+  if (inviteStatus === 'no-longer-valid') {
     return withLayout(
       <div className="flex flex-col gap-3">
         <Admonition
@@ -179,7 +160,7 @@ export const OrganizationInvite = () => {
         data={data}
         error={error}
         isError={isErrorInvitation}
-        isInvalidInvite={inviteIsInvalid}
+        isInvalidInvite={inviteStatus === 'invalid'}
       />
     )
   }
