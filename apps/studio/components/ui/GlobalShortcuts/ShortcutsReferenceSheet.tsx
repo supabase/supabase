@@ -52,6 +52,7 @@ const GROUP_LABELS: Record<string, string> = {
   results: 'Results',
   'schema-visualizer': 'Schema Visualizer',
   shortcuts: 'Shortcuts',
+  'storage-explorer': 'Storage File Explorer',
   'table-editor': 'Table Editor',
   'unified-logs': 'Logs',
 }
