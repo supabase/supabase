@@ -1,18 +1,19 @@
 // @ts-check
 
 /**
- * Fetches the latest agent-skills release from supabase/agent-skills and writes
- * index.json + skill archives to public/.well-known/agent-skills/.
+ * Fetches the latest agent-skills index.json from supabase/agent-skills and
+ * writes it to public/.well-known/agent-skills/index.json with skill URLs
+ * rewritten to absolute GitHub Release URLs.
  *
- * Releases are semver-tagged (e.g. v0.2.0) and managed by Release Please in
- * https://github.com/supabase/agent-skills. Each release includes:
- *   - index.json  (discovery index per agent-skills .well-known spec v0.2.0)
- *   - *.tar.gz    (one archive per skill)
+ * Tarballs are NOT downloaded or hosted here — the index points directly to
+ * GitHub Release assets. The digest in each skill entry is the trust anchor:
+ * clients verify SHA-256 after downloading from GitHub, same pattern as SRI
+ * on the web. The URL is just a location hint; the digest is the guarantee.
  *
+ * Spec: https://github.com/agentskills/agentskills/pull/254
  * Runs unauthenticated — public repo, build-time only.
  */
 
-import { createHash } from 'node:crypto'
 import { promises as fs } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -27,53 +28,35 @@ async function fetchJson(url) {
   return res.json()
 }
 
-async function download(url) {
-  const res = await fetch(url, { headers: { 'User-Agent': 'supabase-www-build' } })
-  if (!res.ok) throw new Error(`GET ${url} → ${res.status}`)
-  return Buffer.from(await res.arrayBuffer())
-}
-
-function sha256(buf) {
-  return 'sha256:' + createHash('sha256').update(buf).digest('hex')
-}
-
 async function main() {
   const release = await fetchJson(`https://api.github.com/repos/${REPO}/releases/latest`)
   console.log(`Fetching agent-skills release: ${release.tag_name}`)
 
-  // Find the index.json asset in the GitHub release to get its download URL
-  const githubReleaseIndexAsset = release.assets.find((a) => a.name === 'index.json')
-  if (!githubReleaseIndexAsset) throw new Error('No index.json found in release assets')
+  const indexAsset = release.assets.find((a) => a.name === 'index.json')
+  if (!indexAsset) throw new Error('No index.json found in release assets')
 
-  // Keep the GitHub download URL as the base URI for RFC 3986 artifact URL resolution (see below)
-  const githubReleaseIndexUrl = githubReleaseIndexAsset.browser_download_url
-  const indexJsonFileBuf = await download(githubReleaseIndexUrl)
-  const indexJsonFile = JSON.parse(indexJsonFileBuf.toString('utf8'))
+  const index = await fetchJson(indexAsset.browser_download_url)
 
-  // Fetch each artifact from its resolved URL, verify digest, buffer before writing
-  const buffers = { 'index.json': indexJsonFileBuf }
-  for (const skill of indexJsonFile.skills ?? []) {
-    // Resolve skill.url against the index URL per RFC 3986 §5.2.2 (https://datatracker.ietf.org/doc/html/rfc3986#section-5.2.2)
-    // as adopted by the agent-skills .well-known spec (https://github.com/agentskills/agentskills/pull/254)
-    // skill.url can be relative ("supabase.tar.gz"), path-absolute, or fully absolute (e.g. a CDN URL)
-    const githubReleaseArtifactUrl = new URL(skill.url, githubReleaseIndexUrl).href
-    const artifactName = new URL(githubReleaseArtifactUrl).pathname.split('/').pop()
-    const buf = await download(githubReleaseArtifactUrl)
-    const actual = sha256(buf)
-    if (actual !== skill.digest) {
-      throw new Error(`Digest mismatch for ${skill.name}: expected ${skill.digest}, got ${actual}`)
-    }
-    console.log(`  ✓ ${skill.name} digest verified`)
-    buffers[artifactName] = buf
+  // skill.url values in the published index.json are relative (e.g. "supabase.tar.gz").
+  // Rewrite them to absolute GitHub Release URLs so supabase.com only needs to
+  // serve index.json — tarballs are fetched directly from GitHub by clients.
+  const assetUrls = Object.fromEntries(release.assets.map((a) => [a.name, a.browser_download_url]))
+
+  const rewritten = {
+    ...index,
+    skills: (index.skills ?? []).map((skill) => ({
+      ...skill,
+      url: assetUrls[skill.url] ?? skill.url,
+    })),
   }
 
   await fs.mkdir(OUT_DIR, { recursive: true })
+  await fs.writeFile(join(OUT_DIR, 'index.json'), JSON.stringify(rewritten, null, 2) + '\n')
 
-  for (const [name, buf] of Object.entries(buffers)) {
-    await fs.writeFile(join(OUT_DIR, name), buf)
+  for (const skill of index.skills ?? []) {
+    console.log(`  ${skill.name}`)
   }
-
-  console.log(`Done — wrote to public/.well-known/agent-skills/`)
+  console.log(`Done — wrote public/.well-known/agent-skills/index.json`)
 }
 
 main().catch((err) => {
