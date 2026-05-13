@@ -22,14 +22,14 @@ import { SalesToolsChart } from './charts/SalesToolsChart'
 import { WorldOutlookChart } from './charts/WorldOutlookChart'
 import { SurveyRankedAnswersPair } from './SurveyRankedAnswersPair'
 import { SurveySectionBreak } from './SurveySectionBreak'
-import { SurveyStatCard } from './SurveyStatCard'
+import { SurveyStatCard, type SurveyStatSource } from './SurveyStatCard'
 import { SurveySummarizedAnswer } from './SurveySummarizedAnswer'
 import { SurveyWordCloud } from './SurveyWordCloud'
 
 interface SurveyChapterSectionProps {
   title: string
   description: string
-  stats?: Array<{ percent: number; label: string }>
+  stats?: Array<{ percent: number; label: string; source?: SurveyStatSource }>
   charts?: string[]
 
   wordCloud?: {
@@ -97,7 +97,12 @@ export function SurveyChapterSection({
         {stats && (
           <aside className="border-t border-muted flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
             {stats.map((stat, index) => (
-              <SurveyStatCard key={index} percent={stat.percent} label={stat.label} />
+              <SurveyStatCard
+                key={index}
+                percent={stat.percent}
+                label={stat.label}
+                source={stat.source}
+              />
             ))}
           </aside>
         )}

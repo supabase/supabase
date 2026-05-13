@@ -63,7 +63,11 @@ const stateOfStartupsData = {
           description:
             'The top metros are still the top metros. But AI has flattened the development gap everywhere else. Europe grew 4pp; Africa grew 2pp. Startups are setting up across Toronto, Chicago, Denver, Austin, across Europe, Asia, and Africa. The playbook no longer requires a specific zip code.',
           stats: [
-            { percent: 25, label: 'Global startups based in Europe' },
+            {
+              percent: 25,
+              label: 'Global startups based in Europe',
+              source: { rpcBase: 'get_location_stats', target: 'Europe' },
+            },
             { percent: 19, label: 'North American startups based in San Francisco' },
             { percent: 9, label: 'North American startups based in New York City' },
           ],
@@ -86,8 +90,16 @@ const stateOfStartupsData = {
           description:
             'Claude Code went from 1% in 2025 to 62% in 2026 (+61pp). Cursor dropped 19 points. v0, Bolt, and Windsurf each lost 6–9 points. VS Code held flat. Antigravity appeared for the first time and took the 4th spot in its debut year.',
           stats: [
-            { percent: 62, label: 'Startups that list Claude Code as a must-have' },
-            { percent: 37, label: 'Startups that list Cursor as a must-have' },
+            {
+              percent: 62,
+              label: 'Startups that list Claude Code as a must-have',
+              source: { rpcBase: 'get_ai_coding_tools_stats', target: 'Claude Code' },
+            },
+            {
+              percent: 37,
+              label: 'Startups that list Cursor as a must-have',
+              source: { rpcBase: 'get_ai_coding_tools_stats', target: 'Cursor' },
+            },
             { percent: 12, label: 'Startups that don’t pay for AI tools at all' },
           ],
           charts: ['AICodingToolsChart'],
@@ -134,9 +146,21 @@ const stateOfStartupsData = {
           description:
             'Paid Claude subscriptions jumped from 28% to 59% of respondents. Paid OpenAI dropped from 57% to 39%. Gemini entered the list at 27%. The money is moving faster than any lagging indicator could capture.',
           stats: [
-            { percent: 59, label: 'Startups that pay for Claude' },
-            { percent: 39, label: 'Startups that pay for OpenAI or ChatGPT' },
-            { percent: 27, label: 'Startups that pay for Gemini' },
+            {
+              percent: 59,
+              label: 'Startups that pay for Claude',
+              source: { rpcBase: 'get_subscriptions_stats', target: 'Claude' },
+            },
+            {
+              percent: 39,
+              label: 'Startups that pay for OpenAI or ChatGPT',
+              source: { rpcBase: 'get_subscriptions_stats', target: 'OpenAI / ChatGPT' },
+            },
+            {
+              percent: 27,
+              label: 'Startups that pay for Gemini',
+              source: { rpcBase: 'get_subscriptions_stats', target: 'Gemini' },
+            },
           ],
           charts: ['PaidSubscriptionsChart'],
           wordCloud: undefined,
@@ -148,9 +172,21 @@ const stateOfStartupsData = {
           description:
             'Anthropic/Claude climbed from 38% to 64%; OpenAI fell from 69% to 51%. Gemini entered at 43%. Hugging Face and custom models lost material share, suggesting fewer teams are running their own inference.',
           stats: [
-            { percent: 64, label: 'Startups using Anthropic models' },
-            { percent: 51, label: 'Startups using OpenAI models' },
-            { percent: 43, label: 'Startups using Gemini' },
+            {
+              percent: 64,
+              label: 'Startups using Anthropic models',
+              source: { rpcBase: 'get_ai_models_stats', target: 'Anthropic/Claude' },
+            },
+            {
+              percent: 51,
+              label: 'Startups using OpenAI models',
+              source: { rpcBase: 'get_ai_models_stats', target: 'OpenAI' },
+            },
+            {
+              percent: 43,
+              label: 'Startups using Gemini',
+              source: { rpcBase: 'get_ai_models_stats', target: 'Gemini' },
+            },
           ],
           charts: ['AIModelsChart'],
           wordCloud: undefined,
@@ -177,9 +213,27 @@ const stateOfStartupsData = {
           description:
             'This question was new in 2026. Among non-technical founders, the 76-to-100% share rises to 54%. Among 50-to-59-year-olds it rises to 80%. AI code generation is a median practice, not a fringe one.',
           stats: [
-            { percent: 41, label: 'Startups with 76–100% of their codebase AI-generated' },
-            { percent: 62, label: 'Startups with a majority AI-generated codebase' },
-            { percent: 2, label: 'Startups with zero AI-generated code' },
+            {
+              percent: 41,
+              label: 'Startups with 76–100% of their codebase AI-generated',
+              source: {
+                rpcBase: 'get_ai_generated_codebase_percent_stats',
+                target: '76-100%',
+              },
+            },
+            {
+              percent: 62,
+              label: 'Startups with a majority AI-generated codebase',
+              source: {
+                rpcBase: 'get_ai_generated_codebase_percent_stats',
+                target: ['51-75%', '76-100%'],
+              },
+            },
+            {
+              percent: 2,
+              label: 'Startups with zero AI-generated code',
+              source: { rpcBase: 'get_ai_generated_codebase_percent_stats', target: '0%' },
+            },
           ],
           charts: ['AICodebasePercentChart'],
           wordCloud: undefined,
@@ -220,7 +274,11 @@ const stateOfStartupsData = {
           description:
             'Supabase went from 76% to 82%. Every legacy NoSQL option lost share: MongoDB dropped 5pp, MySQL 3pp, Firebase 2pp. Neon, DynamoDB, and Convex appeared as options for the first time and took small but measurable shares.',
           stats: [
-            { percent: 82, label: 'Startups using Supabase as a database' },
+            {
+              percent: 82,
+              label: 'Startups using Supabase as a database',
+              source: { rpcBase: 'get_databases_stats', target: 'Supabase' },
+            },
             { percent: 60, label: 'Startups with Node.js in their backend stack' },
             { percent: 83, label: 'Startups with a JavaScript framework in their frontend stack' },
           ],
@@ -234,9 +292,21 @@ const stateOfStartupsData = {
           description:
             'This question was new in 2026, so there is no prior baseline. Three in four respondents who answered the auth question picked Supabase Auth. The firm migration floor is the ~25% who picked no Supabase option at all.',
           stats: [
-            { percent: 72, label: 'Startups using Supabase Auth' },
-            { percent: 15, label: 'Startups using Auth0' },
-            { percent: 14, label: 'Startups using NextAuth or Auth.js' },
+            {
+              percent: 72,
+              label: 'Startups using Supabase Auth',
+              source: { rpcBase: 'get_auth_provider_stats', target: 'Supabase Auth' },
+            },
+            {
+              percent: 15,
+              label: 'Startups using Auth0',
+              source: { rpcBase: 'get_auth_provider_stats', target: 'Auth0' },
+            },
+            {
+              percent: 14,
+              label: 'Startups using NextAuth or Auth.js',
+              source: { rpcBase: 'get_auth_provider_stats', target: 'NextAuth / Auth.js' },
+            },
           ],
           charts: ['AuthProviderChart'],
           wordCloud: undefined,
@@ -291,9 +361,17 @@ const stateOfStartupsData = {
           description:
             'Agent-building share is statistically flat year over year. The “not sure” cohort shrank, which means undecided builders are making up their minds and shipping. What they automate has shifted: workflow and data analysis climbed; customer support fell off the top spot.',
           stats: [
-            { percent: 52, label: 'Startups building or planning to build AI agents' },
+            {
+              percent: 52,
+              label: 'Startups building or planning to build AI agents',
+              source: { rpcBase: 'get_building_ai_agents_stats', target: 'Yes' },
+            },
             { percent: 34, label: 'Startups with agents automating customer support' },
-            { percent: 16, label: 'Startups that are not building AI agents' },
+            {
+              percent: 16,
+              label: 'Startups that are not building AI agents',
+              source: { rpcBase: 'get_building_ai_agents_stats', target: 'No' },
+            },
           ],
           charts: ['BuildingAgentsChart'],
           wordCloud: undefined,
@@ -370,9 +448,24 @@ const stateOfStartupsData = {
           description:
             '53% of startups with a GTM motion have no formal CRM, up from 43%. Every named CRM lost share: HubSpot, Salesforce, Notion/Airtable, Google Sheets. Build-your-own, or nothing at all.',
           stats: [
-            { percent: 53, label: 'Startups with no formal CRM' },
-            { percent: 18, label: 'Startups using Google Sheets as a CRM' },
-            { percent: 12, label: 'Startups using HubSpot' },
+            {
+              percent: 53,
+              label: 'Startups with no formal CRM',
+              source: {
+                rpcBase: 'get_sales_tools_stats',
+                target: 'We don’t have a formal CRM or sales tool yet',
+              },
+            },
+            {
+              percent: 18,
+              label: 'Startups using Google Sheets as a CRM',
+              source: { rpcBase: 'get_sales_tools_stats', target: 'Google Sheets' },
+            },
+            {
+              percent: 12,
+              label: 'Startups using HubSpot',
+              source: { rpcBase: 'get_sales_tools_stats', target: 'HubSpot' },
+            },
           ],
           charts: ['SalesToolsChart'],
           wordCloud: undefined,
@@ -458,6 +551,10 @@ const stateOfStartupsData = {
               percent: 67,
               label:
                 'Startups that get their first customers via personal and professional networks',
+              source: {
+                rpcBase: 'get_initial_paying_customers_stats',
+                target: 'Personal/professional network',
+              },
             },
             { percent: 48, label: 'Startups that engage users through social media' },
             { percent: 36, label: 'Startups that use tiered feature plans for pricing' },
@@ -509,7 +606,14 @@ const stateOfStartupsData = {
           description:
             'X lost 6 points. LinkedIn lost 3. Reddit and Discord lost 3–4. TikTok was the only platform that grew. The “I have no online persona” share grew 5 points to 33%. One in three respondents is fully offline.',
           stats: [
-            { percent: 10, label: 'Founders that have given up on social media' },
+            {
+              percent: 10,
+              label: 'Founders that have given up on social media',
+              source: {
+                rpcBase: 'get_regular_social_media_use_stats',
+                target: 'I’ve given up social media',
+              },
+            },
             { percent: 33, label: 'Respondents with no online persona' },
             { percent: 55, label: 'Engineers using LinkedIn regularly' },
           ],
@@ -561,7 +665,14 @@ const stateOfStartupsData = {
           description:
             'The largest year-over-year shift in any single category. Three new challenge options came online: burn out, AI competition, runway anxiety. Together they absorb roughly the same share that used to pick technical complexity. Among 1–10 person teams, burn out has already overtaken technical complexity as the second-biggest challenge.',
           stats: [
-            { percent: 11, label: 'Startups naming technical complexity their biggest challenge' },
+            {
+              percent: 11,
+              label: 'Startups naming technical complexity their biggest challenge',
+              source: {
+                rpcBase: 'get_biggest_challenge_stats',
+                target: 'Technical complexity',
+              },
+            },
             { percent: 82, label: 'Founders that evaluate tools via hands-on experience' },
             {
               percent: 45,

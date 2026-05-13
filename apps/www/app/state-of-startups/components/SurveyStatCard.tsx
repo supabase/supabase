@@ -1,33 +1,72 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useAccent } from './accent-context'
-import { useYear } from './year-context'
+import { useSurveyDataCache } from './survey-data-context'
+import { rpcNameForYear, useYear } from './year-context'
 
 const ANIMATION_DURATION = 600
 
-// Stat values are written against the 2026 narrative. When the user toggles
-// the page to an earlier year, we don't fabricate prior-year baselines; the
-// card renders a neutral "—" instead. Chart RPCs still refetch for the
-// selected year independently.
+// Stats are written against the 2026 narrative. If a stat declares a
+// `source` ({ rpcBase, target }), the card looks up the live percent for
+// the active year in the preloaded chart cache. Otherwise it falls back to
+// the static `percent` for 2026 and "—" for other years.
 const NARRATIVE_YEAR = 2026
 
-// These values are calculated via static SQL queries under 'Key Stats' and rounded for display in data/surveys/state-of-startups-2025.tsx file
-export function SurveyStatCard({ label, percent }: { label: string; percent: number }) {
-  const [displayValue, setDisplayValue] = useState(0)
-  const [hasAnimated, setHasAnimated] = useState(false)
-  const [shouldAnimateBar, setShouldAnimateBar] = useState(false)
+export interface SurveyStatSource {
+  /** Base RPC name without the `_<year>` suffix, matching the per-chart RPC. */
+  rpcBase: string
+  /** Bucket label(s) to match in the cached chart rows. Sums when multiple. */
+  target: string | string[]
+}
+
+interface SurveyStatCardProps {
+  label: string
+  percent: number
+  source?: SurveyStatSource
+}
+
+export function SurveyStatCard({ label, percent, source }: SurveyStatCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const accent = useAccent()
   const { year } = useYear()
-  const isNarrativeYear = year === NARRATIVE_YEAR
+  const { get } = useSurveyDataCache()
 
   const accentBg = 'bg-brand'
   const accentText = 'text-brand'
 
+  // Resolve the percent to display: live value when a source is declared,
+  // otherwise the static 2026 baseline (with "—" on prior years).
+  const resolvedPercent: number | null = useMemo(() => {
+    if (source) {
+      const rpcName = rpcNameForYear(source.rpcBase, year)
+      const rows = get(rpcName, {})
+      if (!rows) return null
+      const targets = Array.isArray(source.target) ? source.target : [source.target]
+      let sumRaw = 0
+      let matched = 0
+      for (const row of rows) {
+        if (targets.includes(row.label)) {
+          sumRaw += row.rawValue
+          matched += 1
+        }
+      }
+      if (matched === 0) return null
+      return Math.round(sumRaw)
+    }
+    return year === NARRATIVE_YEAR ? percent : null
+  }, [source, year, get, percent])
+
+  const [displayValue, setDisplayValue] = useState(0)
+  const [hasAnimated, setHasAnimated] = useState(false)
+  const [shouldAnimateBar, setShouldAnimateBar] = useState(false)
+
+  // Initial scroll-in animation: count up from 0 to the resolved value the
+  // first time the card enters the viewport.
   useEffect(() => {
-    if (!isNarrativeYear || !percent || hasAnimated) return
+    if (hasAnimated) return
+    if (resolvedPercent === null) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -36,25 +75,16 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
             setHasAnimated(true)
             setShouldAnimateBar(true)
 
-            // Start counting animation
             const startTime = Date.now()
-            const duration = ANIMATION_DURATION
             const startValue = 0
-            const endValue = percent
+            const endValue = resolvedPercent
 
             const animate = () => {
               const elapsed = Date.now() - startTime
-              const progress = Math.min(elapsed / duration, 1)
-
-              // Easing function for smooth animation
+              const progress = Math.min(elapsed / ANIMATION_DURATION, 1)
               const easeOutQuart = 1 - Math.pow(1 - progress, 4)
-              const currentValue = Math.round(startValue + (endValue - startValue) * easeOutQuart)
-
-              setDisplayValue(currentValue)
-
-              if (progress < 1) {
-                requestAnimationFrame(animate)
-              }
+              setDisplayValue(Math.round(startValue + (endValue - startValue) * easeOutQuart))
+              if (progress < 1) requestAnimationFrame(animate)
             }
 
             requestAnimationFrame(animate)
@@ -65,18 +95,27 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
     )
 
     const currentCardRef = cardRef.current
-    if (currentCardRef) {
-      observer.observe(currentCardRef)
-    }
-
+    if (currentCardRef) observer.observe(currentCardRef)
     return () => {
-      if (currentCardRef) {
-        observer.unobserve(currentCardRef)
-      }
+      if (currentCardRef) observer.unobserve(currentCardRef)
     }
-  }, [percent, hasAnimated])
+  }, [resolvedPercent, hasAnimated])
 
-  const renderedBarValue = isNarrativeYear ? percent : 0
+  // After the initial animation, snap to the latest resolved value when the
+  // year toggle (or live data) changes.
+  useEffect(() => {
+    if (!hasAnimated) return
+    if (resolvedPercent === null) {
+      setDisplayValue(0)
+      setShouldAnimateBar(false)
+      return
+    }
+    setDisplayValue(resolvedPercent)
+    setShouldAnimateBar(true)
+  }, [resolvedPercent, hasAnimated])
+
+  const hasValue = resolvedPercent !== null
+  const renderedBarValue = hasValue ? resolvedPercent : 0
 
   return (
     <div ref={cardRef} className="flex-1 px-8 py-8 flex flex-col gap-4">
@@ -100,17 +139,16 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
           }}
         />
 
-        {/* Filled portion of the bar */}
-        {isNarrativeYear && (
+        {/* Filled portion of the bar (only when there is a value to show) */}
+        {hasValue && (
           <div
             className={`h-full relative bg-surface-100`}
             style={{
               width: `calc(max(0.5%, (var(--bar-value) / 100) * 100%))`,
               clipPath: shouldAnimateBar ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
-              transition: `clip-path 0.5s steps(${Math.max(2, Math.floor((percent / 100) * 12))}, end)`,
+              transition: `clip-path 0.5s steps(${Math.max(2, Math.floor(((resolvedPercent ?? 0) / 100) * 12))}, end)`,
             }}
           >
-            {/* Foreground pattern for the filled portion */}
             <div
               className={`absolute inset-0 pointer-events-none ${accentBg}`}
               style={{
@@ -125,7 +163,7 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
       </div>
       {/* Text */}
       <div className="flex flex-col gap-2">
-        {isNarrativeYear ? (
+        {hasValue ? (
           <p
             className={`md:-ml-1 md:mt-8 text-2xl md:text-6xl font-mono tracking-tight inline-block flex flex-row items-baseline ${hasAnimated ? accentText : 'text-foreground-muted'} transition-colors duration-1000`}
           >
