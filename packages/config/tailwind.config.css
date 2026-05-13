@@ -5,7 +5,6 @@
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
 @plugin "tailwindcss-animate";
-@plugin "./tailwind-plugins/motion-safe-transition";
 
 /* Per-theme overrides for semantic --background-/--foreground-/--brand-*
  * tokens. Radix/scale/brand --color-* values are inlined directly in

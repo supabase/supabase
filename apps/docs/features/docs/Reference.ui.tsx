@@ -133,7 +133,7 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
           'text-xs text-foreground-light',
           'data-open:bg-surface-200',
           'data-open:rounded-b-none data-open:border-b-0',
-          'transition-safe-all ease-out'
+          'transition motion-reduce:duration-1 ease-out'
         )}
       >
         <ChevronRight size={12} className="group-data-open:rotate-90 transition-transform" />
