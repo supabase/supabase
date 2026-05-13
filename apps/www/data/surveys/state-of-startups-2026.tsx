@@ -35,9 +35,29 @@ const stateOfStartupsData = {
           description:
             'Solo founders were already the largest group in 2025 at 52%. In 2026 they are 61% of respondents, up 8 points. Technical-founder share dropped from 82% to 78%, and every age band above 40 grew by a statistically significant margin.',
           stats: [
-            { percent: 61, label: 'Startups with a single founder' },
-            { percent: 22, label: 'Startups founded by non-technical founders' },
-            { percent: 26, label: 'Founders aged 40 or older' },
+            {
+              percent: 61,
+              label: 'Startups with a single founder',
+              source: { column: 'founder_count', aggregation: 'single', target: '1' },
+            },
+            {
+              percent: 22,
+              label: 'Startups founded by non-technical founders',
+              source: {
+                column: 'founders_are_technical',
+                aggregation: 'boolean',
+                target: 'FALSE',
+              },
+            },
+            {
+              percent: 26,
+              label: 'Founders aged 40 or older',
+              source: {
+                column: 'person_age',
+                aggregation: 'single',
+                target: ['40–49', '50–59', '60+'],
+              },
+            },
           ],
           charts: ['RoleChart'],
           wordCloud: undefined,
@@ -49,7 +69,11 @@ const stateOfStartupsData = {
           description:
             'Startups are mostly bootstrapped or at early stages of funding. They are small teams, and usually less than a year old.',
           stats: [
-            { percent: 91, label: 'Startups with 10 or fewer employees' },
+            {
+              percent: 91,
+              label: 'Startups with 10 or fewer employees',
+              source: { column: 'team_size', aggregation: 'single', target: '1–10' },
+            },
             { percent: 66, label: 'Startups under one year old' },
             { percent: 6, label: 'Startups over 5 years old' },
           ],
@@ -66,7 +90,7 @@ const stateOfStartupsData = {
             {
               percent: 25,
               label: 'Global startups based in Europe',
-              source: { rpcBase: 'get_location_stats', target: 'Europe' },
+              source: { column: 'location', aggregation: 'single', target: 'Europe' },
             },
             { percent: 19, label: 'North American startups based in San Francisco' },
             { percent: 9, label: 'North American startups based in New York City' },
@@ -93,12 +117,12 @@ const stateOfStartupsData = {
             {
               percent: 62,
               label: 'Startups that list Claude Code as a must-have',
-              source: { rpcBase: 'get_ai_coding_tools_stats', target: 'Claude Code' },
+              source: { column: 'ai_coding_tools', aggregation: 'multi', target: 'Claude Code' },
             },
             {
               percent: 37,
               label: 'Startups that list Cursor as a must-have',
-              source: { rpcBase: 'get_ai_coding_tools_stats', target: 'Cursor' },
+              source: { column: 'ai_coding_tools', aggregation: 'multi', target: 'Cursor' },
             },
             { percent: 12, label: 'Startups that don’t pay for AI tools at all' },
           ],
@@ -149,17 +173,21 @@ const stateOfStartupsData = {
             {
               percent: 59,
               label: 'Startups that pay for Claude',
-              source: { rpcBase: 'get_subscriptions_stats', target: 'Claude' },
+              source: { column: 'subscriptions', aggregation: 'multi', target: 'Claude' },
             },
             {
               percent: 39,
               label: 'Startups that pay for OpenAI or ChatGPT',
-              source: { rpcBase: 'get_subscriptions_stats', target: 'OpenAI / ChatGPT' },
+              source: {
+                column: 'subscriptions',
+                aggregation: 'multi',
+                target: 'OpenAI / ChatGPT',
+              },
             },
             {
               percent: 27,
               label: 'Startups that pay for Gemini',
-              source: { rpcBase: 'get_subscriptions_stats', target: 'Gemini' },
+              source: { column: 'subscriptions', aggregation: 'multi', target: 'Gemini' },
             },
           ],
           charts: ['PaidSubscriptionsChart'],
@@ -175,17 +203,21 @@ const stateOfStartupsData = {
             {
               percent: 64,
               label: 'Startups using Anthropic models',
-              source: { rpcBase: 'get_ai_models_stats', target: 'Anthropic/Claude' },
+              source: {
+                column: 'ai_models_used',
+                aggregation: 'multi',
+                target: 'Anthropic/Claude',
+              },
             },
             {
               percent: 51,
               label: 'Startups using OpenAI models',
-              source: { rpcBase: 'get_ai_models_stats', target: 'OpenAI' },
+              source: { column: 'ai_models_used', aggregation: 'multi', target: 'OpenAI' },
             },
             {
               percent: 43,
               label: 'Startups using Gemini',
-              source: { rpcBase: 'get_ai_models_stats', target: 'Gemini' },
+              source: { column: 'ai_models_used', aggregation: 'multi', target: 'Gemini' },
             },
           ],
           charts: ['AIModelsChart'],
@@ -217,7 +249,8 @@ const stateOfStartupsData = {
               percent: 41,
               label: 'Startups with 76–100% of their codebase AI-generated',
               source: {
-                rpcBase: 'get_ai_generated_codebase_percent_stats',
+                column: 'ai_generated_codebase_percent',
+                aggregation: 'single',
                 target: '76-100%',
               },
             },
@@ -225,14 +258,19 @@ const stateOfStartupsData = {
               percent: 62,
               label: 'Startups with a majority AI-generated codebase',
               source: {
-                rpcBase: 'get_ai_generated_codebase_percent_stats',
+                column: 'ai_generated_codebase_percent',
+                aggregation: 'single',
                 target: ['51-75%', '76-100%'],
               },
             },
             {
               percent: 2,
               label: 'Startups with zero AI-generated code',
-              source: { rpcBase: 'get_ai_generated_codebase_percent_stats', target: '0%' },
+              source: {
+                column: 'ai_generated_codebase_percent',
+                aggregation: 'single',
+                target: '0%',
+              },
             },
           ],
           charts: ['AICodebasePercentChart'],
@@ -277,7 +315,7 @@ const stateOfStartupsData = {
             {
               percent: 82,
               label: 'Startups using Supabase as a database',
-              source: { rpcBase: 'get_databases_stats', target: 'Supabase' },
+              source: { column: 'databases', aggregation: 'multi', target: 'Supabase' },
             },
             { percent: 60, label: 'Startups with Node.js in their backend stack' },
             { percent: 83, label: 'Startups with a JavaScript framework in their frontend stack' },
@@ -295,17 +333,25 @@ const stateOfStartupsData = {
             {
               percent: 72,
               label: 'Startups using Supabase Auth',
-              source: { rpcBase: 'get_auth_provider_stats', target: 'Supabase Auth' },
+              source: {
+                column: 'auth_provider',
+                aggregation: 'multi',
+                target: 'Supabase Auth',
+              },
             },
             {
               percent: 15,
               label: 'Startups using Auth0',
-              source: { rpcBase: 'get_auth_provider_stats', target: 'Auth0' },
+              source: { column: 'auth_provider', aggregation: 'multi', target: 'Auth0' },
             },
             {
               percent: 14,
               label: 'Startups using NextAuth or Auth.js',
-              source: { rpcBase: 'get_auth_provider_stats', target: 'NextAuth / Auth.js' },
+              source: {
+                column: 'auth_provider',
+                aggregation: 'multi',
+                target: 'NextAuth / Auth.js',
+              },
             },
           ],
           charts: ['AuthProviderChart'],
@@ -318,7 +364,11 @@ const stateOfStartupsData = {
           description:
             'Supabase held its lead. Vercel was already ahead of AWS in 2025, and in 2026 it extended that lead by 9 points. Cloudflare grew fastest of all, crossing 27% and passing AWS on the way up. Every hyperscaler lost share.',
           stats: [
-            { percent: 27, label: 'Startups hosting on Cloudflare' },
+            {
+              percent: 27,
+              label: 'Startups hosting on Cloudflare',
+              source: { column: 'cloud_providers', aggregation: 'multi', target: 'Cloudflare' },
+            },
             { percent: 9, label: 'Increase in Vercel hosting share over AWS' },
             { percent: 0, label: 'Hyperscaler that gained share this year' },
           ],
@@ -332,8 +382,16 @@ const stateOfStartupsData = {
           description:
             'React and Next.js both grew. But the quieter story is that four tools went from effectively zero to real share in 12 months: Expo 10%, TanStack 8%, HTMX 4%, Astro 3%. Native mobile also picked up 3 points. The React-Next monoculture cracked.',
           stats: [
-            { percent: 10, label: 'Startups using Expo (new in 2026)' },
-            { percent: 8, label: 'Startups using TanStack (new in 2026)' },
+            {
+              percent: 10,
+              label: 'Startups using Expo (new in 2026)',
+              source: { column: 'frontend_stack', aggregation: 'multi', target: 'Expo' },
+            },
+            {
+              percent: 8,
+              label: 'Startups using TanStack (new in 2026)',
+              source: { column: 'frontend_stack', aggregation: 'multi', target: 'TanStack' },
+            },
             { percent: 3, label: 'Increase in native iOS / Android adoption' },
           ],
           charts: [],
@@ -364,13 +422,13 @@ const stateOfStartupsData = {
             {
               percent: 52,
               label: 'Startups building or planning to build AI agents',
-              source: { rpcBase: 'get_building_ai_agents_stats', target: 'Yes' },
+              source: { column: 'building_ai_agents', aggregation: 'single', target: 'Yes' },
             },
             { percent: 34, label: 'Startups with agents automating customer support' },
             {
               percent: 16,
               label: 'Startups that are not building AI agents',
-              source: { rpcBase: 'get_building_ai_agents_stats', target: 'No' },
+              source: { column: 'building_ai_agents', aggregation: 'single', target: 'No' },
             },
           ],
           charts: ['BuildingAgentsChart'],
@@ -397,9 +455,33 @@ const stateOfStartupsData = {
           description:
             'Three in four agent-builders are already doing multi-agent work. 25% say it is in production. 21% in development. 36% are planning. Only 16% said no. This question was new in 2026; the on-ramp is already steeper than the "are you building agents at all" question was in 2025.',
           stats: [
-            { percent: 25, label: 'Agent builders running multi-agent systems in production' },
-            { percent: 21, label: 'Agent builders with multi-agent systems in development' },
-            { percent: 36, label: 'Agent builders planning multi-agent systems' },
+            {
+              percent: 25,
+              label: 'Agent builders running multi-agent systems in production',
+              source: {
+                column: 'building_multi_agent_systems',
+                aggregation: 'single',
+                target: 'Yes, in production',
+              },
+            },
+            {
+              percent: 21,
+              label: 'Agent builders with multi-agent systems in development',
+              source: {
+                column: 'building_multi_agent_systems',
+                aggregation: 'single',
+                target: 'Yes, in development',
+              },
+            },
+            {
+              percent: 36,
+              label: 'Agent builders planning multi-agent systems',
+              source: {
+                column: 'building_multi_agent_systems',
+                aggregation: 'single',
+                target: 'Planning to',
+              },
+            },
           ],
           charts: [],
           wordCloud: undefined,
@@ -452,19 +534,20 @@ const stateOfStartupsData = {
               percent: 53,
               label: 'Startups with no formal CRM',
               source: {
-                rpcBase: 'get_sales_tools_stats',
+                column: 'sales_tools',
+                aggregation: 'multi',
                 target: 'We don’t have a formal CRM or sales tool yet',
               },
             },
             {
               percent: 18,
               label: 'Startups using Google Sheets as a CRM',
-              source: { rpcBase: 'get_sales_tools_stats', target: 'Google Sheets' },
+              source: { column: 'sales_tools', aggregation: 'multi', target: 'Google Sheets' },
             },
             {
               percent: 12,
               label: 'Startups using HubSpot',
-              source: { rpcBase: 'get_sales_tools_stats', target: 'HubSpot' },
+              source: { column: 'sales_tools', aggregation: 'multi', target: 'HubSpot' },
             },
           ],
           charts: ['SalesToolsChart'],
@@ -477,7 +560,15 @@ const stateOfStartupsData = {
           description:
             '56% still don’t use observability tools. “Custom solution” is the fastest-growing answer, up 2.5pp. Datadog and Prometheus both lost share. Sentry kept its lead and grew slightly. The observability market is bifurcating between Sentry for errors and custom dashboards for everything else.',
           stats: [
-            { percent: 56, label: 'Startups that don’t use observability tools' },
+            {
+              percent: 56,
+              label: 'Startups that don’t use observability tools',
+              source: {
+                column: 'observability',
+                aggregation: 'multi',
+                target: 'We don’t use observability tools yet',
+              },
+            },
             { percent: 2.5, label: 'Year-over-year growth in custom observability solutions' },
             { percent: 0, label: 'Hyperscaler observability vendor that gained share' },
           ],
@@ -505,8 +596,16 @@ const stateOfStartupsData = {
           description:
             '“No, we haven’t built a community” grew 4 points to 48%. “In progress / planning to” shrank. The “yes, we built one” share is flat at 11%. Dev-community-led marketing has a smaller top-of-funnel this year than last.',
           stats: [
-            { percent: 48, label: 'Startups that have not built a developer community' },
-            { percent: 11, label: 'Startups that have built a developer community' },
+            {
+              percent: 48,
+              label: 'Startups that have not built a developer community',
+              source: { column: 'dev_community_built', aggregation: 'single', target: 'No' },
+            },
+            {
+              percent: 11,
+              label: 'Startups that have built a developer community',
+              source: { column: 'dev_community_built', aggregation: 'single', target: 'Yes' },
+            },
             { percent: 4, label: 'Year-over-year growth in “no community” share' },
           ],
           charts: [],
@@ -552,7 +651,8 @@ const stateOfStartupsData = {
               label:
                 'Startups that get their first customers via personal and professional networks',
               source: {
-                rpcBase: 'get_initial_paying_customers_stats',
+                column: 'initial_paying_customers',
+                aggregation: 'multi',
                 target: 'Personal/professional network',
               },
             },
@@ -569,7 +669,15 @@ const stateOfStartupsData = {
           description:
             'Dedicated full-time sales hires usually do not arrive until after the tenth employee. Product-led growth as a motion climbed 4 points to half of respondents. “Not sure yet” is shrinking.',
           stats: [
-            { percent: 50, label: 'Startups using a product-led growth motion' },
+            {
+              percent: 50,
+              label: 'Startups using a product-led growth motion',
+              source: {
+                column: 'market_model',
+                aggregation: 'multi',
+                target: 'Product-led growth',
+              },
+            },
             { percent: 4, label: 'Year-over-year growth in product-led motion adoption' },
             { percent: 0, label: 'Startups with a full-time sales team before headcount 10' },
           ],
@@ -583,7 +691,15 @@ const stateOfStartupsData = {
           description:
             'For the first time in the survey, startups are picking a pricing shape earlier in their lifecycle, and they are picking the same one. Tiered feature plans went from 23% to 36% of respondents. The “still experimenting” cohort shrank.',
           stats: [
-            { percent: 36, label: 'Startups using tiered feature plans' },
+            {
+              percent: 36,
+              label: 'Startups using tiered feature plans',
+              source: {
+                column: 'pricing',
+                aggregation: 'multi',
+                target: 'Tiered feature plans',
+              },
+            },
             { percent: 12, label: 'Year-over-year growth in tiered-plan adoption' },
             { percent: 23, label: 'Tiered-plan share in 2025' },
           ],
@@ -610,7 +726,8 @@ const stateOfStartupsData = {
               percent: 10,
               label: 'Founders that have given up on social media',
               source: {
-                rpcBase: 'get_regular_social_media_use_stats',
+                column: 'regular_social_media_use',
+                aggregation: 'multi',
                 target: 'I’ve given up social media',
               },
             },
@@ -636,7 +753,15 @@ const stateOfStartupsData = {
           description:
             '2 in 3 respondents are not attending any industry conference. The “none of the above” cohort jumped 10 points. Google Cloud Next, AWS re:Invent, Microsoft Build, and Y Combinator Demo Day all lost share. Conference-led developer marketing is working for a smaller slice of the market every year.',
           stats: [
-            { percent: 67, label: 'Respondents not attending any industry conference' },
+            {
+              percent: 67,
+              label: 'Respondents not attending any industry conference',
+              source: {
+                column: 'events',
+                aggregation: 'multi',
+                target: 'None of the above',
+              },
+            },
             { percent: 10, label: 'Year-over-year growth in “none of the above” share' },
             { percent: 0, label: 'Named conference that gained share this year' },
           ],
@@ -669,7 +794,8 @@ const stateOfStartupsData = {
               percent: 11,
               label: 'Startups naming technical complexity their biggest challenge',
               source: {
-                rpcBase: 'get_biggest_challenge_stats',
+                column: 'biggest_challenge',
+                aggregation: 'single',
                 target: 'Technical complexity',
               },
             },

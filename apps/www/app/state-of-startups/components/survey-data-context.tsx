@@ -11,7 +11,8 @@ import {
   type ReactNode,
 } from 'react'
 
-import { transformSurveyRows } from '../lib/preload-survey-data'
+import { statKey, transformSurveyRows } from '../lib/preload-survey-data'
+import type { SurveyYear } from './year-context'
 
 export interface ChartDataItem {
   label: string
@@ -19,12 +20,27 @@ export interface ChartDataItem {
   rawValue: number
 }
 
+export type StatAggregation = 'single' | 'multi' | 'boolean'
+
+export interface StatColumnRow {
+  label: string
+  count: number
+}
+
+export interface StatColumnData {
+  rows: StatColumnRow[]
+  respondentCount: number
+}
+
 export type SurveyDataCache = Record<string, ChartDataItem[]>
+export type SurveyStatCache = Record<string, StatColumnData>
 
 interface SurveyDataContextValue {
-  /** Returns cached data for an (rpcName, params) combo, or undefined if absent. */
+  /** Returns cached chart data for an (rpcName, params) combo, or undefined. */
   get: (rpcName: string, params: Record<string, any>) => ChartDataItem[] | undefined
-  /** Fetches and caches a non-default filter combo. Returns the cached promise on duplicate calls. */
+  /** Returns cached stat-column data for a (year, column) pair, or undefined. */
+  getStat: (year: SurveyYear, column: string) => StatColumnData | undefined
+  /** Fetches and caches a non-default chart filter combo. */
   fetchAndCache: (rpcName: string, params: Record<string, any>) => Promise<ChartDataItem[]>
 }
 
@@ -47,9 +63,11 @@ function cacheKey(rpcName: string, params: Record<string, any>): string {
 
 export function SurveyDataProvider({
   preloadedData,
+  preloadedStats,
   children,
 }: {
   preloadedData: SurveyDataCache
+  preloadedStats: SurveyStatCache
   children: ReactNode
 }) {
   const [cache, setCache] = useState<Map<string, ChartDataItem[]>>(() => {
@@ -60,11 +78,24 @@ export function SurveyDataProvider({
     return initial
   })
 
+  const statCache = useMemo(() => {
+    const map = new Map<string, StatColumnData>()
+    for (const [key, value] of Object.entries(preloadedStats)) {
+      map.set(key, value)
+    }
+    return map
+  }, [preloadedStats])
+
   const inflight = useRef<Map<string, Promise<ChartDataItem[]>>>(new Map())
 
   const get = useCallback(
     (rpcName: string, params: Record<string, any>) => cache.get(cacheKey(rpcName, params)),
     [cache]
+  )
+
+  const getStat = useCallback(
+    (year: SurveyYear, column: string) => statCache.get(statKey(year, column)),
+    [statCache]
   )
 
   const fetchAndCache = useCallback(
@@ -96,7 +127,7 @@ export function SurveyDataProvider({
     [cache]
   )
 
-  const value = useMemo(() => ({ get, fetchAndCache }), [get, fetchAndCache])
+  const value = useMemo(() => ({ get, getStat, fetchAndCache }), [get, getStat, fetchAndCache])
 
   return <SurveyDataContext.Provider value={value}>{children}</SurveyDataContext.Provider>
 }

@@ -4,20 +4,25 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useAccent } from './accent-context'
 import { useSurveyDataCache } from './survey-data-context'
-import { rpcNameForYear, useYear } from './year-context'
+import { useYear } from './year-context'
 
 const ANIMATION_DURATION = 600
 
 // Stats are written against the 2026 narrative. If a stat declares a
-// `source` ({ rpcBase, target }), the card looks up the live percent for
-// the active year in the preloaded chart cache. Otherwise it falls back to
-// the static `percent` for 2026 and "—" for other years.
+// `source` ({ column, aggregation, target }), the card looks up the live
+// percent for the active year in the preloaded stat cache. Otherwise it
+// falls back to the static `percent` for 2026 and "—" for other years.
 const NARRATIVE_YEAR = 2026
 
 export interface SurveyStatSource {
-  /** Base RPC name without the `_<year>` suffix, matching the per-chart RPC. */
-  rpcBase: string
-  /** Bucket label(s) to match in the cached chart rows. Sums when multiple. */
+  column: string
+  /**
+   * 'single' | 'multi' | 'boolean'. Kept as `string` here so narrative
+   * literals don't need `as const` casts; preload-survey-data.ts dispatches
+   * on the literal value when calling the matching generic RPC.
+   */
+  aggregation: string
+  /** Bucket label(s) to match in the cached stat rows. Sums when multiple. */
   target: string | string[]
 }
 
@@ -31,32 +36,40 @@ export function SurveyStatCard({ label, percent, source }: SurveyStatCardProps) 
   const cardRef = useRef<HTMLDivElement>(null)
   const accent = useAccent()
   const { year } = useYear()
-  const { get } = useSurveyDataCache()
+  const { getStat } = useSurveyDataCache()
 
   const accentBg = 'bg-brand'
   const accentText = 'text-brand'
 
-  // Resolve the percent to display: live value when a source is declared,
-  // otherwise the static 2026 baseline (with "—" on prior years).
+  // Resolve the percent to display: live value when a source is declared and
+  // present in the cache, otherwise fall back to the static 2026 baseline
+  // (with "—" on prior years).
   const resolvedPercent: number | null = useMemo(() => {
     if (source) {
-      const rpcName = rpcNameForYear(source.rpcBase, year)
-      const rows = get(rpcName, {})
-      if (!rows) return null
-      const targets = Array.isArray(source.target) ? source.target : [source.target]
-      let sumRaw = 0
-      let matched = 0
-      for (const row of rows) {
-        if (targets.includes(row.label)) {
-          sumRaw += row.rawValue
-          matched += 1
+      const data = getStat(year, source.column)
+      if (data && data.respondentCount > 0) {
+        const targets = Array.isArray(source.target) ? source.target : [source.target]
+        let count = 0
+        let matched = 0
+        for (const row of data.rows) {
+          if (targets.includes(row.label)) {
+            count += row.count
+            matched += 1
+          }
         }
+        if (matched > 0) {
+          return Math.round((count / data.respondentCount) * 100)
+        }
+        // Cache present but target not in this year's rows → option didn't
+        // exist that year. Render "—".
+        return null
       }
-      if (matched === 0) return null
-      return Math.round(sumRaw)
+      // No cache entry for this (year, column) — column likely didn't exist
+      // that year, or the preload errored. Fall through to the static
+      // fallback so the 2026 page still shows something pre-deploy.
     }
     return year === NARRATIVE_YEAR ? percent : null
-  }, [source, year, get, percent])
+  }, [source, year, getStat, percent])
 
   const [displayValue, setDisplayValue] = useState(0)
   const [hasAnimated, setHasAnimated] = useState(false)

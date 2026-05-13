@@ -9,7 +9,11 @@ import { forwardRef, useEffect, useRef, useState, type RefObject } from 'react'
 import { Button, cn } from 'ui'
 
 import { StateOfStartupsAuroraHeader } from './components/StateOfStartupsAuroraHeader'
-import { SurveyDataProvider, type SurveyDataCache } from './components/survey-data-context'
+import {
+  SurveyDataProvider,
+  type SurveyDataCache,
+  type SurveyStatCache,
+} from './components/survey-data-context'
 import { SurveyChapter } from './components/SurveyChapter'
 import { SurveyChapterSection } from './components/SurveyChapterSection'
 import { SurveySectionBreak } from './components/SurveySectionBreak'
@@ -118,8 +122,10 @@ function FloatingTableOfContents({
 
 export default function StateOfStartups2026Content({
   preloadedData,
+  preloadedStats,
 }: {
   preloadedData: SurveyDataCache
+  preloadedStats: SurveyStatCache
 }) {
   const [showFloatingToc, setShowFloatingToc] = useState(false)
   const [isTocOpen, setIsTocOpen] = useState(false)
@@ -193,7 +199,7 @@ export default function StateOfStartups2026Content({
 
   return (
     <YearProvider>
-      <SurveyDataProvider preloadedData={preloadedData}>
+      <SurveyDataProvider preloadedData={preloadedData} preloadedStats={preloadedStats}>
         <DefaultLayout className="bg-alternative overflow-hidden">
           <AnimatePresence>
             {showFloatingToc && (

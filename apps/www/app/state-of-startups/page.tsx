@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { preloadSurveyData } from './lib/preload-survey-data'
+import { preloadStatData, preloadSurveyData } from './lib/preload-survey-data'
 import { RegisterContent } from './register/RegisterContent'
 import StateOfStartups2026Content from './StateOfStartups2026Content'
 
@@ -48,6 +48,11 @@ export const metadata: Metadata = SHOW_RESULTS
 export default async function StateOfStartupsPage() {
   if (!SHOW_RESULTS) return <RegisterContent />
 
-  const preloadedData = await preloadSurveyData()
-  return <StateOfStartups2026Content preloadedData={preloadedData} />
+  const [preloadedData, preloadedStats] = await Promise.all([
+    preloadSurveyData(),
+    preloadStatData(),
+  ])
+  return (
+    <StateOfStartups2026Content preloadedData={preloadedData} preloadedStats={preloadedStats} />
+  )
 }
