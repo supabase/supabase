@@ -14,7 +14,7 @@ import {
   keyword,
   analyticsLiteral as lit,
   safeSql,
-  type SafeSqlFragment,
+  type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
 
 // Pagination and control parameters
@@ -35,10 +35,10 @@ const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] a
  * @param search Search params (URL-derived filter values)
  * @param excludeKey Optional key to skip — used by facet-count branches that
  *                   need every filter applied *except* the one being faceted
- * @returns Array of SafeSqlFragment predicates ready to be AND-joined
+ * @returns Array of SafeLogSqlFragment predicates ready to be AND-joined
  */
-const buildConditions = (search: QuerySearchParamsType, excludeKey?: string): SafeSqlFragment[] => {
-  const conditions: SafeSqlFragment[] = []
+const buildConditions = (search: QuerySearchParamsType, excludeKey?: string): SafeLogSqlFragment[] => {
+  const conditions: SafeLogSqlFragment[] = []
 
   Object.entries(search).forEach(([key, value]) => {
     if (key === excludeKey) return
@@ -75,7 +75,7 @@ const buildConditions = (search: QuerySearchParamsType, excludeKey?: string): Sa
   return conditions
 }
 
-const whereClause = (conditions: SafeSqlFragment[]): SafeSqlFragment =>
+const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
   conditions.length > 0 ? safeSql`WHERE ${joinSqlFragments(conditions, ' AND ')}` : safeSql``
 
 /**
@@ -139,7 +139,7 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, unkno
  *
  * excludes `/rest/` in the path
  */
-const getEdgeLogsQuery = (): SafeSqlFragment => safeSql`
+const getEdgeLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -168,7 +168,7 @@ const getEdgeLogsQuery = (): SafeSqlFragment => safeSql`
   `
 
 // Postgrest logs — WHERE pathname includes `/rest/`
-const getPostgrestLogsQuery = (): SafeSqlFragment => safeSql`
+const getPostgrestLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -198,7 +198,7 @@ const getPostgrestLogsQuery = (): SafeSqlFragment => safeSql`
 /**
  * Postgres logs query fragment
  */
-const getPostgresLogsQuery = (): SafeSqlFragment => safeSql`
+const getPostgresLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -225,7 +225,7 @@ const getPostgresLogsQuery = (): SafeSqlFragment => safeSql`
 /**
  * Edge function logs query fragment
  */
-const getEdgeFunctionLogsQuery = (): SafeSqlFragment => safeSql`
+const getEdgeFunctionLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -262,7 +262,7 @@ const getEdgeFunctionLogsQuery = (): SafeSqlFragment => safeSql`
 /**
  * Auth logs query fragment
  */
-const getAuthLogsQuery = (): SafeSqlFragment => safeSql`
+const getAuthLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       el_in_al.id as id,
       al.id as source_id,
@@ -296,7 +296,7 @@ const getAuthLogsQuery = (): SafeSqlFragment => safeSql`
 /**
  * Supabase storage logs query fragment
  */
-const getSupabaseStorageLogsQuery = (): SafeSqlFragment => safeSql`
+const getSupabaseStorageLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -322,7 +322,7 @@ const getSupabaseStorageLogsQuery = (): SafeSqlFragment => safeSql`
     WHERE edge_logs_request.path LIKE '%/storage/%'
   `
 
-const LOG_TYPE_QUERIES: Record<string, () => SafeSqlFragment> = {
+const LOG_TYPE_QUERIES: Record<string, () => SafeLogSqlFragment> = {
   edge: getEdgeLogsQuery,
   postgrest: getPostgrestLogsQuery,
   postgres: getPostgresLogsQuery,
@@ -335,7 +335,7 @@ const LOG_TYPE_QUERIES: Record<string, () => SafeSqlFragment> = {
  * Combine the requested log sources to create the unified logs CTE.
  * Defaults to postgres + postgrest on first load to reduce query cost.
  */
-export const getUnifiedLogsCTE = (logTypes: string[] = [...DEFAULT_LOG_TYPES]): SafeSqlFragment => {
+export const getUnifiedLogsCTE = (logTypes: string[] = [...DEFAULT_LOG_TYPES]): SafeLogSqlFragment => {
   const queries = logTypes
     .filter((type) => type in LOG_TYPE_QUERIES)
     .map((type) => LOG_TYPE_QUERIES[type]())
@@ -353,7 +353,7 @@ WITH unified_logs AS (
 /**
  * Unified logs SQL query
  */
-export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeSqlFragment => {
+export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildConditions(search)
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
 
@@ -384,7 +384,7 @@ export const getFacetCountCTE = ({
   search: QuerySearchParamsType
   facet: string
   facetSearch?: string
-}): SafeSqlFragment => {
+}): SafeLogSqlFragment => {
   const MAX_FACETS_QUANTITY = 20
 
   // `facet` is used both as a column reference and to derive a CTE name;
@@ -413,7 +413,7 @@ ${facetCte} AS (
 `
 }
 
-export const getUnifiedLogsCountCTE = (): SafeSqlFragment => safeSql`
+export const getUnifiedLogsCountCTE = (): SafeLogSqlFragment => safeSql`
 WITH unified_logs AS (
     -- Single scan of edge_logs covering edge gateway, postgrest, and storage
     select
@@ -506,15 +506,15 @@ WITH unified_logs AS (
 )
   `
 
-export const getLogsCountQuery = (search: QuerySearchParamsType): SafeSqlFragment => {
+export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
   const logTypeConditions = buildConditions(search, 'log_type')
   const levelConditions = buildConditions(search, 'level')
-  const logTypeWhere: SafeSqlFragment =
+  const logTypeWhere: SafeLogSqlFragment =
     logTypeConditions.length > 0
       ? safeSql`WHERE ${joinSqlFragments(logTypeConditions, ' AND ')}`
       : safeSql`WHERE log_type IS NOT NULL`
-  const levelWhere: SafeSqlFragment =
+  const levelWhere: SafeLogSqlFragment =
     levelConditions.length > 0
       ? safeSql`WHERE ${joinSqlFragments(levelConditions, ' AND ')}`
       : safeSql`WHERE level IS NOT NULL`
@@ -571,7 +571,7 @@ UNION ALL SELECT dimension, value, count FROM pathname_count
  * Enhanced logs chart query with dynamic bucketing based on time range
  * Incorporates dynamic bucketing from the older implementation
  */
-export const getLogsChartQuery = (search: QuerySearchParamsType): SafeSqlFragment => {
+export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildConditions(search)
   const truncationLevel = calculateChartBucketing(search)
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]

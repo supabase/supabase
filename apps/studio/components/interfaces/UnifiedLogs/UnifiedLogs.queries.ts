@@ -6,7 +6,7 @@ import {
   joinSqlFragments,
   analyticsLiteral as lit,
   safeSql,
-  type SafeSqlFragment,
+  type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
 
 // Pagination and control parameters
@@ -41,7 +41,7 @@ const ATTR = {
  * logs from postgREST / storage-api and are intentionally not part of unified
  * logs; the UI surfaces gateway HTTP traffic for those buckets.
  */
-const LOG_TYPE_PREDICATE: Record<string, SafeSqlFragment> = {
+const LOG_TYPE_PREDICATE: Record<string, SafeLogSqlFragment> = {
   edge: safeSql`source = 'edge_logs' AND ${ATTR.path} NOT LIKE '%/rest/%' AND ${ATTR.path} NOT LIKE '%/storage/%'`,
   postgrest: safeSql`source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%'`,
   storage: safeSql`source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%'`,
@@ -51,7 +51,7 @@ const LOG_TYPE_PREDICATE: Record<string, SafeSqlFragment> = {
 }
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
-const LOG_TYPE_EXPR: SafeSqlFragment = safeSql`CASE
+const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
       WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%' THEN 'storage'
       WHEN source = 'edge_logs' THEN 'edge'
@@ -63,7 +63,7 @@ const LOG_TYPE_EXPR: SafeSqlFragment = safeSql`CASE
 
 // Status code is sourced from the HTTP response for gateway-style rows and
 // from the Postgres `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
-const STATUS_EXPR: SafeSqlFragment = safeSql`CASE
+const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
       ELSE toString(${ATTR.status})
     END`
@@ -76,7 +76,7 @@ const STATUS_EXPR: SafeSqlFragment = safeSql`CASE
 // `severity_text` of `INFO` regardless of response code) bucket as
 // success/warning/error by status. Postgres-style severity is the
 // fallback for rows without a status code.
-const LEVEL_EXPR: SafeSqlFragment = safeSql`CASE
+const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) >= 500 THEN 'error'
       WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 400 AND 499 THEN 'warning'
       WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 200 AND 299 THEN 'success'
@@ -86,7 +86,7 @@ const LEVEL_EXPR: SafeSqlFragment = safeSql`CASE
       ELSE 'success'
     END`
 
-const logTypeWherePredicate = (logTypes: string[]): SafeSqlFragment => {
+const logTypeWherePredicate = (logTypes: string[]): SafeLogSqlFragment => {
   const effective = logTypes.filter((t) => t in LOG_TYPE_PREDICATE)
   const types = effective.length ? effective : [...DEFAULT_LOG_TYPES]
   const branches = types.map((t) => safeSql`(${LOG_TYPE_PREDICATE[t]})`)
@@ -99,13 +99,13 @@ const logTypeWherePredicate = (logTypes: string[]): SafeSqlFragment => {
  * `log_type` or `level` in WHERE for some shapes, so we always emit raw-column
  * predicates (source/severity_text/log_attributes[…]).
  */
-const translateFilter = (key: string, value: unknown): SafeSqlFragment | null => {
+const translateFilter = (key: string, value: unknown): SafeLogSqlFragment | null => {
   if (value === null || value === undefined) return null
 
   const arr = Array.isArray(value) ? (value.length > 0 ? value : null) : null
   if (Array.isArray(value) && !arr) return null
 
-  const inList = (values: readonly unknown[]): SafeSqlFragment =>
+  const inList = (values: readonly unknown[]): SafeLogSqlFragment =>
     safeSql`(${joinSqlFragments(
       values.map((v) => lit(String(v))),
       ','
@@ -165,8 +165,8 @@ const translateFilter = (key: string, value: unknown): SafeSqlFragment | null =>
 const buildPredicates = (
   search: QuerySearchParamsType,
   excludeField?: string
-): SafeSqlFragment[] => {
-  const predicates: SafeSqlFragment[] = []
+): SafeLogSqlFragment[] => {
+  const predicates: SafeLogSqlFragment[] = []
   Object.entries(search).forEach(([key, value]) => {
     if (key === excludeField) return
     if (key === 'log_type') return
@@ -181,7 +181,7 @@ const buildPredicates = (
   return predicates
 }
 
-const whereClause = (predicates: SafeSqlFragment[]): SafeSqlFragment =>
+const whereClause = (predicates: SafeLogSqlFragment[]): SafeLogSqlFragment =>
   predicates.length > 0 ? safeSql`WHERE ${joinSqlFragments(predicates, ' AND ')}` : safeSql``
 
 /**
@@ -221,7 +221,7 @@ const calculateChartBucketing = (
   return 'MINUTE'
 }
 
-const truncationFunction = (level: 'MINUTE' | 'HOUR' | 'DAY'): SafeSqlFragment => {
+const truncationFunction = (level: 'MINUTE' | 'HOUR' | 'DAY'): SafeLogSqlFragment => {
   switch (level) {
     case 'DAY':
       return safeSql`toStartOfDay`
@@ -238,7 +238,7 @@ const truncationFunction = (level: 'MINUTE' | 'HOUR' | 'DAY'): SafeSqlFragment =
  * inlined so the result can be referenced (or filtered) at the same query
  * level — the OTEL endpoint rejects subqueries.
  */
-const rowProjection = (): SafeSqlFragment => safeSql`
+const rowProjection = (): SafeLogSqlFragment => safeSql`
     id,
     null AS source_id,
     timestamp,
@@ -255,9 +255,9 @@ const rowProjection = (): SafeSqlFragment => safeSql`
 const buildBaseWhere = (
   search: QuerySearchParamsType,
   excludeField?: string
-): SafeSqlFragment[] => {
+): SafeLogSqlFragment[] => {
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
-  const parts: SafeSqlFragment[] = []
+  const parts: SafeLogSqlFragment[] = []
   if (excludeField !== 'log_type') {
     parts.push(logTypeWherePredicate(effectiveLogTypes))
   }
@@ -268,7 +268,7 @@ const buildBaseWhere = (
 /**
  * Unified logs row query — flat SELECT, no subquery wrapper.
  */
-export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeSqlFragment => {
+export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const predicates = buildBaseWhere(search)
   return safeSql`
 SELECT ${rowProjection()}
@@ -288,14 +288,14 @@ export const getFacetCountQuery = ({
   search: QuerySearchParamsType
   facet: string
   facetSearch?: string
-}): SafeSqlFragment => {
+}): SafeLogSqlFragment => {
   if (!(FACET_FIELDS as readonly string[]).includes(facet)) {
     throw new Error('Invalid unified logs facet')
   }
 
   const MAX_FACETS_QUANTITY = 20
 
-  const facetExpr: SafeSqlFragment =
+  const facetExpr: SafeLogSqlFragment =
     facet === 'log_type'
       ? LOG_TYPE_EXPR
       : facet === 'level'
@@ -308,7 +308,7 @@ export const getFacetCountQuery = ({
               ? ATTR.path
               : safeSql`log_attributes[${lit(facet)}]`
 
-  const predicates: SafeSqlFragment[] = [
+  const predicates: SafeLogSqlFragment[] = [
     ...buildBaseWhere(search, facet),
     safeSql`(${facetExpr}) IS NOT NULL AND (${facetExpr}) != ''`,
   ]
@@ -329,8 +329,8 @@ LIMIT ${lit(MAX_FACETS_QUANTITY)}
  * Bundled count query — UNION ALL of (dimension, value, count) rows so the
  * frontend can render facet counts and total in one round trip.
  */
-export const getLogsCountQuery = (search: QuerySearchParamsType): SafeSqlFragment => {
-  const baseFiltersFor = (excludeField?: string): SafeSqlFragment =>
+export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
+  const baseFiltersFor = (excludeField?: string): SafeLogSqlFragment =>
     joinSqlFragments(buildBaseWhere(search, excludeField), ' AND ')
 
   // The "total" badge should reflect the user's *current* filter set,
@@ -379,7 +379,7 @@ WHERE ${baseFiltersFor('level')}
 /**
  * Logs chart query with dynamic bucketing based on time range.
  */
-export const getLogsChartQuery = (search: QuerySearchParamsType): SafeSqlFragment => {
+export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const truncationLevel = calculateChartBucketing(search)
   const truncFn = truncationFunction(truncationLevel)
   const predicates = buildBaseWhere(search)
