@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { LogsBarChartDatum } from '../HomeNew/ProjectUsage.metrics'
+import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import {
   calculateAggregatedMetrics,
   calculateDateRange,

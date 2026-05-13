@@ -1,0 +1,52 @@
+services:
+
+  # By default, Kong is used as the API gateway and its ports/env are reset
+  # below so nginx can terminate TLS in front of it.
+  #
+  # When running Envoy instead, e.g.:
+  #   docker compose -f docker-compose.yml -f docker-compose.envoy.yml \
+  #                  -f docker-compose.nginx.yml up -d
+  # comment out the `kong:` block below and uncomment the `api-gw:` block
+  # (and the matching `depends_on` entry further down) so nginx sits in front
+  # of Envoy rather than Kong.
+
+  #api-gw:
+  #  ports: !reset []
+
+  kong:
+    ports: !reset []
+    environment:
+      KONG_PORT_MAPS: "443:8000,443:8443"
+
+  nginx:
+    container_name: supabase-nginx
+    image: jonasal/nginx-certbot:6.0.1-nginx1.29.5
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      #api-gw:
+      #  condition: service_healthy
+      kong:
+        condition: service_healthy
+      studio:
+        condition: service_healthy
+    environment:
+      PROXY_DOMAIN: ${PROXY_DOMAIN}
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+      PROXY_AUTH_USERNAME: ${DASHBOARD_USERNAME}
+      PROXY_AUTH_PASSWORD: ${DASHBOARD_PASSWORD}
+    command:
+      - /bin/bash
+      - -c
+      - |
+        printf '%s:%s\n' "$${PROXY_AUTH_USERNAME}" "$$(openssl passwd -apr1 "$${PROXY_AUTH_PASSWORD}")" > /etc/nginx/user_conf.d/dashboard-passwd && \
+        envsubst '$${PROXY_DOMAIN}' < /etc/nginx/supabase-nginx.conf.tpl > /etc/nginx/user_conf.d/nginx.conf && \
+        /scripts/start_nginx_certbot.sh
+    volumes:
+      - ./volumes/proxy/nginx/supabase-nginx.conf.tpl:/etc/nginx/supabase-nginx.conf.tpl:ro
+      - nginx_letsencrypt:/etc/letsencrypt
+
+volumes:
+  nginx_letsencrypt:

@@ -1,9 +1,10 @@
-import { useFlag, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
 import { Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
+import { FeaturePreviewBadge } from '../FeaturePreviewBadge'
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
@@ -27,8 +28,11 @@ export function FilterSideBar({
   const { ref } = useParams()
   const { table } = useDataTable()
 
-  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const { disable: disableUnifiedLogs } = useUnifiedLogsPreview()
+  const {
+    disable: disableUnifiedLogs,
+    isEligible: isUnifiedLogsEligible,
+    isEnabled: isUnifiedLogsEnabled,
+  } = useUnifiedLogsPreview()
 
   const handleGoBackToOldLogs = () => {
     disableUnifiedLogs()
@@ -69,11 +73,16 @@ export function FilterSideBar({
       </div>
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
-        {isUnifiedLogsPreviewAvailable && (
+        {isUnifiedLogsEligible && (
           <FeaturePreviewSidebarPanel
             className="mx-2 mt-2 mb-3"
             title="Go back to old logs"
             description="Use the traditional interface"
+            illustration={
+              isUnifiedLogsEnabled ? (
+                <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS} />
+              ) : undefined
+            }
             actions={
               <Button type="default" size="tiny" onClick={handleGoBackToOldLogs}>
                 Switch back

@@ -1,13 +1,13 @@
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM } from 'lib/constants'
+import { useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 
-export const generateAdvisorsMenu = (
-  project?: Project,
-  features?: { advisorRules: boolean }
-): ProductMenuGroup[] => {
-  const ref = project?.ref ?? 'default'
+import { useIsAdvisorRulesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
+import { IS_PLATFORM } from '@/lib/constants'
+
+export const useGenerateAdvisorsMenu = (): ProductMenuGroup[] => {
+  const { ref } = useParams()
+  const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
 
   return [
     {
@@ -34,7 +34,7 @@ export const generateAdvisorsMenu = (
         },
       ],
     },
-    ...(IS_PLATFORM && features?.advisorRules
+    ...(IS_PLATFORM && isAdvisorRulesEnabled
       ? [
           {
             title: 'Configuration',

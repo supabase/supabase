@@ -10,22 +10,22 @@ You can use Realtime Broadcast to send low-latency messages between users. Messa
 
 The way Broadcast works changes based on the channel you are using:
 
-- From REST API will receive an HTTP request which then will be sent via WebSocket to connected clients
-- From Client libraries we have an established WebSocket connection and we use that to send a message to the server which then will be sent via WebSocket to connected clients
-- From Database we add a new entry to `realtime.messages` where we have logical replication set to listen for changes which then will be sent via WebSocket to connected clients
+- **REST API**: Receives an HTTP request and then sends a message via WebSocket to connected clients
+- **Client libraries**: Sends a message via WebSocket to the server, and then the server sends a message via WebSocket to connected clients
+- **Database**: Adds a new entry to `realtime.messages` where a logical replication is set to listen for changes, and then sends a message via WebSocket to connected clients
 
 <Admonition type="note">
 
-The public flag (the last argument in `realtime.send(payload, event, topic, is_private))` only affects who can subscribe to the topic not who can read messages from the database.
+The public flag (the last argument in `realtime.send(payload, event, topic, is_private)`) only affects who can subscribe to the topic not who can read messages from the database.
 
-- Public (false) → Anyone can subscribe to that topic without authentication
-- Private (true) → Only authenticated clients can subscribe to that topic
+- Public (`false`) → Anyone can subscribe to that topic without authentication
+- Private (`true`) → Only authenticated clients can subscribe to that topic
 
-However, regardless of whether it's public or private, the Realtime service connects to your database as the authenticated Supabase Admin role.
+Regardless if it's public or private, the Realtime service connects to your database as the authenticated Supabase Admin role.
 
 </Admonition>
 
-For Authorization we insert a message and try to read it, and rollback the transaction to verify that the RLS policies set by the user are being respected by the user joining the channel, but this message isn't sent to the user. You can read more about it in the [Authorization docs](/docs/guides/realtime/authorization).
+For Authorization, we insert a message and try to read it, and rollback the transaction to verify that the Row Level Security (RLS) policies set by the user are being respected by the user joining the channel, but this message isn't sent to the user. You can read more about it in [Authorization](/docs/guides/realtime/authorization).
 
 ## Subscribe to messages
 
@@ -41,10 +41,11 @@ Get the Project URL and key from [the project's **Connect** dialog](/dashboard/p
 
 Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260), but in the transition period, you can use both the current `anon` and `service_role` keys and the new publishable key with the form `sb_publishable_xxx` which will replace the older keys.
 
+**The legacy keys will be deprecated shortly, so we strongly encourage switching to and using the new publishable and secret API keys**.
+
 In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in [the API Keys section of a Project's Settings page](/dashboard/project/_/settings/api-keys/):
 
-- **For legacy keys**, copy the `anon` key for client-side operations and the `service_role` key for server-side operations from the **Legacy API Keys** tab.
-- **For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
+**For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
 
 </Admonition>
 
@@ -61,7 +62,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
     import { createClient } from '@supabase/supabase-js'
 
     const SUPABASE_URL = 'https://<project>.supabase.co'
-    const SUPABASE_KEY = '<sb_publishable_... or anon key>'
+    const SUPABASE_KEY = '<sb_publishable_... key>'
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
     ```
@@ -76,7 +77,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
     void main() async {
       Supabase.initialize(
         url: 'https://<project>.supabase.co',
-        anonKey: '<sb_publishable_... or anon key>',
+        publishableKey: '<sb_publishable_... key>',
       );
       runApp(MyApp());
     }
@@ -93,7 +94,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
     import Supabase
 
     let SUPABASE_URL = "https://<project>.supabase.co"
-    let SUPABASE_KEY = "<sb_publishable_... or anon key>"
+    let SUPABASE_KEY = "<sb_publishable_... key>"
 
     let supabase = SupabaseClient(supabaseURL: URL(string: SUPABASE_URL)!, supabaseKey: SUPABASE_KEY)
     ```
@@ -105,7 +106,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
 
     ```kotlin
     val supabaseUrl = "https://<project>.supabase.co"
-    val supabaseKey = "<sb_publishable_... or anon key>"
+    val supabaseKey = "<sb_publishable_... key>"
     val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
         install(Realtime)
     }
@@ -121,7 +122,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
     from supabase import acreate_client
 
     URL = "https://<project>.supabase.co"
-    KEY = "<sb_publishable_... or anon key>"
+    KEY = "<sb_publishable_... key>"
 
     async def create_supabase():
       supabase = await acreate_client(URL, KEY)
@@ -132,9 +133,9 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
   </$Show>
 </Tabs>
 
-### Receiving Broadcast messages
+### Receive Broadcast messages
 
-You can provide a callback for the `broadcast` channel to receive messages. This example will receive any `broadcast` messages that are sent to `test-channel`:
+You can receive Broadcast messages by providing a callback to the channel.
 
 <Tabs
   scrollable
@@ -149,7 +150,7 @@ You can provide a callback for the `broadcast` channel to receive messages. This
     ```js
     // @noImplicitAny: false
     import { createClient } from '@supabase/supabase-js'
-    const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
+    const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... key>')
 
     // ---cut---
     // Join a room/topic. Can be anything except for 'realtime'.
@@ -421,12 +422,6 @@ You can use the Supabase client libraries to send Broadcast messages.
 
 ### Broadcast from the Database
 
-<Admonition type="caution">
-
-This feature is in Public Beta. [Submit a support ticket](https://supabase.help) if you have any issues.
-
-</Admonition>
-
 <Admonition type="note">
 
 All the messages sent using Broadcast from the Database are stored in `realtime.messages` table and will be deleted after 3 days.
@@ -448,13 +443,13 @@ select
 
 <Admonition type="note">
 
-The realtime.send function in the database includes a flag that determines whether the broadcast is private or public, and client channels also have the same configuration. For broadcasts to work correctly, these settings must match a public broadcast will only reach public channels, and a private broadcast will only reach private ones.
+The `realtime.send()` function in the database includes a flag that determines whether the broadcast is private or public, and client channels also have the same configuration. For broadcasts to work correctly, these settings must match. A public broadcast only reaches public channels and a private broadcast only reaches private channels.
 
-By default, all database broadcasts are private, meaning clients must authenticate to receive them. If the database sends a public message but the client subscribes to a private channel, the message won't be delivered since private channels only accept signed, authenticated messages.
+By default, all database broadcasts are private, meaning clients must authenticate to receive them. If the database sends a public message but the client subscribes to a private channel, the message is not delivered because private channels only accept signed, authenticated messages.
 
 </Admonition>
 
-It's a common use case to broadcast messages when a record is created, updated, or deleted. We provide a helper function specific to this use case, `realtime.broadcast_changes()`. For more details, check out the [Subscribing to Database Changes](/docs/guides/realtime/subscribing-to-database-changes) guide.
+You can use the `realtime.broadcast_changes()` helper function to broadcast messages when a record is created, updated, or deleted. For more details, read [Subscribing to Database Changes](/docs/guides/realtime/subscribing-to-database-changes).
 
 ### Broadcast using the REST API
 
@@ -685,7 +680,7 @@ You can pass configuration options while initializing the Supabase Client.
 >
   <TabPanel id="js" label="JavaScript">
 
-    You can confirm that the Realtime servers have received your message by setting Broadcast's `ack` config to `true`.
+    You can confirm that the Realtime servers have received your message by setting Broadcast's `ack` setting to `true`.
 
     {/* prettier-ignore */}
     ```js
@@ -881,20 +876,20 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
 ### How it works
 
-Broadcast Changes allows you to trigger messages from your database. To achieve it Realtime is directly reading your WAL (Write Append Log) file using a publication against the `realtime.messages` table so whenever a new insert happens a message is sent to connected users.
+Broadcast Changes allows you to trigger messages from your database. To achieve it, Realtime directly reads your Write-Ahead Log (WAL) file using a publication against the `realtime.messages` table. Whenever a new insert occurs, a message is sent to connected users.
 
-It uses partitioned tables per day which allows the deletion your previous messages in a performant way by dropping the physical tables of this partitioned table. Tables older than 3 days old are deleted.
+It uses partitioned tables per day, which allows performant deletion of your previous messages by dropping the physical tables of this partitioned table. Tables older than 3 days are deleted.
 
-Broadcasting from the database works like a client-side broadcast, using WebSockets to send JSON packages. [Realtime Authorization](/docs/guides/realtime/authorization) is required and enabled by default to protect your data.
+Broadcasting from the database works like a client-side broadcast, using WebSockets to send JSON payloads. [Realtime Authorization](/docs/guides/realtime/authorization) is required and enabled by default to protect your data.
 
-The database broadcast feature provides two functions to help you send messages:
+Broadcast Changes provides two functions to help you send messages:
 
-- `realtime.send` will insert a message into realtime.messages without a specific format.
-- `realtime.broadcast_changes` will insert a message with the required fields to emit database changes to clients. This helps you set up triggers on your tables to emit changes.
+- `realtime.send()` inserts a message into `realtime.messages` without a specific format.
+- `realtime.broadcast_changes()` inserts a message with the required fields to emit database changes to clients. This helps you set up triggers on your tables to emit changes.
 
 ### Broadcasting a message from your database
 
-The `realtime.send` function provides the most flexibility by allowing you to broadcast messages from your database without a specific format. This allows you to use database broadcast for messages that aren't necessarily tied to the shape of a Postgres row change.
+The `realtime.send()` function provides the most flexibility by allowing you to broadcast messages from your database without a specific format. This allows you to use database broadcast for messages that aren't necessarily tied to the shape of a Postgres row change.
 
 ```sql
 SELECT realtime.send (
@@ -909,7 +904,7 @@ SELECT realtime.send (
 
 #### Setup realtime authorization
 
-Realtime Authorization is required and enabled by default. To allow your users to listen to messages from topics, create an RLS (Row Level Security) policy:
+Realtime Authorization is required and enabled by default. To allow your users to listen to messages from topics, create an RLS policy:
 
 ```sql
 CREATE POLICY "authenticated can receive broadcasts"
@@ -920,13 +915,13 @@ USING ( true );
 
 ```
 
-See the [Realtime Authorization](/docs/guides/realtime/authorization) docs to learn how to set up more specific policies.
+Read [Realtime Authorization](/docs/guides/realtime/authorization) to learn how to set up more specific policies.
 
 #### Set up trigger function
 
-First, set up a trigger function that uses `realtime.broadcast_changes` to insert an event whenever it is triggered. The event is set up to include data on the schema, table, operation, and field changes that triggered it.
+First, set up a trigger function that uses the `realtime.broadcast_changes()` function to insert an event whenever it is triggered. The event is set up to include data on the schema, table, operation, and field changes that triggered it.
 
-For this example use case, we want to have a topic with the name `topic:<record id>` to which we're going to broadcast events.
+For this example, you're going broadcast events to a topic named `topic:<record_id>`.
 
 ```sql
 CREATE OR REPLACE FUNCTION public.your_table_changes()
@@ -948,7 +943,7 @@ END;
 $$ LANGUAGE plpgsql;
 ```
 
-Of note are the Postgres native trigger special variables used:
+The Postgres native trigger special variables used are:
 
 - `TG_OP` - the operation that triggered the function
 - `TG_TABLE_NAME` - the table that caused the trigger
@@ -988,19 +983,13 @@ const changes = supabase
 
 ## Broadcast replay
 
-<Admonition type="caution">
-
-This feature is currently in Public Alpha. If you have any issues [submit a support ticket](https://supabase.help).
-
-</Admonition>
-
 ### How it works
 
 Broadcast Replay enables **private** channels to access messages that were sent earlier. Only messages published via [Broadcast From the Database](#broadcast-from-the-database) are available for replay.
 
 You can configure replay with the following options:
 
-- **`since`** (Required): The epoch timestamp in milliseconds (e.g., `1697472000000`), specifying the earliest point from which messages should be retrieved.
+- **`since`** (Required): The epoch timestamp in milliseconds (for example, `1697472000000`), specifying the earliest point from which messages should be retrieved.
 - **`limit`** (Optional): The number of messages to return. This must be a positive integer, with a maximum value of 25.
 
 <Tabs

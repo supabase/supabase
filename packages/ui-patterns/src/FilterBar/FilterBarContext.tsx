@@ -1,6 +1,14 @@
 'use client'
 
-import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react'
+import React, {
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react'
 
 import { useFilterBarState, useOptionsCache } from './hooks'
 import {
@@ -17,13 +25,14 @@ import {
   findConditionByPath,
   isAsyncOptionsFunction,
   removeFromGroup,
+  resolvePropertyChange,
   updateNestedLogicalOperator,
   updateNestedOperator,
+  updateNestedPropertyName,
   updateNestedValue,
 } from './utils'
 
 export type FilterBarContextValue = {
-  // Core state
   filters: FilterGroup
   filterProperties: FilterProperty[]
   activeInput: ActiveInputState
@@ -32,7 +41,6 @@ export type FilterBarContextValue = {
   error: string | null
   highlightedConditionPath: number[] | null
 
-  // Handlers
   onFilterChange: (filters: FilterGroup) => void
   onFreeformTextChange: (text: string) => void
   setActiveInput: (input: ActiveInputState) => void
@@ -47,9 +55,9 @@ export type FilterBarContextValue = {
   handleInputBlur: () => void
   handleGroupFreeformChange: (path: number[], value: string) => void
   handleLabelClick: (path: number[]) => void
+  handlePropertyChange: (path: number[], newPropertyName: string) => void
   handleLogicalOperatorChange: (path: number[]) => void
 
-  // Options cache
   propertyOptionsCache: Record<
     string,
     { options: (string | FilterOptionObject)[]; searchValue: string }
@@ -58,13 +66,11 @@ export type FilterBarContextValue = {
   loadPropertyOptions: (property: FilterProperty, search: string) => void
   optionsError: string | null
 
-  // Config
   supportsOperators: boolean
   variant: FilterBarVariant
   actions?: FilterBarAction[]
   icon?: React.ReactNode
 
-  // Refs
   rootRef: React.RefObject<HTMLDivElement>
 }
 
@@ -94,19 +100,26 @@ export type FilterBarRootProps = {
 
 export type FilterBarVariant = 'default' | 'pill'
 
-export function FilterBarRoot({
-  children,
-  filterProperties,
-  filters,
-  onFilterChange,
-  freeformText,
-  onFreeformTextChange,
-  actions,
-  isLoading: externalLoading,
-  supportsOperators = false,
-  variant = 'default',
-  icon,
-}: FilterBarRootProps) {
+export type FilterBarHandle = {
+  focus: () => void
+}
+
+export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(function FilterBarRoot(
+  {
+    children,
+    filterProperties,
+    filters,
+    onFilterChange,
+    freeformText,
+    onFreeformTextChange,
+    actions,
+    isLoading: externalLoading,
+    supportsOperators = false,
+    variant = 'default',
+    icon,
+  }: FilterBarRootProps,
+  ref: React.Ref<FilterBarHandle>
+) {
   const rootRef = useRef<HTMLDivElement>(null)
 
   const {
@@ -240,14 +253,12 @@ export function FilterBarRoot({
       }
       setIsCommandMenuVisible(false)
       setActiveInput(null)
-      // Clear highlight when clicking outside
       setHighlightedConditionPath(null)
     }, 0)
   }, [setIsCommandMenuVisible, setActiveInput, hideTimeoutRef, setHighlightedConditionPath])
 
   const handleGroupFreeformChange = useCallback(
     (_path: number[], value: string) => {
-      // Clear highlight when user types
       if (highlightedConditionPath) {
         setHighlightedConditionPath(null)
       }
@@ -258,9 +269,40 @@ export function FilterBarRoot({
 
   const handleLabelClick = useCallback(
     (path: number[]) => {
-      setActiveInput({ type: 'value', path })
+      setActiveInput({ type: 'property', path })
+      setIsCommandMenuVisible(true)
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current)
+      }
     },
-    [setActiveInput]
+    [setActiveInput, setIsCommandMenuVisible, hideTimeoutRef]
+  )
+
+  const handlePropertyChange = useCallback(
+    (path: number[], newPropertyName: string) => {
+      const condition = findConditionByPath(filters, path)
+      if (!condition) return
+
+      const newProperty = filterProperties.find((p) => p.name === newPropertyName)
+      if (!newProperty) return
+
+      const { operator, value, focusTarget } = resolvePropertyChange(
+        condition.operator,
+        (condition.value ?? '').toString(),
+        newProperty
+      )
+
+      const updatedFilters = updateNestedPropertyName(
+        filters,
+        path,
+        newPropertyName,
+        operator,
+        value
+      )
+      onFilterChange(updatedFilters)
+      setActiveInput({ type: focusTarget, path })
+    },
+    [filters, filterProperties, onFilterChange, setActiveInput]
   )
 
   const handleLogicalOperatorChange = useCallback(
@@ -292,7 +334,6 @@ export function FilterBarRoot({
   const loading = externalLoading ?? isLoading
 
   const contextValue: FilterBarContextValue = {
-    // Core state
     filters,
     filterProperties,
     activeInput,
@@ -301,7 +342,6 @@ export function FilterBarRoot({
     error,
     highlightedConditionPath,
 
-    // Handlers
     onFilterChange,
     onFreeformTextChange,
     setActiveInput,
@@ -316,29 +356,31 @@ export function FilterBarRoot({
     handleInputBlur,
     handleGroupFreeformChange,
     handleLabelClick,
+    handlePropertyChange,
     handleLogicalOperatorChange,
 
-    // Options cache
     propertyOptionsCache,
     loadingOptions,
     loadPropertyOptions,
     optionsError,
 
-    // Config
     supportsOperators,
     variant,
     actions,
     icon,
 
-    // Refs
     rootRef,
   }
 
+  useImperativeHandle(ref, () => ({
+    focus: () => handleGroupFreeformFocus([]),
+  }))
+
   return (
     <FilterBarContext.Provider value={contextValue}>
-      <div ref={rootRef} data-filterbar-root className="h-full min-h-[26px] flex items-stretch">
+      <div ref={rootRef} data-filterbar-root className="h-full min-h-[32px] flex items-stretch">
         {children}
       </div>
     </FilterBarContext.Provider>
   )
-}
+})

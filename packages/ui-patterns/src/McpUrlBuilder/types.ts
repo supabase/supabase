@@ -18,6 +18,8 @@ export interface McpClient {
   key: string
   label: string
   icon?: string
+  /** When true, use -icon-dark.svg in dark theme; otherwise the same -icon.svg is used for both themes. */
+  hasDistinctDarkIcon?: boolean
   docsUrl?: string
   externalDocsUrl?: string
   configFile?: string
@@ -156,8 +158,17 @@ export interface OpenCodeMcpConfig {
   }
 }
 
+export interface AntigravityMcpConfig {
+  mcpServers: {
+    supabase: {
+      serverUrl: string
+    }
+  }
+}
+
 // Union of all possible config types
 export type McpClientConfig =
+  | AntigravityMcpConfig
   | ClaudeCodeMcpConfig
   | ClaudeDesktopMcpConfig
   | CodexMcpConfig
@@ -196,6 +207,14 @@ export function isOpenCodeMcpConfig(config: McpClientConfig): config is OpenCode
   return '$schema' in config && 'mcp' in config && 'supabase' in config.mcp
 }
 
+export function isAntigravityMcpConfig(config: McpClientConfig): config is AntigravityMcpConfig {
+  return (
+    'mcpServers' in config &&
+    'supabase' in config.mcpServers &&
+    'serverUrl' in config.mcpServers.supabase
+  )
+}
+
 export function isMcpServersConfig(
   config: McpClientConfig
 ): config is McpClientBaseConfig | ClaudeCodeMcpConfig | FactoryMcpConfig {
@@ -218,6 +237,9 @@ export function getMcpUrl(config: McpClientConfig): string {
   }
   if (isOpenCodeMcpConfig(config)) {
     return config.mcp.supabase.url
+  }
+  if (isAntigravityMcpConfig(config)) {
+    return config.mcpServers.supabase.serverUrl
   }
   if (isMcpServersConfig(config)) {
     return config.mcpServers.supabase.url

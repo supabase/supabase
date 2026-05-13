@@ -1,3 +1,5 @@
+import type { SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
+
 export interface PolicyTemplate {
   id: string
   preview: boolean
@@ -5,8 +7,8 @@ export interface PolicyTemplate {
   description: string
   name: string
   statement: string
-  definition: string
-  check: string
+  definition: SafeSqlFragment
+  check: SafeSqlFragment
   command: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
-  roles: string[]
+  roles: Array<string>
 }

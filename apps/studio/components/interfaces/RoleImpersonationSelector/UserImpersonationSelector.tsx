@@ -1,19 +1,9 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ChevronDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { keepPreviousData } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
-import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessTokenHookDetails'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import type { ResponseError } from 'types'
 import {
   Button,
   cn,
@@ -21,7 +11,11 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   DropdownMenuSeparator,
-  Input,
+  Input_Shadcn_ as Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
   ScrollArea,
   Switch,
   Tabs_Shadcn_,
@@ -29,12 +23,23 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
+import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
-const UserImpersonationSelector = () => {
+export const UserImpersonationSelector = () => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const [externalUserId, setExternalUserId] = useState('')
@@ -96,10 +101,10 @@ const UserImpersonationSelector = () => {
     setPreviousSearches((prev) => {
       // Remove if already present
       const filtered = prev.filter((u) => u.id !== user.id)
-      // Add new user to the end
-      const updated = [...filtered, user]
+      // Add new user to the start of the list (last used first)
+      const updated = [user, ...filtered]
       // Keep only the last 6
-      return updated.slice(-6)
+      return updated.slice(0, 5)
     })
 
     if (customAccessTokenHookDetails?.type === 'https') {
@@ -136,6 +141,7 @@ const UserImpersonationSelector = () => {
       parsedClaims = additionalClaims ? JSON.parse(additionalClaims) : {}
     } catch (e) {
       toast.error('Invalid JSON in additional claims')
+      setIsImpersonateLoading(false)
       return
     }
     try {
@@ -185,12 +191,12 @@ const UserImpersonationSelector = () => {
     <>
       <div className="px-5 py-3">
         <p className="text-foreground text-sm">
-          {displayName ? `Impersonating ${displayName}` : 'Impersonate a User'}
+          {displayName ? `Impersonating ${displayName}` : 'Impersonate a user'}
         </p>
-        <p className="text-sm text-foreground-light">
+        <p className="text-sm text-foreground-light mb-1">
           {!impersonatingUser && !isExternalAuthImpersonating
-            ? "Select a user to respect your database's Row-Level Security policies for that particular user."
-            : "Results will respect your database's Row-Level Security policies for this user."}
+            ? "Select a user to respect your database's RLS policies for that particular user."
+            : "Results will respect your database's RLS policies for this user."}
         </p>
 
         {impersonatingUser && (
@@ -226,11 +232,16 @@ const UserImpersonationSelector = () => {
 
             <TabsContent_Shadcn_ value="user">
               <div className="flex flex-col gap-y-2">
-                <Input
-                  size="tiny"
-                  className="table-editor-search border-none"
-                  icon={
-                    isSearching ? (
+                <InputGroup>
+                  <InputGroupInput
+                    size="tiny"
+                    className="table-editor-search border-none"
+                    placeholder="Search by id, email, phone, or name..."
+                    onChange={(e) => setSearchText(e.target.value)}
+                    value={searchText}
+                  />
+                  <InputGroupAddon>
+                    {isSearching ? (
                       <Loader2
                         className="animate-spin text-foreground-lighter"
                         size={16}
@@ -238,24 +249,17 @@ const UserImpersonationSelector = () => {
                       />
                     ) : (
                       <Search className="text-foreground-lighter" size={16} strokeWidth={1.5} />
-                    )
-                  }
-                  placeholder="Search by id, email, phone, or name..."
-                  onChange={(e) => setSearchText(e.target.value)}
-                  value={searchText}
-                  actions={
-                    searchText && (
-                      <Button
-                        size="tiny"
-                        type="text"
-                        className="px-1"
-                        onClick={() => setSearchText('')}
-                      >
-                        <X size={12} strokeWidth={2} />
-                      </Button>
-                    )
-                  }
-                />
+                    )}
+                  </InputGroupAddon>
+                  <InputGroupAddon align="inline-end">
+                    {searchText && (
+                      <InputGroupButton size="tiny" type="text" onClick={() => setSearchText('')}>
+                        <span className="sr-only">Clear search</span>
+                        <X size={12} />
+                      </InputGroupButton>
+                    )}
+                  </InputGroupAddon>
+                </InputGroup>
                 {isLoading && (
                   <div className="flex flex-col gap-2 items-center justify-center h-24">
                     <Loader2 className="animate-spin" size={24} />
@@ -294,7 +298,7 @@ const UserImpersonationSelector = () => {
                       {previousSearches.length > 0 ? (
                         <>
                           <Collapsible_Shadcn_ className="relative">
-                            <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+                            <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
                               <div className="flex items-center gap-x-1 w-full">
                                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                                   Recents
@@ -343,24 +347,32 @@ const UserImpersonationSelector = () => {
 
             <TabsContent_Shadcn_ value="external">
               <div className="flex flex-col gap-y-4">
-                <Input
-                  size="small"
+                <FormItemLayout
                   layout="horizontal"
                   label="External User ID"
-                  descriptionText="The user ID from your external auth provider"
-                  placeholder="e.g. user_abc123"
-                  value={externalUserId}
-                  onChange={(e) => setExternalUserId(e.target.value)}
-                />
-                <Input
-                  size="small"
+                  description="The user ID from your external auth provider"
+                  isReactForm={false}
+                >
+                  <Input
+                    size="small"
+                    placeholder="e.g. user_abc123"
+                    value={externalUserId}
+                    onChange={(e) => setExternalUserId(e.target.value)}
+                  />
+                </FormItemLayout>
+                <FormItemLayout
                   layout="horizontal"
                   label="Additional Claims (JSON)"
-                  descriptionText="Optional: Add custom claims like org_id or roles"
-                  placeholder='e.g. {"app_metadata": {"org_id": "org_456"}}'
-                  value={additionalClaims}
-                  onChange={(e) => setAdditionalClaims(e.target.value)}
-                />
+                  description="Optional: Add custom claims like org_id or roles"
+                  isReactForm={false}
+                >
+                  <Input
+                    size="small"
+                    placeholder='e.g. {"app_metadata": {"org_id": "org_456"}}'
+                    value={additionalClaims}
+                    onChange={(e) => setAdditionalClaims(e.target.value)}
+                  />
+                </FormItemLayout>
                 <div className="flex items-center justify-end">
                   <Button
                     type="default"
@@ -382,7 +394,7 @@ const UserImpersonationSelector = () => {
           <DropdownMenuSeparator className="m-0" />
           <div className="px-5 py-2 flex flex-col gap-2 relative">
             <Collapsible_Shadcn_>
-              <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+              <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
                 <div className="flex items-center gap-x-1 w-full">
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     Advanced options
@@ -420,8 +432,6 @@ const UserImpersonationSelector = () => {
     </>
   )
 }
-
-export default UserImpersonationSelector
 
 // Base interface for shared impersonation row props to reduce
 // duplication between user and external auth impersonation displays
@@ -462,7 +472,7 @@ const BaseImpersonatingRow = ({
       </div>
 
       <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>
   )
@@ -558,7 +568,7 @@ const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: 
       </div>
 
       <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>
   )

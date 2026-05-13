@@ -1,14 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { handleError, put } from 'data/fetchers'
-import { invoicesKeys } from 'data/invoices/keys'
-import { organizationKeys } from 'data/organizations/keys'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
-import { usageKeys } from 'data/usage/keys'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types/base'
+
 import { subscriptionKeys } from './keys'
 import type { SubscriptionTier } from './types'
-import { UseCustomMutationOptions } from 'types'
+import { handleError, put } from '@/data/fetchers'
+import { invoicesKeys } from '@/data/invoices/keys'
+import { organizationKeys } from '@/data/organizations/keys'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
+import { usageKeys } from '@/data/usage/keys'
+import { UseCustomMutationOptions } from '@/types'
+import type { ResponseError } from '@/types/base'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string
@@ -77,6 +78,7 @@ export const useOrgSubscriptionUpdateMutation = ({
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
           queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgPlans(slug) }),
+          queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgBalance(slug) }),
           queryClient.invalidateQueries({ queryKey: usageKeys.orgUsage(slug) }),
           queryClient.invalidateQueries({ queryKey: invoicesKeys.orgUpcomingPreview(slug) }),
           queryClient.invalidateQueries({ queryKey: organizationKeys.detail(slug) }),

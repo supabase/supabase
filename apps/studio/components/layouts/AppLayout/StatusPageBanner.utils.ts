@@ -1,6 +1,6 @@
-import type { IncidentCache } from 'lib/api/incident-status'
+import type { IncidentCache } from '@/lib/api/incident-status'
 
-type BannerIncident = { cache?: IncidentCache | null }
+type BannerIncident = { id: string; cache?: IncidentCache | null }
 
 /**
  * Determines whether the incident status banner should be shown to a given user,
@@ -26,11 +26,15 @@ export function shouldShowBanner({
   hasUnknownRegions?: boolean
 }): boolean {
   return incidents.some((incident) => {
+    // Forced incidents are shown unconditionally, regardless of regions or project state
+    if (incident.cache?.force) return true
+
     const affectedRegions = incident.cache?.affected_regions ?? []
     const affectsProjectCreation = incident.cache?.affects_project_creation ?? false
 
     // Users with no projects only see the banner if the incident affects project creation
-    if (!hasProjects) return affectsProjectCreation
+    // and has no specific region targeting (inline notice in RegionSelector handles region-specific incidents)
+    if (!hasProjects) return affectsProjectCreation && affectedRegions.length === 0
 
     // User has projects: if no region restriction, always show
     if (affectedRegions.length === 0) return true
@@ -39,6 +43,30 @@ export function shouldShowBanner({
     if (hasUnknownRegions) return true
 
     // Region restriction: only show if the user has a database in an affected region
-    return affectedRegions.some((region) => userRegions.has(region))
+    return affectedRegions.some((region) => userRegions.has(region.toLowerCase()))
   })
+}
+
+/**
+ * Returns the IDs of incidents that are relevant to the given user.
+ *
+ * An incident is considered relevant if it would trigger banner visibility for
+ * the user, per the same logic as shouldShowBanner.
+ */
+export function getRelevantIncidentIds({
+  incidents,
+  hasProjects,
+  userRegions,
+  hasUnknownRegions = false,
+}: {
+  incidents: Array<BannerIncident>
+  hasProjects: boolean
+  userRegions: Set<string>
+  hasUnknownRegions?: boolean
+}): Array<string> {
+  return incidents
+    .filter((incident) =>
+      shouldShowBanner({ incidents: [incident], hasProjects, userRegions, hasUnknownRegions })
+    )
+    .map((incident) => incident.id)
 }

@@ -1,7 +1,6 @@
 import Editor from '@monaco-editor/react'
 import { Check, Copy } from 'lucide-react'
 import { useMemo, useState } from 'react'
-
 import { Button, cn, copyToClipboard } from 'ui'
 
 type SqlMonacoBlockProps = {
@@ -45,7 +44,7 @@ export const SqlMonacoBlock = ({
         className={className}
         wrapperProps={{
           className:
-            '[&_.monaco-editor]:!bg-transparent [&_.monaco-editor-background]:!bg-transparent [&_.monaco-editor]:!outline-transparent [&_.cursor]:!hidden',
+            '[&_.monaco-editor]:bg-transparent! [&_.monaco-editor-background]:bg-transparent! [&_.monaco-editor]:outline-transparent! [&_.cursor]:hidden!',
         }}
         options={{
           readOnly: true,

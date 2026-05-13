@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react'
+import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
 import {
   Activity,
   BarChart,
@@ -34,14 +34,14 @@ import {
   UserX,
   Zap,
 } from 'lucide-react'
-import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
+import type { LucideIcon } from 'lucide-react'
+import { FunctionComponent } from 'react'
 import {
   PRODUCT,
   PRODUCT_MODULE,
   PRODUCT_MODULES_SHORTNAMES,
   PRODUCT_SHORTNAMES,
 } from 'shared-data/products'
-import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
   PLATFORM = 'platform',
@@ -98,6 +98,10 @@ export type FeatureType = {
    * url to docs or blog page for this feature
    */
   docsUrl?: string
+  /**
+   * url to a related blog post
+   */
+  blogUrl?: string
   /**
    * feature metadata on its status
    */
@@ -298,6 +302,46 @@ By using custom domains, you create a more cohesive brand experience and gain fl
     },
   },
   {
+    title: 'Custom Identity Providers',
+    subtitle: 'Connect any OAuth2 or OIDC identity provider to Supabase Auth.',
+    description: `Supabase Auth ships with 20+ built-in providers. For providers not on that list, Custom Identity Providers lets you add them in two ways:
+
+- **OIDC providers** — supply an issuer URL and Supabase auto-fetches the discovery document, JWKS, and endpoints automatically.
+- **OAuth2-only providers** — supply the authorization, token, and userinfo endpoint URLs directly for providers that don't expose an OIDC discovery document.
+
+Once configured, your users sign in with \`signInWithOAuth({ provider: 'custom:my-provider' })\`, the same call used for any built-in provider. Same client libraries (JS, Flutter, Swift, Kotlin), same RLS enforcement, no special client-side handling required.
+
+## Key benefits
+1. Auto-discovery (OIDC): Supply an issuer URL and Supabase resolves the discovery document, JWKS, and endpoints automatically. No manual endpoint wiring.
+2. Manual endpoint control (OAuth2): Supply the authorization URL, token URL, and userinfo URL directly for providers without OIDC discovery.
+3. Any provider: GitHub Enterprise Server, regional compliance IdPs, internal OAuth2 servers, and proprietary identity systems. If it speaks OAuth2 or OIDC, it works.
+4. PKCE by default: All custom providers use PKCE (Proof Key for Code Exchange) automatically. No client-side changes needed.
+5. Same sign-in flow: One code path for all OAuth flows. Same client libraries and RLS enforcement as built-in providers.
+6. Multi-platform support: List additional client IDs via \`acceptable_client_ids\` for web, iOS, and Android apps.
+7. Full management via Dashboard and Admin API: Create, update, rotate secrets, toggle enabled state, or delete providers without touching your code.
+8. Email-optional: Providers that don't return an email address are supported via the \`email_optional\` setting.
+9. Custom authorization params: Append extra query parameters to the authorization URL for consent screens, offline access, login hints, and more.
+
+## Custom Identity Providers are valuable for:
+- Teams using a SAML-to-OIDC bridge, GitHub Enterprise Server, or GitLab self-managed for SSO
+- Applications in regulated industries with mandated regional identity providers
+- Internal tools authenticating against a company's custom OAuth2 server
+- Platforms with proprietary OAuth2 implementations that don't expose a discovery document
+- Platforms integrating with niche identity networks (gaming, healthcare, device-based auth)
+- Multi-platform apps (web, iOS, Android) needing unified auth across client IDs
+- Enterprise buyers evaluating Supabase Auth for compliance-sensitive deployments
+- Developers who need precise control over endpoint configuration`,
+    icon: Shield,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: 'https://www.youtube-nocookie.com/embed/WrX3FfKj6I8',
+    docsUrl: 'https://supabase.com/docs/guides/auth/custom-oauth-providers',
+    slug: 'custom-oidc-providers',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
     title: 'Network restrictions',
     subtitle: 'Restrict IP ranges that can connect to your database.',
     description: `
@@ -375,32 +419,33 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
   },
   {
     title: 'Branching',
-    subtitle: 'Test and preview changes using Supabase Branches.',
+    subtitle: 'Test schema changes without touching production.',
     description: `
-Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. Branching 2.0 (currently in public alpha) removes the Git requirement—spin up branches directly from the dashboard, CLI, or Management API, with or without GitHub integration.
+Branching without Git is now the default for all Supabase projects. Create a branch directly from the Supabase Dashboard, make schema changes, review the diff, and merge. No Git configuration required. Git-based branching remains fully supported for teams that manage migrations in version control. You can start with dashboard branching and add a Git integration later.
+
+## Two ways to branch
+
+**Dashboard branching (default)**
+Create branches directly from the Supabase Dashboard. Each branch gets its own Postgres instance with your current production schema. Make changes using the SQL Editor or Table Editor, preview the diff, and merge. The whole workflow stays inside Supabase.
+
+**Git-based branching**
+Connect a GitHub repo to your Supabase project. Migrations live in version control, and branches are created automatically when you open a pull request and cleaned up when it closes.
 
 ## Key features
-1. No-Git workflows: Create branches directly from dashboard or CLI without requiring GitHub connection.
-2. Git-based workflow: Optionally integrate with GitHub, creating preview branches for each pull request.
+1. No-Git workflow: Create and merge branches entirely from the dashboard. No GitHub connection needed.
+2. Git-based workflow: Optionally integrate with GitHub for pull request-driven schema reviews.
 3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
 4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
-5. Data seeding: Preview branches can be seeded with sample data using ./supabase/seed.sql.
+5. Data seeding: Seed branches with sample data using ./supabase/seed.sql.
 6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
 7. Merge requests: Review schema diffs and merge changes directly in the dashboard.
 
-## Benefits:
-- Risk-free experimentation: Test changes without affecting the production environment.
-- Improved collaboration: Multiple team members can work on different features simultaneously.
-- Streamlined reviews: Facilitate thorough checks of database changes before merging.
-- Rapid iteration: Quickly prototype and validate database-driven features.
-- Flexible workflows: Use Git integration, dashboard creation, or combine both approaches.
-
-## Supabase Branching is valuable for:
-- Agile teams working on multiple features concurrently
-- Projects with complex database schemas requiring careful management
-- Applications undergoing significant refactoring or upgrades
-- CI/CD pipelines integrating database changes
-- Teams preferring no-code or database-first development workflows
+## When to use branching
+- Developers prototyping schema changes who want fast iteration without upfront configuration
+- AI agents that need to create and manage database branches programmatically
+- Teams managing database migrations in Git who want PR-driven schema reviews
+- Projects with complex schemas requiring careful diff review before merging
+- CI/CD pipelines integrating database changes alongside application code
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -409,7 +454,7 @@ Supabase Branching allows you to create and test changes in separate, temporary 
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
     status: {
-      stage: PRODUCT_STAGES.GA,
+      stage: PRODUCT_STAGES.BETA,
       availableOnSelfHosted: false,
     },
   },
@@ -478,8 +523,6 @@ Supabase Read Replicas distribute read traffic across multiple databases. Use th
 ## Get Started
 
 Deploy your first Read Replica in minutes from Project Settings > Infrastructure. Choose a region—same region for analytics isolation, different region for geo-distribution. Select a compute size to match your workload.
-
-[Read blog post](https://supabase.com/blog/read-replicas-vs-bigger-compute)
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -681,7 +724,7 @@ This feature is particularly useful for teams looking to enhance their security 
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
     },
   },
@@ -1234,7 +1277,7 @@ JWT Signing Keys provide modern, secure JWT management with the flexibility requ
     slug: 'jwt-signing-keys',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: false,
+      availableOnSelfHosted: true,
     },
   },
   {
@@ -1944,13 +1987,13 @@ Persistent Storage backed by S3 protocol survives invocations. Ephemeral Storage
 - Machine learning model storage
 
 ## Setup
-Requires S3 credentials as environment variables: \`AWS_ACCESS_KEY_ID\`, \`AWS_SECRET_ACCESS_KEY\`, \`AWS_REGION\`, \`AWS_ENDPOINT_URL_S3\`.
+Requires S3 credentials as environment variables: \`S3FS_ACCESS_KEY_ID\`, \`S3FS_SECRET_ACCESS_KEY\`, \`S3FS_REGION\`, \`S3FS_ENDPOINT_URL\`.
 
 Persistent Storage transforms Edge Functions into stateful, high-performance computing environments.`,
     icon: UploadCloud,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/storage',
+    docsUrl: 'https://supabase.com/docs/guides/functions/ephemeral-storage',
     slug: 'persistent-storage',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2606,26 +2649,30 @@ This feature is particularly beneficial for developers working with complex data
   },
   {
     title: 'Log Drains',
-    subtitle: 'Export logs to external destinations for enhanced monitoring.',
+    subtitle: 'Export logs to Datadog, Grafana, Sentry, S3, and more — now available on Pro.',
     description: `
-Log Drains enable developers to export logs generated by Supabase products—such as the Database, Storage, Realtime, and Auth—to external destinations like Datadog or custom HTTP endpoints. This feature provides a unified view of logs within existing logging and monitoring systems, allowing teams to build robust alerting and observability pipelines.
+Log Drains enable developers to export logs generated by Supabase services—Postgres, Auth, Storage, Edge Functions, Realtime, and the API Gateway—directly to their existing observability tools. Previously available on Team and Enterprise plans only, Log Drains are now available as a Pro plan add-on.
 
 ## Key benefits
-1. Centralized logging: Consolidate logs from multiple Supabase services into a single location for easier management and analysis.
-2. Custom alerting: Ingest logs into Security Information and Event Management (SIEM) or Intrusion Detection Systems (IDS) to create tailored alerting rules based on database events.
-3. Extended retention: Supports longer log retention periods to meet compliance requirements, ensuring data availability for audits and investigations.
-4. Flexible configuration: Easily set up Log Drains through the project settings, with support for popular destinations like Datadog and custom HTTP endpoints.
-5. Scalable architecture: Built on Logflare's multi-node Elixir cluster, allowing for efficient and scalable log dispatching to multiple destinations.
+1. Full-stack visibility: Export logs from every layer of your Supabase infrastructure—not just application code—into a single dashboard alongside your other services.
+2. Centralized logging: Consolidate logs from multiple Supabase services into your existing observability stack without building custom polling infrastructure.
+3. Custom alerting: Ingest logs into Datadog, Grafana, or Sentry to trigger alerts on database errors, auth failures, or traffic anomalies.
+4. Extended retention: Route logs to AWS S3 for low-cost long-term archival, meeting compliance and audit requirements.
+5. Near-real-time delivery: Logs are batched (up to 250 per batch or flushed every second) and compressed with gzip when the destination supports it.
 
-This feature is particularly useful for teams seeking to enhance their observability practices while maintaining compliance and security standards across their applications.
+## Supported destinations
+Datadog, Grafana Loki, Sentry, AWS S3, Axiom, and a generic HTTP endpoint for custom routing.
+
+## Pricing
+$60 per drain per project, plus $0.20 per million events and $0.09 per GB egress.
 `,
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
-    docsUrl: 'https://supabase.com/blog/log-drains',
+    docsUrl: 'https://supabase.com/docs/guides/telemetry/log-drains',
     slug: 'log-drains',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -2875,7 +2922,7 @@ The MCP Server simplifies the integration of AI tools with Supabase, enabling a 
 2. Standardized tool ecosystem: MCP standardizes how tools interact with Supabase, enabling a plug-and-play experience for AI-powered workflows.
 3. Streamlined workflows: Build faster by offloading repetitive tasks like schema design and configuration management to your AI assistant.
 4. Extensive toolset: Access over 20 tools for database design, data querying, and project management.
-5. Evolving capabilities: MCP continues to evolve, with upcoming support for native OAuth authentication, Edge Function deployment, and advanced schema discovery.
+5. Evolving capabilities: MCP continues to evolve, with support for native OAuth authentication, Edge Function deployment, and advanced schema discovery.
 
 The MCP Server empowers developers to build AI-native applications, accelerating productivity and reducing the complexity of working across multiple tools.
 
@@ -2910,11 +2957,11 @@ MCP is a standard that defines how AI tools and platforms communicate. It enable
 
 ### Do I need a personal access token (PAT) to use the MCP Server?
 
-Yes, you'll need to create a PAT in your Supabase settings to authenticate the MCP Server. Future versions of MCP will support OAuth login flows for simpler authentication.
+No, a PAT is no longer required. The MCP Server now uses OAuth by default via dynamic client registration, so your AI tool authenticates through a browser-based flow. A PAT is only needed for CI/CD or non-interactive scenarios.
 
 ### Can I use the MCP Server with self-hosted Supabase instances?
 
-No, the official Supabase MCP Server connects directly to Supabase Cloud. For local instances, you can use the Postgres MCP Server instead.
+Yes, self-hosted Supabase instances are supported. Follow the [self-hosted MCP guide](/docs/guides/self-hosting/enable-mcp) to configure secure access via SSH tunnel or VPN.
 
 ### Which AI tools are compatible with the MCP Server?
 

@@ -1,14 +1,4 @@
 import { Smartphone } from 'lucide-react'
-
-import { TOTPFactors } from 'components/interfaces/Account/TOTPFactors'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   cn,
@@ -25,15 +15,24 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { TOTPFactors } from '@/components/interfaces/Account/TOTPFactors'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
+
 const collapsibleClasses = [
   'bg-surface-100',
   'hover:bg-surface-200',
   'data-open:bg-surface-200',
   'border-default',
   'hover:border-strong data-open:border-strong',
-  'data-open:pb-px col-span-12 rounded',
+  'data-open:pb-px col-span-12 rounded-sm',
   '-space-y-px overflow-hidden',
-  'border shadow',
+  'border shadow-sm',
   'transition',
   'hover:z-50',
 ]
@@ -64,7 +63,7 @@ const Security: NextPageWithLayout = () => {
           <CollapsibleTrigger_Shadcn_ asChild>
             <button
               type="button"
-              className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
+              className="group flex w-full items-center justify-between rounded-sm py-3 px-4 md:px-6 text-foreground"
             >
               <div className="flex flex-row gap-4 items-center py-1">
                 <Smartphone strokeWidth={1.5} />
@@ -89,10 +88,8 @@ const Security: NextPageWithLayout = () => {
 
 Security.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout hideMobileMenu headerTitle="Account">
-      <OrganizationLayout>
-        <AccountLayout title="Security">{page}</AccountLayout>
-      </OrganizationLayout>
+    <DefaultLayout headerTitle="Account">
+      <AccountLayout title="Security">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
 )

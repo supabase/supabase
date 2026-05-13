@@ -1,44 +1,34 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { QUEUES_SCHEMA } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Button, Form, FormControl, FormField, FormItem, Switch } from 'ui'
+import { Admonition } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import {
   FormPanelContainer,
   FormPanelContent,
   FormPanelFooter,
-} from 'components/ui/Forms/FormPanel'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import {
-  QUEUES_SCHEMA,
-  useDatabaseQueueToggleExposeMutation,
-} from 'data/database-queues/database-queues-toggle-postgrest-mutation'
-import { useDatabaseQueuesVersionQuery } from 'data/database-queues/database-queues-version-query'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Switch,
-} from 'ui'
-import { Admonition } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-// [Joshen] Not convinced with the UI and layout but getting the functionality out first
+} from '@/components/ui/Forms/FormPanel'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useQueuesQuery } from '@/data/database-queues/database-queues-query'
+import { useDatabaseQueueToggleExposeMutation } from '@/data/database-queues/database-queues-toggle-postgrest-mutation'
+import { useDatabaseQueuesVersionQuery } from '@/data/database-queues/database-queues-version-query'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -66,6 +56,18 @@ export const QueuesSettings = () => {
   })
   const tablesWithoutRLS =
     queueTables?.filter((x) => x.name.startsWith('q_') && !x.rls_enabled) ?? []
+
+  // pgmq lowercases queue names when building q_/a_ relations, but pgmq.meta keeps
+  // the original casing. Look up each relname in list_queues() so we render the
+  // user-provided name rather than the lowercased relname slice.
+  const { data: queues } = useQueuesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const queueDisplayName = (relname: string) => {
+    const stripped = relname.slice(2)
+    return queues?.find((q) => q.queue_name.toLowerCase() === stripped)?.queue_name ?? stripped
+  }
 
   const { data: config, error: configError } = useProjectPostgrestConfigQuery({
     projectRef: project?.ref,
@@ -197,15 +199,15 @@ export const QueuesSettings = () => {
           title="Settings"
           description="Manage your queues via any client library or Data APIs endpoints"
         />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="pgmq-postgrest" onSubmit={form.handleSubmit(onSubmit)}>
             <FormPanelContainer>
               <FormPanelContent className="px-8 py-8">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="enable"
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="w-full">
+                    <FormItem className="w-full">
                       <FormItemLayout
                         className="w-full"
                         layout="flex"
@@ -243,7 +245,7 @@ export const QueuesSettings = () => {
                           </>
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             name="enable"
                             size="large"
@@ -253,7 +255,7 @@ export const QueuesSettings = () => {
                             checked={field.value}
                             onCheckedChange={(value) => field.onChange(value)}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                       {tablesWithoutRLS.length > 0 && (
                         <Admonition
@@ -261,7 +263,7 @@ export const QueuesSettings = () => {
                           title="Existing Queues must have RLS enabled first before exposing via PostgREST"
                           className="mt-2"
                         >
-                          <p className="!m-0">
+                          <p className="m-0!">
                             Please ensure that the following {tablesWithoutRLS.length} queue
                             {tablesWithoutRLS.length > 1 ? 's' : ''} have RLS enabled in order to
                             prevent anonymous access.
@@ -270,7 +272,9 @@ export const QueuesSettings = () => {
                             {tablesWithoutRLS.map((x) => {
                               return (
                                 <li key={x.name}>
-                                  <code className="text-code-inline">{x.name.slice(2)}</code>
+                                  <code className="text-code-inline">
+                                    {queueDisplayName(x.name)}
+                                  </code>
                                 </li>
                               )
                             })}
@@ -283,7 +287,7 @@ export const QueuesSettings = () => {
                           >
                             Enable RLS on{' '}
                             {tablesWithoutRLS.length === 1
-                              ? tablesWithoutRLS[0].name.slice(2)
+                              ? queueDisplayName(tablesWithoutRLS[0].name)
                               : `${tablesWithoutRLS.length} queues`}
                           </Button>
                         </Admonition>
@@ -317,13 +321,15 @@ export const QueuesSettings = () => {
                           </p>
                         </Admonition>
                       )}
-                    </FormItem_Shadcn_>
+                    </FormItem>
                   )}
                 />
               </FormPanelContent>
 
               <FormPanelFooter className="flex px-8 py-4 flex items-center justify-between">
-                <DocsButton href="https://github.com/tembo-io/pgmq?tab=readme-ov-file#sql-examples" />
+                <DocsButton
+                  href={`${DOCS_URL}/guides/queues/quickstart#expose-queues-to-client-side-consumers`}
+                />
                 <div className="flex items-center gap-x-2">
                   <Button
                     type="default"
@@ -344,7 +350,7 @@ export const QueuesSettings = () => {
               </FormPanelFooter>
             </FormPanelContainer>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
 
       <ConfirmationModal
@@ -363,7 +369,7 @@ export const QueuesSettings = () => {
           {tablesWithoutRLS.map((x) => {
             return (
               <li key={x.id}>
-                <code className="text-code-inline">{x.name.slice(2)}</code>
+                <code className="text-code-inline">{queueDisplayName(x.name)}</code>
               </li>
             )
           })}

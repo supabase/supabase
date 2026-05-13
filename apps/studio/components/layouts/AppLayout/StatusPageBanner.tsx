@@ -1,6 +1,6 @@
+import { useStatusPageBannerVisibility } from './useStatusPageBannerVisibility'
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useStatusPageBannerVisibility } from './useStatusPageBannerVisibility'
 
 const BANNER_DESCRIPTION = (
   <>
@@ -16,5 +16,12 @@ export const StatusPageBanner = () => {
 
   if (!banner) return null
 
-  return <HeaderBanner variant="warning" title={banner.title} description={BANNER_DESCRIPTION} />
+  return (
+    <HeaderBanner
+      variant="warning"
+      title={banner.title}
+      description={BANNER_DESCRIPTION}
+      onDismiss={banner.dismiss}
+    />
+  )
 }

@@ -1,5 +1,4 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { BookText } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
@@ -8,7 +7,9 @@ import {
   InnerSideMenuCollapsibleTrigger,
 } from 'ui-patterns'
 import { InnerSideMenuDataItem } from 'ui-patterns/InnerSideMenu'
+
 import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 
 const OPTIONS = ['templates', 'quickstarts'] as const
 
@@ -38,7 +39,7 @@ export function CommunitySnippetsSection() {
       }}
     >
       <InnerSideMenuCollapsibleTrigger title="Community" />
-      <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+      <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
         {OPTIONS.map((pageId) => {
           const active = isPageActive(pageId)
           return (

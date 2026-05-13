@@ -90,7 +90,6 @@ export const EntityListItem = ({
   const { data: countData } = useTableRowsCountQuery(
     {
       projectRef,
-      connectionString: project?.connectionString,
       tableId: entity.id,
       filters,
       enforceExactCount: false,
@@ -235,7 +234,7 @@ export const EntityListItem = ({
           <DropdownMenu>
             <DropdownMenuTrigger
               asChild
-              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground"
+              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
             >
               <Button
                 type="text"

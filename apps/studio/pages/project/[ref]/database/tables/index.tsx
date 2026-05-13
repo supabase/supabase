@@ -1,60 +1,63 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { TableList } from 'components/interfaces/Database/Tables/TableList'
-import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { Entity, isTableLike, postgresTableToEntity } from 'data/table-editor/table-editor-types'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import {
-  PageHeader,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import { TableList } from '@/components/interfaces/Database/Tables/TableList'
+import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { AutoEnableRLSNotice } from '@/components/ui/AutoEnableRLSNotice'
+import { Entity, isTableLike, postgresTableToEntity } from '@/data/table-editor/table-editor-types'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const snap = useTableEditorStateSnapshot()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<Entity>()
 
+  const [isAutoEnableRLSMinimized] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? ''),
+    false
+  )
+
   return (
     <>
-      <PageHeader size="large">
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>Database Tables</PageHeaderTitle>
-          </PageHeaderSummary>
-        </PageHeaderMeta>
-      </PageHeader>
-      <PageContainer size="large">
-        <PageSection>
-          <PageSectionContent>
-            <TableList
-              onAddTable={snap.onAddTable}
-              onEditTable={(table) => {
-                setSelectedTableToEdit(postgresTableToEntity(table))
-                snap.onEditTable()
-              }}
-              onDeleteTable={(table) => {
-                setSelectedTableToEdit(postgresTableToEntity(table))
-                snap.onDeleteTable()
-              }}
-              onDuplicateTable={(table) => {
-                setSelectedTableToEdit(postgresTableToEntity(table))
-                snap.onDuplicateTable()
-              }}
-            />
-          </PageSectionContent>
-        </PageSection>
-      </PageContainer>
+      <PageLayout
+        title="Database Tables"
+        size="large"
+        primaryActions={isAutoEnableRLSMinimized && <AutoEnableRLSNotice iconOnly />}
+      >
+        <PageContainer size="large">
+          <PageSection>
+            {!isAutoEnableRLSMinimized && <AutoEnableRLSNotice />}
+
+            <PageSectionContent>
+              <TableList
+                onAddTable={snap.onAddTable}
+                onEditTable={(table) => {
+                  setSelectedTableToEdit(postgresTableToEntity(table))
+                  snap.onEditTable()
+                }}
+                onDeleteTable={(table) => {
+                  setSelectedTableToEdit(postgresTableToEntity(table))
+                  snap.onDeleteTable()
+                }}
+                onDuplicateTable={(table) => {
+                  setSelectedTableToEdit(postgresTableToEntity(table))
+                  snap.onDuplicateTable()
+                }}
+              />
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      </PageLayout>
 
       {projectRef !== undefined &&
         selectedTableToEdit !== undefined &&
@@ -68,14 +71,14 @@ const DatabaseTables: NextPageWithLayout = () => {
           </TableEditorTableStateContextProvider>
         )}
 
-      <SidePanelEditor includeColumns selectedTable={selectedTableToEdit as PostgresTable} />
+      <SidePanelEditor includeColumns selectedTable={selectedTableToEdit as PGTable} />
     </>
   )
 }
 
 DatabaseTables.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Tables">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

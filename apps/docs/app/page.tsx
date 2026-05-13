@@ -1,15 +1,16 @@
+import { isFeatureEnabled } from 'common'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import Link from 'next/link'
-import { cn, IconBackground, TextLink } from 'ui'
+import { cn, IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
+import { TextLink } from 'ui-patterns/TextLink'
 
-import { isFeatureEnabled } from 'common'
-import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
-import { MIGRATION_PAGES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
-import { GlassPanelWithIconPicker } from '~/features/ui/GlassPanelWithIconPicker'
-import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
-import HomeLayout from '~/layouts/HomeLayout'
-import { BASE_PATH } from '~/lib/constants'
+import MenuIconPicker from '@/components/Navigation/NavigationMenu/MenuIconPicker'
+import { MIGRATION_PAGES } from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
+import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker'
+import { IconPanelWithIconPicker } from '@/features/ui/IconPanelWithIconPicker'
+import HomeLayout from '@/layouts/HomeLayout'
+import { BASE_PATH } from '@/lib/constants'
 
 const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
   'sdk:csharp',
@@ -28,7 +29,10 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
       ...(parentAlternates && {
         languages: parentAlternates.languages || undefined,
         media: parentAlternates.media || undefined,
-        types: parentAlternates.types || undefined,
+        types: {
+          ...(parentAlternates.types ?? {}),
+          'text/markdown': '/llms-full.txt',
+        },
       }),
     },
   }
@@ -98,6 +102,18 @@ const postgresIntegrations = [
     href: '/guides/queues',
     description: 'Durable Message Queues with guaranteed delivery',
   },
+  {
+    title: 'Data REST API',
+    icon: 'rest',
+    href: '/guides/api',
+    description: 'Access your database through a RESTful API.',
+  },
+  {
+    title: 'GraphQL API',
+    icon: 'graphql',
+    href: '/guides/graphql',
+    description: 'Access your database through a GraphQL API.',
+  },
 ]
 
 const selfHostingOptions = [
@@ -125,7 +141,7 @@ const selfHostingOptions = [
 
 const clientLibraries = [
   {
-    title: 'Javascript',
+    title: 'JavaScript',
     icon: 'reference-javascript',
     href: '/reference/javascript/introduction',
     enabled: true,
@@ -164,10 +180,16 @@ const clientLibraries = [
 
 const additionalResources = [
   {
-    title: 'Management API',
-    description: 'Manage your Supabase projects and organizations.',
-    icon: 'reference-api',
-    href: '/reference/api/introduction',
+    title: 'AI tools',
+    description: 'Develop with Supabase AI-first using plugins, MCP, and skills.',
+    icon: 'ai-tools',
+    href: '/guides/ai',
+  },
+  {
+    title: 'Platform guides',
+    description: 'Learn more about the tools and services powering Supabase.',
+    icon: 'platform',
+    href: '/guides/platform',
   },
   {
     title: 'Supabase CLI',
@@ -176,10 +198,10 @@ const additionalResources = [
     href: '/reference/cli/introduction',
   },
   {
-    title: 'Platform Guides',
-    description: 'Learn more about the tools and services powering Supabase.',
-    icon: 'platform',
-    href: '/guides/platform',
+    title: 'Management API',
+    description: 'Manage your Supabase projects and organizations.',
+    icon: 'reference-api',
+    href: '/reference/api/introduction',
   },
   {
     title: 'Integrations',
@@ -223,7 +245,7 @@ const HomePage = () => (
       <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
         <div className="col-span-4">
           <h2 id="postgres-integrations" className="scroll-mt-24 m-0">
-            Postgres Modules
+            Modules
           </h2>
         </div>
         <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">

@@ -16,15 +16,12 @@ Projects must meet these requirements to use Read Replicas:
 
 1. Running on AWS.
 2. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
-
    - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
 
 3. Running on Postgres 15+.
-
    - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
 
 4. Not using [legacy logical backups](/docs/guides/platform/backups#point-in-time-recovery)
-
    - Physical backups are automatically enabled if using [Point in time recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery)
 
 ## Creating a Read Replica
@@ -43,7 +40,7 @@ curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/se
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "region": "us-east-1"
+    "read_replica_region": "us-east-1"
   }'
 
 # Delete a Read Replica

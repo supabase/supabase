@@ -60,7 +60,6 @@ export type FeatureKey =
   | 'storage.cachedEgress'
   | 'storage.cdn'
   | 'storage.transformations'
-  | 'storage.byoc'
   | 'functions.invocations'
   | 'functions.scriptSize'
   | 'functions.numberOfFunctions'
@@ -75,6 +74,7 @@ export type FeatureKey =
   | 'security.logDrain'
   | 'security.metricsEndpoint'
   | 'security.soc2'
+  | 'security.iso27001'
   | 'security.hipaa'
   | 'security.privateLink'
   | 'security.sso'
@@ -462,17 +462,6 @@ export const pricing: Pricing = {
         },
         usage_based: true,
       },
-      {
-        key: 'storage.byoc',
-        title: 'Bring your own storage provider',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
     ],
   },
   edge_functions: {
@@ -590,7 +579,7 @@ export const pricing: Pricing = {
         title: 'Log Drain',
         plans: {
           free: false,
-          pro: false,
+          pro: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           team: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           enterprise: 'Custom',
         },
@@ -621,6 +610,17 @@ export const pricing: Pricing = {
       {
         key: 'security.soc2',
         title: 'SOC2',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        key: 'security.iso27001',
+        title: 'ISO 27001',
         plans: {
           free: false,
           pro: false,

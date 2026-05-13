@@ -1,31 +1,31 @@
 'use client'
 
 import { useDebounce } from '@uidotdev/usehooks'
+import { useParams } from 'common'
+import { AnalyticsBucket as AnalyticsBucketIcon, FilesBucket, Storage, VectorBucket } from 'icons'
 import { Loader2 } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 
-import { useParams } from 'common'
-import {
-  useIsAnalyticsBucketsEnabled,
-  useIsVectorBucketsEnabled,
-} from 'data/config/project-storage-config-query'
-import {
-  useAnalyticsBucketsQuery,
-  type AnalyticsBucket,
-} from 'data/storage/analytics-buckets-query'
-import {
-  useBucketNumberEstimateQuery,
-  usePaginatedBucketsQuery,
-  type Bucket,
-} from 'data/storage/buckets-query'
-import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
-import { AnalyticsBucket as AnalyticsBucketIcon, FilesBucket, Storage, VectorBucket } from 'icons'
 import {
   EmptyState,
   ResultsList,
   SkeletonResults,
   type SearchResult,
 } from './ContextSearchResults.shared'
+import {
+  useIsAnalyticsBucketsEnabled,
+  useIsVectorBucketsEnabled,
+} from '@/data/config/project-storage-config-query'
+import {
+  useAnalyticsBucketsQuery,
+  type AnalyticsBucket,
+} from '@/data/storage/analytics-buckets-query'
+import {
+  useBucketNumberEstimateQuery,
+  usePaginatedBucketsQuery,
+  type Bucket,
+} from '@/data/storage/buckets-query'
+import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
 
 interface StorageSearchResultsProps {
   query: string
@@ -235,8 +235,8 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
 
   const totalBucketsEstimate = useMemo(() => {
     const fileBucketCount = fileBucketsEstimate ?? 0
-    const analyticsBucketCount = isAnalyticsBucketsEnabled ? analyticsBuckets?.length ?? 0 : 0
-    const vectorBucketCount = isVectorBucketsEnabled ? vectorBuckets?.length ?? 0 : 0
+    const analyticsBucketCount = isAnalyticsBucketsEnabled ? (analyticsBuckets?.length ?? 0) : 0
+    const vectorBucketCount = isVectorBucketsEnabled ? (vectorBuckets?.length ?? 0) : 0
 
     return fileBucketCount + analyticsBucketCount + vectorBucketCount
   }, [

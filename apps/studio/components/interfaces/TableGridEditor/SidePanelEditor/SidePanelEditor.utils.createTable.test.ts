@@ -1,8 +1,9 @@
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from './SidePanelEditor.types'
+import { createTable } from './SidePanelEditor.utils'
 
 // Define mock functions at module level
 const mockExecuteSql = vi.fn()
@@ -15,26 +16,26 @@ const mockToastError = vi.fn()
 const mockFetchQuery = vi.fn()
 
 // Setup mocks before imports
-vi.mock('data/query-client', () => ({
+vi.mock('@/data/query-client', () => ({
   getQueryClient: () => ({
     fetchQuery: mockFetchQuery,
   }),
 }))
 
-vi.mock('data/sql/execute-sql-query', () => ({
+vi.mock('@/data/sql/execute-sql-query', () => ({
   executeSql: (...args: unknown[]) => mockExecuteSql(...args),
 }))
 
-vi.mock('data/tables/table-retrieve-query', () => ({
+vi.mock('@/data/tables/table-retrieve-query', () => ({
   getTable: (...args: unknown[]) => mockGetTable(...args),
   getTableQuery: (...args: unknown[]) => mockGetTable(...args),
 }))
 
-vi.mock('data/telemetry/send-event-mutation', () => ({
+vi.mock('@/data/telemetry/send-event-mutation', () => ({
   sendEvent: (...args: unknown[]) => mockSendEvent(...args),
 }))
 
-vi.mock('data/prefetchers/project.$ref.editor.$id', () => ({
+vi.mock('@/data/prefetchers/project.$ref.editor.$id', () => ({
   prefetchEditorTablePage: (...args: unknown[]) => mockPrefetchEditorTablePage(...args),
 }))
 
@@ -47,12 +48,9 @@ vi.mock('sonner', () => ({
 }))
 
 // Mock SparkBar component used in toast
-vi.mock('components/ui/SparkBar', () => ({
+vi.mock('@/components/ui/SparkBar', () => ({
   default: () => null,
 }))
-
-// Import after mocks are set up
-import { createTable } from './SidePanelEditor.utils'
 
 // Helper to create a column field with defaults
 const createColumnField = (overrides: Partial<ColumnField> = {}): ColumnField => ({
@@ -306,7 +304,7 @@ describe('createTable', () => {
     const sqlCall = mockExecuteSql.mock.calls[0][0]
     expect(sqlCall.sql).toContain('ADD FOREIGN KEY')
     expect(sqlCall.sql).toContain('REFERENCES')
-    expect(sqlCall.sql).toContain('"users"')
+    expect(sqlCall.sql).toContain('users')
     expect(sqlCall.sql).toContain('ON DELETE CASCADE')
   })
 

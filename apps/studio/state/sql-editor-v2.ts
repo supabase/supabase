@@ -1,17 +1,19 @@
-import type { QueryPlanRow } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { UpsertContentPayload, upsertContent } from 'data/content/content-upsert-mutation'
-import { contentKeys } from 'data/content/keys'
-import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
-import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
-import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
-import { getQueryClient } from 'data/query-client'
+import { untrustedSql } from '@supabase/pg-meta'
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import type { SqlSnippets } from 'types'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
+
+import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
+import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
+import { upsertContent, UpsertContentPayload } from '@/data/content/content-upsert-mutation'
+import { contentKeys } from '@/data/content/keys'
+import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutation'
+import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
+import { Snippet, SnippetFolder } from '@/data/content/sql-folders-query'
+import { getQueryClient } from '@/data/query-client'
+import type { SqlSnippets } from '@/types'
 
 type StateSnippetFolder = {
   projectRef: string
@@ -177,7 +179,7 @@ export const sqlEditorState = proxy({
   }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
-      snippet.content.sql = sql
+      snippet.content.unchecked_sql = untrustedSql(sql)
       sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },

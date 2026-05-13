@@ -1,14 +1,10 @@
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfileNameAndPicture } from 'lib/profile'
+import { useFlag } from 'common'
 import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
-  Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -22,23 +18,44 @@ import {
   Theme,
 } from 'ui'
 
+import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
+import { ProfileImage } from '@/components/ui/ProfileImage'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfileNameAndPicture } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
 
-export function UserDropdown() {
+export function UserDropdown({
+  triggerClassName,
+  contentClassName,
+}: {
+  triggerClassName?: string
+  contentClassName?: string
+}) {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
+  const timezonePickerEnabled = useFlag('timezonePicker')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const track = useTrack()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild className="border flex-shrink-0 px-3">
-        <Button
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (open) track('header_user_dropdown_opened')
+      }}
+    >
+      <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
+        <ButtonTooltip
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+          tooltip={{ content: { text: 'Account settings' } }}
         >
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
@@ -47,10 +64,10 @@ export function UserDropdown() {
           ) : (
             <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
           )}
-        </Button>
+        </ButtonTooltip>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="bottom" align="end">
+      <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
@@ -76,7 +93,7 @@ export function UserDropdown() {
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="/account/me"
                   onClick={() => {
@@ -90,14 +107,14 @@ export function UserDropdown() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="flex gap-2"
+                className="flex gap-2 cursor-pointer"
                 onClick={() => toggleFeaturePreviewModal(true)}
                 // onSelect={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="https://supabase.com/changelog"
                   target="_blank"
@@ -120,17 +137,30 @@ export function UserDropdown() {
             }}
           >
             {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+              <DropdownMenuRadioItem
+                key={theme.value}
+                value={theme.value}
+                className="cursor-pointer"
+              >
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
+        {timezonePickerEnabled && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <TimezoneDropdown />
+            </DropdownMenuGroup>
+          </>
+        )}
         {IS_PLATFORM && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
+                className="cursor-pointer"
                 onSelect={() => {
                   router.push('/logout')
                 }}

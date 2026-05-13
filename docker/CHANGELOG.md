@@ -5,33 +5,142 @@ All notable changes to the Supabase self-hosted Docker configuration.
 Changes are grouped by service rather than by change type. See [versions.md](./versions.md) 
 for complete image version history and rollback information.
 
-Check updates for each service to learn more.
+See per-service updates below for details.
 
-**Note:** Configuration updates marked with "requires [...] update" are already included in the latest version of the repository. Pull the latest changes or refer to the linked PR for manual updates. After updating `docker-compose.yml`, pull latest images and recreate containers - use `docker compose pull && docker compose down && docker compose up -d`.
+**Note:** Configuration updates marked with "requires [...] update" are already included in the latest version of the repository. Pull the latest changes or refer to the linked PR for manual updates. After updating `docker-compose.yml`, pull the latest images and recreate containers - use `docker compose pull && docker compose down && docker compose up -d`.
 
 ---
 
 ## Unreleased
+
+⚠️ **Upcoming default changes:** In a future release, several defaults will change: Postgres 15 → 17, Kong → Envoy, MinIO → RustFS, Analytics/Vector removed from the default stack, and the new API keys and authentication replacing the "legacy" architecture. Most of these are already available as optional configurations.
+
+---
+
+## [2026-04-27]
+
+### Configuration
+- ⚠️ Added `docker-compose.envoy.yml` and `volumes/api/envoy` - PR [#43838](https://github.com/supabase/supabase/pull/43838). See also the API gateway updates below
+- ⚠️ Changed Studio healthcheck and some other configuration for better compatibility with Podman (requires `docker-compose.yml` update) - PR [#44754](https://github.com/supabase/supabase/pull/44754)
+- ⚠️ Changed Studio configuration to bind to all IPv4 interfaces only (requires `docker-compose.yml` update) - PR [#44772](https://github.com/supabase/supabase/pull/44772)
+
+### Documentation
+- Added a new [how-to](https://supabase.com/docs/guides/self-hosting/remove-superuser-access) describing how to switch from `supabase_admin` to `postgres` role for Studio - PR [#42975](https://github.com/supabase/supabase/pull/42975) (via [@singh-inder](https://github.com/singh-inder/))
+- Added a new [how-to](https://github.com/supabase/supabase/pull/45152) for configuring Envoy as the new API gateway - PR [#45152](https://github.com/supabase/supabase/pull/45152)
+- Updated the main [setup guide](https://supabase.com/docs/guides/self-hosting/docker) and the how-tos to reflect the state of the self-hosted Supabase configuration - PR [#45011](https://github.com/supabase/supabase/pull/45011)
+
+### Utils
+- ⚠️ Added `reassign-owner.sh` to update database objects - PR [#42975](https://github.com/supabase/supabase/pull/42975). Read more in the "[Remove superuser access](https://supabase.com/docs/guides/self-hosting/remove-superuser-access)" how-to guide
+- ⚠️ Changed `add-new-auth-keys.sh` to also update `docker-compose.yml` - PR [#45056](https://github.com/supabase/supabase/pull/45056)
+
+### Studio
+- Updated to `2026.04.27-sha-5f60601`
+- ⚠️ Added 4 new lints to the Security Advisor - PR [#45253](https://github.com/supabase/supabase/pull/45253), PR [#45260](https://github.com/supabase/supabase/pull/45260). Read more about lint rules 0026 - 0029 in the [Performance and Security Advisors](https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0026_pg_graphql_anon_table_exposed) section of the Supabase documentation
+
+### API gateway
+- ⚠️ Added Envoy as the new optional API gateway (requires `docker-compose.envoy.yml`, `volumes/api/envoy`, and `volumes/logs/vector.yml` update) - PR [#43838](https://github.com/supabase/supabase/pull/43838) (via [@luizfelmach](https://github.com/luizfelmach/))
+
+---
+
+## [2026-04-08]
+
+### Documentation
+- Added new how-to guides for configuring [custom email templates](https://supabase.com/docs/guides/self-hosting/custom-email-templates), setting up [SAML SSO](https://supabase.com/docs/guides/self-hosting/self-hosted-saml-sso), and [using Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) - PR [#42832](https://github.com/supabase/supabase/pull/42832), PR [#43386](https://github.com/supabase/supabase/pull/43386), PR [#44147](https://github.com/supabase/supabase/pull/44147)
+
+### Utils
+- ⚠️ Added `upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147). Read more in the "[Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17)" how-to guide
+
+### Studio
+- Updated to `2026.04.08-sha-205cbe7`
+
+### API gateway
+- ⚠️ Added configuration for SAML SSO (requires `.env`, `docker-compose.yml` and `volumes/api/kong.yml` update) - PR [#43385](https://github.com/supabase/supabase/pull/43385) (via [@luizfelmach](https://github.com/luizfelmach/))
+
+### PostgREST
+- Updated to `v14.8` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.8)
+
+### Storage
+- Updated to `v1.48.26` - [Release](https://github.com/supabase/storage/releases/tag/v1.48.26)
+
+### imgproxy
+- Changed `IMGPROXY_ENABLE_WEBP_DETECTION` environment variable to `IMGPROXY_AUTO_WEBP` (requires `.env` and `docker-compose.yml` update) - PR [#43919](https://github.com/supabase/supabase/pull/43919)
+
+### Postgres Meta
+- Updated to `v0.96.3` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.96.3)
+
+### Analytics (Logflare)
+- Updated to `v1.36.1` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.36.1)
+
+### Postgres
+- ⚠️ Added `docker-compose.pg17.yml` override - PR [#44147](https://github.com/supabase/supabase/pull/44147)
+- ⚠️ Added `upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147)
+- ⚠️ Added [documentation](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) explaining the upgrade to Postgres 17
+
+---
+
+## [2026-03-16]
+
+⚠️ **Note:** This update includes **important changes**. Please check the details below. The following configuration files have been added/updated: `utils/add-new-auth-keys.sh`, `utils/rotate-new-api-keys.sh`, `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `docker-compose.rustfs.yml`, `volumes/api/kong.yml`, `volumes/api/kong-entrypoint.sh`, `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, `volumes/functions/main/index.ts`, and `volumes/proxy`.
+
+### Configuration
+- ⚠️ Added scripts and templates to support the new API key format (`sb_` API keys) and the new asymmetric authentication - PR [#43554](https://github.com/supabase/supabase/pull/43554); see the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) for detailed instructions
+- Added optional proxy configuration for Caddy and nginx - PR [#43291](https://github.com/supabase/supabase/pull/43291); read the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) to learn more
+
+### Documentation
+- Added several new how-to guides to the self-hosted Supabase [documentation](https://supabase.com/docs/guides/self-hosting) - PR [#42745](https://github.com/supabase/supabase/pull/42745), PR [#42953](https://github.com/supabase/supabase/pull/42953), PR [#43177](https://github.com/supabase/supabase/pull/43177), PR [#43286](https://github.com/supabase/supabase/pull/43286), PR [#43293](https://github.com/supabase/supabase/pull/43293)
+
+### Utils and tests
+- Added `add-new-auth-keys.sh` and `rotate-new-api-keys.sh` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
+- Added `./tests` with 100+ test cases - PR [#43573](https://github.com/supabase/supabase/pull/43573)
+
+### Studio
+- Updated to `2026.03.16-sha-5528817`
+- ⚠️ Added the link to the Data API page in Integrations - PR [#43268](https://github.com/supabase/supabase/pull/43268)
+- ⚠️ Added `PGRST_DB_SCHEMAS`, `PGRST_DB_EXTRA_SEARCH_PATH`, and `PGRST_DB_MAX_ROWS` to Studio configuration (requires `docker-compose.yml` update) - PR [#43268](https://github.com/supabase/supabase/pull/43268)
+
+### MCP Server
+- Updated to `v0.7.0` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.7.0)
+
+### API gateway
+- ⚠️ Updated Kong to `3.9.1` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
+
+### PostgREST
+- Updated to `v14.6` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.6)
+
+### Realtime
+
+- ⚠️ Added **mandatory** `METRICS_JWT_SECRET` environment variable (requires `docker-compose.s3.yml` update) - PR [realtime#1729](https://github.com/supabase/realtime/pull/1729)
+
+### Storage
+- Updated to `v1.44.2` - [Release](https://github.com/supabase/storage/releases/tag/v1.44.2)
+- ⚠️ Added `STORAGE_PUBLIC_URL` environment variable to simplify proxy configuration (requires `docker-compose.s3.yml` update) - PR [storage#900](https://github.com/supabase/storage/pull/900)
+- ⚠️ Added RustFS as an optional S3 backend - PR [#42935](https://github.com/supabase/supabase/pull/42935)
+- ⚠️ Changed Docker Compose configuration for S3 backends to use named volumes - PR [#43815](https://github.com/supabase/supabase/pull/43815)
+
+### Edge Runtime
+- Updated to `v1.71.2` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.71.2)
+- ⚠️ Added `SUPABASE_PUBLISHABLE_KEYS`, `SUPABASE_SECRET_KEYS`, and `SUPABASE_PUBLIC_URL` environment variables (requires `docker-compose.yml` update)
+- ⚠️ Added an option for a "hybrid" JWT verification following the addition of the new API keys and the new asymmetric authentication (requires `volumes/functions/main/index.ts` update) - PR [#42130](https://github.com/supabase/supabase/pull/42130)
+- ⚠️ Added optional rate limiter - PR [edge-runtime#670](https://github.com/supabase/edge-runtime/pull/670)
 
 ---
 
 ## [2026-02-18]
 
 ### Storage
-- Updated `supabase/storage-api` to `v1.37.8` in `docker-compose.s3.yml`
-- Changed MinIO image in `docker-compose.s3.yml` to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Changed MinIO image to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Updated Storage image version to `v1.37.8` in `docker-compose.s3.yml`
 - Removed `imgproxy` service from `docker-compose.s3.yml` to minimize redundancy - PR [#42942](https://github.com/supabase/supabase/pull/42942)
-- Fixed inconsistent `storage` service entry ordering in `docker-compose.yml` and `docker-compose.s3.yml` to improve diff readability (requires `docker-compose.yml` and `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Fixed inconsistent `storage` service entry ordering in `docker-compose.yml` and `docker-compose.s3.yml` to improve diff readability - PR [#42942](https://github.com/supabase/supabase/pull/42942)
 
 ### Edge Runtime
-
-- Added a `deno-cache` named volume to to avoid re-downloading dependencies (requires `docker-compose.yml` and `volumes/functions/*` update) - PR [#40822](https://github.com/supabase/supabase/pull/40822)
+- Added a `deno-cache` named volume to avoid re-downloading dependencies (requires `docker-compose.yml` and `volumes/functions/*` update) - PR [#40822](https://github.com/supabase/supabase/pull/40822)
 
 ---
 
 ## [2026-02-16]
 
-⚠️ **Note:** This update includes several breaking changes, including a security fix for Analytics. Please check the details below. The following configuration files have been updated: `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `volumes/api/kong.yml`, and `volumes/logs/vector.yml`. 
+⚠️ **Note:** This update includes several breaking changes, including a security fix for Analytics. Please check the details below. The following configuration files have been updated: `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `volumes/api/kong.yml`, and `volumes/logs/vector.yml`.
 
 ### Studio
 - Updated to `2026.02.16-sha-26c615c`
@@ -41,35 +150,29 @@ Check updates for each service to learn more.
 - Updated to `v0.6.3` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.6.3)
 
 ### Auth
-
 - Updated to `v2.186.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.186.0)
 
 ### PostgREST
-
 - Updated to `v14.5` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.5)
 
 ### Realtime
-
 - Updated to `v2.76.5` - [Release](https://github.com/supabase/realtime/releases/tag/v2.76.5)
 
 ### Storage
-
 - Updated to `v1.37.8` - [Release](https://github.com/supabase/storage/releases/tag/v1.37.8)
-- ⚠️ Added configuration to access buckets via `/storage/v1/s3` endpoint (requires `docker-compose.s3.yml` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185)
 - ⚠️ Changed environment variable configuration for Storage (requires `docker-compose.yml`, `.env.example` and `.env` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185), PR [#42862](https://github.com/supabase/supabase/pull/42862)
+- ⚠️ Added **default** configuration to access buckets via `/storage/v1/s3` endpoint (requires `docker-compose.yml` and `.env` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185)
+- ⚠️ Changed MinIO configuration for the S3 backend (requires `docker-compose.s3.yml` and `.env` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185)
 
 ### Edge Runtime
-
 - Updated to `v1.70.3` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.70.3)
 
 ### Analytics (Logflare)
-
 - Updated to `v1.31.2` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.31.2)
-- ⚠️ Changed default configuration to disable Logflare on `0.0.0.0:4000` to prevent access to `/dashboard` (requires `docker-compose.yml` update). Read more in "Production Recommendations" section of Logflare [documentation](https://supabase.com/docs/reference/self-hosting-analytics/introduction) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
+- ⚠️ Changed default configuration to disable Logflare on `0.0.0.0:4000` to prevent access to `/dashboard` (requires `docker-compose.yml` update). Read more in the "Production Recommendations" section of Logflare [documentation](https://supabase.com/docs/reference/self-hosting-analytics/introduction) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
 - ⚠️ Changed Kong routes to not include `/analytics/v1` by default (requires `/volumes/api/kong.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
 
 ### Vector
-
 - Updated to `0.53.0-alpine` - [Changelog](https://vector.dev/releases/0.53.0/) | [Release](https://github.com/vectordotdev/vector/releases/tag/v0.53.0)
 - ⚠️ Major version jump from `0.28.1` (requires `volumes/logs/vector.yml` update) - PR [#42525](https://github.com/supabase/supabase/pull/42525)
 - ⚠️ Changed Postgres sink configuration to bypass Kong (requires `volumes/logs/vector.yml` update) - PR [#42857](https://github.com/supabase/supabase/pull/42857)
@@ -89,13 +192,13 @@ Check updates for each service to learn more.
 
 ### Studio
 - Updated to `2026.01.27-sha-6aa59ff`
-- Added SQL snippets (requires `docker-compose.yml` update) - PR [#41112](https://github.com/supabase/supabase/pull/41112), PR [#41557](https://github.com/supabase/supabase/pull/41557)
+- Added SQL snippets (requires `docker-compose.yml` update) - PR [#41112](https://github.com/supabase/supabase/pull/41112), PR [#41557](https://github.com/supabase/supabase/pull/41557), discussion [#42031](https://github.com/orgs/supabase/discussions/42031)
 - Fixed type generator - PR [#40481](https://github.com/supabase/supabase/pull/40481)
 - Fixed minor UI discrepancies - PR [#40579](https://github.com/supabase/supabase/pull/40579), PR [#41936](https://github.com/supabase/supabase/pull/41936), PR [#41970](https://github.com/supabase/supabase/pull/41970), PR [#41971](https://github.com/supabase/supabase/pull/41971), PR [#41972](https://github.com/supabase/supabase/pull/41972), PR [#42015](https://github.com/supabase/supabase/pull/42015)
 
 ### Auth
 - Updated to `v2.185.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.185.0)
-- ⚠️ Fixed security related issues
+- ⚠️ Fixed security-related issues
 
 ### PostgREST
 - Updated to `v14.3` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.3)
@@ -159,34 +262,27 @@ Check updates for each service to learn more.
 ## [2025-12-10]
 
 ### Studio
-
 - Updated to `2025.12.09-sha-434634f`
 - ⚠️ Fixed security issues related to [React2Shell](https://vercel.com/kb/bulletin/react2shell)
 
 ### MCP Server
-
 - Updated to `v0.5.9` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.5.9)
 - ⚠️ Changed MCP tool `get_anon_key` to `get_publishable_keys`
 
 ### PostgREST
-
 - Updated to `v14.1` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.1)
 - ⚠️ **Major upgrade from v13.x to v14.x** - please report any unexpected behavior
 
 ### Realtime
-
-- Updated to `v2.68.0` - [Releases](https://github.com/supabase/realtime/releases/tag/v2.68.0)
+- Updated to `v2.68.0` - [Release](https://github.com/supabase/realtime/releases/tag/v2.68.0)
 
 ### Storage
-
 - Updated to `v1.33.0` - [Release](https://github.com/supabase/storage/releases/tag/v1.33.0)
 
 ### Edge Runtime
-
 - Updated to `v1.69.28` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.69.28)
 
 ### Analytics (Logflare)
-
 - Updated to `v1.26.25` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.26.25)
 
 ---
@@ -231,7 +327,7 @@ Check updates for each service to learn more.
 
 ### Realtime
 - Updated to `v2.65.2` - [Release](https://github.com/supabase/realtime/releases/tag/v2.65.2)
-- Fixed handling of boolean configurations options - PR [realtime#1614](https://github.com/supabase/realtime/pull/1614)
+- Fixed handling of boolean configuration options - PR [realtime#1614](https://github.com/supabase/realtime/pull/1614)
 
 ### Storage
 - Updated to `v1.32.0` - [Release](https://github.com/supabase/storage/releases/tag/v1.32.0)

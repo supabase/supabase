@@ -1,28 +1,26 @@
-import dayjs from 'dayjs'
-import { Clock, HistoryIcon } from 'lucide-react'
-import type { PropsWithChildren } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-
-import { Badge } from '@ui/components/shadcn/ui/badge'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import dayjs from 'dayjs'
+import { Clock, HistoryIcon, Lock } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   ButtonProps,
   Calendar,
-  Input_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   cn,
   copyToClipboard,
+  Input_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
 } from 'ui'
+
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
-import type { PlanId } from 'data/subscriptions/types'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TimeSplitInput } from '@/components/ui/DatePicker/TimeSplitInput'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 type Unit = 'minute' | 'hour' | 'day'
 
@@ -57,30 +55,11 @@ export const parseCustomInput = (input: string): ParsedCustomInput => {
   return { type: 'unit', value, unit: matchedUnit }
 }
 
-export const getAvailableInForDays = (days: number): PlanId[] => {
-  if (days <= 1) return ['free', 'pro', 'team', 'enterprise', 'platform']
-  if (days <= 7) return ['pro', 'team', 'enterprise', 'platform']
-  return ['team', 'enterprise', 'platform']
-}
-
-export const convertToDays = (value: number, unit: Unit): number => {
-  switch (unit) {
-    case 'minute':
-      return value / (60 * 24)
-    case 'hour':
-      return value / 24
-    case 'day':
-      return value
-  }
-}
-
 export const generateDynamicHelper = (value: number, unit: Unit): DatetimeHelper => {
-  const days = convertToDays(value, unit)
   return {
     text: `Last ${value} ${unit}${value === 1 ? '' : 's'}`,
     calcFrom: () => dayjs().subtract(value, unit).toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: getAvailableInForDays(days),
   }
 }
 
@@ -330,7 +309,6 @@ export const LogsDatePicker = ({
 
   const showHelperBadge = (helper?: DatetimeHelper) => {
     if (!helper) return false
-    if (!helper.availableIn?.length) return false
     if (!entitledToAuditLogDays) return false
 
     const day = Math.abs(dayjs().diff(dayjs(helper.calcFrom()), 'day'))
@@ -359,7 +337,7 @@ export const LogsDatePicker = ({
             placeholder="e.g. 2h, 30m, 7d"
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
-            className="mb-2 text-xs h-7 rounded-sm"
+            className="mb-2 text-xs h-7 rounded-xs"
           />
           <RadioGroup
             onValueChange={handleHelperChange}
@@ -370,7 +348,7 @@ export const LogsDatePicker = ({
               <Label
                 key={helper.text}
                 className={cn(
-                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
+                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-xs text-xs w-full',
                   {
                     'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
                   }
@@ -384,7 +362,9 @@ export const LogsDatePicker = ({
                   aria-disabled={helper.disabled}
                 ></RadioGroupItem>
                 {helper.text}
-                {showHelperBadge(helper) ? <Badge>{helper.availableIn?.[0] || ''}</Badge> : null}
+                {showHelperBadge(helper) ? (
+                  <Lock size={12} className="text-foreground-muted" />
+                ) : null}
               </Label>
             ))}
           </RadioGroup>
@@ -392,7 +372,7 @@ export const LogsDatePicker = ({
 
         <div>
           <div className="flex p-2 gap-2 items-center">
-            <div className="flex flex-grow *:flex-grow gap-2 font-mono">
+            <div className="flex grow *:grow gap-2 font-mono">
               <TimeSplitInput
                 type="start"
                 startTime={startTime}
@@ -416,7 +396,7 @@ export const LogsDatePicker = ({
                 endDate={endDate}
               />
             </div>
-            <div className="flex-shrink">
+            <div className="shrink">
               <ButtonTooltip
                 tooltip={{
                   content: {

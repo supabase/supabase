@@ -33,6 +33,7 @@ class PostHogClient {
   private config: PostHogClientConfig
   private readonly maxPendingEvents = MAX_PENDING_EVENTS
   private devListeners: Set<ClientTelemetryListener> = new Set()
+  private pendingFeatureFlagCallbacks: Set<() => void> = new Set()
 
   constructor(config: PostHogClientConfig = {}) {
     const apiHost =
@@ -107,6 +108,10 @@ class PostHogClient {
 
     this.initStarted = true
     posthog.init(this.config.apiKey, config)
+
+    // Register any feature flag callbacks that were queued before init
+    this.pendingFeatureFlagCallbacks.forEach((cb) => posthog.onFeatureFlags(cb))
+    this.pendingFeatureFlagCallbacks.clear()
   }
 
   capturePageView(properties: Record<string, any>, hasConsent: boolean = true) {
@@ -245,6 +250,52 @@ class PostHogClient {
     }
 
     return undefined
+  }
+
+  /**
+   * Returns a PostHog feature flag value directly from the client-side SDK.
+   * Use this for www/docs pages where server-side evaluation lacks full person context.
+   * In local dev, DevToolbar overrides (x-ph-flag-overrides cookie) take priority.
+   */
+  getFeatureFlag(key: string): string | boolean | undefined {
+    if (typeof document === 'undefined') return undefined
+
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const cookieEntry = document.cookie
+          .split(';')
+          .map((c) => c.trim())
+          .find((c) => c.startsWith('x-ph-flag-overrides='))
+        if (cookieEntry) {
+          const overrides = JSON.parse(
+            decodeURIComponent(cookieEntry.substring('x-ph-flag-overrides='.length))
+          )
+          if (key in overrides) return overrides[key]
+        }
+      } catch {}
+    }
+
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.getFeatureFlag(key)
+    } catch {
+      return undefined
+    }
+  }
+
+  /**
+   * Subscribe to PostHog feature flag loads/reloads.
+   * Returns an unsubscribe function.
+   */
+  onFeatureFlags(callback: () => void): () => void {
+    if (!this.initStarted) {
+      // Queue until init() is called
+      this.pendingFeatureFlagCallbacks.add(callback)
+      return () => this.pendingFeatureFlagCallbacks.delete(callback)
+    }
+    if (typeof posthog.onFeatureFlags !== 'function') return () => {}
+    return posthog.onFeatureFlags(callback) ?? (() => {})
   }
 
   /**

@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 
+import { getVectorBucketFDWName } from './VectorBuckets.utils'
 import {
   WRAPPER_HANDLERS,
   WRAPPERS,
-} from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import { wrapperMetaComparator } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { getVectorBucketFDWName } from './VectorBuckets.utils'
+} from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { wrapperMetaComparator } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useS3VectorsWrapperInstance = ({ bucketId }: { bucketId?: string }) => {
   const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()

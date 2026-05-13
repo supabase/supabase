@@ -1,15 +1,15 @@
 import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
-import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { customRender } from 'tests/lib/custom-render'
-import { addAPIMock } from 'tests/lib/msw'
-import { routerMock } from 'tests/lib/route-mock'
-import type { VaultSecret } from 'types'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { EditSecretModal } from '../EditSecretModal'
+import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
+import type { VaultSecret } from '@/types'
 
 const secret: VaultSecret = {
   id: '47ca58b4-01c5-4a71-8814-c73856b02e0e',
@@ -79,7 +79,7 @@ describe(`EditSecretModal`, () => {
 
     await screen.findByRole(`dialog`)
 
-    const nameInput = screen.getByLabelText(`Name`)
+    const nameInput = await screen.findByLabelText(`Name`)
     const descriptionInput = screen.getByLabelText(`Description`)
     const valueInput = screen.getByLabelText(`Secret value`)
     const togglePasswordButton = screen.getByRole(`button`, { name: `Show secret value` })

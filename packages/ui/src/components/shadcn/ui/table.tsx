@@ -52,10 +52,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
   ({ className, ...props }, ref) => (
     <tr
       ref={ref}
-      className={cn(
-        'border-b [&>td]:hover:bg-surface-200 data-[state=selected]:bg-muted',
-        className
-      )}
+      className={cn('border-b group data-[state=selected]:bg-muted', className)}
       {...props}
     />
   )
@@ -122,7 +119,7 @@ function TableHeadSort<TColumn extends string = string>({
           className={cn(
             baseIconClass,
             'transition-opacity opacity-80 md:opacity-40',
-            !isActive ? 'group-hover/table-head-sort:opacity-80' : '!opacity-0'
+            !isActive ? 'group-hover/table-head-sort:opacity-80' : 'opacity-0!'
           )}
         />
       </>
@@ -133,7 +130,7 @@ function TableHeadSort<TColumn extends string = string>({
     <button
       type="button"
       className={cn(
-        'group/table-head-sort heading-meta whitespace-nowrap flex items-center gap-1 cursor-pointer select-none !bg-transparent border-none p-0 w-full text-left',
+        'group/table-head-sort heading-meta whitespace-nowrap flex items-center gap-1 cursor-pointer select-none bg-transparent! border-none p-0 w-full text-left',
         className
       )}
       onClick={() => onSortChange(column)}
@@ -151,7 +148,10 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn('transition-colors p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
+    className={cn(
+      'transition-colors p-4 align-middle group-hover:bg-surface-200 [&:has([role=checkbox])]:pr-0',
+      className
+    )}
     {...props}
   />
 ))

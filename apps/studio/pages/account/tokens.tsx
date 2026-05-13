@@ -1,18 +1,18 @@
 import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
-import { AccessTokenList } from 'components/interfaces/Account/AccessTokens/AccessTokenList'
-import { NewTokenButton } from 'components/interfaces/Account/AccessTokens/Classic/NewTokenButton'
-import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
-import AccessTokensLayout from 'components/layouts/AccessTokens/AccessTokensLayout'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { AccessTokenList } from '@/components/interfaces/Account/AccessTokens/AccessTokenList'
+import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
+import { NewTokenButton } from '@/components/interfaces/Account/AccessTokens/Classic/NewTokenButton'
+import { AccessTokensLayout } from '@/components/layouts/AccessTokens/AccessTokensLayout'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { NewAccessToken } from '@/data/access-tokens/access-tokens-create-mutation'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
@@ -66,10 +66,8 @@ const UserAccessTokens: NextPageWithLayout = () => {
 
 UserAccessTokens.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout hideMobileMenu headerTitle="Account">
-      <OrganizationLayout>
-        <AccountLayout title="Access Tokens">{page}</AccountLayout>
-      </OrganizationLayout>
+    <DefaultLayout headerTitle="Account">
+      <AccountLayout title="Access Tokens">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
 )

@@ -1,14 +1,14 @@
 import 'swiper/css'
 
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
-import Image from 'next/image'
-import Link from 'next/link'
-import { ReactNode, useEffect, useState } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Button } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { AnimatePresence, motion, useAnimation } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
 
 interface TabProps {
   label: string
@@ -23,7 +23,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
   <button
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
-      isActive ? 'flex-[2] text-foreground' : 'flex-[1] text-foreground-light'
+      isActive ? 'flex-2 text-foreground' : 'flex-1 text-foreground-light'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -58,13 +58,13 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
 interface Tab {
   label: string
   paragraph?: string
-  panel?: JSX.Element
+  panel?: ReactNode
   colabUrl: string
   code?: string
 }
 
 interface Props {
-  title: string | ReactNode
+  title: ReactNode
   paragraph: string
   cta?: {
     label?: string
@@ -170,7 +170,7 @@ const TimedTabsSection = ({
           </Swiper>
           <OpenInColab
             colabUrl={tabs[activeTab]?.colabUrl}
-            className="flex md:hidden !relative !top-0 !right-0 mt-8 w-full justify-center"
+            className="flex md:hidden relative! top-0! right-0! mt-8 w-full justify-center"
           />
         </div>
       </div>

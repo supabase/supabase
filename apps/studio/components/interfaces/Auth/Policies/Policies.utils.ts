@@ -1,16 +1,16 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PGPolicy } from '@supabase/pg-meta'
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import { has, isEmpty, isEqual } from 'lodash'
 
-import { ident } from '@supabase/pg-meta/src/pg-format'
-import { generateSqlPolicy } from 'data/ai/sql-policy-mutation'
-import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import {
   PolicyFormField,
   PolicyForReview,
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
 } from './Policies.types'
+import { generateSqlPolicy } from '@/data/ai/sql-policy-mutation'
+import type { CreatePolicyBody } from '@/data/database-policies/database-policy-create-mutation'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 
 /**
  * Returns an array of SQL statements that will preview in the review step of the policy editor
@@ -19,7 +19,7 @@ import {
 
 export const createSQLPolicy = (
   policyFormFields: PolicyFormField,
-  originalPolicyFormFields: PostgresPolicy
+  originalPolicyFormFields?: PGPolicy
 ) => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
@@ -32,7 +32,7 @@ export const createSQLPolicy = (
     check: check ? check.replace(/\s+/g, ' ').trim() : check === undefined ? null : check,
   }
 
-  if (isEmpty(originalPolicyFormFields)) {
+  if (!originalPolicyFormFields || isEmpty(originalPolicyFormFields)) {
     return createSQLStatementForCreatePolicy(formattedPolicyFormFields)
   }
 
@@ -129,7 +129,7 @@ export const createPayloadForCreatePolicy = (
 
 export const createPayloadForUpdatePolicy = (
   policyFormFields: PolicyFormField,
-  originalPolicyFormFields: PostgresPolicy
+  originalPolicyFormFields: PGPolicy
 ): PostgresPolicyUpdatePayload => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {

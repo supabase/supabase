@@ -1,24 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Button, Form, FormField, Input_Shadcn_, Modal, Separator } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { useParams } from 'common'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-import { getFDWs } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal, Separator } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
 import { SchemaEditor } from '../TableGridEditor/SidePanelEditor/SchemaEditor'
 import { getAnalyticsBucketFDWServerName } from './AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from './AnalyticsBuckets/AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 import { getDecryptedParameters } from './Storage.utils'
+import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
+import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
+import { getFDWs } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface ImportForeignSchemaDialogProps {
   namespace: string
@@ -165,7 +165,7 @@ export const ImportForeignSchemaDialog = ({
       header={<span>Create target schema</span>}
       onCancel={() => onClose()}
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-4">
             <p className="text-sm">
@@ -175,7 +175,7 @@ export const ImportForeignSchemaDialog = ({
                 : 'clashes with an existing database schema. Create a new schema to use as the destination for this data.'}
             </p>
             <Separator />
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="targetSchema"
               render={({ field }) => (
@@ -199,7 +199,7 @@ export const ImportForeignSchemaDialog = ({
             </Button>
           </Modal.Content>
         </form>
-      </Form_Shadcn_>
+      </Form>
       <SchemaEditor
         visible={createSchemaSheetOpen}
         closePanel={() => setCreateSchemaSheetOpen(false)}

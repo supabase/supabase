@@ -1,11 +1,12 @@
 'use client'
 
-import dayjs from 'dayjs'
-import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { formatPercentage, numberFormatter } from './Charts.utils'
+import { useFormatDateTime, useTimezone } from '@/lib/datetime'
+import { formatBytes } from '@/lib/helpers'
 
 export interface ReportAttributes {
   id?: string
@@ -14,7 +15,8 @@ export interface ReportAttributes {
   attributes?: (MultiAttribute | false)[]
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
-  availableIn?: string[]
+  entitlement?: string
+  requiredPlan?: string
   hideChartType?: boolean
   format?: string
   className?: string
@@ -29,7 +31,10 @@ export interface ReportAttributes {
   YAxisProps?: {
     width?: number
     tickFormatter?: (value: any) => string
+    domain?: [number | string, number | string]
+    allowDataOverflow?: boolean
   }
+  normalizeVisibleStackToPercent?: boolean
   hideHighlightedValue?: boolean
 }
 
@@ -110,6 +115,8 @@ interface TooltipProps {
   payload?: any[]
   label?: string | number
   attributes?: MultiAttribute[]
+  data?: Record<string, unknown>[]
+  xAxisKey?: string
   isPercentage?: boolean
   format?: string | ((value: unknown) => string)
   valuePrecision?: number
@@ -136,14 +143,18 @@ export const calculateTotalChartAggregate = (
 export const CustomTooltip = ({
   active,
   payload,
-  label,
+  label: _label,
   attributes,
+  data,
+  xAxisKey = 'period_start',
   isPercentage,
   format,
   valuePrecision,
   showTotal,
   isActiveHoveredChart,
 }: TooltipProps) => {
+  const formatDateTime = useFormatDateTime()
+  const { timezone } = useTimezone()
   if (active && payload && payload.length) {
     /**
      * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
@@ -151,10 +162,15 @@ export const CustomTooltip = ({
     const firstItem = payload[0].payload
     const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
     const timestamp = payload[0].payload[timestampKey]
+    const rawDataPoint = data?.find(
+      (point) => point[xAxisKey] === timestamp || point[timestampKey] === timestamp
+    )
     const maxValueAttribute = isMaxAttribute(attributes)
-    const maxValueData =
-      maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
-    const maxValue = maxValueData?.value
+    const maxValue =
+      maxValueAttribute && rawDataPoint
+        ? Number(rawDataPoint[maxValueAttribute.attribute])
+        : undefined
+    const hasFiniteMaxValue = typeof maxValue === 'number' && Number.isFinite(maxValue)
     const isRamChart =
       !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
@@ -179,38 +195,64 @@ export const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
-    const localTimeZone = dayjs.tz.guess()
+    const localTimeZone = timezone
 
-    const total = showTotal && calculateTotalChartAggregate(payload, attributesToIgnoreFromTotal)
+    const rawPayload = payload.map((entry: any) => ({
+      ...entry,
+      value:
+        rawDataPoint && typeof rawDataPoint[entry.dataKey] === 'number'
+          ? Number(rawDataPoint[entry.dataKey])
+          : entry.value,
+    }))
+
+    const total = showTotal && calculateTotalChartAggregate(rawPayload, attributesToIgnoreFromTotal)
 
     const getIcon = (color: string, isMax: boolean) =>
       isMax ? <MaxConnectionsIcon /> : <CustomIcon color={color} />
 
     const formatNumeric = (value: number) => {
       if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
-      return shouldFormatBytes
-        ? formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
-        : numberFormatter(value, valuePrecision)
+      if (shouldFormatBytes) {
+        return formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
+      }
+      const formatted = numberFormatter(value, valuePrecision)
+      if (
+        !isBytesFormat &&
+        format !== '%' &&
+        format !== 'ms' &&
+        typeof format === 'string' &&
+        format
+      ) {
+        return `${formatted}${format}`
+      }
+      return formatted
     }
 
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a?.attribute === entry.name)
-      const percentage = ((entry.value / maxValue) * 100).toFixed(valuePrecision)
+      const rawValue =
+        rawDataPoint && typeof rawDataPoint[entry.dataKey] === 'number'
+          ? Number(rawDataPoint[entry.dataKey])
+          : entry.value
+      const percentage =
+        hasFiniteMaxValue && maxValue > 0
+          ? ((rawValue / maxValue) * 100).toFixed(valuePrecision)
+          : null
       const isMax = entry.dataKey === maxValueAttribute?.attribute
 
       return (
         <div key={entry.name} className="flex items-center w-full">
           {getIcon(entry.color, isMax)}
-          <span className="text-foreground-lighter ml-1 flex-grow cursor-default select-none">
+          <span className="text-foreground-lighter ml-1 grow cursor-default select-none">
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
-            {formatNumeric(entry.value) + (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
+            {formatNumeric(rawValue) + (!isPercentage && format !== 'ms' ? byteUnitSuffix : '')}
             {isPercentage ? '%' : ''}
             {format === 'ms' ? 'ms' : ''}
 
             {/* Show percentage if max value is set */}
-            {!!maxValueData && !isMax && !isPercentage && (
+            {percentage !== null && !isMax && !isPercentage && (
               <span className="text-[11px] text-foreground-light mb-0.5">({percentage}%)</span>
             )}
           </span>
@@ -221,19 +263,19 @@ export const CustomTooltip = ({
     return (
       <div
         className={cn(
-          'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
+          'grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg-default px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
           !isActiveHoveredChart && 'opacity-0'
         )}
       >
         <p className="text-foreground-light text-xs">{localTimeZone}</p>
-        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
+        <p className="font-medium">{formatDateTime(timestamp, DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
-          {payload.reverse().map((entry: any, index: number) => (
+          {[...payload].reverse().map((entry: any, index: number) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />
           ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
-              <span className="flex-grow text-foreground-lighter">Total</span>
+              <span className="grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
                   {isPercentage
@@ -243,11 +285,12 @@ export const CustomTooltip = ({
                   {format === 'ms' ? 'ms' : ''}
                 </span>
                 {maxValueAttribute &&
+                  hasFiniteMaxValue &&
                   !isPercentage &&
-                  !isNaN((total as number) / maxValueData?.value) &&
-                  isFinite((total as number) / maxValueData?.value) && (
+                  !isNaN((total as number) / maxValue) &&
+                  isFinite((total as number) / maxValue) && (
                     <span className="text-[11px] text-foreground-light mb-0.5">
-                      ({(((total as number) / maxValueData?.value) * 100).toFixed(1)}%)
+                      ({(((total as number) / maxValue) * 100).toFixed(1)}%)
                     </span>
                   )}
               </div>
@@ -280,7 +323,7 @@ export const CustomLabel = ({
 }: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMaxAttribute(attributes)
-  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
+  const [, setHoveredLabel] = useState<string | null>(null)
 
   const handleMouseEnter = (label: string) => {
     setHoveredLabel(label)
@@ -346,7 +389,9 @@ export const CustomLabel = ({
     <div className="relative z-10 mx-auto flex flex-col items-center gap-1 text-xs w-full">
       <div className="flex flex-wrap items-center justify-center gap-2">
         <TooltipProvider delayDuration={800}>
-          {items?.map((entry, index) => <LabelItem key={`${entry.name}-${index}`} entry={entry} />)}
+          {items?.map((entry, index) => (
+            <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+          ))}
         </TooltipProvider>
       </div>
     </div>

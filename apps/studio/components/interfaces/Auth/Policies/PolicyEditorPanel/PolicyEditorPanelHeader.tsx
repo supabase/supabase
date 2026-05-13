@@ -1,18 +1,17 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PGPolicy } from '@supabase/pg-meta'
 import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useState } from 'react'
-
 import {
+  cn,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   SheetClose,
   SheetHeader,
   SheetTitle,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 
 export const PolicyEditorPanelHeader = ({
@@ -20,7 +19,7 @@ export const PolicyEditorPanelHeader = ({
   showTools,
   setShowTools,
 }: {
-  selectedPolicy?: PostgresPolicy
+  selectedPolicy?: PGPolicy
   showTools: boolean
   setShowTools: (v: boolean) => void
 }) => {
@@ -32,7 +31,7 @@ export const PolicyEditorPanelHeader = ({
         <SheetClose
           className={cn(
             'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-            'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+            'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
             'transition disabled:pointer-events-none data-[state=open]:bg-secondary',
             'mt-1.5'
           )}
@@ -40,7 +39,7 @@ export const PolicyEditorPanelHeader = ({
           <X className="h-3 w-3" />
           <span className="sr-only">Close</span>
         </SheetClose>
-        <div className="h-[24px] w-[1px] bg-border-overlay" />
+        <div className="h-[24px] w-px bg-border-overlay" />
         <div>
           <SheetTitle className="truncate">
             {selectedPolicy !== undefined
@@ -53,7 +52,7 @@ export const PolicyEditorPanelHeader = ({
               open={showDetails}
               onOpenChange={setShowDetails}
             >
-              <CollapsibleTrigger_Shadcn_ className="group  font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+              <CollapsibleTrigger_Shadcn_ className="group  font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
                 <div className="flex items-center gap-x-2 w-full">
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     View policy details
@@ -119,6 +118,7 @@ export const PolicyEditorPanelHeader = ({
             ) : (
               <PanelRightClose size={19} strokeWidth={1} />
             )}
+            <span className="sr-only">{showTools ? 'Hide' : 'Show'} tools</span>
           </button>
         </TooltipTrigger>
         <TooltipContent side="left">{showTools ? 'Hide' : 'Show'} tools</TooltipContent>

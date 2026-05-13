@@ -1,16 +1,6 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { Pipeline } from 'data/replication/pipelines-query'
-import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
-import { useUpdatePipelineVersionMutation } from 'data/replication/update-pipeline-version-mutation'
 import { ChevronDown } from 'lucide-react'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from 'state/replication-pipeline-request-status'
+import { toast } from 'sonner'
 import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -18,8 +8,19 @@ import {
   DialogSectionSeparator,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
+import { Pipeline } from '@/data/replication/pipelines-query'
+import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
+import { useUpdatePipelineVersionMutation } from '@/data/replication/update-pipeline-version-mutation'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 interface UpdateVersionModalProps {
   visible: boolean
@@ -65,9 +66,9 @@ export const UpdateVersionModal = ({
     // Step 1: Update to the new version
     try {
       await updatePipelineVersion({ projectRef, pipelineId: pipeline.id, versionId })
-    } catch (e: any) {
+    } catch (e) {
       // 404: default changed; version cache will refresh via mutation onError. Keep dialog open.
-      if (e?.code === 404) return
+      if ((e as ResponseError)?.code === 404) return
       // Other errors are already toasted by the mutation; do not double-toast here.
       return
     }
@@ -80,10 +81,10 @@ export const UpdateVersionModal = ({
       try {
         await restartPipeline({ projectRef, pipelineId: pipeline.id })
         toast.success('Pipeline successfully updated and is currently restarting')
-      } catch (e: any) {
+      } catch (e) {
         // Clear optimistic state and surface a single concise error
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-        toast.error('Failed to restart pipeline')
+        toast.error(`Failed to restart pipeline: ${(e as ResponseError).message}`)
       }
     } else {
       toast.success('Pipeline successfully updated')
@@ -97,7 +98,7 @@ export const UpdateVersionModal = ({
       size="small"
       visible={visible}
       title="Update pipeline image"
-      className="!p-0"
+      className="p-0!"
       confirmLabel={confirmLabel ?? (isStopped ? 'Update image' : 'Update and restart')}
       confirmLabelLoading={confirmLabelLoading}
       onCancel={onClose}
@@ -119,20 +120,20 @@ export const UpdateVersionModal = ({
       <Collapsible_Shadcn_ className="px-5 py-3 group">
         <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between text-sm text-foreground-light">
           <p>View version update details</p>
-          <ChevronDown size={14} className="group-data-[state=open]:-rotate-180 transition" />
+          <ChevronDown size={14} className="group-data-open:-rotate-180 transition" />
         </CollapsibleTrigger_Shadcn_>
         <CollapsibleContent_Shadcn_>
           <div className="flex flex-col gap-y-2 mt-2 pb-2">
             <div className="text-sm text-foreground prose max-w-full">
               <p className="text-foreground-light mb-1">Current version:</p>{' '}
               <code className="text-code-inline">
-                {isLoadingVersion ? 'Loading...' : currentVersionName ?? 'Unknown'}
+                {isLoadingVersion ? 'Loading...' : (currentVersionName ?? 'Unknown')}
               </code>
             </div>
             <div className="text-sm text-foreground prose max-w-full">
               <p className="text-foreground-light mb-1">New version:</p>{' '}
               <code className="text-code-inline">
-                {isLoadingVersion ? 'Loading...' : newVersionName ?? 'Unknown'}
+                {isLoadingVersion ? 'Loading...' : (newVersionName ?? 'Unknown')}
               </code>
             </div>
           </div>

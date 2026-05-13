@@ -1,28 +1,29 @@
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { useFlag, useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
-import type { Organization } from 'types'
 
-export const generateSettingsMenu = (
-  ref?: string,
-  project?: Project,
-  organization?: Organization,
-  features?: {
-    auth?: boolean
-    authProviders?: boolean
-    edgeFunctions?: boolean
-    storage?: boolean
-    invoices?: boolean
-    legacyJwtKeys?: boolean
-    logDrains?: boolean
-    billing?: boolean
-  }
-): ProductMenuGroup[] => {
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+
+export const useGenerateSettingsMenu = () => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const showDashboardPreferences = useFlag('dashboardPreferences')
+
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
+
+  const { projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled, billingAll: billingEnabled } =
+    useIsFeatureEnabled(['project_settings:legacy_jwt_keys', 'billing:all'])
+
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
   if (!IS_PLATFORM) {
     return [
       {
-        title: 'Project Settings',
+        title: 'Configuration',
         items: [
           {
             name: `Log Drains`,
@@ -35,14 +36,9 @@ export const generateSettingsMenu = (
     ]
   }
 
-  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-
-  const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
-  const billingEnabled = features?.billing ?? true
-
   return [
     {
-      title: 'Project Settings',
+      title: 'Configuration',
       items: [
         {
           name: 'General',
@@ -72,11 +68,22 @@ export const generateSettingsMenu = (
           items: [],
           disabled: !isProjectActive,
         },
+        ...(platformWebhooksEnabled
+          ? [
+              {
+                name: 'Webhooks',
+                key: 'webhooks',
+                url: `/project/${ref}/settings/webhooks`,
+                items: [],
+                disabled: !isProjectActive,
+              },
+            ]
+          : []),
 
         {
           name: 'API Keys',
           key: 'api-keys',
-          url: `/project/${ref}/settings/api-keys/new`,
+          url: `/project/${ref}/settings/api-keys`,
           items: [],
           disabled: !isProjectActive,
         },
@@ -98,15 +105,25 @@ export const generateSettingsMenu = (
           disabled: !isProjectActive,
         },
         {
-          name: 'Add Ons',
+          name: 'Add-ons',
           key: 'addons',
           url: `/project/${ref}/settings/addons`,
           items: [],
         },
+        ...(showDashboardPreferences
+          ? [
+              {
+                name: 'Dashboard',
+                key: 'dashboard',
+                url: `/project/${ref}/settings/dashboard`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
     {
-      title: 'Configuration',
+      title: 'Integrations',
       items: [
         {
           name: 'Data API',

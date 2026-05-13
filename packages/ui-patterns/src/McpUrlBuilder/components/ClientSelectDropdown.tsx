@@ -19,20 +19,25 @@ import {
 import type { McpClient } from '../types'
 import { ConnectionIcon } from './ConnectionIcon'
 
+export interface ClientGroup {
+  heading: string
+  clients: McpClient[]
+}
+
 interface ClientSelectDropdownProps {
-  basePath: string
   theme?: 'light' | 'dark'
   label?: string
   clients: McpClient[]
+  groups?: ClientGroup[]
   selectedClient: McpClient
   onClientChange: (clientKey: string) => void
 }
 
 export const ClientSelectDropdown = ({
-  basePath,
   theme = 'light',
   label = 'Client',
   clients,
+  groups,
   selectedClient,
   onClientChange,
 }: ClientSelectDropdownProps) => {
@@ -41,6 +46,33 @@ export const ClientSelectDropdown = ({
   function onSelectClient(key: string) {
     onClientChange(key)
     setOpen(false)
+  }
+
+  function renderClient(client: McpClient) {
+    return (
+      <CommandItem_Shadcn_
+        key={client.key}
+        value={client.key}
+        onSelect={() => onSelectClient(client.key)}
+        className="flex gap-2 items-center"
+      >
+        {client.icon ? (
+          <ConnectionIcon
+            connection={client.icon}
+            theme={theme}
+            hasDistinctDarkIcon={client.hasDistinctDarkIcon}
+          />
+        ) : (
+          <Bot size={12} aria-hidden={true} />
+        )}
+        {client.label}
+        <Check
+          aria-label={client.key === selectedClient.key ? 'selected' : undefined}
+          size={15}
+          className={cn('ml-auto', client.key === selectedClient.key ? 'opacity-100' : 'opacity-0')}
+        />
+      </CommandItem_Shadcn_>
+    )
   }
 
   return (
@@ -64,11 +96,9 @@ export const ClientSelectDropdown = ({
             <div className="flex items-center gap-2">
               {selectedClient?.icon ? (
                 <ConnectionIcon
-                  basePath={basePath}
-                  iconFolder="mcp-clients"
                   connection={selectedClient.icon}
                   theme={theme}
-                  supportsDarkMode={true}
+                  hasDistinctDarkIcon={selectedClient.hasDistinctDarkIcon}
                 />
               ) : (
                 <Bot size={12} aria-hidden={true} />
@@ -83,40 +113,15 @@ export const ClientSelectDropdown = ({
           <CommandInput_Shadcn_ placeholder="Search..." />
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
-              {clients.map((client) => (
-                <CommandItem_Shadcn_
-                  key={client.key}
-                  value={client.key}
-                  onSelect={() => {
-                    onSelectClient(client.key)
-                    setOpen(false)
-                  }}
-                  className="flex gap-2 items-center"
-                >
-                  {client.icon ? (
-                    <ConnectionIcon
-                      basePath={basePath}
-                      iconFolder="mcp-clients"
-                      connection={client.icon}
-                      theme={theme}
-                      supportsDarkMode={true}
-                    />
-                  ) : (
-                    <Bot size={12} aria-hidden={true} />
-                  )}
-                  {client.label}
-                  <Check
-                    aria-label={client.key === selectedClient.key ? 'selected' : undefined}
-                    size={15}
-                    className={cn(
-                      'ml-auto',
-                      client.key === selectedClient.key ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                </CommandItem_Shadcn_>
-              ))}
-            </CommandGroup_Shadcn_>
+            {groups ? (
+              groups.map((group) => (
+                <CommandGroup_Shadcn_ key={group.heading} heading={group.heading}>
+                  {group.clients.map(renderClient)}
+                </CommandGroup_Shadcn_>
+              ))
+            ) : (
+              <CommandGroup_Shadcn_>{clients.map(renderClient)}</CommandGroup_Shadcn_>
+            )}
           </CommandList_Shadcn_>
         </Command_Shadcn_>
       </PopoverContent_Shadcn_>

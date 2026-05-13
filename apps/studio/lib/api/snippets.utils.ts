@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
-import { compact, sortBy } from 'lodash'
 import path from 'path'
+import { compact, sortBy } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
 
@@ -84,7 +84,7 @@ const buildSnippet = (
     description: '',
     favorite: false,
     content: {
-      sql: content, // Default content
+      sql: content,
       content_id: uuidv4(),
       schema_version: '1.0',
     },
