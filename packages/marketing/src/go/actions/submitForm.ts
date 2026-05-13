@@ -8,6 +8,12 @@ export interface FormSubmitResult {
   errors: string[]
 }
 
+/** Hidden field added by MarketingForm — bots fill it, humans never see it. */
+const HONEYPOT_FIELD = 'website'
+
+/** Minimum milliseconds a form must be on the page before a submission is accepted. */
+const MIN_FORM_RENDER_MS = 3000
+
 // Enable debug logging in local dev and on Vercel preview/development deployments
 const isDebug =
   process.env.NODE_ENV === 'development' ||
@@ -62,18 +68,43 @@ function buildCrmConfig(crm: GoFormCrmConfig): CRMConfig {
 export async function submitFormAction(
   crm: GoFormCrmConfig,
   values: Record<string, string>,
-  context?: { pageUri?: string; pageName?: string }
+  context?: { pageUri?: string; pageName?: string; honeypot?: string; formMountedAt?: number }
 ): Promise<FormSubmitResult> {
   debug('Form submission received', { crm, values, context })
 
+  // Anti-spam: honeypot tripped or form submitted suspiciously fast. Return a
+  // fake success so bots think they got through and don't retry with variations.
+  const honeypot = context?.honeypot ?? values[HONEYPOT_FIELD] ?? ''
+  if (honeypot.trim() !== '') {
+    console.warn('[go/form] Rejected submission: honeypot tripped', {
+      pageUri: context?.pageUri,
+    })
+    return { success: true, errors: [] }
+  }
+
+  if (
+    typeof context?.formMountedAt === 'number' &&
+    Date.now() - context.formMountedAt < MIN_FORM_RENDER_MS
+  ) {
+    console.warn('[go/form] Rejected submission: form submitted too quickly', {
+      pageUri: context.pageUri,
+      elapsedMs: Date.now() - context.formMountedAt,
+    })
+    return { success: true, errors: [] }
+  }
+
   try {
+    // The honeypot field is never part of the real payload, even if a real
+    // form happens to include a `website` field name.
+    const { [HONEYPOT_FIELD]: _honeypot, ...payloadValues } = values
+
     // Detect the email value from common field names
     const email =
-      values['email'] ??
-      values['workEmail'] ??
-      values['work_email'] ??
-      values['emailAddress'] ??
-      values['email_address'] ??
+      payloadValues['email'] ??
+      payloadValues['workEmail'] ??
+      payloadValues['work_email'] ??
+      payloadValues['emailAddress'] ??
+      payloadValues['email_address'] ??
       ''
 
     if (!email) {
@@ -102,7 +133,7 @@ export async function submitFormAction(
     if (crm.hubspot) {
       const fieldMap = crm.hubspot.fieldMap ?? {}
       hubspotFields = {}
-      for (const [formField, value] of Object.entries(values)) {
+      for (const [formField, value] of Object.entries(payloadValues)) {
         const hsField = fieldMap[formField] ?? formField
         hubspotFields[hsField] = value
       }
@@ -115,13 +146,13 @@ export async function submitFormAction(
     if (crm.customerio?.profileMap) {
       customerioProfile = {}
       for (const [formField, attrName] of Object.entries(crm.customerio.profileMap)) {
-        customerioProfile[attrName] = values[formField]
+        customerioProfile[attrName] = payloadValues[formField]
       }
     }
     if (crm.customerio) {
       debug('Customer.io payload', {
         event: crm.customerio.event,
-        properties: values,
+        properties: payloadValues,
         customerioProfile,
       })
     }
@@ -132,8 +163,8 @@ export async function submitFormAction(
       const columnMap = crm.notion.columnMap ?? {}
       const properties: Record<string, unknown> = {}
       for (const [formField, columnName] of Object.entries(columnMap)) {
-        if (formField in values) {
-          properties[columnName] = values[formField]
+        if (formField in payloadValues) {
+          properties[columnName] = payloadValues[formField]
         }
       }
       if (crm.notion.staticProperties) {
@@ -146,11 +177,11 @@ export async function submitFormAction(
     const { errors } = await client.submitEvent({
       email,
       hubspotFields,
-      context,
+      context: context && { pageUri: context.pageUri, pageName: context.pageName },
       consent,
       event: crm.customerio?.event,
       properties: crm.customerio
-        ? { ...(values as Record<string, unknown>), ...crm.customerio.staticProperties }
+        ? { ...(payloadValues as Record<string, unknown>), ...crm.customerio.staticProperties }
         : undefined,
       customerioProfile,
       notion,

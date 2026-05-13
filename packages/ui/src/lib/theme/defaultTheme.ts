@@ -834,13 +834,6 @@ export default {
     option_check_icon: `h-5 w-5`,
   },
 
-  collapsible: {
-    content: `
-      data-open:animate-slide-down-normal
-      data-closed:animate-slide-up-normal
-    `,
-  },
-
   inputErrorIcon: {
     base: `
       flex items-center
