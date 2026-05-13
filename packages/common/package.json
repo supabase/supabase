@@ -33,6 +33,7 @@
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "tsconfig": "workspace:*",
+    "type-fest": "5.6.0",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

@@ -3,7 +3,6 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import {
-  Alert,
   Button,
   Checkbox,
   Input,
@@ -13,6 +12,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
@@ -53,11 +53,12 @@ const VercelIntegration: NextPageWithLayout = () => {
             />
           </header>
           <CreateProject />
-          <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
-            <Markdown
-              content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
-            />
-          </Alert>
+          <Admonition
+            type="default"
+            layout="horizontal"
+            title="You can uninstall this Integration at any time."
+            description="You can remove this integration at any time via Vercel or the Supabase dashboard"
+          />
         </ScaffoldColumn>
       </ScaffoldContainer>
     </>

@@ -29,6 +29,9 @@
         "VERCEL",
         "VERCEL_ENV",
         "VERCEL_GIT_COMMIT_SHA",
+        "INTEGRATIONS_MARKETPLACE_DB",
+        "NEXT_PUBLIC_MARKETPLACE_API_URL",
+        "NEXT_PUBLIC_MARKETPLACE_PUBLISHABLE_KEY",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
