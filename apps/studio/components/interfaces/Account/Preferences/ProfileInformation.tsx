@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { groupBy } from 'lodash'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -30,7 +29,6 @@ import z from 'zod'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useProfileUpdateMutation } from '@/data/profile/profile-update-mutation'
 import { useProfile } from '@/lib/profile'
-import type { FormSchema } from '@/types'
 
 const FormSchema = z.object({
   first_name: z.string().optional(),
@@ -43,20 +41,29 @@ const formId = 'profile-information-form'
 
 export const ProfileInformation = () => {
   const { profile } = useProfile()
+  const currentPrimaryEmail = profile?.primary_email ?? ''
 
   const {
     data: identityData,
     isPending: isIdentitiesLoading,
     isSuccess: isIdentitiesSuccess,
   } = useProfileIdentitiesQuery()
-  const identities = (identityData?.identities ?? []).filter((x) => x.identity_data?.email !== null)
-  const dedupedIdentityEmails = Object.keys(groupBy(identities, 'identity_data.email'))
+  const primaryEmailOptions = [
+    ...new Set(
+      [
+        currentPrimaryEmail,
+        ...(identityData?.identities ?? []).map((identity) => identity.identity_data?.email),
+      ].filter((email): email is string => Boolean(email))
+    ),
+  ]
+  const primaryEmailDefault =
+    currentPrimaryEmail || (primaryEmailOptions.length === 1 ? primaryEmailOptions[0] : '')
 
   const defaultValues = {
     first_name: profile?.first_name ?? '',
     last_name: profile?.last_name ?? '',
     username: profile?.username ?? '',
-    primary_email: profile?.primary_email ?? '',
+    primary_email: primaryEmailDefault,
   }
 
   const form = useForm({
@@ -66,14 +73,14 @@ export const ProfileInformation = () => {
   })
 
   const { mutate: updateProfile, isPending: isUpdatingProfile } = useProfileUpdateMutation({
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       toast.success('Successfully saved profile')
       const { first_name, last_name, username, primary_email } = data
       form.reset({
         first_name: first_name ?? undefined,
         last_name: last_name ?? undefined,
         username,
-        primary_email,
+        primary_email: primary_email || variables.primaryEmail,
       })
     },
     onError: (error) => toast.error(`Failed to update profile: ${error.message}`),
@@ -151,7 +158,7 @@ export const ProfileInformation = () => {
                             </SelectTrigger_Shadcn_>
                             <SelectContent_Shadcn_ className="col-span-8">
                               {isIdentitiesSuccess &&
-                                dedupedIdentityEmails.map((email) => (
+                                primaryEmailOptions.map((email) => (
                                   <SelectItem_Shadcn_ key={email} value={email}>
                                     {email}
                                   </SelectItem_Shadcn_>
