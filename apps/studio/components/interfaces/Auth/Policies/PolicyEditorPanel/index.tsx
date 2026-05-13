@@ -80,8 +80,6 @@ const defaultValues = {
 
 /**
  * Using memo for this component because everything rerenders on window focus because of outside fetches
- * Note: For INSERT command, editor one holds the check expression (not using)
-   Whereas for others: editor one = using, editor two = optional check
  */
 export const PolicyEditorPanel = memo(function ({
   visible,
@@ -186,7 +184,8 @@ export const PolicyEditorPanel = memo(function ({
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const { name, table, behavior, command, roles } = data
 
-    // [Joshen] Refer to top note as to why we're using the "USING" section for INSERT
+    // For INSERT: editor one holds the check expression (not using)
+    // For others: editor one = using, editor two = optional check
     const usingExpr = command !== 'insert' ? using : undefined
     const checkExpr = command === 'insert' ? using : check
 
@@ -222,25 +221,31 @@ export const PolicyEditorPanel = memo(function ({
     } else if (selectedProject !== undefined) {
       const payload: {
         name?: string
-        definition?: string
-        check?: string
+        definition?: SafeSqlFragment
+        check?: SafeSqlFragment
         roles?: Array<string>
       } = {}
       const updatedRoles = roles.length === 0 ? ['public'] : roles.split(', ')
-      // Trim for string comparison against the stored policy values
+      // Trim for string comparison against the stored policy values. The Save click is the
+      // explicit user gesture that promotes editor content to executable SQL.
       const usingVal = using?.trim()
       const checkVal = check?.trim()
 
       if (name !== selectedPolicy.name) payload.name = name
       if (!isEqual(selectedPolicy.roles, updatedRoles)) payload.roles = updatedRoles
       if (selectedPolicy.definition !== null && selectedPolicy.definition !== usingVal)
-        payload.definition = usingVal
+        payload.definition =
+          usingVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(usingVal))
 
       if (selectedPolicy.command === 'INSERT') {
         // [Joshen] Cause editor one will be the check statement in this scenario
-        if (selectedPolicy.check !== usingVal) payload.check = usingVal
+        if (selectedPolicy.check !== usingVal)
+          payload.check =
+            usingVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(usingVal))
       } else {
-        if (selectedPolicy.check !== checkVal) payload.check = checkVal
+        if (selectedPolicy.check !== checkVal)
+          payload.check =
+            checkVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(checkVal))
       }
 
       if (Object.keys(payload).length === 0) return onSelectCancel()
@@ -281,19 +286,13 @@ export const PolicyEditorPanel = memo(function ({
           command: command.toLowerCase(),
           roles: roles.length === 1 && roles[0] === 'public' ? '' : roles.join(', '),
         })
-
-        // [Joshen] Refer to top note as to why we're using the "USING" section for INSERT
-        if (selectedPolicy.definition) {
-          setUsing(safeSql`  ${selectedPolicy.definition}`)
+        if (selectedPolicy.definition) setUsing(safeSql`  ${selectedPolicy.definition}`)
+        if (selectedPolicy.check && selectedPolicy.command === 'INSERT')
+          setUsing(safeSql`  ${selectedPolicy.check}`)
+        if (selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
+          setCheck(safeSql`  ${selectedPolicy.check}`)
+          setShowCheckBlock(true)
         }
-        if (selectedPolicy.check) {
-          if (selectedPolicy.command === 'INSERT') setUsing(safeSql`  ${selectedPolicy.check}`)
-          else {
-            setCheck(safeSql`  ${selectedPolicy.check}`)
-            setShowCheckBlock(true)
-          }
-        }
-
         setRolesFragment(
           roles.length === 1 && roles[0] === 'public'
             ? safeSql`public`
@@ -585,8 +584,6 @@ export const PolicyEditorPanel = memo(function ({
                             form.setValue('roles', value.roles.join(', ') ?? '')
 
                             setUsing(safeSql`  ${value.definition}`)
-
-                            // [Joshen] Refer to top note as to why we're using the "USING" section for INSERT
                             if (value.check) {
                               if (value.command === 'INSERT') {
                                 setUsing(safeSql`  ${value.check}`)
@@ -594,7 +591,6 @@ export const PolicyEditorPanel = memo(function ({
                                 setCheck(safeSql`  ${value.check}`)
                               }
                             }
-
                             setRolesFragment(
                               value.roles.length === 0 ||
                                 (value.roles.length === 1 && value.roles[0] === 'public')

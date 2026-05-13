@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta/src/pg-format'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -42,7 +43,7 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import SchemaSelector from '@/components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from '@/data/database-functions/database-functions-create-mutation'
-import { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from '@/data/database-functions/database-functions-update-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -52,7 +53,7 @@ import type { FormSchema } from '@/types'
 const FORM_ID = 'create-function-sidepanel'
 
 interface CreateFunctionProps {
-  func?: DatabaseFunction
+  func?: SavedDatabaseFunction
   isDuplicating?: boolean
   visible: boolean
   onClose: () => void
@@ -101,10 +102,15 @@ export const CreateFunction = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!project) return console.error('Project is required')
+    // Submit click is the explicit user gesture that promotes form-entered SQL fragments
+    // (`args` items, `return_type`, and each `config_params` value) to executable.
     const payload = {
       ...data,
-      args: data.args.map((x) => `${x.name} ${x.type}`),
-      config_params: mapValues(keyBy(data.config_params, 'name'), 'value') as Record<string, never>,
+      args: data.args.map((x) => acceptUntrustedSql(untrustedSql(`${x.name} ${x.type}`))),
+      return_type: acceptUntrustedSql(untrustedSql(data.return_type)),
+      config_params: mapValues(keyBy(data.config_params, 'name'), (item) =>
+        acceptUntrustedSql(untrustedSql(item.value))
+      ),
     }
 
     if (isEditing) {
