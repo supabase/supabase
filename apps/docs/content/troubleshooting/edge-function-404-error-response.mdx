@@ -10,39 +10,27 @@ code = "NOT_FOUND"
 message = "Requested function was not found"
 ---
 
-The edge function is not recognized by Supabase
-
-## Context for the error
-
-If the Supabase Edge Function Runtime does not recognize the function specified in the URL endpoint:
+A 404 response means the function name was unrecognized in the request URL:
 
 ```sh
 https://PROJECT_REF.supabase.co/functions/v1/UNRECOGNIZED_FUNCTION_NAME
 ```
 
-then the runtime will return a 404 error.
-
-## Solving the error
-
-### Step 1: Identifying the error
-
-<Admonition type="note">
-
-If the tests return a 404 but don't match the criteria below, the error is coming from your app logic, not the JWT check.
-
-</Admonition>
-
-### Inspecting the return message from the request
+### Confirming the 404
 
 <Admonition type="caution">
 
-Platform 404 errors cannot be detected in the browser. Instead, to confirm 404s from the browser, you must [check the logs](#inspecting-the-logs) instead.
+**Browsers hide platform 404s:**
 
-Browsers misreport 404s as generic `CORS errors`. As a result, the [Supabase JavaScript client](/docs/reference/javascript/introduction) surfaces only a generic message: `Failed to send a request to the Edge Function`.
+Browsers suppress platform 404 errors with [CORS message](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS/Errors#identifying_a_cors_issue), and the [Supabase JavaScript client](/docs/reference/javascript/introduction) surfaces only `Failed to send a request to the Edge Function`.
+
+You cannot always confirm a 404 error from the browser alone. To verify, use one of the methods below.
 
 </Admonition>
 
-When an edge function fails due to a platform 404 error, it will return the error:
+### Identifying 404s from the response message
+
+A platform 404 returns from a non-browser client (cURL, Postman, Python...) returns the below message:
 
 ```json
 {
@@ -51,68 +39,123 @@ When an edge function fails due to a platform 404 error, it will return the erro
 }
 ```
 
-### Inspecting the logs
+If you encountered the error, go the the [unrecognized function](#unrecognized-function) section.
 
-<Admonition type='tip'>
+If the body contains a different message, or something custom, your code executed and returned a 404 based on its logic.
 
-Always configure an appropriate time frame when using the log explorer
+Go to: [Your function returned a 404](#your-function-returned-a-404)
 
-        ![image](/docs/img/troubleshooting/edge_function_404_set_timeframe.png)
+### Identifying 404s from the Function logs
 
-</Admonition>
-
-One cannot inspect the function dashboard to find platform 404 errors, instead, you must run the below query in the [log explorer](/dashboard/project/_/logs/explorer?q=SELECT+DISTINCT%0A++++req.pathname+AS+function_name%2C%0A++++res.status_code%0AFROM+function_edge_logs%0ACROSS+JOIN+UNNEST%28metadata%29+AS+metadata+%0ACROSS+JOIN+UNNEST%28metadata.request%29+AS+req+%0ACROSS+JOIN+UNNEST%28metadata.response%29+AS+res+%0AWHERE+%0A++++status_code+%3D+404+%0A++++++++AND+%0A++++metadata.execution_id+IS+NULL%0ALIMIT+10%3B). Results will show all requests that reached Supabase but were rejected as unrecognizable.
+Run the below query in the [Log Explorer](</dashboard/project/_/logs/explorer?q=SELECT%0A++req.pathname+AS+function_name,%0A++CASE%0A++++WHEN+metadata.execution_id+IS+NULL+THEN+%27unrecognized_function%27%0A++++ELSE+%27app_level_error%27%0A++END+AS+cause,%0A++timestamp%0AFROM%0A++function_edge_logs%0A++CROSS+JOIN+UNNEST(metadata)+AS+metadata%0A++CROSS+JOIN+UNNEST(metadata.request)+AS+req%0A++CROSS+JOIN+UNNEST(metadata.response)+AS+res%0AWHERE%0A++res.status_code+=+404%0ALIMIT+10;&its=&ite=>):
 
 ```sql
-select distinct
+select
   req.pathname as function_name,
-  res.status_code
+  case
+    when metadata.execution_id is null then 'unrecognized_function'
+    else 'app_level_error'
+  end as cause,
+  timestamp
 from
   function_edge_logs
   cross join UNNEST(metadata) as metadata
   cross join UNNEST(metadata.request) as req
   cross join UNNEST(metadata.response) as res
-where status_code = 404 and metadata.execution_id is null
+where res.status_code = 404
 limit 10;
 ```
 
-### Step 2: Check the function for typos
+The `function_name` column tells you exactly what path was requested, while `cause` indicates whether the platform rejected it or your code returned the 404.
 
-In your code, make sure your function name doesn't have any typos, such as:
+Depending on the output, you can use this table to find the appropriate debugging section:
+
+| Cause                   | Go to                                                         |
+| ----------------------- | ------------------------------------------------------------- |
+| `app_level_error`       | [Your function returned a 404](#your-function-returned-a-404) |
+| `unrecognized_function` | [Unrecognized function](#unrecognized-function)               |
+
+---
+
+# Addressing the error
+
+## Your function returned a 404
+
+Your function executed successfully at the platform level, but your code returned a 404 response itself.
+
+**Example:**
+
+```js
+return new Response(JSON.stringify({ error: 'Not found' }), {
+  headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  status: 404, // <-- you set this
+})
+```
+
+**How to fix:**
+
+1. Search your function code for `404`. Look for explicit status codes on `Response` objects.
+2. Trace the condition that triggered it. If your function calls external APIs, it may be passing along errors returned by those services.
+3. Add logging before the return so future occurrences leave a trace:
+
+```js
+console.error('Returning 404 - reason:', reason)
+```
+
+See: [Error handling in Edge Functions](/docs/guides/functions/error-handling)
+
+---
+
+## Unrecognized function
+
+The platform could not match your request URL to a deployed function.
+
+### Check for typos
+
+Make sure the function name in your request doesn't have:
 
 - miscapitalization
 - em-dashes instead of dashes
 - misplaced characters
 - unnecessary slashes `///`
 
-### Step 3: Try calling the function from the dashboard
+### Test from the dashboard
 
-When selecting your function in the [Function Dashboard](/dashboard/project/_/functions), you should have the option to make a test call:
+In the [Functions Dashboard](/dashboard/project/_/functions), select your function and use the test call option:
 
 ![image](/docs/img/troubleshooting/edge_function_404_test_call.png)
 
-If the call works, consider double checking your code for typos or to see if it is overwriting the function name dynamically. Otherwise, go on to step 4.
+- **If the call succeeds:** the problem is likely with how your client constructs the request. Double check your client code to see if it is overwriting the function name dynamically.
 
-### Step 4: Redeploy the function
+- **If the test call also 404s:** this can indicate an internal platform issue. Try redeploying the function.
 
-If step 3 fails, it may be a sign of an internal bug and it may be necessary to redeploy your function. This can be done within the [Function Dashboard](/dashboard/project/_/functions) under the respective function's code tab:
+### Redeploy the function
+
+**Option A: Dashboard**
+
+In the [Functions Dashboard](/dashboard/project/_/functions), open the function's code tab and redeploy:
 
 ![image](/docs/img/troubleshooting/edge_function_404_redeploy.png)
 
-Alternatively, if you develop locally, you can redeploy the function with the [Supabase CLI](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=macos):
+**Option B: CLI**
+
+If you set up the [Supabase CLI](/docs/guides/functions/quickstart) for your functions, you can run:
 
 ```sh
+# Redeploy a specific function
 supabase functions deploy FUNCTION_NAME
 
-# If you want to deploy all functions, run the `deploy` command without specifying a function name:
+# Redeploy all functions
 supabase functions deploy
 ```
 
-Then write in a ticket to [Supabase Support](/dashboard/support/new)
+If redeploying corrects your issue or if it continues to persist, open a ticket with [Supabase Support](/dashboard/support/new).
+
+---
 
 ## Additional resources
 
 - [Securing Edge Functions](/docs/guides/functions/auth)
 - [Debugging Edge Functions](/docs/guides/functions/logging)
-- [Quickstart Deployment: Dashboard](/docs/guides/functions/quickstart-dashboard)
-- [Quickstart Deployment: CLI](/docs/guides/functions/quickstart)
+- [Quickstart: Dashboard deployment](/docs/guides/functions/quickstart-dashboard)
+- [Quickstart: CLI deployment](/docs/guides/functions/quickstart)
