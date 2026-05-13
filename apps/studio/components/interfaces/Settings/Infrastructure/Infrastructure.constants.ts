@@ -82,10 +82,13 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
       },
       {
         anchor: 'disk_io',
-        key: 'disk_io_consumption',
-        attributes: [{ key: 'disk_io_consumption', color: 'white' }],
-        name: 'Disk IO Bandwidth',
-        unit: 'percentage',
+        key: 'disk_throughput',
+        attributes: [
+          { key: 'disk_bytes_read', color: 'blue' },
+          { key: 'disk_bytes_written', color: 'green' },
+        ],
+        name: 'Disk Throughput',
+        unit: 'bytes',
         links: [
           {
             name: 'Disk Throughput and IOPS',
@@ -101,7 +104,7 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
           },
         ],
         description:
-          'The disk performance of your workload is determined by the Disk IO bandwidth.\nSmaller compute instances (below 4XL) can burst above their baseline disk throughput and IOPS for short periods of time. Beyond that, the performance reverts to the baseline.',
+          'Actual bytes read from and written to disk per second.\nSustained throughput near the maximum for your compute size may indicate disk pressure.',
         chartDescription: '',
       },
     ],

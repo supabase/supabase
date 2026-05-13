@@ -1,17 +1,13 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { capitalize } from 'lodash'
-import { BarChart2, ChartLine, ExternalLink } from 'lucide-react'
+import { BarChart2, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useMemo, useState } from 'react'
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { CPUWarnings } from '@/components/interfaces/Billing/Usage/UsageWarningAlerts/CPUWarnings'
-import { DiskIOBandwidthWarnings } from '@/components/interfaces/Billing/Usage/UsageWarningAlerts/DiskIOBandwidthWarnings'
 import { RAMWarnings } from '@/components/interfaces/Billing/Usage/UsageWarningAlerts/RAMWarnings'
 import UsageBarChart from '@/components/interfaces/Organization/Usage/UsageBarChart'
 import {
@@ -23,7 +19,6 @@ import {
 } from '@/components/layouts/Scaffold'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
-import { DocsButton } from '@/components/ui/DocsButton'
 import Panel from '@/components/ui/Panel'
 import { DataPoint } from '@/data/analytics/constants'
 import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
@@ -37,23 +32,16 @@ import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from '@/lib/constants'
+import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from '@/lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
+import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-
-const NON_DEDICATED_IO_RESOURCES = [
-  'ci_micro',
-  'ci_small',
-  'ci_medium',
-  'ci_large',
-  'ci_xlarge',
-  'ci_2xlarge',
-]
 
 const INFRA_ATTRIBUTES: InfraMonitoringAttribute[] = [
   'max_cpu_usage',
   'ram_usage',
-  'disk_io_consumption',
+  'disk_bytes_read',
+  'disk_bytes_written',
 ]
 
 export const InfrastructureActivity = () => {
@@ -78,9 +66,6 @@ export const InfrastructureActivity = () => {
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
-  const hasDedicatedIOResources =
-    computeInstance !== undefined &&
-    !NON_DEDICATED_IO_RESOURCES.includes(computeInstance.variant.identifier)
 
   function getCurrentComputeInstanceSpecs() {
     if (computeInstance?.variant.meta) {
@@ -93,18 +78,6 @@ export const InfrastructureActivity = () => {
   }
 
   const currentComputeInstanceSpecs = getCurrentComputeInstanceSpecs()
-
-  const currentBillingCycleSelected = useMemo(() => {
-    // Selected by default
-    if (!dateRange?.period_start || !dateRange?.period_end || !subscription) return true
-
-    const { current_period_start, current_period_end } = subscription
-
-    return (
-      dayjs(dateRange.period_start.date).isSame(new Date(current_period_start * 1000)) &&
-      dayjs(dateRange.period_end.date).isSame(new Date(current_period_end * 1000))
-    )
-  }, [dateRange, subscription])
 
   const upgradeUrl =
     organization === undefined
@@ -171,18 +144,15 @@ export const InfrastructureActivity = () => {
 
   const cpuUsageData = transformedData?.max_cpu_usage
   const memoryUsageData = transformedData?.ram_usage
-  const ioBudgetData = transformedData?.disk_io_consumption
 
-  const hasLatest = dayjs(endDate!).isAfter(dayjs().startOf('day'))
-
-  const latestIoBudgetConsumption =
-    hasLatest && ioBudgetData?.data?.slice(-1)?.[0]
-      ? Number(ioBudgetData.data.slice(-1)[0].disk_io_consumption)
-      : 0
-
-  const highestIoBudgetConsumption = (ioBudgetData?.data || [])
-    .map((x) => Number(x.disk_io_consumption) ?? 0)
-    .reduce((a, b) => Math.max(a, b), 0)
+  const diskThroughputData = useMemo((): DataPoint[] => {
+    const readData = transformedData?.disk_bytes_read?.data ?? []
+    const writeData = transformedData?.disk_bytes_written?.data ?? []
+    return readData.map((point, i) => ({
+      ...point,
+      disk_bytes_written: writeData[i]?.disk_bytes_written ?? 0,
+    }))
+  }, [transformedData])
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
     max_cpu_usage: {
@@ -193,9 +163,9 @@ export const InfrastructureActivity = () => {
       isLoading: isLoadingInfraData,
       data: memoryUsageData?.data ?? [],
     },
-    disk_io_consumption: {
+    disk_throughput: {
       isLoading: isLoadingInfraData,
-      data: ioBudgetData?.data ?? [],
+      data: diskThroughputData,
     },
   }
 
@@ -269,68 +239,6 @@ export const InfrastructureActivity = () => {
                   </div>
                 </ScaffoldSectionDetail>
                 <ScaffoldSectionContent>
-                  {attribute.key === 'disk_io_consumption' && (
-                    <>
-                      <DiskIOBandwidthWarnings
-                        upgradeUrl={upgradeUrl}
-                        hasAccessToComputeSizes={hasAccessToComputeSizes}
-                        hasLatest={hasLatest}
-                        currentBillingCycleSelected={currentBillingCycleSelected}
-                        latestIoBudgetConsumption={latestIoBudgetConsumption}
-                        highestIoBudgetConsumption={highestIoBudgetConsumption}
-                      />
-                      <div className="space-y-1">
-                        <p>Disk IO Bandwidth</p>
-
-                        {currentComputeInstanceSpecs.baseline_disk_io_mbs ===
-                        currentComputeInstanceSpecs.max_disk_io_mbs ? (
-                          <p className="text-sm text-foreground-light">
-                            Your current compute has a baseline and maximum disk throughput of{' '}
-                            {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps.
-                          </p>
-                        ) : (
-                          <p className="text-sm text-foreground-light">
-                            Your current compute can burst above the baseline disk throughput of{' '}
-                            {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()}{' '}
-                            Mbps for short periods of time.
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm mb-2">Overview</p>
-                        <div className="flex items-center justify-between border-b py-1">
-                          <p className="text-xs text-foreground-light">Current compute instance</p>
-                          <p className="text-xs">
-                            {computeInstance?.variant?.name ??
-                              capitalize(project?.infra_compute_size) ??
-                              'Micro'}
-                          </p>
-                        </div>
-                        <div className="flex items-center justify-between border-b py-1">
-                          <p className="text-xs text-foreground-light">Baseline IO Bandwidth</p>
-                          <p className="text-xs">
-                            {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()}{' '}
-                            Mbps
-                          </p>
-                        </div>
-                        <div className="flex items-center justify-between border-b py-1">
-                          <p className="text-xs text-foreground-light">
-                            Maximum IO Bandwidth (burst limit)
-                          </p>
-                          <p className="text-xs">
-                            {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps
-                          </p>
-                        </div>
-                        {currentComputeInstanceSpecs.max_disk_io_mbs !==
-                          currentComputeInstanceSpecs?.baseline_disk_io_mbs && (
-                          <div className="flex items-center justify-between py-1">
-                            <p className="text-xs text-foreground-light">Daily burst time limit</p>
-                            <p className="text-xs">30 mins</p>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
                   {attribute.key === 'max_cpu_usage' && (
                     <CPUWarnings
                       upgradeUrl={upgradeUrl}
@@ -348,8 +256,8 @@ export const InfrastructureActivity = () => {
 
                   <div className="space-y-1">
                     <div className="flex flex-row justify-between">
-                      {attribute.key === 'disk_io_consumption' ? (
-                        <p>Disk IO consumed per {interval === '1d' ? 'day' : 'hour'}</p>
+                      {attribute.key === 'disk_throughput' ? (
+                        <p>Disk throughput per {interval === '1d' ? 'day' : 'hour'}</p>
                       ) : (
                         <p>
                           Max{' '}
@@ -388,37 +296,33 @@ export const InfrastructureActivity = () => {
                       </p>
                     ))}
                   </div>
-                  {attribute.key === 'disk_io_consumption' && hasDedicatedIOResources ? (
-                    <>
-                      <Admonition
-                        type="note"
-                        title={`Your compute instance of ${computeInstance.variant.name} comes with dedicated I/O resources`}
-                        description="Your project thus does not rely on I/O balance or burst capacity as larger
-                      add-ons are designed for sustained, high performance with specific IOPS and
-                      throughput limits without needing to burst."
-                      >
-                        <DocsButton
-                          abbrev={false}
-                          href={`${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`}
-                        />
-                      </Admonition>
-                    </>
-                  ) : chartMeta[attribute.key].isLoading ? (
+                  {chartMeta[attribute.key].isLoading ? (
                     <div className="space-y-2">
                       <ShimmeringLoader />
                       <ShimmeringLoader className="w-3/4" />
                       <ShimmeringLoader className="w-1/2" />
                     </div>
                   ) : chartData.length ? (
-                    <UsageBarChart
-                      name={`${attribute.chartPrefix || ''} ${attribute.name}`}
-                      unit={attribute.unit}
-                      attributes={attribute.attributes}
-                      data={chartData}
-                      yFormatter={(value) => `${Math.round(Number(value))}%`}
-                      tooltipFormatter={(value) => `${value}%`}
-                      yLimit={100}
-                    />
+                    attribute.key === 'disk_throughput' ? (
+                      <UsageBarChart
+                        name={attribute.name}
+                        unit={attribute.unit}
+                        attributes={attribute.attributes}
+                        data={chartData}
+                        yFormatter={(value) => `${formatBytes(Number(value), 1)}/s`}
+                        tooltipFormatter={(value) => `${formatBytes(Number(value), 1)}/s`}
+                      />
+                    ) : (
+                      <UsageBarChart
+                        name={`${attribute.chartPrefix || ''} ${attribute.name}`}
+                        unit={attribute.unit}
+                        attributes={attribute.attributes}
+                        data={chartData}
+                        yFormatter={(value) => `${Math.round(Number(value))}%`}
+                        tooltipFormatter={(value) => `${value}%`}
+                        yLimit={100}
+                      />
+                    )
                   ) : (
                     <Panel>
                       <Panel.Content>
@@ -431,19 +335,6 @@ export const InfrastructureActivity = () => {
                         </div>
                       </Panel.Content>
                     </Panel>
-                  )}
-                  {attribute.key === 'disk_io_consumption' && !hasDedicatedIOResources && (
-                    <Admonition
-                      type="default"
-                      title="Looking for actual disk activity?"
-                      description="The chart above shows your remaining burst budget, not real disk throughput. For detailed read/write IOPS and throughput charts, head to the Database Observability page."
-                    >
-                      <Button asChild type="default" icon={<ChartLine size={14} />}>
-                        <Link href={`/project/${projectRef}/observability/database`}>
-                          View detailed IOPS and throughput
-                        </Link>
-                      </Button>
-                    </Admonition>
                   )}
                 </ScaffoldSectionContent>
               </ScaffoldSection>
