@@ -115,7 +115,7 @@ function InputGroupAddon({
   )
 }
 
-const inputGroupButtonVariants = cva('relative', {
+const inputGroupButtonVariants = cva('', {
   variants: {
     size: {
       tiny: "h-6 gap-1 rounded-md px-2 has-[>svg]:px-2 [&>svg:not([class*='size-'])]:size-3.5",
