@@ -5,6 +5,7 @@ import {
   commaSeparatedStringIntoArray,
   constructHeaders,
   fromNodeHeaders,
+  normalizeRefParam,
   toSnakeCase,
   zBooleanString,
 } from './apiHelpers'
@@ -254,6 +255,28 @@ describe('apiHelpers', () => {
       expect(result.get('authorization')).toBe('Bearer token')
       expect(result.get('x-empty')).toBeNull()
       expect(result.get('x-custom')).toBe('value1, value2')
+    })
+  })
+
+  describe('normalizeRefParam', () => {
+    it('returns the string as-is when given a plain string', () => {
+      expect(normalizeRefParam('moonlit')).toBe('moonlit')
+      expect(normalizeRefParam('default')).toBe('default')
+      expect(normalizeRefParam('production')).toBe('production')
+    })
+
+    it('returns the first element when given an array', () => {
+      expect(normalizeRefParam(['moonlit', 'extra'])).toBe('moonlit')
+      expect(normalizeRefParam(['default'])).toBe('default')
+    })
+
+    it('returns "default" when given undefined', () => {
+      expect(normalizeRefParam(undefined)).toBe('default')
+    })
+
+    it('returns "default" when given an empty array', () => {
+      // Array.isArray([]) is true; [0] is undefined → falls back to 'default'
+      expect(normalizeRefParam([])).toBe('default')
     })
   })
 })

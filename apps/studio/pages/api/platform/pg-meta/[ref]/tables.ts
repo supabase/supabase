@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { fetchGet } from '@/data/fetchers'
 import { constructHeaders } from '@/lib/api/apiHelpers'
 import apiWrapper from '@/lib/api/apiWrapper'
-import { PG_META_URL } from '@/lib/constants'
+import { getPgMetaUrlByRef } from '@/lib/api/self-hosted/projects'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -21,25 +21,27 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 /**
- * Construct the pgMeta redirection url passing along the filtering query params
- * @param req
- * @param endpoint
+ * Construct the pgMeta redirection url passing along the filtering query params.
+ * Uses the per-project pg-meta URL derived from `req.query.ref`.
  */
 export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
-  const query = Object.entries(req.query).reduce((query, entry) => {
-    const [key, value] = entry
+  const pgMetaUrl = getPgMetaUrlByRef(req.query.ref)
+
+  const query = Object.entries(req.query).reduce((acc, [key, value]) => {
+    // Skip the route param — it's not a pg-meta query parameter.
+    if (key === 'ref') return acc
     if (Array.isArray(value)) {
       for (const v of value) {
-        query.append(key, v)
+        acc.append(key, v)
       }
     } else if (value) {
-      query.set(key, value)
+      acc.set(key, value)
     }
-    return query
+    return acc
   }, new URLSearchParams())
 
-  let url = `${PG_META_URL}/${endpoint}`
-  if (Object.keys(req.query).length > 0) {
+  let url = `${pgMetaUrl}/${endpoint}`
+  if (query.toString().length > 0) {
     url += `?${query}`
   }
   return url

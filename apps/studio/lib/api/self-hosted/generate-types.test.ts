@@ -6,8 +6,8 @@ vi.mock('@/data/fetchers', () => ({
   fetchGet: vi.fn(),
 }))
 
-vi.mock('@/lib/constants', () => ({
-  PG_META_URL: 'http://localhost:8080',
+vi.mock('./projects', () => ({
+  getPgMetaUrlByRef: vi.fn().mockReturnValue('http://localhost:8080'),
 }))
 
 vi.mock('./util', () => ({

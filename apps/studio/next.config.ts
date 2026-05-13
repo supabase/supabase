@@ -113,42 +113,17 @@ const nextConfig = {
             },
           ]
         : [
-            {
-              source: '/',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/register',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signup',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signin',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/login',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/log-in',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/project/:ref/building',
-              destination: '/project/:ref',
-              permanent: false,
-            },
-          ]),
+            // In self-hosted mode, auth paths redirect to `/` which resolves
+            // the correct project ref at request time via getServerSideProps
+            // (Node.js runtime, which can read env vars and SUPABASE_PROJECTS_FILE).
+            { source: '/register', destination: '/', permanent: false },
+            { source: '/signup', destination: '/', permanent: false },
+            { source: '/signin', destination: '/', permanent: false },
+            { source: '/login', destination: '/', permanent: false },
+            { source: '/log-in', destination: '/', permanent: false },
+            { source: '/project/:ref/building', destination: '/project/:ref', permanent: false },
+          ]
+      ),
       {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',

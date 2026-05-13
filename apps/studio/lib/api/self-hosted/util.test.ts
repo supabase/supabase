@@ -20,6 +20,27 @@ vi.mock('crypto-js', () => {
   }
 })
 
+// Mock the projects registry so getConnectionString tests stay isolated.
+vi.mock('./projects', () => ({
+  getProject: vi.fn().mockImplementation((ref = 'default') => {
+    const host = process.env.POSTGRES_HOST || 'db'
+    const port = Number(process.env.POSTGRES_PORT) || 5432
+    const db = process.env.POSTGRES_DB || 'postgres'
+    const password = process.env.POSTGRES_PASSWORD || 'postgres'
+    const userReadWrite = process.env.POSTGRES_USER_READ_WRITE || 'supabase_admin'
+    const userReadOnly = process.env.POSTGRES_USER_READ_ONLY || 'supabase_read_only_user'
+    return {
+      ref,
+      postgresHost: host,
+      postgresPort: port,
+      postgresDb: db,
+      postgresPassword: password,
+      postgresUserReadWrite: userReadWrite,
+      postgresUserReadOnly: userReadOnly,
+    }
+  }),
+}))
+
 describe('api/self-hosted/util', () => {
   beforeEach(() => {
     vi.clearAllMocks()

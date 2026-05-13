@@ -130,3 +130,13 @@ export class InternalServerError extends Error {
     this.name = 'InternalServerError'
   }
 }
+
+/**
+ * Normalizes a Next.js route parameter (which can be a string array when using
+ * catch-all routes) to a plain string. Returns `'default'` when the value is
+ * absent so that self-hosted single-project deployments continue working without
+ * any configuration.
+ */
+export function normalizeRefParam(ref: string | string[] | undefined): string {
+  return (Array.isArray(ref) ? ref[0] : ref) ?? 'default'
+}

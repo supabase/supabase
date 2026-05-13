@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from '@/lib/api/apiWrapper'
+import { getProject } from '@/lib/api/self-hosted/projects'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -18,11 +19,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
-  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/`, {
+const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+  let project
+  try {
+    project = getProject(req.query.ref)
+  } catch (err: any) {
+    if (err?.statusCode === 404) {
+      return res.status(404).json({ error: { message: err.message } })
+    }
+    throw err
+  }
+
+  const response = await fetch(project.supabaseRestUrl, {
     method: 'GET',
     headers: {
-      apikey: process.env.SUPABASE_SERVICE_KEY!,
+      apikey: project.serviceKey,
     },
   })
   if (response.ok) {

@@ -14,7 +14,7 @@ import {
   getDebuggingOperations,
   getDevelopmentOperations,
 } from '@/lib/api/self-hosted/mcp'
-import { DEFAULT_PROJECT } from '@/lib/constants/api'
+import { getProjects } from '@/lib/api/self-hosted/projects'
 
 const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
 
@@ -58,16 +58,23 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { features, read_only } = data
   const headers = fromNodeHeaders(req.headers)
 
+  // Use the first configured project as the default for MCP.
+  // TODO: Support per-request project selection once the MCP protocol or a
+  // custom header can carry the desired project ref. For now this is a known
+  // limitation: all MCP tool calls always operate against projects[0].
+  const projects = getProjects()
+  const defaultProjectRef = projects[0]?.ref ?? 'default'
+
   const platform: SupabasePlatform = {
-    database: getDatabaseOperations({ headers }),
-    development: getDevelopmentOperations({ headers }),
-    debugging: getDebuggingOperations({ headers }),
+    database: getDatabaseOperations({ headers, ref: defaultProjectRef }),
+    development: getDevelopmentOperations({ headers, ref: defaultProjectRef }),
+    debugging: getDebuggingOperations({ headers, ref: defaultProjectRef }),
   }
 
   try {
     const server = createSupabaseMcpServer({
       platform,
-      projectId: DEFAULT_PROJECT.ref,
+      projectId: defaultProjectRef,
       features,
       readOnly: read_only,
     })
