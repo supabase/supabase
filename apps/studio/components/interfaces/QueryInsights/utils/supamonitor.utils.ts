@@ -10,6 +10,8 @@ import {
 } from '../QueryInsights.constants'
 import type { ChartDataPoint, ParsedLogEntry } from '../QueryInsights.types'
 
+const MINUTE_MS = 60_000
+
 export function filterSystemLogs(
   logs: ParsedLogEntry[],
   { includeIntrospection = false }: { includeIntrospection?: boolean } = {}
@@ -98,8 +100,112 @@ export function transformLogsToChartData(parsedLogs: ParsedLogEntry[]): ChartDat
         cache_misses: 0,
       }
     })
-    .filter((item): item is NonNullable<typeof item> => item !== null)
+    .filter((item): item is NonNullable => item !== null)
     .sort((a, b) => a.period_start - b.period_start)
+}
+
+export function aggregateLogsToMinuteBuckets(
+  parsedLogs: ParsedLogEntry[],
+  startMs: number,
+  endMs: number
+): ChartDataPoint[] {
+  type Accumulator = {
+    calls: number
+    weightedP50: number
+    weightedP95: number
+    totalWeight: number
+    minTime: number
+    maxTime: number
+    totalTime: number
+  }
+
+  const buckets = new Map<number, Accumulator>()
+
+  for (const log of parsedLogs) {
+    if (!log.timestamp) continue
+    const ts = new Date(log.timestamp).getTime()
+    if (isNaN(ts)) continue
+
+    const minuteTs = Math.floor(ts / MINUTE_MS) * MINUTE_MS
+    const calls = Math.max(0, parseInt(String(log.calls ?? 0), 10))
+    const p50 =
+      parseFloat(String(log.p50_exec_time ?? 0)) + parseFloat(String(log.p50_plan_time ?? 0))
+    const p95 =
+      parseFloat(String(log.p95_exec_time ?? 0)) + parseFloat(String(log.p95_plan_time ?? 0))
+    const minTime =
+      parseFloat(String(log.min_exec_time ?? 0)) + parseFloat(String(log.min_plan_time ?? 0))
+    const maxTime =
+      parseFloat(String(log.max_exec_time ?? 0)) + parseFloat(String(log.max_plan_time ?? 0))
+    const totalTime =
+      parseFloat(String(log.total_exec_time ?? 0)) + parseFloat(String(log.total_plan_time ?? 0))
+
+    if (!buckets.has(minuteTs)) {
+      buckets.set(minuteTs, {
+        calls: 0,
+        weightedP50: 0,
+        weightedP95: 0,
+        totalWeight: 0,
+        minTime: Infinity,
+        maxTime: -Infinity,
+        totalTime: 0,
+      })
+    }
+
+    const bucket = buckets.get(minuteTs)!
+    bucket.calls += calls
+    bucket.weightedP50 += p50 * calls
+    bucket.weightedP95 += p95 * calls
+    bucket.totalWeight += calls
+    bucket.minTime = Math.min(bucket.minTime, minTime)
+    bucket.maxTime = Math.max(bucket.maxTime, maxTime)
+    bucket.totalTime += totalTime
+  }
+
+  const startMinute = Math.floor(startMs / MINUTE_MS) * MINUTE_MS
+  const endMinute = Math.floor(endMs / MINUTE_MS) * MINUTE_MS
+
+  const result: ChartDataPoint[] = []
+  for (let t = startMinute; t <= endMinute; t += MINUTE_MS) {
+    const bucket = buckets.get(t)
+    if (bucket) {
+      const meanTime = bucket.calls > 0 ? bucket.totalTime / bucket.calls : 0
+      const p50 = bucket.totalWeight > 0 ? bucket.weightedP50 / bucket.totalWeight : 0
+      const p95 = bucket.totalWeight > 0 ? bucket.weightedP95 / bucket.totalWeight : 0
+      result.push({
+        period_start: t,
+        timestamp: new Date(t).toISOString(),
+        query_latency: meanTime,
+        mean_time: meanTime,
+        min_time: bucket.minTime === Infinity ? 0 : bucket.minTime,
+        max_time: bucket.maxTime === -Infinity ? 0 : bucket.maxTime,
+        stddev_time: 0,
+        p50_time: p50,
+        p95_time: p95,
+        calls: bucket.calls,
+        rows_read: 0,
+        cache_hits: 0,
+        cache_misses: 0,
+      })
+    } else {
+      result.push({
+        period_start: t,
+        timestamp: new Date(t).toISOString(),
+        query_latency: 0,
+        mean_time: 0,
+        min_time: 0,
+        max_time: 0,
+        stddev_time: 0,
+        p50_time: 0,
+        p95_time: 0,
+        calls: 0,
+        rows_read: 0,
+        cache_hits: 0,
+        cache_misses: 0,
+      })
+    }
+  }
+
+  return result
 }
 
 function normalizeQuery(query: string): string {

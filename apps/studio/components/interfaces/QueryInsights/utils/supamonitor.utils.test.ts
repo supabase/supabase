@@ -4,11 +4,12 @@ import { describe, expect, it } from 'vitest'
 import type { ParsedLogEntry } from '../QueryInsights.types'
 import {
   aggregateLogsByQuery,
+  aggregateLogsToMinuteBuckets,
   parseSupamonitorLogs,
   transformLogsToChartData,
 } from './supamonitor.utils'
 
-const makeSampleLog = (overrides: Partial<ParsedLogEntry> = {}): any => ({
+const makeSampleLog = (overrides: Partial = {}): any => ({
   timestamp: '2025-01-01T00:00:00Z',
   application_name: 'test_app',
   calls: 10,
@@ -157,6 +158,113 @@ describe('transformLogsToChartData', () => {
     expect(result[0].timestamp).toBe('2025-01-01T00:00:00Z')
     expect(result[1].timestamp).toBe('2025-01-02T00:00:00Z')
     expect(result[2].timestamp).toBe('2025-01-03T00:00:00Z')
+  })
+})
+
+describe('aggregateLogsToMinuteBuckets', () => {
+  const MIN = 60_000
+  const BASE_MS = new Date('2025-01-01T00:00:00Z').getTime()
+
+  it('returns empty buckets for the full range when logs are empty', () => {
+    const result = aggregateLogsToMinuteBuckets([], BASE_MS, BASE_MS + 2 * MIN)
+    expect(result).toHaveLength(3) // minutes 0, 1, 2
+    result.forEach((pt) => {
+      expect(pt.calls).toBe(0)
+      expect(pt.p50_time).toBe(0)
+      expect(pt.p95_time).toBe(0)
+    })
+  })
+
+  it('produces exactly one bucket per minute across the range', () => {
+    const result = aggregateLogsToMinuteBuckets([], BASE_MS, BASE_MS + 59 * MIN)
+    expect(result).toHaveLength(60)
+    expect(result[0].period_start).toBe(BASE_MS)
+    expect(result[59].period_start).toBe(BASE_MS + 59 * MIN)
+  })
+
+  it('aggregates multiple queries at the same minute into one bucket', () => {
+    const logs: ParsedLogEntry[] = [
+      {
+        timestamp: '2025-01-01T00:00:00Z',
+        calls: 10,
+        p50_exec_time: 8,
+        p50_plan_time: 2,
+        p95_exec_time: 40,
+        p95_plan_time: 10,
+        total_exec_time: 80,
+        total_plan_time: 20,
+        min_exec_time: 1,
+        min_plan_time: 0,
+        max_exec_time: 50,
+        max_plan_time: 5,
+      },
+      {
+        timestamp: '2025-01-01T00:00:30Z', // same minute
+        calls: 5,
+        p50_exec_time: 20,
+        p50_plan_time: 5,
+        p95_exec_time: 80,
+        p95_plan_time: 20,
+        total_exec_time: 100,
+        total_plan_time: 25,
+        min_exec_time: 5,
+        min_plan_time: 1,
+        max_exec_time: 90,
+        max_plan_time: 10,
+      },
+    ]
+
+    const result = aggregateLogsToMinuteBuckets(logs, BASE_MS, BASE_MS)
+    expect(result).toHaveLength(1)
+    const bucket = result[0]
+    expect(bucket.calls).toBe(15) // 10 + 5
+    // weighted p50: (10*10 + 5*25) / 15 = (100 + 125) / 15 = 15
+    expect(bucket.p50_time).toBeCloseTo(15)
+    // weighted p95: (10*50 + 5*100) / 15 = (500 + 500) / 15 ≈ 66.67
+    expect(bucket.p95_time).toBeCloseTo(66.67, 1)
+    expect(bucket.min_time).toBe(1) // min(1+0, 5+1) = 1
+    expect(bucket.max_time).toBe(100) // max(50+5, 90+10) = 100
+  })
+
+  it('fills missing minute buckets with zeros between data points', () => {
+    const logs: ParsedLogEntry[] = [
+      { timestamp: '2025-01-01T00:00:00Z', calls: 5 },
+      { timestamp: '2025-01-01T00:05:00Z', calls: 3 }, // gap at minutes 1-4
+    ]
+
+    const result = aggregateLogsToMinuteBuckets(logs, BASE_MS, BASE_MS + 5 * MIN)
+    expect(result).toHaveLength(6) // minutes 0-5
+    expect(result[0].calls).toBe(5)
+    expect(result[1].calls).toBe(0) // filled
+    expect(result[2].calls).toBe(0) // filled
+    expect(result[3].calls).toBe(0) // filled
+    expect(result[4].calls).toBe(0) // filled
+    expect(result[5].calls).toBe(3)
+  })
+
+  it('data outside the start/end range is ignored', () => {
+    const logs: ParsedLogEntry[] = [
+      { timestamp: '2024-12-31T23:59:00Z', calls: 99 }, // before range
+      { timestamp: '2025-01-01T00:00:00Z', calls: 5 },
+      { timestamp: '2025-01-01T00:02:00Z', calls: 99 }, // after range
+    ]
+
+    const result = aggregateLogsToMinuteBuckets(logs, BASE_MS, BASE_MS + MIN)
+    expect(result).toHaveLength(2)
+    expect(result[0].calls).toBe(5)
+    expect(result[1].calls).toBe(0) // minute 1, no data in range
+  })
+
+  it('skips entries with missing or invalid timestamps', () => {
+    const logs: ParsedLogEntry[] = [
+      { timestamp: undefined, calls: 10 },
+      { timestamp: 'not-a-date', calls: 10 },
+      { timestamp: '2025-01-01T00:00:00Z', calls: 5 },
+    ]
+
+    const result = aggregateLogsToMinuteBuckets(logs, BASE_MS, BASE_MS)
+    expect(result).toHaveLength(1)
+    expect(result[0].calls).toBe(5)
   })
 })
 
