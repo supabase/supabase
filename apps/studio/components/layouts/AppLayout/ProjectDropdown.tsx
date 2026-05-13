@@ -13,6 +13,7 @@ import { ProjectRowLink } from './ProjectRowLink'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import PartnerIcon from '@/components/ui/PartnerIcon'
+import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
@@ -73,12 +74,8 @@ function ProjectDropdownNewProjectActions({
   )
 }
 
-function ProjectDropdownNonPlatformView({ projectName }: { projectName: string }) {
-  return (
-    <Button type="text">
-      <span className="text-sm">{projectName}</span>
-    </Button>
-  )
+const ProjectDropdownNonPlatformView = ({ projectName }: { projectName: string }) => {
+  return <div className="text-sm px-3 py-1">{projectName}</div>
 }
 
 interface ProjectDropdownPlatformViewProps {
