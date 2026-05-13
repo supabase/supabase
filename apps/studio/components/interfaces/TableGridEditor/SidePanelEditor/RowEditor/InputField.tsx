@@ -123,10 +123,11 @@ export const InputField = ({
             <span className="text-sm text-foreground-lighter">
               {field.comment && '('}Has a foreign key relation to
             </span>
-            <span className="text-code font-mono text-xs text-foreground-lighter">
+            <br />
+            <code className="text-code-inline">
               {field.foreignKey.target_table_schema}.{field.foreignKey.target_table_name}.
               {field.foreignKey.target_column_name}
-            </span>
+            </code>
             {field.comment && <span className="text-sm text-foreground-lighter">{`)`}</span>}
           </>
         }
