@@ -3,6 +3,7 @@ export const SHORTCUT_REFERENCE_GROUPS = {
   NAVIGATION_DATABASE: 'navigation.database',
   NAVIGATION_AUTH: 'navigation.auth',
   NAVIGATION_STORAGE: 'navigation.storage',
+  NAVIGATION_FUNCTIONS: 'navigation.functions',
 } as const
 
 export const SHORTCUT_REFERENCE_GROUP_LABELS: Record<string, string> = {
@@ -10,6 +11,7 @@ export const SHORTCUT_REFERENCE_GROUP_LABELS: Record<string, string> = {
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_DATABASE]: 'Database Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_AUTH]: 'Auth Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_STORAGE]: 'Storage Navigation',
+  [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_FUNCTIONS]: 'Edge Functions Navigation',
 }
 
 export const SHORTCUT_REFERENCE_GROUP_ORDER = [
@@ -22,6 +24,8 @@ export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_STORAGE,
   'storage-buckets',
   'storage-explorer',
+  SHORTCUT_REFERENCE_GROUPS.NAVIGATION_FUNCTIONS,
+  'functions-list',
   'nav',
   'ai-assistant',
   'inline-editor',
