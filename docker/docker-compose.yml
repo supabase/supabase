@@ -570,9 +570,6 @@ services:
     container_name: supabase-vector
     image: timberio/vector:0.53.0-alpine
     restart: unless-stopped
-    depends_on:
-      analytics:
-        condition: service_healthy
     volumes:
       - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro,z
