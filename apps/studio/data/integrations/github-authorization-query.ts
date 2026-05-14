@@ -1,3 +1,7 @@
+/**
+ * GitHub Integration API queries
+ * Handles GitHub authorization and repository connections
+ */
 import { useQuery } from '@tanstack/react-query'
 
 import { integrationKeys } from './keys'
