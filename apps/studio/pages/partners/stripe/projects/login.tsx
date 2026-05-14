@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { LogOut } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Button } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
@@ -16,10 +16,7 @@ import {
 } from '@/components/layouts/InterstitialLayout'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-projects-confirm-mutation'
-import {
-  accountRequestQueryOptions,
-  type AccountRequestDetails,
-} from '@/data/partners/stripe-projects-query'
+import { accountRequestQueryOptions } from '@/data/partners/stripe-projects-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { useSignOut } from '@/lib/auth'
 import { BASE_PATH } from '@/lib/constants'
@@ -28,75 +25,12 @@ import { useProfileNameAndPicture } from '@/lib/profile'
 import type { NextPageWithLayout } from '@/types'
 
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize Stripe Projects', brand: 'Supabase' })
-const STRIPE_PROJECTS_MOCK_STATES = ['pending', 'linked', 'wrong-account', 'success'] as const
-
-type MockState = (typeof STRIPE_PROJECTS_MOCK_STATES)[number]
-
-const MOCK_RESPONSES = {
-  pending: {
-    id: 'mock',
-    email: 'jane@acmecorp.io',
-    email_matches: true,
-    status: 'pending',
-    expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
-    linked_organization: undefined,
-  },
-  linked: {
-    id: 'mock',
-    email: 'jane@acmecorp.io',
-    email_matches: true,
-    status: 'pending',
-    expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
-    linked_organization: { id: 42, name: 'Acme Corp', slug: 'acme-corp' },
-  },
-  'wrong-account': {
-    id: 'mock',
-    email: 'jane@acmecorp.io',
-    email_matches: false,
-    status: 'pending',
-    expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
-    linked_organization: undefined,
-  },
-  success: {
-    id: 'mock',
-    email: 'jane@acmecorp.io',
-    email_matches: true,
-    status: 'complete',
-    expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
-    linked_organization: undefined,
-  },
-} satisfies Record<MockState, AccountRequestDetails>
-
-const getMockState = (value: unknown): MockState | undefined => {
-  return typeof value === 'string' && STRIPE_PROJECTS_MOCK_STATES.includes(value as MockState)
-    ? (value as MockState)
-    : undefined
-}
-
-const isStripeProjectsMockPreviewEnabled = () => {
-  if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') return true
-  if (typeof window === 'undefined') return false
-
-  return window.location.hostname.endsWith('.vercel.app')
-}
 
 const StripeProjectsLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ar_id } = useParams()
   const signOut = useSignOut()
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
-  const mock =
-    router.isReady && isStripeProjectsMockPreviewEnabled()
-      ? getMockState(router.query.mock)
-      : undefined
-
-  const [mockConfirming, setMockConfirming] = useState(false)
-  const [mockConfirmed, setMockConfirmed] = useState(false)
-
-  useEffect(() => {
-    setMockConfirming(false)
-    setMockConfirmed(false)
-  }, [mock])
 
   const {
     data: accountRequest,
@@ -106,7 +40,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
     error,
   } = useQuery({
     ...accountRequestQueryOptions({ arId: ar_id }),
-    enabled: !mock && typeof ar_id !== 'undefined',
+    enabled: typeof ar_id !== 'undefined',
   })
 
   const {
@@ -117,36 +51,25 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (!router.isReady) return
-    if (mock) return
 
     if (!ar_id) {
       router.push('/404')
     }
-  }, [router.isReady, ar_id, mock, router])
+  }, [router.isReady, ar_id, router])
 
   const handleApprove = async () => {
-    if (mock) {
-      setMockConfirming(true)
-      setTimeout(() => {
-        setMockConfirming(false)
-        setMockConfirmed(true)
-      }, 1200)
-      return
-    }
-
     if (!ar_id || isConfirmationPending) return
     confirmAccountRequest({ arId: ar_id })
   }
 
-  const effectiveAccountRequest = mock ? MOCK_RESPONSES[mock] : accountRequest
-  const linkedOrg = effectiveAccountRequest?.linked_organization
-  const emailMatches = effectiveAccountRequest?.email_matches ?? false
-  const displayName = primaryEmail ?? username ?? effectiveAccountRequest?.email ?? ''
-  const isPending = mock ? false : router.isReady && isQueryPending
-  const isConfirmed = mock ? mock === 'success' || mockConfirmed : isConfirmationSuccess
-  const isConfirming = mock ? mockConfirming : isConfirmationPending
-  const isSuccess = mock ? mock !== 'success' : isQuerySuccess
-  const isError = mock ? false : isQueryError
+  const linkedOrg = accountRequest?.linked_organization
+  const emailMatches = accountRequest?.email_matches ?? false
+  const displayName = primaryEmail ?? username ?? accountRequest?.email ?? ''
+  const isPending = router.isReady && isQueryPending
+  const isConfirmed = isConfirmationSuccess
+  const isConfirming = isConfirmationPending
+  const isSuccess = isQuerySuccess
+  const isError = isQueryError
   const showAuthorizationState = isSuccess && !isConfirmed
   const interstitialDescription = isConfirmed
     ? undefined
@@ -157,12 +80,6 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
       <Head>
         <title>{PAGE_TITLE}</title>
       </Head>
-
-      {mock && (
-        <div className="fixed right-3 top-3 z-50 rounded-md border bg-warning-200 px-2 py-1 font-mono text-xs text-warning-1200">
-          mock: {mock}
-        </div>
-      )}
 
       <InterstitialLayout
         logo={
@@ -208,10 +125,8 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 description={
                   <>
                     You're signed in to a different account. Sign out and sign back in as{' '}
-                    <span className="font-medium text-foreground">
-                      {effectiveAccountRequest?.email}
-                    </span>
-                    . Then return to Stripe to restart the request.
+                    <span className="font-medium text-foreground">{accountRequest?.email}</span>.
+                    Then return to Stripe to restart the request.
                   </>
                 }
               />
