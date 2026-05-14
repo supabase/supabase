@@ -10,20 +10,20 @@ catalogs:
       specifier: ^10.26.0
       version: 10.27.0
     '@supabase/auth-js':
-      specifier: 2.105.4
-      version: 2.105.4
+      specifier: 2.105.5-beta.10
+      version: 2.105.5-beta.10
     '@supabase/postgrest-js':
-      specifier: 2.105.4
-      version: 2.105.4
+      specifier: 2.105.5-beta.10
+      version: 2.105.5-beta.10
     '@supabase/realtime-js':
-      specifier: 2.105.4
-      version: 2.105.4
+      specifier: 2.105.5-beta.10
+      version: 2.105.5-beta.10
     '@supabase/ssr':
       specifier: 0.10.2
       version: 0.10.2
     '@supabase/supabase-js':
-      specifier: 2.105.4
-      version: 2.105.4
+      specifier: 2.105.5-beta.10
+      version: 2.105.5-beta.10
     '@types/node':
       specifier: ^22.0.0
       version: 22.13.14
@@ -355,7 +355,7 @@ importers:
         version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2))
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@tanstack/react-query':
         specifier: ^5.13.4
         version: 5.83.0(react@18.3.1)
@@ -934,7 +934,7 @@ importers:
         version: 9.1.0
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@supabase/mcp-server-supabase':
         specifier: ^0.7.0
         version: 0.7.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)
@@ -943,7 +943,7 @@ importers:
         version: link:../../packages/pg-meta
       '@supabase/realtime-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@supabase/shared-types':
         specifier: 0.1.88
         version: 0.1.88
@@ -952,7 +952,7 @@ importers:
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@tanstack/react-hotkeys':
         specifier: ^0.9.1
         version: 0.9.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1379,7 +1379,7 @@ importers:
         version: 0.1.0
       '@supabase/postgrest-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@supabase/supa-mdx-lint':
         specifier: 0.2.6-alpha
         version: 0.2.6-alpha
@@ -1521,10 +1521,10 @@ importers:
         version: 1.6.0
       '@supabase/ssr':
         specifier: 'catalog:'
-        version: 0.10.2(@supabase/supabase-js@2.105.4)
+        version: 0.10.2(@supabase/supabase-js@2.105.5-beta.10)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@tanstack/react-router':
         specifier: ^1.168.0
         version: 1.168.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1635,10 +1635,10 @@ importers:
         version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.18(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.59.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2))
       '@supabase/ssr':
         specifier: 'catalog:'
-        version: 0.10.2(@supabase/supabase-js@2.105.4)
+        version: 0.10.2(@supabase/supabase-js@2.105.5-beta.10)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@vercel/og':
         specifier: ^0.6.2
         version: 0.6.2
@@ -1891,10 +1891,10 @@ importers:
     dependencies:
       '@supabase/ssr':
         specifier: 'catalog:'
-        version: 0.10.2(@supabase/supabase-js@2.105.4)
+        version: 0.10.2(@supabase/supabase-js@2.105.5-beta.10)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@vueuse/core':
         specifier: ^14.1.0
         version: 14.1.0(vue@3.5.30(typescript@6.0.2))
@@ -1940,7 +1940,7 @@ importers:
         version: 1.59.1
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       cross-fetch:
         specifier: ^4.1.0
         version: 4.1.0(encoding@0.1.13)
@@ -1968,7 +1968,7 @@ importers:
         version: 0.18.5
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       ai:
         specifier: 5.0.52
         version: 5.0.52(zod@3.25.76)
@@ -2059,10 +2059,10 @@ importers:
     dependencies:
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@types/dat.gui':
         specifier: ^0.7.12
         version: 0.7.12
@@ -2507,7 +2507,7 @@ importers:
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.105.4
+        version: 2.105.5-beta.10
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -7619,8 +7619,16 @@ packages:
     resolution: {integrity: sha512-Ejfa37M5xoIwoxVebxRahnwubPo8g22qkXQ4p50+N9MIvU9UZoN+A8dwVPtczzGf8oV/YXN80ZPxK4aWXuSN/A==}
     engines: {node: '>=20.0.0'}
 
+  '@supabase/auth-js@2.105.5-beta.10':
+    resolution: {integrity: sha512-Pk3cRsBSxNLVjfWWwaFsKIOnNaeGGT/orV6nGD6gPZkDhHopTj8c90ZRg5gnWS/uRiR+ouYrFf6DTmpMs1cFFg==}
+    engines: {node: '>=20.0.0'}
+
   '@supabase/functions-js@2.105.4':
     resolution: {integrity: sha512-JVNKbBft3Qkja+WlGaE026AJ2AH9K0UTsxsfvEIHgd4zFrBor4BYRCrYFrv9IDsvVqkF72wKDsODJl5GY/C4tA==}
+    engines: {node: '>=20.0.0'}
+
+  '@supabase/functions-js@2.105.5-beta.10':
+    resolution: {integrity: sha512-x4GzV3QrxE3gRGU7XVF6oL8XnKz1c6do3SUqbKDAnH9M3Dy5Yo3sc6v7Congt131pr/9LeXucYtFCPaMs+5cUg==}
     engines: {node: '>=20.0.0'}
 
   '@supabase/mcp-server-supabase@0.7.0':
@@ -7643,8 +7651,16 @@ packages:
     resolution: {integrity: sha512-SppIyLo/kTwIlz1qpv2HN1EQqBg0GVktrDDFsXygYROha3MgVn4rT7p5EjFHFqXQm2rdRGb/BI7bc+jr10m91w==}
     engines: {node: '>=20.0.0'}
 
+  '@supabase/postgrest-js@2.105.5-beta.10':
+    resolution: {integrity: sha512-9tRk2zSlQFaedCWn9Hm0+RgS/JmJIyInfruYnwqpbMXUADWxU89k2lLzEe6ioCusyIl6BnAheSkmNdo+GItGsg==}
+    engines: {node: '>=20.0.0'}
+
   '@supabase/realtime-js@2.105.4':
     resolution: {integrity: sha512-6ov6c59+8D9h7q4M4Gy/uDJlC0Akxl9/714Y+6vJ+Sijuc16TS/p5DwhfRCLNcIhNiej1gEt+CQUwsjiPt4PxQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@supabase/realtime-js@2.105.5-beta.10':
+    resolution: {integrity: sha512-z/HG7sBwku+Vy3FNGIO27K0Kd9GkSbmUDJhVSfOafVIvExegNjHx/ECU6SmOLgOjoa4tzgPDuKH9Ca60XUBWSQ==}
     engines: {node: '>=20.0.0'}
 
   '@supabase/shared-types@0.1.88':
@@ -7660,6 +7676,10 @@ packages:
 
   '@supabase/storage-js@2.105.4':
     resolution: {integrity: sha512-Jx+pzMP1Whjof2PWHoVBUA75/p7PQE9CqKBzn1oXVyJDOggMLSH2OzVWwsXYaxEpdC1K/KltwmOX44nL3LHl9g==}
+    engines: {node: '>=20.0.0'}
+
+  '@supabase/storage-js@2.105.5-beta.10':
+    resolution: {integrity: sha512-zUYtYGMOMyHUgjRCUYIV1JRYZLGrlFDMliuflahpQwkBthSPw6Oum+WOzRluHdR7x3mAH10+OTnbqFqJ+OLLNA==}
     engines: {node: '>=20.0.0'}
 
   '@supabase/supa-mdx-lint-darwin@0.2.6-alpha':
@@ -7799,6 +7819,10 @@ packages:
 
   '@supabase/supabase-js@2.105.4':
     resolution: {integrity: sha512-cEnx+k49knU+qdIP7rXwR6fqEXPHZs+74xFK1R0S8MgQ7v9tbePVdGxvO03n3bPympMdJWVLadARBfU4TgNHCQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@supabase/supabase-js@2.105.5-beta.10':
+    resolution: {integrity: sha512-6HBtJNRRF5BBx6Pw1jb7MSO7o4BVc+lIvhmM+b3TepMlixgEiB14rd8fXjTvDcA1BanOuP4Ow7vGZ0+tdj1e2g==}
     engines: {node: '>=20.0.0'}
 
   '@swc/helpers@0.5.15':
@@ -23815,7 +23839,15 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@supabase/auth-js@2.105.5-beta.10':
+    dependencies:
+      tslib: 2.8.1
+
   '@supabase/functions-js@2.105.4':
+    dependencies:
+      tslib: 2.8.1
+
+  '@supabase/functions-js@2.105.5-beta.10':
     dependencies:
       tslib: 2.8.1
 
@@ -23841,7 +23873,16 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  '@supabase/postgrest-js@2.105.5-beta.10':
+    dependencies:
+      tslib: 2.8.1
+
   '@supabase/realtime-js@2.105.4':
+    dependencies:
+      '@supabase/phoenix': 0.4.2
+      tslib: 2.8.1
+
+  '@supabase/realtime-js@2.105.5-beta.10':
     dependencies:
       '@supabase/phoenix': 0.4.2
       tslib: 2.8.1
@@ -23857,12 +23898,17 @@ snapshots:
       - encoding
       - supports-color
 
-  '@supabase/ssr@0.10.2(@supabase/supabase-js@2.105.4)':
+  '@supabase/ssr@0.10.2(@supabase/supabase-js@2.105.5-beta.10)':
     dependencies:
-      '@supabase/supabase-js': 2.105.4
+      '@supabase/supabase-js': 2.105.5-beta.10
       cookie: 1.0.2
 
   '@supabase/storage-js@2.105.4':
+    dependencies:
+      iceberg-js: 0.8.1
+      tslib: 2.8.1
+
+  '@supabase/storage-js@2.105.5-beta.10':
     dependencies:
       iceberg-js: 0.8.1
       tslib: 2.8.1
@@ -23970,6 +24016,14 @@ snapshots:
       '@supabase/postgrest-js': 2.105.4
       '@supabase/realtime-js': 2.105.4
       '@supabase/storage-js': 2.105.4
+
+  '@supabase/supabase-js@2.105.5-beta.10':
+    dependencies:
+      '@supabase/auth-js': 2.105.5-beta.10
+      '@supabase/functions-js': 2.105.5-beta.10
+      '@supabase/postgrest-js': 2.105.5-beta.10
+      '@supabase/realtime-js': 2.105.5-beta.10
+      '@supabase/storage-js': 2.105.5-beta.10
 
   '@swc/helpers@0.5.15':
     dependencies:
