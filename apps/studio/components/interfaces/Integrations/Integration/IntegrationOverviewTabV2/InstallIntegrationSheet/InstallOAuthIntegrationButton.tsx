@@ -26,12 +26,12 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
 
   const { data: apiKeys, isLoading: isApiKeysLoading } = useAPIKeysQuery(
     { projectRef, reveal: false },
-    { enabled: !!projectRef && requiresApiKeysCheck }
+    { enabled: requiresApiKeysCheck }
   )
 
   const { data: edgeFunctionSecrets, isPending: isEdgeFunctionSecretsLoading } = useSecretsQuery(
     { projectRef },
-    { enabled: !!projectRef && requiresEdgeFunctionSecretsCheck }
+    { enabled: requiresEdgeFunctionSecretsCheck }
   )
 
   const { mutate: installOAuthIntegration, isPending: isInstalling } =
@@ -58,17 +58,13 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
 
     if (integration.installIdentificationMethod === 'secret_key_prefix') {
       const prefix = integration.secretKeyPrefix
-      if (!prefix) return false
-      if (isApiKeysLoading || !apiKeys) return false
-
+      if (!prefix || isApiKeysLoading || !apiKeys) return false
       return apiKeys.some((k) => k.type === 'secret' && k.name.startsWith(prefix))
     }
 
     if (integration.installIdentificationMethod === 'edge_function_secret_name') {
       const secretName = integration.edgeFunctionSecretName
-      if (!secretName) return false
-      if (isEdgeFunctionSecretsLoading || !edgeFunctionSecrets) return false
-
+      if (!secretName || isEdgeFunctionSecretsLoading || !edgeFunctionSecrets) return false
       return edgeFunctionSecrets.some((secret) => secret.name === secretName)
     }
 
