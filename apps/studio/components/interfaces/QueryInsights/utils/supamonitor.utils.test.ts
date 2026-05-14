@@ -14,7 +14,7 @@ const makeSampleLog = (overrides: Partial<ParsedLogEntry> = {}): ParsedLogEntry 
   application_name: 'test_app',
   calls: 10,
   database_name: 'test_db',
-  query: 'SELECT 1',
+  query: safeSql`SELECT 1`,
   query_id: 1,
   total_exec_time: 100,
   total_plan_time: 20,
@@ -40,7 +40,7 @@ describe('parseSupamonitorLogs', () => {
 
   it('parses log entries preserving all fields', () => {
     const raw = [makeSampleLog()]
-    const result = parseSupamonitorLogs(raw)
+    const result = parseSupamonitorLogs(raw as any)
 
     expect(result).toHaveLength(1)
     expect(result[0]).toEqual({
@@ -68,7 +68,7 @@ describe('parseSupamonitorLogs', () => {
 
   it('handles multiple log entries', () => {
     const raw = [makeSampleLog(), makeSampleLog({ query: safeSql`SELECT 2`, query_id: 2 })]
-    const result = parseSupamonitorLogs(raw)
+    const result = parseSupamonitorLogs(raw as any)
     expect(result).toHaveLength(2)
   })
 })
