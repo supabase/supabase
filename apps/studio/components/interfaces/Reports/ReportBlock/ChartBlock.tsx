@@ -316,7 +316,7 @@ export const ChartBlock = ({
                     <ChartTooltipContent
                       className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => dayjs.utc(String(x)).format('DD MMM YYYY')}
                     />
                   }
                 />
@@ -343,7 +343,7 @@ export const ChartBlock = ({
                   content={
                     <ChartTooltipContent
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => dayjs.utc(String(x)).format('DD MMM YYYY')}
                     />
                   }
                 />
