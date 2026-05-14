@@ -100,7 +100,7 @@ export function transformLogsToChartData(parsedLogs: ParsedLogEntry[]): ChartDat
         cache_misses: 0,
       }
     })
-    .filter((item): item is NonNullable => item !== null)
+    .filter((item): item is ChartDataPoint => item !== null)
     .sort((a, b) => a.period_start - b.period_start)
 }
 

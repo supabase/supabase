@@ -9,7 +9,7 @@ import {
   transformLogsToChartData,
 } from './supamonitor.utils'
 
-const makeSampleLog = (overrides: Partial = {}): any => ({
+const makeSampleLog = (overrides: Partial<ParsedLogEntry> = {}): ParsedLogEntry => ({
   timestamp: '2025-01-01T00:00:00Z',
   application_name: 'test_app',
   calls: 10,
