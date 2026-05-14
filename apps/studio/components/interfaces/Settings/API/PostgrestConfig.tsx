@@ -246,7 +246,12 @@ export const PostgrestConfig = () => {
   }, [isReady])
 
   const watchedDbSchema = useWatch({ control: form.control, name: 'dbSchema' })
+  const watchedDbExtraSearchPath = useWatch({ control: form.control, name: 'dbExtraSearchPath' })
   const watchedTableIdsToAdd = useWatch({ control: form.control, name: 'tableIdsToAdd' })
+
+  const missingSchemas =
+    watchedDbExtraSearchPath?.filter((schema) => !watchedDbSchema.includes(schema)) ?? []
+  const hasSchemaDesync = missingSchemas.length > 0
   const watchedTableIdsToRemove = useWatch({
     control: form.control,
     name: 'tableIdsToRemove',
@@ -283,24 +288,33 @@ export const PostgrestConfig = () => {
                       label="Exposed schemas"
                       description="Select schemas to include in the Data API. Schemas must be included before tables can be exposed."
                     >
-                      <ExposedSchemaSelector
-                        selectedSchemas={watchedDbSchema}
-                        disabled={!canUpdatePostgrestConfig}
-                        onToggleSchema={(schema) => {
-                          const current = form.getValues('dbSchema')
-                          if (current.includes(schema)) {
-                            form.setValue(
-                              'dbSchema',
-                              current.filter((x) => x !== schema),
-                              { shouldDirty: true }
-                            )
-                          } else {
-                            form.setValue('dbSchema', [...current, schema], {
-                              shouldDirty: true,
-                            })
-                          }
-                        }}
-                      />
+                      <div className="flex flex-col gap-y-4 w-full">
+                        {hasSchemaDesync && (
+                          <Admonition
+                            type="warning"
+                            title="Configuration mismatch"
+                            description="Warning: You have schemas active in your Data API Hardening settings that are not listed here. This may cause PostgREST to fail. Please ensure both settings match."
+                          />
+                        )}
+                        <ExposedSchemaSelector
+                          selectedSchemas={watchedDbSchema}
+                          disabled={!canUpdatePostgrestConfig}
+                          onToggleSchema={(schema) => {
+                            const current = form.getValues('dbSchema')
+                            if (current.includes(schema)) {
+                              form.setValue(
+                                'dbSchema',
+                                current.filter((x) => x !== schema),
+                                { shouldDirty: true }
+                              )
+                            } else {
+                              form.setValue('dbSchema', [...current, schema], {
+                                shouldDirty: true,
+                              })
+                            }
+                          }}
+                        />
+                      </div>
                     </FormItemLayout>
 
                     <FormItemLayout
