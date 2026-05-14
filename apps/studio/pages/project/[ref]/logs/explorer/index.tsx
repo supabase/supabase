@@ -105,6 +105,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     []
   )
 
+  const [useOtelEndpoint, setUseOtelEndpoint] = useLocalStorage<boolean>(
+    `logs-explorer-use-otel-endpoint-${projectRef}`,
+    false
+  )
+
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
@@ -136,7 +141,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       iso_timestamp_start: resolvedRange.from,
       iso_timestamp_end: resolvedRange.to,
     },
-    true
+    true,
+    { useOtel: useOtelEndpoint }
   )
 
   const results = logData
@@ -194,7 +200,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     addRecentLogSqlSnippet({ sql: template.searchString })
   }
 
-  const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
+  const handleRun = (value?: string | React.MouseEvent) => {
     track('log_explorer_query_run_button_clicked', { is_saved_query: !!queryId })
 
     const query = typeof value === 'string' ? value || editorValue : editorValue
@@ -379,6 +385,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
+            useOtel={useOtelEndpoint}
+            onUseOtelChange={setUseOtelEndpoint}
           />
           <ShimmerLine active={isLoading} />
           <CodeEditor

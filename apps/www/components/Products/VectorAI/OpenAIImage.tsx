@@ -278,7 +278,7 @@ const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
 
   return (
     <>
-      <div className="w-[44%] h-[44%] -translate-x-[2px] absolute z-10 inset-0 top-auto bottom-[16%] m-auto">
+      <div className="w-[44%] h-[44%] translate-x-[-2px] absolute z-10 inset-0 top-auto bottom-[16%] m-auto">
         <Image
           src={
             resolvedTheme?.includes('dark')

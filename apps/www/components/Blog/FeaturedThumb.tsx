@@ -35,7 +35,7 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
         href={`${blog.path}`}
         className="grid gap-4 lg:grid-cols-7 lg:gap-8 xl:gap-12 hover:bg-surface-200 dark:hover:bg-surface-75 p-2 sm:p-4 rounded-xl"
       >
-        <div className="relative w-full aspect-[2/1] lg:col-span-3 lg:aspect-[3/2] overflow-auto rounded-lg border">
+        <div className="relative w-full aspect-2/1 lg:col-span-3 lg:aspect-3/2 overflow-auto rounded-lg border">
           <Image
             src={imageUrl}
             fill
@@ -53,7 +53,7 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
           </div>
 
           <div>
-            <h2 className="h2 lg:!text-2xl xl:!text-3xl !mb-2">{blog.title}</h2>
+            <h2 className="h2 lg:text-2xl! xl:text-3xl! mb-2!">{blog.title}</h2>
             <p className="p xl:text-lg">{blog.description}</p>
           </div>
 

@@ -48,7 +48,7 @@ const FeaturesSection = ({
         </div>
       </div>
       {content && (
-        <div className="col-span-full lg:col-start-6 lg:col-span-7 prose !max-w-none text-foreground-light">
+        <div className="col-span-full lg:col-start-6 lg:col-span-7 prose max-w-none! text-foreground-light">
           <ReactMarkdown>{content}</ReactMarkdown>
         </div>
       )}

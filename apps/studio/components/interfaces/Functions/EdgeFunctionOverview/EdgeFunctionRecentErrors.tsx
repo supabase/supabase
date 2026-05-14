@@ -343,7 +343,7 @@ export const EdgeFunctionRecentErrors = ({
                                         )}
                                         <span
                                           className={cn(
-                                            'flex-1 break-words whitespace-pre-wrap',
+                                            'flex-1 wrap-break-word whitespace-pre-wrap',
                                             isError ? 'text-destructive' : 'text-foreground-light'
                                           )}
                                         >

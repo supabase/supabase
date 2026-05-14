@@ -1,3 +1,16 @@
+import { SHORTCUT_REFERENCE_GROUPS } from './referenceGroups'
+import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
+import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
+import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
+import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
+import {
+  SCHEMA_VISUALIZER_SHORTCUT_IDS,
+  schemaVisualizerRegistry,
+} from './registry/schema-visualizer'
+import { SQL_EDITOR_SHORTCUT_IDS, sqlEditorRegistry } from './registry/sql-editor'
+import { STORAGE_BUCKETS_SHORTCUT_IDS, storageBucketsRegistry } from './registry/storage-buckets'
+import { STORAGE_EXPLORER_SHORTCUT_IDS, storageExplorerRegistry } from './registry/storage-explorer'
+import { STORAGE_NAV_SHORTCUT_IDS, storageNavRegistry } from './registry/storage-nav'
 import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
 import { ShortcutDefinition } from './types'
 
@@ -49,6 +62,30 @@ export const SHORTCUT_IDS = {
 
   // Table editor shortcuts
   ...TABLE_EDITOR_SHORTCUT_IDS,
+
+  // SQL editor shortcuts
+  ...SQL_EDITOR_SHORTCUT_IDS,
+
+  // Schema visualizer shortcuts
+  ...SCHEMA_VISUALIZER_SHORTCUT_IDS,
+
+  // Shared list-page shortcuts (database/* listing pages, etc.)
+  ...LIST_PAGE_SHORTCUT_IDS,
+
+  // Database sub-page navigation chords
+  ...DATABASE_NAV_SHORTCUT_IDS,
+
+  // Auth users page shortcuts
+  ...AUTH_USERS_SHORTCUT_IDS,
+  // Auth sub-page navigation chords
+  ...AUTH_NAV_SHORTCUT_IDS,
+
+  // Storage sub-page navigation chords
+  ...STORAGE_NAV_SHORTCUT_IDS,
+  // Storage Files (bucket list) page shortcuts
+  ...STORAGE_BUCKETS_SHORTCUT_IDS,
+  // Storage Explorer (file browser) shortcuts
+  ...STORAGE_EXPLORER_SHORTCUT_IDS,
 } as const
 
 /**
@@ -178,114 +215,133 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     label: 'Go to Project Overview',
     sequence: ['G', 'H'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_TABLE_EDITOR]: {
     id: SHORTCUT_IDS.NAV_TABLE_EDITOR,
     label: 'Go to Table Editor',
     sequence: ['G', 'T'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_SQL_EDITOR]: {
     id: SHORTCUT_IDS.NAV_SQL_EDITOR,
     label: 'Go to SQL Editor',
     sequence: ['G', 'S'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_DATABASE]: {
     id: SHORTCUT_IDS.NAV_DATABASE,
     label: 'Go to Database',
     sequence: ['G', 'D'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_AUTH]: {
     id: SHORTCUT_IDS.NAV_AUTH,
     label: 'Go to Authentication',
     sequence: ['G', 'A'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_STORAGE]: {
     id: SHORTCUT_IDS.NAV_STORAGE,
     label: 'Go to Storage',
     sequence: ['G', 'B'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_FUNCTIONS]: {
     id: SHORTCUT_IDS.NAV_FUNCTIONS,
     label: 'Go to Edge Functions',
     sequence: ['G', 'F'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_REALTIME]: {
     id: SHORTCUT_IDS.NAV_REALTIME,
     label: 'Go to Realtime',
     sequence: ['G', 'R'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ADVISORS]: {
     id: SHORTCUT_IDS.NAV_ADVISORS,
     label: 'Go to Advisors',
     sequence: ['G', 'V'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_OBSERVABILITY]: {
     id: SHORTCUT_IDS.NAV_OBSERVABILITY,
     label: 'Go to Observability',
     sequence: ['G', 'U'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_LOGS]: {
     id: SHORTCUT_IDS.NAV_LOGS,
     label: 'Go to Logs',
     sequence: ['G', 'L'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_INTEGRATIONS]: {
     id: SHORTCUT_IDS.NAV_INTEGRATIONS,
     label: 'Go to Integrations',
     sequence: ['G', 'I'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_SETTINGS]: {
     id: SHORTCUT_IDS.NAV_SETTINGS,
     label: 'Go to Project Settings',
     sequence: ['G', ','],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_PROJECTS]: {
     id: SHORTCUT_IDS.NAV_ORG_PROJECTS,
     label: 'Go to Projects',
     sequence: ['G', 'P'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_TEAM]: {
     id: SHORTCUT_IDS.NAV_ORG_TEAM,
     label: 'Go to Team',
     sequence: ['G', 'M'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_INTEGRATIONS]: {
     id: SHORTCUT_IDS.NAV_ORG_INTEGRATIONS,
     label: 'Go to Organization Integrations',
     sequence: ['G', 'I'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_USAGE]: {
     id: SHORTCUT_IDS.NAV_ORG_USAGE,
     label: 'Go to Usage',
     sequence: ['G', 'U'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_BILLING]: {
     id: SHORTCUT_IDS.NAV_ORG_BILLING,
     label: 'Go to Billing',
     sequence: ['G', 'B'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.NAV_ORG_SETTINGS]: {
     id: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     label: 'Go to Organization Settings',
     sequence: ['G', 'O'],
     showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
   [SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE]: {
     id: SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
@@ -297,4 +353,28 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Table editor shortcut registration
   ...tableEditorRegistry,
+
+  // SQL editor shortcut registration
+  ...sqlEditorRegistry,
+
+  // Schema visualizer shortcut registration
+  ...schemaVisualizerRegistry,
+
+  // Shared list-page shortcut registration
+  ...listPageRegistry,
+
+  // Database sub-page navigation chord registration
+  ...databaseNavRegistry,
+
+  // Auth users page shortcut registration
+  ...authUsersRegistry,
+  // Auth sub-page navigation chord registration
+  ...authNavRegistry,
+
+  // Storage sub-page navigation chord registration
+  ...storageNavRegistry,
+  // Storage Files (bucket list) page shortcut registration
+  ...storageBucketsRegistry,
+  // Storage Explorer (file browser) shortcut registration
+  ...storageExplorerRegistry,
 }

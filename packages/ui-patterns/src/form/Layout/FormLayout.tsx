@@ -227,7 +227,7 @@ const FlexContainer = cva('', {
     {
       layout: 'flex-row-reverse',
       className:
-        'flex flex-col justify-center items-start md:items-end shrink-0 md:w-1/2 xl:w-2/5 md:min-w-100 [&>div]:md:w-full',
+        'flex flex-col justify-center items-start md:items-end shrink-0 md:w-1/2 xl:w-2/5 [&>div]:md:w-full',
     },
   ],
 })
@@ -286,6 +286,7 @@ export const FormLayout = React.forwardRef<
       nonBoxInput = !label,
       hideMessage = false,
       isReactForm,
+      error,
       ...props
     },
     ref
@@ -301,6 +302,10 @@ export const FormLayout = React.forwardRef<
           )}
           data-formlayout-id="message"
         />
+      ) : error && !hideMessage ? (
+        <p className={cn('mt-2 text-sm text-destructive', layout === 'flex-row-reverse' && 'mt-0')}>
+          {error}
+        </p>
       ) : null
 
     const renderDescription =
@@ -365,7 +370,7 @@ export const FormLayout = React.forwardRef<
             >
               {hasLabel && isReactForm ? (
                 <FormLabel
-                  className="text-foreground flex gap-2 items-center break-words"
+                  className="text-foreground flex gap-2 items-center wrap-break-word"
                   data-formlayout-id="formLabel"
                   htmlFor={props.name || id}
                 >
@@ -373,7 +378,7 @@ export const FormLayout = React.forwardRef<
                 </FormLabel>
               ) : (
                 <Label_Shadcn_
-                  className="text-foreground flex gap-2 items-center break-words leading-normal"
+                  className="text-foreground flex gap-2 items-center wrap-break-word leading-normal"
                   data-formlayout-id="label"
                   htmlFor={props.name || id}
                 >

@@ -4,10 +4,12 @@ import dayjs from 'dayjs'
 import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,6 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 
 import {
   ERROR_STATES,
@@ -48,7 +51,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) =>
 
   return (
     <>
-      <div className="flex flex-col rounded bg-surface-100 border border-default">
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
         <div
           className="flex items-start justify-between p-3 gap-x-4"
           style={{ width: NODE_WIDTH / 2 - 10 }}
@@ -114,7 +117,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
         className={!hasLoadBalancer ? 'opacity-0' : ''}
         style={{ background: 'transparent' }}
       />
-      <div className="flex flex-col rounded bg-surface-100 border border-default">
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
         <div
           className="flex items-start justify-between p-3"
           style={{ width: NODE_WIDTH / 2 - 10 }}
@@ -129,7 +132,19 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
                 <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-sm text-foreground-light">{region.region}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="text-sm transition text-foreground-light hover:text-foreground"
+                      onClick={async () =>
+                        await copyToClipboard(region.region, () => toast('Copied project region'))
+                      }
+                    >
+                      {region.region}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Click to copy</TooltipContent>
+                </Tooltip>
                 {projectHomepageShowInstanceSize && (
                   <>
                     <span className="text-sm text-foreground-lighter">·</span>
@@ -141,7 +156,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
           </div>
           <img
             alt="region icon"
-            className="w-8 rounded-sm mt-0.5"
+            className="w-8 rounded-xs mt-0.5"
             src={`${BASE_PATH}/img/regions/${region.region}.svg`}
           />
         </div>
@@ -165,7 +180,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
               className="border-t px-3 py-2 hover:bg-surface-200 transition flex items-center gap-x-3 text-xs"
             >
               {metricsLoading ? (
-                <div className="h-3 w-44 rounded bg-surface-300 animate-pulse" />
+                <div className="h-3 w-44 rounded-sm bg-surface-300 animate-pulse" />
               ) : metricsError ? (
                 <span className="text-foreground-lighter">Metrics unavailable</span>
               ) : (
@@ -256,7 +271,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
     <>
       <Handle type="target" position={Position.Top} style={{ background: 'transparent' }} />
       <div
-        className="flex justify-between items-start rounded bg-surface-100 border border-default p-3"
+        className="flex justify-between items-start rounded-sm bg-surface-100 border border-default p-3"
         style={{ width: NODE_WIDTH / 2 - 10 }}
       >
         <div className="flex gap-x-3">
@@ -318,7 +333,19 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
             <div className="my-0.5">
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
-                <span>{region.region}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="text-sm transition text-foreground-light hover:text-foreground"
+                      onClick={async () =>
+                        await copyToClipboard(region.region, () => toast('Copied replica region'))
+                      }
+                    >
+                      {region.region}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Click to copy</TooltipContent>
+                </Tooltip>
                 {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span className="text-foreground-lighter">·</span>
@@ -333,7 +360,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
                   <div className="w-56">
                     <SparkBar
                       labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
-                      labelBottomClass="text-xs !normal-nums text-foreground-light"
+                      labelBottomClass="text-xs normal-nums! text-foreground-light"
                       type="horizontal"
                       value={stagePercent * 100}
                       max={100}
@@ -366,7 +393,10 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
                 Error: {ERROR_STATES[error as keyof typeof ERROR_STATES]}
               </p>
             ) : (
-              <p className="text-sm text-foreground-light">Created: {created}</p>
+              <p className="text-sm text-foreground-light">
+                Created:{' '}
+                <TimestampInfo className="text-sm" utcTimestamp={inserted_at} label={created} />
+              </p>
             )}
           </div>
         </div>
@@ -404,13 +434,13 @@ export const RegionNode = ({ data }: any) => {
 
   return (
     <div
-      className="relative flex justify-between rounded bg-black/10 border border-default border-white/10 border-2 p-3"
+      className="relative flex justify-between rounded-sm bg-black/10 border border-default border-white/10 border-2 p-3"
       style={{ width: regionNodeWidth, height: 162 }}
     >
       <div className="absolute bottom-2 flex items-center justify-between gap-x-2">
         <img
           alt="region icon"
-          className="w-5 rounded-sm"
+          className="w-5 rounded-xs"
           src={`${BASE_PATH}/img/regions/${region.region}.svg`}
         />
         <p className="text-sm">{region.name}</p>

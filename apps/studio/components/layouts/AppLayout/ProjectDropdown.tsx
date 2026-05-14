@@ -2,8 +2,8 @@ import { useParams } from 'common'
 import { Box, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import type { ComponentProps } from 'react'
+import { useState } from 'react'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
@@ -21,6 +21,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ManagedBy } from '@/lib/constants/infrastructure'
+import { useTrack } from '@/lib/telemetry/track'
 
 // --- Sub-components ---
 
@@ -72,12 +73,8 @@ function ProjectDropdownNewProjectActions({
   )
 }
 
-function ProjectDropdownNonPlatformView({ projectName }: { projectName: string }) {
-  return (
-    <Button type="text">
-      <span className="text-sm">{projectName}</span>
-    </Button>
-  )
+const ProjectDropdownNonPlatformView = ({ projectName }: { projectName: string }) => {
+  return <div className="text-sm px-3 py-1">{projectName}</div>
 }
 
 interface ProjectDropdownPlatformViewProps {
@@ -140,6 +137,7 @@ export const ProjectDropdown = ({
   const selectedProject = parentProject ?? project
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
+  const track = useTrack()
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
@@ -153,7 +151,12 @@ export const ProjectDropdown = ({
     if (!embedded) return <ShimmeringLoader className="p-2 md:mr-2 md:w-[90px]" />
   }
 
-  const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen
+  const handleSetOpen = embedded
+    ? (_value: boolean) => onClose?.()
+    : (next: boolean) => {
+        if (next) track('header_project_dropdown_opened')
+        setOpen(next)
+      }
 
   const selectorProps = {
     open,

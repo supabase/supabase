@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Pause } from 'lucide-react'
+import { CirclePause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -86,7 +86,7 @@ const PauseProjectButton = () => {
     <>
       <ButtonTooltip
         type="default"
-        icon={<Pause />}
+        icon={<CirclePause />}
         onClick={() => setIsModalOpen(true)}
         loading={isPausing}
         disabled={buttonDisabled}
@@ -105,8 +105,8 @@ const PauseProjectButton = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Pause project?</AlertDialogTitle>
             <AlertDialogDescription>
-              This project will be unavailable while paused. Your data stays safe, and you can
-              resume it later from the dashboard while it remains within the restore window.
+              This project will be unavailable while paused. Paused projects can be resumed for 90
+              days. After that, backups remain available to download.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

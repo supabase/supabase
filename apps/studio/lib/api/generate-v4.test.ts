@@ -57,7 +57,7 @@ test('generateV4 calls the tool sanitizer', async () => {
   vi.mock('@/lib/ai/model', () => ({
     getModel: vi.fn().mockResolvedValue({
       modelParams: { model: {} },
-      promptProviderOptions: {},
+      systemProviderOptions: {},
     }),
   }))
 

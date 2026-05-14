@@ -128,11 +128,11 @@ const logos = [
 const LogosRow: React.FC<{ className?: string }> = ({ className }) => (
   <div className={cn(className)} suppressHydrationWarning>
     {logos.map((logo) => (
-      <div key={`logos-group-${logo.name}`} className="h-12 lg:h-12 w-max !inline-block">
+      <div key={`logos-group-${logo.name}`} className="h-12 lg:h-12 w-max inline-block!">
         <img
           src={logo.image}
           alt={logo.alt}
-          className={'h-12 lg:h-12 !min-h-12 lg:!min-h-12 w-auto block'}
+          className={'h-12 lg:h-12 min-h-12! lg:min-h-12! w-auto block'}
           draggable={false}
         />
       </div>

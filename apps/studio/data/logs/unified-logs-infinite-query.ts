@@ -1,7 +1,10 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
   PageParam,
   QuerySearchParamsType,
@@ -47,7 +50,12 @@ export const getUnifiedLogsISOStartEnd = (
 }
 
 export async function getUnifiedLogs(
-  { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam: PageParam | null },
+  {
+    projectRef,
+    search,
+    pageParam,
+    useOtel = false,
+  }: UnifiedLogsVariables & { pageParam: PageParam | null; useOtel?: boolean },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -74,7 +82,8 @@ export async function getUnifiedLogs(
    */
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
-  const sql = `${getUnifiedLogsQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
+  const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
+  const sql = `${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
 
   const cursorValue = pageParam?.cursor
   const cursorDirection = pageParam?.direction
@@ -85,17 +94,21 @@ export async function getUnifiedLogs(
     // Live mode: fetch logs newer than the cursor
     timestampEnd = new Date().toISOString()
   } else if (cursorDirection === 'next') {
-    // Regular pagination: fetch logs older than the cursor
-    timestampEnd = cursorValue
-      ? new Date(Number(cursorValue) / 1000).toISOString()
-      : isoTimestampEnd
+    // Regular pagination: fetch logs older than the cursor.
+    // The cursor is stored as milliseconds (set below from `date.getTime()`),
+    // so we can convert it directly without worrying about the wire format.
+    timestampEnd =
+      cursorValue !== null && cursorValue !== undefined
+        ? new Date(Number(cursorValue)).toISOString()
+        : isoTimestampEnd
   } else {
     timestampEnd = isoTimestampEnd
   }
 
   let headers = new Headers(headersInit)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+  const endpoint = logsAllEndpointUrl(useOtel)
+  const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: timestampEnd, sql },
     signal,
@@ -107,8 +120,16 @@ export async function getUnifiedLogs(
   const resultData = data?.result ?? []
 
   const result = resultData.map((row: any) => {
-    // Create a date object for display purposes
-    const date = new Date(Number(row.timestamp) / 1000)
+    // Disambiguate timestamp shape by format, not by Number.isFinite — a
+    // numeric string of microseconds is always finite, so checking finite-
+    // ness can't tell us whether the value is microseconds or already-ms.
+    // ISO-like strings contain `T` or `-` and are parsed via Date; anything
+    // else is treated as numeric microseconds-since-epoch.
+    const ts = String(row.timestamp ?? '')
+    const looksLikeIso = /[T-]/.test(ts)
+    const date = looksLikeIso
+      ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
+      : new Date(Number(ts) / 1000)
 
     return {
       id: row.id,
@@ -135,11 +156,10 @@ export async function getUnifiedLogs(
   const lastRow = result.length > 0 ? result[result.length - 1] : null
   const hasMore = result.length >= LOGS_PAGE_LIMIT - 1
 
-  const nextCursor = lastRow ? lastRow.timestamp : null
-  // FIXED: Always provide prevCursor like DataTableDemo does
-  // This ensures live mode never breaks the infinite query chain
-  // DataTableDemo uses milliseconds, but our timestamps are in microseconds
-  const prevCursor = result.length > 0 ? firstRow!.timestamp : new Date().getTime() * 1000
+  // Cursors are stored as milliseconds (Date.getTime()) so the OTEL endpoint's
+  // wire format (ISO string vs numeric microseconds) doesn't bleed into pagination.
+  const nextCursor = lastRow ? lastRow.date.getTime() : null
+  const prevCursor = firstRow ? firstRow.date.getTime() : new Date().getTime()
 
   return {
     data: result,
@@ -161,10 +181,11 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     PageParam | null
   > = {}
 ) => {
+  const useOtel = useFlag('otelUnifiedLogs')
   return useInfiniteQuery({
-    queryKey: logsKeys.unifiedLogsInfinite(projectRef, search),
+    queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal, pageParam }) => {
-      return getUnifiedLogs({ projectRef, search, pageParam }, signal)
+      return getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal)
     },
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,

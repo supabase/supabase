@@ -393,8 +393,8 @@ export const PostgrestConfig = () => {
                           <FormItem>
                             <FormItemLayout
                               layout="flex-row-reverse"
-                              label="Automatically expose new tables and functions"
-                              description="Grants privileges to Data API roles by default, exposing new tables and functions. We recommend disabling this to control access manually."
+                              label="Automatically expose new tables"
+                              description="Grants privileges to Data API roles by default, exposing new tables. We recommend disabling this to control access manually."
                             >
                               <FormControl>
                                 <div>

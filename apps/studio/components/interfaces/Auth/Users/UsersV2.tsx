@@ -1,5 +1,5 @@
-import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
+import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -42,6 +43,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { SortDropdown } from './SortDropdown'
+import { useAuthUsersShortcuts } from './useAuthUsersShortcuts'
 import { UserPanel } from './UserPanel'
 import type { SpecificFilterColumn } from './Users.constants'
 import {
@@ -74,6 +76,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -87,6 +90,7 @@ order by timestamp desc
 limit 100`
 
 export const UsersV2 = () => {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const {
@@ -95,7 +99,10 @@ export const UsersV2 = () => {
     isError: isProjectError,
   } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+
   const gridRef = useRef<DataGridHandle>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const xScroll = useRef<number>(0)
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -187,10 +194,10 @@ export const UsersV2 = () => {
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
   const [showFreeformWarning, setShowFreeformWarning] = useState(false)
   const [showCreateIndexesModal, setShowCreateIndexesModal] = useState(false)
+  const [search, setSearch] = useState(filterKeywords)
 
   const { data: totalUsersCountData, isSuccess: isCountLoaded } = useUsersCountQuery(
     {
@@ -356,6 +363,22 @@ export const UsersV2 = () => {
     setSortByValue(value)
   }
 
+  const onSelectImpersonateUser = async (user: User, destination: 'sql' | 'table-editor') => {
+    await roleImpersonationState.setRole({
+      type: 'postgrest',
+      role: 'authenticated',
+      userType: 'native',
+      user,
+      aal: 'aal1',
+    })
+
+    if (destination === 'sql') {
+      router.push(`/project/${projectRef}/sql`)
+    } else {
+      router.push(`/project/${projectRef}/editor`)
+    }
+  }
+
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
     xScroll.current = event.currentTarget.scrollLeft
@@ -432,6 +455,28 @@ export const UsersV2 = () => {
     }
   }
 
+  const handleRefresh = () => {
+    refetch()
+    sendEvent({
+      action: 'auth_users_search_submitted',
+      properties: {
+        trigger: 'refresh_button',
+        ...telemetryProps,
+      },
+      groups: telemetryGroups,
+    })
+  }
+
+  const { onCellKeyDown, showDeleteModal, setShowDeleteModal } = useAuthUsersShortcuts({
+    gridRef,
+    searchInputRef,
+    users,
+    selectedUsers,
+    setSelectedUsers,
+    setSearch,
+    onRefresh: handleRefresh,
+  })
+
   useEffect(() => {
     if (
       !isRefetching &&
@@ -446,6 +491,7 @@ export const UsersV2 = () => {
         visibleColumns: selectedColumns,
         setSortByValue: updateSortByValue,
         onSelectDeleteUser: setSelectedUserToDelete,
+        onSelectImpersonateUser,
       })
       setColumns(columns)
       if (columns.length < userTableColumns.length) {
@@ -485,7 +531,7 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0 border-b" title="Users" />
+        <FormHeader className="py-4 px-6 mb-0! border-b" title="Users" />
 
         {showImprovedSearchOptIn && (
           <Alert_Shadcn_ className="rounded-none mb-0 border-0 relative">
@@ -556,6 +602,9 @@ export const UsersV2 = () => {
             <>
               <div className="flex flex-wrap items-center gap-2">
                 <UsersSearch
+                  ref={searchInputRef}
+                  search={search}
+                  setSearch={setSearch}
                   improvedSearchEnabled={improvedSearchEnabled}
                   telemetryProps={telemetryProps}
                   telemetryGroups={telemetryGroups}
@@ -592,7 +641,7 @@ export const UsersV2 = () => {
                       <SelectTrigger_Shadcn_
                         size="tiny"
                         className={cn(
-                          'w-[140px] !bg-transparent',
+                          'w-[140px] bg-transparent!',
                           filterUserType === 'all' && 'border-dashed'
                         )}
                       >
@@ -685,6 +734,7 @@ export const UsersV2 = () => {
                       visibleColumns: value,
                       setSortByValue: updateSortByValue,
                       onSelectDeleteUser: setSelectedUserToDelete,
+                      onSelectImpersonateUser,
                     })
 
                     setSelectedColumns(value)
@@ -725,17 +775,7 @@ export const UsersV2 = () => {
                   type="default"
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
-                  onClick={() => {
-                    refetch()
-                    sendEvent({
-                      action: 'auth_users_search_submitted',
-                      properties: {
-                        trigger: 'refresh_button',
-                        ...telemetryProps,
-                      },
-                      groups: telemetryGroups,
-                    })
-                  }}
+                  onClick={handleRefresh}
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
                 />
                 <AddUserDropdown />
@@ -762,7 +802,7 @@ export const UsersV2 = () => {
                   const isSelected = row.id === selectedUser
                   return [
                     `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                     '[&>.rdg-cell:first-child>div]:ml-4',
                   ].join(' ')
                 }}
@@ -774,6 +814,7 @@ export const UsersV2 = () => {
                     toast(`Only up to ${MAX_BULK_DELETE} users can be selected at a time`)
                   } else setSelectedUsers(rows)
                 }}
+                onCellKeyDown={onCellKeyDown}
                 onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
                 onColumnsReorder={(source, target) => {
                   const sourceIdx = columns.findIndex((col) => col.key === source)

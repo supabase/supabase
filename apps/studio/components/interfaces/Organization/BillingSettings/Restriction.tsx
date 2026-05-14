@@ -107,7 +107,7 @@ export const Restriction = () => {
           <AlertTitle_Shadcn_>Your grace period has started.</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             <p className="leading-tight">
-              Your organization is over its quota
+              Your organization went over its quota in the previous billing cycle
               {violationLabels && ` ${violationLabels}`}. You can continue with your projects until
               your grace period ends on{' '}
               <span className="text-foreground">

@@ -5,8 +5,9 @@ import type {
   UpdateOAuthClientParams,
 } from '@supabase/supabase-js'
 import { useParams } from 'common'
-import { Trash2, Upload, X } from 'lucide-react'
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { Storage } from 'icons'
+import { ImageOff, Trash2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -18,6 +19,11 @@ import {
   FormField,
   FormLabel,
   Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   Separator,
   Sheet,
   SheetClose,
@@ -34,6 +40,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
 
+import { LogoPicker } from './LogoPicker'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
@@ -62,6 +69,9 @@ const FormSchema = z.object({
     .array()
     .min(1, 'At least one redirect URI is required'),
   client_type: z.enum(['public', 'confidential']).default('confidential'),
+  token_endpoint_auth_method: z
+    .enum(['client_secret_basic', 'client_secret_post', 'none'])
+    .default('client_secret_basic'),
   client_id: z.string().optional(),
   client_secret: z.string().optional(),
   logo_uri: z.string().optional(),
@@ -74,6 +84,7 @@ const initialValues = {
   type: 'manual' as const,
   redirect_uris: [{ value: '' }],
   client_type: 'confidential' as const,
+  token_endpoint_auth_method: 'client_secret_basic' as const,
   client_id: '',
   client_secret: '',
   logo_uri: '',
@@ -86,12 +97,10 @@ export const CreateOrUpdateOAuthAppSheet = ({
   onCancel,
 }: CreateOrUpdateOAuthAppSheetProps) => {
   const { ref: projectRef } = useParams()
-  const uploadButtonRef = useRef<HTMLInputElement>(null)
 
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
-  const [logoFile, setLogoFile] = useState<File>()
+  const [storagePickerOpen, setStoragePickerOpen] = useState(false)
   const [logoUrl, setLogoUrl] = useState<string>()
-  const [logoRemoved, setLogoRemoved] = useState(false)
 
   const isEditMode = !!appToEdit
   const hasLogo = logoUrl !== undefined
@@ -128,9 +137,13 @@ export const CreateOrUpdateOAuthAppSheet = ({
     })
 
   useEffect(() => {
+    if (!visible) {
+      setStoragePickerOpen(false)
+    }
+  }, [visible])
+
+  useEffect(() => {
     if (visible) {
-      setLogoFile(undefined)
-      setLogoRemoved(false)
       if (appToEdit) {
         form.reset({
           name: appToEdit.client_name,
@@ -140,6 +153,11 @@ export const CreateOrUpdateOAuthAppSheet = ({
               ? appToEdit.redirect_uris.map((uri) => ({ value: uri }))
               : [{ value: '' }],
           client_type: appToEdit.client_type,
+          token_endpoint_auth_method:
+            (appToEdit.token_endpoint_auth_method as
+              | 'client_secret_basic'
+              | 'client_secret_post'
+              | 'none') || 'client_secret_basic',
           client_id: appToEdit.client_id,
           client_secret: '****************************************************************',
           logo_uri: appToEdit.logo_uri || undefined,
@@ -152,42 +170,20 @@ export const CreateOrUpdateOAuthAppSheet = ({
     }
   }, [visible, appToEdit, form])
 
-  const onFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    event.persist()
-    const files = event.target.files
-    if (files && files.length > 0) {
-      const file = files[0]
-      setLogoFile(file)
-      setLogoUrl(URL.createObjectURL(file))
-      setLogoRemoved(false)
-      event.target.value = ''
-    }
-  }
-
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const validRedirectUris = data.redirect_uris
       .map((uri) => uri.value.trim())
       .filter((uri) => uri !== '')
 
-    let uploadedLogoUri: string | undefined = undefined
-
-    if (logoRemoved) {
-      uploadedLogoUri = ''
-    } else if (logoFile) {
-      const reader = new FileReader()
-      uploadedLogoUri = await new Promise<string>((resolve) => {
-        reader.onloadend = () => resolve(reader.result as string)
-        reader.readAsDataURL(logoFile)
-      })
-    } else if (logoUrl) {
-      uploadedLogoUri = logoUrl
-    }
+    const uploadedLogoUri = data.logo_uri?.trim() ?? ''
 
     if (isEditMode && appToEdit) {
-      const payload: UpdateOAuthClientParams = {
+      const payload: UpdateOAuthClientParams & { token_endpoint_auth_method?: string } = {
         client_name: data.name,
         redirect_uris: validRedirectUris,
         logo_uri: uploadedLogoUri,
+        token_endpoint_auth_method:
+          data.client_type === 'public' ? 'none' : data.token_endpoint_auth_method,
       }
 
       updateOAuthApp({
@@ -197,12 +193,18 @@ export const CreateOrUpdateOAuthAppSheet = ({
         ...payload,
       })
     } else {
-      const payload: CreateOAuthClientParams & { logo_uri?: string; client_type?: string } = {
+      const payload: CreateOAuthClientParams & {
+        logo_uri?: string
+        client_type?: string
+        token_endpoint_auth_method?: string
+      } = {
         client_name: data.name,
         client_uri: '',
         client_type: data.client_type,
         redirect_uris: validRedirectUris,
         logo_uri: uploadedLogoUri || undefined,
+        token_endpoint_auth_method:
+          data.client_type === 'public' ? 'none' : data.token_endpoint_auth_method,
       }
 
       createOAuthApp({
@@ -230,28 +232,39 @@ export const CreateOrUpdateOAuthAppSheet = ({
     })
   }
 
-  const handleUploadLogo = () => uploadButtonRef.current?.click()
+  const handlePickLogoFromStorage = (uri: string) => {
+    setLogoUrl(uri)
+    form.setValue('logo_uri', uri)
+  }
+
   const handleRemoveLogo = () => {
-    setLogoFile(undefined)
     setLogoUrl(undefined)
-    setLogoRemoved(true)
+    form.setValue('logo_uri', '')
   }
 
   return (
     <>
+      {projectRef ? (
+        <LogoPicker
+          open={storagePickerOpen}
+          onOpenChange={setStoragePickerOpen}
+          onSelect={handlePickLogoFromStorage}
+        />
+      ) : null}
       <Sheet open={visible} onOpenChange={() => onCancel()}>
         <SheetContent
           size="lg"
           showClose={false}
           className="flex flex-col gap-0"
           tabIndex={undefined}
+          aria-describedby={undefined}
         >
           <SheetHeader>
             <div className="flex flex-row gap-3 items-center">
               <SheetClose
                 className={cn(
                   'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                  'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
                   'disabled:pointer-events-none data-[state=open]:bg-secondary',
                   'transition'
                 )}
@@ -283,47 +296,62 @@ export const CreateOrUpdateOAuthAppSheet = ({
                     <FormField
                       control={form.control}
                       name="logo_uri"
-                      render={() => (
-                        <FormItemLayout label="Logo" description="Upload a logo for your OAuth app">
+                      render={({ field }) => (
+                        <FormItemLayout
+                          label="Logo"
+                          description={`Paste an absolute image URL/path or select one from a public File Storage bucket.`}
+                        >
                           <FormControl>
-                            <div className="flex gap-4 items-center">
-                              <button
-                                type="button"
-                                onClick={handleUploadLogo}
-                                className={cn(
-                                  'flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong'
-                                )}
-                                style={{
-                                  backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
-                                }}
-                              >
-                                {!hasLogo && <Upload size={14} />}
-                              </button>
-                              <div className="flex gap-2 items-center">
-                                <Button
-                                  type="default"
-                                  size="tiny"
-                                  icon={<Upload size={14} />}
-                                  onClick={handleUploadLogo}
+                            <div className="flex w-full flex-col gap-3">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <div
+                                  className={cn(
+                                    'flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter overflow-hidden rounded-full bg-cover border'
+                                  )}
+                                  title={logoUrl ? undefined : 'No image selected'}
+                                  style={{
+                                    backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
+                                  }}
                                 >
-                                  Upload
-                                </Button>
-                                {hasLogo && (
-                                  <Button
-                                    type="default"
-                                    size="tiny"
-                                    icon={<Trash2 size={12} />}
-                                    onClick={handleRemoveLogo}
-                                  />
-                                )}
+                                  {!hasLogo && <ImageOff size={14} />}
+                                </div>
+                                <div className="flex min-w-0 flex-1 items-center gap-2">
+                                  <div className="group relative min-w-0 flex-1">
+                                    <Input_Shadcn_
+                                      {...field}
+                                      value={field.value ?? ''}
+                                      className={cn('flex-1', projectRef ? 'pr-10' : '')}
+                                      placeholder="https://example.com/logo.png"
+                                      onChange={(event) => {
+                                        field.onChange(event)
+                                        const next = event.target.value.trim()
+                                        setLogoUrl(next.length > 0 ? next : undefined)
+                                      }}
+                                    />
+                                    {projectRef ? (
+                                      <Button
+                                        type="default"
+                                        size="tiny"
+                                        icon={<Storage strokeWidth={1.5} />}
+                                        className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 justify-center overflow-hidden px-1 transition-all duration-150 group-hover:w-36 group-focus-within:w-36 [&_span]:hidden group-hover:[&_span]:block group-focus-within:[&_span]:block"
+                                        onClick={() => setStoragePickerOpen(true)}
+                                      >
+                                        <span className="hidden whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                                          Select from Storage
+                                        </span>
+                                      </Button>
+                                    ) : null}
+                                  </div>
+                                  {field.value ? (
+                                    <Button
+                                      type="default"
+                                      size="tiny"
+                                      icon={<Trash2 size={12} />}
+                                      onClick={handleRemoveLogo}
+                                    />
+                                  ) : null}
+                                </div>
                               </div>
-                              <input
-                                type="file"
-                                ref={uploadButtonRef}
-                                className="hidden"
-                                accept="image/png, image/jpeg"
-                                onChange={onFileUpload}
-                              />
                             </div>
                           </FormControl>
                         </FormItemLayout>
@@ -438,15 +466,50 @@ export const CreateOrUpdateOAuthAppSheet = ({
                       <FormControl>
                         <Switch
                           checked={field.value === 'public'}
-                          onCheckedChange={(checked) =>
-                            field.onChange(checked ? 'public' : 'confidential')
-                          }
+                          onCheckedChange={(checked) => {
+                            const newType = checked ? 'public' : 'confidential'
+                            field.onChange(newType)
+                            form.setValue(
+                              'token_endpoint_auth_method',
+                              newType === 'public' ? 'none' : 'client_secret_basic'
+                            )
+                          }}
                           disabled={isEditMode}
                         />
                       </FormControl>
                     </FormItemLayout>
                   )}
                 />
+
+                {form.watch('client_type') === 'confidential' && (
+                  <FormField
+                    control={form.control}
+                    name="token_endpoint_auth_method"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Token Endpoint Auth Method"
+                        description="How the client authenticates with the token endpoint. The client secret is included in either the Authorization header or the request body."
+                        className="px-5"
+                      >
+                        <FormControl>
+                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger_Shadcn_ className="text-sm">
+                              <SelectValue_Shadcn_ />
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              <SelectItem_Shadcn_ value="client_secret_basic" className="text-sm">
+                                HTTP Basic Auth header (client_secret_basic)
+                              </SelectItem_Shadcn_>
+                              <SelectItem_Shadcn_ value="client_secret_post" className="text-sm">
+                                Request body (client_secret_post)
+                              </SelectItem_Shadcn_>
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
               </form>
             </Form>
           </SheetSection>

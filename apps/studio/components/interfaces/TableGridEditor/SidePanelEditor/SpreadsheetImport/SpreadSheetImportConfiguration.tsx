@@ -1,6 +1,13 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-import { Button, cn, Collapsible, SidePanel } from 'ui'
+import {
+  Button,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  SidePanel,
+} from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
 
 import type { SpreadsheetData } from './SpreadsheetImport.types'
@@ -26,8 +33,12 @@ const SpreadsheetImportConfiguration = ({
   )
 
   return (
-    <Collapsible open={expandConfiguration} onOpenChange={setExpandConfiguration} className={''}>
-      <Collapsible.Trigger asChild>
+    <Collapsible_Shadcn_
+      open={expandConfiguration}
+      onOpenChange={setExpandConfiguration}
+      className={''}
+    >
+      <CollapsibleTrigger_Shadcn_ asChild>
         <SidePanel.Content>
           <div className="py-1 flex items-center justify-between">
             <p className="text-sm">Configure import data</p>
@@ -46,8 +57,8 @@ const SpreadsheetImportConfiguration = ({
             />
           </div>
         </SidePanel.Content>
-      </Collapsible.Trigger>
-      <Collapsible.Content>
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_>
         <SidePanel.Content>
           <div className="py-2 space-y-3">
             <div>
@@ -107,8 +118,8 @@ const SpreadsheetImportConfiguration = ({
             </div>
           </div>
         </SidePanel.Content>
-      </Collapsible.Content>
-    </Collapsible>
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
   )
 }
 

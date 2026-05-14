@@ -12,7 +12,7 @@ import {
   generateMigrationCliCommand,
   generateSeedCliCommand,
 } from './SQLEditor.utils'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { DOCS_URL } from '@/lib/constants'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
@@ -69,12 +69,12 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
           {SNIPPETS.map((snippet) => {
             return (
               <Tabs.Panel key={snippet.id} id={snippet.id} label={snippet.label}>
-                <Modal.Content className="!py-0">
+                <Modal.Content className="py-0!">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex flex-col gap-y-1">
                       <p className="text-base">{snippet.title}</p>
                       <Markdown
-                        className="text-sm text-scale-1000 [&>p>code]:!break-normal"
+                        className="text-sm text-scale-1000 [&>p>code]:break-normal!"
                         content={snippet.description}
                       />
                     </div>

@@ -470,6 +470,7 @@ allow_list = [
     "vecs",
     "vs",
     "watchOS",
+    "WebCrypto",
     "[Xx]min",
 ]
 

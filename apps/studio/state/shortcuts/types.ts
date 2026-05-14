@@ -55,6 +55,29 @@ export interface ShortcutOptions {
    * context-specific shortcuts that only make sense in certain views.
    */
   registerInCommandMenu?: boolean
+
+  /**
+   * Override the registry's default `label` for the duration of this mount.
+   * Flows to the Cmd+K command-menu entry and the hover tooltip rendered via
+   * `<Shortcut>`. Use for shared shortcuts whose contextual label changes per
+   * page (e.g. `list-page.focus-search` rendering as "Search tables" on one
+   * page and "Search functions" on another). Leave `undefined` to use the
+   * registry default.
+   */
+  label?: string
+
+  /**
+   * How the hotkey lib should behave when this shortcut's `sequence` is already
+   * registered by another mounted shortcut. Defaults to `'warn'` (the lib's
+   * default) — every duplicate registration logs a console warning.
+   *
+   * Set to `'allow'` for shortcuts that intentionally share a sequence with
+   * sibling shortcuts and are routed by mutually-exclusive `enabled` gates
+   * (e.g. an Escape ladder: clear selection → close preview → close search).
+   * Use `'replace'` only when you actually want the new registration to
+   * supplant the old one — rarely the right choice for our use cases.
+   */
+  conflictBehavior?: 'warn' | 'allow' | 'replace'
 }
 
 /**
@@ -98,6 +121,12 @@ export interface ShortcutDefinition {
    * standalone user preference.
    */
   showInSettings?: boolean
+
+  /**
+   * Optional grouping override for the Keyboard shortcuts reference sheet.
+   * Falls back to the shortcut id prefix when omitted.
+   */
+  referenceGroup?: string
 }
 
 export type RegistryDefinations<T extends string> = Record<T, ShortcutDefinition>
