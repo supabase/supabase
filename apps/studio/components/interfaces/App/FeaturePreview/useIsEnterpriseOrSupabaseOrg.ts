@@ -13,8 +13,7 @@ export const useIsEnterpriseOrSupabaseOrg = () => {
   })
 
   const isLoading = isProjectLoading || isOrgLoading || (org !== undefined && isSubscriptionLoading)
-  const isEligible =
-    subscription?.plan?.id === 'team' || subscription?.plan?.id === 'enterprise' || org?.id === 1
+  const isEligible = subscription?.plan?.id === 'enterprise' || org?.id === 1
 
   return { isLoading, isEligible }
 }
