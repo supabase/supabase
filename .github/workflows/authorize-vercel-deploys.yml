@@ -53,5 +53,7 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           # The SHA of the commit that triggered the validate-pr workflow
           HEAD_COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+          
