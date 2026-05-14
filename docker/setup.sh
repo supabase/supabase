@@ -203,7 +203,6 @@ prepare_source() {
     { rm -rf "$SRC_TMP"; return 1; }
 
     cd "$SRC_TMP/supabase" || { rm -rf "$SRC_TMP"; return 1; }
-    git config core.sparseCheckout true && \
     git sparse-checkout init --cone && \
     git sparse-checkout set docker && \
     git checkout --quiet 2>/dev/null
