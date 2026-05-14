@@ -92,6 +92,14 @@ export const getReportAttributesV2: (
           tooltip:
             'Unallocated memory available for use. A small portion is always reserved by the operating system',
         },
+        {
+          attribute: 'ram_usage_total',
+          provider: 'infra-monitoring',
+          label: 'Total RAM',
+          isMaxValue: true,
+          omitFromTotal: true,
+          tooltip: 'Total RAM available on this instance',
+        },
       ],
     },
     {
@@ -120,6 +128,16 @@ export const getReportAttributesV2: (
           label: 'Swap',
           tooltip:
             'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
+        },
+        {
+          attribute: 'swap_scale_minimum',
+          provider: 'reference-line',
+          isMaxValue: true,
+          omitFromTotal: true,
+          label: '512 MB',
+          tooltip:
+            'Minimum chart scale — the y-axis shows at least 512 MB so low swap usage is not visually exaggerated',
+          customValue: 512 * 1024 * 1024,
         },
       ],
     },

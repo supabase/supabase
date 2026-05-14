@@ -458,6 +458,7 @@ export function ComposedChart({
         valuePrecision={valuePrecision}
         shouldFormatBytes={shouldFormatBytes}
         isNetworkChart={isNetworkChart}
+        isMemoryChart={isMemoryChart}
         attributes={attributes}
         sql={sql}
       />
