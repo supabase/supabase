@@ -20,7 +20,7 @@ function inspectComponentProps<T>(component: React.ComponentType<T>): void {
 
   for (const propName in defaultProps) {
     const propType = typeof defaultProps[propName]
-    console.log(`${propName}: ${propType}`)
+    console.debug(`${propName}: ${propType}`)
   }
 }
 
@@ -341,7 +341,7 @@ function getComponentSourceFileContent(node: UnistNode) {
 
   // Read the source file.
   const filePath = path.join(process.cwd(), src)
-  console.log('filePath', filePath)
+  console.debug('filePath', filePath)
   const source = fs.readFileSync(filePath, 'utf8')
 
   return source
