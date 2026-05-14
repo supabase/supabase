@@ -72,7 +72,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
   const [editorId] = useState<string>(uuidv4())
-  const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
+  const { search, setSearch, timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
   const defaultHelper = useMemo(() => getDefaultHelper(EXPLORER_DATEPICKER_HELPERS), [])
   const initialDatePickerValue = useMemo<DatePickerValue>(() => {
     if (timestampStart && timestampEnd) {
@@ -217,15 +217,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     } else {
       setTimeRange('', '')
     }
-    const queryParams: Record<string, string | string[] | undefined> = { ...router.query, q: query }
-    if (datePickerValue.isHelper) {
-      delete queryParams.its
-      delete queryParams.ite
-    }
-    router.push({
-      pathname: router.pathname,
-      query: queryParams,
-    })
+    setSearch(query)
     addRecentLogSqlSnippet({ sql: query })
   }
 
@@ -328,8 +320,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (q) {
       setEditorValue(q)
+    } else if (search) {
+      setEditorValue(search)
     }
-  }, [q])
+  }, [q, search])
 
   useEffect(() => {
     // prevents overwriting when the user selects a helper.
