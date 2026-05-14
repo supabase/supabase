@@ -50,9 +50,7 @@ export const MarketplaceIndex = () => {
       'wrapper',
     ]).withOptions({ clearOnDefault: true })
   )
-  // View mode lives in localStorage rather than the URL so it survives sidebar
-  // navigation (which replaces the URL with `?category=…`/`?type=…`). Grid is
-  // the default per design.
+
   const [viewMode, setViewMode] = useLocalStorageQuery<ViewMode>(
     MARKETPLACE_VIEW_MODE_STORAGE_KEY,
     'grid'
@@ -167,17 +165,7 @@ export const MarketplaceIndex = () => {
                 categoryOptions={categoryOptions}
               />
             )}
-            {/* {!hasSearchOrFilter && featured.length > 0 && (
-              <MarketplaceFeaturedHero
-                integrations={featured}
-                installedIds={installedIds}
-                categoryOptions={categoryOptions}
-              />
-            )} */}
-
-            {/* {!hasSearchOrFilter && <MarketplaceCategoryGrid integrations={availableIntegrations} />} */}
-            {/* <MarketplaceCategoryGrid integrations={availableIntegrations} /> */}
-
+            
             <MarketplaceFilterBar
               resultCount={filtered.length}
               search={search}

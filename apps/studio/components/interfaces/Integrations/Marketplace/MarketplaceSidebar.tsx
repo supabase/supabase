@@ -25,9 +25,6 @@ interface CollapsibleSectionProps {
   children: ReactNode
 }
 
-// Collapsible navigation group — title row doubles as the trigger, chevron
-// rotates with the open state for affordance. Defaults to open so the sidebar
-// behaves the same as before on first render.
 const CollapsibleSection = ({ title, defaultOpen = true, children }: CollapsibleSectionProps) => (
   <Collapsible_Shadcn_ defaultOpen={defaultOpen}>
     <CollapsibleTrigger_Shadcn_
@@ -130,8 +127,6 @@ export const MarketplaceSidebar = () => {
   const baseHref = `/project/${ref}/integrations`
   const isDiscoverActive = !activeCategory && !activeType
   const onIndexRoute = router.pathname === '/project/[ref]/integrations'
-  // The detail route is /project/[ref]/integrations/[id]/[...slug?], so the
-  // active integration id sits in the `id` URL param.
   const activeIntegrationId = typeof router.query.id === 'string' ? router.query.id : undefined
 
   return (
@@ -150,7 +145,7 @@ export const MarketplaceSidebar = () => {
             href={`${baseHref}?type=${key}`}
             active={onIndexRoute && activeType === key}
             icon={<Icon size={13} />}
-            label={label}
+            label={`${label}s`}
             count={typeCounts[key]}
           />
         ))}

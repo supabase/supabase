@@ -24,6 +24,7 @@ export const FEATURED_INTEGRATION_IDS = [
   'grafana',
   'stripe_sync_engine',
   'aikido',
+  'aikido-security',
   'doppler',
   'cipherstash',
 ] as const
@@ -60,10 +61,6 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   devtools: Wrench,
 }
 
-// Pinned list of categories shown in the marketplace index "Browse by
-// category" grid and sidebar. Order here is the order rendered. Slugs that
-// don't match a marketplaceDB category still render (count falls back to 0)
-// so the surface stays predictable while remote data evolves.
 export const FEATURED_CATEGORIES: Array<{ slug: string; name: string }> = [
   { slug: 'observability', name: 'Observability' },
   { slug: 'security', name: 'Security' },
@@ -78,12 +75,6 @@ export const getCategoryIcon = (slug: string | null | undefined): LucideIcon => 
   return CATEGORY_ICONS[slug] ?? Boxes
 }
 
-// Resolve a category slug (e.g. `observability`, `ai_vectors`) to its human
-// label. Pinned categories in `FEATURED_CATEGORIES` win first so curated
-// labels like `AI & Vectors`/`DevTools` survive title-casing; unknown slugs
-// fall back to a generic title-case derived from the slug itself. Pass an
-// optional `categoryOptions` (e.g. from the marketplaceDB) to bias toward
-// upstream names when available.
 export const formatCategoryLabel = (
   slug: string | null | undefined,
   categoryOptions?: Array<{ slug: string; name: string }>
@@ -100,10 +91,6 @@ export const formatCategoryLabel = (
     .join(' ')
 }
 
-// Classify an integration into one of the four marketplace install mechanisms.
-// Existing IntegrationDefinition.type covers oauth/postgres_extension/wrapper;
-// 'template' is a heuristic — anything that ships a managed schema (e.g.
-// stripe_sync_engine) is a template.
 export const getMarketplaceType = (
   integration: IntegrationDefinition
 ): MarketplaceIntegrationType => {
@@ -116,10 +103,6 @@ export const getMarketplaceType = (
 export const getMarketplaceTypeLabel = (type: MarketplaceIntegrationType): string =>
   INTEGRATION_TYPES.find((t) => t.key === type)?.label ?? type
 
-// Tier shown in the table/cards. The static catalogue doesn't carry a
-// `partner` flag, so we infer:
-// - listingId present (came from marketplaceDB) → Partner
-// - wrapper/postgres_extension/internal → Official
 export type MarketplaceTier = 'Partner' | 'Official'
 
 export const getMarketplaceTier = (integration: IntegrationDefinition): MarketplaceTier => {

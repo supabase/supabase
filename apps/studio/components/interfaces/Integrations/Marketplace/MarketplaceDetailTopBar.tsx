@@ -4,17 +4,10 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 interface MarketplaceDetailTopBarProps {
-  /** Integration name to render as the title in the bar */
   title: string
-  /** Right-aligned actions (e.g. Docs, Install, Manage) */
   actions?: ReactNode
 }
 
-/**
- * Anchored top action bar above the brand hero on the integration detail
- * page. Kept as its own component so it can stay sticky/anchored across tabs
- * and be reused by future marketplace surfaces.
- */
 export const MarketplaceDetailTopBar = ({ title, actions }: MarketplaceDetailTopBarProps) => {
   const { ref } = useParams()
 

@@ -15,7 +15,7 @@ export const DataApiSettingsTab = () => {
   }
 
   return (
-    <PageContainer size="default" className="ml-0">
+    <PageContainer size="default" className="mx-0">
       <ServiceList />
     </PageContainer>
   )

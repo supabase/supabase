@@ -7,18 +7,15 @@ import type { IntegrationDefinition } from '@/components/interfaces/Integrations
 
 interface MarketplaceDetailHeroProps {
   integration: IntegrationDefinition
-  /** Lede paragraph below the title */
-  lede?: ReactNode
-  /** Subtitle line (category, version, install state) */
+  description?: ReactNode
   subtitle?: ReactNode
-  /** Tabs to render below the hero; href change handles activation */
   tabs: Array<{ label: string; href: string; active: boolean }>
   isInstalled?: boolean
 }
 
 export const MarketplaceDetailHero = ({
   integration,
-  lede,
+  description,
   subtitle,
   tabs,
   isInstalled,
@@ -52,9 +49,9 @@ export const MarketplaceDetailHero = ({
             <div className="text-[13.5px] text-foreground-light">{subtitle}</div>
           </div>
         </div>
-        {lede && (
+        {description && (
           <p className="m-0 max-w-[760px] text-lg leading-snug tracking-tight text-foreground">
-            {lede}
+            {description}
           </p>
         )}
 

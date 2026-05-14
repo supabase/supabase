@@ -18,7 +18,7 @@ export const OverviewTab = ({ integration, isInstalled }: OverviewTabProps) => {
           {files.length > 0 && <FilesViewer files={files} />}
           <MarkdownContent integrationId={integration.id} content={content} />
         </div>
-        <MarketplaceDetailRail integration={integration} isInstalled={isInstalled} />
+        <MarketplaceDetailAside integration={integration} isInstalled={isInstalled} />
       </div>
     </div>
   )

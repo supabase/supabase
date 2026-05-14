@@ -1,4 +1,4 @@
-import { ArrowRight, Pause, Settings } from 'lucide-react'
+import { Pause, Play } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Badge, Button, cn } from 'ui'
@@ -9,23 +9,11 @@ import type { IntegrationDefinition } from '@/components/interfaces/Integrations
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const ROTATION_INTERVAL_MS = 7000
-
 interface MarketplaceFeaturedHeroProps {
   integrations: IntegrationDefinition[]
   installedIds: string[]
   categoryOptions: Array<{ slug: string; name: string }>
 }
-
-// Splits the description into a short title (first sentence) and the rest of
-// the body. Falls back to the full description for the title when no sentence
-// break is found.
-// const splitDescription = (description: string | null) => {
-//   if (!description) return { title: '', body: '' }
-//   const trimmed = description.trim()
-//   const match = trimmed.match(/^(.+?[.!?])(\s+)(.*)$/s)
-//   if (!match) return { title: trimmed, body: '' }
-//   return { title: match[1].trim(), body: match[3].trim() }
-// }
 
 export const MarketplaceFeaturedHero = ({
   integrations,
@@ -76,7 +64,6 @@ export const MarketplaceFeaturedHero = ({
     ? formatCategoryLabel(activeCategorySlug, categoryOptions)
     : null
   const isActiveInstalled = installedIds.includes(active.id)
-  // const { title, body } = splitDescription(active.description)
 
   const handleTabClick = (idx: number) => {
     setActiveIndex(idx)
@@ -84,6 +71,19 @@ export const MarketplaceFeaturedHero = ({
 
   return (
     <section>
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm">Featured Partners Integrations</h2>
+        </div>
+        <Button
+          aria-label={isPaused ? 'Resume auto-rotation' : 'Pause auto-rotation'}
+          type="default"
+          size="tiny"
+          className="px-1"
+          icon={isPaused ? <Play size={10} /> : <Pause size={10} />}
+          onClick={() => setIsPaused((p) => !p)}
+        />
+      </div>
       <div ref={cardRef} className="overflow-hidden rounded-lg border bg-surface-100">
         <div className="grid gap-0 @3xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
           <div className="relative hidden @3xl:block">
@@ -120,12 +120,6 @@ export const MarketplaceFeaturedHero = ({
 
             <div className="grow flex flex-col gap-2">
               <p className="text-base text-foreground-light">{active.description}</p>
-              {/* {title && (
-                <h3 className="text-lg font-medium leading-snug text-foreground @3xl:text-xl">
-                  {title}
-                </h3>
-              )}
-              {body && <p className="text-[13px] leading-relaxed text-foreground-light">{body}</p>} */}
             </div>
 
             <div className="mt-1 flex items-center gap-4">
@@ -138,7 +132,7 @@ export const MarketplaceFeaturedHero = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 border-t @md:grid-cols-3 @3xl:grid-cols-5">
+        <div className="grid grid-cols-2 border-t @md:grid-cols-3">
           {integrations.map((integration, idx) => {
             const isActive = idx === activeIndex
             const slug = integration.categories?.[0]
@@ -185,33 +179,6 @@ export const MarketplaceFeaturedHero = ({
             )
           })}
         </div>
-      </div>
-      <div className="mt-2 -mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {/* <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-          <h2 className="text-sm font-medium">Featured partners</h2> */}
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsPaused((p) => !p)}
-          className="flex items-center gap-1.5 p-1 text-[11px] text-foreground-lighter transition-colors hover:text-foreground-light"
-          aria-label={isPaused ? 'Resume auto-rotation' : 'Pause auto-rotation'}
-        >
-          {isPaused ? (
-            <>
-              <Pause size={10} />
-              <span>Paused</span>
-            </>
-          ) : (
-            <>
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand" />
-              </span>
-              <span>Auto Play</span>
-            </>
-          )}
-        </button>
       </div>
     </section>
   )

@@ -161,7 +161,7 @@ export const MarketplaceDetail = () => {
       <MarketplaceDetailHero
         integration={integration}
         subtitle={subtitle}
-        lede={integration.description}
+        description={integration.description}
         tabs={tabs}
         isInstalled={isInstalled}
       />
