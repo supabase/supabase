@@ -133,9 +133,13 @@ export const RunQueryWarningModal = ({
   }
 
   const confirmationCopy =
-    warnings.length > 1
-      ? 'Only continue if these changes are intentional.'
-      : 'Only continue if this change is intentional.'
+    hasMissingRLS && onConfirmWithRLS
+      ? warnings.length > 1
+        ? 'Review each issue, then choose whether to enable Row Level Security before running this query.'
+        : 'Choose whether to enable Row Level Security before running this query.'
+      : warnings.length > 1
+        ? 'Run this query only if these effects are expected.'
+        : 'Run this query only if this effect is expected.'
   const title = warnings.length > 1 ? 'Potential issues detected' : 'Potential issue detected'
 
   return (
@@ -145,17 +149,22 @@ export const RunQueryWarningModal = ({
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription asChild>
             {warnings.length === 0 ? (
-              <div>Are you sure you want to run this query?</div>
+              <div>
+                <p>Are you sure you want to run this query?</p>
+              </div>
             ) : warnings.length === 1 ? (
               <div>
-                {warnings[0].summary}. {warnings[0].description} {confirmationCopy}
+                <p>
+                  {warnings[0].summary}. {warnings[0].description}
+                </p>
+                <p className="mt-3">{confirmationCopy}</p>
               </div>
             ) : (
               <div>
                 <p>This query has multiple potential issues:</p>
-                <ul className="mt-3 grid gap-2">
+                <ul>
                   {warnings.map((warning) => (
-                    <li key={warning.id}>
+                    <li key={warning.id} className="mt-3">
                       <span className="font-medium text-foreground">{warning.summary}.</span>{' '}
                       <span>{warning.description}</span>
                     </li>
