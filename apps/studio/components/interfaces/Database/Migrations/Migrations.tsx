@@ -84,6 +84,7 @@ const Migrations = () => {
 
   const hasDateFilter = dateFrom !== null || dateTo !== null
 
+  /** Downloads the currently-filtered migrations as a numbered ZIP archive. */
   async function handleDownloadZip() {
     if (migrations.length === 0) return
     setIsExporting(true)
@@ -107,6 +108,7 @@ const Migrations = () => {
     }
   }
 
+  /** Downloads the currently-filtered migrations as a single combined SQL file. */
   function handleDownloadSql() {
     if (migrations.length === 0) return
     const parts = migrations.map((migration, index) => {
