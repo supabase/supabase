@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PGColumn, PGTable } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEmpty, isUndefined, noop } from 'lodash'
@@ -140,7 +140,7 @@ const createTableApiAccessHandlerParams = ({
   selectedTable,
 }: {
   snap: DeepReadonly<TableEditorState>
-  selectedTable?: PostgresTable
+  selectedTable?: PGTable
 }): TableApiAccessParams | undefined => {
   const tableSidePanel = snap.sidePanel?.type === 'table' ? snap.sidePanel : undefined
   if (!tableSidePanel) return undefined
@@ -170,7 +170,7 @@ const createTableApiAccessHandlerParams = ({
 
 export interface SidePanelEditorProps {
   editable?: boolean
-  selectedTable?: PostgresTable
+  selectedTable?: PGTable
   includeColumns?: boolean // This is mainly used for invalidating useTablesQuery
 
   // Because the panel is shared between grid editor and database pages
@@ -396,7 +396,7 @@ export const SidePanelEditor = ({
       : await updateColumn({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
-          originalColumn: selectedColumnToEdit as PostgresColumn,
+          originalColumn: selectedColumnToEdit as PGColumn,
           payload: payload as UpdateColumnPayload,
           selectedTable,
           primaryKey,
@@ -924,7 +924,7 @@ export const SidePanelEditor = ({
         <ColumnEditor
           column={
             snap.sidePanel?.type === 'column'
-              ? (snap.sidePanel.column as unknown as PostgresColumn)
+              ? (snap.sidePanel.column as unknown as PGColumn)
               : undefined
           }
           selectedTable={selectedTable}

@@ -46,7 +46,7 @@ const DROPDOWN_GAP = 8
 const commandItemClass = cn(
   'relative text-foreground-lighter text-left px-2 py-1.5 rounded-sm',
   'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
-  'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong'
+  'peer-data-[value=true]:bg-overlay-hover'
 )
 
 function useMultiSelect() {

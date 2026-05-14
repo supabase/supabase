@@ -1,4 +1,4 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -60,9 +60,9 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface TableListProps {
   onAddTable: () => void
-  onEditTable: (table: PostgresTable) => void
-  onDeleteTable: (table: PostgresTable) => void
-  onDuplicateTable: (table: PostgresTable) => void
+  onEditTable: (table: PGTable) => void
+  onDeleteTable: (table: PGTable) => void
+  onDuplicateTable: (table: PGTable) => void
 }
 
 export const TableList = ({

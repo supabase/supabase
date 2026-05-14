@@ -1,6 +1,9 @@
-import { getDatabaseTriggerUpdateSQL, type SafeSqlFragment } from '@supabase/pg-meta'
-import { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import {
+  getDatabaseTriggerUpdateSQL,
+  type PGTrigger,
+  type PGTriggerCreate,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -15,7 +18,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type DatabaseTriggerUpdateVariables = {
   projectRef: string
   connectionString?: string | null
-  originalTrigger: PostgresTrigger
+  originalTrigger: PGTrigger
   updatedTrigger: Omit<PGTriggerCreate, 'events'> &
     Pick<PGTrigger, 'enabled_mode'> & { events: Array<SafeSqlFragment> }
 }

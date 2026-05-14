@@ -1,5 +1,4 @@
-import { PostgresMaterializedView, PostgresTable, PostgresView } from '@supabase/postgres-meta'
-import { PostgresForeignTable } from '@supabase/postgres-meta/dist/lib/types'
+import type { PGForeignTable, PGMaterializedView, PGTable, PGView } from '@supabase/pg-meta'
 
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
@@ -11,10 +10,10 @@ export const formatAllEntities = ({
   materializedViews = [],
   foreignTables = [],
 }: {
-  tables?: PostgresTable[]
-  views?: PostgresView[]
-  materializedViews?: PostgresMaterializedView[]
-  foreignTables?: PostgresForeignTable[]
+  tables?: PGTable[]
+  views?: PGView[]
+  materializedViews?: PGMaterializedView[]
+  foreignTables?: PGForeignTable[]
 }) => {
   const formattedTables = tables.map((x) => {
     return {

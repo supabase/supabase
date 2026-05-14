@@ -1,4 +1,4 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { ArrowRight } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
@@ -38,7 +38,7 @@ export const ForeignKeyFormatter = (props: Props) => {
       r.source_column_name === column.name
   )
 
-  const { data: targetTable, isPending: isLoadingTargetTable } = useTableQuery<PostgresTable>(
+  const { data: targetTable, isPending: isLoadingTargetTable } = useTableQuery<PGTable>(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

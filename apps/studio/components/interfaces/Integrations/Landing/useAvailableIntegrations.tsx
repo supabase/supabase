@@ -42,6 +42,7 @@ export const useAvailableIntegrations = () => {
           id: listingId,
           slug,
           categories,
+          featured,
           title,
           description,
           documentation_url: docsUrl,
@@ -63,6 +64,7 @@ export const useAvailableIntegrations = () => {
           id: slug ?? '',
           name: title ?? '',
           status,
+          featured: !!featured,
           type: 'oauth' as const, // Currently marketplace only supports oauth apps
           categories: Array.isArray(categories)
             ? (categories as Array<{ slug: string }>).map((x) => x.slug)
