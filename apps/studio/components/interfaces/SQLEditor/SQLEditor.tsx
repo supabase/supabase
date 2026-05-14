@@ -104,8 +104,10 @@ const DiffEditor = dynamic(
 
 /** Returns true for DDL/DML statements that should be auto-tracked as migrations. */
 function isDdlOrDml(sql: string): boolean {
-  // Strip leading single-line comments and blank lines before checking
-  const stripped = sql.replace(/^(\s*(--[^\n]*)?\n)*/gm, '').trimStart()
+  // Strip leading single-line (--) and block (/* */) comments before checking
+  const stripped = sql
+    .replace(/^\s*(?:(?:--[^\n]*\n)|(?:\/\*[\s\S]*?\*\/\s*))*/,'')
+    .trimStart()
   return /^(CREATE|ALTER|DROP|TRUNCATE|INSERT|UPDATE|DELETE|GRANT|REVOKE|COMMENT\s+ON)\s/i.test(
     stripped
   )
