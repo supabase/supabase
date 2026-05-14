@@ -68,40 +68,31 @@ language="typescript"
 
 ## Using Drizzle
 
-You can use Drizzle together with [Postgres.js](https://github.com/porsager/postgres). Both can be loaded directly from npm:
+You can use Drizzle together with [Postgres.js](https://github.com/porsager/postgres). Both can be loaded directly from npm.
 
-**Set up dependencies in `import_map.json`**:
+First, declare the dependencies in a `deno.json` file inside the function directory (see [Managing dependencies](/docs/guides/functions/dependencies) for more details):
 
-```json supabase/functions/import_map.json
-{
-  "imports": {
-    "drizzle-orm": "npm:drizzle-orm@0.29.1",
-    "drizzle-orm/": "npm:/drizzle-orm@0.29.1/",
-    "postgres": "npm:postgres@3.4.3"
-  }
-}
-```
+<$CodeSample
+path="/edge-functions/supabase/functions/drizzle/deno.json"
+title="supabase/functions/drizzle/deno.json"
+language="json"
+/>
 
-**Use in your function**:
+Then define your schema and query the database:
 
-```ts supabase/functions/drizzle/index.ts
-import { drizzle } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
-import { countries } from '../_shared/schema.ts'
+<$CodeSample
+path="/edge-functions/supabase/functions/_shared/schema.ts"
+title="supabase/functions/_shared/schema.ts"
+language="typescript"
+/>
 
-const connectionString = Deno.env.get('SUPABASE_DB_URL')!
+<$CodeSample
+path="/edge-functions/supabase/functions/drizzle/index.ts"
+title="supabase/functions/drizzle/index.ts"
+language="typescript"
+/>
 
-Deno.serve(async (_req) => {
-  // Disable prefetch as it is not supported for "Transaction" pool mode
-  const client = postgres(connectionString, { prepare: false })
-  const db = drizzle(client)
-  const allCountries = await db.select().from(countries)
-
-  return Response.json(allCountries)
-})
-```
-
-You can find the full example on [GitHub](https://github.com/thorwebdev/edgy-drizzle).
+You can find the full example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/drizzle).
 
 ---
 
