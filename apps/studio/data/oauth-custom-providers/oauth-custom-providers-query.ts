@@ -1,8 +1,8 @@
 import { AuthError, type CustomOAuthProvider } from '@supabase/auth-js'
 import { useQuery } from '@tanstack/react-query'
 
-import { useAuthConfigQuery } from '../auth/auth-config-query'
 import { oAuthCustomProvidersKeys } from './keys'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { handleError } from '@/data/fetchers'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
@@ -16,7 +16,6 @@ export type OAuthCustomProvidersVariables = {
 export async function getOAuthCustomProviders({
   projectRef,
   clientEndpoint,
-  page = 1,
 }: OAuthCustomProvidersVariables & { clientEndpoint: string | undefined }) {
   if (!projectRef) throw new Error('Project reference is required')
   if (!clientEndpoint) throw new Error('Client endpoint is required')

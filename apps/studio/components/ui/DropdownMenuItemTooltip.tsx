@@ -17,7 +17,7 @@ export const DropdownMenuItemTooltip = forwardRef<
         <DropdownMenuItem
           ref={ref}
           {...props}
-          className={cn(props.className, '!pointer-events-auto')}
+          className={cn(props.className, 'pointer-events-auto!')}
           onClick={(e) => {
             if (!props.disabled && props.onClick) props.onClick(e)
           }}

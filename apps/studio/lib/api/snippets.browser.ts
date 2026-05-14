@@ -39,7 +39,7 @@ export function generateDeterministicUuid(inputs: (string | undefined | null)[])
       seed = (seed * 1103515245 + 12345) & 0x7fffffff
       bytes[i] = (seed >>> 16) & 0xff
     }
-    return Array.from(bytes)
+    return bytes
   }
 
   // Generate UUID v4 using the deterministic RNG

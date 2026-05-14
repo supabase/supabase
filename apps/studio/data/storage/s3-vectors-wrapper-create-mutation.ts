@@ -1,17 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import { getVectorURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
+import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { getVectorURI } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import {
   getVectorBucketFDWName,
   getVectorBucketFDWServerName,
   getVectorBucketS3KeyName,
-} from 'components/interfaces/Storage/VectorBuckets/VectorBuckets.utils'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
+} from '@/components/interfaces/Storage/VectorBuckets/VectorBuckets.utils'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useS3VectorsWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()

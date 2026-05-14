@@ -12,14 +12,41 @@
 #
 # Prerequisites:
 #   - .env file (run generate-keys.sh and add-new-auth-keys.sh first)
-#   - node >= 16
+#   - node (>= 16) or docker
 #
 
 set -e
 
-if ! command -v node >/dev/null 2>&1; then
-    echo "Error: node (>= 16) is required but not found."
-    exit 1
+node_ok() {
+    command -v node >/dev/null 2>&1 || return 1
+    major=$(node -v 2>/dev/null | sed 's/^v//' | cut -d. -f1)
+    [ -n "$major" ] && [ "$major" -ge 16 ] 2>/dev/null
+}
+
+# Resolve how to run node: local install (>= 16) preferred, docker fallback.
+if node_ok; then
+    node_runner="node"
+else
+    if command -v node >/dev/null 2>&1; then
+        echo "Local node $(node -v) is too old (need >= 16), falling back to docker."
+    fi
+
+    if ! command -v docker >/dev/null 2>&1; then
+        echo "Error: requires either node (>= 16) or docker."
+        exit 1
+    fi
+
+    if ! docker info >/dev/null 2>&1; then
+        echo "Error: docker is installed but the daemon is not running."
+        exit 1
+    fi
+
+    if ! docker image inspect node:22-alpine >/dev/null 2>&1; then
+        echo "Pulling node:22-alpine (first-run only)..."
+        docker pull node:22-alpine
+    fi
+
+    node_runner="docker run --rm node:22-alpine node"
 fi
 
 if [ ! -f .env ]; then
@@ -30,7 +57,7 @@ fi
 tmpdir=$(mktemp -d)
 trap 'rm -rf "$tmpdir"' EXIT
 
-node -e '
+$node_runner -e '
 const crypto = require("crypto");
 
 const PROJECT_REF = "supabase-self-hosted";

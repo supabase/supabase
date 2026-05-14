@@ -5,7 +5,7 @@ import { FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 
 export const logEventBus = {
-  listeners: new Map<string, Set<(...args: any[]) => void>>(),
+  listeners: new Map<string, Set<(rowId: string) => void>>(),
 
   on(event: 'selectTraceTab', callback: (rowId: string) => void) {
     if (!this.listeners.has(event)) {
@@ -21,13 +21,13 @@ export const logEventBus = {
 }
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
-  return (table: TTable<TData>, columnId: string) => {
+  return (_table: TTable<TData>, columnId: string) => {
     return new Map(facets?.[columnId]?.rows?.map(({ value, total }) => [value, total]) || [])
   }
 }
 
 export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
-  return (table: TTable<TData>, columnId: string) => {
+  return (_table: TTable<TData>, columnId: string) => {
     const min = facets?.[columnId]?.min
     const max = facets?.[columnId]?.max
     if (typeof min === 'number' && typeof max === 'number') return [min, max]
@@ -35,6 +35,21 @@ export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetad
     if (typeof max === 'number') return [max, max]
     return undefined
   }
+}
+
+/**
+ * Returns a unified-logs row's timestamp in epoch milliseconds.
+ *
+ * The row mapper attaches a pre-parsed `date` (works for both BigQuery
+ * microsecond timestamps and OTEL ISO strings); fall back to the raw
+ * `timestamp` value when it's a number (older BQ-style microseconds).
+ */
+export function getRowTimestampMs(
+  row: { date?: Date | null; timestamp?: number | string | null } | null | undefined
+): number | null {
+  if (row?.date instanceof Date) return row.date.getTime()
+  if (typeof row?.timestamp === 'number') return row.timestamp / 1000
+  return null
 }
 
 export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
@@ -66,12 +81,14 @@ export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
       return ''
     case 'warning':
       return cn(
-        'bg-warning/5 hover:bg-warning/10 data-[state=selected]:bg-warning/20 focus-visible:bg-warning/10',
+        'bg-warning/5 hover:bg-warning/10',
+        'data-[state=selected]:bg-warning/20 focus-visible:bg-warning/10',
         'dark:bg-warning/10 dark:hover:bg-warning/20 dark:data-[state=selected]:bg-warning/30 dark:focus-visible:bg-warning/20'
       )
     case 'error':
       return cn(
-        'bg-destructive/5 hover:bg-destructive/10 data-[state=selected]:bg-destructive/20 focus-visible:bg-destructive/10',
+        'bg-destructive/5 hover:bg-destructive/10',
+        'data-[state=selected]:bg-destructive/20 focus-visible:bg-destructive/10',
         'dark:bg-error/10 dark:hover:bg-destructive/20 dark:data-[state=selected]:bg-destructive/30 dark:focus-visible:bg-destructive/20'
       )
     default:

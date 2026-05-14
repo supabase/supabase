@@ -1,10 +1,10 @@
-import { getTableIndexAdvisorSql } from '@supabase/pg-meta'
+import { getTableIndexAdvisorSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { filterProtectedSchemaIndexStatements } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { databaseKeys } from './keys'
+import { filterProtectedSchemaIndexStatements } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type TableIndexAdvisorVariables = {
   projectRef?: string
@@ -14,7 +14,7 @@ export type TableIndexAdvisorVariables = {
 }
 
 export type IndexAdvisorSuggestion = {
-  query: string
+  query: SafeSqlFragment
   calls: number
   total_time: number
   mean_time: number
@@ -113,7 +113,7 @@ export async function getTableIndexAdvisorSuggestions({
           : 0
 
       return {
-        query: row.query,
+        query: row.query as SafeSqlFragment,
         calls: row.calls,
         total_time: row.total_time,
         mean_time: row.mean_time,

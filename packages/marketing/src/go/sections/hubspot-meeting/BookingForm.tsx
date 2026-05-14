@@ -130,7 +130,7 @@ export default function BookingForm({
             <button
               type="button"
               onClick={onDismissError}
-              className="text-destructive-600/60 hover:text-destructive-600 transition-colors flex-shrink-0 p-0.5"
+              className="text-destructive-600/60 hover:text-destructive-600 transition-colors shrink-0 p-0.5"
               aria-label="Dismiss error"
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">

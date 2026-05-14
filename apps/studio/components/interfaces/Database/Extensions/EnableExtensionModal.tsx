@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { PostgresExtension } from '@supabase/postgres-meta'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -12,9 +11,9 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -31,7 +30,7 @@ import * as z from 'zod'
 import { extensionsWithRecommendedSchemas } from './Extensions.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
-import { useDatabaseExtensionDefaultSchemaQuery } from '@/data/database-extensions/database-extension-schema-query'
+import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
@@ -51,7 +50,7 @@ const FormSchema = z.object({ name: z.string(), schema: z.string() }).superRefin
 
 interface EnableExtensionModalProps {
   visible: boolean
-  extension: PostgresExtension
+  extension: DatabaseExtension
   onCancel: () => void
 }
 
@@ -66,7 +65,7 @@ export const EnableExtensionModal = ({
 
   const recommendedSchema = extensionsWithRecommendedSchemas[extension.name]
 
-  const { data: schemas = [], isPending: isSchemasLoading } = useSchemasQuery(
+  const { data: schemas = [], isPending: isLoading } = useSchemasQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -79,19 +78,9 @@ export const EnableExtensionModal = ({
       !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
   )
 
-  const { data: extensionMeta, isPending: fetchingSchemaInfo } =
-    useDatabaseExtensionDefaultSchemaQuery(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        extension: extension.name,
-      },
-      { enabled: visible }
-    )
   // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
-  const defaultSchema = extension.name === 'pg_cron' ? 'pg_catalog' : extensionMeta?.schema
-
-  const isLoading = fetchingSchemaInfo || isSchemasLoading
+  const defaultSchema =
+    extension.name === 'pg_cron' ? 'pg_catalog' : extension.default_version_schema
 
   const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
@@ -179,7 +168,7 @@ export const EnableExtensionModal = ({
         )}
 
         <DialogSection>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id="enable-extensions-form" onSubmit={form.handleSubmit(onSubmit)}>
               {isLoading ? (
                 <div className="space-y-2">
@@ -197,12 +186,12 @@ export const EnableExtensionModal = ({
                     <Input_Shadcn_ disabled value={defaultSchema} />
                   </FormItemLayout>
                   <p className="text-sm text-foreground-light">
-                    Extension must be installed in the “{defaultSchema}” schema.
+                    Extension must be installed in the "{defaultSchema}" schema.
                   </p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-y-2">
-                  <FormField_Shadcn_
+                  <FormField
                     key="schema"
                     name="schema"
                     control={form.control}
@@ -211,7 +200,7 @@ export const EnableExtensionModal = ({
                         name="schema"
                         label="Select a schema to enable the extension for"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Select_Shadcn_
                             value={field.value}
                             onValueChange={field.onChange}
@@ -242,7 +231,7 @@ export const EnableExtensionModal = ({
                               })}
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -255,15 +244,15 @@ export const EnableExtensionModal = ({
                   )}
 
                   {schema === 'custom' && (
-                    <FormField_Shadcn_
+                    <FormField
                       key="name"
                       name="name"
                       control={form.control}
                       render={({ field }) => (
                         <FormItemLayout name="name" label="Schema name">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Input_Shadcn_ {...field} />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -271,7 +260,7 @@ export const EnableExtensionModal = ({
                 </div>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
 
         <DialogFooter>

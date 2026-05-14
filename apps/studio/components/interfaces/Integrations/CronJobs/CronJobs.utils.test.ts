@@ -52,6 +52,16 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should return a sql function command for lowercase select', () => {
+    const command = 'select lowercase.issue ()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'lowercase',
+      functionName: 'issue',
+      snippet: command,
+    })
+  })
+
   it('should return a sql snippet command when the command is SELECT public.test_fn(1, 2)', () => {
     const command = 'SELECT public.test_fn(1, 2)'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
@@ -165,13 +175,13 @@ describe('parseCronJobCommand', () => {
   })
 
   it('should return an HTTP request config with POST method, some headers and empty body', () => {
-    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', '2'), body:='', timeout_milliseconds:=1000 );`
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', 'O''Reilly'), body:='', timeout_milliseconds:=1000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
       httpHeaders: [
         { name: 'fst', value: '1' },
-        { name: 'snd', value: '2' },
+        { name: 'snd', value: "O'Reilly" },
       ],
       httpBody: '',
       timeoutMs: 1000,
@@ -222,16 +232,42 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body with ::jsonb typecasting', () => {
-    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"fst": "1", "snd": "2"}'::jsonb,body:='{"key": "value"}'::jsonb,timeout_milliseconds:=5000);`
+  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body with escaped SQL strings and ::jsonb typecasting', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"X-Name":"O''Reilly"}'::jsonb,body:='{"message":"hello  there","name":"O''Reilly"}'::jsonb,timeout_milliseconds:=5000);`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'X-Name', value: "O'Reilly" }],
+      httpBody: `{"message":"hello  there","name":"O'Reilly"}`,
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should return an HTTP request config with POST method, escape-string headers and body with backslashes', () => {
+    const command = String.raw`select net.http_post( url:='https://example.com/api/endpoint', headers:=E'{"Content-Type":"application/json","X-Regex":"^\\\\d+$"}'::jsonb,body:=E'{"path":"C:\\\\tmp","regex":"^\\\\d+$"}',timeout_milliseconds:=1000);`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
       httpHeaders: [
-        { name: 'fst', value: '1' },
-        { name: 'snd', value: '2' },
+        { name: 'Content-Type', value: 'application/json' },
+        { name: 'X-Regex', value: String.raw`^\d+$` },
       ],
-      httpBody: '{"key": "value"}',
+      httpBody: String.raw`{"path":"C:\\tmp","regex":"^\\d+$"}`,
+      timeoutMs: 1000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should parse a POST body without swallowing later quoted arguments', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', body:='{"payload":"ok"}'::jsonb, headers:='{"Authorization":"Bearer demo"}'::jsonb, timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Authorization', value: 'Bearer demo' }],
+      httpBody: '{"payload":"ok"}',
       timeoutMs: 5000,
       type: 'http_request',
       snippet: command,

@@ -7,7 +7,9 @@ import {
   Badge,
   Button,
   cn,
-  Collapsible,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
   SidePanel,
   WarningIcon,
 } from 'ui'
@@ -24,6 +26,7 @@ interface SpreadsheetImportPreviewProps {
   errors?: any[]
   selectedHeaders: string[]
   incompatibleHeaders: string[]
+  emptyStringAsNullHeaders: string[]
 }
 
 export const SpreadsheetImportPreview = ({
@@ -32,6 +35,7 @@ export const SpreadsheetImportPreview = ({
   errors = [],
   selectedHeaders,
   incompatibleHeaders,
+  emptyStringAsNullHeaders,
 }: SpreadsheetImportPreviewProps) => {
   const [expandPreview, setExpandPreview] = useState(false)
   const [expandedErrors, setExpandedErrors] = useState<string[]>([])
@@ -66,8 +70,8 @@ export const SpreadsheetImportPreview = ({
   )
 
   return (
-    <Collapsible open={expandPreview} onOpenChange={setExpandPreview} className={''}>
-      <Collapsible.Trigger asChild>
+    <Collapsible_Shadcn_ open={expandPreview} onOpenChange={setExpandPreview} className={''}>
+      <CollapsibleTrigger_Shadcn_ asChild>
         <SidePanel.Content>
           <div className="py-1 flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -93,8 +97,8 @@ export const SpreadsheetImportPreview = ({
             />
           </div>
         </SidePanel.Content>
-      </Collapsible.Trigger>
-      <Collapsible.Content>
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_>
         <SidePanel.Content>
           <div className="mb-4">
             <p className="text-sm text-foreground-light">
@@ -112,7 +116,12 @@ export const SpreadsheetImportPreview = ({
           </div>
           <div className="mb-4">
             {previewHeaders.length > 0 && previewRows.length > 0 ? (
-              <SpreadsheetPreviewGrid height={350} headers={previewHeaders} rows={previewRows} />
+              <SpreadsheetPreviewGrid
+                height={350}
+                headers={previewHeaders}
+                rows={previewRows}
+                emptyStringAsNullHeaders={emptyStringAsNullHeaders}
+              />
             ) : (
               <div className="flex items-center justify-center py-4 border border-control rounded-md space-x-2">
                 <AlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
@@ -169,7 +178,7 @@ export const SpreadsheetImportPreview = ({
                           {errorData !== undefined ? (
                             <button
                               type="button"
-                              className="flex items-center space-x-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                              className="flex items-center space-x-2 cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
                               onClick={() => onSelectExpandError(key)}
                               aria-expanded={isExpanded}
                               aria-controls={`${key}-panel`}
@@ -218,6 +227,7 @@ export const SpreadsheetImportPreview = ({
                             <SpreadsheetPreviewGrid
                               headers={spreadsheetData.headers}
                               rows={[errorData]}
+                              emptyStringAsNullHeaders={emptyStringAsNullHeaders}
                             />
                           )}
                         </li>
@@ -229,7 +239,7 @@ export const SpreadsheetImportPreview = ({
             </Alert_Shadcn_>
           )}
         </SidePanel.Content>
-      </Collapsible.Content>
-    </Collapsible>
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
   )
 }

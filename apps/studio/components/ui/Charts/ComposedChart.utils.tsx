@@ -1,12 +1,11 @@
 'use client'
 
-import dayjs from 'dayjs'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { formatPercentage, numberFormatter } from './Charts.utils'
-import { guessLocalTimezone } from '@/lib/dayjs'
+import { useFormatDateTime, useTimezone } from '@/lib/datetime'
 import { formatBytes } from '@/lib/helpers'
 
 export interface ReportAttributes {
@@ -144,7 +143,7 @@ export const calculateTotalChartAggregate = (
 export const CustomTooltip = ({
   active,
   payload,
-  label,
+  label: _label,
   attributes,
   data,
   xAxisKey = 'period_start',
@@ -154,6 +153,8 @@ export const CustomTooltip = ({
   showTotal,
   isActiveHoveredChart,
 }: TooltipProps) => {
+  const formatDateTime = useFormatDateTime()
+  const { timezone } = useTimezone()
   if (active && payload && payload.length) {
     /**
      * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
@@ -194,7 +195,7 @@ export const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
-    const localTimeZone = guessLocalTimezone()
+    const localTimeZone = timezone
 
     const rawPayload = payload.map((entry: any) => ({
       ...entry,
@@ -211,9 +212,20 @@ export const CustomTooltip = ({
 
     const formatNumeric = (value: number) => {
       if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
-      return shouldFormatBytes
-        ? formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
-        : numberFormatter(value, valuePrecision)
+      if (shouldFormatBytes) {
+        return formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
+      }
+      const formatted = numberFormatter(value, valuePrecision)
+      if (
+        !isBytesFormat &&
+        format !== '%' &&
+        format !== 'ms' &&
+        typeof format === 'string' &&
+        format
+      ) {
+        return `${formatted}${format}`
+      }
+      return formatted
     }
 
     const LabelItem = ({ entry }: { entry: any }) => {
@@ -231,7 +243,7 @@ export const CustomTooltip = ({
       return (
         <div key={entry.name} className="flex items-center w-full">
           {getIcon(entry.color, isMax)}
-          <span className="text-foreground-lighter ml-1 flex-grow cursor-default select-none">
+          <span className="text-foreground-lighter ml-1 grow cursor-default select-none">
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
@@ -251,19 +263,19 @@ export const CustomTooltip = ({
     return (
       <div
         className={cn(
-          'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
+          'grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg-default px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
           !isActiveHoveredChart && 'opacity-0'
         )}
       >
         <p className="text-foreground-light text-xs">{localTimeZone}</p>
-        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
+        <p className="font-medium">{formatDateTime(timestamp, DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
           {[...payload].reverse().map((entry: any, index: number) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />
           ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
-              <span className="flex-grow text-foreground-lighter">Total</span>
+              <span className="grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
                   {isPercentage
@@ -311,7 +323,7 @@ export const CustomLabel = ({
 }: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMaxAttribute(attributes)
-  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
+  const [, setHoveredLabel] = useState<string | null>(null)
 
   const handleMouseEnter = (label: string) => {
     setHoveredLabel(label)

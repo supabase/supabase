@@ -1,8 +1,8 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
-import { Alert, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
@@ -83,7 +83,7 @@ const Subscription = () => {
                   </div>
 
                   <div>
-                    {canChangeTier && (
+                    {canChangeTier ? (
                       <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                         <Button
                           type="default"
@@ -94,40 +94,34 @@ const Subscription = () => {
                           Change subscription plan
                         </Button>
                       </ProjectUpdateDisabledTooltip>
+                    ) : projectUpdateDisabled ? (
+                      <Admonition
+                        type="default"
+                        layout="horizontal"
+                        title={`Unable to update plan from ${planName}`}
+                        description="We have temporarily disabled project and subscription changes - our
+                          engineers are working on a fix."
+                      />
+                    ) : (
+                      <Admonition
+                        type="default"
+                        layout="horizontal"
+                        title={`Unable to update plan from ${planName}`}
+                        description="Please contact us if you'd like to change your plan."
+                        actions={
+                          <Button asChild key="contact-support" type="default">
+                            <SupportLink
+                              queryParams={{
+                                category: SupportCategories.SALES_ENQUIRY,
+                                subject: `Change plan away from ${planName}`,
+                              }}
+                            >
+                              Contact support
+                            </SupportLink>
+                          </Button>
+                        }
+                      />
                     )}
-                    {!canChangeTier &&
-                      (projectUpdateDisabled ? (
-                        <Alert
-                          className="mt-2"
-                          withIcon
-                          variant="info"
-                          title={`Unable to update plan from ${planName}`}
-                        >
-                          We have temporarily disabled project and subscription changes - our
-                          engineers are working on a fix.
-                        </Alert>
-                      ) : (
-                        <Alert
-                          withIcon
-                          className="mt-2"
-                          variant="info"
-                          title={`Unable to update plan from ${planName}`}
-                          actions={[
-                            <Button asChild key="contact-support" type="default">
-                              <SupportLink
-                                queryParams={{
-                                  category: SupportCategories.SALES_ENQUIRY,
-                                  subject: `Change plan away from ${planName}`,
-                                }}
-                              >
-                                Contact support
-                              </SupportLink>
-                            </Button>,
-                          ]}
-                        >
-                          Please contact us if you'd like to change your plan.
-                        </Alert>
-                      ))}
                   </div>
 
                   {!subscription?.usage_billing_enabled && (
@@ -135,7 +129,7 @@ const Subscription = () => {
                       type="default"
                       title="This organization is limited by the included usage"
                     >
-                      <div className="[&>p]:!leading-normal prose text-sm">
+                      <div className="[&>p]:leading-normal! prose text-sm">
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
                         seamlessly,{' '}

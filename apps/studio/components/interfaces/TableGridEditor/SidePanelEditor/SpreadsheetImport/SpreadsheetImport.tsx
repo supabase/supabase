@@ -1,4 +1,4 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { useCallback, type ChangeEvent, type DragEvent } from 'react'
@@ -25,7 +25,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 
 interface SpreadsheetImportProps {
   visible: boolean
-  selectedTable?: PostgresTable
+  selectedTable?: PGTable
   saveContent: (prefillData: ImportContent) => void
   closePanel: () => void
   updateEditorDirty?: (value: boolean) => void
@@ -40,12 +40,10 @@ export const SpreadsheetImport = ({
 }: SpreadsheetImportProps) => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
-
   const {
     state,
-    treatEmptyAsNull,
     handleSwitchTab,
-    handleToggleTreatEmptyAsNull,
+    handleSetEmptyStringAsNullHeaders,
     handleInputText,
     handleUploadFile,
     handleRemoveFile,
@@ -54,9 +52,11 @@ export const SpreadsheetImport = ({
   const tab = isFileTab(state) ? 'fileUpload' : 'pasteText'
 
   const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
-  const csvHeaders =
-    state._tag === 'file_parsed' || state._tag === 'text_parsed' ? state.data.headers : []
-  const incompatibleHeaders = csvHeaders.filter((header) => !selectedTableColumns.includes(header))
+  const selectedHeaders =
+    state._tag === 'file_parsed' || state._tag === 'text_parsed' ? state.selectedHeaders : []
+  const incompatibleHeaders = selectedHeaders.filter(
+    (header) => !selectedTableColumns.includes(header)
+  )
   const isCompatible = !selectedTable || incompatibleHeaders.length === 0
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -83,7 +83,7 @@ export const SpreadsheetImport = ({
         file: state._tag === 'file_parsed' ? state.file : undefined,
         ...state.data,
         selectedHeaders: state.selectedHeaders,
-        treatEmptyAsNull: treatEmptyAsNull,
+        emptyStringAsNullHeaders: state.emptyStringAsNullHeaders,
         resolve,
       })
       sendEvent({
@@ -148,8 +148,8 @@ export const SpreadsheetImport = ({
             spreadsheetData={state.data}
             selectedHeaders={state.selectedHeaders}
             onToggleHeader={handleToggleSelectedHeader}
-            treatEmptyAsNull={treatEmptyAsNull}
-            onToggleTreatEmptyAsNull={handleToggleTreatEmptyAsNull}
+            emptyStringAsNullHeaders={state.emptyStringAsNullHeaders}
+            onEmptyStringAsNullHeadersChange={handleSetEmptyStringAsNullHeaders}
           />
           <SidePanel.Separator />
           <SpreadsheetImportPreview
@@ -158,6 +158,7 @@ export const SpreadsheetImport = ({
             errors={state.errors}
             selectedHeaders={state.selectedHeaders}
             incompatibleHeaders={incompatibleHeaders}
+            emptyStringAsNullHeaders={state.emptyStringAsNullHeaders}
           />
           <SidePanel.Separator />
         </>

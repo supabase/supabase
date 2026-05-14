@@ -1,3 +1,4 @@
+import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
@@ -52,14 +53,16 @@ export function generateQueryPerformanceSql({
     VALID_SORT_COLUMNS.has(orderBy.column) &&
     (orderBy.order === 'asc' || orderBy.order === 'desc')
 
-  const orderBySql = isValidOrderBy ? `ORDER BY ${orderBy!.column} ${orderBy!.order}` : undefined
+  const orderBySql = isValidOrderBy
+    ? `ORDER BY ${ident(orderBy!.column)} ${orderBy!.order}`
+    : undefined
 
   const whereConditions = []
   if (roles.length > 0) {
-    whereConditions.push(`auth.rolname in (${roles.map((r) => `'${r}'`).join(', ')})`)
+    whereConditions.push(`auth.rolname in (${roles.map((r) => `${literal(r)}`).join(', ')})`)
   }
   if (searchQuery.length > 0) {
-    whereConditions.push(`statements.query ~* '${searchQuery}'`)
+    whereConditions.push(`statements.query ~* ${literal(searchQuery)}`)
   }
   if (sources.includes('dashboard') && !sources.includes('non-dashboard')) {
     whereConditions.push(`statements.query ~* 'source: dashboard'`)
@@ -67,10 +70,10 @@ export function generateQueryPerformanceSql({
   if (sources.includes('non-dashboard') && !sources.includes('dashboard')) {
     whereConditions.push(`statements.query !~* 'source: dashboard'`)
   }
-  if (minCalls > 0) {
+  if (Number.isFinite(minCalls) && minCalls > 0) {
     whereConditions.push(`statements.calls >= ${minCalls}`)
   }
-  if (minTotalTime > 0) {
+  if (Number.isFinite(minTotalTime) && minTotalTime > 0) {
     whereConditions.push(
       `(statements.total_exec_time + statements.total_plan_time) >= ${minTotalTime}`
     )

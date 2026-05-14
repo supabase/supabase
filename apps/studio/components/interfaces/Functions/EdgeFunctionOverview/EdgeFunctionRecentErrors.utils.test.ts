@@ -1,18 +1,31 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildGroupAssistantPrompt,
+  buildTroubleshootingDocsUrl,
   formatLogTimestamp,
   formatSingleLineMessage,
+  getDisplayErrorMessage,
   getFunctionRuntimeLogsSql,
+  getNoErrorsSinceLastDeployMessage,
   getRecentErrorGroups,
   getRecentErrorGroupsBase,
   getRelatedExecutionIds,
+  getSinceLastDeployInvocationCount,
+  getSinceLastDeployInvocationCountSql,
+  getSinceLastDeployInvocationPhrase,
+  getSinceLastDeployLogRange,
   getStatusBadgeVariant,
+  summarizeErrorMessage,
   toAlertError,
+  toIsoTimestamp,
 } from './EdgeFunctionRecentErrors.utils'
 
 describe('EdgeFunctionRecentErrors.utils', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('normalizes alert errors and single-line messages', () => {
     expect(toAlertError('boom')).toEqual({ message: 'boom' })
     expect(toAlertError({ message: 'broken' })).toEqual({ message: 'broken' })
@@ -40,6 +53,61 @@ cross join unnest(metadata) as metadata
 where metadata.function_id = 'fn_''123' and metadata.execution_id in ('exec_1', 'exec_''2')
 order by timestamp desc
 limit 25`)
+  })
+
+  it('normalizes deploy timestamps and derives the logs query range', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-03-20T12:00:00.000Z'))
+
+    const deployedAt = '2026-03-20T10:15:00.000Z'
+    const deployedAtMilliseconds = Date.parse(deployedAt)
+
+    expect(toIsoTimestamp(deployedAt)).toBe(deployedAt)
+    expect(toIsoTimestamp(String(deployedAtMilliseconds))).toBe(deployedAt)
+    expect(toIsoTimestamp(String(deployedAtMilliseconds * 1000))).toBe(deployedAt)
+    expect(toIsoTimestamp('')).toBeUndefined()
+    expect(toIsoTimestamp('not-a-date')).toBeUndefined()
+
+    expect(getSinceLastDeployLogRange(deployedAt)).toEqual({
+      isoTimestampStart: deployedAt,
+      isoTimestampEnd: '2026-03-20T12:00:00.000Z',
+    })
+
+    expect(getSinceLastDeployLogRange('2026-03-20T13:00:00.000Z')).toEqual({
+      isoTimestampStart: '2026-03-20T13:00:00.000Z',
+      isoTimestampEnd: '2026-03-20T13:00:00.000Z',
+    })
+
+    expect(getSinceLastDeployLogRange()).toEqual({})
+  })
+
+  it('builds the since-deploy invocation count query and empty-state message', () => {
+    expect(getSinceLastDeployInvocationCountSql()).toContain(
+      'SELECT count(*) as count FROM function_edge_logs'
+    )
+    expect(getSinceLastDeployInvocationCountSql()).toContain("(function_id = '__pending__')")
+
+    expect(
+      getSinceLastDeployInvocationCount([
+        {
+          count: '12',
+        },
+      ] as unknown as Parameters<typeof getSinceLastDeployInvocationCount>[0])
+    ).toBe(12)
+    expect(getSinceLastDeployInvocationCount([])).toBe(0)
+
+    expect(getSinceLastDeployInvocationPhrase(1)).toBe('1 invocation')
+    expect(getSinceLastDeployInvocationPhrase(1200)).toBe('1,200 invocations')
+
+    expect(getNoErrorsSinceLastDeployMessage(0)).toBe(
+      'There have been 0 invocations since last deploy and no errors.'
+    )
+    expect(getNoErrorsSinceLastDeployMessage(1)).toBe(
+      'There has been 1 invocation since last deploy and no errors.'
+    )
+    expect(getNoErrorsSinceLastDeployMessage(1200)).toBe(
+      'There have been 1,200 invocations since last deploy and no errors.'
+    )
   })
 
   it('groups recent failed invocations by parsed error message', () => {
@@ -196,10 +264,73 @@ limit 25`)
         },
         'my-function'
       )
-    ).toContain('Analyze this recurring edge function error for `my-function`.')
+    ).toContain('Analyze this edge function error since the last deploy for `my-function`.')
 
     expect(getStatusBadgeVariant()).toBe('destructive')
     expect(getStatusBadgeVariant('500')).toBe('destructive')
     expect(getStatusBadgeVariant('404')).toBe('default')
+  })
+
+  it('summarizes verbose error messages by trimming the stack trace', () => {
+    expect(summarizeErrorMessage('')).toBe('')
+    expect(summarizeErrorMessage('boom')).toBe('boom')
+    expect(
+      summarizeErrorMessage(
+        "SyntaxError: Expected ',' or '}' after property value in JSON at position 22 at parse (<anonymous>) at packageData (ext:deno_fetch/22_body.js:408:14)"
+      )
+    ).toBe("SyntaxError: Expected ',' or '}' after property value in JSON at position 22")
+    expect(summarizeErrorMessage('  multi\n  line\t error  ')).toBe('multi line error')
+  })
+
+  it('prefers the first runtime error log message and falls back to invocation message', () => {
+    expect(
+      getDisplayErrorMessage({
+        message: 'https://example.supabase.red/functions/v1/hello-world',
+        count: 1,
+        lastSeen: 0,
+        executionIds: [],
+        logs: [
+          {
+            key: 'log:booted (time: 22ms)',
+            message: 'booted (time: 22ms)',
+            level: 'log',
+            count: 1,
+            lastSeen: 1,
+          },
+          {
+            key: 'error:SyntaxError: bad json at parse (<anonymous>)',
+            message: 'SyntaxError: bad json at parse (<anonymous>)',
+            level: 'error',
+            count: 1,
+            lastSeen: 2,
+          },
+        ],
+      })
+    ).toBe('SyntaxError: bad json')
+
+    expect(
+      getDisplayErrorMessage({
+        message: 'https://example.supabase.red/functions/v1/hello-world',
+        count: 1,
+        lastSeen: 0,
+        executionIds: [],
+        logs: [],
+      })
+    ).toBe('https://example.supabase.red/functions/v1/hello-world')
+  })
+
+  it('builds a troubleshooting docs URL keyed off the response status code', () => {
+    expect(buildTroubleshootingDocsUrl({ statusCode: '500' })).toBe(
+      'https://supabase.com/docs/guides/troubleshooting/edge-function-500-response'
+    )
+    expect(buildTroubleshootingDocsUrl({ statusCode: '503' })).toBe(
+      'https://supabase.com/docs/guides/troubleshooting/edge-function-503-response'
+    )
+    expect(buildTroubleshootingDocsUrl({})).toBe(
+      'https://supabase.com/docs/guides/troubleshooting?search=edge%20function'
+    )
+    expect(buildTroubleshootingDocsUrl({ statusCode: 'not-a-number' })).toBe(
+      'https://supabase.com/docs/guides/troubleshooting?search=edge%20function'
+    )
   })
 })

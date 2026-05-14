@@ -5,8 +5,9 @@
 import * as Sentry from '@sentry/nextjs'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
-import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
-import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from 'lib/sanitize'
+
+import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
+import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
 
 const DEFAULT_ERROR_SAMPLE_RATE = 1.0
 const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01
@@ -96,7 +97,7 @@ Sentry.init({
   debug: false,
 
   // Enable performance monitoring
-  tracesSampleRate: 1.0, // Capture 100% of transactions for performance monitoring
+  tracesSampleRate: 0.02,
 
   integrations: (() => {
     const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
@@ -104,7 +105,7 @@ Sentry.init({
 
     // Tag errors whose stack trace only contains third-party frames (browser extensions,
     // injected scripts, etc.). This uses build-time code annotation via the applicationKey
-    // in next.config.js to reliably distinguish our code from third-party code.
+    // in next.config.ts to reliably distinguish our code from third-party code.
     // We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
     // crashes — these may originate in third-party code but are caused by first-party bugs.
     return [

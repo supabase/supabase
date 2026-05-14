@@ -42,7 +42,7 @@ function MultipleSources({ children, sources }: PropsWithChildren<{ sources: (st
       {children}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="block -mt-4 mb-4 ml-auto text-foreground-lighter text-sm focus-visible:outline-none focus-visible:underline">
+          <button className="block -mt-4 mb-4 ml-auto text-foreground-lighter text-sm focus-visible:outline-hidden focus-visible:underline">
             View sources
           </button>
         </DropdownMenuTrigger>

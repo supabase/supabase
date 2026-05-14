@@ -156,8 +156,8 @@ function Resources({ schema }: { schema: any }) {
                                 <li key={nestedAttribute}>
                                   {nestedAttribute}
                                   <ul>
-                                    <li>
-                                      <ReactMarkdown className="*:!m-0">
+                                    <li className="*:m-0!">
+                                      <ReactMarkdown>
                                         {
                                           schema[resource].block.attributes[attribute].nested_type
                                             .attributes[nestedAttribute].description
@@ -285,8 +285,8 @@ function DataSources({ schema }: { schema: any }) {
                                 <li key={nestedAttribute}>
                                   {nestedAttribute}
                                   <ul>
-                                    <li>
-                                      <ReactMarkdown className="*:!m-0">
+                                    <li className="*:m-0!">
+                                      <ReactMarkdown>
                                         {
                                           schema[dataSource].block.attributes[attribute].nested_type
                                             .attributes[nestedAttribute].description
@@ -352,7 +352,11 @@ const TerraformReferencePage = async () => {
   const editLink = newEditLink('supabase/terraform-provider-supabase')
 
   return (
-    <GuideTemplate meta={meta} editLink={editLink}>
+    <GuideTemplate
+      meta={meta}
+      editLink={editLink}
+      pathname="/guides/deployment/terraform/reference"
+    >
       The Terraform Provider provides access to{' '}
       <Link
         href="https://developer.hashicorp.com/terraform/language/resources"

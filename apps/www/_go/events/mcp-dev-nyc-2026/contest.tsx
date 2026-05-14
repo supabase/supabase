@@ -59,7 +59,7 @@ const page: GoPageInput = {
           </div>
           <Button asChild type="default" size="medium">
             <Link
-              href="https://supabase.link/mcpdev-nyc-slides"
+              href="https://mcp-dev-summit-presentation.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -79,7 +79,9 @@ const page: GoPageInput = {
             <li>Create a Supabase account and note the email address you used</li>
             <li>Load data into a Supabase database</li>
             <li>Fill out the entry form below</li>
-            <li>Complete these steps by the contest deadline</li>
+            <li>
+              Complete these steps by the contest deadline, Monday April 13, 2026 at 12:00 PM PDT
+            </li>
           </ol>
           <Button asChild type="default" size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>

@@ -7,7 +7,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
+  Form,
   ScrollArea,
   Separator,
   Sheet,
@@ -35,6 +35,7 @@ import {
   type NewScopedAccessToken,
   type ScopedAccessTokenCreateVariables,
 } from '@/data/scoped-access-tokens/scoped-access-token-create-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface NewScopedTokenSheetProps {
   visible: boolean
@@ -65,6 +66,7 @@ export const NewScopedTokenSheet = ({
     },
     mode: 'onChange',
   })
+  const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const resourceAccess = form.watch('resourceAccess')
@@ -175,6 +177,12 @@ export const NewScopedTokenSheet = ({
 
     createAccessToken(finalPayload, {
       onSuccess: (data) => {
+        track('access_token_created', {
+          tokenType: 'scoped',
+          expiryPreset: values.expiresAt || 'never',
+          resourceAccess: values.resourceAccess,
+          permissionCount: permissions.length,
+        })
         toast.success('Access token created successfully')
         onCreateToken(data)
         handleClose()
@@ -239,7 +247,7 @@ export const NewScopedTokenSheet = ({
       <SheetContent
         showClose={false}
         size="default"
-        className="!min-w-[600px] flex flex-col h-full gap-0"
+        className="min-w-[600px]! flex flex-col h-full gap-0"
       >
         <SheetHeader>
           <SheetTitle>
@@ -279,7 +287,7 @@ export const NewScopedTokenSheet = ({
               </div>
             )}
 
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <div className="flex flex-col gap-0 overflow-visible">
                 <BasicInfo
                   control={form.control}
@@ -301,10 +309,10 @@ export const NewScopedTokenSheet = ({
                   setResourceSearchOpen={setResourceSearchOpen}
                 />
               </div>
-            </Form_Shadcn_>
+            </Form>
           </div>
         </ScrollArea>
-        <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
+        <SheetFooter className="justify-end! w-full mt-auto py-4 border-t">
           <div className="flex gap-2">
             <Button type="default" disabled={isPending} onClick={handleClose}>
               Cancel

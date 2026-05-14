@@ -171,6 +171,16 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     [folders, privateSnippets]
   )
 
+  const privateSnippetsTreeNodeIds = useMemo(
+    () => new Set(privateSnippetsTreeState.map((node) => node.id.toString())),
+    [privateSnippetsTreeState]
+  )
+
+  const validExpandedFolderIds = useMemo(
+    () => expandedFolderIds.filter((id) => privateSnippetsTreeNodeIds.has(id)),
+    [expandedFolderIds, privateSnippetsTreeNodeIds]
+  )
+
   const privateSnippetsLastItemIds = useMemo(
     () => getLastItemIds(privateSnippetsTreeState),
     [privateSnippetsTreeState]
@@ -464,7 +474,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
             <InnerSideMenuCollapsibleTrigger
               title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
             />
-            <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+            <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
               {isLoadingSharedSqlSnippets ? (
                 <SQLEditorLoadingSnippets />
               ) : sharedSnippets.length === 0 ? (
@@ -540,7 +550,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
             <InnerSideMenuCollapsibleTrigger
               title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
             />
-            <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+            <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
               {isLoadingFavoriteSqlSnippets ? (
                 <SQLEditorLoadingSnippets />
               ) : favoriteSnippets.length === 0 ? (
@@ -550,7 +560,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   description={
                     <>
                       Save a query to favorites for easy accessibility by clicking the{' '}
-                      <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
+                      <Heart size={12} className="inline-block relative align-center -top-px" />{' '}
                       icon.
                     </>
                   }
@@ -622,7 +632,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
           title={`PRIVATE
             ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
         />
-        <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+        <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
           {isLoading ? (
             <EditorMenuListSkeleton />
           ) : folders.length === 0 && privateSnippets.length === 0 ? (
@@ -644,7 +654,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   setExpandedFolderIds(expandedFolderIds.filter((x) => x !== folderId))
                 }
               }}
-              expandedIds={expandedFolderIds}
+              expandedIds={validExpandedFolderIds}
               nodeRenderer={({ element, ...props }) => {
                 const isOpened = Object.values(tabs.tabsMap).some(
                   (tab) => tab.metadata?.sqlId === element.metadata?.id

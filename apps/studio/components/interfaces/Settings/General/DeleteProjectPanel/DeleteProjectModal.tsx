@@ -2,9 +2,11 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Input } from 'ui'
+import { TextArea_Shadcn_ as TextArea } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
+import { LogicalBackupCliInstructions } from '@/components/layouts/ProjectLayout/LogicalBackupCliInstructions'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useSendDowngradeFeedbackMutation } from '@/data/feedback/exit-survey-send'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
@@ -83,8 +85,14 @@ export const DeleteProjectModal = ({
 
       toast.success(`Successfully deleted ${project?.name}`)
 
-      if (lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-      else router.push('/organizations')
+      // Only redirect if still viewing the deleted project
+      if (router.asPath.startsWith(`/project/${projectRef}`)) {
+        if (lastVisitedOrganization) {
+          router.push(`/org/${lastVisitedOrganization}`)
+        } else {
+          router.push('/organizations')
+        }
+      }
     },
   })
   const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation()
@@ -110,7 +118,7 @@ export const DeleteProjectModal = ({
     <TextConfirmModal
       visible={visible}
       loading={isSubmitting}
-      size={isFree ? 'small' : 'xlarge'}
+      size={isFree ? 'medium' : 'xlarge'}
       title={`Confirm deletion of ${project?.name}`}
       variant="destructive"
       alert={{
@@ -132,58 +140,62 @@ export const DeleteProjectModal = ({
         if (!isSubmitting) onClose()
       }}
     >
-      {/* 
+      <div className="space-y-6">
+        <LogicalBackupCliInstructions enabled={visible} showResetPassword={false} />
+
+        {/*
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
           but leaving that for the future.
         */}
-      {!isFree && (
-        <>
-          <div className="space-y-1">
-            <h4 className="text-base">What made you decide to delete your project?</h4>
-          </div>
-          <div className="space-y-4 pt-4">
-            <div className="flex flex-wrap gap-2" data-toggle="buttons">
-              {shuffledReasons.map((option) => {
-                const active = selectedReason[0] === option.value
-                return (
-                  <label
-                    key={option.value}
-                    className={[
-                      'flex cursor-pointer items-center space-x-2 rounded-md py-1',
-                      'pl-2 pr-3 text-center text-sm shadow-sm transition-all duration-100',
-                      `${
-                        active
-                          ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
-                          : ` bg-border-strong text-foreground opacity-50 hover:opacity-75`
-                      }`,
-                    ].join(' ')}
-                  >
-                    <input
-                      type="radio"
-                      name="options"
-                      value={option.value}
-                      className="hidden"
-                      checked={active}
-                      onChange={() => onSelectCancellationReason(option.value)}
-                    />
-                    <div>{option.value}</div>
-                  </label>
-                )
-              })}
-            </div>
-            <div className="text-area-text-sm flex flex-col gap-y-2">
-              <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
-              <Input.TextArea
+        {!isFree && (
+          <div className="flex flex-col gap-y-6">
+            <FormItemLayout
+              isReactForm={false}
+              label="What made you decide to delete your project?"
+            >
+              <div className="flex flex-wrap gap-2" data-toggle="buttons">
+                {shuffledReasons.map((option) => {
+                  const active = selectedReason[0] === option.value
+                  return (
+                    <label
+                      key={option.value}
+                      className={[
+                        'flex cursor-pointer items-center space-x-2 rounded-md py-1',
+                        'pl-2 pr-3 text-center text-sm shadow-xs transition-all duration-100',
+                        `${
+                          active
+                            ? ` bg-foreground text-background opacity-100 hover:bg-foreground/75`
+                            : ` bg-border-strong text-foreground opacity-50 hover:opacity-75`
+                        }`,
+                      ].join(' ')}
+                    >
+                      <input
+                        type="radio"
+                        name="options"
+                        value={option.value}
+                        className="hidden"
+                        checked={active}
+                        onChange={() => onSelectCancellationReason(option.value)}
+                      />
+                      <div>{option.value}</div>
+                    </label>
+                  )
+                })}
+              </div>
+            </FormItemLayout>
+
+            <FormItemLayout isReactForm={false} label={textareaLabel}>
+              <TextArea
                 name="message"
                 rows={3}
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
               />
-            </div>
+            </FormItemLayout>
           </div>
-        </>
-      )}
+        )}
+      </div>
     </TextConfirmModal>
   )
 }

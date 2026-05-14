@@ -1,10 +1,10 @@
+import type { PGMaterializedView } from '@supabase/pg-meta'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { useQuery } from '@tanstack/react-query'
 
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { PostgresMaterializedView } from '@supabase/postgres-meta'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { materializedViewKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type MaterializedViewsVariables = {
   projectRef?: string
@@ -38,7 +38,7 @@ export async function getMaterializedViews(
   })
 
   if (error) handleError(error)
-  return data as PostgresMaterializedView[]
+  return data as PGMaterializedView[]
 }
 
 export type MaterializedViewsData = Awaited<ReturnType<typeof getMaterializedViews>>

@@ -4,12 +4,12 @@ import { RotateCcw } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupInput,
   InputGroupText,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -93,13 +93,29 @@ export function DiskSizeField({
   return (
     <div id="disk-size" className="grid @xl:grid-cols-12 gap-5">
       <div className="col-span-4">
-        <FormField_Shadcn_
+        <FormField
           name="totalSize"
           control={control}
           render={({ field, fieldState: { isDirty } }) => (
             <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
-              <FormControl_Shadcn_ className="max-w-32">
+              <FormControl className="max-w-32">
                 <InputGroup>
+                  <FormInputGroupInput
+                    type="number"
+                    id={field.name}
+                    {...field}
+                    disabled={disableInput || isError}
+                    onWheel={(e) => e.currentTarget.blur()}
+                    onChange={(e) => {
+                      setValue('totalSize', e.target.valueAsNumber, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                      trigger('provisionedIOPS')
+                      trigger('throughput')
+                    }}
+                    min={includedDiskGB}
+                  />
                   <InputGroupAddon align="inline-end">
                     <InputGroupText>GB</InputGroupText>
                     {isDirty ? (
@@ -118,24 +134,8 @@ export function DiskSizeField({
                       </InputGroupButton>
                     ) : null}
                   </InputGroupAddon>
-                  <InputGroupInput
-                    type="number"
-                    id={field.name}
-                    {...field}
-                    disabled={disableInput || isError}
-                    onWheel={(e) => e.currentTarget.blur()}
-                    onChange={(e) => {
-                      setValue('totalSize', e.target.valueAsNumber, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
-                      trigger('provisionedIOPS')
-                      trigger('throughput')
-                    }}
-                    min={includedDiskGB}
-                  />
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -149,7 +149,7 @@ export function DiskSizeField({
           <span className="text-foreground-lighter text-sm">
             {includedDiskGB > 0 &&
               org?.plan.id &&
-              `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
+              `Your plan includes up to ${includedDiskGB} GB of ${watchedStorageType} storage.`}
 
             <div className="mt-3">
               <DocsButton abbrev={false} href={`${DOCS_URL}/guides/platform/database-size`} />

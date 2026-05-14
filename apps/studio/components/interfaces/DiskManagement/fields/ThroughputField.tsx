@@ -1,14 +1,13 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -39,7 +38,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
   const watchedComputeSize = watch('computeSize')
   const throughput_mbps = formState.defaultValues?.throughput
 
-  const { isPending: isLoading, error } = useDiskAttributesQuery({ projectRef })
+  useDiskAttributesQuery({ projectRef })
 
   const throughputPrice = calculateThroughputPrice({
     storageType: form.getValues('storageType') as DiskType,
@@ -79,7 +78,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
           transition={{ duration: 0.1 }}
           style={{ overflow: 'hidden' }}
         >
-          <FormField_Shadcn_
+          <FormField
             name="throughput"
             control={control}
             render={({ field }) => (
@@ -118,12 +117,9 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                   </>
                 }
               >
-                <FormControl_Shadcn_ className="max-w-32">
+                <FormControl className="max-w-32">
                   <InputGroup>
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupText>MB/s</InputGroupText>
-                    </InputGroupAddon>
-                    <InputGroupInput
+                    <FormInputGroupInput
                       type="number"
                       {...field}
                       value={field.value}
@@ -135,8 +131,11 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                       }}
                       disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
                     />
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupText>MB/s</InputGroupText>
+                    </InputGroupAddon>
                   </InputGroup>
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />

@@ -16,9 +16,9 @@ import {
   DialogTitle,
   DialogTrigger,
   ExpandingTextArea,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -31,6 +31,14 @@ import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import {
+  BatchInvitationResult,
+  buildProjectPayload,
+  buildSsoPayload,
+  categorizeInviteEmails,
+  emailSchema,
+  parseEmails,
+} from './InviteMemberButton.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -48,14 +56,8 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
-
-function parseEmails(value: string): string[] {
-  return value
-    .split(',')
-    .map((e) => e.trim())
-    .filter(Boolean)
-}
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -93,6 +95,8 @@ export const InviteMemberButton = () => {
     (userMemberData?.role_ids ?? []).length === 1 &&
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
+  const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
+
   const { rolesAddable } = useGetRolesManagementPermissions(
     organization?.slug,
     orgScopedRoles,
@@ -115,33 +119,23 @@ export const InviteMemberButton = () => {
   const { mutateAsync: inviteMemberAsync, isPending: isInviting } =
     useOrganizationCreateInvitationMutation()
 
-  const emailSchema = z
-    .string()
-    .min(1, 'At least one email address is required')
-    .refine(
-      (val) => {
-        const emails = parseEmails(val)
-        if (emails.length === 0) return false
-        return emails.every((e) => z.string().email().safeParse(e).success)
-      },
-      (val) => {
-        const emails = parseEmails(val)
-        const invalid = emails.find((e) => !z.string().email().safeParse(e).success)
-        return {
-          message: invalid
-            ? `Invalid email address: ${invalid}`
-            : 'At least one email address is required',
-        }
+  const FormSchema = z
+    .object({
+      email: emailSchema,
+      role: z.string().min(1, 'Role is required'),
+      applyToOrg: z.boolean(),
+      projectRef: z.string(),
+      requireSso: z.enum(['auto', 'sso', 'non-sso']),
+    })
+    .superRefine((data, ctx) => {
+      if (!data.applyToOrg && !data.projectRef) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'A project must be selected',
+          path: ['projectRef'],
+        })
       }
-    )
-
-  const FormSchema = z.object({
-    email: emailSchema,
-    role: z.string().min(1, 'Role is required'),
-    applyToOrg: z.boolean(),
-    projectRef: z.string(),
-    requireSso: z.enum(['auto', 'sso', 'non-sso']),
-  })
+    })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -159,22 +153,10 @@ export const InviteMemberButton = () => {
     if (profile?.id === undefined) return console.error('Profile ID required')
     const emails = parseEmails(values.email).map((e) => e.toLowerCase())
 
-    const alreadyInvited: string[] = []
-    const alreadyMembers: string[] = []
-    const toInvite: string[] = []
-
-    for (const emailAddress of emails) {
-      const existingMember = (members ?? []).find((member) => member.primary_email === emailAddress)
-      if (existingMember !== undefined) {
-        if (existingMember.invited_id) {
-          alreadyInvited.push(emailAddress)
-        } else {
-          alreadyMembers.push(emailAddress)
-        }
-      } else {
-        toInvite.push(emailAddress)
-      }
-    }
+    const { alreadyInvited, alreadyMembers, toInvite } = categorizeInviteEmails(
+      emails,
+      members ?? []
+    )
 
     if (alreadyInvited.length > 0) {
       toast.error(
@@ -194,46 +176,38 @@ export const InviteMemberButton = () => {
       if (toInvite.length === 0) return
     }
 
-    const projectPayload =
-      !values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}
+    const projectPayload = buildProjectPayload(values.applyToOrg, values.projectRef)
+    const ssoPayload = buildSsoPayload(values.requireSso)
 
-    // Transform SSO preference to backend format
-    const ssoPayload =
-      values.requireSso === 'sso'
-        ? { requireSso: true }
-        : values.requireSso === 'non-sso'
-          ? { requireSso: false }
-          : {} // 'auto' - let backend use automatic behavior
-
-    const results = await Promise.allSettled(
-      toInvite.map((emailAddress) =>
-        inviteMemberAsync({
-          slug,
-          email: emailAddress,
-          roleId: Number(values.role),
-          ...projectPayload,
-          ...ssoPayload,
-        })
-      )
-    )
-
-    const successCount = results.filter((r) => r.status === 'fulfilled').length
-    const failedEmails = toInvite.filter((_, i) => results[i].status === 'rejected')
-
-    if (successCount > 0) {
-      toast.success(
-        successCount === 1
-          ? 'Successfully sent invitation to new member'
-          : `Successfully sent invitations to ${successCount} new members`
-      )
-      closeInviteDialog()
+    let result: BatchInvitationResult
+    try {
+      result = (await inviteMemberAsync({
+        slug,
+        emails: toInvite,
+        roleId: Number(values.role),
+        ...projectPayload,
+        ...ssoPayload,
+      })) as BatchInvitationResult
+    } catch {
+      return // onError callback already showed the toast
     }
-    if (failedEmails.length > 0) {
-      toast.error(
-        failedEmails.length === 1
-          ? `Failed to send invitation to ${failedEmails[0]}`
-          : `Failed to send invitations to ${failedEmails.length} emails`
+
+    const { succeeded, failed } = result
+
+    if (succeeded.length > 0) {
+      toast.success(
+        succeeded.length === 1
+          ? 'Successfully sent invitation to new member'
+          : `Successfully sent invitations to ${succeeded.length} new members`
       )
+    }
+
+    for (const { email, error } of failed) {
+      toast.error(`Failed to invite ${email}: ${error}`)
+    }
+
+    if (succeeded.length > 0) {
+      closeInviteDialog()
     }
   }
 
@@ -274,7 +248,7 @@ export const InviteMemberButton = () => {
           type="primary"
           disabled={!canInviteMembers}
           icon={<UserPlus size={14} />}
-          className="pointer-events-auto flex-grow md:flex-grow-0"
+          className="pointer-events-auto grow md:grow-0"
           onClick={() => setIsOpen(true)}
           tooltip={{
             content: {
@@ -315,19 +289,19 @@ export const InviteMemberButton = () => {
             </>
           }
         />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id="organization-invitation"
             className="flex flex-col gap-y-4"
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              <FormField_Shadcn_
+              <FormField
                 name="role"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Role">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_ className="text-sm capitalize">
                           {orgScopedRoles.find((role) => role.id === Number(field.value))?.name ??
@@ -337,30 +311,42 @@ export const InviteMemberButton = () => {
                           <SelectGroup_Shadcn_>
                             {orgScopedRoles.map((role) => {
                               const canAssignRole = rolesAddable.includes(role.id)
+                              const isOwnerRole = role.name === 'Owner'
+                              const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                              const disabled = !canAssignRole || disabledForStripe
+                              const disabledReason = disabledForStripe
+                                ? 'Cannot be assigned in Stripe Projects organizations'
+                                : !canAssignRole
+                                  ? 'Additional permissions required to assign role'
+                                  : undefined
 
                               return (
                                 <SelectItem_Shadcn_
                                   key={role.id}
                                   value={role.id.toString()}
-                                  className="text-sm [&>span:nth-child(2)]:w-full [&>span:nth-child(2)]:flex [&>span:nth-child(2)]:items-center [&>span:nth-child(2)]:justify-between"
-                                  disabled={!canAssignRole}
+                                  className="text-sm"
+                                  disabled={disabled}
                                 >
-                                  <span>{role.name}</span>
-                                  {!canAssignRole && (
-                                    <span>Additional permissions required to assign role</span>
-                                  )}
+                                  <div className="flex flex-col gap-0.5">
+                                    <span>{role.name}</span>
+                                    {disabledReason && (
+                                      <span className="text-xs text-foreground-lighter">
+                                        {disabledReason}
+                                      </span>
+                                    )}
+                                  </div>
                                 </SelectItem_Shadcn_>
                               )
                             })}
                           </SelectGroup_Shadcn_>
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
               {hasSsoProvider && (
-                <FormField_Shadcn_
+                <FormField
                   name="requireSso"
                   control={form.control}
                   render={({ field }) => (
@@ -368,7 +354,7 @@ export const InviteMemberButton = () => {
                       label="Invitation type"
                       description="Choose how the invitee should authenticate"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_>
                             <SelectValue_Shadcn_ placeholder="Automatic (based on your account)" />
@@ -387,26 +373,26 @@ export const InviteMemberButton = () => {
                             </SelectGroup_Shadcn_>
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
               {hasAccessToProjectLevelPermissions && (
-                <FormField_Shadcn_
+                <FormField
                   name="applyToOrg"
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout layout="flex" label="Grant this role on all projects">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
               {!applyToOrg && (
-                <FormField_Shadcn_
+                <FormField
                   name="projectRef"
                   control={form.control}
                   render={({ field }) => (
@@ -414,7 +400,7 @@ export const InviteMemberButton = () => {
                       label="Select a project"
                       description="Project access can be adjusted after the user joins"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <OrganizationProjectSelector
                           fetchOnMount
                           sameWidthAsTrigger
@@ -426,17 +412,17 @@ export const InviteMemberButton = () => {
                           onSelect={(project) => field.onChange(project.ref)}
                           onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
-              <FormField_Shadcn_
+              <FormField
                 name="email"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Email addresses">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <ExpandingTextArea
                         autoFocus
                         {...field}
@@ -449,12 +435,12 @@ export const InviteMemberButton = () => {
                         data-form-type="other"
                         data-bwignore
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <Button type="default" onClick={confirmOnClose}>
                 Cancel
               </Button>
@@ -463,7 +449,7 @@ export const InviteMemberButton = () => {
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
       <DiscardChangesConfirmationDialog
         {...discardChangesModalProps}

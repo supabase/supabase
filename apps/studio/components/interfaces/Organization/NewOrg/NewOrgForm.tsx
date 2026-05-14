@@ -2,20 +2,21 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
+import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { groupBy } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -25,9 +26,11 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
 import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
+import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
 import {
@@ -38,6 +41,7 @@ import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useOrganizationCreateMutation } from '@/data/organizations/organization-create-mutation'
+import { useOrganizationCreationPreview } from '@/data/organizations/organization-creation-preview'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
@@ -184,6 +188,56 @@ export const NewOrgForm = ({
     }
   }, [isSuccess, form, organizations?.length, user.profile?.username, user.isSuccess])
 
+  const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
+  const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
+
+  const billingAddress = useDebounce(latestAddress, 1000)
+  const billingTaxId = useDebounce(latestTaxId, 1000)
+
+  const handleAddressChange = useCallback((address: CustomerAddress) => {
+    setLatestAddress({
+      ...address,
+      line2: address.line2 || undefined,
+    })
+  }, [])
+
+  const handleAddressIncomplete = useCallback(() => {
+    setLatestAddress(undefined)
+  }, [])
+
+  const handleTaxIdChange = useCallback((taxId: CustomerTaxId | null) => {
+    setLatestTaxId(taxId)
+  }, [])
+
+  const selectedPlan = form.watch('plan')
+  const selectedSpendCap = form.watch('spend_cap')
+
+  useEffect(() => {
+    if (selectedPlan === 'FREE' || !setupIntent) {
+      setLatestAddress(undefined)
+      setLatestTaxId(null)
+    }
+  }, [selectedPlan, setupIntent])
+
+  const previewTier = useMemo(() => {
+    if (selectedPlan === 'FREE') return undefined
+    const dbTier = selectedPlan === 'PRO' && !selectedSpendCap ? 'PAYG' : selectedPlan
+    return ('tier_' + dbTier.toLowerCase()) as 'tier_pro' | 'tier_payg' | 'tier_team'
+  }, [selectedPlan, selectedSpendCap])
+
+  const {
+    data: creationPreview,
+    isFetching: creationPreviewIsFetching,
+    isSuccess: creationPreviewInitialized,
+  } = useOrganizationCreationPreview(
+    {
+      tier: previewTier,
+      address: billingAddress,
+      taxId: billingTaxId ?? undefined,
+    },
+    { enabled: !!previewTier && !!billingAddress }
+  )
+
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
 
@@ -206,7 +260,6 @@ export const NewOrgForm = ({
     },
     onError: (data) => {
       toast.error(data.message, { duration: 10_000 })
-      resetPaymentMethod()
       setNewOrgLoading(false)
     },
   })
@@ -301,23 +354,21 @@ export const NewOrgForm = ({
 
     if (formValues.plan === 'FREE') {
       await createOrg(formValues)
-    } else if (!paymentMethod) {
-      const result = await paymentRef.current?.createPaymentMethod()
-      if (result) {
-        setPaymentMethod(result.paymentMethod)
-        const customerData = {
-          address: result.address,
-          billing_name: result.customerName,
-          tax_id: result.taxId,
-        }
-
-        createOrg(formValues, result.paymentMethod.id, customerData)
-      } else {
-        setNewOrgLoading(false)
-      }
-    } else {
-      createOrg(formValues, paymentMethod.id)
+      return
     }
+
+    const result = await paymentRef.current?.createPaymentMethod()
+    if (!result) {
+      setNewOrgLoading(false)
+      return
+    }
+
+    setPaymentMethod(result.paymentMethod)
+    createOrg(formValues, result.paymentMethod.id, {
+      address: result.address,
+      billing_name: result.customerName,
+      tax_id: result.taxId,
+    })
   }
 
   const resetPaymentMethod = () => {
@@ -326,7 +377,7 @@ export const NewOrgForm = ({
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
         <Panel
           title={
@@ -356,7 +407,7 @@ export const NewOrgForm = ({
                 htmlType="submit"
                 type="primary"
                 loading={newOrgLoading}
-                disabled={newOrgLoading}
+                disabled={newOrgLoading || creationPreviewIsFetching}
               >
                 Create organization
               </Button>
@@ -370,7 +421,7 @@ export const NewOrgForm = ({
         >
           <div className="divide-y divide-border-muted">
             <Panel.Content>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
@@ -379,7 +430,7 @@ export const NewOrgForm = ({
                     layout="horizontal"
                     description="What's the name of your company or team? You can change this later."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         autoFocus
                         type="text"
@@ -390,13 +441,13 @@ export const NewOrgForm = ({
                         data-bwignore
                         {...field}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </Panel.Content>
             <Panel.Content>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="kind"
                 render={({ field }) => (
@@ -405,7 +456,7 @@ export const NewOrgForm = ({
                     layout="horizontal"
                     description="What best describes your organization?"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_ className="w-full">
                           <SelectValue_Shadcn_ />
@@ -419,7 +470,7 @@ export const NewOrgForm = ({
                           ))}
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -427,7 +478,7 @@ export const NewOrgForm = ({
 
             {form.watch('kind') == 'COMPANY' && (
               <Panel.Content>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="size"
                   render={({ field }) => (
@@ -436,7 +487,7 @@ export const NewOrgForm = ({
                       layout="horizontal"
                       description="How many people are in your company?"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_ className="w-full">
                             <SelectValue_Shadcn_ />
@@ -450,7 +501,7 @@ export const NewOrgForm = ({
                             ))}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -459,7 +510,7 @@ export const NewOrgForm = ({
 
             {isBillingEnabled && (
               <Panel.Content>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="plan"
                   render={({ field }) => (
@@ -473,7 +524,7 @@ export const NewOrgForm = ({
                         </>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_
                           value={field.value}
                           onValueChange={(value) => {
@@ -493,7 +544,7 @@ export const NewOrgForm = ({
                             ))}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -503,7 +554,7 @@ export const NewOrgForm = ({
             {form.watch('plan') === 'PRO' && (
               <>
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="spend_cap"
                     render={({ field }) => (
@@ -526,9 +577,9 @@ export const NewOrgForm = ({
                             : `You pay for overages beyond the plan's quota.`
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -548,8 +599,39 @@ export const NewOrgForm = ({
                     ref={paymentRef}
                     email={user.profile?.primary_email}
                     readOnly={newOrgLoading || paymentConfirmationLoading}
+                    onAddressChange={handleAddressChange}
+                    onAddressIncomplete={handleAddressIncomplete}
+                    onTaxIdChange={handleTaxIdChange}
                   />
                 </Elements>
+
+                {!!billingAddress && !creationPreviewInitialized && (
+                  <div className="space-y-2 mt-4">
+                    <ShimmeringLoader />
+                    <ShimmeringLoader className="w-3/4" />
+                    <ShimmeringLoader className="w-1/2" />
+                  </div>
+                )}
+
+                {creationPreviewInitialized && !!billingAddress && (
+                  <div className="mt-4">
+                    <ChargeBreakdown
+                      subtotal={creationPreview.plan_price}
+                      subtotalLabel="Plan price"
+                      total={creationPreview.total}
+                      tax={
+                        creationPreview.tax
+                          ? {
+                              amount: creationPreview.tax.tax_amount,
+                              percentage: creationPreview.tax.tax_rate_percentage,
+                            }
+                          : undefined
+                      }
+                      taxStatus={creationPreview.tax_status}
+                      isFetching={creationPreviewIsFetching}
+                    />
+                  </div>
+                )}
               </Panel.Content>
             )}
 
@@ -576,6 +658,6 @@ export const NewOrgForm = ({
           </Elements>
         )}
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

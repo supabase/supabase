@@ -3,7 +3,7 @@ import { expect, Page } from '@playwright/test'
 import { createTable, dropTable, query } from '../utils/db/index.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { waitForTableToLoad } from '../utils/wait-for-response.js'
+import { createApiResponseWaiter, waitForTableToLoad } from '../utils/wait-for-response.js'
 
 const QUEUE_OPERATIONS_KEY = 'supabase-ui-queue-operations'
 const tableNamePrefix = 'pw_queue_table'
@@ -46,8 +46,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -94,8 +100,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -137,8 +149,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -175,14 +193,20 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('new row value')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -217,19 +241,25 @@ test.describe('Queue Table Operations', () => {
     )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('row one')
     await page.getByTestId('action-bar-save-row').click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('row two')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -262,19 +292,25 @@ test.describe('Queue Table Operations', () => {
     )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('keep this row')
     await page.getByTestId('action-bar-save-row').click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('remove this row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -309,14 +345,20 @@ test.describe('Queue Table Operations', () => {
     )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('shortcut test')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -350,8 +392,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -359,7 +407,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'existing row' })).toBeVisible()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('undo this row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -388,19 +436,25 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('first row')
     await page.getByTestId('action-bar-save-row').click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('second row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -433,8 +487,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -473,8 +533,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -508,8 +574,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -552,8 +624,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -591,8 +669,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -608,7 +692,7 @@ test.describe('Queue Table Operations', () => {
     await page.getByRole('menuitem', { name: 'Delete row' }).click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('new row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -636,9 +720,7 @@ test.describe('Queue Table Operations', () => {
 
     await using _ = await withSetupCleanup(
       async () => {
-        await createTable(tableName, columnName, [
-          { name: 'existing row' },
-        ])
+        await createTable(tableName, columnName, [{ name: 'existing row' }])
       },
       async () => {
         await dropTable(tableName)
@@ -647,15 +729,21 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     // Add a new row
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('new row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -703,14 +791,20 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName1}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('pending in table 1')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -719,7 +813,7 @@ test.describe('Queue Table Operations', () => {
     await page.getByRole('button', { name: `View ${tableName2}`, exact: true }).click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('pending in table 2')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -757,14 +851,20 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName1}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('only in table 1')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -776,7 +876,7 @@ test.describe('Queue Table Operations', () => {
 
     // Add a row in table 2
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('only in table 2')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -801,8 +901,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -846,10 +952,10 @@ test.describe('Queue Table Operations', () => {
             last_name text
           )`
         )
-        await query(
-          `INSERT INTO ${tableName} (first_name, last_name) VALUES ($1, $2)`,
-          ['Alice', 'Smith']
-        )
+        await query(`INSERT INTO ${tableName} (first_name, last_name) VALUES ($1, $2)`, [
+          'Alice',
+          'Smith',
+        ])
       },
       async () => {
         await dropTable(tableName)
@@ -858,8 +964,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)

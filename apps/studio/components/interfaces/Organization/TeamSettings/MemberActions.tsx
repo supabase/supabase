@@ -128,12 +128,12 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
             const projects = projectScopedRole.projects.map(({ ref }) => ref)
             inviteMember({
               slug,
-              email: member.primary_email,
+              emails: [member.primary_email],
               roleId: projectScopedRole.base_role_id,
               projects,
             })
           } else {
-            inviteMember({ slug, email: member.primary_email, roleId })
+            inviteMember({ slug, emails: [member.primary_email], roleId })
           }
         },
       }

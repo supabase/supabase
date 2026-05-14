@@ -1,37 +1,36 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+// Audit log timestamps are returned in microseconds, not milliseconds.
+// Divide by this constant before passing to dayjs/Date to get a valid date.
+export const TIMESTAMP_MICROS_PER_MS = 1000
 
 export type AuditLog = {
+  organization_slug?: string
+  project_ref?: string
+  request_id: string
   action: {
-    metadata: {
-      method?: string
-      route?: string
-      status?: number
-    }[]
     name: string
+    method: string
+    route: string
+    status: number
+    metadata?: Record<string, unknown>
   }
   actor: {
-    id: string
-    type: 'user' | string
-    metadata: {
-      email?: string
-      ip?: string
-      tokenType?: string
-    }[]
+    token_type: string
+    token_hash?: string
+    user_id?: string
+    email?: string
+    oauth_app_id?: string
+    oauth_app_name?: string
+    app_id?: string
+    app_name?: string
+    ip?: string
   }
-  target: {
-    description: string
-    metadata: {
-      org_slug?: string
-      project_ref?: string | null
-      ref?: string | null
-      slug?: string | null
-    }
-  }
-  occurred_at: string
+  timestamp: number
 }
 
 export type OrganizationAuditLogsResponse = {

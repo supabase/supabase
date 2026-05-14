@@ -12,13 +12,13 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
   InfoIcon,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Modal,
   WarningIcon,
@@ -74,7 +74,7 @@ const DiskSizeConfigurationModal = ({
 
   const { mutate: updateProjectUsage, isPending: isUpdatingDiskSize } =
     useProjectDiskResizeMutation({
-      onSuccess: (res, variables) => {
+      onSuccess: (_res, variables) => {
         toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
         hideModal(false)
       },
@@ -183,9 +183,9 @@ const DiskSizeConfigurationModal = ({
                     </Button>
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
-                <Form_Shadcn_ {...form}>
+                <Form {...form}>
                   <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} noValidate>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="new-disk-size"
                       disabled={!isAbleToResizeDatabase}
@@ -195,24 +195,24 @@ const DiskSizeConfigurationModal = ({
                           layout="vertical"
                           label="New disk size"
                         >
-                          <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>GB</InputGroupText>
-                            </InputGroupAddon>
-                            <FormControl_Shadcn_>
-                              <InputGroupInput
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
                                 id="new-disk-size"
                                 type="number"
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                               />
-                            </FormControl_Shadcn_>
-                          </InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>GB</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </form>
-                </Form_Shadcn_>
+                </Form>
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content className="flex space-x-2 justify-end">

@@ -126,6 +126,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-description-only": {
+      name: "admonition-description-only",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-description-only")),
+      source: "",
+      files: ["registry/default/example/admonition-description-only.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "admonition-warning": {
       name: "admonition-warning",
       type: "components:example",
@@ -133,6 +144,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/admonition-warning")),
       source: "",
       files: ["registry/default/example/admonition-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "admonition-success": {
+      name: "admonition-success",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-success")),
+      source: "",
+      files: ["registry/default/example/admonition-success.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -1046,6 +1068,39 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/input-otp-form")),
       source: "",
       files: ["registry/default/example/input-otp-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-demo": {
+      name: "keyboard-shortcut-demo",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-demo")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-pill": {
+      name: "keyboard-shortcut-pill",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-pill")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-pill.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-inline": {
+      name: "keyboard-shortcut-inline",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-inline")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-inline.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2531,6 +2586,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/multi-select-inline-search-input")),
       source: "",
       files: ["registry/default/example/multi-select-inline-search-input.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-in-dialog": {
+      name: "multi-select-in-dialog",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-in-dialog")),
+      source: "",
+      files: ["registry/default/example/multi-select-in-dialog.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

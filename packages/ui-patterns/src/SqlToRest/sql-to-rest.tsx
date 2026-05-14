@@ -28,7 +28,14 @@ import {
 } from 'react'
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { Alert_Shadcn_ as Alert, cn, Collapsible, Tabs } from 'ui'
+import {
+  Alert_Shadcn_ as Alert,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Tabs,
+} from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { assumptions } from './assumptions'
@@ -315,7 +322,7 @@ export default function SqlToRest({
             </div>
             <div className="prose text-sm mt-2">
               PostgREST doesn't support this query. If you're sure the syntax is correct and are
-              unable to modify it, wrap it in a stored procedure and call it using the{' '}
+              unable to modify it, wrap it in a database function and call it using the{' '}
               <a href="https://postgrest.org/en/v12/references/api/stored_procedures.html#stored-procedures">
                 RPC
               </a>{' '}
@@ -415,8 +422,8 @@ export default function SqlToRest({
               <h3 className="my-1 text-base text-inherit">Assumptions</h3>
               <ol className="my-0 text-foreground">
                 {relevantAssumptions.map((assumption) => (
-                  <li>
-                    <Markdown className="text-sm">{assumption}</Markdown>
+                  <li className="text-sm">
+                    <Markdown>{assumption}</Markdown>
                   </li>
                 ))}
               </ol>
@@ -427,14 +434,16 @@ export default function SqlToRest({
             <>
               <h3 className="my-1 text-base text-inherit">FAQs</h3>
               {relevantFaqs.map((faq) => (
-                <Collapsible
+                <Collapsible_Shadcn_
                   key={faq.id}
-                  className="flex flex-col items-stretch justify-start bg-surface-100 rounded border border-default px-4"
+                  className="flex flex-col items-stretch justify-start bg-surface-100 rounded-sm border border-default px-4"
                 >
-                  <Collapsible.Trigger asChild>
-                    <button type="button" className="flex justify-between items-center p-3">
+                  <CollapsibleTrigger_Shadcn_ asChild>
+                    <button
+                      type="button"
+                      className="flex justify-between items-center p-3 text-sm text-left"
+                    >
                       <Markdown
-                        className="text-sm text-left"
                         components={{
                           p: ({ children }: PropsWithChildren) => <p className="m-0">{children}</p>,
                         }}
@@ -443,11 +452,10 @@ export default function SqlToRest({
                       </Markdown>
                       <ChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
                     </button>
-                  </Collapsible.Trigger>
-                  <Collapsible.Content>
-                    <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4">
+                  </CollapsibleTrigger_Shadcn_>
+                  <CollapsibleContent_Shadcn_>
+                    <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4 text-sm">
                       <Markdown
-                        className="text-sm"
                         components={{
                           code: (props: any) => <CodeBlock hideLineNumbers {...props} />,
                         }}
@@ -455,8 +463,8 @@ export default function SqlToRest({
                         {faq.answer}
                       </Markdown>
                     </div>
-                  </Collapsible.Content>
-                </Collapsible>
+                  </CollapsibleContent_Shadcn_>
+                </Collapsible_Shadcn_>
               ))}
             </>
           )}

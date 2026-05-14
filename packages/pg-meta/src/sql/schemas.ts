@@ -1,4 +1,6 @@
-export const SCHEMAS_SQL = /* SQL */ `
+import { safeSql } from '../pg-format'
+
+export const SCHEMAS_SQL = /* SQL */ safeSql`
 -- Adapted from information_schema.schemata
 
 select

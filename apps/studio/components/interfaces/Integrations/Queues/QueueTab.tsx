@@ -16,6 +16,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { pgmqQueueTable } from './Queues.utils'
 import { DeleteQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
 import { PurgeQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
 import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
@@ -51,7 +52,8 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = tables?.find((x) => x.name === `q_${queueName}`)
+  const queueRelname = queueName ? pgmqQueueTable(queueName) : undefined
+  const queueTable = tables?.find((x) => x.name === queueRelname)
   const isRlsEnabled = queueTable?.rls_enabled ?? false
 
   const { data: policies } = useDatabasePoliciesQuery({
@@ -59,7 +61,7 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queuePolicies = (policies ?? []).filter((policy) => policy.table === `q_${queueName}`)
+  const queuePolicies = (policies ?? []).filter((policy) => policy.table === queueRelname)
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,
@@ -121,6 +123,7 @@ export const QueueTab = () => {
             onClick={() => setPurgeQueueModalShown(true)}
             icon={<Paintbrush />}
             title="Purge messages"
+            aria-label="Purge messages"
             tooltip={{ content: { side: 'bottom', text: 'Purge messages' } }}
           />
 
@@ -130,6 +133,7 @@ export const QueueTab = () => {
             onClick={() => setDeleteQueueModalShown(true)}
             icon={<Trash2 />}
             title="Delete queue"
+            aria-label="Delete queue"
             tooltip={{ content: { side: 'bottom', text: 'Delete queue' } }}
           />
 
@@ -221,7 +225,7 @@ export const QueueTab = () => {
                   ) : (
                     <>
                       <Markdown
-                        className="[&>p]:!leading-normal text-xs [&>p]:!m-0 flex flex-col gap-y-2"
+                        className="[&>p]:leading-normal! text-xs [&>p]:m-0! flex flex-col gap-y-2"
                         content={`
 RLS for queues is only relevant if exposure through PostgREST has been enabled, in which you can restrict and control who can manage this queue using Row Level Security.
 

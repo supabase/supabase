@@ -33,7 +33,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient(supabase_url, anon_key)
+          const supabase = createClient(supabase_url, publishable_key)
           ```
       - id: create-auth-client-server-side
         name: Create auth client (server-side)
@@ -42,7 +42,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient(supabase_url, anon_key, {
+          const supabase = createClient(supabase_url, publishable_key, {
             auth: {
               autoRefreshToken: false,
               persistSession: false,
@@ -68,6 +68,10 @@ functions:
     $ref: '@supabase/auth-js.GoTrueClient.signInWithSSO'
   - id: sign-in-with-web3
     $ref: '@supabase/auth-js.GoTrueClient.signInWithWeb3'
+  - id: sign-in-with-passkey
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithPasskey'
+  - id: register-passkey
+    $ref: '@supabase/auth-js.GoTrueClient.registerPasskey'
   - id: get-claims
     $ref: '@supabase/auth-js.GoTrueClient.getClaims'
   - id: sign-out
@@ -124,11 +128,39 @@ functions:
     $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
   - id: mfa-get-authenticator-assurance-level
     $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
+  - id: passkey-api
+    title: Auth Passkey
+    notes: |
+      This section contains methods for WebAuthn passkey registration, authentication, and management. Methods are invoked behind the `supabase.auth.passkey` namespace.
+
+      Passkey support is an experimental feature. Enable it when creating the client:
+
+      ```ts
+      const supabase = createClient(supabaseUrl, publishableKey, {
+        auth: {
+          experimental: { passkey: true },
+        },
+      })
+      ```
+  - id: passkey-list
+    $ref: '@supabase/auth-js.AuthPasskeyApi.list'
+  - id: passkey-update
+    $ref: '@supabase/auth-js.AuthPasskeyApi.update'
+  - id: passkey-delete
+    $ref: '@supabase/auth-js.AuthPasskeyApi.delete'
+  - id: passkey-start-registration
+    $ref: '@supabase/auth-js.AuthPasskeyApi.startRegistration'
+  - id: passkey-verify-registration
+    $ref: '@supabase/auth-js.AuthPasskeyApi.verifyRegistration'
+  - id: passkey-start-authentication
+    $ref: '@supabase/auth-js.AuthPasskeyApi.startAuthentication'
+  - id: passkey-verify-authentication
+    $ref: '@supabase/auth-js.AuthPasskeyApi.verifyAuthentication'
   - id: admin-api
     title: Overview
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the browser.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
@@ -137,7 +169,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient(supabase_url, service_role_key, {
+          const supabase = createClient(supabase_url, secret_key, {
             auth: {
               autoRefreshToken: false,
               persistSession: false
@@ -169,6 +201,30 @@ functions:
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
   - id: mfa-delete-factor
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.deleteFactor'
+  - id: admin-passkey-api
+    title: Passkey Admin API
+    notes: |
+      Contains passkey administration methods. Requires a secret key.
+  - id: admin-list-passkeys
+    $ref: '@supabase/auth-js.GoTrueAdminPasskeyApi.listPasskeys'
+  - id: admin-delete-passkey
+    $ref: '@supabase/auth-js.GoTrueAdminPasskeyApi.deletePasskey'
+  - id: admin-custom-providers-api
+    title: Custom OIDC/OAuth Provider Admin API
+    notes: |
+      - These methods allow you to manage custom OIDC/OAuth providers programmatically.
+      - Requires `secret` key.
+      - Custom providers use the `custom:` prefix when signing in (e.g., `custom:my-oidc-provider`).
+  - id: admin-custom-providers-create
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.createProvider'
+  - id: admin-custom-providers-list
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.listProviders'
+  - id: admin-custom-providers-get
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.getProvider'
+  - id: admin-custom-providers-update
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.updateProvider'
+  - id: admin-custom-providers-delete
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.deleteProvider'
   - id: select
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
   - id: insert
@@ -436,6 +492,8 @@ functions:
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
   - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
+  - id: strip-nulls
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.stripNulls'
   - id: returns
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
   - id: overrideTypes
@@ -532,7 +590,7 @@ functions:
     notes: |
       The OAuth Admin API allows you to manage OAuth clients programmatically.
       Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
-      These functions should only be called on a server. Never expose your `service_role` key in the browser.
+      These functions should only be called on a server. Never expose your `secret` key in the browser.
   - id: auth-js-gotrueadminoauthapi-createclient
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
   - id: auth-js-gotrueadminoauthapi-deleteclient

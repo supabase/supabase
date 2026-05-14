@@ -1,4 +1,4 @@
-import { Input } from 'ui'
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from 'ui'
 
 interface PolicyNameProps {
   name: string
@@ -16,16 +16,18 @@ export const PolicyName = ({ name = '', limit = 100, onUpdatePolicyName }: Polic
         <p className="text-sm text-foreground-lighter">A descriptive name for your policy</p>
       </div>
       <div className="relative md:w-2/3">
-        <Input
-          id="policy-name"
-          value={name}
-          onChange={(e) => onUpdatePolicyName(e.target.value)}
-          actions={
-            <span className="mr-3 text-sm text-foreground-lighter">
+        <InputGroup>
+          <InputGroupInput
+            id="policy-name"
+            value={name}
+            onChange={(e) => onUpdatePolicyName(e.target.value)}
+          />
+          <InputGroupAddon align="inline-end">
+            <InputGroupText>
               {name.length}/{limit}
-            </span>
-          }
-        />
+            </InputGroupText>
+          </InputGroupAddon>
+        </InputGroup>
       </div>
     </div>
   )

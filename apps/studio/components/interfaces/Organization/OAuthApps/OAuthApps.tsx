@@ -199,7 +199,7 @@ export const OAuthApps = () => {
                 className={cn(
                   'flex items-center justify-between p-4 px-6 border first:rounded-t last:rounded-b',
                   'bg-background-alternative',
-                  'rounded'
+                  'rounded-sm'
                 )}
               >
                 <div className="absolute top-4 right-4">

@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
@@ -125,10 +126,7 @@ export const BucketTableRow = ({
                   Public
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent side="top">
-                This bucket is publicly readable. Anyone can list and access all objects stored in
-                it.
-              </TooltipContent>
+              <TooltipContent side="top">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
             </Tooltip>
           )}
         </div>

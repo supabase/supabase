@@ -8,7 +8,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Table,
   TableBody,
   TableCell,
@@ -26,7 +28,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-export default function PageLayoutList(): React.JSX.Element {
+export default function PageLayoutList() {
   const functions = [
     {
       id: 1,
@@ -68,12 +70,16 @@ export default function PageLayoutList(): React.JSX.Element {
             <div className="w-full space-y-4">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-                  <Input
-                    placeholder="Search for a function"
-                    size="tiny"
-                    icon={<Search />}
-                    className="w-full lg:w-52"
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      placeholder="Search for a function"
+                      size="tiny"
+                      className="w-full lg:w-52"
+                    />
+                    <InputGroupAddon>
+                      <Search />
+                    </InputGroupAddon>
+                  </InputGroup>
                 </div>
                 <Button type="primary">Create a new function</Button>
               </div>

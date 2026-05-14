@@ -24,7 +24,6 @@ import {
 } from 'react'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -46,11 +45,13 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
-import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { APIDocsButton } from '@/components/ui/APIDocsButton'
+import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
+import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 const VIEW_OPTIONS = [
@@ -207,39 +208,67 @@ export const FileExplorerHeader = ({
   onFilesUpload = noop,
 }: FileExplorerHeader) => {
   const snap = useStorageExplorerStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const track = useTrack()
 
   const [pathString, setPathString] = useState('')
   const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   const [isPathDialogOpen, setIsPathDialogOpen] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const previousBreadcrumbs = useRef<string[] | null>(null)
 
   const {
+    projectRef,
     columns,
-    sortBy,
-    setSortBy,
-    sortByOrder,
-    setSortByOrder,
     popColumn,
     popColumnAtIndex,
     popOpenedFolders,
     popOpenedFoldersAtIndex,
     fetchFoldersByPath,
     refetchAllOpenedFolders,
+    refreshAll,
+    isRefreshing,
     addNewFolderPlaceholder,
     clearOpenedFolders,
     setSelectedFilePreview,
-    selectedBucket,
   } = useStorageExplorerStateSnapshot()
+  const {
+    view,
+    setView,
+    sortBy,
+    setSortBy: setPreferenceSortBy,
+    sortByOrder,
+    setSortByOrder: setPreferenceSortByOrder,
+  } = useStoragePreference(projectRef)
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
+  useFileExplorerHeaderShortcuts({
+    uploadButtonRef,
+    searchInputRef,
+    canUpdateStorage,
+    hasBreadcrumbs: breadcrumbs.length > 0,
+    isSearching: snap.isSearching,
+    setIsSearching: snap.setIsSearching,
+    addNewFolderPlaceholder,
+    setView,
+  })
+
+  const setSortBy = async (value: STORAGE_SORT_BY) => {
+    setPreferenceSortBy(value)
+    setSelectedFilePreview(undefined)
+    await refetchAllOpenedFolders()
+  }
+
+  const setSortByOrder = async (value: STORAGE_SORT_BY_ORDER) => {
+    setPreferenceSortByOrder(value)
+    setSelectedFilePreview(undefined)
+    await refetchAllOpenedFolders()
+  }
 
   useEffect(() => {
     // [Joshen] Somehow toggle search triggers this despite breadcrumbs
@@ -326,9 +355,7 @@ export const FileExplorerHeader = ({
   }
 
   const refreshData = async () => {
-    setIsRefreshing(true)
-    await refetchAllOpenedFolders()
-    setIsRefreshing(false)
+    await refreshAll()
   }
 
   const onOpenNavigate = () => {
@@ -370,7 +397,7 @@ export const FileExplorerHeader = ({
           {/* Actions */}
           <div className="flex shrink-0 items-center whitespace-nowrap py-[7px]">
             <div className="flex shrink-0 items-center space-x-1 px-2">
-              {snap.view === STORAGE_VIEWS.COLUMNS && (
+              {view === STORAGE_VIEWS.COLUMNS && (
                 <Button
                   size="tiny"
                   icon={<Edit2 />}
@@ -381,22 +408,24 @@ export const FileExplorerHeader = ({
                   Navigate
                 </Button>
               )}
-              <Button
-                size="tiny"
-                icon={<RefreshCw />}
-                type="text"
-                loading={isRefreshing}
-                onClick={refreshData}
-              >
-                Reload
-              </Button>
+              <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH} side="bottom">
+                <Button
+                  size="tiny"
+                  icon={<RefreshCw />}
+                  type="text"
+                  loading={isRefreshing}
+                  onClick={refreshData}
+                >
+                  Reload
+                </Button>
+              </ShortcutTooltip>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     type="text"
                     icon={
-                      snap.view === 'LIST' ? (
+                      view === 'LIST' ? (
                         <List size={16} strokeWidth={2} />
                       ) : (
                         <Columns size={16} strokeWidth={2} />
@@ -408,10 +437,10 @@ export const FileExplorerHeader = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40 min-w-0">
                   {VIEW_OPTIONS.map((option) => (
-                    <DropdownMenuItem key={option.key} onClick={() => snap.setView(option.key)}>
+                    <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
-                        {snap.view === option.key && (
+                        {view === option.key && (
                           <Check size={16} className="text-brand" strokeWidth={2} />
                         )}
                       </div>
@@ -460,44 +489,57 @@ export const FileExplorerHeader = ({
               <div className="hidden">
                 <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
               </div>
-              <ButtonTooltip
-                icon={<Upload size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={onSelectUpload}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canUpdateStorage
-                      ? 'You need additional permissions to upload files'
-                      : undefined,
-                  },
-                }}
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_UPLOAD}
+                side="bottom"
+                open={!canUpdateStorage ? false : undefined}
               >
-                Upload files
-              </ButtonTooltip>
-              <ButtonTooltip
-                icon={<FolderPlus size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={() => addNewFolderPlaceholder(-1)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canUpdateStorage
-                      ? 'You need additional permissions to create folders'
-                      : undefined,
-                  },
-                }}
+                <ButtonTooltip
+                  icon={<Upload size={16} strokeWidth={2} />}
+                  type="text"
+                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                  onClick={onSelectUpload}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canUpdateStorage
+                        ? 'You need additional permissions to upload files'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Upload files
+                </ButtonTooltip>
+              </ShortcutTooltip>
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_NEW_FOLDER}
+                side="bottom"
+                open={!canUpdateStorage ? false : undefined}
               >
-                Create folder
-              </ButtonTooltip>
+                <ButtonTooltip
+                  icon={<FolderPlus size={16} strokeWidth={2} />}
+                  type="text"
+                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                  onClick={() => addNewFolderPlaceholder(-1)}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canUpdateStorage
+                        ? 'You need additional permissions to create folders'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Create folder
+                </ButtonTooltip>
+              </ShortcutTooltip>
             </div>
 
             <div className="h-6 shrink-0 border-r border-control" />
             <div className="flex shrink-0 items-center px-2">
               {snap.isSearching ? (
                 <Input
+                  ref={searchInputRef}
                   size="tiny"
                   autoFocus
                   className="w-52"
@@ -518,24 +560,21 @@ export const FileExplorerHeader = ({
                   onChange={(event) => setItemSearchString(event.target.value)}
                 />
               ) : (
-                <Button
-                  icon={<Search />}
-                  size="tiny"
-                  type="text"
-                  className="px-1"
-                  onClick={toggleSearch}
-                />
+                <ShortcutTooltip
+                  shortcutId={SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH}
+                  label="Search files"
+                  side="bottom"
+                >
+                  <Button
+                    icon={<Search />}
+                    size="tiny"
+                    type="text"
+                    className="px-1"
+                    onClick={toggleSearch}
+                  />
+                </ShortcutTooltip>
               )}
             </div>
-
-            {isNewAPIDocsEnabled && (
-              <>
-                <div className="h-6 shrink-0 border-r border-control" />
-                <div className="mx-2 shrink-0">
-                  <APIDocsButton section={['storage', selectedBucket.name]} source="storage" />
-                </div>
-              </>
-            )}
           </div>
         </div>
       </div>

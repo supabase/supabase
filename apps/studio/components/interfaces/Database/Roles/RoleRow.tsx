@@ -6,14 +6,16 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Collapsible,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -45,7 +47,6 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
   const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: role,
@@ -93,7 +94,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
   const formId = `role-update-form-${role.id}`
 
   return (
-    <Collapsible
+    <Collapsible_Shadcn_
       open={isExpanded}
       className={cn(
         'bg-surface-100',
@@ -103,17 +104,17 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         'data-open:border-strong',
         'data-open:pb-px col-span-12 mx-auto',
         '-space-y-px overflow-hidden',
-        'border border-t-0 first:border-t first:!mt-0 hover:border-t hover:-mt-[1px] shadow transition hover:z-50',
+        'border border-t-0 first:border-t first:mt-0! hover:border-t hover:-mt-px shadow-sm transition hover:z-50',
         'first:rounded-tl first:rounded-tr',
         'last:rounded-bl last:rounded-br'
       )}
     >
-      <div className={cn('flex items-center relative', !disabled && 'pr-[--card-padding-x]')}>
-        <Collapsible.Trigger asChild>
+      <div className={cn('flex items-center relative', !disabled && 'pr-(--card-padding-x)')}>
+        <CollapsibleTrigger_Shadcn_ asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
-            className="group flex w-full items-center justify-between rounded py-3 px-card text-foreground"
+            className="group flex w-full items-center justify-between rounded-sm py-3 px-card text-foreground"
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
@@ -150,7 +151,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               </p>
             </div>
           </button>
-        </Collapsible.Trigger>
+        </CollapsibleTrigger_Shadcn_>
         {!disabled && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -176,8 +177,8 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           </DropdownMenu>
         )}
       </div>
-      <Collapsible.Content>
-        <Form_Shadcn_ {...form}>
+      <CollapsibleContent_Shadcn_>
+        <Form {...form}>
           <form
             id={formId}
             onSubmit={form.handleSubmit(onSaveChanges)}
@@ -186,7 +187,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             <div className="py-4 space-y-[9px]">
               {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[]).map(
                 (permission) => (
-                  <FormField_Shadcn_
+                  <FormField
                     key={permission}
                     control={form.control}
                     name={permission}
@@ -197,14 +198,14 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                         layout="flex"
                         label={ROLE_PERMISSIONS[permission].description}
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             id={`${role.id}-${permission}`}
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -227,8 +228,8 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               </div>
             )}
           </form>
-        </Form_Shadcn_>
-      </Collapsible.Content>
-    </Collapsible>
+        </Form>
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
   )
 }

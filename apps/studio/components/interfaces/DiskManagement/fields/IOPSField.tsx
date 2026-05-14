@@ -1,13 +1,12 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -36,7 +35,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
   const watchedComputeSize = watch('computeSize')
   const watchedIOPS = watch('provisionedIOPS') ?? 0
 
-  const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
+  const { isError } = useDiskAttributesQuery({ projectRef })
 
   const iopsPrice = calculateIOPSPrice({
     oldStorageType: formState.defaultValues?.storageType as DiskType,
@@ -49,7 +48,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
     RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={control}
       name="provisionedIOPS"
       render={({ field }) => {
@@ -105,10 +104,9 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
               </>
             }
           >
-            <FormControl_Shadcn_ className="max-w-32">
+            <FormControl className="max-w-32">
               <InputGroup>
-                <InputGroupAddon align="inline-end">IOPS</InputGroupAddon>
-                <InputGroupInput
+                <FormInputGroupInput
                   type="number"
                   {...field}
                   value={field.value}
@@ -120,8 +118,9 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                     })
                   }}
                 />
+                <InputGroupAddon align="inline-end">IOPS</InputGroupAddon>
               </InputGroup>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )
       }}

@@ -54,12 +54,6 @@ export const STORAGE_CLIENT_LIBRARY_MAPPINGS = {
   getPublicUrl: [],
 }
 
-export const CONTEXT_MENU_KEYS = {
-  STORAGE_COLUMN: 'STORAGE_COLUMN',
-  STORAGE_ITEM: 'STORAGE_ITEM',
-  STORAGE_FOLDER: 'STORAGE_FOLDER',
-}
-
 export const BUCKET_TYPES = {
   files: {
     displayName: 'Files',
@@ -88,3 +82,5 @@ export const BUCKET_TYPES = {
 }
 export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
 export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'files'
+
+export const PUBLIC_BUCKET_TOOLTIP = 'Objects in this bucket are readable by anyone with the URL.'

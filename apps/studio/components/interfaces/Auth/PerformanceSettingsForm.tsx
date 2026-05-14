@@ -8,12 +8,12 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -46,6 +46,23 @@ const FormSchema = z.object({
   DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
 })
 
+export const DatabaseFormSchema = z
+  .object({
+    DB_MAX_POOL_SIZE: z.coerce.number().min(1),
+    DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
+  })
+  .superRefine((data, ctx) => {
+    if (data.DB_MAX_POOL_SIZE_UNIT === 'percent') {
+      if (data.DB_MAX_POOL_SIZE < 1 || data.DB_MAX_POOL_SIZE > 100) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['DB_MAX_POOL_SIZE'],
+          message: 'Percentage must be between 1 and 100',
+        })
+      }
+    }
+  })
+
 export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
   const { hasAccess: hasAccessToPerformance, isLoading: isLoadingEntitlement } =
@@ -77,7 +94,7 @@ export const PerformanceSettingsForm = () => {
 
   const promptUpgrade = IS_PLATFORM && !isLoadingEntitlement && !hasAccessToPerformance
 
-  const { mutate: updateAuthConfig, isPending: isSaving } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const requestDurationForm = useForm({
     resolver: zodResolver(
@@ -87,12 +104,7 @@ export const PerformanceSettingsForm = () => {
   })
 
   const databaseForm = useForm({
-    resolver: zodResolver(
-      z.object({
-        DB_MAX_POOL_SIZE: FormSchema.shape.DB_MAX_POOL_SIZE,
-        DB_MAX_POOL_SIZE_UNIT: FormSchema.shape.DB_MAX_POOL_SIZE_UNIT,
-      })
-    ),
+    resolver: zodResolver(DatabaseFormSchema),
     defaultValues: {
       DB_MAX_POOL_SIZE: 10,
       DB_MAX_POOL_SIZE_UNIT: 'connections',
@@ -135,7 +147,7 @@ export const PerformanceSettingsForm = () => {
     updateAuthConfig(
       { projectRef: project?.ref, config },
       {
-        onError: (error) => {
+        onError: () => {
           setIsUpdatingDatabaseForm(false)
         },
         onSuccess: () => {
@@ -207,11 +219,11 @@ export const PerformanceSettingsForm = () => {
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Request duration</ScaffoldSectionTitle>
 
-        <Form_Shadcn_ {...requestDurationForm}>
+        <Form {...requestDurationForm}>
           <form onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}>
             <Card>
               <CardContent className="pt-6">
-                <FormField_Shadcn_
+                <FormField
                   control={requestDurationForm.control}
                   name="API_MAX_REQUEST_DURATION"
                   render={({ field }) => (
@@ -226,22 +238,22 @@ export const PerformanceSettingsForm = () => {
                       }
                     >
                       <div className="flex flex-col gap-2">
-                        <FormControl_Shadcn_>
-                          <div className="relative">
+                        <div className="relative">
+                          <FormControl>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>seconds</InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 type="number"
                                 min={5}
                                 max={30}
                                 {...field}
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
-                          </div>
-                        </FormControl_Shadcn_>
+                          </FormControl>
+                        </div>
 
                         <p className="text-xs text-right text-foreground-muted">
                           10+ seconds recommended
@@ -274,17 +286,17 @@ export const PerformanceSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </ScaffoldSection>
 
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Connection management</ScaffoldSectionTitle>
 
-        <Form_Shadcn_ {...databaseForm}>
+        <Form {...databaseForm}>
           <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
             <Card>
               <CardContent className="pt-6 flex flex-col gap-4">
-                <FormField_Shadcn_
+                <FormField
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE_UNIT"
                   render={({ field }) => (
@@ -299,7 +311,7 @@ export const PerformanceSettingsForm = () => {
                         </p>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_
                           value={field.value}
                           onValueChange={(value) => {
@@ -345,13 +357,13 @@ export const PerformanceSettingsForm = () => {
                             </SelectItem_Shadcn_>
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE"
                   render={({ field }) => (
@@ -368,44 +380,38 @@ export const PerformanceSettingsForm = () => {
                         </p>
                       }
                     >
-                      <FormControl_Shadcn_>
-                        <div className="flex flex-col gap-2">
-                          <div className="relative">
+                      <div className="flex flex-col gap-2">
+                        <div className="relative">
+                          <FormControl>
                             <InputGroup>
+                              <FormInputGroupInput
+                                type="number"
+                                {...field}
+                                disabled={!canUpdateConfig || promptUpgrade}
+                              />
                               <InputGroupAddon align="inline-end">
                                 <InputGroupText>
                                   {chosenUnit === 'percent' ? '%' : 'connections'}
                                 </InputGroupText>
                               </InputGroupAddon>
-                              <InputGroupInput
-                                type="number"
-                                {...field}
-                                min={3}
-                                max={
-                                  chosenUnit === 'percent'
-                                    ? 80
-                                    : Math.floor(maxConnectionLimit * 0.8)
-                                }
-                                disabled={!canUpdateConfig || promptUpgrade}
-                              />
                             </InputGroup>
-                          </div>
-                          {isLoadingMaxConns ? (
-                            <ShimmeringLoader className="py-2 w-16 ml-auto" />
-                          ) : (
-                            <p className="text-xs text-right text-foreground-muted">
-                              <span className="text-foreground-light">
-                                {chosenUnit === 'percent'
-                                  ? Math.floor(
-                                      maxConnectionLimit * (Math.min(100, field.value!) / 100)
-                                    ).toString()
-                                  : Math.min(maxConnectionLimit, field.value!)}
-                              </span>{' '}
-                              / {maxConnectionLimit}
-                            </p>
-                          )}
+                          </FormControl>
                         </div>
-                      </FormControl_Shadcn_>
+                        {isLoadingMaxConns ? (
+                          <ShimmeringLoader className="py-2 w-16 ml-auto" />
+                        ) : (
+                          <p className="text-xs text-right text-foreground-muted">
+                            <span className="text-foreground-light">
+                              {chosenUnit === 'percent'
+                                ? Math.floor(
+                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
+                                  ).toString()
+                                : Math.min(maxConnectionLimit, field.value!)}
+                            </span>{' '}
+                            / {maxConnectionLimit}
+                          </p>
+                        )}
+                      </div>
                     </FormItemLayout>
                   )}
                 />
@@ -430,7 +436,7 @@ export const PerformanceSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </ScaffoldSection>
     </>
   )

@@ -1,50 +1,49 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { ReportChartUpsell } from 'components/interfaces/Reports/v2/ReportChartUpsell'
-import { POOLING_OPTIMIZATIONS } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
-import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import Table from 'components/to-be-cleaned/Table'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ChartHandler from 'components/ui/Charts/ChartHandler'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
-import { ReportSettings } from 'components/ui/Charts/ReportSettings'
-import { ObservabilityLink } from 'components/ui/ObservabilityLink'
-import Panel from 'components/ui/Panel'
-import { analyticsKeys } from 'data/analytics/keys'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { getReportAttributesV2 } from 'data/reports/database-charts'
-import { useDatabaseReport } from 'data/reports/database-report-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, Button } from 'ui'
+
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
+import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
+import { ReportChartUpsell } from '@/components/interfaces/Reports/v2/ReportChartUpsell'
+import { POOLING_OPTIMIZATIONS } from '@/components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
+import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import Table from '@/components/to-be-cleaned/Table'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
+import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
+import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { analyticsKeys } from '@/data/analytics/keys'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
+import { useDatabaseSizeQuery } from '@/data/database/database-size-query'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
+import { getReportAttributesV2 } from '@/data/reports/database-charts'
+import { useDatabaseReport } from '@/data/reports/database-report-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { formatBytes } from '@/lib/helpers'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -101,7 +100,7 @@ const DatabaseUsage = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
+  usePgbouncerConfigQuery({ projectRef: project?.ref })
 
   // PGBouncer connections
   const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
@@ -133,13 +132,16 @@ const DatabaseUsage = () => {
     !org?.usage_billing_enabled &&
     project?.cloud_provider !== 'FLY'
 
+  const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
+
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
     project!,
     diskConfig,
     maxConnections,
     defaultMaxClientConn,
-    isSpendCapEnabled
+    isSpendCapEnabled,
+    showDiskIOBurstBalanceChart
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -289,21 +291,32 @@ const DatabaseUsage = () => {
             )
           })}
         {selectedDateRange && isReplicaSelected && (
-          <Panel title="Replica Information">
-            <Panel.Content>
-              <div id="replication-lag">
-                <ChartHandler
-                  startDate={selectedDateRange?.period_start?.date}
-                  endDate={selectedDateRange?.period_end?.date}
-                  attribute="physical_replication_lag_physical_replication_lag_seconds"
-                  label="Replication lag"
-                  interval={selectedDateRange.interval}
-                  provider="infra-monitoring"
-                  syncId="database-charts"
-                />
-              </div>
-            </Panel.Content>
-          </Panel>
+          <LazyComposedChartHandler
+            id="replication-lag"
+            label="Replication lag"
+            format="s"
+            valuePrecision={2}
+            showTooltip
+            YAxisProps={{
+              width: 50,
+              tickFormatter: (value: number) => `${value}s`,
+            }}
+            attributes={[
+              {
+                attribute: 'physical_replication_lag_physical_replication_lag_seconds',
+                provider: 'infra-monitoring',
+                label: 'Replication lag',
+                tooltip:
+                  'Seconds the read replica is behind its primary. Sustained or growing lag may indicate the replica cannot keep up with write throughput',
+              },
+            ]}
+            interval={selectedDateRange.interval}
+            startDate={selectedDateRange?.period_start?.date}
+            endDate={selectedDateRange?.period_end?.date}
+            updateDateRange={updateDateRange}
+            defaultChartStyle="line"
+            syncId="database-charts"
+          />
         )}
       </ReportStickyNav>
       <section id="database-size-report">

@@ -15,6 +15,7 @@ import { post } from './fetchWrappers'
 import type { FirstReferrerData, MwDiagData } from './first-referrer-cookie'
 import {
   isExternalReferrer,
+  isOAuthRedirectReferrer,
   parseFirstReferrerCookie,
   parseMwDiagCookie,
 } from './first-referrer-cookie'
@@ -108,7 +109,6 @@ interface HandlePageTelemetryOptions {
 }
 
 function handlePageTelemetry({
-  apiUrl: API_URL,
   pathname,
   featureFlags,
   slug,
@@ -123,7 +123,10 @@ function handlePageTelemetry({
     const storedReferrer = telemetryDataOverride?.ph?.referrer
 
     const shouldUseStoredReferrer = Boolean(
-      storedReferrer && isExternalReferrer(storedReferrer) && !isExternalReferrer(liveReferrer)
+      storedReferrer &&
+      isExternalReferrer(storedReferrer) &&
+      !isOAuthRedirectReferrer(storedReferrer) &&
+      (!isExternalReferrer(liveReferrer) || isOAuthRedirectReferrer(liveReferrer))
     )
 
     const pageData = telemetryDataOverride
@@ -145,7 +148,8 @@ function handlePageTelemetry({
     if (
       firstReferrerData &&
       isExternalReferrer(firstReferrerData.referrer) &&
-      !isExternalReferrer(pageData.ph.referrer)
+      !isOAuthRedirectReferrer(firstReferrerData.referrer) &&
+      (!isExternalReferrer(pageData.ph.referrer) || isOAuthRedirectReferrer(pageData.ph.referrer))
     ) {
       pageData.ph.referrer = firstReferrerData.referrer
       firstReferrerCookieConsumed = true
@@ -224,13 +228,13 @@ function handlePageTelemetry({
 }
 
 export function handlePageLeaveTelemetry(
-  API_URL: string,
+  _API_URL: string,
   pathname: string,
-  featureFlags?: {
+  _featureFlags?: {
     [key: string]: unknown
   },
-  slug?: string,
-  ref?: string
+  _slug?: string,
+  _ref?: string
 ) {
   if (typeof window !== 'undefined') {
     const pageData = getSharedTelemetryData(pathname)
@@ -442,7 +446,13 @@ export function useTelemetryIdentify(API_URL: string) {
         ...(anonymousId && { anonymous_id: anonymousId }),
       })
 
-      posthogClient.identify(user.id, { gotrue_id: user.id })
+      // user.created_at is gotrue's immutable signup timestamp — safe to $set on
+      // every identify because the value never changes per user. Lets flag
+      // targeting distinguish brand-new signups from returning single-org users.
+      posthogClient.identify(user.id, {
+        gotrue_id: user.id,
+        ...(user.created_at && { signup_timestamp: user.created_at }),
+      })
     }
   }, [API_URL, user?.id])
 }

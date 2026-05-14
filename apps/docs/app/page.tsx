@@ -29,7 +29,10 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
       ...(parentAlternates && {
         languages: parentAlternates.languages || undefined,
         media: parentAlternates.media || undefined,
-        types: parentAlternates.types || undefined,
+        types: {
+          ...(parentAlternates.types ?? {}),
+          'text/markdown': '/llms-full.txt',
+        },
       }),
     },
   }
@@ -138,7 +141,7 @@ const selfHostingOptions = [
 
 const clientLibraries = [
   {
-    title: 'Javascript',
+    title: 'JavaScript',
     icon: 'reference-javascript',
     href: '/reference/javascript/introduction',
     enabled: true,
@@ -177,10 +180,16 @@ const clientLibraries = [
 
 const additionalResources = [
   {
-    title: 'Management API',
-    description: 'Manage your Supabase projects and organizations.',
-    icon: 'reference-api',
-    href: '/reference/api/introduction',
+    title: 'AI tools',
+    description: 'Develop with Supabase AI-first using plugins, MCP, and skills.',
+    icon: 'ai-tools',
+    href: '/guides/ai',
+  },
+  {
+    title: 'Platform guides',
+    description: 'Learn more about the tools and services powering Supabase.',
+    icon: 'platform',
+    href: '/guides/platform',
   },
   {
     title: 'Supabase CLI',
@@ -189,10 +198,10 @@ const additionalResources = [
     href: '/reference/cli/introduction',
   },
   {
-    title: 'Platform Guides',
-    description: 'Learn more about the tools and services powering Supabase.',
-    icon: 'platform',
-    href: '/guides/platform',
+    title: 'Management API',
+    description: 'Manage your Supabase projects and organizations.',
+    icon: 'reference-api',
+    href: '/reference/api/introduction',
   },
   {
     title: 'Integrations',

@@ -34,7 +34,7 @@ const AlertCollapsible = React.forwardRef<HTMLDivElement, AlertCollapsibleProps>
             <Button
               type="outline"
               size="tiny"
-              className={cn('!px-0 w-[26px]', '[&[data-state=open]_svg]:rotate-180')}
+              className={cn('px-0! w-[26px]', '[&[data-state=open]_svg]:rotate-180')}
               aria-label="Toggle"
               icon={<ChevronDown className="transition-transform duration-200" />}
             />

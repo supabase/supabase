@@ -3,8 +3,8 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -69,18 +69,31 @@ interface CategorySelectorProps {
 
 function CategorySelector({ form }: CategorySelectorProps) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name="category"
       control={form.control}
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
+        // Radix Select fires `onValueChange('')` when its controlled value
+        // transitions from `undefined` to a defined value whose matching
+        // SelectItem isn't mounted yet (the dropdown is closed, so
+        // SelectContent and the items it portals haven't registered). On
+        // React 19's stricter scheduling this races our `setValue` from
+        // useSupportForm and clobbers the prefilled category. No
+        // SelectItem can have value="" (Radix throws), so `v === ''` is
+        // always the spurious bubble — drop it. See
+        // radix-ui/primitives#3381.
+        const onValueChange = (v: string) => {
+          if (v === '' && field.value) return
+          field.onChange(v)
+        }
         return (
           <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 defaultValue={field.value}
-                onValueChange={field.onChange}
+                onValueChange={onValueChange}
               >
                 <SelectTrigger_Shadcn_ aria-label="Select an issue" className="w-full">
                   <SelectValue_Shadcn_ placeholder="Select an issue">
@@ -102,7 +115,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )
       }}
@@ -116,14 +129,14 @@ interface SeveritySelectorProps {
 
 function SeveritySelector({ form }: SeveritySelectorProps) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name="severity"
       control={form.control}
       render={({ field }) => {
         const { ref, ...fieldWithoutRef } = field
         return (
           <FormItemLayout hideMessage layout="vertical" label="Severity">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 defaultValue={field.value}
@@ -147,7 +160,7 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )
       }}

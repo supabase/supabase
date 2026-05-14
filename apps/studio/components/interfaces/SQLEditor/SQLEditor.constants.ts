@@ -1,3 +1,4 @@
+import { untrustedSql } from '@supabase/pg-meta'
 import { IS_PLATFORM } from 'common'
 
 import type { SqlSnippets, UserContent } from '@/types'
@@ -13,7 +14,7 @@ export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
   content: {
     schema_version: SQL_SNIPPET_SCHEMA_VERSION,
     content_id: '',
-    sql: 'this is a test',
+    unchecked_sql: untrustedSql(''),
   },
 }
 
@@ -40,8 +41,12 @@ export const destructiveSqlRegex = [
   /^(.*;)?\s*(drop|delete|truncate|alter\s+table\s+.*\s+drop\s+column)\s/is,
 ]
 
+// Matches `UPDATE <table> SET ...` where <table> is any combination of bareword
+// or double-quoted identifiers, optionally schema-qualified. Quoted identifiers
+// can contain any character (including spaces) and use `""` to escape an inner
+// quote, mirroring Postgres syntax.
 export const updateWithoutWhereRegex =
-  /(?:^|;)\s*update\s+(?:"[\w.]+"\."[\w.]+"|[\w.]+)\s+set\s+[\w\W]+?(?!\s*where\s)/is
+  /(?:^|;)\s*update\s+(?:"(?:[^"]|"")+"|[\w]+)(?:\.(?:"(?:[^"]|"")+"|[\w]+))?\s+set\s+[\w\W]+?(?!\s*where\s)/is
 
 export const alterDatabasePreventConnectionStatements = [
   'alter database postgres connection limit 0',
