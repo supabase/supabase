@@ -6,6 +6,12 @@ import {
   getLogsCountQuery,
   getUnifiedLogsQuery,
 } from './UnifiedLogs.queries'
+import {
+  getFacetCountCTE as getFacetCountCTEBq,
+  getLogsChartQuery as getLogsChartQueryBq,
+  getLogsCountQuery as getLogsCountQueryBq,
+  getUnifiedLogsQuery as getUnifiedLogsQueryBq,
+} from './UnifiedLogs.queries.bq'
 
 const baseSearch = {
   date: [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')],
@@ -131,6 +137,61 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).not.toContain(`log_attributes['request.method'] IN ('GET')`)
       expect(sql).toContain(`log_attributes['response.status_code'] IN ('200')`)
       expect(sql).toContain('GROUP BY value')
+      expect(sql).toContain('LIMIT 20')
+    })
+  })
+})
+
+describe('UnifiedLogs.queries.bq (BigQuery fallback)', () => {
+  describe('getUnifiedLogsQuery', () => {
+    it('defaults to postgres + postgrest log types when none specified', () => {
+      const sql = getUnifiedLogsQueryBq(baseSearch)
+      expect(sql).toContain(`'postgres' as log_type`)
+      expect(sql).toContain(`edge_logs_request.path LIKE '%/rest/%'`)
+      expect(sql).not.toContain(`'storage' as log_type`)
+    })
+
+    it('escapes single quotes in filter values to prevent SQL injection', () => {
+      const sql = getUnifiedLogsQueryBq({
+        ...baseSearch,
+        method: [`G'ET`],
+        pathname: `/customers'; DROP TABLE logs --`,
+      } as any)
+
+      expect(sql).toContain(`method IN ('G''ET')`)
+      expect(sql).toContain(`pathname LIKE '%/customers''; DROP TABLE logs --%'`)
+    })
+  })
+
+  describe('getLogsCountQuery', () => {
+    it('keeps the total count branch aligned with an active log_type filter', () => {
+      const sql = getLogsCountQueryBq({ ...baseSearch, log_type: ['edge'] } as any)
+      const logTypeCountsCte = sql.match(/log_type_counts AS \(\s+SELECT[\s\S]*?FROM unified_logs\s+(.*?)\s+\),/i)
+
+      expect(logTypeCountsCte?.[1]).toContain(`WHERE log_type IN ('edge')`)
+    })
+  })
+
+  describe('getLogsChartQuery', () => {
+    it('uses BigQuery timestamp truncation with hour bucketing for long ranges', () => {
+      const sql = getLogsChartQueryBq({
+        ...baseSearch,
+        date: [new Date('2026-05-08T00:00:00Z'), new Date('2026-05-08T18:00:00Z')],
+      } as any)
+      expect(sql).toContain('TIMESTAMP_TRUNC(timestamp, HOUR)')
+    })
+  })
+
+  describe('getFacetCountCTE', () => {
+    it('excludes the requested facet from the WHERE filters and keeps the other ones', () => {
+      const sql = getFacetCountCTEBq({
+        search: { ...baseSearch, method: ['GET'], status: ['200'] } as any,
+        facet: 'method',
+      })
+
+      expect(sql).not.toContain(`method IN ('GET')`)
+      expect(sql).toContain(`status IN ('200')`)
+      expect(sql).toContain(`GROUP BY method`)
       expect(sql).toContain('LIMIT 20')
     })
   })
