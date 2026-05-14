@@ -132,8 +132,9 @@ export const RunQueryWarningModal = ({
     })
   }
 
+  const canEnableRLS = hasMissingRLS && onConfirmWithRLS !== undefined
   const confirmationCopy =
-    hasMissingRLS && onConfirmWithRLS
+    canEnableRLS
       ? warnings.length > 1
         ? 'Review each issue, then choose whether to enable Row Level Security before running this query.'
         : 'Choose whether to enable Row Level Security before running this query.'
@@ -176,9 +177,9 @@ export const RunQueryWarningModal = ({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="warning" onClick={handleConfirm}>
-            {hasMissingRLS ? 'Run without RLS' : 'Run query'}
+            {canEnableRLS ? 'Run without RLS' : 'Run query'}
           </AlertDialogAction>
-          {hasMissingRLS && onConfirmWithRLS && (
+          {canEnableRLS && (
             <AlertDialogAction onClick={handleConfirmWithRLS}>Run and enable RLS</AlertDialogAction>
           )}
         </AlertDialogFooter>
