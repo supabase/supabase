@@ -28,7 +28,7 @@ interface DataTableSheetRowActionProps<
   TData,
   TFields extends DataTableFilterField<TData>,
 > extends ComponentPropsWithRef<typeof DropdownMenuTrigger> {
-  fieldValue: TFields['value']
+  fieldValue?: TFields['value']
   filterFields: TFields[]
   value: string | number
   table: Table<TData>
@@ -47,8 +47,8 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
   const { copy, isCopied } = useCopyToClipboard()
-  const field = filterFields.find((field) => field.value === fieldValue)
-  const column = table.getColumn(fieldValue.toString())
+  const field = !!fieldValue ? filterFields.find((f) => f.value === fieldValue) : undefined
+  const column = !!fieldValue ? table.getColumn(fieldValue.toString()) : undefined
 
   function renderOptions() {
     if (!field) return null

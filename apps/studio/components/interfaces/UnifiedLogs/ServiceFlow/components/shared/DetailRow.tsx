@@ -12,7 +12,7 @@ interface DetailRowProps {
   filterId?: string
   filterValue?: string | number
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
-  filterFields?: DataTableFilterField<any>[]
+  filterFields: DataTableFilterField<any>[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
   table?: Table<any>
   isLoading?: boolean
@@ -73,8 +73,8 @@ export const DetailRow = ({
 
   return (
     <DataTableSheetRowAction
-      fieldValue={filterId!}
-      filterFields={filterFields!}
+      fieldValue={filterId}
+      filterFields={filterFields}
       value={resolvedFilterValue ?? ''}
       table={table!}
       label={label}
