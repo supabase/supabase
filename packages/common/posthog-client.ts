@@ -170,8 +170,15 @@ class PostHogClient {
     if (!hasConsent) return
 
     if (!this.initialized) {
-      // Queue the identification for when PostHog initializes
-      this.pendingIdentification = { userId, properties }
+      // Queue the identification for when PostHog initializes. Merge properties
+      // across pre-init calls for the same user so callers don't clobber each
+      // other (e.g. useTelemetryIdentify sets gotrue_id, then a separate effect
+      // sets org_count — both should land when the SDK flushes).
+      const pending = this.pendingIdentification
+      this.pendingIdentification =
+        pending && pending.userId === userId
+          ? { userId, properties: { ...pending.properties, ...properties } }
+          : { userId, properties }
       return
     }
 
