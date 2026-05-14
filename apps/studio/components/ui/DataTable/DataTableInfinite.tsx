@@ -83,7 +83,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             return (
               <TableHead
                 key={header.id}
-                className={headerClassName}
+                id={header.id}
+                className={cn('w-full', headerClassName)}
                 aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}
               >
                 {header.isPlaceholder

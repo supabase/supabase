@@ -439,7 +439,16 @@ export const UnifiedLogs = () => {
                   isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                 )}
               >
-                <div className="h-full [&>div]:h-full [&_thead_tr]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]! [&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]! [&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]! [&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0! [&_thead_tr:hover]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]! [&_thead_th]:text-foreground-lighter!">
+                <div
+                  className={cn(
+                    'h-full [&>div]:h-full',
+                    '[&_thead_tr]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]!',
+                    '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
+                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]!',
+                    '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0! [&_thead_tr:hover]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]!',
+                    '[&_thead_th]:text-foreground-lighter!'
+                  )}
+                >
                   <DataTableInfinite
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}
