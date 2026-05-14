@@ -66,8 +66,8 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             }}
             className="flex items-center gap-2"
           >
-            <Search size={16} />
-            Include
+            <Search size={14} />
+            Add as filter for {column?.id}
           </DropdownMenuItem>
         )
       case 'input':
@@ -76,8 +76,8 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             onClick={() => column?.setFilterValue(value)}
             className="flex items-center gap-2"
           >
-            <Search size={16} />
-            Include
+            <Search size={14} />
+            Add as filter for {column?.id}
           </DropdownMenuItem>
         )
       case 'slider':
@@ -174,7 +174,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
           </div>
         ) : null}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side="bottom" className="w-40">
+      <DropdownMenuContent align="end" side="bottom" className="w-48">
         {renderOptions()}
         <DropdownMenuSeparator />
         <DropdownMenuItem
