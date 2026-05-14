@@ -231,7 +231,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               {item.item_name === 'minimum_amount' && (
                                 <p className="mb-2" translate="no">
                                   Minimum Fee - If your cost is below the minimum fee, you will be
-                                  charged the difference as a floor fee'
+                                  charged the difference as a floor fee
                                 </p>
                               )}
 
