@@ -187,9 +187,7 @@ const whereClause = (predicates: SafeLogSqlFragment[]): SafeLogSqlFragment =>
 /**
  * Calculates the chart bucketing level (minute/hour/day) given the date range.
  */
-const calculateChartBucketing = (
-  search: SearchParamsType | Record<string, unknown>
-): 'MINUTE' | 'HOUR' | 'DAY' => {
+const calculateChartBucketing = (search: SearchParamsType | Record<string, unknown>): 'MINUTE' | 'HOUR' | 'DAY' => {
   const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
 
   const convertToMillis = (timestamp: Date | string | number | null | undefined) => {
@@ -317,11 +315,11 @@ export const getFacetCountQuery = ({
   }
 
   return safeSql`
-SELECT ${lit(facet)} AS dimension, (${facetExpr}) AS value, count() AS count
+(SELECT ${lit(facet)} AS dimension, (${facetExpr}) AS value, count() AS count
 FROM logs
 ${whereClause(predicates)}
 GROUP BY value
-LIMIT ${lit(MAX_FACETS_QUANTITY)}
+LIMIT ${lit(MAX_FACETS_QUANTITY)})
 `
 }
 
