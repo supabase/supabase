@@ -29,8 +29,6 @@ export const FEATURED_INTEGRATION_IDS = [
   'cipherstash',
 ] as const
 
-// Integration mechanism types in the new marketplace nav. Maps to
-// IntegrationDefinition['type'] when possible; templates is heuristic.
 export type MarketplaceIntegrationType = 'oauth' | 'postgres_extension' | 'template' | 'wrapper'
 
 export const INTEGRATION_TYPES: Array<{

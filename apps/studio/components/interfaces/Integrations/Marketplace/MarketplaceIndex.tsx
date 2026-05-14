@@ -165,7 +165,7 @@ export const MarketplaceIndex = () => {
                 categoryOptions={categoryOptions}
               />
             )}
-            
+
             <MarketplaceFilterBar
               resultCount={filtered.length}
               search={search}
