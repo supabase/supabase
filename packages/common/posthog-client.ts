@@ -264,11 +264,17 @@ class PostHogClient {
    * Returns undefined if PostHog hasn't initialized or the property hasn't been set.
    * Use this to gate behavior on whether a property has actually landed in the SDK
    * (e.g., waiting for an identify to complete before evaluating flag-dependent UI).
+   *
+   * Person properties set via `identify(id, props)` are stored under the
+   * `$stored_person_properties` bucket in persistence — `get_property(key)`
+   * reads top-level super properties, not person properties, so we index in.
    */
   getPersonProperty(key: string): unknown {
     if (!this.initialized) return undefined
     try {
-      return posthog.get_property(key)
+      const stored = posthog.get_property('$stored_person_properties')
+      if (!stored || typeof stored !== 'object') return undefined
+      return (stored as Record<string, unknown>)[key]
     } catch {
       return undefined
     }
