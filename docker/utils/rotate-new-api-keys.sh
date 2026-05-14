@@ -30,18 +30,22 @@ else
     if command -v node >/dev/null 2>&1; then
         echo "Local node $(node -v) is too old (need >= 16), falling back to docker."
     fi
+
     if ! command -v docker >/dev/null 2>&1; then
         echo "Error: requires either node (>= 16) or docker."
         exit 1
     fi
+
     if ! docker info >/dev/null 2>&1; then
         echo "Error: docker is installed but the daemon is not running."
         exit 1
     fi
+
     if ! docker image inspect node:22-alpine >/dev/null 2>&1; then
         echo "Pulling node:22-alpine (first-run only)..."
         docker pull node:22-alpine
     fi
+
     node_runner="docker run --rm node:22-alpine node"
 fi
 
