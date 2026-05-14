@@ -12,7 +12,6 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
@@ -30,6 +29,7 @@ import {
   Switch,
   useWatch,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -261,7 +261,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
             <SheetClose
               className={cn(
                 'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
                 'disabled:pointer-events-none data-[state=open]:bg-secondary',
                 'transition'
               )}

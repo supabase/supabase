@@ -1,6 +1,6 @@
 import '@code-hike/mdx/styles.css'
 import 'config/code-hike.css'
-import '../styles/index.css'
+import '../styles/globals.css'
 import '../pages/launch-week/launchWeek.css'
 
 import { Metadata } from 'next'

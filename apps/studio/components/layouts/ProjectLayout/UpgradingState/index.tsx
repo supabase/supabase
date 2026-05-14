@@ -76,7 +76,7 @@ export const UpgradingState = () => {
           <h1 className="text-3xl">{project?.name}</h1>
         </div>
         <div className="w-full mx-auto mt-8 mb-16 max-w-7xl">
-          <div className="flex h-[500px] items-center justify-center rounded border border-muted bg-surface-100 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded-sm border border-muted bg-surface-100 p-8">
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
@@ -156,7 +156,7 @@ export const UpgradingState = () => {
                   )}
 
                   <div
-                    className="!mt-4 !mb-2 py-3 px-4 transition-all overflow-hidden border rounded relative"
+                    className="mt-4! mb-2! py-3 px-4 transition-all overflow-hidden border rounded-sm relative"
                     style={{ maxHeight: isExpanded ? '500px' : '110px' }}
                   >
                     {isExpanded ? (

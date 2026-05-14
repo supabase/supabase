@@ -2,8 +2,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildGroupAssistantPrompt,
+  buildTroubleshootingDocsUrl,
   formatLogTimestamp,
   formatSingleLineMessage,
+  getDisplayErrorMessage,
   getFunctionRuntimeLogsSql,
   getNoErrorsSinceLastDeployMessage,
   getRecentErrorGroups,
@@ -14,6 +16,7 @@ import {
   getSinceLastDeployInvocationPhrase,
   getSinceLastDeployLogRange,
   getStatusBadgeVariant,
+  summarizeErrorMessage,
   toAlertError,
   toIsoTimestamp,
 } from './EdgeFunctionRecentErrors.utils'
@@ -266,5 +269,68 @@ limit 25`)
     expect(getStatusBadgeVariant()).toBe('destructive')
     expect(getStatusBadgeVariant('500')).toBe('destructive')
     expect(getStatusBadgeVariant('404')).toBe('default')
+  })
+
+  it('summarizes verbose error messages by trimming the stack trace', () => {
+    expect(summarizeErrorMessage('')).toBe('')
+    expect(summarizeErrorMessage('boom')).toBe('boom')
+    expect(
+      summarizeErrorMessage(
+        "SyntaxError: Expected ',' or '}' after property value in JSON at position 22 at parse (<anonymous>) at packageData (ext:deno_fetch/22_body.js:408:14)"
+      )
+    ).toBe("SyntaxError: Expected ',' or '}' after property value in JSON at position 22")
+    expect(summarizeErrorMessage('  multi\n  line\t error  ')).toBe('multi line error')
+  })
+
+  it('prefers the first runtime error log message and falls back to invocation message', () => {
+    expect(
+      getDisplayErrorMessage({
+        message: 'https://example.supabase.red/functions/v1/hello-world',
+        count: 1,
+        lastSeen: 0,
+        executionIds: [],
+        logs: [
+          {
+            key: 'log:booted (time: 22ms)',
+            message: 'booted (time: 22ms)',
+            level: 'log',
+            count: 1,
+            lastSeen: 1,
+          },
+          {
+            key: 'error:SyntaxError: bad json at parse (<anonymous>)',
+            message: 'SyntaxError: bad json at parse (<anonymous>)',
+            level: 'error',
+            count: 1,
+            lastSeen: 2,
+          },
+        ],
+      })
+    ).toBe('SyntaxError: bad json')
+
+    expect(
+      getDisplayErrorMessage({
+        message: 'https://example.supabase.red/functions/v1/hello-world',
+        count: 1,
+        lastSeen: 0,
+        executionIds: [],
+        logs: [],
+      })
+    ).toBe('https://example.supabase.red/functions/v1/hello-world')
+  })
+
+  it('builds a troubleshooting docs URL keyed off the response status code', () => {
+    expect(buildTroubleshootingDocsUrl({ statusCode: '500' })).toBe(
+      'https://supabase.com/docs/guides/troubleshooting/edge-function-500-response'
+    )
+    expect(buildTroubleshootingDocsUrl({ statusCode: '503' })).toBe(
+      'https://supabase.com/docs/guides/troubleshooting/edge-function-503-response'
+    )
+    expect(buildTroubleshootingDocsUrl({})).toBe(
+      'https://supabase.com/docs/guides/troubleshooting?search=edge%20function'
+    )
+    expect(buildTroubleshootingDocsUrl({ statusCode: 'not-a-number' })).toBe(
+      'https://supabase.com/docs/guides/troubleshooting?search=edge%20function'
+    )
   })
 })

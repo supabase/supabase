@@ -96,7 +96,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     type="text"
-                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
+                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
                     icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                   />
                 </DropdownMenuTrigger>
@@ -182,7 +182,7 @@ export function SideBarNavLink({
   const buttonProps = {
     disabled: route.disabled,
     isActive: active,
-    className: cn('text-sm', sidebarBehaviour === 'open' ? '!px-2' : ''),
+    className: cn('text-sm', sidebarBehaviour === 'open' ? 'px-2!' : ''),
     size: 'default' as const,
     onClick: onClick,
   }

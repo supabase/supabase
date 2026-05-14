@@ -1,6 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
 import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
+import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 export type FeaturePreview = {
   key: string
@@ -20,17 +21,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const { isEligible: isEnterpriseOrSupabaseOrg } = useIsEnterpriseOrSupabaseOrg()
 
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
-  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
-  const rlsTesterEnabled = useFlag('rlsTester')
 
   return [
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER,
       name: 'RLS Tester',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/45233',
-      enabled: rlsTesterEnabled,
+      enabled: true,
       isNew: true,
       isPlatformOnly: false,
       isDefaultOptIn: false,
@@ -39,7 +38,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
       name: 'New Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-      enabled: isUnifiedLogsPreviewAvailable && isEnterpriseOrSupabaseOrg,
+      enabled: isUnifiedLogsPreviewAvailable && (IS_STAGING_OR_LOCAL || isEnterpriseOrSupabaseOrg),
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
@@ -89,15 +88,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: false,
       isPlatformOnly: false,
       isDefaultOptIn: false,
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR,
-      name: 'Floating Mobile Toolbar',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/43721',
-      enabled: showFloatingMobileToolbar,
-      isNew: true,
-      isPlatformOnly: false,
-      isDefaultOptIn: true,
     },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

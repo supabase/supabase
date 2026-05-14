@@ -191,7 +191,7 @@ const InnerSideBarFilterSearchInput = forwardRef<
           'pl-7',
           'pr-7',
           'w-full',
-          'rounded',
+          'rounded-sm',
           // 'bg-transparent',
           // 'border',
           // 'border-control',

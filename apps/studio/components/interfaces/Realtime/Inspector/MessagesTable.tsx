@@ -55,7 +55,10 @@ const NoResultAlert = ({
 
           <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-              <IconBroadcast size="xlarge" className="text-background bg-foreground rounded w-6" />
+              <IconBroadcast
+                size="xlarge"
+                className="text-background bg-foreground rounded-sm w-6"
+              />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Create a Broadcast message</p>
                 <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
@@ -65,7 +68,10 @@ const NoResultAlert = ({
               </Button>
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-              <IconPresence size="xlarge" className="text-background bg-foreground rounded w-6" />
+              <IconPresence
+                size="xlarge"
+                className="text-background bg-foreground rounded-sm w-6"
+              />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Join from another browser tab</p>
                 <p className="text-foreground-lighter text-xs">
@@ -82,7 +88,7 @@ const NoResultAlert = ({
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
               <IconDatabaseChanges
                 size="xlarge"
-                className="text-background bg-foreground rounded w-6"
+                className="text-background bg-foreground rounded-sm w-6"
               />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Listen to a table for changes</p>
@@ -142,8 +148,13 @@ const MessagesTable = ({
     <>
       <section className="flex w-full flex-col md:max-h-[calc(100vh-var(--header-height)-3rem)]">
         <ShimmerLine active={enabled} />
-        <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
-          <div className="flex grow flex-col">
+        <div
+          className={cn(
+            'grid grid-rows-2 grid-cols-1 lg:flex h-full lg:flex-row',
+            enabled ? 'border-brand-400' : null
+          )}
+        >
+          <div className="flex grow flex-col lg:w-1/2">
             {enabled && (
               <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
                 <div className="inline-flex gap-2.5 text-xs">
@@ -179,7 +190,7 @@ const MessagesTable = ({
                   isEqual(row, focusedLog)
                     ? 'bg-scale-800 rdg-row--focused'
                     : 'bg-200 hover:bg-scale-300 cursor-pointer',
-                  isErrorLog(row) && '!bg-warning-300',
+                  isErrorLog(row) && 'bg-warning-300!',
                 ])
               }}
               rows={data}
@@ -218,7 +229,8 @@ const MessagesTable = ({
               }}
             />
           </div>
-          <div className="flex w-1/2 flex-col">
+
+          <div className="flex lg:w-1/2 flex-col">
             <MessageSelection onClose={() => setFocusedLog(null)} log={focusedLog} />
           </div>
         </div>

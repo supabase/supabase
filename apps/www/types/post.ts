@@ -1,4 +1,4 @@
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client/serialize'
 
 import type { getSortedPosts } from '@/lib/posts'
 
@@ -78,7 +78,7 @@ export type Blog = {
   slug: string
   title: string
   description?: string
-  content: MDXRemoteSerializeResult
+  content: string
   toc: string | { content: string }
   author?: string
   authors?: StaticAuthor[]
@@ -113,7 +113,7 @@ export type BlogData = {
   slug: string
   title: string
   description?: string
-  content: MDXRemoteSerializeResult
+  content: string
   toc: string | { content: string }
   author?: string
   authors?: StaticAuthor[]

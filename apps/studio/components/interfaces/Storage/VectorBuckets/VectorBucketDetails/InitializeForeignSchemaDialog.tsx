@@ -165,7 +165,7 @@ export const InitializeForeignSchemaDialog = () => {
                 )}
               />
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <DocsButton href={`${DOCS_URL}/guides/storage/vector/querying-vectors`} />
               <div className="flex items-center gap-x-2">
                 <Button type="default" disabled={isCreating} onClick={() => setIsOpen(false)}>

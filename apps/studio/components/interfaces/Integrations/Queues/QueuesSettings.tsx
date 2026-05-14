@@ -21,6 +21,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useQueuesQuery } from '@/data/database-queues/database-queues-query'
 import { useDatabaseQueueToggleExposeMutation } from '@/data/database-queues/database-queues-toggle-postgrest-mutation'
 import { useDatabaseQueuesVersionQuery } from '@/data/database-queues/database-queues-version-query'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
@@ -55,6 +56,18 @@ export const QueuesSettings = () => {
   })
   const tablesWithoutRLS =
     queueTables?.filter((x) => x.name.startsWith('q_') && !x.rls_enabled) ?? []
+
+  // pgmq lowercases queue names when building q_/a_ relations, but pgmq.meta keeps
+  // the original casing. Look up each relname in list_queues() so we render the
+  // user-provided name rather than the lowercased relname slice.
+  const { data: queues } = useQueuesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const queueDisplayName = (relname: string) => {
+    const stripped = relname.slice(2)
+    return queues?.find((q) => q.queue_name.toLowerCase() === stripped)?.queue_name ?? stripped
+  }
 
   const { data: config, error: configError } = useProjectPostgrestConfigQuery({
     projectRef: project?.ref,
@@ -250,7 +263,7 @@ export const QueuesSettings = () => {
                           title="Existing Queues must have RLS enabled first before exposing via PostgREST"
                           className="mt-2"
                         >
-                          <p className="!m-0">
+                          <p className="m-0!">
                             Please ensure that the following {tablesWithoutRLS.length} queue
                             {tablesWithoutRLS.length > 1 ? 's' : ''} have RLS enabled in order to
                             prevent anonymous access.
@@ -259,7 +272,9 @@ export const QueuesSettings = () => {
                             {tablesWithoutRLS.map((x) => {
                               return (
                                 <li key={x.name}>
-                                  <code className="text-code-inline">{x.name.slice(2)}</code>
+                                  <code className="text-code-inline">
+                                    {queueDisplayName(x.name)}
+                                  </code>
                                 </li>
                               )
                             })}
@@ -272,7 +287,7 @@ export const QueuesSettings = () => {
                           >
                             Enable RLS on{' '}
                             {tablesWithoutRLS.length === 1
-                              ? tablesWithoutRLS[0].name.slice(2)
+                              ? queueDisplayName(tablesWithoutRLS[0].name)
                               : `${tablesWithoutRLS.length} queues`}
                           </Button>
                         </Admonition>
@@ -354,7 +369,7 @@ export const QueuesSettings = () => {
           {tablesWithoutRLS.map((x) => {
             return (
               <li key={x.id}>
-                <code className="text-code-inline">{x.name.slice(2)}</code>
+                <code className="text-code-inline">{queueDisplayName(x.name)}</code>
               </li>
             )
           })}

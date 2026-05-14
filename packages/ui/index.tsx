@@ -5,11 +5,8 @@ export * from './src/components/Icon/IconBackground'
 
 // DISPLAYS
 
-export { Card as Card_legacy_ } from './src/components/Card'
 export * from './src/components/Tabs'
-export * from './src/components/Alert'
 export * from './src/components/Accordion'
-export * from './src/components/Collapsible'
 
 // NAV
 
@@ -36,9 +33,7 @@ export * from './src/lib/utils'
 
 // DATA ENTRY
 
-export * from './src/components/Listbox'
 export * from './src/components/Input'
-export * from './src/components/Toggle'
 export * from './src/components/ExpandingTextArea'
 
 // layout
@@ -135,6 +130,7 @@ export {
   PopoverContent as PopoverContent_Shadcn_,
   PopoverAnchor as PopoverAnchor_Shadcn_,
   PopoverSeparator as PopoverSeparator_Shadcn_,
+  type PopoverContentProps as PopoverContentProps_Shadcn_,
 } from './src/components/shadcn/ui/popover'
 
 export {

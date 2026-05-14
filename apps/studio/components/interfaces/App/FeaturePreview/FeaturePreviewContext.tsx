@@ -14,6 +14,7 @@ import {
 import { useFeaturePreviews } from './useFeaturePreviews'
 import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
@@ -28,7 +29,7 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
 
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
-export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
+export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
   const featurePreviews = useFeaturePreviews()
 
@@ -93,7 +94,7 @@ export const useUnifiedLogsPreview = () => {
     useIsEnterpriseOrSupabaseOrg()
 
   const isLoading = !flagsHaveLoaded || isOrgLoading
-  const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
+  const isEligible = unifiedLogsEnabled && (IS_STAGING_OR_LOCAL || isEnterpriseOrSupabaseOrg)
   const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
@@ -125,18 +126,9 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
-export const useIsFloatingMobileToolbarEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
-
-  return showFloatingMobileToolbar && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]
-}
-
 export const useIsRLSTesterEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const rlsTesterEnabled = useFlag('rlsTester')
-
-  return rlsTesterEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
 }
 
 export const useFeaturePreviewModal = () => {

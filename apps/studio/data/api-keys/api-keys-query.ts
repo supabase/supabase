@@ -48,7 +48,7 @@ interface APIKeysVariables {
   reveal?: boolean
 }
 
-type APIKey = LegacyKeys | SecretKeys | PublishableKeys
+export type APIKey = LegacyKeys | SecretKeys | PublishableKeys
 
 async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')

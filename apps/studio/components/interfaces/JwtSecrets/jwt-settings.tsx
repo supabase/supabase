@@ -219,7 +219,7 @@ export const JWTSettings = () => {
           </div>
         }
       >
-        <Panel.Content className="border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+        <Panel.Content className="border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark">
           <Form {...form}>
             <form
               id={formId}
@@ -239,7 +239,7 @@ export const JWTSettings = () => {
                       type="warning"
                       title="Legacy JWT secret has been migrated to new JWT Signing Keys"
                     >
-                      <p className="!leading-normal">
+                      <p className="leading-normal!">
                         Legacy JWT secret can only be changed by rotating to a standby key and then
                         revoking it. It is used to{' '}
                         <em className="text-foreground not-italic">
@@ -249,7 +249,7 @@ export const JWTSettings = () => {
                       </p>
 
                       {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
-                        <p className="!leading-normal">
+                        <p className="leading-normal!">
                           <em className="text-warning not-italic">
                             This includes the <code className="text-code-inline">anon</code> and{' '}
                             <code className="text-code-inline">service_role</code> JWT based API
@@ -373,7 +373,7 @@ export const JWTSettings = () => {
               )}
 
               <Collapsible_Shadcn_ className="bg border rounded-md mt-4">
-                <CollapsibleTrigger_Shadcn_ className="p-4 w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
+                <CollapsibleTrigger_Shadcn_ className="p-4 w-full flex items-center justify-between [&[data-state=open]>svg]:-rotate-180!">
                   <p className="text-sm">
                     {disableLegacyJwtSecretRotation
                       ? 'How to migrate to the new API keys?'
@@ -412,7 +412,7 @@ export const JWTSettings = () => {
                           </InlineLink>
                           , create a publishable key and secret key, then swap them into your apps
                           in place of <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline !break-keep">service_role</code>{' '}
+                          <code className="text-code-inline break-keep!">service_role</code>{' '}
                           respectively. Watch the "Last used" indicators to confirm no traffic still
                           depends on the legacy keys.
                         </p>

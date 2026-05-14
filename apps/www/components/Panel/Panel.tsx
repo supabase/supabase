@@ -53,7 +53,7 @@ const Panel = ({
       const activeGlow =
         hasActiveOnHover && isActive
           ? `radial-gradient(65rem circle at ${x}px ${y}px, ${
-              activeColor === 'brand' ? 'var(--colors-brand9)' : 'hsl(var(--border-stronger))'
+              activeColor === 'brand' ? 'var(--color-brand-900)' : 'hsl(var(--border-stronger))'
             }, transparent), `
           : ''
       outerElement.style.backgroundImage = `
@@ -82,11 +82,11 @@ const Panel = ({
     <Component
       ref={outerRef}
       className={cn(
-        'group/panel relative rounded-lg md:rounded-xl p-px bg-surface-75 bg-gradient-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md flex items-center justify-center',
+        'group/panel relative rounded-lg md:rounded-xl p-px bg-surface-75 bg-linear-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md flex items-center justify-center',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
-            ? 'hover:bg-none hover:!bg-brand'
-            : 'hover:bg-none hover:!bg-border-stronger'
+            ? 'hover:bg-none hover:bg-brand!'
+            : 'hover:bg-none hover:bg-border-stronger!'
           : '',
         outerClassName
       )}

@@ -1,8 +1,8 @@
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PGColumn, PGTable } from '@supabase/pg-meta'
 
 interface Props {
-  table: PostgresTable
-  column?: PostgresColumn
+  table: PGTable
+  column?: PGColumn
 }
 
 export const HeaderTitle = ({ table, column }: Props) => {
@@ -10,14 +10,14 @@ export const HeaderTitle = ({ table, column }: Props) => {
     return (
       <>
         <span>Add new column to</span>
-        <code className="text-code-inline !text-sm ml-1">{table.name}</code>
+        <code className="text-code-inline text-sm! ml-1">{table.name}</code>
       </>
     )
   }
   return (
     <>
-      Update column <code className="text-code-inline !text-sm">{column.name}</code> from{' '}
-      <code className="text-code-inline !text-sm">{column.table}</code>
+      Update column <code className="text-code-inline text-sm!">{column.name}</code> from{' '}
+      <code className="text-code-inline text-sm!">{column.table}</code>
     </>
   )
 }

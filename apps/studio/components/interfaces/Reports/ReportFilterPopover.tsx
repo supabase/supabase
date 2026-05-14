@@ -10,7 +10,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Input,
+  Input_Shadcn_ as Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
@@ -87,7 +87,7 @@ const FilterableInput = ({
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           className={cn('h-6 text-sm', defaultTheme.input.variants.standard, sizes.tiny)}
-          wrapperClassName="!p-0 !border !border-control rounded-md"
+          wrapperClassName="p-0! border! border-control! rounded-md"
           showSearchIcon={false}
         />
         <div

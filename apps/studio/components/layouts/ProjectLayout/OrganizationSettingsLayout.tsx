@@ -227,7 +227,7 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       title="Organization Settings"
       sections={sections}
       header={
-        <div className="border-default flex min-h-[var(--header-height)] items-center border-b px-6">
+        <div className="border-default flex min-h-(--header-height) items-center border-b px-6">
           <h4 className="text-lg">Settings</h4>
         </div>
       }
@@ -236,5 +236,3 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
     </WithSidebar>
   )
 }
-
-export default OrganizationSettingsLayout

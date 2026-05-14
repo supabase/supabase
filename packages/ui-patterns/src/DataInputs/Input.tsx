@@ -15,7 +15,6 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from 'ui'
-import styleHandler from 'ui/src/lib/theme/styleHandler'
 
 export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'onCopy'> {
   copy?: boolean
@@ -50,8 +49,6 @@ const Input = forwardRef<
     const [copyLabel, setCopyLabel] = useState('Copy')
     const [hidden, setHidden] = useState(true)
 
-    const __styles = styleHandler('input')
-
     function _onCopy(value: any) {
       copyToClipboard(value, () => {
         /* clipboard successfully set */
@@ -67,9 +64,6 @@ const Input = forwardRef<
       setHidden(false)
     }
 
-    let inputClasses: string[] = []
-    if (size) inputClasses.push(__styles.size[size])
-
     return (
       <InputGroup className={containerClassName}>
         <InputGroupInput
@@ -80,7 +74,7 @@ const Input = forwardRef<
           onCopy={onCopy}
           type={reveal && hidden ? 'password' : props.type}
           disabled={props.disabled}
-          className={cn(...inputClasses, props.className)}
+          className={props.className}
           data-1p-ignore // 1Password
           data-lpignore="true" // LastPass
           data-form-type="other" // Dashlane

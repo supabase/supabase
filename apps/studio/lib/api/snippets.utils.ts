@@ -84,7 +84,7 @@ const buildSnippet = (
     description: '',
     favorite: false,
     content: {
-      sql: content, // Default content
+      sql: content,
       content_id: uuidv4(),
       schema_version: '1.0',
     },

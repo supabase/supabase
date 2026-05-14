@@ -1,4 +1,4 @@
-import { PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -58,7 +58,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
-const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
+const getColumnTypeAffordancePresentation = (column: PGColumn) => {
   const { kind, label } = getColumnTypeAffordance(column.format)
   const iconClassName = 'text-foreground-muted'
 
@@ -98,8 +98,8 @@ const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
 
 interface ColumnListProps {
   onAddColumn: () => void
-  onEditColumn: (column: PostgresColumn) => void
-  onDeleteColumn: (column: PostgresColumn) => void
+  onEditColumn: (column: PGColumn) => void
+  onDeleteColumn: (column: PGColumn) => void
 }
 
 export const ColumnList = ({
@@ -190,7 +190,7 @@ export const ColumnList = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-0 !px-0" />
+                <TableHead className="w-0 px-0!" />
 
                 <TableHead
                   className={cn(columns.length === 0 ? 'text-foreground-muted' : undefined)}
@@ -312,7 +312,7 @@ export const ColumnList = ({
 
                   return (
                     <TableRow key={column.name}>
-                      <TableCell className="w-0 !pl-5 !pr-1">
+                      <TableCell className="w-0 pl-5! pr-1!">
                         <Tooltip>
                           <TooltipTrigger asChild className="cursor-default" aria-label={typeLabel}>
                             <div className="flex w-4 justify-center">{TypeIcon}</div>

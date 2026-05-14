@@ -11,12 +11,22 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/api/api-keys',
+    destination: '/docs/guides/getting-started/api-keys',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/hardening-data-api',
     destination: '/docs/guides/api/securing-your-api',
   },
   {
     permanent: true,
     source: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/data-api',
     destination: '/docs/guides/api/securing-your-api',
   },
   {
@@ -3089,6 +3099,42 @@ module.exports = [
     destination: '/docs/guides/database/overview',
   },
 
+  // AI tools move
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/plugins',
+    destination: '/docs/guides/ai-tools/plugins',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts/:slug',
+    destination: '/docs/guides/ai-tools/ai-prompts/:slug',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/mcp',
+    destination: '/docs/guides/ai-tools/mcp',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/byo-mcp',
+    destination: '/docs/guides/ai-tools/byo-mcp',
+  },
   // design
   {
     permanent: true,
