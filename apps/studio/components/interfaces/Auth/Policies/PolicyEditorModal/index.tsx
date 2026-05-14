@@ -1,5 +1,4 @@
-import { acceptUntrustedSql } from '@supabase/pg-meta'
-import { PGPolicy } from '@supabase/pg-meta'
+import { acceptUntrustedSql, PGPolicy } from '@supabase/pg-meta'
 import { isEmpty, noop } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'

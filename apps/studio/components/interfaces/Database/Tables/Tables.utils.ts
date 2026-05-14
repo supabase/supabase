@@ -1,5 +1,4 @@
-import { PGMaterializedView, PGView } from '@supabase/pg-meta'
-import { PGForeignTable } from '@supabase/pg-meta'
+import { PGForeignTable, PGMaterializedView, PGView } from '@supabase/pg-meta'
 
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { SafePostgresTable } from '@/lib/postgres-types'

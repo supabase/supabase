@@ -56,7 +56,8 @@ withTestDatabase('list tables', async ({ executeQuery }) => {
       id: expect.any(Number),
       live_rows_estimate: expect.any(Number),
       size: expect.any(String),
-    }, `
+    },
+    `
     {
       "bytes": Any<Number>,
       "columns": [
@@ -159,7 +160,8 @@ withTestDatabase('list tables', async ({ executeQuery }) => {
       "schema": "public",
       "size": Any<String>,
     }
-  `)
+  `
+  )
 })
 
 withTestDatabase('list tables without columns', async ({ executeQuery }) => {
@@ -500,7 +502,8 @@ withTestDatabase('primary keys', async ({ executeQuery }) => {
       id: expect.any(Number),
       live_rows_estimate: expect.any(Number),
       size: expect.any(String),
-    }, `
+    },
+    `
     {
       "bytes": Any<Number>,
       "columns": [
@@ -567,7 +570,8 @@ withTestDatabase('primary keys', async ({ executeQuery }) => {
       "schema": "public",
       "size": Any<String>,
     }
-  `)
+  `
+  )
 })
 
 // /** Additional tests */
@@ -582,7 +586,8 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
       id: expect.any(Number),
       live_rows_estimate: expect.any(Number),
       size: expect.any(String),
-    }, `
+    },
+    `
     {
       "bytes": Any<Number>,
       "columns": [
@@ -748,7 +753,8 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
       "schema": "public",
       "size": Any<String>,
     }
-  `)
+  `
+  )
 })
 
 withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) => {
@@ -762,7 +768,8 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
       id: expect.any(Number),
       live_rows_estimate: expect.any(Number),
       size: expect.any(String),
-    }, `
+    },
+    `
     {
       "bytes": Any<Number>,
       "columns": [
@@ -928,7 +935,8 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
       "schema": "public",
       "size": Any<String>,
     }
-  `)
+  `
+  )
 })
 
 withTestDatabase('retrieve error if missing identifiers', async ({}) => {

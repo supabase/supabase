@@ -1,5 +1,4 @@
-import type { SafeSqlFragment } from '@supabase/pg-meta'
-import type { PGTableRelationship } from '@supabase/pg-meta'
+import type { PGTableRelationship, SafeSqlFragment } from '@supabase/pg-meta'
 
 import { CreateColumnBody } from '@/data/database-columns/database-column-create-mutation'
 import { UpdateColumnBody } from '@/data/database-columns/database-column-update-mutation'

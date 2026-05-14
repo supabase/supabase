@@ -30,7 +30,8 @@ withTestDatabase('list materialized views', async ({ executeQuery }) => {
   const views = listZod.parse(await executeQuery(listSql))
   const todosMaterializedView = views.find(({ name }) => name === 'todos_matview')
   expect(todosMaterializedView).toMatchInlineSnapshot(
-    { id: expect.any(Number) }, `
+    { id: expect.any(Number) },
+    `
     {
       "columns": [
         {
@@ -103,7 +104,8 @@ withTestDatabase('list materialized views', async ({ executeQuery }) => {
       "name": "todos_matview",
       "schema": "public",
     }
-  `)
+  `
+  )
 })
 
 withTestDatabase('list materialized views without columns', async ({ executeQuery }) => {
@@ -131,7 +133,8 @@ withTestDatabase('retrieve materialized view by name', async ({ executeQuery }) 
   })
   const view = retrieveZod.parse((await executeQuery(retrieveSql))[0])
   expect(view).toMatchInlineSnapshot(
-    { id: expect.any(Number) }, `
+    { id: expect.any(Number) },
+    `
     {
       "columns": [
         {
@@ -204,7 +207,8 @@ withTestDatabase('retrieve materialized view by name', async ({ executeQuery }) 
       "name": "todos_matview",
       "schema": "public",
     }
-  `)
+  `
+  )
 })
 
 withTestDatabase('retrieve materialized view by id', async ({ executeQuery }) => {
@@ -213,7 +217,8 @@ withTestDatabase('retrieve materialized view by id', async ({ executeQuery }) =>
   })
   const view = retrieveZod.parse((await executeQuery(retrieveSql))[0])
   expect(view).toMatchInlineSnapshot(
-    { id: expect.any(Number) }, `
+    { id: expect.any(Number) },
+    `
     {
       "columns": [
         {
@@ -286,5 +291,6 @@ withTestDatabase('retrieve materialized view by id', async ({ executeQuery }) =>
       "name": "todos_matview",
       "schema": "public",
     }
-  `)
+  `
+  )
 })
