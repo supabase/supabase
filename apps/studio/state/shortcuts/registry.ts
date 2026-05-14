@@ -8,6 +8,9 @@ import {
   schemaVisualizerRegistry,
 } from './registry/schema-visualizer'
 import { SQL_EDITOR_SHORTCUT_IDS, sqlEditorRegistry } from './registry/sql-editor'
+import { STORAGE_BUCKETS_SHORTCUT_IDS, storageBucketsRegistry } from './registry/storage-buckets'
+import { STORAGE_EXPLORER_SHORTCUT_IDS, storageExplorerRegistry } from './registry/storage-explorer'
+import { STORAGE_NAV_SHORTCUT_IDS, storageNavRegistry } from './registry/storage-nav'
 import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
 import { ShortcutDefinition } from './types'
 
@@ -76,6 +79,13 @@ export const SHORTCUT_IDS = {
   ...AUTH_USERS_SHORTCUT_IDS,
   // Auth sub-page navigation chords
   ...AUTH_NAV_SHORTCUT_IDS,
+
+  // Storage sub-page navigation chords
+  ...STORAGE_NAV_SHORTCUT_IDS,
+  // Storage Files (bucket list) page shortcuts
+  ...STORAGE_BUCKETS_SHORTCUT_IDS,
+  // Storage Explorer (file browser) shortcuts
+  ...STORAGE_EXPLORER_SHORTCUT_IDS,
 } as const
 
 /**
@@ -360,4 +370,11 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   ...authUsersRegistry,
   // Auth sub-page navigation chord registration
   ...authNavRegistry,
+
+  // Storage sub-page navigation chord registration
+  ...storageNavRegistry,
+  // Storage Files (bucket list) page shortcut registration
+  ...storageBucketsRegistry,
+  // Storage Explorer (file browser) shortcut registration
+  ...storageExplorerRegistry,
 }

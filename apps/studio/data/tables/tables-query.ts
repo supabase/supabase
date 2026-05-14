@@ -1,5 +1,5 @@
+import type { PGTable } from '@supabase/pg-meta'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { sortBy } from 'lodash'
 import { useCallback } from 'react'
@@ -16,7 +16,7 @@ export type TablesVariables = {
    * Defaults to false
    */
   includeColumns?: boolean
-  sortByProperty?: keyof PostgresTable
+  sortByProperty?: keyof PGTable
 }
 
 export async function getTables(
@@ -61,10 +61,10 @@ export async function getTables(
 
   // Sort the data if the sortByName option is true
   if (Array.isArray(data) && sortByProperty) {
-    return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
+    return sortBy(data, (t) => t[sortByProperty]) as PGTable[]
   }
 
-  return data as PostgresTable[]
+  return data as PGTable[]
 }
 
 export type TablesData = Awaited<ReturnType<typeof getTables>>

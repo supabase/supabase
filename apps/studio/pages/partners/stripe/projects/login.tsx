@@ -3,16 +3,10 @@ import { useParams } from 'common'
 import { LogOut } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Button } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
-import {
-  ConnectMockMenu,
-  ConnectPreviewToolbar,
-  getConnectMockState,
-  isTemporaryConnectMockPreviewEnabled,
-} from '@/components/interfaces/Connect/ConnectMockMenu'
 import {
   InterstitialAccountRow,
   InterstitialLayout,
@@ -30,125 +24,54 @@ import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import type { NextPageWithLayout } from '@/types'
 
-const STRIPE_PROJECTS_MOCK_STATES = ['pending', 'linked', 'wrong-account', 'success'] as const
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize Stripe Projects', brand: 'Supabase' })
-
-type MockState = (typeof STRIPE_PROJECTS_MOCK_STATES)[number]
-
-const MOCK_RESPONSES = {
-  pending: {
-    id: 'mock',
-    email: 'jane@acmecorp.io',
-    email_matches: true,
-    status: 'pending' as const,
-    expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
-    linked_organization: undefined,
-  },
-  linked: {
-    id: 'mock',
-    email: 'jane@acmecorp.io',
-    email_matches: true,
-    status: 'pending' as const,
-    expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
-    linked_organization: { id: 42, name: 'Acme Corp', slug: 'acme-corp' },
-  },
-  'wrong-account': {
-    id: 'mock',
-    email: 'jane@acmecorp.io',
-    email_matches: false,
-    status: 'pending' as const,
-    expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
-    linked_organization: undefined,
-  },
-  success: {
-    id: 'mock',
-    email: 'jane@acmecorp.io',
-    email_matches: true,
-    status: 'complete' as const,
-    expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
-    linked_organization: undefined,
-  },
-} satisfies Record<MockState, unknown>
 
 const StripeProjectsLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ar_id } = useParams()
-
   const signOut = useSignOut()
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
 
-  const mock =
-    router.isReady && isTemporaryConnectMockPreviewEnabled()
-      ? getConnectMockState(router.query.mock, STRIPE_PROJECTS_MOCK_STATES)
-      : undefined
-
-  const [mockConfirming, setMockConfirming] = useState(false)
-  const [mockConfirmed, setMockConfirmed] = useState(false)
-
-  useEffect(() => {
-    setMockConfirming(false)
-    setMockConfirmed(false)
-  }, [mock])
-
   const {
     data: accountRequest,
-    isPending,
-    isSuccess,
-    isError,
+    isPending: isQueryPending,
+    isSuccess: isQuerySuccess,
+    isError: isQueryError,
     error,
   } = useQuery({
     ...accountRequestQueryOptions({ arId: ar_id }),
-    enabled: !mock && typeof ar_id !== 'undefined',
+    enabled: typeof ar_id !== 'undefined',
   })
 
   const {
     mutate: confirmAccountRequest,
-    isPending: isConfirming,
-    isSuccess: isConfirmed,
+    isPending: isConfirmationPending,
+    isSuccess: isConfirmationSuccess,
   } = useConfirmAccountRequestMutation()
 
   useEffect(() => {
     if (!router.isReady) return
-    if (mock) return
 
     if (!ar_id) {
       router.push('/404')
     }
-  }, [router.isReady, ar_id, mock, router])
+  }, [router.isReady, ar_id, router])
 
   const handleApprove = async () => {
-    if (mock) {
-      setMockConfirming(true)
-      setTimeout(() => {
-        setMockConfirming(false)
-        setMockConfirmed(true)
-      }, 1200)
-      return
-    }
-    if (!ar_id || isConfirming) return
+    if (!ar_id || isConfirmationPending) return
     confirmAccountRequest({ arId: ar_id })
   }
 
-  const replaceMockState = (state: MockState) => {
-    router.replace(
-      { pathname: router.pathname, query: { ...router.query, mock: state } },
-      undefined,
-      { shallow: true }
-    )
-  }
-
-  const effectiveAccountRequest = mock ? MOCK_RESPONSES[mock] : accountRequest
-  const effectiveIsPending = mock ? false : router.isReady && isPending
-  const effectiveIsSuccess = mock ? mock !== 'success' : isSuccess
-  const effectiveIsConfirmed = mock ? mock === 'success' || mockConfirmed : isConfirmed
-  const effectiveIsConfirming = mock ? mockConfirming : isConfirming
-  const effectiveIsError = mock ? false : isError
-
-  const linkedOrg = effectiveAccountRequest?.linked_organization
-  const emailMatches = effectiveAccountRequest?.email_matches ?? false
-  const displayName = primaryEmail ?? username ?? effectiveAccountRequest?.email ?? ''
-  const showSuccessBranch = effectiveIsSuccess && !effectiveIsConfirmed
-  const interstitialDescription = effectiveIsConfirmed
+  const linkedOrg = accountRequest?.linked_organization
+  const emailMatches = accountRequest?.email_matches ?? false
+  const displayName = primaryEmail ?? username ?? accountRequest?.email ?? ''
+  const isPending = router.isReady && isQueryPending
+  const isConfirmed = isConfirmationSuccess
+  const isConfirming = isConfirmationPending
+  const isSuccess = isQuerySuccess
+  const isError = isQueryError
+  const showAuthorizationState = isSuccess && !isConfirmed
+  const interstitialDescription = isConfirmed
     ? undefined
     : 'This will create an organization on your behalf in Supabase'
 
@@ -157,17 +80,6 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
       <Head>
         <title>{PAGE_TITLE}</title>
       </Head>
-
-      {mock && (
-        <ConnectPreviewToolbar>
-          <ConnectMockMenu
-            state={mock}
-            states={STRIPE_PROJECTS_MOCK_STATES}
-            onSelect={replaceMockState}
-            width="w-[180px]"
-          />
-        </ConnectPreviewToolbar>
-      )}
 
       <InterstitialLayout
         logo={
@@ -180,7 +92,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
         description={interstitialDescription}
       >
         <div className="px-6 pb-6">
-          {effectiveIsPending && (
+          {isPending && (
             <div className="flex flex-col gap-6">
               <div className="flex items-center gap-3 rounded-lg border border-secondary p-3">
                 <ShimmeringLoader className="size-9 flex-shrink-0 rounded-full py-0" />
@@ -197,29 +109,24 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
             </div>
           )}
 
-          {effectiveIsConfirmed && (
+          {isConfirmed && (
             <div className="flex flex-col gap-4">
-              <Admonition
-                type="success"
-                description="A new Supabase organization has been created and linked to your Stripe account."
-              />
+              <Admonition type="success" title="Stripe Projects authorized" />
               <p className="text-center text-xs text-foreground-lighter text-balance">
                 You can now close this tab.
               </p>
             </div>
           )}
 
-          {showSuccessBranch && !emailMatches && (
+          {showAuthorizationState && !emailMatches && (
             <div className="flex flex-col gap-3">
               <Admonition
                 type="warning"
                 description={
                   <>
-                    You’re signed in to a different account. Sign out and sign back in as{' '}
-                    <span className="font-medium text-foreground">
-                      {effectiveAccountRequest?.email}
-                    </span>
-                    . Then return to Stripe to restart the request.
+                    You're signed in to a different account. Sign out and sign back in as{' '}
+                    <span className="font-medium text-foreground">{accountRequest?.email}</span>.
+                    Then return to Stripe to restart the request.
                   </>
                 }
               />
@@ -229,7 +136,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
             </div>
           )}
 
-          {showSuccessBranch && emailMatches && linkedOrg && (
+          {showAuthorizationState && emailMatches && linkedOrg && (
             <div className="flex flex-col gap-3">
               <Admonition
                 type="tip"
@@ -241,13 +148,8 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 }
               />
               <div className="flex flex-col gap-2">
-                <Button
-                  type="primary"
-                  block
-                  loading={effectiveIsConfirming}
-                  onClick={handleApprove}
-                >
-                  Confirm
+                <Button type="primary" block loading={isConfirming} onClick={handleApprove}>
+                  Authorize Stripe Projects
                 </Button>
                 <Button type="text" block onClick={() => router.push('/')}>
                   Cancel
@@ -256,7 +158,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
             </div>
           )}
 
-          {showSuccessBranch && emailMatches && !linkedOrg && (
+          {showAuthorizationState && emailMatches && !linkedOrg && (
             <div className="flex flex-col gap-6">
               <InterstitialAccountRow
                 avatarUrl={avatarUrl}
@@ -283,8 +185,8 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
               <div className="flex flex-col gap-2">
                 <Button
                   type="primary"
-                  loading={effectiveIsConfirming}
-                  disabled={effectiveIsConfirming}
+                  loading={isConfirming}
+                  disabled={isConfirming}
                   onClick={handleApprove}
                 >
                   Create organization
@@ -296,7 +198,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
             </div>
           )}
 
-          {effectiveIsError && (
+          {isError && (
             <div className="flex flex-col gap-3">
               <Admonition
                 type="danger"

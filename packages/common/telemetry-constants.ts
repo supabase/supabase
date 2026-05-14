@@ -3440,6 +3440,18 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 }
 
 /**
+ * User ran a query in the RLS tester feature preview.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RLSTesterRunQueryClickedEvent {
+  action: 'rls_tester_run_query_clicked'
+  properties: { type: 'raw' | 'inferred' }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3638,3 +3650,4 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | RLSTesterRunQueryClickedEvent

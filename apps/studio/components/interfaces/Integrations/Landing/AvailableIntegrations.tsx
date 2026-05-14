@@ -97,9 +97,9 @@ export const AvailableIntegrations = () => {
       <div className="p-4 md:p-10 md:py-8 flex flex-col gap-y-5">
         <div className="grid xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-3">
           {isLoading &&
-            new Array(3)
-              .fill(0)
-              .map((_, idx) => <IntegrationLoadingCard key={`integration-loading-${idx}`} />)}
+            Array.from({ length: 3 }).map((_, idx) => (
+              <IntegrationLoadingCard key={`integration-loading-${idx}`} />
+            ))}
           {isError && (
             <AlertError
               className="xl:col-span-3 2xl:col-span-4"

@@ -9,7 +9,6 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  Collapsible,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -179,9 +178,10 @@ export const TopApiRoutesRenderer = (
   if (props.data.length === 0) return null
 
   return (
-    <Collapsible>
+    <>
       <Table
         className="rounded-t-none"
+        containerClassName="overflow-x-auto"
         head={
           <>
             <Table.th className={headerClasses}>Request</Table.th>
@@ -207,11 +207,11 @@ export const TopApiRoutesRenderer = (
                       <Table.td className={[cellClasses].join(' ')}>
                         <RouteTdContent {...datum} />
                       </Table.td>
-                      <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                      <Table.td className={[cellClasses, 'text-right'].join(' ')}>
                         {datum.count}
                       </Table.td>
                       {props.data[0].avg !== undefined && (
-                        <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                        <Table.td className={[cellClasses, 'text-right'].join(' ')}>
                           {Number(datum.avg).toFixed(2)}ms
                         </Table.td>
                       )}
@@ -223,22 +223,20 @@ export const TopApiRoutesRenderer = (
           </>
         }
       />
-      <Collapsible.Trigger asChild>
-        <div className="flex flex-row justify-end w-full gap-2 p-1">
-          <Button
-            type="text"
-            onClick={() => setShowMore(!showMore)}
-            className={[
-              'transition',
-              showMore ? 'text-foreground' : 'text-foreground-lighter',
-              props.data.length <= 3 ? 'hidden' : '',
-            ].join(' ')}
-          >
-            {!showMore ? 'Show more' : 'Show less'}
-          </Button>
-        </div>
-      </Collapsible.Trigger>
-    </Collapsible>
+      <div className="flex flex-row justify-end w-full gap-2 p-1">
+        <Button
+          type="text"
+          onClick={() => setShowMore(!showMore)}
+          className={[
+            'transition',
+            showMore ? 'text-foreground' : 'text-foreground-lighter',
+            props.data.length <= 3 ? 'hidden' : '',
+          ].join(' ')}
+        >
+          {!showMore ? 'Show more' : 'Show less'}
+        </Button>
+      </div>
+    </>
   )
 }
 
