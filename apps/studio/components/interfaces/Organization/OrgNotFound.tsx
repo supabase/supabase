@@ -28,7 +28,7 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
               ) : (
                 <>This organization </>
               )}
-              does not exist or you do not have permission to access to it. Contact the the owner if
+              does not exist or you do not have permission to access it. Contact the owner if
               you believe this is a mistake.
             </>
           }
