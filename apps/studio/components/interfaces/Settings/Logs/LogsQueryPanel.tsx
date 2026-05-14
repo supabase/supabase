@@ -18,10 +18,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   SidePanel,
+  Switch,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -36,7 +38,7 @@ import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -45,6 +47,8 @@ export interface LogsQueryPanelProps {
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: string) => void
   onDateChange: (value: DatePickerValue) => void
+  useOtel?: boolean
+  onUseOtelChange?: (value: boolean) => void
 }
 
 function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: string }) {
@@ -63,9 +67,14 @@ const LogsQueryPanel = ({
   onSelectTemplate,
   onSelectSource,
   onDateChange,
+  useOtel = false,
+  onUseOtelChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
+  // Staff-only debugging affordance: only show on staging/local, never to
+  // enterprise customers running against production.
+  const otelToggleEnabled = IS_STAGING_OR_LOCAL && !!onUseOtelChange
 
   const {
     projectAuthAll: authEnabled,
@@ -151,6 +160,30 @@ const LogsQueryPanel = ({
               }}
               helpers={EXPLORER_DATEPICKER_HELPERS}
             />
+
+            {otelToggleEnabled && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="logs-explorer-otel-toggle"
+                      checked={useOtel}
+                      onCheckedChange={(checked) => onUseOtelChange?.(checked)}
+                    />
+                    <Label_Shadcn_
+                      htmlFor="logs-explorer-otel-toggle"
+                      className="text-xs text-foreground-light cursor-pointer"
+                    >
+                      OTEL endpoint
+                    </Label_Shadcn_>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  Run this query against the new ClickHouse-backed OTEL endpoint instead of
+                  BigQuery. Use to validate ClickHouse SQL before relying on it.
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             <div
               data-testid="log-explorer-warnings"

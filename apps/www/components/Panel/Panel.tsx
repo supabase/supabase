@@ -53,7 +53,7 @@ const Panel = ({
       const activeGlow =
         hasActiveOnHover && isActive
           ? `radial-gradient(65rem circle at ${x}px ${y}px, ${
-              activeColor === 'brand' ? 'var(--colors-brand9)' : 'hsl(var(--border-stronger))'
+              activeColor === 'brand' ? 'var(--color-brand-900)' : 'hsl(var(--border-stronger))'
             }, transparent), `
           : ''
       outerElement.style.backgroundImage = `

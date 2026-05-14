@@ -6,7 +6,6 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { IntegrationDefinition } from './Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH } from '@/lib/constants'
 
 type IntegrationCardProps = IntegrationDefinition & {
   isInstalled?: boolean
@@ -58,7 +57,7 @@ export const IntegrationCard = ({
             {image ? (
               <Image
                 fill
-                src={`${BASE_PATH}/${image}`}
+                src={image}
                 alt={`${name} integration`}
                 className="w-full h-full object-cover invert dark:invert-0"
                 objectFit="cover"

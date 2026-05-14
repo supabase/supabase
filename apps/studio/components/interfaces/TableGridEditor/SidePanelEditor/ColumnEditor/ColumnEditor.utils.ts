@@ -1,5 +1,5 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
-import type { PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { isNull } from 'lodash'
 import { toast } from 'sonner'
 
@@ -57,7 +57,7 @@ export const generateColumnField = (
 }
 
 export const generateColumnFieldFromPostgresColumn = (
-  column: PostgresColumn,
+  column: PGColumn,
   table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ): ColumnField => {
@@ -213,7 +213,7 @@ export const getForeignKeyUIState = (
 }
 
 export const getColumnForeignKey = (
-  column: PostgresColumn,
+  column: PGColumn,
   table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ) => {

@@ -122,7 +122,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
           <div>
             <Table className="w-full text-sm">
               <TableBody>
-                {!planFeePaidInAdvance && (
+                {planItem && !planFeePaidInAdvance && (
                   <TableRow>
                     <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
                     <TableCell className="text-right py-2 px-0">
@@ -228,6 +228,13 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           <span>{item.description ?? 'Unknown'}</span>
                           {(sortedBreakdown.length > 0 || item.usage_metric !== null) && (
                             <InfoTooltip className="max-w-sm">
+                              {item.item_name === 'minimum_amount' && (
+                                <p className="mb-2" translate="no">
+                                  Minimum Fee - If your cost is below the minimum fee, you will be
+                                  charged the difference as a floor fee
+                                </p>
+                              )}
+
                               {item.unit_price_desc && (
                                 <p className="mb-2" translate="no">
                                   Pricing: {item.unit_price_desc}

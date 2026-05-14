@@ -27,6 +27,7 @@ import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPa
 import { DetailSectionHeader } from './ServiceFlow/components/shared/DetailSection'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
+import { getRowTimestampMs } from './UnifiedLogs.utils'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import {
   ServiceFlowType,
@@ -89,11 +90,7 @@ export function ServiceFlowPanel({
 
   if (!selectedRowKey || !selectedRow) return null
 
-  const timestampMs = selectedRow.timestamp
-    ? selectedRow.timestamp / 1000
-    : selectedRow.date
-      ? selectedRow.date.getTime()
-      : null
+  const timestampMs = getRowTimestampMs(selectedRow)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   // Prepare JSON data for Raw JSON tab

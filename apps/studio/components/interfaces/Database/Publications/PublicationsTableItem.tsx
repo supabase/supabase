@@ -1,4 +1,4 @@
-import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
+import type { PGPublication, PGTable } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -10,8 +10,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
 interface PublicationsTableItemProps {
-  table: PostgresTable
-  selectedPublication: PostgresPublication
+  table: PGTable
+  selectedPublication: PGPublication
 }
 
 export const PublicationsTableItem = ({
@@ -35,10 +35,7 @@ export const PublicationsTableItem = ({
 
   const { mutate: updatePublications, isPending } = useDatabasePublicationUpdateMutation()
 
-  const toggleReplicationForTable = async (
-    table: PostgresTable,
-    publication: PostgresPublication
-  ) => {
+  const toggleReplicationForTable = async (table: PGTable, publication: PGPublication) => {
     if (project === undefined) return console.error('Project is required')
 
     const originalChecked = checked

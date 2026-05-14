@@ -1,4 +1,4 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -23,7 +23,7 @@ import type { ImportContent, TableField } from './TableEditor.types'
 import {
   formatImportedContentToColumnFields,
   generateTableField,
-  generateTableFieldFromPostgresTable,
+  generateTableFieldFromPGTable,
   validateFields,
 } from './TableEditor.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -53,7 +53,7 @@ type SaveTablePayloadFor<Action extends SaveTableParams['action']> =
   SaveTableParamsFor<Action>['payload']
 
 export interface TableEditorProps {
-  table?: PostgresTable
+  table?: PGTable
   isDuplicating: boolean
   templateData?: Partial<TableField>
   visible: boolean
@@ -281,7 +281,7 @@ export const TableEditor = ({
         }
         setFkRelations([])
       } else {
-        const tableFields = generateTableFieldFromPostgresTable(
+        const tableFields = generateTableFieldFromPGTable(
           table,
           foreignKeyMeta ?? [],
           isDuplicating,
@@ -303,7 +303,7 @@ export const TableEditor = ({
 
   useEffect(() => {
     if (!isNewRecord) {
-      const tableFields = generateTableFieldFromPostgresTable(
+      const tableFields = generateTableFieldFromPGTable(
         table,
         foreignKeyMeta ?? [],
         isDuplicating,
