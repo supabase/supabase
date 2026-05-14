@@ -113,7 +113,7 @@ export function ServiceFlowPanel({
       <ResizablePanel
         id="log-sidepanel"
         defaultSize={400}
-        minSize={300}
+        minSize={dock === 'bottom' ? 300 : 400}
         className="bg-dash-sidebar"
       >
         <div className="flex h-full flex-col overflow-hidden">

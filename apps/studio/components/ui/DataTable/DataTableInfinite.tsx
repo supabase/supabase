@@ -3,7 +3,7 @@ import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Fragment, ReactNode, UIEvent, useCallback, useRef } from 'react'
+import { Fragment, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
@@ -24,7 +24,6 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   isLoading?: boolean
   hasNextPage?: boolean
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
-  renderLiveRow?: (props?: { row: Row<TData> }) => ReactNode
   setColumnOrder: (columnOrder: string[]) => void
   setColumnVisibility: (columnVisibility: VisibilityState) => void
 
@@ -41,7 +40,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   totalRows = 0,
   filterRows = 0,
   totalRowsFetched = 0,
-  renderLiveRow,
   setColumnOrder,
   setColumnVisibility,
   searchParamsParser,
@@ -123,15 +121,13 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         {rows.length ? (
           rows.map((row) => (
             // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
-            <Fragment key={row.id}>
-              {renderLiveRow?.({ row: row as any })}
-              <DataTableRow
-                row={row}
-                table={table}
-                searchParamsParser={searchParamsParser}
-                selected={row.getIsSelected()}
-              />
-            </Fragment>
+            <DataTableRow
+              key={row.id}
+              row={row}
+              table={table}
+              searchParamsParser={searchParamsParser}
+              selected={row.getIsSelected()}
+            />
           ))
         ) : isLoading ? (
           <Fragment>
