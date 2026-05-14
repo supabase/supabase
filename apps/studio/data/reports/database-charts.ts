@@ -110,7 +110,8 @@ export const getReportAttributesV2: (
       YAxisProps: {
         width: 75,
         tickFormatter: (value: number) => formatBytesMinMB(value, 2),
-        domain: [0, (dataMax: number) => Math.max(dataMax, 512 * 1024 * 1024)],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        domain: [0, (dataMax: number) => Math.max(dataMax, 512 * 1024 * 1024)] as any,
       },
       attributes: [
         {

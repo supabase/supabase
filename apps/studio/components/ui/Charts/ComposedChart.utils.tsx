@@ -31,10 +31,7 @@ export interface ReportAttributes {
   YAxisProps?: {
     width?: number
     tickFormatter?: (value: any) => string
-    domain?: [
-      number | string | ((dataMin: number) => number),
-      number | string | ((dataMax: number) => number)
-    ]
+    domain?: [number | string, number | string]
     allowDataOverflow?: boolean
   }
   normalizeVisibleStackToPercent?: boolean
