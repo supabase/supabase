@@ -4,7 +4,7 @@
  * v4-native packages. */
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
-@plugin "tailwindcss-animate";
+@import 'tw-animate-css';
 
 /* Per-theme overrides for semantic --background-/--foreground-/--brand-*
  * tokens. Radix/scale/brand --color-* values are inlined directly in
