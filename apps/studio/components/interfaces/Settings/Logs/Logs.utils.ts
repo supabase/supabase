@@ -43,8 +43,6 @@ export const isDefaultLogPreviewFormat = (log: LogData) =>
 /**
  * Recursively retrieve all nested object key paths.
  *
- * TODO: move to utils
- *
  * @param obj any object
  * @param parent a string representing the parent key
  * @returns string[] all dot paths for keys.
