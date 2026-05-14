@@ -32,7 +32,7 @@ interface DataTableSheetRowActionProps<
   filterFields: TFields[]
   value: string | number
   table: Table<TData>
-  label: string
+  label?: string
 }
 
 export function DataTableSheetRowAction<TData, TFields extends DataTableFilterField<TData>>({
