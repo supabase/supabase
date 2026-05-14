@@ -9,8 +9,8 @@ import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { timestampFormatter } from '@/components/ui/Charts/Charts.utils'
+import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import {
   checkHasNonPositiveValues,
   computeYAxisWidth,
