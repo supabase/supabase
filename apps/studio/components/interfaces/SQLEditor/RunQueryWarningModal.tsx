@@ -137,9 +137,7 @@ export const RunQueryWarningModal = ({
       ? warnings.length > 1
         ? 'Review each issue, then choose whether to enable Row Level Security before running this query.'
         : 'Choose whether to enable Row Level Security before running this query.'
-      : warnings.length > 1
-        ? 'Run this query only if these effects are expected.'
-        : 'Run this query only if this effect is expected.'
+      : 'Run this query only if you intend these changes and understand the risks.'
   const title = warnings.length > 1 ? 'Potential issues detected' : 'Potential issue detected'
 
   return (
