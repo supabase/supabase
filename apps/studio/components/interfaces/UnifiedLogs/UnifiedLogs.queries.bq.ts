@@ -11,7 +11,6 @@ import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import {
   bqIdent,
   joinSqlFragments,
-  keyword,
   analyticsLiteral as lit,
   safeSql,
   type SafeLogSqlFragment,
@@ -28,7 +27,7 @@ const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] a
 
 /**
  * Builds WHERE-clause fragments from a search-param map. Identifier-position
- * keys are validated via `keyword()` (regex allowlist) and value-position
+ * keys are validated via `bqIdent()` (regex allowlist) and value-position
  * inputs via `analyticsLiteral` — both throw on disallowed input, in which
  * case we drop the predicate rather than emit unsafe SQL.
  *
@@ -37,7 +36,10 @@ const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] a
  *                   need every filter applied *except* the one being faceted
  * @returns Array of SafeLogSqlFragment predicates ready to be AND-joined
  */
-const buildConditions = (search: QuerySearchParamsType, excludeKey?: string): SafeLogSqlFragment[] => {
+const buildConditions = (
+  search: QuerySearchParamsType,
+  excludeKey?: string
+): SafeLogSqlFragment[] => {
   const conditions: SafeLogSqlFragment[] = []
 
   Object.entries(search).forEach(([key, value]) => {
@@ -83,7 +85,17 @@ const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
  * and determines the appropriate bucketing level (minute, hour, day)
  * Ported from the older implementation (apps/studio/components/interfaces/Settings/Logs/Logs.utils.ts)
  */
-const calculateChartBucketing = (search: SearchParamsType | Record<string, unknown>): string => {
+type TruncationLevel = 'MINUTE' | 'HOUR' | 'DAY'
+
+const TRUNCATION_LEVEL_SQL: Record<TruncationLevel, SafeLogSqlFragment> = {
+  MINUTE: safeSql`MINUTE`,
+  HOUR: safeSql`HOUR`,
+  DAY: safeSql`DAY`,
+}
+
+const calculateChartBucketing = (
+  search: SearchParamsType | Record<string, unknown>
+): TruncationLevel => {
   // Extract start and end times from the date array if available
   const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
 
@@ -117,21 +129,12 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, unkno
   const startTime = dayjs(startMillis)
   const endTime = dayjs(endMillis)
 
-  let truncationLevel = 'MINUTE'
-
   const hourDiff = endTime.diff(startTime, 'hour')
   const dayDiff = endTime.diff(startTime, 'day')
 
-  // Adjust bucketing based on time range
-  if (dayDiff >= 2) {
-    truncationLevel = 'DAY'
-  } else if (hourDiff >= 12) {
-    truncationLevel = 'HOUR'
-  } else {
-    truncationLevel = 'MINUTE'
-  }
-
-  return truncationLevel
+  if (dayDiff >= 2) return 'DAY'
+  if (hourDiff >= 12) return 'HOUR'
+  return 'MINUTE'
 }
 
 /**
@@ -335,7 +338,9 @@ const LOG_TYPE_QUERIES: Record<string, () => SafeLogSqlFragment> = {
  * Combine the requested log sources to create the unified logs CTE.
  * Defaults to postgres + postgrest on first load to reduce query cost.
  */
-export const getUnifiedLogsCTE = (logTypes: string[] = [...DEFAULT_LOG_TYPES]): SafeLogSqlFragment => {
+export const getUnifiedLogsCTE = (
+  logTypes: string[] = [...DEFAULT_LOG_TYPES]
+): SafeLogSqlFragment => {
   const queries = logTypes
     .filter((type) => type in LOG_TYPE_QUERIES)
     .map((type) => LOG_TYPE_QUERIES[type]())
@@ -579,7 +584,7 @@ export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   return safeSql`
 ${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
-  TIMESTAMP_TRUNC(timestamp, ${keyword(truncationLevel)}) as time_bucket,
+  TIMESTAMP_TRUNC(timestamp, ${TRUNCATION_LEVEL_SQL[truncationLevel]}) as time_bucket,
   COUNTIF(level = 'success') as success,
   COUNTIF(level = 'warning') as warning,
   COUNTIF(level = 'error') as error,

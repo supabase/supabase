@@ -330,8 +330,12 @@ LIMIT ${lit(MAX_FACETS_QUANTITY)}
  * frontend can render facet counts and total in one round trip.
  */
 export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
-  const baseFiltersFor = (excludeField?: string): SafeLogSqlFragment =>
-    joinSqlFragments(buildBaseWhere(search, excludeField), ' AND ')
+  // When no predicates remain, fall back to `1` so we emit a valid
+  // tautology rather than a bare `WHERE`.
+  const baseFiltersFor = (excludeField?: string): SafeLogSqlFragment => {
+    const predicates = buildBaseWhere(search, excludeField)
+    return predicates.length > 0 ? joinSqlFragments(predicates, ' AND ') : safeSql`1`
+  }
 
   // The "total" badge should reflect the user's *current* filter set,
   // including any active log_type filter. Pass no excludeField so the

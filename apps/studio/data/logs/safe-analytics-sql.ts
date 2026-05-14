@@ -29,7 +29,7 @@
  *
  * Values of this type are either:
  * - Static strings in source code (no interpolation) via `rawSql`
- * - Outputs of `analyticsLiteral`, `bqIdent`, `clickhouseIdent`, or `keyword`
+ * - Outputs of `analyticsLiteral`, `bqIdent`, or `clickhouseIdent`
  * - Compositions via the `safeSql` template tag (which only accepts
  *   `SafeLogSqlFragment` interpolations)
  * - Compositions via `joinSqlFragments`
@@ -83,20 +83,6 @@ export function joinSqlFragments(
   separator: LogSqlFragmentSeparator
 ): SafeLogSqlFragment {
   return fragments.join(separator) as SafeLogSqlFragment
-}
-
-/**
- * Marks SQL keywords (e.g., 'BEFORE', 'instead of') as safe for interpolation.
- * Only letters, numbers, underscores, and spaces are allowed, to prevent
- * injection.
- */
-export function keyword(value: string): SafeLogSqlFragment {
-  if (!/^[A-Za-z][A-Za-z0-9_ ]*$/.test(value)) {
-    throw new Error(
-      `Not a valid keyword: "${value}". Only letters, numbers, underscores, and spaces are permitted.`
-    )
-  }
-  return value as SafeLogSqlFragment
 }
 
 export function analyticsLiteral(value: string | number | boolean): SafeLogSqlFragment {
