@@ -12,11 +12,11 @@ export const INTEGRATION_TYPES = [
 export type INTEGRATION_TYPES = (typeof INTEGRATION_TYPES)[number]
 
 export const getIntegrationType = (integration?: ThirdPartyAuthIntegration): INTEGRATION_TYPES => {
-  if (integration?.type === 'workos') {
-    return 'workos'
+  if (integration?.type) {
+    if (integration.type === 'workos') return 'workos'
+    if (integration.type === 'custom') return 'custom'
   }
 
-  // TODO(hf): Move these to check type as well.
   if (integration?.oidc_issuer_url?.startsWith('https://securetoken.google.com/')) {
     return 'firebase'
   }
