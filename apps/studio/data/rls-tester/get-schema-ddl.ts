@@ -1,5 +1,4 @@
-import pgMeta, { getEntityDefinitionsSql } from '@supabase/pg-meta'
-import type { PostgresPolicy } from '@supabase/postgres-meta'
+import pgMeta, { getEntityDefinitionsSql, type PGPolicy } from '@supabase/pg-meta'
 import { z } from 'zod'
 
 import { executeSql } from '@/data/sql/execute-sql-query'
@@ -22,7 +21,7 @@ export interface DatabaseSchemaDDL {
   typeDefinitions: string[]
   entityDefinitions: string[]
   functionDefinitions: string[]
-  policies: PostgresPolicy[]
+  policies: PGPolicy[]
   rlsStatuses: RlsTableStatus[]
   customRoles: CustomRole[]
 }
@@ -166,7 +165,7 @@ export async function getDatabaseSchemaDDL(
       (d: { sql: string }) => d.sql
     ),
     functionDefinitions: functions.map((f) => f.complete_statement),
-    policies: policiesResult.result as z.infer<typeof pgMetaPoliciesZod> as PostgresPolicy[],
+    policies: policiesResult.result as z.infer<typeof pgMetaPoliciesZod> as PGPolicy[],
     rlsStatuses: (rlsResult.result as z.infer<typeof pgMetaTablesZod>).map((t) => ({
       schema: t.schema,
       table: t.name,

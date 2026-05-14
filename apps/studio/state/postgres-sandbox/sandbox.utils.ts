@@ -1,5 +1,4 @@
-import { ident, literal } from '@supabase/pg-meta'
-import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { ident, literal, type PGPolicy } from '@supabase/pg-meta'
 
 import { DatabaseSchemaDDL } from '@/data/rls-tester/get-schema-ddl'
 import { TableSeedData } from '@/data/rls-tester/get-seed-data'
@@ -9,7 +8,7 @@ interface Executor {
   execSql(sql: string): Promise<void>
 }
 
-function buildPolicySQL(policy: PostgresPolicy): string {
+function buildPolicySQL(policy: PGPolicy): string {
   const name = ident(policy.name)
   const target = `${ident(policy.schema)}.${ident(policy.table)}`
   const permissiveness = policy.action === 'RESTRICTIVE' ? 'AS RESTRICTIVE' : ''
