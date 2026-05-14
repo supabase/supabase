@@ -331,7 +331,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   mission.
                 </p>
               </div>
-              <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60">
+              <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60 max-w-full overflow-hidden">
                 {contributors.map((contributor, i) => {
                   return (
                     <div
