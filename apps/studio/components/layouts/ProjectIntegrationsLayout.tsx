@@ -10,6 +10,7 @@ import { ProjectLayout } from '@/components/layouts/ProjectLayout'
 import AlertError from '@/components/ui/AlertError'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
+import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { withAuth } from '@/hooks/misc/withAuth'
 
@@ -55,9 +56,23 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const { data: categories = [], isPending: isPendingCategories } = useQuery(
     marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled })
   )
+  const { data: listings = [], isPending: isPendingListings } = useQuery(
+    marketplaceIntegrationsQueryOptions({ enabled: isMarketplaceEnabled })
+  )
+
+  const populatedCategoryIds = new Set(
+    listings.flatMap((listing) =>
+      Array.isArray(listing.categories)
+        ? (listing.categories as Array<{ id: string }>).map((c) => c.id)
+        : []
+    )
+  )
+  const nonEmptyCategories = categories.filter(
+    (category) => category.id && populatedCategoryIds.has(category.id)
+  )
 
   const isLoading = IS_PLATFORM
-    ? !flagsLoaded || (isMarketplaceEnabled && isPendingCategories)
+    ? !flagsLoaded || (isMarketplaceEnabled && (isPendingCategories || isPendingListings))
     : false
 
   const allCategories = [
@@ -84,7 +99,7 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
       url: `/project/${ref}/integrations?category=postgres_extension`,
       items: [],
     },
-    ...categories.map((category) => ({
+    ...nonEmptyCategories.map((category) => ({
       name: category.name ?? '',
       key: category.slug ?? '',
       url: `/project/${ref}/integrations?category=${category.slug}`,

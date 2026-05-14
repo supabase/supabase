@@ -27,6 +27,7 @@ import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPa
 import { DetailSectionHeader } from './ServiceFlow/components/shared/DetailSection'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
+import { getRowTimestampMs } from './UnifiedLogs.utils'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import {
   ServiceFlowType,
@@ -35,12 +36,16 @@ import {
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ServiceFlowPanelProps {
+  dock: 'bottom' | 'right'
+  setDock: (value: 'bottom' | 'right') => void
   selectedRow?: ColumnSchema
   selectedRowKey: string
   searchParameters: QuerySearchParamsType
 }
 
 export function ServiceFlowPanel({
+  dock,
+  setDock,
   selectedRow,
   selectedRowKey,
   searchParameters,
@@ -82,18 +87,12 @@ export function ServiceFlowPanel({
       type: serviceFlowType,
       search: searchParameters,
     },
-    {
-      enabled: Boolean(projectRef) && Boolean(selectedRow?.id) && Boolean(serviceFlowType),
-    }
+    { enabled: Boolean(selectedRow?.id) && Boolean(serviceFlowType) }
   )
 
   if (!selectedRowKey || !selectedRow) return null
 
-  const timestampMs = selectedRow.timestamp
-    ? selectedRow.timestamp / 1000
-    : selectedRow.date
-      ? selectedRow.date.getTime()
-      : null
+  const timestampMs = getRowTimestampMs(selectedRow)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   // Prepare JSON data for Raw JSON tab
@@ -138,7 +137,8 @@ export function ServiceFlowPanel({
                   Raw JSON
                 </TabsTrigger>
               </TabsList>
-              <ServiceFlowPanelControls />
+
+              <ServiceFlowPanelControls dock={dock} setDock={setDock} />
             </div>
 
             {shouldShowServiceFlow && (

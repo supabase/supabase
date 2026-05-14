@@ -1,6 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
 import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
+import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 export type FeaturePreview = {
   key: string
@@ -37,7 +38,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
       name: 'New Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-      enabled: isUnifiedLogsPreviewAvailable && isEnterpriseOrSupabaseOrg,
+      enabled: isUnifiedLogsPreviewAvailable && (IS_STAGING_OR_LOCAL || isEnterpriseOrSupabaseOrg),
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
