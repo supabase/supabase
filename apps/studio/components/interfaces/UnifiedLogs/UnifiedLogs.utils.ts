@@ -81,13 +81,13 @@ export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
       return ''
     case 'warning':
       return cn(
-        'bg-warning/5 [&>td]:group-hover:bg-warning/10',
+        'bg-warning/5 hover:bg-warning/10',
         'data-[state=selected]:bg-warning/20 focus-visible:bg-warning/10',
         'dark:bg-warning/10 dark:hover:bg-warning/20 dark:data-[state=selected]:bg-warning/30 dark:focus-visible:bg-warning/20'
       )
     case 'error':
       return cn(
-        'bg-destructive/5 [&>td]:group-hover:bg-destructive/10',
+        'bg-destructive/5 hover:bg-destructive/10',
         'data-[state=selected]:bg-destructive/20 focus-visible:bg-destructive/10',
         'dark:bg-error/10 dark:hover:bg-destructive/20 dark:data-[state=selected]:bg-destructive/30 dark:focus-visible:bg-destructive/20'
       )
