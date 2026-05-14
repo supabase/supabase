@@ -44,7 +44,7 @@ import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
-import { formatBytes } from '@/lib/helpers'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartId?: string
@@ -221,7 +221,9 @@ export function ComposedChart({
 
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      const formatted = formatBytes(bytesValue, valuePrecision)
+      const formatted = isMemoryChart
+        ? formatBytesMinMB(bytesValue, valuePrecision)
+        : formatBytes(bytesValue, valuePrecision)
       return format === 'bytes-per-second' ? `${formatted}/s` : formatted
     }
 
@@ -373,6 +375,8 @@ export function ComposedChart({
   const isRamChart =
     !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
     chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
+  const isSwapChart = chartData?.some((att: any) => att.name.toLowerCase().includes('swap_'))
+  const isMemoryChart = isRamChart || isSwapChart
   const isDiskSpaceChart = chartData?.some((att: any) =>
     att.name.toLowerCase().includes('disk_space_')
   )
@@ -382,7 +386,7 @@ export function ComposedChart({
   const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
   const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
   const shouldFormatBytes =
-    isBytesFormat || isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+    isBytesFormat || isMemoryChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   const yMaxFromVisible = Math.max(
     0,
     ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
