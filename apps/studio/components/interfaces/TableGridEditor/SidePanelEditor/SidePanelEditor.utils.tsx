@@ -11,8 +11,8 @@ import pgMeta, {
   getUpdateIdentitySequenceSQL,
   type ForeignKey,
 } from '@supabase/pg-meta'
+import type { PGTablePrimaryKey } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
-import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -788,7 +788,7 @@ export const updateTable = async ({
   const primaryKeyColumns = columns
     .filter((column) => column.isPrimaryKey)
     .map((column) => column.name)
-  const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
+  const existingPrimaryKeyColumns = table.primary_keys.map((pk: PGTablePrimaryKey) => pk.name)
   const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
   if (isPrimaryKeyUpdated) {

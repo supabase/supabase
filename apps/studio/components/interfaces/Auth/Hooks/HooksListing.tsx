@@ -26,6 +26,8 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
@@ -40,6 +42,8 @@ export const HooksListing = () => {
   const [hook, setHook] = useQueryState('hook', parseAsString)
 
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
+  const [addHookAsideOpen, setAddHookAsideOpen] = useState(false)
+  const [addHookEmptyOpen, setAddHookEmptyOpen] = useState(false)
 
   const { mutate: updateAuthHooks, isPending: isDeletingAuthHook } = useAuthHooksUpdateMutation({
     onSuccess: async () => {
@@ -73,6 +77,15 @@ export const HooksListing = () => {
       ),
     }
   })
+
+  const validHooks = hooks.filter((h) => isValidHook(h))
+  const hasValidHooks = validHooks.length > 0
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
+    () => (hasValidHooks ? setAddHookAsideOpen(true) : setAddHookEmptyOpen(true)),
+    { label: 'Add hook' }
+  )
 
   const selectedHook = hooks.find((h) => h.id === hook)
 
@@ -114,6 +127,8 @@ export const HooksListing = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <AddHookDropdown
+            open={addHookAsideOpen}
+            onOpenChange={setAddHookAsideOpen}
             onSelectHook={(title) => {
               const hook = hooks.find((h) => h.title === title)
               if (hook) setHook(hook.id)
@@ -122,7 +137,7 @@ export const HooksListing = () => {
         </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
-        {hooks.filter((h) => isValidHook(h)).length === 0 && (
+        {!hasValidHooks && (
           <EmptyStatePresentational
             title="Create an auth hook"
             description="Use Postgres functions or HTTP endpoints to customize your authentication flow."
@@ -131,6 +146,8 @@ export const HooksListing = () => {
               type="default"
               align="center"
               buttonText="Add a new hook"
+              open={addHookEmptyOpen}
+              onOpenChange={setAddHookEmptyOpen}
               onSelectHook={(title) => {
                 const hook = hooks.find((h) => h.title === title)
                 if (hook) setHook(hook.id)
@@ -140,13 +157,9 @@ export const HooksListing = () => {
         )}
 
         <div className="-space-y-px">
-          {hooks
-            .filter((h) => isValidHook(h))
-            .map((hook) => {
-              return (
-                <HookCard key={hook.enabledKey} hook={hook} onSelect={() => setHook(hook.id)} />
-              )
-            })}
+          {validHooks.map((hook) => {
+            return <HookCard key={hook.enabledKey} hook={hook} onSelect={() => setHook(hook.id)} />
+          })}
         </div>
 
         <CreateHookSheet

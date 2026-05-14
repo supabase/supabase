@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { TextArea_Shadcn_ as TextArea } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
 import { LogicalBackupCliInstructions } from '@/components/layouts/ProjectLayout/LogicalBackupCliInstructions'
@@ -141,17 +142,18 @@ export const DeleteProjectModal = ({
     >
       <div className="space-y-6">
         <LogicalBackupCliInstructions enabled={visible} showResetPassword={false} />
+
         {/*
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
           but leaving that for the future.
         */}
         {!isFree && (
-          <>
-            <div className="space-y-1">
-              <h4 className="text-base">What made you decide to delete your project?</h4>
-            </div>
-            <div className="space-y-4 pt-4">
+          <div className="flex flex-col gap-y-6">
+            <FormItemLayout
+              isReactForm={false}
+              label="What made you decide to delete your project?"
+            >
               <div className="flex flex-wrap gap-2" data-toggle="buttons">
                 {shuffledReasons.map((option) => {
                   const active = selectedReason[0] === option.value
@@ -181,19 +183,17 @@ export const DeleteProjectModal = ({
                   )
                 })}
               </div>
-              <div className="text-area-text-sm flex flex-col gap-y-2">
-                <label htmlFor="message" className="text-sm whitespace-pre-line wrap-break-word">
-                  {textareaLabel}
-                </label>
-                <TextArea
-                  name="message"
-                  rows={3}
-                  value={message}
-                  onChange={(event) => setMessage(event.target.value)}
-                />
-              </div>
-            </div>
-          </>
+            </FormItemLayout>
+
+            <FormItemLayout isReactForm={false} label={textareaLabel}>
+              <TextArea
+                name="message"
+                rows={3}
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+              />
+            </FormItemLayout>
+          </div>
         )}
       </div>
     </TextConfirmModal>

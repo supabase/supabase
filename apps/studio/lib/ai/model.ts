@@ -12,19 +12,19 @@ import {
   PROVIDERS,
 } from './model.utils'
 
-type PromptProviderOptions = Record<string, any>
 type ProviderOptions = Record<string, any>
+type SystemProviderOptions = Record<string, any>
 
 type ModelSuccess = {
   /** Spread directly into AI SDK calls: `streamText({ ...modelParams, ... })` */
   modelParams: { model: LanguageModel; providerOptions?: ProviderOptions }
-  promptProviderOptions?: PromptProviderOptions
+  systemProviderOptions?: SystemProviderOptions
   error?: never
 }
 
 export type ModelError = {
   modelParams?: never
-  promptProviderOptions?: never
+  systemProviderOptions?: never
   error: Error
 }
 
@@ -52,7 +52,7 @@ export type GetModelParams =
  * Retrieves a LanguageModel from a specific provider and model entry.
  * Callers are responsible for resolving the correct model entry (including throttling/entitlement
  * fallbacks) before calling this function.
- * Returns promptProviderOptions that callers can attach to the system message.
+ * Returns systemProviderOptions that callers can attach to the system message.
  */
 export async function getModel(params: GetModelParams): Promise<ModelResponse> {
   const { provider } = params
@@ -77,10 +77,10 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
     }
     const bedrock = createRoutedBedrock(params.routingKey)
     const model = await bedrock(chosenModelId as BedrockModel)
-    const promptProviderOptions = (
+    const systemProviderOptions = (
       providerRegistry.models as Record<BedrockModel, ProviderModelConfig>
-    )[chosenModelId as BedrockModel]?.promptProviderOptions
-    return { modelParams: { model }, promptProviderOptions }
+    )[chosenModelId as BedrockModel]?.systemProviderOptions
+    return { modelParams: { model }, systemProviderOptions }
   }
 
   if (provider === 'openai') {
@@ -96,7 +96,7 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
         model: openai(chosenModelId as OpenAIModelId),
         providerOptions: { openai: openaiProviderOptions },
       },
-      promptProviderOptions: models[chosenModelId as OpenAIModelId]?.promptProviderOptions,
+      systemProviderOptions: models[chosenModelId as OpenAIModelId]?.systemProviderOptions,
     }
   }
 

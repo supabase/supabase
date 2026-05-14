@@ -286,6 +286,7 @@ export const FormLayout = React.forwardRef<
       nonBoxInput = !label,
       hideMessage = false,
       isReactForm,
+      error,
       ...props
     },
     ref
@@ -301,6 +302,10 @@ export const FormLayout = React.forwardRef<
           )}
           data-formlayout-id="message"
         />
+      ) : error && !hideMessage ? (
+        <p className={cn('mt-2 text-sm text-destructive', layout === 'flex-row-reverse' && 'mt-0')}>
+          {error}
+        </p>
       ) : null
 
     const renderDescription =

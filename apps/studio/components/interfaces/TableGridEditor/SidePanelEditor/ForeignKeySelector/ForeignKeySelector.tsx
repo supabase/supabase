@@ -1,5 +1,5 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { sortBy } from 'lodash'
 import { ArrowRight, HelpCircle, Loader2, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
@@ -90,7 +90,7 @@ export const ForeignKeySelector = ({
     includeColumns: false,
   })
 
-  const { data: selectedTable, isLoading: isLoadingSelectedTable } = useTableQuery<PostgresTable>(
+  const { data: selectedTable, isLoading: isLoadingSelectedTable } = useTableQuery<PGTable>(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
