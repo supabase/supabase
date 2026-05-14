@@ -1,8 +1,8 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { ArrowDownNarrowWide, Search } from 'lucide-react'
+import { ArrowDownNarrowWide, RefreshCw, Search } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -24,12 +24,15 @@ import { CreateBucketButton } from '../NewBucketButton'
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketsTable } from './BucketsTable'
+import { useFilesBucketsShortcuts } from './useFilesBucketsShortcuts'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const FilesBuckets = () => {
@@ -37,6 +40,7 @@ export const FilesBuckets = () => {
   const snap = useStorageExplorerStateSnapshot()
   const { sortBucket, setSortBucket } = useStoragePreference(snap.projectRef)
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState('')
   const debouncedFilterString = useDebounce(filterString, 250)
   const normalizedSearch = debouncedFilterString.trim()
@@ -59,6 +63,7 @@ export const FilesBuckets = () => {
     isFetching: isFetchingBuckets,
     fetchNextPage,
     hasNextPage,
+    refetch: refetchBuckets,
   } = usePaginatedBucketsQuery({
     projectRef: ref,
     search: normalizedSearch.length > 0 ? normalizedSearch : undefined,
@@ -79,6 +84,19 @@ export const FilesBuckets = () => {
       fetchNextPage()
     }
   }, [hasNextPage, isFetchingBuckets, fetchNextPage])
+
+  const handleRefresh = useCallback(() => {
+    refetchBuckets()
+  }, [refetchBuckets])
+
+  useFilesBucketsShortcuts({
+    searchInputRef,
+    setFilterString,
+    sortBucket,
+    setSortBucket,
+    setCreateVisible: setVisible,
+    onRefresh: handleRefresh,
+  })
 
   return (
     <>
@@ -109,14 +127,21 @@ export const FilesBuckets = () => {
                   <>
                     <div className="flex grow justify-between gap-x-2 items-center mb-4">
                       <div className="flex items-center gap-x-2">
-                        <Input
-                          size="tiny"
-                          className="grow lg:grow-0 w-52"
-                          placeholder="Search for a bucket"
-                          value={filterString}
-                          onChange={(e) => setFilterString(e.target.value)}
-                          icon={<Search />}
-                        />
+                        <ShortcutTooltip
+                          shortcutId={SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH}
+                          label="Search buckets"
+                          side="bottom"
+                        >
+                          <Input
+                            ref={searchInputRef}
+                            size="tiny"
+                            className="grow lg:grow-0 w-52"
+                            placeholder="Search for a bucket"
+                            value={filterString}
+                            onChange={(e) => setFilterString(e.target.value)}
+                            icon={<Search />}
+                          />
+                        </ShortcutTooltip>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button type="default" icon={<ArrowDownNarrowWide />}>
@@ -137,8 +162,27 @@ export const FilesBuckets = () => {
                             </DropdownMenuRadioGroup>
                           </DropdownMenuContent>
                         </DropdownMenu>
+                        <ShortcutTooltip
+                          shortcutId={SHORTCUT_IDS.STORAGE_BUCKETS_REFRESH}
+                          side="bottom"
+                        >
+                          <Button
+                            type="default"
+                            icon={<RefreshCw />}
+                            loading={isFetchingBuckets}
+                            onClick={handleRefresh}
+                          >
+                            Refresh
+                          </Button>
+                        </ShortcutTooltip>
                       </div>
-                      <CreateBucketButton onClick={() => setVisible(true)} />
+                      <ShortcutTooltip
+                        shortcutId={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                        label="Create new bucket"
+                        side="bottom"
+                      >
+                        <CreateBucketButton onClick={() => setVisible(true)} />
+                      </ShortcutTooltip>
                     </div>
 
                     <Card>

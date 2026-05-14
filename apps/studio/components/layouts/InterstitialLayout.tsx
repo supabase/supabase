@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { ArrowRightLeft } from 'lucide-react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { Card, CardContent, CardHeader, cn } from 'ui'
 
@@ -88,21 +89,44 @@ export const LogoBox = ({ children, className }: { children: ReactNode; classNam
   </div>
 )
 
+export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode }) => (
+  <div className="flex items-center justify-center gap-2.5">
+    {left}
+    <ArrowRightLeft className="size-4 text-foreground-muted" />
+    {right}
+  </div>
+)
+
 export const SupabaseLogo = () => (
   <LogoBox>
     <img alt="Supabase" src={`${BASE_PATH}/img/supabase-logo.svg`} className="size-7" />
   </LogoBox>
 )
 
+export const PartnerLogo = ({ src, alt }: { src: string; alt: string }) => (
+  <LogoBox>
+    <img alt={alt} src={src} className="size-full object-cover" />
+  </LogoBox>
+)
+
 export const InterstitialAccountRow = ({
   avatarUrl,
   displayName,
+  action,
+  className,
 }: {
   avatarUrl?: string
   displayName?: string
+  action?: ReactNode
+  className?: string
 }) => (
-  <Card className="border-muted bg-surface-200/50 shadow-none">
-    <CardContent className="flex items-start gap-3 border-none p-3">
+  <Card className={cn('shadow-none', !action && 'border-muted bg-surface-200/50', className)}>
+    <CardContent
+      className={cn(
+        'flex gap-3 border-none',
+        action ? 'items-center px-4 py-3' : 'items-start p-3'
+      )}
+    >
       <ProfileImage
         src={avatarUrl}
         alt={displayName}
@@ -114,6 +138,7 @@ export const InterstitialAccountRow = ({
           {displayName || <span className="invisible">Loading account</span>}
         </p>
       </div>
+      {action}
     </CardContent>
   </Card>
 )

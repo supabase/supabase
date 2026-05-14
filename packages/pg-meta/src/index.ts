@@ -45,6 +45,16 @@ export {
 } from './pg-format'
 export type { SafeSqlFragment, UntrustedSqlFragment, DisplayableSqlFragment } from './pg-format'
 
+export type { PGTable, PGTablePrimaryKey, PGTableRelationship } from './pg-meta-tables'
+export type { PGColumn } from './pg-meta-columns'
+export type { PGPolicy } from './pg-meta-policies'
+export type { PGTrigger, PGTriggerCreate, PGTriggerUpdate } from './pg-meta-triggers'
+export type { PGView } from './pg-meta-views'
+export type { PGMaterializedView } from './pg-meta-materialized-views'
+export type { PGForeignTable } from './pg-meta-foreign-tables'
+export type { PGSchema } from './pg-meta-schemas'
+export type { PGPublication } from './pg-meta-publications'
+
 export default {
   roles,
   columns,

@@ -3,7 +3,9 @@ import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
-  Collapsible,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
   Label_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -151,8 +153,8 @@ export default function RealtimeLimitsEstimater({}) {
         </div>
       )}
 
-      <Collapsible open={expandPreview} onOpenChange={setExpandPreview}>
-        <Collapsible.Trigger asChild>
+      <Collapsible_Shadcn_ open={expandPreview} onOpenChange={setExpandPreview}>
+        <CollapsibleTrigger_Shadcn_ asChild>
           <div className="py-1 flex items-center">
             <p className="text-sm">View raw throughput table</p>
             <Button
@@ -168,8 +170,8 @@ export default function RealtimeLimitsEstimater({}) {
               onClick={() => setExpandPreview(!expandPreview)}
             />
           </div>
-        </Collapsible.Trigger>
-        <Collapsible.Content>
+        </CollapsibleTrigger_Shadcn_>
+        <CollapsibleContent_Shadcn_>
           <div>
             {throughputTable
               .map((l) => l.computeAddOn)
@@ -218,8 +220,8 @@ export default function RealtimeLimitsEstimater({}) {
                 </div>
               ))}
           </div>
-        </Collapsible.Content>
-      </Collapsible>
+        </CollapsibleContent_Shadcn_>
+      </Collapsible_Shadcn_>
     </div>
   )
 }

@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { Code } from 'lucide-react'
+import { Code, ExternalLink } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -43,6 +43,7 @@ import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRo
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { PostgresSandboxProvider } from '@/state/postgres-sandbox/sandbox'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
@@ -61,6 +62,7 @@ export const RLSTesterSheet = (props: RLSTesterSheetProps) => {
 }
 
 const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
+  const track = useTrack()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { setRole } = useRoleImpersonationStateSnapshot()
@@ -114,8 +116,10 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
     if (format === 'lib') {
       if (!inferredSQL) return
       await testQuery({ value: acceptUntrustedSql(inferredSQL), ...executionCallbacks })
+      track('rls_tester_run_query_clicked', { type: 'inferred' })
     } else {
       await testQuery({ value, ...executionCallbacks })
+      track('rls_tester_run_query_clicked', { type: 'raw' })
     }
   }
 
@@ -286,11 +290,10 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
         </div>
 
         <SheetFooter className="sm:justify-between">
-          <Button asChild type="text">
+          <Button asChild type="default" icon={<ExternalLink />}>
             <a
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground-light hover:text-foreground"
               href="https://github.com/orgs/supabase/discussions/45233"
             >
               Give feedback

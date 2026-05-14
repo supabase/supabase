@@ -112,11 +112,11 @@ function RealtimePage() {
                 </p>
               </div>
               <Cursor
-                color="var(--colors-yellow9)"
+                color="var(--color-yellow-900)"
                 className={`${RealtimeStyles['cursor-one']} absolute top-[220px] right-[130px]`}
               />
               <Cursor
-                color="var(--colors-indigo9)"
+                color="var(--color-indigo-900)"
                 className={`${RealtimeStyles['cursor-two']} absolute top-[180px] right-[280px]`}
               />
               <div
@@ -129,7 +129,7 @@ function RealtimePage() {
                 <p className="text-lg">🤔</p>
               </div>
               <Cursor
-                color="var(--colors-tomato9)"
+                color="var(--color-tomato-900)"
                 className={`${RealtimeStyles['cursor-three']} absolute top-[170px] right-[180px]`}
               />
               <div

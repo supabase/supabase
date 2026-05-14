@@ -1,4 +1,4 @@
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PGColumn, PGTable } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
 import { ExternalLink, Plus } from 'lucide-react'
@@ -65,8 +65,8 @@ import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface ColumnEditorProps {
-  column?: Readonly<PostgresColumn>
-  selectedTable: PostgresTable
+  column?: Readonly<PGColumn>
+  selectedTable: PGTable
   visible: boolean
   closePanel: () => void
   saveChanges: (

@@ -1,4 +1,4 @@
-import { COMPUTE_MAX_IOPS } from 'shared-data'
+import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
 
 import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
@@ -9,28 +9,48 @@ import { Project } from '@/data/projects/project-detail-query'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 
+// Compute variants below 4XL run on EBS instances that draw on a burst
+// credit pool for disk IO, so the burst balance chart only makes sense for
+// these. Larger instances have dedicated IOPS and don't expose this metric.
+const BURSTABLE_IO_VARIANTS = new Set([
+  'ci_nano',
+  'ci_micro',
+  'ci_small',
+  'ci_medium',
+  'ci_large',
+  'ci_xlarge',
+  'ci_2xlarge',
+])
+
 export const getReportAttributesV2: (
   entitledFeatures: string[],
   project: Project,
   diskConfig?: DiskAttributesData,
   maxConnections?: MaxConnectionsData,
   pgBouncerMaxConnections?: number,
-  isSpendCapEnabled?: boolean
+  isSpendCapEnabled?: boolean,
+  showDiskIOBurstBalanceChart?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
   diskConfig,
   maxConnections,
   pgBouncerMaxConnections,
-  isSpendCapEnabled
+  isSpendCapEnabled,
+  showDiskIOBurstBalanceChart
 ) => {
+  const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   const provisionedDiskIops = diskConfig?.attributes?.iops
-  const computeIopsLimit =
-    COMPUTE_MAX_IOPS[mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)]
+  const computeIopsLimit = COMPUTE_MAX_IOPS[computeVariantId]
   const effectiveMaxIops =
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
+  const hasBurstableIO = BURSTABLE_IO_VARIANTS.has(computeVariantId)
+  const showBurstBalanceChart = !!showDiskIOBurstBalanceChart && hasBurstableIO
+  const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
+  const baselineThroughputLabel =
+    typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
 
   return [
     {
@@ -309,6 +329,37 @@ export const getReportAttributesV2: (
               : undefined,
           tooltip: 'Maximum disk throughput for your current compute size',
           isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'disk-io-burst-balance',
+      label: 'Disk IO Burst Balance',
+      titleTooltip: `The burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
+      docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
+      syncId: 'database-reports',
+      hide: !showBurstBalanceChart,
+      format: '%',
+      valuePrecision: 0,
+      showTooltip: true,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
+      },
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'disk_io_budget',
+          provider: 'infra-monitoring',
+          label: 'Burst credits remaining',
+          format: '%',
+          tooltip: `Percentage of EBS burst credits remaining. Drops only matter while the instance is bursting above its baseline IO. At 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
         },
       ],
     },
