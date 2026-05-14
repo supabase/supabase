@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatTableRowsToSQL } from './TableEntity.utils'
+import { formatTableRowsToSQL, getTablePoliciesUrl } from './TableEntity.utils'
 import type { SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
@@ -175,5 +175,34 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     const result = formatTableRowsToSQL(table, rows)
     const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, 'Person 2');`
     expect(result).toBe(expected)
+  })
+})
+
+describe('TableEntity.utils: getTablePoliciesUrl', () => {
+  it('builds the policies url for plain schema and name values', () => {
+    expect(getTablePoliciesUrl('abc', 'public', 'users')).toBe(
+      '/project/abc/auth/policies?search=users&schema=public'
+    )
+  })
+
+  it('preserves special characters in the table name', () => {
+    const url = getTablePoliciesUrl('abc', 'public', 'user_data&secret=1')
+    const parsed = new URL(url, 'http://example.com')
+    expect(parsed.searchParams.get('search')).toBe('user_data&secret=1')
+    expect(parsed.searchParams.get('schema')).toBe('public')
+  })
+
+  it('preserves special characters in the schema', () => {
+    const url = getTablePoliciesUrl('abc', 'my schema+x', 'users')
+    const parsed = new URL(url, 'http://example.com')
+    expect(parsed.searchParams.get('schema')).toBe('my schema+x')
+    expect(parsed.searchParams.get('search')).toBe('users')
+  })
+
+  it('encodes both the table name and schema together', () => {
+    const url = getTablePoliciesUrl('abc', 'a&b=c', 'd e+f')
+    const parsed = new URL(url, 'http://example.com')
+    expect(parsed.searchParams.get('search')).toBe('d e+f')
+    expect(parsed.searchParams.get('schema')).toBe('a&b=c')
   })
 })

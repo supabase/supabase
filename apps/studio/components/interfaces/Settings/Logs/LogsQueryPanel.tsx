@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -38,7 +38,7 @@ import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL, IS_STAGING_OR_LOCAL } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -72,9 +72,8 @@ const LogsQueryPanel = ({
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
-  // Staff-only debugging affordance: only show on staging/local, never to
-  // enterprise customers running against production.
-  const otelToggleEnabled = IS_STAGING_OR_LOCAL && !!onUseOtelChange
+  const showChToggleInLogExplorer = useFlag('showChToggleInLogExplorer')
+  const otelToggleEnabled = !!showChToggleInLogExplorer && !!onUseOtelChange
 
   const {
     projectAuthAll: authEnabled,
