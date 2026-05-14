@@ -3,7 +3,6 @@
  * on the marketplace feature flag
  */
 
-import { useFlag } from 'common'
 import { PropsWithChildren } from 'react'
 
 import { IntegrationOverviewTab, IntegrationOverviewTabProps } from './IntegrationOverviewTab'

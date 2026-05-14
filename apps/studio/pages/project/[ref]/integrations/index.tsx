@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { IS_PLATFORM, useFeatureFlags, useFlag } from 'common'
+import { IS_PLATFORM, useFeatureFlags } from 'common'
 import { Database } from 'common/marketplace.types'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'

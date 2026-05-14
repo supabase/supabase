@@ -19,6 +19,35 @@ import { DOCS_URL } from '@/lib/constants'
 const sectionLabelCls =
   'px-2 pt-4 pb-1.5 font-mono text-[10px] uppercase tracking-wider text-foreground-lighter'
 
+interface CollapsibleSectionProps {
+  title: string
+  defaultOpen?: boolean
+  children: ReactNode
+}
+
+// Collapsible navigation group — title row doubles as the trigger, chevron
+// rotates with the open state for affordance. Defaults to open so the sidebar
+// behaves the same as before on first render.
+const CollapsibleSection = ({ title, defaultOpen = true, children }: CollapsibleSectionProps) => (
+  <Collapsible_Shadcn_ defaultOpen={defaultOpen}>
+    <CollapsibleTrigger_Shadcn_
+      className={cn(
+        sectionLabelCls,
+        'group flex w-full items-center justify-between gap-2 hover:text-foreground-light'
+      )}
+    >
+      <span>{title}</span>
+      <ChevronRight
+        size={12}
+        className="text-foreground-muted transition-transform group-data-[state=open]:rotate-90"
+      />
+    </CollapsibleTrigger_Shadcn_>
+    <CollapsibleContent_Shadcn_ className="flex flex-col gap-y-0.5">
+      {children}
+    </CollapsibleContent_Shadcn_>
+  </Collapsible_Shadcn_>
+)
+
 interface SidebarLinkProps {
   href: string
   active?: boolean
@@ -114,21 +143,21 @@ export const MarketplaceSidebar = () => {
         label="Explore All"
       />
 
-      <div className={sectionLabelCls}>Integration type</div>
-      {INTEGRATION_TYPES.map(({ key, label, icon: Icon }) => (
-        <SidebarLink
-          key={key}
-          href={`${baseHref}?type=${key}`}
-          active={onIndexRoute && activeType === key}
-          icon={<Icon size={13} />}
-          label={label}
-          count={typeCounts[key]}
-        />
-      ))}
+      <CollapsibleSection title="Integration type">
+        {INTEGRATION_TYPES.map(({ key, label, icon: Icon }) => (
+          <SidebarLink
+            key={key}
+            href={`${baseHref}?type=${key}`}
+            active={onIndexRoute && activeType === key}
+            icon={<Icon size={13} />}
+            label={label}
+            count={typeCounts[key]}
+          />
+        ))}
+      </CollapsibleSection>
 
       {categoriesWithCounts.length > 0 && (
-        <>
-          <div className={sectionLabelCls}>Categories</div>
+        <CollapsibleSection title="Categories">
           {categoriesWithCounts.map((category) => {
             const Icon = getCategoryIcon(category.slug)
             return (
@@ -142,7 +171,7 @@ export const MarketplaceSidebar = () => {
               />
             )
           })}
-        </>
+        </CollapsibleSection>
       )}
 
       {installedIntegrations.length > 0 && (
