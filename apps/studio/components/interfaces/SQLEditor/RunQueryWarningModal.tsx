@@ -133,12 +133,11 @@ export const RunQueryWarningModal = ({
   }
 
   const canEnableRLS = hasMissingRLS && onConfirmWithRLS !== undefined
-  const confirmationCopy =
-    canEnableRLS
-      ? warnings.length > 1
-        ? 'Review each issue, then choose whether to enable Row Level Security before running this query.'
-        : 'Choose whether to enable Row Level Security before running this query.'
-      : 'Run this query only if you intend these changes and understand the risks.'
+  const confirmationCopy = canEnableRLS
+    ? warnings.length > 1
+      ? 'Review each issue, then choose whether to enable Row Level Security before running this query.'
+      : 'Choose whether to enable Row Level Security before running this query.'
+    : 'Run this query only if you intend these changes and understand the risks.'
   const title = warnings.length > 1 ? 'Potential issues detected' : 'Potential issue detected'
 
   return (
