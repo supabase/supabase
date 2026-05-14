@@ -12,13 +12,26 @@
 #
 # Prerequisites:
 #   - .env file (run generate-keys.sh and add-new-auth-keys.sh first)
-#   - node >= 16
+#   - node (>= 16) or docker
 #
 
 set -e
 
-if ! command -v node >/dev/null 2>&1; then
-    echo "Error: node (>= 16) is required but not found."
+# Resolve how to run node: local install preferred, docker fallback.
+if command -v node >/dev/null 2>&1; then
+    node_runner="node"
+elif command -v docker >/dev/null 2>&1; then
+    if ! docker info >/dev/null 2>&1; then
+        echo "Error: docker is installed but the daemon is not running."
+        exit 1
+    fi
+    if ! docker image inspect node:22-alpine >/dev/null 2>&1; then
+        echo "Pulling node:22-alpine (first-run only)..."
+        docker pull node:22-alpine
+    fi
+    node_runner="docker run --rm node:22-alpine node"
+else
+    echo "Error: requires either node (>= 16) or docker."
     exit 1
 fi
 
@@ -30,7 +43,7 @@ fi
 tmpdir=$(mktemp -d)
 trap 'rm -rf "$tmpdir"' EXIT
 
-node -e '
+$node_runner -e '
 const crypto = require("crypto");
 
 const PROJECT_REF = "supabase-self-hosted";

@@ -14,19 +14,26 @@
 #
 # Prerequisites:
 #   - .env file with JWT_SECRET set (run generate-keys.sh first)
-#   - openssl
-#   - node >= 16
+#   - node (>= 16) or docker
 #
 
 set -e
 
-if ! command -v openssl >/dev/null 2>&1; then
-    echo "Error: openssl is required but not found."
-    exit 1
-fi
-
-if ! command -v node >/dev/null 2>&1; then
-    echo "Error: node (>= 16) is required but not found."
+# Resolve how to run node: local install preferred, docker fallback.
+if command -v node >/dev/null 2>&1; then
+    node_runner="node"
+elif command -v docker >/dev/null 2>&1; then
+    if ! docker info >/dev/null 2>&1; then
+        echo "Error: docker is installed but the daemon is not running."
+        exit 1
+    fi
+    if ! docker image inspect node:22-alpine >/dev/null 2>&1; then
+        echo "Pulling node:22-alpine (first-run only)..."
+        docker pull node:22-alpine
+    fi
+    node_runner="docker run --rm node:22-alpine node"
+else
+    echo "Error: requires either node (>= 16) or docker."
     exit 1
 fi
 
@@ -36,7 +43,7 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-jwt_secret=$(grep '^JWT_SECRET=' .env | cut -d= -f2-)
+jwt_secret=$(grep '^JWT_SECRET=' .env | cut -d= -f2- | tr -d '\r')
 if [ -z "$jwt_secret" ]; then
     echo "Error: JWT_SECRET not found in .env. Run generate-keys.sh first."
     exit 1
@@ -45,23 +52,18 @@ fi
 tmpdir=$(mktemp -d)
 trap 'rm -rf "$tmpdir"' EXIT
 
-# Generate EC P-256 private key
-openssl ecparam -name prime256v1 -genkey -noout -out "$tmpdir/ec_private.pem" 2>/dev/null
-
 # Node.js does the crypto-heavy work:
-#   - PEM -> JWK conversion
+#   - EC P-256 keypair generation
 #   - JWKS construction (with symmetric key included)
 #   - ES256 JWT signing
 #   - Opaque API key generation with checksum
-node -e '
+$node_runner -e '
 const crypto = require("crypto");
-const fs = require("fs");
 
-const pem = fs.readFileSync(process.argv[1]);
-const jwtSecret = process.argv[2];
+const jwtSecret = process.argv[1];
 
-// EC key -> JWK
-const privateKey = crypto.createPrivateKey(pem);
+// Generate EC P-256 keypair and export as JWK
+const { privateKey } = crypto.generateKeyPairSync("ec", { namedCurve: "P-256" });
 const jwkPrivate = privateKey.export({ format: "jwk" });
 
 const kid = crypto.randomUUID();
@@ -129,7 +131,7 @@ console.log("ANON_KEY_ASYMMETRIC=" + anonJwt);
 console.log("SERVICE_ROLE_KEY_ASYMMETRIC=" + serviceJwt);
 console.log("JWT_KEYS=" + JSON.stringify(jwksKeypair.keys));
 console.log("JWT_JWKS=" + JSON.stringify(jwksPublic));
-' "$tmpdir/ec_private.pem" "$jwt_secret" > "$tmpdir/output"
+' "$jwt_secret" > "$tmpdir/output"
 
 # Read generated values
 SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' "$tmpdir/output" | cut -d= -f2-)
