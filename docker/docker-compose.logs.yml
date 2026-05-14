@@ -25,9 +25,8 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "curl",
-          "http://localhost:4000/health"
+          "CMD-SHELL",
+          "curl -sSfL -o /dev/null http://localhost:4000/health"
         ]
       timeout: 5s
       interval: 5s
@@ -64,12 +63,8 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://vector:9001/health"
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://vector:9001/health"
         ]
       timeout: 5s
       interval: 5s
