@@ -279,7 +279,7 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
      */
     variant: 'control' | 'test'
   }
-  groups: Omit<TelemetryGroups, 'project'>
+  groups: Omit
 }
 
 /**
@@ -341,7 +341,7 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
   properties: {
     instanceSize?: string
   }
-  groups: Omit<TelemetryGroups, 'project'>
+  groups: Omit
 }
 
 /**
@@ -987,7 +987,7 @@ export interface SignInButtonClickedEvent {
  */
 export interface HelpButtonClickedEvent {
   action: 'help_button_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -998,7 +998,7 @@ export interface HelpButtonClickedEvent {
  */
 export interface SendFeedbackButtonClickedEvent {
   action: 'send_feedback_button_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -1094,7 +1094,7 @@ export interface StudioPricingPlanCtaClickedEvent {
      */
     currentPlan?: string
   }
-  groups: Omit<TelemetryGroups, 'project'>
+  groups: Omit
 }
 
 /**
@@ -1113,7 +1113,7 @@ export interface StudioPricingSidePanelOpenedEvent {
      */
     origin?: string
   }
-  groups: Omit<TelemetryGroups, 'project'>
+  groups: Omit
 }
 
 /**
@@ -1384,7 +1384,7 @@ export interface SupportTicketSubmittedEvent {
   properties: {
     ticketCategory: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -1397,7 +1397,7 @@ export interface SupportTicketSubmittedEvent {
  */
 export interface AiAssistantInSupportFormClickedEvent {
   action: 'ai_assistant_in_support_form_clicked'
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -1458,7 +1458,7 @@ export interface OrganizationMfaEnforcementUpdatedEvent {
   properties: {
     mfaEnforced: boolean
   }
-  groups: Omit<TelemetryGroups, 'project'>
+  groups: Omit
 }
 
 /**
@@ -1952,7 +1952,7 @@ export interface DocumentViewButtonClickedEvent {
      */
     documentName: 'TIA' | 'SOC2' | 'Standard Security Questionnaire'
   }
-  groups: Omit<TelemetryGroups, 'project'>
+  groups: Omit
 }
 
 /**
@@ -1964,7 +1964,7 @@ export interface DocumentViewButtonClickedEvent {
  */
 export interface HipaaRequestButtonClickedEvent {
   action: 'hipaa_request_button_clicked'
-  groups: Omit<TelemetryGroups, 'project'>
+  groups: Omit
 }
 
 /**
@@ -1994,7 +1994,7 @@ export interface TableCreatedEvent {
      */
     has_generated_policies?: boolean
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -2020,7 +2020,7 @@ export interface TableDataAddedEvent {
      */
     table_name?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -2046,7 +2046,7 @@ export interface TableRLSEnabledEvent {
      */
     table_name?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -2162,7 +2162,7 @@ export interface ApiDocsOpenedEvent {
      */
     source: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -2184,7 +2184,7 @@ export interface ApiDocsCodeCopyButtonClickedEvent {
      */
     selectedLanguage?: string
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -2258,7 +2258,7 @@ export interface CommandMenuOpenedEvent {
      */
     app: 'studio' | 'docs' | 'www'
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -2280,7 +2280,7 @@ export interface CommandMenuSearchSubmittedEvent {
      */
     app: 'studio' | 'docs' | 'www'
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -2304,7 +2304,7 @@ export interface CommandMenuCommandClickedEvent {
      */
     app: 'studio' | 'docs' | 'www'
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -2340,7 +2340,7 @@ export interface InlineEditorSettingClickedEvent {
      */
     enabled: boolean
   }
-  groups: Partial<TelemetryGroups>
+  groups: Partial
 }
 
 /**
@@ -2531,7 +2531,7 @@ export interface RequestUpgradeModalOpenedEvent {
     /** Feature context driving the upgrade request */
     featureProposition?: string
   }
-  groups: Omit<TelemetryGroups, 'project'>
+  groups: Omit
 }
 
 /**
@@ -2550,7 +2550,7 @@ export interface RequestUpgradeSubmittedEvent {
     /** Current organization plan */
     currentPlan?: string
   }
-  groups: Omit<TelemetryGroups, 'project'>
+  groups: Omit
 }
 
 /**
@@ -2715,6 +2715,18 @@ export interface LogExplorerQueryRunButtonClickedEvent {
 }
 
 /**
+ * User generated a SQL query from natural language in the log explorer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/logs/explorer
+ */
+export interface LogExplorerNlQueryGeneratedEvent {
+  action: 'log_explorer_nl_query_generated'
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2864,3 +2876,4 @@ export type TelemetryEvent =
   | IntegrationUninstallCompletedEvent
   | RlsEventTriggerBannerCreateButtonClickedEvent
   | PricingCalculatorExperimentExposedEvent
+  | LogExplorerNlQueryGeneratedEvent
