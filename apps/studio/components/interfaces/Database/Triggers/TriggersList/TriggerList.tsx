@@ -1,3 +1,4 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { includes, sortBy } from 'lodash'
@@ -16,11 +17,7 @@ import {
   TableRow,
 } from 'ui'
 
-import {
-  generateTriggerCreateSQL,
-  getDatabaseFunctionsHref,
-  type PostgresTrigger,
-} from './TriggerList.utils'
+import { generateTriggerCreateSQL } from './TriggerList.utils'
 import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -135,7 +132,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
           <TableCell className="space-x-2">
             {x.function_name ? (
               <Link
-                href={getDatabaseFunctionsHref(projectRef, x.function_schema, x.function_name)}
+                href={`/project/${projectRef}/database/functions?search=${encodeURIComponent(x.function_name ?? '')}&schema=${encodeURIComponent(x.function_schema ?? '')}`}
                 className="text-link-table-cell block max-w-40 text-foreground-light"
               >
                 {x.function_name}
