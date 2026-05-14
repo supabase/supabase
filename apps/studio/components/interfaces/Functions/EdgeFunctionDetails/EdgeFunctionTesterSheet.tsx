@@ -38,6 +38,7 @@ import * as z from 'zod'
 import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
@@ -53,6 +54,8 @@ import {
   RoleImpersonationStateContextProvider,
   useGetImpersonatedRoleState,
 } from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean
@@ -171,6 +174,14 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
       removeQueryParam(index)
     }
   }
+
+  useShortcut(
+    SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST,
+    () => {
+      form.handleSubmit(onSubmit)()
+    },
+    { enabled: visible && !isPending }
+  )
 
   const onSubmit = async (values: FormValues) => {
     setError(null)
@@ -461,26 +472,28 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
                   disallowAuthenticatedOption
                   header="Run edge function as a role"
                 />
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isPending}
-                  disabled={isPending}
-                  onClick={() =>
-                    sendEvent({
-                      action: 'edge_function_test_send_button_clicked',
-                      properties: {
-                        httpMethod: method,
-                      },
-                      groups: {
-                        project: projectRef ?? 'Unknown',
-                        organization: org?.slug ?? 'Unknown',
-                      },
-                    })
-                  }
-                >
-                  Send Request
-                </Button>
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST} side="top">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isPending}
+                    disabled={isPending}
+                    onClick={() =>
+                      sendEvent({
+                        action: 'edge_function_test_send_button_clicked',
+                        properties: {
+                          httpMethod: method,
+                        },
+                        groups: {
+                          project: projectRef ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
+                      })
+                    }
+                  >
+                    Send Request
+                  </Button>
+                </ShortcutTooltip>
               </div>
             </SheetFooter>
           </form>
