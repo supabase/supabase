@@ -14,10 +14,14 @@
 # Usage:
 #   ./run.sh start                  # docker compose -f ... up -d --wait
 #   ./run.sh stop                   # docker compose -f ... down
-#   ./run.sh restart                # docker compose -f ... restart
-#   ./run.sh recreate               # stop then start
+#   ./run.sh restart [service]      # restart the stack (or named services)
+#   ./run.sh restart --except <svc>...  # restart all services except the named ones
+#   ./run.sh recreate [service]     # stop then start (or force-recreate one service)
+#   ./run.sh recreate --except <svc>...  # force-recreate all services except the named ones
 #   ./run.sh status                 # docker compose ps
 #   ./run.sh logs [service]         # follow logs (all or one service)
+#   ./run.sh inspect <service>      # docker inspect on a service's container
+#   ./run.sh printenv <service>     # print a service's environment variables
 #   ./run.sh pull                   # pull images
 #   ./run.sh config                 # print CONFIG list of the compose files
 #   ./run.sh config add <name>      # add overrides to CONFIG in .env
@@ -59,6 +63,24 @@ print_config() {
     echo "CONFIG=$cfg"
     echo "compose files: $files"
     echo ""
+}
+
+# Echoes the list of services (one per line) minus those passed as args.
+# Warns on unknown names; returns 1 if no services remain.
+services_except() {
+    # shellcheck disable=SC2086
+    all_services=$(docker compose $COMPOSE_FILES config --services)
+    filtered="$all_services"
+    for ex in "$@"; do
+        echo "$all_services" | grep -qFx "$ex" \
+            || echo "Warning: '$ex' is not a service in this project" >&2
+        filtered=$(echo "$filtered" | grep -vFx "$ex" || true)
+    done
+    if [ -z "$filtered" ]; then
+        echo "No services left after applying --except" >&2
+        return 1
+    fi
+    printf '%s\n' "$filtered"
 }
 
 write_env_config() {
@@ -106,14 +128,34 @@ case "$CMD" in
         exec docker compose $COMPOSE_FILES down "$@"
         ;;
     restart)
+        if [ "${1:-}" = "--except" ]; then
+            shift
+            [ $# -eq 0 ] && { echo "Usage: $(basename "$0") restart --except <svc>..." >&2; exit 1; }
+            services=$(services_except "$@") || exit 1
+            # shellcheck disable=SC2086
+            exec docker compose $COMPOSE_FILES restart $services
+        fi
         # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES restart
+        exec docker compose $COMPOSE_FILES restart "$@"
         ;;
     recreate)
+        if [ "${1:-}" = "--except" ]; then
+            shift
+            [ $# -eq 0 ] && { echo "Usage: $(basename "$0") recreate --except <svc>..." >&2; exit 1; }
+            services=$(services_except "$@") || exit 1
+            # shellcheck disable=SC2086
+            exec docker compose $COMPOSE_FILES up -d --wait --force-recreate --no-deps $services
+        fi
+        if [ $# -eq 0 ]; then
+            # shellcheck disable=SC2086
+            docker compose $COMPOSE_FILES down
+            # shellcheck disable=SC2086
+            exec docker compose $COMPOSE_FILES up -d --wait
+        fi
+        # Single-service recreate: force-recreate the named services only,
+        # leave their dependencies running.
         # shellcheck disable=SC2086
-        docker compose $COMPOSE_FILES down
-        # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES up -d --wait
+        exec docker compose $COMPOSE_FILES up -d --wait --force-recreate --no-deps "$@"
         ;;
     status|ps)
         # shellcheck disable=SC2086
@@ -122,6 +164,22 @@ case "$CMD" in
     logs)
         # shellcheck disable=SC2086
         exec docker compose $COMPOSE_FILES logs -f "$@"
+        ;;
+    inspect)
+        [ $# -eq 0 ] && { echo "Usage: $(basename "$0") inspect <service> [docker-inspect-args]" >&2; exit 1; }
+        svc="$1"; shift
+        # shellcheck disable=SC2086
+        cid=$(docker compose $COMPOSE_FILES ps -q "$svc")
+        [ -z "$cid" ] && { echo "Service '$svc' is not running" >&2; exit 1; }
+        exec docker inspect "$cid" "$@"
+        ;;
+    printenv)
+        [ $# -eq 0 ] && { echo "Usage: $(basename "$0") printenv <service>" >&2; exit 1; }
+        svc="$1"
+        # shellcheck disable=SC2086
+        cid=$(docker compose $COMPOSE_FILES ps -q "$svc")
+        [ -z "$cid" ] && { echo "Service '$svc' is not running" >&2; exit 1; }
+        exec docker inspect --format='{{range .Config.Env}}{{println .}}{{end}}' "$cid"
         ;;
     pull)
         # shellcheck disable=SC2086
@@ -205,10 +263,16 @@ Usage: $(basename "$0") <command>
 Commands:
   start                 Start the stack (docker compose up -d --wait)
   stop                  Stop the stack (docker compose down)
-  restart               Restart the stack (docker compose restart)
-  recreate              Stop then start (docker compose down && docker compose up -d --wait)
+  restart [service]     Restart the stack (or named services)
+  restart --except <svc>...
+                        Restart all services except the named ones
+  recreate [service]    Stop then start, or force-recreate one service (--no-deps)
+  recreate --except <svc>...
+                        Force-recreate all services except the named ones (--no-deps)
   status                Show service status
   logs [service]        Follow logs (optionally for a single service)
+  inspect <service>     Inspect a service's container (forwards extra args to docker inspect)
+  printenv <service>    Print a service's environment variables (one per line)
   pull                  Pull all images
   config                Show CONFIG list of the compose files
   config add <name>     Add overrides to CONFIG in .env (validates the file exists)
