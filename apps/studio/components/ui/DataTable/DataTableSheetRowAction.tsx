@@ -32,6 +32,7 @@ interface DataTableSheetRowActionProps<
   filterFields: TFields[]
   value: string | number
   table: Table<TData>
+  label: string
 }
 
 export function DataTableSheetRowAction<TData, TFields extends DataTableFilterField<TData>>({
@@ -41,14 +42,13 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   children,
   className,
   table,
+  label,
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
   const { copy, isCopied } = useCopyToClipboard()
   const field = filterFields.find((field) => field.value === fieldValue)
   const column = table.getColumn(fieldValue.toString())
-
-  if (!field || !column) return null
 
   function renderOptions() {
     if (!field) return null
@@ -174,15 +174,21 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
           </div>
         ) : null}
       </DropdownMenuTrigger>
+
       <DropdownMenuContent align="end" side="bottom" className="w-48 -translate-x-4">
-        {renderOptions()}
-        <DropdownMenuSeparator />
+        {!!field && !!column && (
+          <>
+            {renderOptions()}
+            <DropdownMenuSeparator />
+          </>
+        )}
+
         <DropdownMenuItem
           onClick={() => copy(String(value), { timeout: 1000 })}
           className="flex items-center gap-2"
         >
           <Copy size={12} />
-          Copy {column.id}
+          Copy {label}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

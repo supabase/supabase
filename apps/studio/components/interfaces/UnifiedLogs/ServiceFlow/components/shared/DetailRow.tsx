@@ -62,47 +62,31 @@ export const DetailRow = ({
     <Skeleton className="h-4 w-24" />
   ) : isEmpty ? (
     <span className="font-mono text-xs text-foreground-muted">—</span>
-  ) : typeof value === 'string' || typeof value === 'number' ? (
-    <span
-      className={cn(
-        'font-mono text-xs text-foreground',
-        wrap ? 'break-all text-right max-w-[calc(100%-12rem)]' : 'truncate text-right',
-        isFilterable && 'group-hover:underline'
-      )}
-    >
-      {value}
-    </span>
   ) : (
     value
   )
 
   const rowClass = cn(
-    'flex items-start justify-between gap-x-3 px-4',
+    'flex items-start justify-between gap-x-10 px-4',
     wrap ? 'min-h-9 py-2' : 'h-9 items-center'
   )
 
-  if (isFilterable && resolvedFilterValue !== undefined) {
-    return (
-      <DataTableSheetRowAction
-        fieldValue={filterId!}
-        filterFields={filterFields!}
-        value={resolvedFilterValue}
-        table={table!}
-        className={cn(rowClass, 'rounded-none group w-full cursor-pointer hover:!bg-surface-100')}
-      >
-        <div className="flex items-center gap-x-2">
-          {labelEl}
-          <Filter size={12} className="text-foreground-lighter" />
-        </div>
-        {valueEl}
-      </DataTableSheetRowAction>
-    )
-  }
-
   return (
-    <div className={rowClass}>
-      {labelEl}
+    <DataTableSheetRowAction
+      fieldValue={filterId!}
+      filterFields={filterFields!}
+      value={resolvedFilterValue ?? ''}
+      table={table!}
+      label={label}
+      className={cn(rowClass, 'rounded-none group w-full cursor-pointer hover:bg-surface-100!')}
+    >
+      <div className="flex items-center gap-x-2">
+        {labelEl}
+        {isFilterable && resolvedFilterValue !== undefined && (
+          <Filter size={12} className="text-foreground-lighter" />
+        )}
+      </div>
       {valueEl}
-    </div>
+    </DataTableSheetRowAction>
   )
 }
