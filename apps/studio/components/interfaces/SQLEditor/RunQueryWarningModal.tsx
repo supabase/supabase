@@ -86,7 +86,7 @@ export const RunQueryWarningModal = ({
   if (hasDestructiveOperations) {
     warnings.push({
       id: 'destructive-operations',
-      summary: 'This query includes destructive operations.',
+      summary: 'This query includes destructive operations',
       description: 'It may permanently change or remove data, tables, schemas, or other objects.',
     })
   }
@@ -97,7 +97,7 @@ export const RunQueryWarningModal = ({
       summary: (
         <>
           This query runs an <code className="text-code-inline">UPDATE</code> without a{' '}
-          <code className="text-code-inline">WHERE</code> clause.
+          <code className="text-code-inline">WHERE</code> clause
         </>
       ),
       description: 'It may update every row in the target table.',
@@ -107,7 +107,7 @@ export const RunQueryWarningModal = ({
   if (hasAlterDatabasePreventConnection) {
     warnings.push({
       id: 'prevent-database-connections',
-      summary: 'This query may prevent new database connections.',
+      summary: 'This query may prevent new database connections',
       description:
         'The dashboard may lose access until the setting is restored from a direct database connection.',
     })
@@ -121,8 +121,8 @@ export const RunQueryWarningModal = ({
       id: 'missing-rls',
       summary:
         missingRLSTables.length === 1
-          ? 'This query creates a table without enabling Row Level Security.'
-          : 'This query creates tables without enabling Row Level Security.',
+          ? 'This query creates a table without enabling Row Level Security'
+          : 'This query creates tables without enabling Row Level Security',
       description: (
         <>
           Clients using anon or authenticated keys may be able to access{' '}
@@ -134,22 +134,21 @@ export const RunQueryWarningModal = ({
 
   const confirmationCopy =
     warnings.length > 1
-      ? 'Make sure these are intentional before running this query.'
-      : 'Make sure this is intentional before running this query.'
+      ? 'Only continue if these changes are intentional.'
+      : 'Only continue if this change is intentional.'
+  const title = warnings.length > 1 ? 'Potential issues detected' : 'Potential issue detected'
 
   return (
     <AlertDialog open={visible} onOpenChange={handleOpenChange}>
       <AlertDialogContent size="small">
         <AlertDialogHeader>
-          <AlertDialogTitle>Potential issue detected</AlertDialogTitle>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription asChild>
             {warnings.length === 0 ? (
               <div>Are you sure you want to run this query?</div>
             ) : warnings.length === 1 ? (
               <div>
-                <p>{warnings[0].summary}</p>
-                <p className="mt-2">{warnings[0].description}</p>
-                <p className="mt-2">{confirmationCopy}</p>
+                {warnings[0].summary}. {warnings[0].description} {confirmationCopy}
               </div>
             ) : (
               <div>
@@ -157,7 +156,7 @@ export const RunQueryWarningModal = ({
                 <ul className="mt-3 grid gap-2">
                   {warnings.map((warning) => (
                     <li key={warning.id}>
-                      <span className="font-medium text-foreground">{warning.summary}</span>{' '}
+                      <span className="font-medium text-foreground">{warning.summary}.</span>{' '}
                       <span>{warning.description}</span>
                     </li>
                   ))}
