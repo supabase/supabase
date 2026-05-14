@@ -5,6 +5,7 @@ import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { Fragment, ReactNode, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { formatCompactNumber } from './DataTable.utils'
 import { useDataTable } from './providers/DataTableProvider'
@@ -71,7 +72,13 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   })
 
   return (
-    <Table ref={tableRef} onScroll={onScroll}>
+    <Table
+      ref={tableRef}
+      onScroll={onScroll}
+      className={
+        isLoading ? '[mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]' : ''
+      }
+    >
       <TableHeader>
         <TableRow className="bg-surface-75">
           {headers.map((header) => {
@@ -105,6 +112,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           })}
         </TableRow>
       </TableHeader>
+
       <TableBody
         id="content"
         tabIndex={-1}
@@ -124,25 +132,33 @@ export function DataTableInfinite<TData, TValue, TMeta>({
               />
             </Fragment>
           ))
+        ) : isLoading ? (
+          <Fragment>
+            {new Array(15).fill(0).map((_, x) => (
+              <TableRow
+                key={x}
+                className="h-[30px] hover:!bg-transparent [&>td]:group-hover:!bg-transparent"
+              >
+                {table.getAllLeafColumns().map((col, idx) => (
+                  <TableCell key={col.id}>
+                    <ShimmeringLoader className={cn('py-2', idx % 2 === 0 && 'opacity-50')} />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </Fragment>
         ) : (
           <Fragment>
-            {renderLiveRow?.()}
             <TableRow>
               <TableCell colSpan={columns.length} className="h-[32vh] text-center">
                 <div className="flex flex-col items-center justify-center h-full gap-3">
-                  {isLoading ? (
-                    <>
-                      <LoaderCircle className="h-6 w-6 animate-spin text-foreground-muted" />
-                      <p className="text-foreground-light text-sm">Retrieving logs...</p>
-                    </>
-                  ) : (
-                    <p className="text-foreground-light text-sm">No results found</p>
-                  )}
+                  <p className="text-foreground-light text-sm">No results found</p>
                 </div>
               </TableCell>
             </TableRow>
           </Fragment>
         )}
+
         {/* Only show load more section if we have rows OR if we're not in initial loading state */}
         {(rows.length > 0 || (!isLoading && !rows.length)) && (
           <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
