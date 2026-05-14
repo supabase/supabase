@@ -318,12 +318,13 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    if (q) {
-      setEditorValue(q)
-    } else if (search) {
+    if (search) {
       setEditorValue(search)
+    } else if (q) {
+      setEditorValue(q)
+      setSearch(q)
     }
-  }, [q, search])
+  }, [q, search, setSearch])
 
   useEffect(() => {
     // prevents overwriting when the user selects a helper.
