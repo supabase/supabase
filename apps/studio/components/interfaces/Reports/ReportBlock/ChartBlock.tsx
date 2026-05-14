@@ -9,7 +9,6 @@ import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { timestampFormatter } from '@/components/ui/Charts/Charts.utils'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { PortalChartTooltip } from '@/components/ui/Charts/PortalChartTooltip'
 import {
@@ -29,7 +28,6 @@ import {
   useProjectDailyStatsQuery,
 } from '@/data/analytics/project-daily-stats-query'
 import { METRICS } from '@/lib/constants/metrics'
-import { useFormatDateTime } from '@/lib/datetime'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
 
@@ -76,14 +74,6 @@ export const ChartBlock = ({
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
-  const formatChartDate = useFormatDateTime()
-  const formatTooltipDate = useCallback(
-    (value: string | number, format: string) =>
-      /^\d{4}-\d{2}-\d{2}$/.test(String(value))
-        ? timestampFormatter(String(value), format, true)
-        : formatChartDate(value, format),
-    [formatChartDate]
-  )
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -330,7 +320,7 @@ export const ChartBlock = ({
                       chartRef={chartRef}
                       className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
-                      labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
+                      labelFormatter={(x) => dayjs.utc(String(x)).format('DD MMM YYYY')}
                     />
                   }
                 />
@@ -358,7 +348,7 @@ export const ChartBlock = ({
                     <PortalChartTooltip
                       chartRef={chartRef}
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
-                      labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
+                      labelFormatter={(x) => dayjs.utc(String(x)).format('DD MMM YYYY')}
                     />
                   }
                 />
