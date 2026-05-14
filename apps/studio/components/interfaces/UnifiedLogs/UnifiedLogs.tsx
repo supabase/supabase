@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { useDebounce, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useDebounce, useParams } from 'common'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -110,6 +110,11 @@ export const UnifiedLogs = () => {
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>(defaultRowSelection)
+
+  const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
+    LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK,
+    'bottom'
+  )
 
   const [columnVisibility, setColumnVisibility] = useLocalStorageQuery<VisibilityState>(
     'data-table-visibility',
@@ -430,7 +435,11 @@ export const UnifiedLogs = () => {
                 chartConfig={filteredChartConfig}
               />
             </div>
-            <ResizablePanelGroup key="main-logs" orientation="vertical" className="flex-1">
+            <ResizablePanelGroup
+              key="main-logs"
+              className="flex-1"
+              orientation={dock === 'bottom' ? 'vertical' : 'horizontal'}
+            >
               <ResizablePanel
                 defaultSize="100"
                 minSize="10"
@@ -453,13 +462,18 @@ export const UnifiedLogs = () => {
                   />
                 </div>
               </ResizablePanel>
-              <LogsListPanel selectedRow={selectedRow} />
-              {selectedRowKey && (
-                <ServiceFlowPanel
-                  selectedRow={selectedRow?.original}
-                  selectedRowKey={selectedRowKey}
-                  searchParameters={searchParameters}
-                />
+
+              {!!selectedRow && (
+                <>
+                  <LogsListPanel selectedRow={selectedRow} />
+                  <ServiceFlowPanel
+                    dock={dock}
+                    setDock={setDock}
+                    selectedRow={selectedRow?.original}
+                    selectedRowKey={selectedRowKey}
+                    searchParameters={searchParameters}
+                  />
+                </>
               )}
             </ResizablePanelGroup>
           </ResizablePanel>
