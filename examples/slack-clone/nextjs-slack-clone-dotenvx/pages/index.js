@@ -6,7 +6,7 @@ const Home = () => {
   const [mode, setMode] = useState('sign-in')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [message, setMessage] = useState(null)
 
@@ -26,7 +26,7 @@ const Home = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    setLoading(true)
+    setIsLoading(true)
     setError(null)
     setMessage(null)
 
@@ -46,16 +46,18 @@ const Home = () => {
       }
     }
 
-    setLoading(false)
+    setIsLoading(false)
   }
 
   const handleGitHubSignIn = async () => {
+    setIsLoading(true)
     setError(null)
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: { redirectTo: `${window.location.origin}/` },
     })
     if (error) setError(error.message)
+    setIsLoading(false)
   }
 
   if (!session) {
@@ -93,10 +95,10 @@ const Home = () => {
               </label>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isLoading}
                 className="bg-blue-600 text-white rounded px-3 py-2 disabled:opacity-50"
               >
-                {loading ? 'Loading...' : mode === 'sign-in' ? 'Sign in' : 'Sign up'}
+                {isLoading ? 'Loading...' : mode === 'sign-in' ? 'Sign in' : 'Sign up'}
               </button>
             </form>
 
@@ -109,9 +111,10 @@ const Home = () => {
             <button
               type="button"
               onClick={handleGitHubSignIn}
+              disabled={isLoading}
               className="w-full bg-gray-900 text-white rounded px-3 py-2"
             >
-              Continue with GitHub
+              {isLoading ? 'Loading...' : 'Continue with GitHub'}
             </button>
 
             <button
