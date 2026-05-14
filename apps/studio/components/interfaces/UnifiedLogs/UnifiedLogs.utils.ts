@@ -37,6 +37,21 @@ export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetad
   }
 }
 
+/**
+ * Returns a unified-logs row's timestamp in epoch milliseconds.
+ *
+ * The row mapper attaches a pre-parsed `date` (works for both BigQuery
+ * microsecond timestamps and OTEL ISO strings); fall back to the raw
+ * `timestamp` value when it's a number (older BQ-style microseconds).
+ */
+export function getRowTimestampMs(
+  row: { date?: Date | null; timestamp?: number | string | null } | null | undefined
+): number | null {
+  if (row?.date instanceof Date) return row.date.getTime()
+  if (typeof row?.timestamp === 'number') return row.timestamp / 1000
+  return null
+}
+
 export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
   switch (value) {
     case 'success':

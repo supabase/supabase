@@ -1,7 +1,19 @@
+import { literal } from '@supabase/pg-meta/src/pg-format'
 import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+
+// Escapes a substring of a `LIKE '%...%'` clause so a value containing a
+// single quote can't terminate the literal early. `literal()` would wrap
+// the whole value in quotes, which we don't want when concatenating wild-
+// card characters; this strips its quoting back off.
+const likeValue = (value: unknown): string => {
+  const escaped = literal(String(value))
+  // literal() wraps strings as 'value' (and prefixes with E for backslash
+  // values); strip the surrounding quotes since we glue this between %.
+  return escaped.replace(/^E?'/, '').replace(/'$/, '')
+}
 
 // Pagination and control parameters
 const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
@@ -13,395 +25,241 @@ const SPECIAL_FILTER_PARAMS = ['date'] as const
 const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
 const FACET_FIELDS = ['log_type', 'level', 'method', 'status', 'pathname'] as const
 
+// OTEL log_attributes keys for HTTP-style fields. Centralized so they can be
+// adjusted in one place if the backend conventions change.
+const ATTR = {
+  method: `log_attributes['request.method']`,
+  status: `log_attributes['response.status_code']`,
+  path: `log_attributes['request.path']`,
+} as const
+
 /**
- * Builds query conditions from search parameters and returns WHERE clause
- * @param search SearchParamsType object containing query parameters
- * @returns Object with whereConditions array and formatted WHERE clause
+ * Predicate that matches rows belonging to a given log_type. Mirrors the
+ * shape of the original BigQuery unified-logs CTEs: edge gateway traffic
+ * (`source = 'edge_logs'`) is split between `edge`, `postgrest` and `storage`
+ * based on URL path. Other types map straight to a single source.
+ *
+ * The OTEL `postgrest_logs` and `storage_logs` sources contain process-level
+ * logs from postgREST / storage-api and are intentionally not part of unified
+ * logs; the UI surfaces gateway HTTP traffic for those buckets.
  */
-const buildQueryConditions = (search: QuerySearchParamsType) => {
-  const whereConditions: string[] = []
+const LOG_TYPE_PREDICATE: Record<string, string> = {
+  edge: `source = 'edge_logs' AND ${ATTR.path} NOT LIKE '%/rest/%' AND ${ATTR.path} NOT LIKE '%/storage/%'`,
+  postgrest: `source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%'`,
+  storage: `source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%'`,
+  postgres: `source = 'postgres_logs'`,
+  'edge function': `source = 'function_edge_logs'`,
+  auth: `source = 'auth_logs'`,
+}
 
-  // Process all search parameters for filtering
-  Object.entries(search).forEach(([key, value]) => {
-    // Skip pagination/control parameters
-    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) {
-      return
-    }
+// Derived `log_type` column for SELECT / GROUP BY / countIf use.
+const LOG_TYPE_EXPR = `CASE
+      WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
+      WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%' THEN 'storage'
+      WHEN source = 'edge_logs' THEN 'edge'
+      WHEN source = 'postgres_logs' THEN 'postgres'
+      WHEN source = 'function_edge_logs' THEN 'edge function'
+      WHEN source = 'auth_logs' THEN 'auth'
+      ELSE source
+    END`
 
-    // Handle array filters (IN clause)
-    if (Array.isArray(value) && value.length > 0) {
-      whereConditions.push(
-        `${key} IN (${value.map((v) => `'${String(v).replace(/'/g, "''")}'`).join(',')})`
-      )
-      return
-    }
+// Status code is sourced from the HTTP response for gateway-style rows and
+// from the Postgres `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
+const STATUS_EXPR = `CASE
+      WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
+      ELSE toString(${ATTR.status})
+    END`
 
-    // Handle scalar values
-    if (value !== null && value !== undefined) {
-      if (['host', 'pathname'].includes(key)) {
-        whereConditions.push(`${key} LIKE '%${String(value).replace(/'/g, "''")}%'`)
-      } else {
-        whereConditions.push(`${key} = '${String(value).replace(/'/g, "''")}'`)
-      }
-    }
-  })
+// SQL expression for derived `level`. Used inline (not as alias reference)
+// because the OTEL endpoint can't resolve aliases inside countIf when the
+// alias is not in GROUP BY.
+//
+// HTTP status is checked first so gateway rows (which always carry an
+// `severity_text` of `INFO` regardless of response code) bucket as
+// success/warning/error by status. Postgres-style severity is the
+// fallback for rows without a status code.
+const LEVEL_EXPR = `CASE
+      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) >= 500 THEN 'error'
+      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 400 AND 499 THEN 'warning'
+      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 200 AND 299 THEN 'success'
+      WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'
+      WHEN severity_text IN ('WARN','WARNING') THEN 'warning'
+      WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'
+      ELSE 'success'
+    END`
 
-  // Create final WHERE clause
-  const finalWhere = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
-
-  return { whereConditions, finalWhere }
+const logTypeWherePredicate = (logTypes: string[]) => {
+  const effective = logTypes.filter((t) => t in LOG_TYPE_PREDICATE)
+  const types = effective.length ? effective : [...DEFAULT_LOG_TYPES]
+  return `(${types.map((t) => `(${LOG_TYPE_PREDICATE[t]})`).join(' OR ')})`
 }
 
 /**
- * Calculates how much the chart start datetime should be offset given the current datetime filter params
- * and determines the appropriate bucketing level (minute, hour, day)
- * Ported from the older implementation (apps/studio/components/interfaces/Settings/Logs/Logs.utils.ts)
+ * Translates a frontend filter key/value pair into an underlying SQL predicate.
+ * The OTEL endpoint won't accept queries that reference derived aliases like
+ * `log_type` or `level` in WHERE for some shapes, so we always emit raw-column
+ * predicates (source/severity_text/log_attributes[…]).
  */
-const calculateChartBucketing = (search: SearchParamsType | Record<string, unknown>): string => {
-  // Extract start and end times from the date array if available
+const translateFilter = (key: string, value: unknown): string | null => {
+  if (value === null || value === undefined) return null
+
+  const arr = Array.isArray(value) ? (value.length > 0 ? value : null) : null
+  if (Array.isArray(value) && !arr) return null
+
+  const inList = (values: readonly unknown[]) =>
+    `(${values.map((v) => literal(String(v))).join(',')})`
+
+  switch (key) {
+    case 'log_type': {
+      const types = (arr ?? [value]).map((v) => String(v))
+      return `(${types
+        .map((t) => `(${LOG_TYPE_PREDICATE[t] ?? `source = ${literal(t)}`})`)
+        .join(' OR ')})`
+    }
+    case 'level': {
+      // No simple raw column for level; reference the inline CASE expression.
+      const levels = arr ?? [value]
+      return `(${LEVEL_EXPR}) IN ${inList(levels.map((v) => String(v)))}`
+    }
+    case 'method':
+      return arr ? `${ATTR.method} IN ${inList(arr)}` : `${ATTR.method} = ${literal(String(value))}`
+    case 'status':
+      return arr ? `${ATTR.status} IN ${inList(arr)}` : `${ATTR.status} = ${literal(String(value))}`
+    case 'pathname':
+      return arr
+        ? `(${arr.map((v) => `${ATTR.path} LIKE '%${likeValue(v)}%'`).join(' OR ')})`
+        : `${ATTR.path} LIKE '%${likeValue(value)}%'`
+    case 'host':
+      // Best-effort: use full request URL since `host` isn't a top-level field.
+      return arr
+        ? `(${arr.map((v) => `log_attributes['request.url'] LIKE '%${likeValue(v)}%'`).join(' OR ')})`
+        : `log_attributes['request.url'] LIKE '%${likeValue(value)}%'`
+    default:
+      // Unknown filter key — fall back to a generic equality on log_attributes.
+      // We don't pass `key` through literal() because Map key access in
+      // ClickHouse uses bracket syntax with a string literal; the existing
+      // EXCLUDED_QUERY_PARAMS list and the typed search params surface this
+      // from a static allow-list, not user input.
+      return arr
+        ? `log_attributes['${key}'] IN ${inList(arr)}`
+        : `log_attributes['${key}'] = ${literal(String(value))}`
+  }
+}
+
+/**
+ * Builds an array of WHERE predicate strings from search params, optionally
+ * skipping a specific facet field (used when computing faceted counts).
+ * `log_type` is always handled separately (see `logTypeWherePredicate`).
+ */
+const buildPredicates = (search: QuerySearchParamsType, excludeField?: string) => {
+  const predicates: string[] = []
+  Object.entries(search).forEach(([key, value]) => {
+    if (key === excludeField) return
+    if (key === 'log_type') return
+    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return
+    const predicate = translateFilter(key, value)
+    if (predicate) predicates.push(predicate)
+  })
+  return predicates
+}
+
+const whereClause = (predicates: string[]) =>
+  predicates.length > 0 ? `WHERE ${predicates.join(' AND ')}` : ''
+
+/**
+ * Calculates the chart bucketing level (minute/hour/day) given the date range.
+ */
+const calculateChartBucketing = (
+  search: SearchParamsType | Record<string, unknown>
+): 'MINUTE' | 'HOUR' | 'DAY' => {
   const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
 
-  // Handle timestamps that could be in various formats
   const convertToMillis = (timestamp: Date | string | number | null | undefined) => {
     if (!timestamp) return null
-    // If timestamp is a Date object
     if (timestamp instanceof Date) return timestamp.getTime()
-
-    // If timestamp is a string that needs parsing
     if (typeof timestamp === 'string') return dayjs(timestamp).valueOf()
-
-    // If timestamp is already a number (unix timestamp)
-    // Check if microseconds (16 digits) and convert to milliseconds
     if (typeof timestamp === 'number') {
       const str = timestamp.toString()
       if (str.length >= 16) return Math.floor(timestamp / 1000)
       return timestamp
     }
-
     return null
   }
 
   let startMillis = convertToMillis(dateRange[0])
   let endMillis = convertToMillis(dateRange[1])
 
-  // Default values if not set
   if (!startMillis) startMillis = dayjs().subtract(1, 'hour').valueOf()
   if (!endMillis) endMillis = dayjs().valueOf()
 
   const startTime = dayjs(startMillis)
   const endTime = dayjs(endMillis)
 
-  let truncationLevel = 'MINUTE'
-
   const hourDiff = endTime.diff(startTime, 'hour')
   const dayDiff = endTime.diff(startTime, 'day')
 
-  // Adjust bucketing based on time range
-  if (dayDiff >= 2) {
-    truncationLevel = 'DAY'
-  } else if (hourDiff >= 12) {
-    truncationLevel = 'HOUR'
-  } else {
-    truncationLevel = 'MINUTE'
+  if (dayDiff >= 2) return 'DAY'
+  if (hourDiff >= 12) return 'HOUR'
+  return 'MINUTE'
+}
+
+const truncationFunction = (level: 'MINUTE' | 'HOUR' | 'DAY') => {
+  switch (level) {
+    case 'DAY':
+      return 'toStartOfDay'
+    case 'HOUR':
+      return 'toStartOfHour'
+    case 'MINUTE':
+    default:
+      return 'toStartOfMinute'
   }
-
-  return truncationLevel
 }
 
 /**
- * Edge logs query fragment
- *
- * excludes `/rest/` in the path
+ * Returns the projection list for a unified-logs row. All derivations are
+ * inlined so the result can be referenced (or filtered) at the same query
+ * level — the OTEL endpoint rejects subqueries.
  */
-const getEdgeLogsQuery = () => {
-  return `
-    select
-      id,
-      null as source_id,
-      el.timestamp as timestamp,
-      'edge' as log_type,
-      CAST(edge_logs_response.status_code AS STRING) as status,
-      CASE
-          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN edge_logs_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      edge_logs_request.path as pathname,
-      null as event_message,
-      edge_logs_request.method as method,
-      null as log_count,
-      null as logs
-    from edge_logs as el
-    cross join unnest(metadata) as edge_logs_metadata
-    cross join unnest(edge_logs_metadata.request) as edge_logs_request
-    cross join unnest(edge_logs_metadata.response) as edge_logs_response
-
-    -- ONLY include logs where the path does not include /rest/
-    WHERE edge_logs_request.path NOT LIKE '%/rest/%'
-    AND edge_logs_request.path NOT LIKE '%/storage/%'
-    
-  `
-}
-
-// Postgrest logs
-
-// WHERE pathname includes `/rest/`
-const getPostgrestLogsQuery = () => {
-  return `
-    select
-      id,
-      null as source_id,
-      el.timestamp as timestamp,
-      'postgrest' as log_type,
-      CAST(edge_logs_response.status_code AS STRING) as status,
-      CASE
-          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN edge_logs_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      edge_logs_request.path as pathname,
-      null as event_message,
-      edge_logs_request.method as method,
-      null as log_count,
-      null as logs
-    from edge_logs as el
-    cross join unnest(metadata) as edge_logs_metadata
-    cross join unnest(edge_logs_metadata.request) as edge_logs_request
-    cross join unnest(edge_logs_metadata.response) as edge_logs_response
-
-    -- ONLY include logs where the path includes /rest/
-    WHERE edge_logs_request.path LIKE '%/rest/%'
-  `
-}
-
-/**
- * Postgres logs query fragment
- */
-const getPostgresLogsQuery = () => {
-  return `
-    select
-      id,
-      null as source_id,
-      pgl.timestamp as timestamp,
-      'postgres' as log_type,
-      CAST(pgl_parsed.sql_state_code AS STRING) as status,
-      CASE
-          WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
-          WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
-          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
-          WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
-          ELSE null
-      END as level,
-      null as pathname,
-      event_message as event_message,
-      null as method,
-      null as log_count,
-      null as logs
-    from postgres_logs as pgl
-    cross join unnest(pgl.metadata) as pgl_metadata
-    cross join unnest(pgl_metadata.parsed) as pgl_parsed
-  `
-}
-
-/**
- * Edge function logs query fragment
- */
-const getEdgeFunctionLogsQuery = () => {
-  return `
-    select
-      id,
-      null as source_id,
-      fel.timestamp as timestamp,
-      'edge function' as log_type,
-      CAST(fel_response.status_code AS STRING) as status,
-      CASE
-          WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN fel_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      fel_request.pathname as pathname,
-      COALESCE(function_logs_agg.last_event_message, '') as event_message,
-      fel_request.method as method,
-      function_logs_agg.function_log_count as log_count,
-      null as logs
-    from function_edge_logs as fel
-    cross join unnest(metadata) as fel_metadata
-    cross join unnest(fel_metadata.response) as fel_response
-    cross join unnest(fel_metadata.request) as fel_request
-    left join (
-    SELECT
-        fl_metadata.request_id,
-        COUNT(fl.id) as function_log_count,
-        ANY_VALUE(fl.event_message) as last_event_message
-    FROM function_logs as fl
-    CROSS JOIN UNNEST(fl.metadata) as fl_metadata
-    WHERE fl_metadata.request_id IS NOT NULL
-    GROUP BY fl_metadata.request_id
-    ) as function_logs_agg on fel_metadata.request_id = function_logs_agg.request_id
-  `
-}
-
-/**
- * Auth logs query fragment
- */
-const getAuthLogsQuery = () => {
-  return `
-    select
-      el_in_al.id as id,
-      al.id as source_id,
-      el_in_al.timestamp as timestamp,
-      'auth' as log_type,
-      CAST(el_in_al_response.status_code AS STRING) as status,
-      CASE
-          WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN el_in_al_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      el_in_al_request.path as pathname,
-      null as event_message,
-      el_in_al_request.method as method,
-      null as log_count,
-      null as logs
-    from auth_logs as al
-    cross join unnest(metadata) as al_metadata 
-    left join (
-    edge_logs as el_in_al
-        cross join unnest (metadata) as el_in_al_metadata 
-        cross join unnest (el_in_al_metadata.response) as el_in_al_response 
-        cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
-        cross join unnest (el_in_al_metadata.request) as el_in_al_request
-    )
-    on al_metadata.request_id = el_in_al_response_headers.cf_ray
-    WHERE al_metadata.request_id is not null
-  `
-}
-
-/**
- * Supabase storage logs query fragment
- */
-const getSupabaseStorageLogsQuery = () => {
-  return `
-    select
-      id,
-      null as source_id,
-      el.timestamp as timestamp,
-      'storage' as log_type,
-      CAST(edge_logs_response.status_code AS STRING) as status,
-      CASE
-          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN edge_logs_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      edge_logs_request.path as pathname,
-      null as event_message,
-      edge_logs_request.method as method,
-      null as log_count,
-      null as logs
-    from edge_logs as el
-    cross join unnest(metadata) as edge_logs_metadata
-    cross join unnest(edge_logs_metadata.request) as edge_logs_request
-    cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    -- ONLY include logs where the path includes /storage/
-    WHERE edge_logs_request.path LIKE '%/storage/%'
-  `
-}
-
-const LOG_TYPE_QUERIES: Record<string, () => string> = {
-  edge: getEdgeLogsQuery,
-  postgrest: getPostgrestLogsQuery,
-  postgres: getPostgresLogsQuery,
-  'edge function': getEdgeFunctionLogsQuery,
-  auth: getAuthLogsQuery,
-  storage: getSupabaseStorageLogsQuery,
-}
-
-/**
- * Combine the requested log sources to create the unified logs CTE.
- * Defaults to postgres + postgrest on first load to reduce query cost.
- */
-export const getUnifiedLogsCTE = (logTypes: string[] = [...DEFAULT_LOG_TYPES]) => {
-  const queries = logTypes
-    .filter((type) => type in LOG_TYPE_QUERIES)
-    .map((type) => LOG_TYPE_QUERIES[type]())
-
-  const effectiveQueries =
-    queries.length > 0 ? queries : DEFAULT_LOG_TYPES.map((type) => LOG_TYPE_QUERIES[type]())
-
-  return `
-WITH unified_logs AS (
-    ${effectiveQueries.join('\n    union all\n    ')}
-)
-  `
-}
-
-/**
- * Unified logs SQL query
- */
-export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
-  const { finalWhere } = buildQueryConditions(search)
-  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
-
-  const sql = `
-${getUnifiedLogsCTE(effectiveLogTypes)}
-SELECT
+const rowProjection = () => `
     id,
-    source_id,
+    null AS source_id,
     timestamp,
-    log_type,
-    status,
-    level,
-    pathname,
+    ${LOG_TYPE_EXPR} AS log_type,
+    ${STATUS_EXPR} AS status,
+    ${LEVEL_EXPR} AS level,
+    ${ATTR.path} AS pathname,
     event_message,
-    method,
-    log_count,
-    logs
-FROM unified_logs
-${finalWhere}
+    ${ATTR.method} AS method,
+    null AS log_count,
+    null AS logs
 `
 
-  return sql
+const buildBaseWhere = (search: QuerySearchParamsType, excludeField?: string) => {
+  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
+  const parts: string[] = []
+  if (excludeField !== 'log_type') {
+    parts.push(logTypeWherePredicate(effectiveLogTypes))
+  }
+  parts.push(...buildPredicates(search, excludeField))
+  return parts
 }
 
 /**
- * Get a count query for the total logs within the timeframe
- * Uses proper faceted search behavior where facets show "what would I get if I selected ONLY this option"
+ * Unified logs row query — flat SELECT, no subquery wrapper.
  */
-
-// Helper function to build WHERE clause excluding a specific field
-const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): string => {
-  const conditions: string[] = []
-
-  Object.entries(search).forEach(([key, value]) => {
-    if (key === excludeField) return // Skip the field we're getting facets for
-    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return // Skip pagination and special params
-
-    // Handle array filters (IN clause)
-    if (Array.isArray(value) && value.length > 0) {
-      conditions.push(
-        `${key} IN (${value.map((v) => `'${String(v).replace(/'/g, "''")}'`).join(',')})`
-      )
-      return
-    }
-
-    // Handle scalar values
-    if (value !== null && value !== undefined) {
-      if (['host', 'pathname'].includes(key)) {
-        conditions.push(`${key} LIKE '%${String(value).replace(/'/g, "''")}%'`)
-      } else {
-        conditions.push(`${key} = '${String(value).replace(/'/g, "''")}'`)
-      }
-    }
-  })
-
-  return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
+  const predicates = buildBaseWhere(search)
+  return `
+SELECT ${rowProjection()}
+FROM logs
+${whereClause(predicates)}
+`
 }
 
-export const getFacetCountCTE = ({
+/**
+ * Single-facet count query — a complete flat SELECT with GROUP BY.
+ */
+export const getFacetCountQuery = ({
   search,
   facet,
   facetSearch,
@@ -416,188 +274,97 @@ export const getFacetCountCTE = ({
 
   const MAX_FACETS_QUANTITY = 20
 
+  const facetExpr =
+    facet === 'log_type'
+      ? LOG_TYPE_EXPR
+      : facet === 'level'
+        ? LEVEL_EXPR
+        : facet === 'method'
+          ? ATTR.method
+          : facet === 'status'
+            ? STATUS_EXPR
+            : facet === 'pathname'
+              ? ATTR.path
+              : `log_attributes['${facet}']`
+
+  const predicates = [
+    ...buildBaseWhere(search, facet),
+    `(${facetExpr}) IS NOT NULL AND (${facetExpr}) != ''`,
+  ]
+  if (facetSearch) {
+    predicates.push(`(${facetExpr}) LIKE '%${likeValue(facetSearch)}%'`)
+  }
+
   return `
-${facet}_count AS (
-  SELECT '${facet}' as dimension, ${facet} as value, COUNT(*) as count
-  FROM unified_logs
-  ${buildFacetWhere(search, `${facet}`) || `WHERE ${facet} IS NOT NULL`}
-  ${buildFacetWhere(search, `${facet}`) ? ` AND ${facet} IS NOT NULL` : ''}
-  ${!!facetSearch ? `AND ${facet} LIKE '%${facetSearch.replace(/'/g, "''")}%'` : ''}
-  GROUP BY ${facet}
-  LIMIT ${MAX_FACETS_QUANTITY}
-)
+SELECT '${facet}' AS dimension, (${facetExpr}) AS value, count() AS count
+FROM logs
+${whereClause(predicates)}
+GROUP BY value
+LIMIT ${MAX_FACETS_QUANTITY}
 `.trim()
 }
 
-export const getUnifiedLogsCountCTE = () => {
-  return `
-WITH unified_logs AS (
-    -- Single scan of edge_logs covering edge gateway, postgrest, and storage
-    select
-      id,
-      CASE
-        WHEN edge_logs_request.path LIKE '%/rest/%' THEN 'postgrest'
-        WHEN edge_logs_request.path LIKE '%/storage/%' THEN 'storage'
-        ELSE 'edge'
-      END as log_type,
-      CAST(edge_logs_response.status_code AS STRING) as status,
-      CASE
-        WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-        WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-        WHEN edge_logs_response.status_code >= 500 THEN 'error'
-        ELSE 'success'
-      END as level,
-      edge_logs_request.path as pathname,
-      edge_logs_request.method as method
-    from edge_logs as el
-    cross join unnest(metadata) as edge_logs_metadata
-    cross join unnest(edge_logs_metadata.request) as edge_logs_request
-    cross join unnest(edge_logs_metadata.response) as edge_logs_response
-
-    union all
-
-    -- Postgres logs
-    select
-      id,
-      'postgres' as log_type,
-      CAST(pgl_parsed.sql_state_code AS STRING) as status,
-      CASE
-        WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
-        WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
-        WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
-        WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
-        ELSE null
-      END as level,
-      null as pathname,
-      null as method
-    from postgres_logs as pgl
-    cross join unnest(pgl.metadata) as pgl_metadata
-    cross join unnest(pgl_metadata.parsed) as pgl_parsed
-
-    union all
-
-    -- Edge function logs
-    select
-      fel.id,
-      'edge function' as log_type,
-      CAST(fel_response.status_code AS STRING) as status,
-      CASE
-        WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
-        WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-        WHEN fel_response.status_code >= 500 THEN 'error'
-        ELSE 'success'
-      END as level,
-      fel_request.pathname as pathname,
-      fel_request.method as method
-    from function_edge_logs as fel
-    cross join unnest(metadata) as fel_metadata
-    cross join unnest(fel_metadata.response) as fel_response
-    cross join unnest(fel_metadata.request) as fel_request
-
-    union all
-
-    -- Auth logs
-    select
-      el_in_al.id as id,
-      'auth' as log_type,
-      CAST(el_in_al_response.status_code AS STRING) as status,
-      CASE
-        WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
-        WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-        WHEN el_in_al_response.status_code >= 500 THEN 'error'
-        ELSE 'success'
-      END as level,
-      el_in_al_request.path as pathname,
-      el_in_al_request.method as method
-    from auth_logs as al
-    cross join unnest(metadata) as al_metadata
-    left join (
-    edge_logs as el_in_al
-      cross join unnest(metadata) as el_in_al_metadata
-      cross join unnest(el_in_al_metadata.response) as el_in_al_response
-      cross join unnest(el_in_al_response.headers) as el_in_al_response_headers
-      cross join unnest(el_in_al_metadata.request) as el_in_al_request
-    )
-    on al_metadata.request_id = el_in_al_response_headers.cf_ray
-    WHERE al_metadata.request_id is not null
-)
-  `
-}
-
+/**
+ * Bundled count query — UNION ALL of (dimension, value, count) rows so the
+ * frontend can render facet counts and total in one round trip.
+ */
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
-  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
-  const logTypeWhere = buildFacetWhere(search, 'log_type') || 'WHERE log_type IS NOT NULL'
-  const levelWhere = buildFacetWhere(search, 'level') || 'WHERE level IS NOT NULL'
+  const baseFiltersFor = (excludeField?: string) =>
+    buildBaseWhere(search, excludeField).join(' AND ')
 
-  const sql = `
-${getUnifiedLogsCTE(effectiveLogTypes)},
+  // The "total" badge should reflect the user's *current* filter set,
+  // including any active log_type filter. Pass no excludeField so the
+  // log_type predicate is included.
+  const totalSql = `
+SELECT 'total' AS dimension, 'all' AS value, count() AS count
+FROM logs
+WHERE ${baseFiltersFor()}
+`.trim()
 
--- Single COUNTIF pass for all log_type buckets + total (no GROUP BY / sort needed)
-log_type_counts AS (
-  SELECT
-    COUNT(*) AS total,
-    COUNTIF(log_type = 'edge') AS edge_count,
-    COUNTIF(log_type = 'postgrest') AS postgrest_count,
-    COUNTIF(log_type = 'storage') AS storage_count,
-    COUNTIF(log_type = 'postgres') AS postgres_count,
-    COUNTIF(log_type = 'edge function') AS edge_function_count,
-    COUNTIF(log_type = 'auth') AS auth_count
-  FROM unified_logs
-  ${logTypeWhere}
-),
+  const logTypeBranches = Object.entries(LOG_TYPE_PREDICATE)
+    .map(([logType, predicate]) =>
+      `
+SELECT 'log_type' AS dimension, '${logType}' AS value, countIf(${predicate}) AS count
+FROM logs
+WHERE ${baseFiltersFor('log_type')}
+`.trim()
+    )
+    .join('\nUNION ALL\n')
 
--- Single COUNTIF pass for all level buckets
-level_counts AS (
-  SELECT
-    COUNTIF(level = 'success') AS success_count,
-    COUNTIF(level = 'warning') AS warning_count,
-    COUNTIF(level = 'error') AS error_count
-  FROM unified_logs
-  ${levelWhere}
-),
+  const levelBranches = ['success', 'warning', 'error']
+    .map((lvl) =>
+      `
+SELECT 'level' AS dimension, '${lvl}' AS value, countIf((${LEVEL_EXPR}) = '${lvl}') AS count
+FROM logs
+WHERE ${baseFiltersFor('level')}
+`.trim()
+    )
+    .join('\nUNION ALL\n')
 
--- Variable facets: open-ended values still need GROUP BY
-${getFacetCountCTE({ search, facet: 'method' })},
-${getFacetCountCTE({ search, facet: 'status' })},
-${getFacetCountCTE({ search, facet: 'pathname' })}
+  const facetBranches = ['method', 'status', 'pathname']
+    .map((facet) => getFacetCountQuery({ search, facet }))
+    .join('\nUNION ALL\n')
 
-SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'postgrest', postgrest_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'storage', storage_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'postgres', postgres_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'edge function', edge_function_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'auth', auth_count FROM log_type_counts
-UNION ALL SELECT 'level', 'success', success_count FROM level_counts
-UNION ALL SELECT 'level', 'warning', warning_count FROM level_counts
-UNION ALL SELECT 'level', 'error', error_count FROM level_counts
-UNION ALL SELECT dimension, value, count FROM method_count
-UNION ALL SELECT dimension, value, count FROM status_count
-UNION ALL SELECT dimension, value, count FROM pathname_count
-`
-
-  return sql
+  return [totalSql, logTypeBranches, levelBranches, facetBranches].join('\nUNION ALL\n')
 }
 
 /**
- * Enhanced logs chart query with dynamic bucketing based on time range
- * Incorporates dynamic bucketing from the older implementation
+ * Logs chart query with dynamic bucketing based on time range.
  */
 export const getLogsChartQuery = (search: QuerySearchParamsType): string => {
-  const { finalWhere } = buildQueryConditions(search)
   const truncationLevel = calculateChartBucketing(search)
-  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
+  const truncFn = truncationFunction(truncationLevel)
+  const predicates = buildBaseWhere(search)
 
   return `
-${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
-  TIMESTAMP_TRUNC(timestamp, ${truncationLevel}) as time_bucket,
-  COUNTIF(level = 'success') as success,
-  COUNTIF(level = 'warning') as warning,
-  COUNTIF(level = 'error') as error,
-  COUNT(*) as total_per_bucket
-FROM unified_logs
-${finalWhere}
+  ${truncFn}(timestamp) AS time_bucket,
+  countIf((${LEVEL_EXPR}) = 'success') AS success,
+  countIf((${LEVEL_EXPR}) = 'warning') AS warning,
+  countIf((${LEVEL_EXPR}) = 'error') AS error,
+  count() AS total_per_bucket
+FROM logs
+${whereClause(predicates)}
 GROUP BY time_bucket
 ORDER BY time_bucket ASC
 `
