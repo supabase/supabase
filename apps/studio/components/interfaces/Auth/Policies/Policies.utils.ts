@@ -1,5 +1,5 @@
+import type { PGPolicy } from '@supabase/pg-meta'
 import { ident } from '@supabase/pg-meta/src/pg-format'
-import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { has, isEmpty, isEqual } from 'lodash'
 
 import {
@@ -19,7 +19,7 @@ import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constrain
 
 export const createSQLPolicy = (
   policyFormFields: PolicyFormField,
-  originalPolicyFormFields?: PostgresPolicy
+  originalPolicyFormFields?: PGPolicy
 ) => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
@@ -129,7 +129,7 @@ export const createPayloadForCreatePolicy = (
 
 export const createPayloadForUpdatePolicy = (
   policyFormFields: PolicyFormField,
-  originalPolicyFormFields: PostgresPolicy
+  originalPolicyFormFields: PGPolicy
 ): PostgresPolicyUpdatePayload => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {

@@ -94,12 +94,11 @@ HUGGING_FACE_ACCESS_TOKEN=<your-token-here>
 Let's modify the Edge Function to import Hugging Face's inference client and perform a `text-to-image` request:
 
 ```ts
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2'
 
 const hf = new HfInference(Deno.env.get('HUGGING_FACE_ACCESS_TOKEN'))
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const { prompt } = await req.json()
 
   const image = await hf.textToImage(

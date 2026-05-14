@@ -1,10 +1,30 @@
-import { ChevronDown, ChevronUp, X } from 'lucide-react'
+import { Check, ChevronDown, ChevronUp, PanelBottom, PanelRight, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo } from 'react'
-import { Button, KeyboardShortcut, Separator, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  KeyboardShortcut,
+  Separator,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 
-export const ServiceFlowPanelControls = () => {
+interface ServiceFlowPanelControlsProps {
+  dock: 'bottom' | 'right'
+  setDock: (value: 'bottom' | 'right') => void
+}
+
+export const ServiceFlowPanelControls = ({
+  dock = 'bottom',
+  setDock,
+}: ServiceFlowPanelControlsProps) => {
   const { table, rowSelection, isLoading } = useDataTable()
 
   const selectedRowKey = Object.keys(rowSelection)?.[0]
@@ -87,6 +107,7 @@ export const ServiceFlowPanelControls = () => {
           <KeyboardShortcut keys={['ArrowUp']} />
         </TooltipContent>
       </Tooltip>
+
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
@@ -103,7 +124,36 @@ export const ServiceFlowPanelControls = () => {
           <KeyboardShortcut keys={['ArrowDown']} />
         </TooltipContent>
       </Tooltip>
+
       <Separator orientation="vertical" className="mx-1 h-4" />
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <ButtonTooltip
+            type="text"
+            className="px-1"
+            icon={dock === 'bottom' ? <PanelBottom /> : <PanelRight />}
+            tooltip={{ content: { side: 'top', text: 'Dock side' } }}
+          />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-40" align="end">
+          <DropdownMenuItem className="justify-between" onClick={() => setDock('bottom')}>
+            <div className="flex items-center gap-x-2">
+              <PanelBottom size={14} />
+              <span>Dock to bottom</span>
+            </div>
+            {dock === 'bottom' && <Check size={14} className="text-brand" />}
+          </DropdownMenuItem>
+          <DropdownMenuItem className="justify-between" onClick={() => setDock('right')}>
+            <div className="flex items-center gap-x-2">
+              <PanelRight size={14} />
+              <span>Dock to right</span>
+            </div>
+            {dock === 'right' && <Check size={14} className="text-brand" />}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <Tooltip>
         <TooltipTrigger asChild>
           <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />

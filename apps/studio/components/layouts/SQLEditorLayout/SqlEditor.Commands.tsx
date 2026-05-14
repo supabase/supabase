@@ -1,4 +1,4 @@
-import { type PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
@@ -350,7 +350,7 @@ function TableSelector() {
   )
 }
 
-function generateSelectStatement(table: TablesData[number] & { columns?: Array<PostgresColumn> }) {
+function generateSelectStatement(table: TablesData[number] & { columns?: Array<PGColumn> }) {
   return `
 select ${
     !table.columns

@@ -1,7 +1,7 @@
 import type { PropsWithChildren, ReactNode } from 'react'
 import {
   cn,
-  Collapsible,
+  Collapsible_Shadcn_ as Collapsible,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'

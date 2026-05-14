@@ -1,8 +1,8 @@
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PGColumn, PGTable } from '@supabase/pg-meta'
 
 interface Props {
-  table: PostgresTable
-  column?: PostgresColumn
+  table: PGTable
+  column?: PGColumn
 }
 
 export const HeaderTitle = ({ table, column }: Props) => {

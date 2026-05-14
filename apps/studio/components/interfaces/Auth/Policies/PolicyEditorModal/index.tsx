@@ -1,4 +1,4 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PGPolicy } from '@supabase/pg-meta'
 import { isEmpty, noop } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -32,7 +32,7 @@ interface PolicyEditorModalProps {
   visible?: boolean
   schema?: string
   table?: string
-  selectedPolicyToEdit?: PostgresPolicy
+  selectedPolicyToEdit?: PGPolicy
   showAssistantPreview?: boolean
   onSelectCancel: () => void
   onCreatePolicy: (payload: PostgresPolicyCreatePayload) => Promise<boolean>
