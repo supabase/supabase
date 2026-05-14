@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -38,7 +38,6 @@ import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
@@ -73,7 +72,7 @@ const LogsQueryPanel = ({
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
-  const showChToggleInLogExplorer = usePHFlag('showChToggleInLogExplorer')
+  const showChToggleInLogExplorer = useFlag('showChToggleInLogExplorer')
   const otelToggleEnabled = !!showChToggleInLogExplorer && !!onUseOtelChange
 
   const {
