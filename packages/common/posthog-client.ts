@@ -260,6 +260,21 @@ class PostHogClient {
   }
 
   /**
+   * Returns the current value of a person property as stored locally by posthog-js.
+   * Returns undefined if PostHog hasn't initialized or the property hasn't been set.
+   * Use this to gate behavior on whether a property has actually landed in the SDK
+   * (e.g., waiting for an identify to complete before evaluating flag-dependent UI).
+   */
+  getPersonProperty(key: string): unknown {
+    if (!this.initialized) return undefined
+    try {
+      return posthog.get_property(key)
+    } catch {
+      return undefined
+    }
+  }
+
+  /**
    * Returns a PostHog feature flag value directly from the client-side SDK.
    * Use this for www/docs pages where server-side evaluation lacks full person context.
    * In local dev, DevToolbar overrides (x-ph-flag-overrides cookie) take priority.
