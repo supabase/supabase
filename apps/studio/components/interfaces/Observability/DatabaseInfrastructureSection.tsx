@@ -633,8 +633,8 @@ export const DatabaseInfrastructureSection = ({
                   tooltip={
                     <div className="space-y-2">
                       <p>
-                        Average CPU usage percentage over the selected time period. High values may suggest CPU-intensive queries or
-                        workloads.
+                        Average CPU usage percentage over the selected time period. High values may
+                        suggest CPU-intensive queries or workloads.
                       </p>
                       <Link
                         href="https://supabase.com/docs/guides/troubleshooting?search=cpu"
@@ -667,8 +667,8 @@ export const DatabaseInfrastructureSection = ({
                 tooltip={
                   <div className="space-y-2">
                     <p>
-                      Average CPU usage percentage over the selected time period. High values may suggest CPU-intensive queries or
-                      workloads.
+                      Average CPU usage percentage over the selected time period. High values may
+                      suggest CPU-intensive queries or workloads.
                     </p>
                     <Link
                       href="https://supabase.com/docs/guides/troubleshooting?search=cpu"
