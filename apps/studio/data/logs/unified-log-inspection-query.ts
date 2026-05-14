@@ -1,6 +1,13 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
+import {
+  aggregateFunctionLogs,
+  flattenOtelInspectionRow,
+  type OtelLogRow,
+} from './otel-inspection.utils'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -16,7 +23,7 @@ import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/Unifi
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-// Service flow types - subset of LOG_TYPES that support service flows
+// Service flow types — subset of LOG_TYPES that support service flows.
 export const SERVICE_FLOW_TYPES = [
   'postgrest',
   'auth',
@@ -32,6 +39,7 @@ export type UnifiedLogInspectionVariables = {
   logId?: string
   type?: ServiceFlowType
   search: QuerySearchParamsType
+  useOtel?: boolean
 }
 
 export type UnifiedLogInspectionResponse = {
@@ -116,7 +124,7 @@ export interface UnifiedLogInspectionEntry {
 }
 
 export async function getUnifiedLogInspection(
-  { projectRef, logId, type, search }: UnifiedLogInspectionVariables,
+  { projectRef, logId, type, search, useOtel = false }: UnifiedLogInspectionVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -129,36 +137,71 @@ export async function getUnifiedLogInspection(
     throw new Error('type is required')
   }
 
-  let sql = ''
-  switch (type) {
-    case 'postgrest':
-      sql = getPostgrestServiceFlowQuery(logId)
-      break
-    case 'auth':
-      sql = getAuthServiceFlowQuery(logId)
-      break
-    case 'edge-function':
-      sql = getEdgeFunctionServiceFlowQuery(logId)
-      break
-    case 'storage':
-      sql = getStorageServiceFlowQuery(logId)
-      break
-    case 'postgres':
-      sql = getPostgresServiceFlowQuery(logId)
-      break
-    default:
-      throw new Error('Invalid type')
-  }
-
-  // Use the same timestamp logic as the main unified logs query
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
-  const { data, error } = await post('/platform/projects/{ref}/analytics/endpoints/logs.all', {
+  if (!useOtel) {
+    let sql = ''
+    switch (type) {
+      case 'postgrest':
+        sql = getPostgrestServiceFlowQuery(logId)
+        break
+      case 'auth':
+        sql = getAuthServiceFlowQuery(logId)
+        break
+      case 'edge-function':
+        sql = getEdgeFunctionServiceFlowQuery(logId)
+        break
+      case 'storage':
+        sql = getStorageServiceFlowQuery(logId)
+        break
+      case 'postgres':
+        sql = getPostgresServiceFlowQuery(logId)
+        break
+      default:
+        throw new Error('Invalid type')
+    }
+
+    const { data, error } = await post('/platform/projects/{ref}/analytics/endpoints/logs.all', {
+      params: { path: { ref: projectRef } },
+      body: {
+        iso_timestamp_start: isoTimestampStart,
+        iso_timestamp_end: isoTimestampEnd,
+        sql: sql,
+      },
+      signal,
+    })
+
+    if (error) {
+      handleError(error)
+    }
+
+    return data as unknown as UnifiedLogInspectionResponse
+  }
+
+  // OTEL path: the endpoint stores all log sources in a single `logs` table
+  // and exposes the rich detail through the `log_attributes` Map. We just
+  // fetch the single row by id and flatten its attributes onto the response
+  // so existing panel components that read `enrichedData['request.path']`
+  // etc. keep working without per service flow SQL.
+  //
+  // `logId` ultimately originates from a URL query parameter, so we route
+  // every interpolation through pg-meta's `literal()` / `safeSql` helpers.
+  // The analytics endpoint uses ClickHouse SQL string literal escaping
+  // rules (single quotes doubled), which matches Postgres and what
+  // `literal()` produces.
+  const sql = safeSql`
+SELECT id, timestamp, source, event_message, severity_text, log_attributes
+FROM logs
+WHERE id = ${literal(logId)}
+LIMIT 1
+`.trim()
+
+  const { data, error } = await post('/platform/projects/{ref}/analytics/endpoints/logs.all.otel', {
     params: { path: { ref: projectRef } },
     body: {
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
-      sql: sql,
+      sql,
     },
     signal,
   })
@@ -167,7 +210,50 @@ export async function getUnifiedLogInspection(
     handleError(error)
   }
 
-  return data as unknown as UnifiedLogInspectionResponse
+  const otelData = data as { result?: OtelLogRow[] } | undefined
+  const row = otelData?.result?.[0]
+  if (!row) {
+    return { result: [] }
+  }
+
+  const entry = flattenOtelInspectionRow(row)
+
+  // For edge function rows, fetch and aggregate the related `function_logs`
+  // (the per-execution console.log output) — this is the only legitimate
+  // cross-source join in the legacy BigQuery service-flow queries.
+  if (row.source === 'function_edge_logs') {
+    const executionId = row.log_attributes?.['execution_id'] ?? row.log_attributes?.['request_id']
+    if (typeof executionId === 'string') {
+      const fnSql = safeSql`
+SELECT id, timestamp, source, event_message, severity_text, log_attributes
+FROM logs
+WHERE source = 'function_logs' AND log_attributes['execution_id'] = ${literal(executionId)}
+ORDER BY timestamp ASC
+LIMIT 100
+`.trim()
+
+      const { data: fnData, error: fnError } = await post(
+        '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
+        {
+          params: { path: { ref: projectRef } },
+          body: {
+            iso_timestamp_start: isoTimestampStart,
+            iso_timestamp_end: isoTimestampEnd,
+            sql: fnSql,
+          },
+          signal,
+        }
+      )
+
+      if (!fnError) {
+        const fnRows = ((fnData as { result?: OtelLogRow[] } | undefined)?.result ??
+          []) as OtelLogRow[]
+        Object.assign(entry, aggregateFunctionLogs(fnRows))
+      }
+    }
+  }
+
+  return { result: [entry] }
 }
 
 export type UnifiedLogInspectionData = Awaited<ReturnType<typeof getUnifiedLogInspection>>
@@ -179,11 +265,14 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
-) =>
-  useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
-    queryKey: logsKeys.serviceFlow(projectRef, search, logId),
-    queryFn: ({ signal }) => getUnifiedLogInspection({ projectRef, logId, type, search }, signal),
+) => {
+  const useOtel = useFlag('otelUnifiedLogs')
+  return useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
+    queryKey: [...logsKeys.serviceFlow(projectRef, search, logId), { otel: useOtel }],
+    queryFn: ({ signal }) =>
+      getUnifiedLogInspection({ projectRef, logId, type, search, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
   })
+}
