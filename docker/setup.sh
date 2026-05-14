@@ -3,14 +3,13 @@
 # Bootstrap a self-hosted Supabase project on Linux (Debian/Ubuntu or RHEL/CentOS/Fedora).
 #
 # What it does:
-#   1. Installs prerequisites: git, curl, openssl, jq, unzip, ca-certificates
+#   1. Installs prerequisites: git, curl, openssl, jq, ca-certificates
 #   2. Installs Docker Engine + Compose plugin (if missing)
-#   3. Installs Node.js >= 16 (if missing)
-#   4. Optionally installs the AWS CLI v2 (--with-aws)
-#   5. Sparse-clones the repo to extract the contents of ./docker
-#   6. Creates a project directory in CWD and copies docker/* into it
-#   7. Prompts for the main URLs and writes them to .env
-#   8. Generates secrets and asymmetric API keys via utils/*.sh
+#   3. Optionally installs the AWS CLI v2 (--with-aws)
+#   4. Sparse-clones the repo to extract the contents of ./docker
+#   5. Creates a project directory in CWD and copies docker/* into it
+#   6. Prompts for the main URLs and writes them to .env
+#   7. Generates secrets and asymmetric API keys via utils/*.sh
 #
 # Usage:
 #   sh setup.sh                            # interactive
@@ -120,13 +119,13 @@ pkg_install() {
 }
 
 install_base_packages() {
-    log "Installing base packages: git, curl, openssl, jq, unzip, ca-certificates"
+    log "Installing base packages: git, curl, openssl, jq, ca-certificates"
     pkg_update
     if [ "$OS_FAMILY" = "debian" ]; then
-        pkg_install git curl openssl jq unzip ca-certificates \
+        pkg_install git curl openssl jq ca-certificates \
             apt-transport-https gnupg lsb-release
     else
-        pkg_install git curl openssl jq unzip ca-certificates dnf-plugins-core
+        pkg_install git curl openssl jq ca-certificates dnf-plugins-core
     fi
 }
 
@@ -168,42 +167,6 @@ install_docker() {
     docker_present || die "Docker installation finished but 'docker compose' is still unavailable."
 }
 
-node_ok() {
-    command -v node >/dev/null 2>&1 || return 1
-    major=$(node -v 2>/dev/null | sed 's/^v//' | cut -d. -f1)
-    [ -n "$major" ] && [ "$major" -ge 16 ] 2>/dev/null
-}
-
-install_node() {
-    if node_ok; then
-        log "Node.js already installed: $(node -v)"
-        return 0
-    fi
-
-    log "Installing Node.js (distro package)"
-    pkg_install nodejs || true
-
-    if node_ok; then
-        log "Node.js installed: $(node -v)"
-        return 0
-    fi
-
-    log "Distro Node.js missing or too old; installing Node.js 20 from NodeSource"
-    if [ "$OS_FAMILY" = "debian" ]; then
-        $SUDO apt-get remove --purge -y nodejs npm 2>/dev/null || true
-        curl -fsSL https://deb.nodesource.com/setup_20.x | $SUDO bash -
-        $SUDO apt-get update -qq -y
-        pkg_install nodejs
-    else
-        $SUDO dnf remove -y nodejs npm 2>/dev/null || true
-        curl -fsSL https://rpm.nodesource.com/setup_20.x | $SUDO bash -
-        pkg_install nodejs
-    fi
-
-    node_ok || die "Node.js >= 16 still not available after NodeSource install."
-    log "Node.js installed: $(node -v)"
-}
-
 install_aws() {
     if command -v aws >/dev/null 2>&1; then
         log "AWS CLI already installed: $(aws --version 2>&1)"
@@ -218,6 +181,7 @@ install_aws() {
     esac
 
     log "Installing AWS CLI v2 (${aws_arch})"
+    command -v unzip >/dev/null 2>&1 || pkg_install unzip
     tmp=$(mktemp -d)
     (
         cd "$tmp"
@@ -269,7 +233,6 @@ else
     detect_os
     install_base_packages
     install_docker
-    install_node
 fi
 
 if [ "$WITH_AWS" = "1" ]; then
