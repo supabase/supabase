@@ -102,6 +102,15 @@ const DiffEditor = dynamic(
   { ssr: false }
 )
 
+/** Returns true for DDL/DML statements that should be auto-tracked as migrations. */
+function isDdlOrDml(sql: string): boolean {
+  // Strip leading single-line comments and blank lines before checking
+  const stripped = sql.replace(/^(\s*(--[^\n]*)?\n)*/gm, '').trimStart()
+  return /^(CREATE|ALTER|DROP|TRUNCATE|INSERT|UPDATE|DELETE|GRANT|REVOKE|COMMENT\s+ON)\s/i.test(
+    stripped
+  )
+}
+
 export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
@@ -136,6 +145,7 @@ export const SQLEditor = () => {
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
+  const lastRunSqlRef = useRef<string>('')
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const scrollTopRef = useRef<number>(0)
   const shouldRefocusAfterRunRef = useRef(false)
@@ -230,6 +240,24 @@ export const SQLEditor = () => {
           // If on Explain tab but ran a non-EXPLAIN query, switch to Results tab
           setActiveUtilityTab('results')
         }
+
+        // Auto-track DDL/DML as a migration so it appears in the Migrations page
+        const originalSql = lastRunSqlRef.current
+        if (data.result.length === 0 && isDdlOrDml(originalSql) && project?.ref) {
+          const rawName = snapV2.snippets[id]?.snippet?.name ?? 'sql_editor'
+          const migrationName = rawName
+            .toLowerCase()
+            .replace(/[^a-z0-9_-]/g, '_')
+            .replace(/_{2,}/g, '_')
+            .replace(/^_|_$/g, '')
+            .slice(0, 50) || 'sql_editor'
+          const escaped = originalSql.replace(/'/g, "''")
+          trackMigration({
+            sql: `INSERT INTO supabase_migrations.schema_migrations (version, name, statements) VALUES (to_char(now() AT TIME ZONE 'UTC', 'YYYYMMDDHH24MISS'), '${migrationName}', ARRAY['${escaped}']) ON CONFLICT (version) DO NOTHING`,
+            projectRef: project.ref,
+            connectionString: project.connectionString ?? undefined,
+          })
+        }
       }
 
       // revalidate lint query
@@ -275,6 +303,8 @@ export const SQLEditor = () => {
       refocusEditorAfterRunIfNeeded()
     },
   })
+
+  const { mutate: trackMigration } = useExecuteSqlMutation()
 
   const { mutate: executeExplain, isPending: isExplainExecuting } = useExecuteSqlMutation({
     onSuccess(data) {
@@ -417,6 +447,8 @@ export const SQLEditor = () => {
       const userSql = rawSql(sql)
       const { appendAutoLimit } = checkIfAppendLimitRequired(userSql, limit)
       const formattedSql = suffixWithLimit(userSql, limit)
+
+      lastRunSqlRef.current = typeof sql === 'string' ? sql : (editorSql ?? '')
 
       execute({
         projectRef: project.ref,
