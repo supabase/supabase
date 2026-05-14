@@ -10,7 +10,7 @@ import { ComposedChart } from './ComposedChart'
 import { MultiAttribute } from './ComposedChart.utils'
 import { useChartHighlight } from './useChartHighlight'
 import Panel from '@/components/ui/Panel'
-import { AnalyticsInterval, DataPoint } from '@/data/analytics/constants'
+import { AnalyticsData, AnalyticsInterval, DataPoint } from '@/data/analytics/constants'
 import { useInfraMonitoringQueries } from '@/data/analytics/infra-monitoring-queries'
 import { InfraMonitoringAttribute } from '@/data/analytics/infra-monitoring-query'
 import { useProjectDailyStatsQueries } from '@/data/analytics/project-daily-stats-queries'
@@ -50,6 +50,7 @@ export interface ComposedChartHandlerProps {
     domain?: [number | string, number | string]
     allowDataOverflow?: boolean
   }
+  useYAxisLimitAsDomainMin?: boolean
 }
 
 /**
@@ -121,6 +122,8 @@ const ComposedChartHandler = ({
   isVisible = true,
   id,
   syncId,
+  YAxisProps: staticYAxisProps,
+  useYAxisLimitAsDomainMin,
   ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
@@ -142,6 +145,21 @@ const ComposedChartHandler = ({
     Array.isArray(data) ? undefined : data,
     isVisible
   )
+
+  const firstInfraQueryIdx = attributes.findIndex((a: any) => a?.provider === 'infra-monitoring')
+  const yAxisLimitFromQuery: number | undefined =
+    firstInfraQueryIdx >= 0
+      ? (attributeQueries[firstInfraQueryIdx]?.data as AnalyticsData | undefined)?.yAxisLimit
+      : undefined
+
+  const effectiveYAxisProps = useMemo(() => {
+    if (!useYAxisLimitAsDomainMin || !yAxisLimitFromQuery) return staticYAxisProps
+    return {
+      ...staticYAxisProps,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      domain: [0, (dataMax: number) => Math.max(dataMax, yAxisLimitFromQuery)] as any,
+    }
+  }, [useYAxisLimitAsDomainMin, staticYAxisProps, yAxisLimitFromQuery])
 
   const combinedData = useMemo(() => {
     if (data) return Array.isArray(data) ? data : data.data
@@ -172,6 +190,11 @@ const ComposedChartHandler = ({
 
         attributes.forEach((attr, index) => {
           if (!attr) return
+
+          if (attr.useYAxisLimitAsValue) {
+            point[attr.attribute] = yAxisLimitFromQuery ?? attr.customValue ?? 0
+            return
+          }
 
           if (attr.customValue !== undefined) {
             point[attr.attribute] = attr.customValue
@@ -207,7 +230,7 @@ const ComposedChartHandler = ({
       })
 
     return combined as DataPoint[]
-  }, [data, attributeQueries, attributes])
+  }, [data, attributeQueries, attributes, yAxisLimitFromQuery])
 
   const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
 
@@ -309,6 +332,7 @@ const ComposedChartHandler = ({
           syncId={syncId}
           highlightActions={highlightActions}
           {...otherProps}
+          YAxisProps={effectiveYAxisProps}
         />
       </Panel.Content>
     </Panel>
