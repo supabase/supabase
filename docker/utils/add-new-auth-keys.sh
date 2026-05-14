@@ -19,22 +19,33 @@
 
 set -e
 
-# Resolve how to run node: local install preferred, docker fallback.
+# Resolve how to run node: local install (>= 16) preferred, docker fallback.
+node_runner=""
 if command -v node >/dev/null 2>&1; then
-    node_runner="node"
-elif command -v docker >/dev/null 2>&1; then
-    if ! docker info >/dev/null 2>&1; then
-        echo "Error: docker is installed but the daemon is not running."
+    node_version=$(node --version 2>/dev/null)
+    node_major=$(printf '%s' "$node_version" | sed -n 's/^v\([0-9][0-9]*\).*/\1/p')
+    if [ -n "$node_major" ] && [ "$node_major" -ge 16 ]; then
+        node_runner="node"
+    elif [ -n "$node_major" ]; then
+        echo "Local node $node_version is too old (need >= 16), falling back to docker."
+    fi
+fi
+
+if [ -z "$node_runner" ]; then
+    if command -v docker >/dev/null 2>&1; then
+        if ! docker info >/dev/null 2>&1; then
+            echo "Error: docker is installed but the daemon is not running."
+            exit 1
+        fi
+        if ! docker image inspect node:22-alpine >/dev/null 2>&1; then
+            echo "Pulling node:22-alpine (first-run only)..."
+            docker pull node:22-alpine
+        fi
+        node_runner="docker run --rm node:22-alpine node"
+    else
+        echo "Error: requires either node (>= 16) or docker."
         exit 1
     fi
-    if ! docker image inspect node:22-alpine >/dev/null 2>&1; then
-        echo "Pulling node:22-alpine (first-run only)..."
-        docker pull node:22-alpine
-    fi
-    node_runner="docker run --rm node:22-alpine node"
-else
-    echo "Error: requires either node (>= 16) or docker."
-    exit 1
 fi
 
 # Read JWT_SECRET from .env
