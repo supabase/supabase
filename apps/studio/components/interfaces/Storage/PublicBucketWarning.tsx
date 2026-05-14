@@ -198,8 +198,9 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
       >
         <div className="flex flex-col gap-3">
           <p className="text-sm text-foreground-light">
-            This will drop {hasMultiplePolicies ? 'one' : 'the'} <code>SELECT</code> policy that
-            makes the bucket&apos;s contents listable. Object URLs will continue to work.
+            This will drop {hasMultiplePolicies ? 'one' : 'the'} <code>SELECT</code>{' '}
+            policy that makes the bucket&apos;s contents listable. Object URLs will continue to
+            work.
             {hasMultiplePolicies
               ? ` ${policyCount - 1} matching ${
                   policyCount - 1 === 1 ? 'policy' : 'policies'
