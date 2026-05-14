@@ -131,6 +131,12 @@ export const useIsRLSTesterEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
 }
 
+export const useIsMarketplaceEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
+}
+
 export const useFeaturePreviewModal = () => {
   const featurePreviews = useFeaturePreviews()
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')

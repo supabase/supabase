@@ -128,10 +128,10 @@ export const MarketplaceIndex = () => {
 
   return (
     <>
-      <PageHeader size="large" className="!pt-6">
+      <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Integrations</PageHeaderTitle>
+            <PageHeaderTitle>Integrations Marketplace</PageHeaderTitle>
             <PageHeaderDescription>
               Explore native and third-party integrations to add functionality, sync your data, and
               monitor your project.

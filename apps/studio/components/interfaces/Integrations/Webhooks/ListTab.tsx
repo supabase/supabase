@@ -17,7 +17,7 @@ export const WebhooksListTab = () => {
   }
 
   return (
-    <div className="p-10">
+    <div className="py-6 max-w-6xl mx-auto">
       <HooksList />
       <EditHookPanel />
       <DeleteHookModal />

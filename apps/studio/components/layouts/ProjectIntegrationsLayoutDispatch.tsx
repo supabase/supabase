@@ -1,8 +1,8 @@
-import { useFlag } from 'common'
 import type { PropsWithChildren } from 'react'
 
 import { ProjectIntegrationsLayout } from './ProjectIntegrationsLayout'
 import { ProjectMarketplaceLayout } from './ProjectMarketplaceLayout'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 /**
  * Picks between the legacy `ProjectIntegrationsLayout` and the new
@@ -11,7 +11,7 @@ import { ProjectMarketplaceLayout } from './ProjectMarketplaceLayout'
  * and we can flip between them without code-path drift.
  */
 export const ProjectIntegrationsLayoutDispatch = ({ children }: PropsWithChildren) => {
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   if (isMarketplaceEnabled) {
     return <ProjectMarketplaceLayout>{children}</ProjectMarketplaceLayout>
   }

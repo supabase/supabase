@@ -27,7 +27,7 @@ export const MarketplaceDetailHero = ({
 
   return (
     <div className="border-b bg-surface-75 px-6 pt-10 xl:px-10">
-      <div className="mx-auto w-full max-w-[1080px]">
+      <div className="mx-auto w-full max-w-6xl">
         <div className="mb-4 flex items-center gap-4">
           <div
             className={cn(

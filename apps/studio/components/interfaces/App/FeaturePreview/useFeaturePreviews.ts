@@ -89,5 +89,14 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isPlatformOnly: false,
       isDefaultOptIn: false,
     },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
+      name: 'Marketplace',
+      discussionsUrl: undefined,
+      enabled: true,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: false,
+    },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

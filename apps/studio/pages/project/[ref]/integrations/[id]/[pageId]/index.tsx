@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
@@ -28,6 +28,7 @@ import {
 } from 'ui-patterns'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
@@ -44,7 +45,7 @@ import type { NextPageWithLayout } from '@/types'
 type NavigationItem = { label: string; href: string; active?: boolean }
 
 const IntegrationPage: NextPageWithLayout = () => {
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   if (isMarketplaceEnabled) return <MarketplaceDetail />
   return <LegacyIntegrationPage />
 }
@@ -55,7 +56,7 @@ const LegacyIntegrationPage = () => {
   const { ref, id, pageId, childId } = useParams()
 
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,

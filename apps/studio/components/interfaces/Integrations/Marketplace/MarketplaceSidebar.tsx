@@ -1,9 +1,9 @@
 import { useParams } from 'common'
-import { ArrowUpRight, BookOpen, LayoutGrid, PlusSquare } from 'lucide-react'
+import { ArrowUpRight, BookOpen, ChevronRight, LayoutGrid, PlusSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
-import { cn } from 'ui'
+import { useMemo, type ReactNode } from 'react'
+import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
 
 import {
   FEATURED_CATEGORIES,

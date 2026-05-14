@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
+import { FeatureFlagContext, IS_PLATFORM } from 'common'
 import { fullImageUrl } from 'common/marketplace-client'
 import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -8,6 +8,7 @@ import { useContext, useMemo } from 'react'
 import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -19,7 +20,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
  */
 export const useAvailableIntegrations = () => {
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
   const { data: cliData } = useCLIReleaseVersionQuery()

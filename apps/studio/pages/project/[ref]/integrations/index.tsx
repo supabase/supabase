@@ -18,6 +18,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
 
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   IntegrationCard,
   IntegrationLoadingCard,
@@ -206,14 +207,14 @@ function useFeaturedIntegratios(
 }
 
 const IntegrationsPage: NextPageWithLayout = () => {
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   if (isMarketplaceEnabled) return <MarketplaceIndex />
   return <LegacyIntegrationsPage />
 }
 
 const LegacyIntegrationsPage = () => {
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const [search, setSearch] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })

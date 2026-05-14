@@ -50,7 +50,7 @@ export const StripeSyncSettingsPage = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Card className="max-w-4xl">
+          <Card>
             <CardHeader>
               <CardTitle className="text-foreground-lighter">
                 {!syncState ? (

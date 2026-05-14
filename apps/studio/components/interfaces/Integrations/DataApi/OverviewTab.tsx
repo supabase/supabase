@@ -1,10 +1,11 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DataApiEnableSwitch } from '@/components/interfaces/Settings/API/DataApiEnableSwitch'
 import { DataApiProjectUrlCard } from '@/components/interfaces/Settings/API/DataApiProjectUrlCard'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
@@ -51,7 +52,7 @@ const DataApiOverview = () => {
 }
 
 export const DataApiOverviewTab = () => {
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   if (isMarketplaceEnabled) {
     return (
