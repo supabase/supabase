@@ -143,7 +143,7 @@ export function OpenSourceSection() {
       <div className="relative py-24 flex flex-col justify-center">
         {/* Contrib graph background — right-aligned, radial fade */}
         <div
-          className="absolute inset-y-0 left-1/4 right-[calc((100%-var(--container-max-w,75rem))/2*-1)]"
+          className="hidden md:block absolute inset-y-0 left-1/4 right-[calc((100%-var(--container-max-w,75rem))/2*-1)]"
           style={{
             maskImage: 'radial-gradient(ellipse 55% 90% at 58% 50%, black 15%, transparent 60%)',
             WebkitMaskImage:
