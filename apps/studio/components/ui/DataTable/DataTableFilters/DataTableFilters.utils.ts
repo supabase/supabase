@@ -2,7 +2,7 @@ import { ColumnFiltersState } from '@tanstack/react-table'
 import { ParserBuilder } from 'nuqs'
 
 import { ARRAY_DELIMITER, RANGE_DELIMITER, SLIDER_DELIMITER } from '../DataTable.constants'
-import type { DataTableFilterField } from '../DataTable.types'
+import type { DataTableFilterField, Option } from '../DataTable.types'
 import { isArrayOfDates } from '../DataTable.utils'
 
 /**
@@ -34,7 +34,7 @@ export function replaceInputByFieldType<TData>({
 }: {
   prev: string
   currentWord: string
-  optionValue?: string | number | boolean | undefined // FIXME: use DataTableFilterField<TData>["options"][number];
+  optionValue?: Option['value'];
   value: string
   field: DataTableFilterField<TData>
 }) {
