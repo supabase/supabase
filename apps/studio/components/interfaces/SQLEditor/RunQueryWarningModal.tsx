@@ -21,7 +21,8 @@ interface RunQueryWarningModalProps {
 }
 
 type WarningMessage = {
-  title: string
+  id: string
+  summary: ReactNode
   description: ReactNode
 }
 
@@ -84,23 +85,31 @@ export const RunQueryWarningModal = ({
 
   if (hasDestructiveOperations) {
     warnings.push({
-      title: 'Query has destructive operations',
-      description: 'Ensure these operations are intentional before running this query.',
+      id: 'destructive-operations',
+      summary: 'This query includes destructive operations.',
+      description: 'It may permanently change or remove data, tables, schemas, or other objects.',
     })
   }
 
   if (hasUpdateWithoutWhere) {
     warnings.push({
-      title: 'Query updates rows without a WHERE clause',
-      description: 'This may update every row in the table.',
+      id: 'update-without-where',
+      summary: (
+        <>
+          This query runs an <code className="text-code-inline">UPDATE</code> without a{' '}
+          <code className="text-code-inline">WHERE</code> clause.
+        </>
+      ),
+      description: 'It may update every row in the target table.',
     })
   }
 
   if (hasAlterDatabasePreventConnection) {
     warnings.push({
-      title: 'Query prevents database connections',
+      id: 'prevent-database-connections',
+      summary: 'This query may prevent new database connections.',
       description:
-        'The dashboard may lose access until this setting is restored from a direct database connection.',
+        'The dashboard may lose access until the setting is restored from a direct database connection.',
     })
   }
 
@@ -109,48 +118,51 @@ export const RunQueryWarningModal = ({
       missingRLSTables.length === 1 ? getMissingRLSTableName(missingRLSTables[0]) : undefined
 
     warnings.push({
-      title:
+      id: 'missing-rls',
+      summary:
         missingRLSTables.length === 1
-          ? 'New table will not have RLS enabled'
-          : 'New tables will not have RLS enabled',
+          ? 'This query creates a table without enabling Row Level Security.'
+          : 'This query creates tables without enabling Row Level Security.',
       description: (
         <>
-          Without RLS, clients using anon or authenticated keys can access{' '}
-          {tableName ? <code className="text-code-inline">{tableName}</code> : 'these tables'}{' '}
-          through the API.
+          Clients using anon or authenticated keys may be able to access{' '}
+          {tableName ? <code className="text-code-inline">{tableName}</code> : 'these tables'}.
         </>
       ),
     })
   }
 
-  const title =
-    warnings.length === 0
-      ? 'Run query?'
-      : warnings.length === 1
-        ? `${warnings[0].title}.`
-        : `Query has ${warnings.length} potential issues.`
+  const confirmationCopy =
+    warnings.length > 1
+      ? 'Make sure these are intentional before running this query.'
+      : 'Make sure this is intentional before running this query.'
 
   return (
     <AlertDialog open={visible} onOpenChange={handleOpenChange}>
       <AlertDialogContent size="small">
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogTitle>Potential issue detected</AlertDialogTitle>
           <AlertDialogDescription asChild>
             {warnings.length === 0 ? (
-              <div>Confirm that you want to run this query.</div>
+              <div>Are you sure you want to run this query?</div>
             ) : warnings.length === 1 ? (
-              <div>{warnings[0].description}</div>
+              <div>
+                <p>{warnings[0].summary}</p>
+                <p className="mt-2">{warnings[0].description}</p>
+                <p className="mt-2">{confirmationCopy}</p>
+              </div>
             ) : (
               <div>
-                <p>Review these issues before running this query.</p>
+                <p>This query has multiple potential issues:</p>
                 <ul className="mt-3 grid gap-2">
                   {warnings.map((warning) => (
-                    <li key={warning.title}>
-                      <span className="font-medium text-foreground">{warning.title}.</span>{' '}
+                    <li key={warning.id}>
+                      <span className="font-medium text-foreground">{warning.summary}</span>{' '}
                       <span>{warning.description}</span>
                     </li>
                   ))}
                 </ul>
+                <p className="mt-3">{confirmationCopy}</p>
               </div>
             )}
           </AlertDialogDescription>
