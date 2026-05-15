@@ -175,7 +175,7 @@ export const ConnectionPanel = ({
                 onCopyCallback={onCopyCallback}
               />
               {notice && (
-                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-light">
+                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none">
                   {notice?.map((text: string) => (
                     <p key={text} className="text-xs text-foreground-lighter">
                       {text}

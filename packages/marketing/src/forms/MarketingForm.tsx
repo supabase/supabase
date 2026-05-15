@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import {
   Button,
@@ -61,6 +61,13 @@ export interface MarketingFormProps {
 }
 
 type SubmitState = 'idle' | 'loading' | 'success' | 'error'
+
+/** Build the sessionStorage key used to block double-submits of the same email to the same form. */
+function dedupeKey(crm: MarketingFormCrmConfig | undefined, email: string): string | null {
+  const formId = crm?.hubspot?.formGuid ?? crm?.notion?.database_id
+  if (!formId || !email) return null
+  return `marketing-form-submitted:${formId}:${email.trim().toLowerCase()}`
+}
 
 function FieldInput({
   field,
@@ -168,6 +175,12 @@ export default function MarketingForm({
   )
   const [submitState, setSubmitState] = useState<SubmitState>('idle')
   const [errorMessages, setErrorMessages] = useState<string[]>([])
+  // Anti-spam: tracks when the form was first rendered. Submissions that come
+  // back faster than MIN_FORM_RENDER_MS on the server are rejected as bot-like.
+  const formMountedAtRef = useRef<number>(Date.now())
+  // Anti-spam: honeypot. Real users never see or focus this field. The value
+  // is kept out of `values` so it never reaches the CRM payload.
+  const honeypotRef = useRef<HTMLInputElement>(null)
 
   const handleChange = (name: string, value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }))
@@ -204,16 +217,54 @@ export default function MarketingForm({
       return
     }
 
+    // Block repeat submissions of the same email to the same form within this
+    // browser session. Render the success state instead of re-hitting the CRM.
+    const emailValue =
+      submittedValues['email'] ??
+      submittedValues['workEmail'] ??
+      submittedValues['work_email'] ??
+      submittedValues['emailAddress'] ??
+      submittedValues['email_address'] ??
+      ''
+    const sessionKey = dedupeKey(crm, emailValue)
+    if (sessionKey && typeof window !== 'undefined') {
+      try {
+        if (window.sessionStorage.getItem(sessionKey)) {
+          if (successRedirect) {
+            window.location.href = successRedirect
+          } else {
+            setSubmitState('success')
+          }
+          return
+        }
+      } catch {
+        // sessionStorage can throw in private mode / disabled storage — ignore.
+      }
+    }
+
     setSubmitState('loading')
     setErrorMessages([])
 
     const pageUri = typeof window !== 'undefined' ? window.location.href : undefined
     const pageName = typeof document !== 'undefined' ? document.title : undefined
+    const honeypot = honeypotRef.current?.value ?? ''
 
     try {
-      const result = await submitFormAction(crm, submittedValues, { pageUri, pageName })
+      const result = await submitFormAction(crm, submittedValues, {
+        pageUri,
+        pageName,
+        honeypot,
+        formMountedAt: formMountedAtRef.current,
+      })
 
       if (result.success) {
+        if (sessionKey && typeof window !== 'undefined') {
+          try {
+            window.sessionStorage.setItem(sessionKey, '1')
+          } catch {
+            // Storage write can fail in private mode — non-fatal.
+          }
+        }
         if (successRedirect) {
           window.location.href = successRedirect
         } else {
@@ -295,6 +346,27 @@ export default function MarketingForm({
             : 'flex flex-col gap-6'
         }
       >
+        {/*
+          Honeypot: positioned off-screen rather than display:none so that
+          headless bots scraping the form still see and (often) fill it.
+          aria-hidden + tabIndex=-1 keep it out of the user journey.
+        */}
+        <div
+          aria-hidden="true"
+          className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
+        >
+          <label>
+            Website
+            <input
+              ref={honeypotRef}
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              defaultValue=""
+            />
+          </label>
+        </div>
         {rows.map((row, rowIndex) => (
           <div
             key={rowIndex}

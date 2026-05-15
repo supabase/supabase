@@ -3,16 +3,17 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import {
-  Alert,
   Button,
   Checkbox,
-  Input,
+  Input_Shadcn_ as Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
@@ -53,11 +54,12 @@ const VercelIntegration: NextPageWithLayout = () => {
             />
           </header>
           <CreateProject />
-          <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
-            <Markdown
-              content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
-            />
-          </Alert>
+          <Admonition
+            type="default"
+            layout="horizontal"
+            title="You can uninstall this Integration at any time."
+            description="You can remove this integration at any time via Vercel or the Supabase dashboard"
+          />
         </ScaffoldColumn>
       </ScaffoldContainer>
     </>
@@ -252,27 +254,31 @@ const CreateProject = () => {
     <div>
       <p className="mb-2">Supabase project details</p>
       <div className="py-2">
-        <Input
-          autoFocus
+        <FormItemLayout
           id="projectName"
+          isReactForm={false}
+          layout="vertical"
           label="Project name"
-          type="text"
-          placeholder=""
-          descriptionText=""
-          value={projectName}
-          onChange={onProjectNameChange}
-        />
+          size="tiny"
+        >
+          <Input
+            autoFocus
+            id="projectName"
+            type="text"
+            placeholder=""
+            value={projectName}
+            onChange={onProjectNameChange}
+          />
+        </FormItemLayout>
       </div>
       <div className="py-2">
-        <Input
+        <FormItemLayout
           id="dbPass"
+          isReactForm={false}
+          layout="vertical"
           label="Database password"
-          type="password"
-          placeholder="Type in a strong password"
-          value={dbPass}
-          copy={dbPass.length > 0}
-          onChange={onDbPassChange}
-          descriptionText={
+          size="tiny"
+          description={
             <PasswordStrengthBar
               passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
               password={dbPass}
@@ -280,7 +286,17 @@ const CreateProject = () => {
               generateStrongPassword={generatePassword}
             />
           }
-        />
+        >
+          <PasswordInput
+            id="dbPass"
+            type="password"
+            placeholder="Type in a strong password"
+            value={dbPass}
+            reveal
+            copy={dbPass.length > 0}
+            onChange={onDbPassChange}
+          />
+        </FormItemLayout>
       </div>
       <div className="py-2">
         <div className="mt-1">

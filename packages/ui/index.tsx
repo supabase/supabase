@@ -6,9 +6,7 @@ export * from './src/components/Icon/IconBackground'
 // DISPLAYS
 
 export * from './src/components/Tabs'
-export * from './src/components/Alert'
 export * from './src/components/Accordion'
-export * from './src/components/Collapsible'
 
 // NAV
 
@@ -108,8 +106,6 @@ export {
   AlertTitle as AlertTitle_Shadcn_,
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
-
-export * from './src/components/AlertCollapsible'
 
 export {
   Field as Field_Shadcn_,

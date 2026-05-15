@@ -1,0 +1,71 @@
+/*
+ * Custom Tailwind v4 utilities migrated from packages/config/ui.config.js
+ * (addUtilities + matchUtilities) and packages/config/tailwind.config.js
+ * (the .bg legacy shim).
+ *
+ * Note: .no-scrollbar lives in packages/config/tailwind-plugins/motion-safe-transition.js
+ * and is loaded via @plugin from tailwind.config.css, so it's not duplicated here.
+ */
+
+/*
+ * The `bg` class worked in Tailwind v3 but stopped working in v4. Restored as
+ * an alias for `bg-default` to avoid a wide rename across the codebase.
+ * Should be deprecated in favor of `bg-default`.
+ */
+@utility bg {
+  background-color: hsl(var(--background-default));
+}
+
+/*
+ * Soft shimmer gradient used by LoadingLine.
+ */
+@utility line-loading-bg {
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+@utility line-loading-bg-light {
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(33, 33, 33, 0.65) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* may be unused — verify before pruning */
+@utility mask-fadeout-right {
+  -webkit-mask-image: linear-gradient(to right, white 98%, transparent 100%);
+  mask-image: linear-gradient(to right, white 98%, transparent 100%);
+}
+/* may be unused — verify before pruning */
+@utility mask-fadeout-left {
+  -webkit-mask-image: linear-gradient(to left, white 98%, transparent 100%);
+  mask-image: linear-gradient(to left, white 98%, transparent 100%);
+}
+
+/*
+ * Functional color utilities. The `--value(--color-*)` token accepts any
+ * registered --color-* design token (e.g. highlight-foreground-light).
+ */
+/* may be unused — verify before pruning */
+@utility highlight-* {
+  box-shadow: inset 0 1px 0 0 --value(--color-*);
+}
+/* may be unused — verify before pruning */
+@utility subhighlight-* {
+  box-shadow: inset 0 -1px 0 0 --value(--color-*);
+}
+
+/*
+ * Inline-SVG grid background. Used by ProjectLinker as bg-grid-black/5 and
+ * bg-grid-white/5 for the integrations onboarding visuals.
+ */
+@utility bg-grid-* {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='--value(--color-*)'><path d='M0 .5H31.5V32'/></svg>");
+}

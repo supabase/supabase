@@ -28,10 +28,9 @@ import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const LocalVersionPopover = () => {
-  const { data, isSuccess } = useCLIReleaseVersionQuery()
   const track = useTrack()
-  const currentCliVersion = data?.current
-  const latestCliVersion = data?.latest
+  const { data, isSuccess } = useCLIReleaseVersionQuery()
+  const { current: currentCliVersion, latest: latestCliVersion } = data || {}
   const hasLatestCLIVersion = isSuccess && !!latestCliVersion
 
   const current = getSemver(currentCliVersion)

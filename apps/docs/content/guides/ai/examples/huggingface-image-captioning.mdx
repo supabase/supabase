@@ -39,9 +39,9 @@ supabase gen types typescript --project-id=your-project-ref --schema=storage,pub
 Find the complete code on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/huggingface-image-captioning).
 
 ```ts
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2'
 import { createClient } from 'npm:@supabase/supabase-js@2'
+
 import { Database } from './types.ts'
 
 console.log('Hello from `huggingface-image-captioning` function!')
@@ -57,7 +57,7 @@ interface WebhookPayload {
   old_record: null | SoRecord
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const payload: WebhookPayload = await req.json()
   const soRecord = payload.record
   const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)

@@ -43,6 +43,7 @@ const GROUP_LABELS: Record<string, string> = {
   ...SHORTCUT_REFERENCE_GROUP_LABELS,
   'action-bar': 'Actions',
   'ai-assistant': 'AI Assistant',
+  'auth-users': 'Auth Users',
   'command-menu': 'Command Menu',
   'data-table': 'Data Tables',
   'inline-editor': 'Inline Editor',
@@ -52,6 +53,9 @@ const GROUP_LABELS: Record<string, string> = {
   results: 'Results',
   'schema-visualizer': 'Schema Visualizer',
   shortcuts: 'Shortcuts',
+  'sql-editor': 'SQL Editor',
+  'storage-buckets': 'Storage Buckets',
+  'storage-explorer': 'Storage File Explorer',
   'table-editor': 'Table Editor',
   'unified-logs': 'Logs',
 }
