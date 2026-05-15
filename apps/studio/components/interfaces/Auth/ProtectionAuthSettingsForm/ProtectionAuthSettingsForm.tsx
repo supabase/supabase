@@ -358,7 +358,7 @@ export const ProtectionAuthSettingsForm = () => {
                           {field.value ? 'Enabled' : 'Disabled'}
                         </Badge>
                         <Link href={`/project/${projectRef}/auth/providers?provider=Email`}>
-                          <Button type="default">Configure email provider</Button>
+                          <Button type="default">Configure in email provider</Button>
                         </Link>
                       </div>
                     </FormItemLayout>
