@@ -5,9 +5,9 @@ description: 'Authentication patterns for Supabase Edge Functions.'
 subtitle: 'Authentication patterns for Edge Functions'
 ---
 
-This guide shows how to handle each common auth scenario in your Edge Function using the [`@supabase/server`](https://github.com/supabase/server) package. For how authorization headers and the `verify_jwt` platform check work under the hood, see [Authorization headers](/docs/guides/functions/auth-headers).
+The `withSupabase` wrapper from [`@supabase/server`](https://github.com/supabase/server) verifies the caller's credentials against a declared `auth` mode and hands you a pre-configured Supabase client on `ctx`. The sections below show how to use it for each common auth scenario.
 
-The `@supabase/server` package wraps your handler, checks the caller's credentials against a declared `auth` mode, and hands you a pre-configured Supabase client on `ctx`.
+For how authorization headers and the `verify_jwt` platform check work under the hood, see [Authorization headers](/docs/guides/functions/auth-headers).
 
 | Mode            | Accepts                                    |
 | --------------- | ------------------------------------------ |
@@ -16,22 +16,23 @@ The `@supabase/server` package wraps your handler, checks the caller's credentia
 | `'publishable'` | A publishable key on `apikey`              |
 | `'none'`        | Any caller, no check (for signed webhooks) |
 
-<Admonition type="tip">
-
-See the [`@supabase/server` docs](https://github.com/supabase/server) for the full list of modes.
-
-</Admonition>
-
 ## Authenticated user calls
 
-`auth: 'user'` pairs with `verify_jwt = true` (the default). The platform validates the JWT, and the SDK hands you `ctx.supabase` already scoped to the caller.
+Functions called by signed-in users — typically through `supabase.functions.invoke` from the client — send the user's session JWT on the `Authorization` header. Keep `verify_jwt = true` (the default) so the platform validates the JWT before your handler runs, then use `auth: 'user'` to get `ctx.supabase` already scoped to the caller's RLS policies.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {
-    // your business logic. ctx.supabase is scoped to the caller
+    const { supabase, supabaseAdmin, userClaims, jwtClaims, authMode } = ctx
+    // supabase       — RLS-scoped to the authenticated user
+    // supabaseAdmin  — bypasses RLS (service role)
+    // userClaims     — user identity from JWT (id, email, role)
+    // jwtClaims      — full JWT claims
+    // authMode       — which auth mode matched
+
+    // your business logic goes here
     return Response.json({ email: ctx.userClaims?.email })
   }),
 }
@@ -39,7 +40,7 @@ export default {
 
 ## Service-to-service calls
 
-`auth: 'secret'` validates the `apikey` header against any secret key from your [dashboard](/dashboard/project/_/settings/api-keys) and gives you `ctx.supabaseAdmin` for privileged work. Keep `verify_jwt = false`.
+Cron jobs, workers, `pg_net`, or another Edge Function make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'` to validate the key against any secret key from your [dashboard](/dashboard/project/_/settings/api-keys). You get `ctx.supabaseAdmin` for privileged work.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
