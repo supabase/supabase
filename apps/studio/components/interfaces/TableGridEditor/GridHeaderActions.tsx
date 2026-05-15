@@ -21,7 +21,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { EnableIndexAdvisorDialog } from '../QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
@@ -30,6 +29,7 @@ import { RealtimeToggleDialog } from './RealtimeToggleDialog'
 import { SecurityDefinerViewPopover } from './SecurityDefinerViewPopover'
 import { ViewEntityAutofixSecurityModal } from './ViewEntityAutofixSecurityModal'
 import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
+import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
 import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
 import {
   getEntityLintDetails,
@@ -98,12 +98,9 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
   const isRealtimeEnabled = useIsTableRealtimeEnabled({ id: table.id })
 
-  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
+  const { mutateAsync: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
-    },
-    onSettled: () => {
-      closeConfirmModal()
     },
   })
 
@@ -155,10 +152,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       table.schema
     )
 
-  const closeConfirmModal = () => {
-    setRlsConfirmModalOpen(false)
-  }
-
   const onViewAPIDocs = () => {
     appSnap.setActiveDocsSection(['entities', table.name])
     appSnap.setShowProjectApiDocs(true)
@@ -181,7 +174,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       rls_enabled: !(isTable && table.rls_enabled),
     }
 
-    updateTable({
+    const updateTablePromise = updateTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
       id: table.id,
@@ -195,6 +188,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       schema_name: table.schema,
       table_name: table.name,
     })
+
+    return updateTablePromise
   }
 
   return (
@@ -392,17 +387,12 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       />
 
       {isTable && (
-        <ConfirmationModal
-          visible={rlsConfirmModalOpen}
-          variant={table.rls_enabled ? 'destructive' : 'default'}
-          title={`${table.rls_enabled ? 'Disable' : 'Enable'} Row Level Security`}
-          description={`Are you sure you want to ${
-            table.rls_enabled ? 'disable' : 'enable'
-          } Row Level Security for this table?`}
-          confirmLabel={`${table.rls_enabled ? 'Disable' : 'Enable'} RLS`}
-          confirmLabelLoading={`${table.rls_enabled ? 'Disabling' : 'Enabling'} RLS`}
-          loading={isUpdatingTable}
-          onCancel={closeConfirmModal}
+        <RLSToggleDialog
+          open={rlsConfirmModalOpen}
+          tableName={table.name}
+          isEnabled={table.rls_enabled}
+          isSubmitting={isUpdatingTable}
+          onOpenChange={setRlsConfirmModalOpen}
           onConfirm={onToggleRLS}
         />
       )}

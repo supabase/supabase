@@ -3,7 +3,6 @@ import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
@@ -15,7 +14,6 @@ import { ApiAccessToggle, type TableApiAccessHandlerWithHistoryReturn } from './
 import { ColumnManagement } from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import { HeaderTitle } from './HeaderTitle'
-import { RLSDisableModalContent } from './RLSDisableModal'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 import {
@@ -24,6 +22,7 @@ import {
   generateTableFieldFromPGTable,
   validateFields,
 } from './TableEditor.utils'
+import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from '@/data/database/constraints-query'
@@ -530,19 +529,16 @@ export const TableEditor = ({
           closePanel={() => setIsImportingSpreadsheet(false)}
         />
 
-        <ConfirmationModal
-          visible={rlsConfirmVisible}
-          title="Turn off Row Level Security"
-          confirmLabel="Confirm"
-          size="medium"
-          onCancel={() => setRlsConfirmVisible(false)}
+        <RLSToggleDialog
+          open={rlsConfirmVisible}
+          tableName={tableFields.name}
+          isEnabled={tableFields.isRLSEnabled}
+          onOpenChange={setRlsConfirmVisible}
           onConfirm={() => {
-            onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+            onUpdateField({ isRLSEnabled: false })
             setRlsConfirmVisible(false)
           }}
-        >
-          <RLSDisableModalContent />
-        </ConfirmationModal>
+        />
       </SidePanel.Content>
 
       {!isDuplicating && (
