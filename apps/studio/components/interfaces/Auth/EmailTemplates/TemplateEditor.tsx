@@ -14,7 +14,7 @@ import {
   FormControl,
   FormField,
   Input,
-  Label_Shadcn_,
+  Label,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -42,7 +42,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
-  const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
 
   // [Joshen] Error state is handled in the parent
   const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
@@ -274,7 +274,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
           <>
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center justify-between gap-2">
-                <Label_Shadcn_>Body</Label_Shadcn_>
+                <Label>Body</Label>
                 <TwoOptionToggle
                   width={60}
                   options={['preview', 'source']}

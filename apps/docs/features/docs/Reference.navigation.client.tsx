@@ -123,8 +123,8 @@ export function ReferenceNavigationScrollHandler({
   children,
   ...rest
 }: PropsWithChildren & HTMLAttributes<HTMLDivElement>) {
-  const parentRef = useRef<HTMLElement>()
-  const ref = useRef<HTMLDivElement>(null)
+  const parentRef = useRef<HTMLElement | null>(null)
+  const ref = useRef<HTMLDivElement | null>(null)
   const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
 
   useEffect(() => {

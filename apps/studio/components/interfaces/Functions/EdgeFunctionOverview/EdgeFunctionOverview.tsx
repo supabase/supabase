@@ -20,6 +20,7 @@ import type { EdgeFunctionChartRawDatum } from './EdgeFunctionOverview.utils'
 import { EdgeFunctionPerformanceSection } from './EdgeFunctionPerformanceSection'
 import { EdgeFunctionRecentErrors } from './EdgeFunctionRecentErrors'
 import { EdgeFunctionUsageSection } from './EdgeFunctionUsageSection'
+import { useEdgeFunctionOverviewShortcuts } from './useEdgeFunctionOverviewShortcuts'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import NoPermission from '@/components/ui/NoPermission'
 import {
@@ -152,6 +153,20 @@ export const EdgeFunctionOverview = () => {
     ],
     [functionSlug, isUnifiedLogsEnabled, projectRef]
   )
+
+  useEdgeFunctionOverviewShortcuts({
+    onSetInterval: setInterval,
+    onRefresh: () => {
+      combinedStatsResults.refetch()
+    },
+    onOpenLogs: () => {
+      router.push(
+        `/project/${projectRef}/functions/${functionSlug}/${
+          isUnifiedLogsEnabled ? 'logs' : 'invocations'
+        }`
+      )
+    },
+  })
 
   const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,

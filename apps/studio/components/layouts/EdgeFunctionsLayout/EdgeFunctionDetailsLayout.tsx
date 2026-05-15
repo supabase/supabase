@@ -14,6 +14,7 @@ import {
   BreadcrumbList_Shadcn_ as BreadcrumbList,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
+  copyToClipboard,
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
@@ -40,9 +41,11 @@ import {
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
+import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import CopyButton from '@/components/ui/CopyButton'
 import { DocsButton } from '@/components/ui/DocsButton'
 import NoPermission from '@/components/ui/NoPermission'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
@@ -51,6 +54,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 dayjs.extend(relativeTime)
 
@@ -73,6 +77,7 @@ const EdgeFunctionDetailsLayout = ({
   )
 
   const [isOpen, setIsOpen] = useState(false)
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false)
   const [isTimestampHoverCardOpen, setIsTimestampHoverCardOpen] = useState(false)
 
   const {
@@ -235,6 +240,35 @@ const EdgeFunctionDetailsLayout = ({
     }
   }, [isError])
 
+  const openTestSheet = () => {
+    if (!functionSlug) return
+    setIsOpen(true)
+    if (IS_PLATFORM) {
+      sendEvent({
+        action: 'edge_function_test_side_panel_opened',
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: org?.slug ?? 'Unknown',
+        },
+      })
+    }
+  }
+
+  const copyFunctionUrl = () => {
+    if (!functionUrl) return
+    copyToClipboard(functionUrl)
+    toast.success('Function URL copied to clipboard')
+  }
+
+  useFunctionsDetailShortcuts({
+    projectRef: ref,
+    functionSlug,
+    isPlatform: IS_PLATFORM,
+    onOpenTest: openTestSheet,
+    onOpenDownload: () => setIsDownloadOpen((prev) => !prev),
+    onCopyUrl: copyFunctionUrl,
+  })
+
   if (!isLoading && !canReadFunctions) {
     return (
       <ProjectLayout product="Edge Functions" browserTitle={browserTitle}>
@@ -274,7 +308,9 @@ const EdgeFunctionDetailsLayout = ({
               <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm!">
                 <div className="flex items-center gap-x-2">
                   <span className="flex items-center gap-2">{functionUrl}</span>
-                  <CopyButton iconOnly type="text" text={functionUrl} />
+                  <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL} side="bottom">
+                    <CopyButton iconOnly type="text" text={functionUrl} />
+                  </ShortcutTooltip>
                 </div>
 
                 <HoverCard
@@ -330,12 +366,18 @@ const EdgeFunctionDetailsLayout = ({
             <PageHeaderAside>
               <div className="flex items-center space-x-2">
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button type="default" icon={<Download />}>
-                      Download
-                    </Button>
-                  </PopoverTrigger>
+                <Popover open={isDownloadOpen} onOpenChange={setIsDownloadOpen}>
+                  <ShortcutTooltip
+                    shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_DOWNLOAD}
+                    side="bottom"
+                    open={isDownloadOpen ? false : undefined}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button type="default" icon={<Download />}>
+                        Download
+                      </Button>
+                    </PopoverTrigger>
+                  </ShortcutTooltip>
                   <PopoverContent align="end" className="p-0">
                     {IS_PLATFORM && (
                       <>
@@ -366,24 +408,14 @@ const EdgeFunctionDetailsLayout = ({
                   </PopoverContent>
                 </Popover>
                 {!!functionSlug && (
-                  <Button
-                    type="default"
-                    icon={<Send />}
-                    onClick={() => {
-                      setIsOpen(true)
-                      if (IS_PLATFORM) {
-                        sendEvent({
-                          action: 'edge_function_test_side_panel_opened',
-                          groups: {
-                            project: ref ?? 'Unknown',
-                            organization: org?.slug ?? 'Unknown',
-                          },
-                        })
-                      }
-                    }}
+                  <ShortcutTooltip
+                    shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST}
+                    side="bottom"
                   >
-                    Test
-                  </Button>
+                    <Button type="default" icon={<Send />} onClick={openTestSheet}>
+                      Test
+                    </Button>
+                  </ShortcutTooltip>
                 )}
               </div>
             </PageHeaderAside>

@@ -5,7 +5,7 @@ import {
   FormControl,
   FormField,
   Input,
-  Label_Shadcn_,
+  Label,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -72,12 +72,12 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
                   <>
                     <Input {...field} placeholder="Organization name" />
                     <div className="mt-1">
-                      <Label_Shadcn_
+                      <Label
                         htmlFor="name"
                         className="text-foreground-lighter leading-normal text-sm"
                       >
                         What's the name of your company or team?
-                      </Label_Shadcn_>
+                      </Label>
                     </div>
                   </>
                 </FormControl>
@@ -104,12 +104,12 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                     <div className="mt-1">
-                      <Label_Shadcn_
+                      <Label
                         htmlFor="kind"
                         className="text-foreground-lighter leading-normal text-sm"
                       >
                         What would best describe your organization?
-                      </Label_Shadcn_>
+                      </Label>
                     </div>
                   </>
                 </FormControl>
@@ -137,12 +137,12 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
                       <div className="mt-1">
-                        <Label_Shadcn_
+                        <Label
                           htmlFor="size"
                           className="text-foreground-lighter leading-normal text-sm"
                         >
                           How many people are in your company?
-                        </Label_Shadcn_>
+                        </Label>
                       </div>
                     </>
                   </FormControl>

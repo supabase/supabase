@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Label_Shadcn_,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -275,9 +275,9 @@ export const TableList = ({
                             }
                           }}
                         />
-                        <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
+                        <Label htmlFor={key} className="capitalize text-xs">
                           {key.toLowerCase().replace('_', ' ')}
-                        </Label_Shadcn_>
+                        </Label>
                       </div>
                       <Button
                         size="tiny"

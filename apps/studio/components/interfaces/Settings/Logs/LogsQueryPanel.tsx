@@ -18,7 +18,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label_Shadcn_,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -169,12 +169,12 @@ const LogsQueryPanel = ({
                       checked={useOtel}
                       onCheckedChange={(checked) => onUseOtelChange?.(checked)}
                     />
-                    <Label_Shadcn_
+                    <Label
                       htmlFor="logs-explorer-otel-toggle"
                       className="text-xs text-foreground-light cursor-pointer"
                     >
                       OTEL endpoint
-                    </Label_Shadcn_>
+                    </Label>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs">

@@ -1,13 +1,6 @@
 import { Settings } from 'lucide-react'
 import { useState } from 'react'
-import {
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  Label_Shadcn_,
-  Switch,
-} from 'ui'
+import { cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Label, Switch } from 'ui'
 
 import { useChartHoverState } from './useChartHoverState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -32,7 +25,7 @@ export const ReportSettings = ({ chartId }: ReportSettingsProps) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="bottom" className="w-64 p-3">
         <div className="space-y-4">
-          <Label_Shadcn_ htmlFor="sync-hover" className="text-sm font-normal">
+          <Label htmlFor="sync-hover" className="text-sm font-normal">
             <div className="flex items-center justify-between space-x-2">
               Sync chart headers
               <Switch id="sync-hover" checked={syncHover} onCheckedChange={setSyncHover} />
@@ -40,9 +33,9 @@ export const ReportSettings = ({ chartId }: ReportSettingsProps) => {
             <p className="text-xs text-foreground-light mt-1">
               When enabled, hovering over any chart will update headers across all charts
             </p>
-          </Label_Shadcn_>
+          </Label>
 
-          <Label_Shadcn_ htmlFor="sync-tooltips" className="text-sm font-normal flex flex-col">
+          <Label htmlFor="sync-tooltips" className="text-sm font-normal flex flex-col">
             <div className="flex items-center justify-between space-x-2">
               Sync tooltips
               <Switch
@@ -58,7 +51,7 @@ export const ReportSettings = ({ chartId }: ReportSettingsProps) => {
                 Requires header sync.
               </span>
             </p>
-          </Label_Shadcn_>
+          </Label>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -40,7 +40,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   FieldDescription,
-  Label_Shadcn_,
+  Label,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -101,7 +101,7 @@ const NavigateDialog = ({
           </DialogDescription>
         </DialogHeader>
         <DialogSection className="flex flex-col gap-y-2">
-          <Label_Shadcn_ htmlFor={inputId}>Path</Label_Shadcn_>
+          <Label htmlFor={inputId}>Path</Label>
           <Input
             id={inputId}
             autoFocus

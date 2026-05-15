@@ -1,7 +1,7 @@
 import {
   Button,
   Input,
-  Label_Shadcn_,
+  Label,
   Sheet,
   SheetClose,
   SheetContent,
@@ -28,15 +28,15 @@ export default function SheetDemo() {
           <SheetSection>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label_Shadcn_ htmlFor="name" className="text-right">
+                <Label htmlFor="name" className="text-right">
                   Name
-                </Label_Shadcn_>
+                </Label>
                 <Input id="name" value="Pedro Duarte" className="col-span-3" readOnly />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label_Shadcn_ htmlFor="username" className="text-right">
+                <Label htmlFor="username" className="text-right">
                   Username
-                </Label_Shadcn_>
+                </Label>
                 <Input id="username" value="@peduarte" className="col-span-3" readOnly />
               </div>
             </div>

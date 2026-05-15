@@ -3,7 +3,7 @@
 import { cva, VariantProps } from 'class-variance-authority'
 import { Loader2 } from 'lucide-react'
 import { Slot } from 'radix-ui'
-import { cloneElement, forwardRef, isValidElement } from 'react'
+import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
@@ -268,7 +268,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         }}
       >
         {asChild ? (
-          isValidElement(children) ? (
+          isValidElement<{ children: ReactNode }>(children) ? (
             cloneElement(
               children,
               undefined,

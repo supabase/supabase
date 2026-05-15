@@ -6,7 +6,7 @@ import {
   Card,
   Checkbox,
   Input,
-  Label_Shadcn_ as Label,
+  Label,
   Separator,
   Switch,
   Tabs_Shadcn_ as Tabs,

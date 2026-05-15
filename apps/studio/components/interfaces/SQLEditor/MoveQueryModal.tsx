@@ -29,7 +29,7 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Label_Shadcn_,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -229,7 +229,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
             <DialogSection className="py-5 flex flex-col gap-y-4">
               <div className="flex flex-col gap-y-2">
-                <Label_Shadcn_ className="text-foreground-light">Select a folder</Label_Shadcn_>
+                <Label className="text-foreground-light">Select a folder</Label>
                 <Popover open={open} onOpenChange={setOpen} modal={false}>
                   <PopoverTrigger asChild>
                     <Button

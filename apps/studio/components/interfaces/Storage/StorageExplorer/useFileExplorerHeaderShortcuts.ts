@@ -5,8 +5,8 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface UseFileExplorerHeaderShortcutsParams {
-  uploadButtonRef: RefObject<HTMLInputElement>
-  searchInputRef: RefObject<HTMLInputElement>
+  uploadButtonRef: RefObject<HTMLInputElement | null>
+  searchInputRef: RefObject<HTMLInputElement | null>
   canUpdateStorage: boolean
   hasBreadcrumbs: boolean
   isSearching: boolean

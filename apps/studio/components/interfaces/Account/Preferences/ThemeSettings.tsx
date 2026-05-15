@@ -5,7 +5,7 @@ import SVG from 'react-inlinesvg'
 import {
   Card,
   CardContent,
-  Label_Shadcn_,
+  Label,
   RadioGroup,
   RadioGroupLargeItem,
   Select_Shadcn_,
@@ -86,9 +86,9 @@ export const ThemeSettings = () => {
         <Card>
           <CardContent className="grid grid-cols-12 gap-6">
             <div className="col-span-full md:col-span-4 flex flex-col gap-2">
-              <Label_Shadcn_ htmlFor="theme" className="text-foreground">
+              <Label htmlFor="theme" className="text-foreground">
                 Theme mode
-              </Label_Shadcn_>
+              </Label>
               <p className="text-sm text-foreground-light">
                 Choose how Supabase looks to you. Select a single theme, or sync with your system.
               </p>

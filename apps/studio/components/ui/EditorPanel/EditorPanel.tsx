@@ -123,7 +123,7 @@ export const EditorPanel = () => {
   const [showResults, setShowResults] = useState(true)
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle')
-  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>(null)
   const originalSnippetRef = useRef<{ sql: string; name: string } | null>(null)
 
   const refocusEditor = () => {
@@ -145,7 +145,9 @@ export const EditorPanel = () => {
 
   const showSaveSuccess = () => {
     setSaveStatus('success')
-    clearTimeout(saveStatusTimerRef.current)
+    if (saveStatusTimerRef.current) {
+      clearTimeout(saveStatusTimerRef.current)
+    }
     saveStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000)
   }
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)

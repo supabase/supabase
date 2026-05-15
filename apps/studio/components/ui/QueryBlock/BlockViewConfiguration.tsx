@@ -1,7 +1,7 @@
 import { BarChart2, Settings2, Table } from 'lucide-react'
 import {
   Checkbox,
-  Label_Shadcn_,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -108,7 +108,7 @@ export const BlockViewConfiguration = ({
               </Select_Shadcn_>
 
               <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
-                <Label_Shadcn_ htmlFor="cumulative">
+                <Label htmlFor="cumulative">
                   <Checkbox
                     id="cumulative"
                     checked={chartConfig?.cumulative}
@@ -120,8 +120,8 @@ export const BlockViewConfiguration = ({
                     }
                   />
                   Cumulative
-                </Label_Shadcn_>
-                <Label_Shadcn_ htmlFor="logScale">
+                </Label>
+                <Label htmlFor="logScale">
                   <Checkbox
                     id="logScale"
                     checked={chartConfig?.logScale}
@@ -133,7 +133,7 @@ export const BlockViewConfiguration = ({
                     }
                   />
                   Log scale
-                </Label_Shadcn_>
+                </Label>
               </div>
             </>
           )}
