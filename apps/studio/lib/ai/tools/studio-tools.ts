@@ -38,7 +38,7 @@ export const executeSqlInputSchema = z.object({
     .boolean()
     .default(false)
     .describe(
-      'Whether the SQL statement performs a write operation of any kind instead of a read operation. Treat SQL function calls with side effects (for example cron.schedule()) as writes.'
+      'Whether the SQL statement performs a write operation or has side effects. Set true for INSERT/UPDATE/DELETE/DDL and for SELECT statements that call side-effecting functions, such as select cron.schedule(...), cron.unschedule(...), or functions that create, modify, schedule, enqueue, notify, or trigger work.'
     ),
 })
 
