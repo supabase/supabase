@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogBody,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -46,12 +47,9 @@ export default function AlertDialogAsyncError() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         {error && (
-          <Admonition
-            type="destructive"
-            title="Failed to reset template"
-            description={error}
-            className="mx-5 mb-5 w-auto"
-          />
+          <AlertDialogBody>
+            <Admonition type="destructive" title="Failed to reset template" description={error} />
+          </AlertDialogBody>
         )}
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
