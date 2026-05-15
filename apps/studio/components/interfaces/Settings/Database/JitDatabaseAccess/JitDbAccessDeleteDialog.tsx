@@ -28,7 +28,7 @@ export function JitDbAccessDeleteDialog({
 
   return (
     <AlertDialog open={!!user} onOpenChange={(open) => !open && !isDeleting && onClose()}>
-      <AlertDialogContent size="medium">
+      <AlertDialogContent size="small">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete temporary access rule</AlertDialogTitle>
           <AlertDialogDescription asChild>
