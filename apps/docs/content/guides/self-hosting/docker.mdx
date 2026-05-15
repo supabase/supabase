@@ -198,7 +198,7 @@ Access to Studio (Dashboard) is protected with **HTTP basic authentication**.
 
 <Admonition type="danger">
 
-    A secure password MUST be set before starting Supabase. The password must include at least one letter - do not use numbers only or any special characters.
+  A secure password MUST be set before starting Supabase. The password must include at least one letter - do not use numbers only or any special characters.
 
 </Admonition>
 
@@ -230,17 +230,17 @@ Then try inspecting the Docker logs for a specific container, e.g.,
 docker compose logs analytics
 ```
 
-<Admonition type="caution">
-
-  On Windows, CRLF line endings can break mounted shell scripts, causing errors like `exec /home/kong/kong-entrypoint.sh: no such file or directory` when starting Kong. The Docker template includes `volumes/.gitattributes` to enforce LF line endings on fresh checkouts, and existing files can be fixed by converting `volumes/` to LF before restarting with `docker compose down && docker compose up -d`.
-
-</Admonition>
-
 To stop Supabase, use:
 
 ```sh
 docker compose down
 ```
+
+<Admonition type="caution" label="Windows: CRLF line endings">
+
+  If the API gateway (Kong) fails to start with an entrypoint error, your local files may have been checked out with CRLF line endings instead of LF. Re-clone the repository, or normalize everything in the `docker/` directory to LF, then restart Supabase. Fresh clones should already use LF because of `.gitattributes`.
+
+</Admonition>
 
 ## Accessing Supabase Studio (Dashboard)
 
