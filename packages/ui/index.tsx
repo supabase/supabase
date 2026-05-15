@@ -118,15 +118,7 @@ export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
 export { ButtonGroup, ButtonGroupItem } from './src/components/shadcn/ui/button-group'
 
-export {
-  Breadcrumb as Breadcrumb_Shadcn_,
-  BreadcrumbItem as BreadcrumbItem_Shadcn_,
-  BreadcrumbLink as BreadcrumbLink_Shadcn_,
-  BreadcrumbList as BreadcrumbList_Shadcn_,
-  BreadcrumbEllipsis as BreadcrumbEllipsis_Shadcn_,
-  BreadcrumbPage as BreadcrumbPage_Shadcn_,
-  BreadcrumbSeparator as BreadcrumbSeparator_Shadcn_,
-} from './src/components/shadcn/ui/breadcrumb'
+export * from './src/components/shadcn/ui/breadcrumb'
 
 export * from './src/components/shadcn/ui/text-area'
 

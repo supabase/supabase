@@ -9,10 +9,10 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
   Button,
   HoverCard,
   HoverCardContent,

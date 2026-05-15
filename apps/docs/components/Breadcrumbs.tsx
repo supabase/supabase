@@ -6,13 +6,13 @@ import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { Fragment, Suspense } from 'react'
 import {
-  Breadcrumb_Shadcn_ as Breadcrumb,
-  BreadcrumbEllipsis_Shadcn_ as BreadcrumbEllipsis,
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   cn,
   Drawer,
