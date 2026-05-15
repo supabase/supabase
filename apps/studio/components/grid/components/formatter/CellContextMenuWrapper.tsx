@@ -1,8 +1,13 @@
-import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { Copy } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
-import { ContextMenu, ContextMenuItem, ContextMenuTrigger, copyToClipboard } from 'ui'
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  copyToClipboard,
+} from 'ui'
 
 import { formatClipboardValue } from '../../utils/common'
 
