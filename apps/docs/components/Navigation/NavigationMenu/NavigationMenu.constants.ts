@@ -1689,6 +1689,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/auth',
           items: [
             { name: 'Securing your functions', url: '/guides/functions/auth' },
+            { name: 'Authorization headers', url: '/guides/functions/auth-headers' },
             { name: 'Legacy JWT secret', url: '/guides/functions/auth-legacy-jwt' },
           ],
         },
