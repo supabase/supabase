@@ -392,7 +392,19 @@ export default defineConfig(({ mode }) => {
       // entire exports object `{ default: fn }`, and call sites like
       // `AwesomeDebouncePromise(fn, 500)` crash with "is not a function" at
       // SSR module evaluation. Surfaces on routes that load the table grid.
-      noExternal: ['lodash', /^next(\/|$)/, 'tslib', 'react-use', 'awesome-debounce-promise'],
+      // `@sentry/nextjs`'s CJS entry doesn't surface `startSpan` (and other
+      // v8 APIs) onto the namespace shape Vite's SSR externalizer produces,
+      // so `import * as Sentry from '@sentry/nextjs'` + `Sentry.startSpan`
+      // crashes with "is not a function" inside the pg-meta proxy on the
+      // first table-editor request.
+      noExternal: [
+        'lodash',
+        /^next(\/|$)/,
+        'tslib',
+        'react-use',
+        'awesome-debounce-promise',
+        '@sentry/nextjs',
+      ],
     },
     plugins: [
       nextCompat(),
