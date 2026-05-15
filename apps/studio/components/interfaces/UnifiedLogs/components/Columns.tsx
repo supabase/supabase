@@ -30,11 +30,7 @@ function shouldHideColumn(data: ColumnSchema[], columnKey: keyof ColumnSchema): 
 }
 
 // Generate dynamic columns based on data
-export function generateDynamicColumns({
-  data,
-}: {
-  data: ColumnSchema[]
-}): {
+export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
   columns: ColumnDef<ColumnSchema>[]
   columnVisibility: Record<string, boolean>
 } {
