@@ -1,4 +1,4 @@
-@reference "./main.css";
+@reference "./globals.css";
 
 .instance-configuration {
   .react-flow__pane {

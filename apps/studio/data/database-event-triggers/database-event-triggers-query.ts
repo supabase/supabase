@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseEventTriggerKeys } from './keys'
@@ -22,7 +23,7 @@ export type DatabaseEventTrigger = {
   function_definition: string | null
 }
 
-const EVENT_TRIGGERS_SQL = `
+const EVENT_TRIGGERS_SQL = safeSql`
 select
   evt.oid,
   evt.evtname as name,

@@ -1,4 +1,4 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { Label_Shadcn_, SidePanel, Switch } from 'ui'
@@ -25,7 +25,7 @@ import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
-  selectedTable: PostgresTable
+  selectedTable: PGTable
   visible: boolean
   editable?: boolean
   closePanel: () => void

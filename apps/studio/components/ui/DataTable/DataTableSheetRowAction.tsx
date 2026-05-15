@@ -8,7 +8,7 @@ import {
   ChevronRight,
   Copy,
   Equal,
-  Search,
+  Filter,
 } from 'lucide-react'
 import { ComponentPropsWithRef } from 'react'
 import {
@@ -28,10 +28,11 @@ interface DataTableSheetRowActionProps<
   TData,
   TFields extends DataTableFilterField<TData>,
 > extends ComponentPropsWithRef<typeof DropdownMenuTrigger> {
-  fieldValue: TFields['value']
+  fieldValue?: TFields['value']
   filterFields: TFields[]
   value: string | number
   table: Table<TData>
+  label?: string
 }
 
 export function DataTableSheetRowAction<TData, TFields extends DataTableFilterField<TData>>({
@@ -41,14 +42,13 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   children,
   className,
   table,
+  label,
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
   const { copy, isCopied } = useCopyToClipboard()
-  const field = filterFields.find((field) => field.value === fieldValue)
-  const column = table.getColumn(fieldValue.toString())
-
-  if (!field || !column) return null
+  const field = !!fieldValue ? filterFields.find((f) => f.value === fieldValue) : undefined
+  const column = !!fieldValue ? table.getColumn(fieldValue.toString()) : undefined
 
   function renderOptions() {
     if (!field) return null
@@ -66,8 +66,8 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             }}
             className="flex items-center gap-2"
           >
-            <Search size={16} />
-            Include
+            <Filter size={12} />
+            Add as filter for {column?.id}
           </DropdownMenuItem>
         )
       case 'input':
@@ -76,8 +76,8 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             onClick={() => column?.setFilterValue(value)}
             className="flex items-center gap-2"
           >
-            <Search size={16} />
-            Include
+            <Filter size={12} />
+            Add as filter for {column?.id}
           </DropdownMenuItem>
         )
       case 'slider':
@@ -88,7 +88,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               className="flex items-center gap-2"
             >
               {/* FIXME: change icon as it is not clear */}
-              <ChevronLeft size={16} />
+              <ChevronLeft size={12} />
               Less or equal than
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -96,14 +96,14 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               className="flex items-center gap-2"
             >
               {/* FIXME: change icon as it is not clear */}
-              <ChevronRight size={16} />
+              <ChevronRight size={12} />
               Greater or equal than
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => column?.setFilterValue([value])}
               className="flex items-center gap-2"
             >
-              <Equal size={16} />
+              <Equal size={12} />
               Equal to
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -116,7 +116,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               onClick={() => column?.setFilterValue([date])}
               className="flex items-center gap-2"
             >
-              <CalendarSearch size={16} />
+              <CalendarSearch size={12} />
               Exact timestamp
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -127,7 +127,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               }}
               className="flex items-center gap-2"
             >
-              <CalendarClock size={16} />
+              <CalendarClock size={12} />
               Same hour
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -138,7 +138,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               }}
               className="flex items-center gap-2"
             >
-              <CalendarDays size={16} />
+              <CalendarDays size={12} />
               Same day
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -169,18 +169,26 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
       >
         {children}
         {isCopied ? (
-          <div className="absolute inset-0 bg-background/70 place-content-center">Value copied</div>
+          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-surface-100/80 backdrop-blur-sm animate-in fade-in duration-150">
+            <span className="font-mono text-xs text-foreground-light">Copied</span>
+          </div>
         ) : null}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side="bottom" className="w-40">
-        {renderOptions()}
-        <DropdownMenuSeparator />
+
+      <DropdownMenuContent align="end" side="bottom" className="w-48 -translate-x-4">
+        {!!field && !!column && (
+          <>
+            {renderOptions()}
+            <DropdownMenuSeparator />
+          </>
+        )}
+
         <DropdownMenuItem
           onClick={() => copy(String(value), { timeout: 1000 })}
           className="flex items-center gap-2"
         >
-          <Copy size={16} />
-          Copy value
+          <Copy size={12} />
+          Copy {label}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

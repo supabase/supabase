@@ -6,8 +6,10 @@ import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const AddUserDropdown = () => {
   const showSendInvitation = useIsFeatureEnabled('authentication:show_send_invitation')
@@ -38,7 +40,7 @@ export const AddUserDropdown = () => {
             Add user
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end" className="w-40">
+        <DropdownMenuContent side="bottom" align="end" className="w-52">
           {showSendInvitation && (
             <DropdownMenuItemTooltip
               className="gap-x-2"
@@ -50,13 +52,19 @@ export const AddUserDropdown = () => {
                 content: { side: 'left', text: 'You need additional permissions to invite users' },
               }}
             >
-              <Mail size={14} />
-              <p>Send invitation</p>
+              <Mail size={14} className="shrink-0" />
+              <p className="flex-1 min-w-0">Send invitation</p>
+              {canInviteUsers && (
+                <ShortcutBadge
+                  shortcutId={SHORTCUT_IDS.AUTH_USERS_INVITE_USER}
+                  className="shrink-0"
+                />
+              )}
             </DropdownMenuItemTooltip>
           )}
 
           <DropdownMenuItemTooltip
-            className="space-x-2 pointer-events-auto!"
+            className="gap-x-2 pointer-events-auto!"
             disabled={!canCreateUsers}
             onClick={() => {
               if (canCreateUsers) setCreateVisible(true)
@@ -65,8 +73,14 @@ export const AddUserDropdown = () => {
               content: { side: 'left', text: 'You need additional permissions to create users' },
             }}
           >
-            <UserPlus size={14} />
-            <p>Create new user</p>
+            <UserPlus size={14} className="shrink-0" />
+            <p className="flex-1 min-w-0">Create new user</p>
+            {canCreateUsers && (
+              <ShortcutBadge
+                shortcutId={SHORTCUT_IDS.AUTH_USERS_CREATE_USER}
+                className="shrink-0"
+              />
+            )}
           </DropdownMenuItemTooltip>
         </DropdownMenuContent>
       </DropdownMenu>

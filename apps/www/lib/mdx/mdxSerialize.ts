@@ -1,7 +1,7 @@
 import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import { preprocessMdxWithCodeTabs } from '~/components/CodeTabs'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import { serialize } from 'next-mdx-remote/serialize'
+import { serialize } from 'next-mdx-remote-client/serialize'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
@@ -157,32 +157,34 @@ export async function mdxSerialize(source: string, options?: { tocDepth?: number
   const tocDepth = options?.tocDepth ?? 2
   let collectedToc: TocItem[] = []
 
-  const mdxSource = await serialize(preprocessedSource, {
-    blockJS: false,
-    scope: {
-      chCodeConfig: codeHikeOptions,
-    },
-    mdxOptions: {
-      remarkPlugins: [
-        remarkNormalizeHtmlImages,
-        [remarkCodeHike, codeHikeOptions],
-        remarkGfm,
-        // Collect headings into a simple TOC structure
-        () => {
-          const plugin = createRemarkCollectToc(tocDepth)
-          const transformer = (plugin as any)()
-          return (tree: any) => {
-            transformer(tree)
-            if (tree?.data?.__collectedToc) {
-              collectedToc = tree.data.__collectedToc as TocItem[]
+  const mdxSource = await serialize({
+    source: preprocessedSource,
+    options: {
+      scope: {
+        toc: { content: '', json: collectedToc },
+      },
+      mdxOptions: {
+        remarkPlugins: [
+          remarkNormalizeHtmlImages,
+          [remarkCodeHike, codeHikeOptions],
+          remarkGfm,
+          // Collect headings into a simple TOC structure
+          () => {
+            const plugin = createRemarkCollectToc(tocDepth)
+            const transformer = (plugin as any)()
+            return (tree: any) => {
+              transformer(tree)
+              if (tree?.data?.__collectedToc) {
+                collectedToc = tree.data.__collectedToc as TocItem[]
+              }
             }
-          }
-        },
-      ],
-      rehypePlugins: [
-        // @ts-ignore
-        rehypeSlug, // add IDs to any h1-h6 tag that doesn't have one, using a slug made from its text
-      ],
+          },
+        ],
+        rehypePlugins: [
+          // @ts-ignore
+          rehypeSlug, // add IDs to any h1-h6 tag that doesn't have one, using a slug made from its text
+        ],
+      },
     },
   })
 

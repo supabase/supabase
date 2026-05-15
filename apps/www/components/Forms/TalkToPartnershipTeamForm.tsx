@@ -1,9 +1,9 @@
-import { FC, useEffect, useState } from 'react'
-import Link from 'next/link'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { CircleAlert } from 'lucide-react'
+import Link from 'next/link'
+import { FC, useEffect, useState } from 'react'
 import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 interface FormData {
   firstName: string
@@ -190,9 +190,9 @@ const TalkToPartnershipTeamForm: FC<Props> = ({ className }) => {
         className
       )}
     >
-      <div className="border rounded-xl bg-surface-75 p-4 md:p-6 w-full lg:max-w-lg min-h-[200px]">
+      <div className="border rounded-xl bg-surface-75 p-4 md:p-6 w-full lg:max-w-lg min-h-[200px] flex flex-col">
         {success ? (
-          <div className="flex flex-col h-full w-full min-w-[300px] gap-4 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
+          <div className="flex flex-col flex-1 w-full gap-4 items-center justify-center animate-fade-in">
             <p className="text-center text-sm">{success}</p>
             <Button onClick={handleReset}>Reset</Button>
           </div>

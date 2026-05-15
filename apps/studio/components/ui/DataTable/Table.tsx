@@ -20,7 +20,7 @@ export const Table = forwardRef<HTMLTableElement, ComponentPropsWithRef<typeof S
       className={cn(className)}
       containerProps={{
         onScroll,
-        className: 'h-full w-full overflow-auto table-fixed min-w-max caption-bottom text-sm',
+        className: 'h-full w-full overflow-auto caption-bottom text-sm [&>table]:table-fixed',
       }}
     />
   )
@@ -43,7 +43,8 @@ export const TableBody = forwardRef<
     ref={ref}
     {...props}
     className={cn(
-      'outline-1 -outline-offset-1 outline-primary transition-colors focus-visible:outline'
+      'transition-colors outline-none focus-visible:outline-1 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+      className
     )}
   />
 ))

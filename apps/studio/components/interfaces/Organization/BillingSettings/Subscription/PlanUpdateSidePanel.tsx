@@ -135,13 +135,7 @@ export const PlanUpdateSidePanel = () => {
     { enabled: visible }
   )
 
-  const {
-    data: subscriptionPreview,
-    error: subscriptionPreviewError,
-    isPending: subscriptionPreviewIsLoading,
-    isFetching: subscriptionPreviewIsFetching,
-    isSuccess: subscriptionPreviewInitialized,
-  } = useOrganizationBillingSubscriptionPreview({
+  const subscriptionPreviewData = useOrganizationBillingSubscriptionPreview({
     tier: selectedTier,
     organizationSlug: slug,
     address: debouncedAddress,
@@ -181,10 +175,10 @@ export const PlanUpdateSidePanel = () => {
   }, [visible])
 
   useEffect(() => {
-    if (visible && isSuccessSubscription) {
+    if (visible && isSuccessSubscription && subscription.plan.id) {
       originalPlanRef.current = subscription.plan.id
     }
-  }, [visible, isSuccessSubscription])
+  }, [visible, isSuccessSubscription, subscription?.plan.id])
 
   const onConfirmDowngrade = () => {
     setSelectedTier(undefined)
@@ -198,6 +192,14 @@ export const PlanUpdateSidePanel = () => {
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
     : null
+
+  const currentPlanMeta = {
+    ...availablePlans.find((p) => p.id === subscription?.plan?.id),
+    features:
+      subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)?.features ||
+      [],
+  }
+
   const stripeProjectsUpgradeCommand = getStripeProjectsUpgradeCommand(
     selectedOrganization?.plan?.id ?? subscription?.plan?.id
   )
@@ -305,13 +307,14 @@ export const PlanUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
-                    ) : !canUpdateSubscription ? (
+                    ) : !canUpdateSubscription && !isDowngradeOption ? (
                       <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
                     ) : (
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
+                          (!canUpdateSubscription && isDowngradeOption) ||
                           subscription?.plan?.id === 'enterprise' ||
                           subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
@@ -321,7 +324,7 @@ export const PlanUpdateSidePanel = () => {
                           hasOrioleProjects
                         }
                         onClick={() => {
-                          setSelectedTier(plan.id as any)
+                          setSelectedTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')
                           sendEvent({
                             action: 'studio_pricing_plan_cta_clicked',
                             properties: {
@@ -336,14 +339,17 @@ export const PlanUpdateSidePanel = () => {
                             side: 'bottom',
                             className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
-                              subscription?.plan?.id === 'enterprise' ||
-                              subscription?.plan?.id === 'platform'
-                                ? 'Reach out to us via support to update your plan'
-                                : hasOrioleProjects
-                                  ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
-                                  : selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
-                                    ? 'You cannot change the plan for an organization managed by AWS Marketplace'
-                                    : undefined,
+                              !canUpdateSubscription && isDowngradeOption
+                                ? "You need additional permissions to change your organization's plan"
+                                : subscription?.plan?.id === 'enterprise' ||
+                                    subscription?.plan?.id === 'platform'
+                                  ? 'Reach out to us via support to update your plan'
+                                  : hasOrioleProjects
+                                    ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
+                                    : selectedOrganization?.managed_by ===
+                                        MANAGED_BY.AWS_MARKETPLACE
+                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                      : undefined,
                           },
                         }}
                       >
@@ -403,19 +409,9 @@ export const PlanUpdateSidePanel = () => {
         selectedTier={selectedTier}
         onClose={() => setSelectedTier(undefined)}
         planMeta={planMeta}
-        subscriptionPreviewError={subscriptionPreviewError}
-        subscriptionPreviewIsLoading={subscriptionPreviewIsLoading}
-        subscriptionPreviewIsFetching={subscriptionPreviewIsFetching}
-        subscriptionPreviewInitialized={subscriptionPreviewInitialized}
-        subscriptionPreview={subscriptionPreview}
-        subscription={subscription}
+        subscriptionPreviewQueryResult={subscriptionPreviewData}
         projects={orgProjects}
-        currentPlanMeta={{
-          ...availablePlans.find((p) => p.id === subscription?.plan?.id),
-          features:
-            subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)
-              ?.features || [],
-        }}
+        currentPlanMeta={currentPlanMeta}
         onAddressChange={handleAddressChange}
         onTaxIdChange={handleTaxIdChange}
         useAsDefaultBillingAddress={useAsDefaultBillingAddress}

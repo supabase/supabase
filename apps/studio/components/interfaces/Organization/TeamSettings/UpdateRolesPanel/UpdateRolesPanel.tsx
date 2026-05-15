@@ -47,6 +47,7 @@ import {
 import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -77,6 +78,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     permissions ?? []
   )
   const cannotAddAnyRoles = orgScopedRoles.every((r) => !rolesAddable.includes(r.id))
+  const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [showProjectDropdown, setShowProjectDropdown] = useState(false)
@@ -275,19 +277,34 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                             >
                               {role?.name ?? 'Please select a role'}
                             </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectContent_Shadcn_ align="end">
                               <SelectGroup_Shadcn_>
                                 {(orgScopedRoles ?? []).map((role) => {
                                   const canAssignRole = rolesAddable.includes(role.id)
+                                  const isOwnerRole = role.name === 'Owner'
+                                  const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                                  const disabled = !canAssignRole || disabledForStripe
+                                  const disabledReason = disabledForStripe
+                                    ? 'Cannot be assigned in Stripe Projects organizations'
+                                    : !canAssignRole
+                                      ? 'Additional permissions required to assign role'
+                                      : undefined
 
                                   return (
                                     <SelectItem_Shadcn_
                                       key={role.id}
                                       value={role.id.toString()}
                                       className="text-sm hover:bg-selection cursor-pointer"
-                                      disabled={!canAssignRole}
+                                      disabled={disabled}
                                     >
-                                      {role.name}
+                                      <div className="flex flex-col gap-0.5">
+                                        <span>{role.name}</span>
+                                        {disabledReason && (
+                                          <span className="text-xs text-foreground-lighter">
+                                            {disabledReason}
+                                          </span>
+                                        )}
+                                      </div>
                                     </SelectItem_Shadcn_>
                                   )
                                 })}

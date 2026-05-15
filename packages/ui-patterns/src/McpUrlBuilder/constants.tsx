@@ -178,7 +178,7 @@ export const MCP_CLIENTS: McpClient[] = [
     },
     primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
-      const command = `codex mcp add supabase --url ${mcpUrl}`
+      const command = `codex mcp add supabase --url "${mcpUrl}"`
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">Add the Supabase MCP server to Codex:</p>

@@ -3,6 +3,7 @@ import { useFlag, useParams } from 'common'
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export interface GenerateAuthMenuOptions {
   ref?: string
@@ -29,9 +30,23 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
       title: 'Manage',
       items: [
         ...(showOverview
-          ? [{ name: 'Overview', key: 'overview', url: `${baseUrl}/overview`, items: [] }]
+          ? [
+              {
+                name: 'Overview',
+                key: 'overview',
+                url: `${baseUrl}/overview`,
+                items: [],
+                shortcutId: SHORTCUT_IDS.NAV_AUTH_OVERVIEW,
+              },
+            ]
           : []),
-        { name: 'Users', key: 'users', url: `${baseUrl}/users`, items: [] },
+        {
+          name: 'Users',
+          key: 'users',
+          url: `${baseUrl}/users`,
+          items: [],
+          shortcutId: SHORTCUT_IDS.NAV_AUTH_USERS,
+        },
         ...(isPlatform
           ? [
               {
@@ -39,6 +54,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                 key: 'oauth-apps',
                 url: `${baseUrl}/oauth-apps`,
                 items: [],
+                shortcutId: SHORTCUT_IDS.NAV_AUTH_OAUTH_APPS,
               },
             ]
           : []),
@@ -57,6 +73,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                       pages: ['templates', 'smtp'],
                       url: `${baseUrl}/templates`,
                       items: [],
+                      shortcutId: SHORTCUT_IDS.NAV_AUTH_EMAIL,
                     },
                   ]
                 : []),
@@ -72,6 +89,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           key: 'policies',
           url: `${baseUrl}/policies`,
           items: [],
+          shortcutId: SHORTCUT_IDS.NAV_AUTH_POLICIES,
         },
         ...(isPlatform
           ? [
@@ -83,6 +101,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                       pages: ['providers', 'third-party'],
                       url: `${baseUrl}/providers`,
                       items: [],
+                      shortcutId: SHORTCUT_IDS.NAV_AUTH_SIGN_IN,
                     },
                   ]
                 : []),
@@ -93,6 +112,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                       key: 'passkeys',
                       url: `${baseUrl}/passkeys`,
                       label: 'Beta',
+                      shortcutId: SHORTCUT_IDS.NAV_AUTH_PASSKEYS,
                     },
                   ]
                 : []),
@@ -101,12 +121,14 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                 key: 'oauth-server',
                 url: `${baseUrl}/oauth-server`,
                 label: 'Beta',
+                shortcutId: SHORTCUT_IDS.NAV_AUTH_OAUTH_SERVER,
               },
               {
                 name: 'Sessions',
                 key: 'sessions',
                 url: `${baseUrl}/sessions`,
                 items: [],
+                shortcutId: SHORTCUT_IDS.NAV_AUTH_SESSIONS,
               },
               ...(features.rateLimits
                 ? [
@@ -115,6 +137,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                       key: 'rate-limits',
                       url: `${baseUrl}/rate-limits`,
                       items: [],
+                      shortcutId: SHORTCUT_IDS.NAV_AUTH_RATE_LIMITS,
                     },
                   ]
                 : []),
@@ -125,6 +148,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                       key: 'mfa',
                       url: `${baseUrl}/mfa`,
                       items: [],
+                      shortcutId: SHORTCUT_IDS.NAV_AUTH_MFA,
                     },
                   ]
                 : []),
@@ -133,6 +157,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                 key: 'url-configuration',
                 url: `${baseUrl}/url-configuration`,
                 items: [],
+                shortcutId: SHORTCUT_IDS.NAV_AUTH_URL_CONFIGURATION,
               },
               ...(features.attackProtection
                 ? [
@@ -141,6 +166,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                       key: 'protection',
                       url: `${baseUrl}/protection`,
                       items: [],
+                      shortcutId: SHORTCUT_IDS.NAV_AUTH_PROTECTION,
                     },
                   ]
                 : []),
@@ -150,12 +176,14 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                 url: `${baseUrl}/hooks`,
                 items: [],
                 label: 'Beta',
+                shortcutId: SHORTCUT_IDS.NAV_AUTH_HOOKS,
               },
               {
                 name: 'Audit Logs',
                 key: 'audit-logs',
                 url: `${baseUrl}/audit-logs`,
                 items: [],
+                shortcutId: SHORTCUT_IDS.NAV_AUTH_AUDIT_LOGS,
               },
               ...(features.performance
                 ? [
@@ -164,6 +192,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                       key: 'performance',
                       url: `${baseUrl}/performance`,
                       items: [],
+                      shortcutId: SHORTCUT_IDS.NAV_AUTH_PERFORMANCE,
                     },
                   ]
                 : []),

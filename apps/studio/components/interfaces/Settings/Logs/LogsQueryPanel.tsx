@@ -1,18 +1,29 @@
-import { IS_PLATFORM } from 'common'
-import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
+import { IS_PLATFORM, useFlag } from 'common'
+import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Badge,
   Button,
+  cn,
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Label_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
   SidePanel,
-  Tabs,
+  Switch,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -36,6 +47,8 @@ export interface LogsQueryPanelProps {
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: string) => void
   onDateChange: (value: DatePickerValue) => void
+  useOtel?: boolean
+  onUseOtelChange?: (value: boolean) => void
 }
 
 function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: string }) {
@@ -54,9 +67,13 @@ const LogsQueryPanel = ({
   onSelectTemplate,
   onSelectSource,
   onDateChange,
+  useOtel = false,
+  onUseOtelChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
+  const showChToggleInLogExplorer = useFlag('showChToggleInLogExplorer')
+  const otelToggleEnabled = !!showChToggleInLogExplorer && !!onUseOtelChange
 
   const {
     projectAuthAll: authEnabled,
@@ -79,6 +96,9 @@ const LogsQueryPanel = ({
   useEffect(() => {
     setSelectedDatePickerValue(value)
   }, [value.from, value.to, value.text, value.isHelper])
+
+  const [open, setOpen] = useState(false)
+  const [selectedSchema, setSelectedSchema] = useState(logConstants.schemas[0])
 
   return (
     <div className="flex items-center border-b bg-surface-100 h-(--header-height)">
@@ -139,6 +159,30 @@ const LogsQueryPanel = ({
               }}
               helpers={EXPLORER_DATEPICKER_HELPERS}
             />
+
+            {otelToggleEnabled && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="logs-explorer-otel-toggle"
+                      checked={useOtel}
+                      onCheckedChange={(checked) => onUseOtelChange?.(checked)}
+                    />
+                    <Label_Shadcn_
+                      htmlFor="logs-explorer-otel-toggle"
+                      className="text-xs text-foreground-light cursor-pointer"
+                    >
+                      OTEL endpoint
+                    </Label_Shadcn_>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  Run this query against the new ClickHouse-backed OTEL endpoint instead of
+                  BigQuery. Use to validate ClickHouse SQL before relying on it.
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             <div
               data-testid="log-explorer-warnings"
@@ -220,38 +264,64 @@ const LogsQueryPanel = ({
               </div>
             </SidePanel.Content>
             <SidePanel.Separator />
-            <Tabs
-              scrollable
-              size="small"
-              type="underlined"
-              defaultActiveId="edge_logs"
-              listClassNames="px-2"
-            >
-              {logConstants.schemas.map((schema) => (
-                <Tabs.Panel
-                  key={schema.reference}
-                  id={schema.reference}
-                  label={schema.name}
-                  className="px-4 pb-4"
-                >
-                  <Table
-                    head={[
-                      <Table.th className="text-xs p-2!" key="path">
-                        Path
-                      </Table.th>,
-                      <Table.th key="type" className="text-xs p-2!">
-                        Type
-                      </Table.th>,
-                    ]}
-                    body={schema.fields
-                      .sort((a: any, b: any) => a.path - b.path)
-                      .map((field) => (
-                        <Field key={field.path} field={field} />
-                      ))}
-                  />
-                </Tabs.Panel>
-              ))}
-            </Tabs>
+
+            <div className="px-4 pb-4 flex flex-col gap-4">
+              <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+                <PopoverTrigger_Shadcn_ asChild>
+                  <Button
+                    type="default"
+                    role="combobox"
+                    size={'small'}
+                    aria-expanded={open}
+                    className="w-full justify-between"
+                    iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                  >
+                    {value ? selectedSchema?.name : 'Select source...'}
+                  </Button>
+                </PopoverTrigger_Shadcn_>
+                <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
+                  <Command_Shadcn_>
+                    <CommandInput_Shadcn_ placeholder="Search source..." />
+                    <CommandList_Shadcn_>
+                      <CommandEmpty_Shadcn_>No source found.</CommandEmpty_Shadcn_>
+                      <CommandGroup_Shadcn_>
+                        {logConstants.schemas.map((schema) => (
+                          <CommandItem_Shadcn_
+                            key={schema.reference}
+                            value={schema.reference}
+                            onSelect={() => {
+                              setSelectedSchema(schema)
+                              setOpen(false)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                selectedSchema === schema ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            {schema.name}
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </CommandGroup_Shadcn_>
+                    </CommandList_Shadcn_>
+                  </Command_Shadcn_>
+                </PopoverContent_Shadcn_>
+              </Popover_Shadcn_>
+              <Table
+                head={[
+                  <Table.th className="text-xs p-2!" key="path">
+                    Path
+                  </Table.th>,
+                  <Table.th key="type" className="text-xs p-2!">
+                    Type
+                  </Table.th>,
+                ]}
+                body={selectedSchema.fields.map((field) => (
+                  <Field key={field.path} field={field} />
+                ))}
+              />
+            </div>
           </SidePanel>
         </div>
       </div>

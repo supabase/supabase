@@ -1,14 +1,16 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PGPolicy } from '@supabase/pg-meta'
 import { Lock } from 'lucide-react'
 
 interface LockedCreateQuerySection {
   schema: string
-  selectedPolicy?: PostgresPolicy
+  selectedPolicy?: PGPolicy
+  isRenamingPolicy: boolean
   formFields: { name: string; table: string; behavior: string; command: string; roles: string }
 }
 
 export const LockedCreateQuerySection = ({
   schema,
+  isRenamingPolicy,
   selectedPolicy,
   formFields,
 }: LockedCreateQuerySection) => {
@@ -31,7 +33,7 @@ export const LockedCreateQuerySection = ({
         <p className="px-6 font-mono text-sm text-foreground-light select-none">1</p>
         <p className="font-mono tracking-tighter">
           <span className="text-[#569cd6]">{isEditing ? 'alter' : 'create'}</span> policy "
-          {name.length === 0 ? 'policy_name' : name}"
+          {isRenamingPolicy ? selectedPolicy?.name : name.length === 0 ? 'policy_name' : name}"
         </p>
       </div>
       <div className="flex items-start" style={{ fontSize: '14px' }}>

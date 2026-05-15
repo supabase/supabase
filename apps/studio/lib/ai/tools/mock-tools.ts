@@ -148,23 +148,23 @@ function createMockedStudioTools() {
 
   return Object.fromEntries(
     Object.entries(studioTools).map(([name, baseTool]) => {
+      // Always mock execute_sql and deploy_edge_function with needsApproval disabled
+      if (name === 'execute_sql') {
+        return [name, { ...baseTool, needsApproval: false, execute: async () => [] as unknown[] }]
+      }
+      if (name === 'deploy_edge_function') {
+        return [
+          name,
+          { ...baseTool, needsApproval: false, execute: async () => ({ success: true }) },
+        ]
+      }
       if (typeof baseTool.execute === 'function') {
         return [name, baseTool]
       }
 
-      const statusMessage =
-        name === 'execute_sql'
-          ? 'SQL execution mocked successfully.'
-          : name === 'deploy_edge_function'
-            ? 'Edge Function deployment mocked successfully.'
-            : 'Tool call mocked successfully.'
-
       return [
         name,
-        {
-          ...baseTool,
-          execute: async () => ({ status: statusMessage }),
-        },
+        { ...baseTool, execute: async () => ({ status: 'Tool call mocked successfully.' }) },
       ]
     })
   ) as typeof studioTools

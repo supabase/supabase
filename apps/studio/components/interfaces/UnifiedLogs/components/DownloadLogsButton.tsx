@@ -54,10 +54,11 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
       } else {
         if (res.length === 0) return
         const headers = Object.keys(res[0])
-        const formattedResults = res.map((row: any) => {
-          const r = { ...row }
+        const formattedResults = res.map((row) => {
+          const r: Record<string, unknown> = { ...row }
           Object.keys(row).forEach((x) => {
-            if (typeof row[x] === 'object') r[x] = JSON.stringify(row[x])
+            const k = x as keyof typeof row
+            if (typeof row[k] === 'object') r[x] = JSON.stringify(row[k])
           })
           return r
         })

@@ -1,7 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
@@ -12,6 +12,7 @@ import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
+import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
 import { useStoragePreference } from './useStoragePreference'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import type { Bucket } from '@/data/storage/buckets-query'
@@ -40,6 +41,7 @@ export const StorageExplorer = () => {
     clearSelectedItems,
     setSelectedFilePreview,
     setSelectedItemsToMove,
+    setIsSearching,
   } = useStorageExplorerStateSnapshot()
   const { view } = useStoragePreference(projectRef)
 
@@ -54,6 +56,13 @@ export const StorageExplorer = () => {
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
   const [itemSearchString, setItemSearchString] = useState('')
   const debouncedSearchString = useDebounce(itemSearchString, 500)
+
+  const handleClearSearch = useCallback(() => {
+    setIsSearching(false)
+    setItemSearchString('')
+  }, [setIsSearching])
+
+  useStorageExplorerShortcuts({ onClearSearch: handleClearSearch })
 
   const fetchContents = useStaticEffectEvent(async (bucket: Bucket) => {
     if (view === STORAGE_VIEWS.LIST) {

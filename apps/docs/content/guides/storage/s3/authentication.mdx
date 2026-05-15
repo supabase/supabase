@@ -70,6 +70,15 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
 
 </Tabs>
 
+<Admonition type="note">
+
+On [local development](/docs/guides/local-development), use these values:
+
+- `region`: `local`
+- `endpoint`: IP and port e.g. `http://127.0.0.1:54321/storage/v1/s3`
+
+</Admonition>
+
 ## Session token
 
 You can authenticate to Supabase S3 with a user JWT token to provide limited access via RLS to all S3 operations. This is useful when you want initialize the S3 client on the server scoped to a specific user, or use the S3 client directly from the client side.
@@ -79,7 +88,7 @@ All S3 operations performed with the Session Token are scoped to the authenticat
 To authenticate with S3 using a Session Token, use the following credentials:
 
 - access_key_id: `project_ref`
-- secret_access_key: `publishableKey`
+- secret_access_key: `anonKey` (`publishableKey` is [not yet supported](https://github.com/supabase/storage/issues/750))
 - session_token: `valid jwt token`
 
 For example, using the `aws-sdk` library:
@@ -111,6 +120,11 @@ const client = new S3Client({
 
 <Admonition type="note">
 
-On self-hosted Supabase, the `accessKeyId` is the `STORAGE_TENANT_ID` environment variable defined in the `.env` file. Refer to the [self-hosted S3 guide](/docs/guides/self-hosting/self-hosted-s3#session-token) for more details.
+- On self-hosted Supabase, the `accessKeyId` is the `STORAGE_TENANT_ID` environment variable defined in the `.env` file. Refer to the [self-hosted S3 guide](/docs/guides/self-hosting/self-hosted-s3#session-token) for more details.
+- On [local development](/docs/guides/local-development), use the following values:
+  - `region`: `local`
+  - `endpoint`: IP and port e.g. `http://127.0.0.1:54321/storage/v1/s3`
+  - `accessKeyId`: `stub`
+  - `secretAccessKey`: use `ANON_KEY` value from `supabase status -o env`
 
 </Admonition>

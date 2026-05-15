@@ -1,6 +1,6 @@
 import { ChevronDown, X } from 'lucide-react'
 import { KeyboardEvent, memo } from 'react'
-import { Button, Input } from 'ui'
+import { Button, Input_Shadcn_ as Input } from 'ui'
 
 import { FilterOperatorOptions } from './Filter.constants'
 import { DropdownControl } from '@/components/grid/components/common/DropdownControl'
@@ -74,7 +74,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       </DropdownControl>
       <Input
         size="tiny"
-        className="w-full"
+        className="bg-control w-full"
         placeholder={placeholder}
         value={filter.value}
         onChange={(event) =>

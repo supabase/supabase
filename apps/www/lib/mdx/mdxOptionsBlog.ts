@@ -1,6 +1,6 @@
 import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import type { MDXRemoteProps } from 'next-mdx-remote/rsc'
+import type { SerializeOptions } from 'next-mdx-remote-client/serialize'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
@@ -12,7 +12,7 @@ const codeHikeOptions: CodeHikeConfig = {
   autoImport: false,
 }
 
-type MdxOptions = NonNullable<NonNullable<MDXRemoteProps['options']>['mdxOptions']>
+type MdxOptions = NonNullable<SerializeOptions['mdxOptions']>
 
 export const mdxOptionsBlog: MdxOptions = {
   remarkPlugins: [remarkNormalizeHtmlImages, [remarkCodeHike, codeHikeOptions], remarkGfm],

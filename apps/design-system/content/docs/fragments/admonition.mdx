@@ -15,6 +15,12 @@ Admonition provides focus for situations that require a callout.
 
 Use Admonition instead of [Alert](../components/alert) unless you specifically need the primitives. If in doubt, stick with Admonition.
 
+Use `title` for the heading slot when the callout needs its own heading. `title` is optional: short callouts may use `description` without a title when nearby content already provides enough context.
+
+Avoid title-only Admonitions in new code. A callout with `title` should also include `description` or `children` so it does not read like an incomplete heading.
+
+`label` is still supported for older Docs content, but new code should use `title`.
+
 ## Usage
 
 ```tsx
@@ -71,6 +77,24 @@ There are several components that wrap the `warning` Admonition type with reusab
 - NoPermission
 
 AlertError for example rolls up consistent error handling and support contact methods.
+
+### Description only
+
+Use description-only Admonitions for short callouts that sit near a heading or form label with enough context.
+
+<ComponentPreview
+  name="admonition-description-only"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+### Success
+
+Use `success` for positive, completed states where the user does not need to take corrective action.
+
+<ComponentPreview
+  name="admonition-success"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
 
 ### Destructive
 

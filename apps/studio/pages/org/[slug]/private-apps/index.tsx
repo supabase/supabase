@@ -25,9 +25,9 @@ import {
   PrivateAppsProvider,
   usePrivateApps,
 } from '@/components/interfaces/Organization/PrivateApps/PrivateAppsContext'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
 import type { NextPageWithLayout } from '@/types'
 
 function PrivateAppsContent() {

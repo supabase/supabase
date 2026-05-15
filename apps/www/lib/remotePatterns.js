@@ -114,4 +114,18 @@ module.exports = [
     port: '',
     pathname: '/functions/v1/generate-og',
   },
+  // Marketplace DB staging
+  {
+    protocol: 'https',
+    hostname: 'fgxbxpvumhvzrhqngsyu.supabase.co',
+    port: '',
+    pathname: '**',
+  },
+  // Marketplace DB prod
+  {
+    protocol: 'https',
+    hostname: 'otqhrpbxhxkrhrnjqbba.supabase.co',
+    port: '',
+    pathname: '**',
+  },
 ]
