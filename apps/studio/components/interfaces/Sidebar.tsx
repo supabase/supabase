@@ -98,6 +98,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
                     type="text"
                     className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
                     icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                    aria-label="Sidebar control"
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" align="start" className="w-40">

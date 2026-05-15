@@ -8,7 +8,7 @@ export function useAutoScroll({ enabled = true }: UseAutoScrollProps = {}) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null)
   const [isSticky, setIsSticky] = useState(true)
   const isStickyRef = useRef(true)
-  const lastScrollHeightRef = useRef<number>()
+  const lastScrollHeightRef = useRef<number>(null)
 
   const ref = useCallback((element: HTMLDivElement | null) => {
     if (element) {
@@ -36,7 +36,7 @@ export function useAutoScroll({ enabled = true }: UseAutoScrollProps = {}) {
       clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
         if (
-          lastScrollHeightRef.current !== undefined &&
+          lastScrollHeightRef.current != null &&
           container.scrollHeight !== lastScrollHeightRef.current
         ) {
           lastScrollHeightRef.current = container.scrollHeight

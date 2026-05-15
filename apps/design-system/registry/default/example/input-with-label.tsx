@@ -1,9 +1,9 @@
-import { Input, Label_Shadcn_ } from 'ui'
+import { Input, Label } from 'ui'
 
 export default function InputWithLabel() {
   return (
     <div className="grid w-full max-w-sm items-center gap-1.5">
-      <Label_Shadcn_ htmlFor="email">Email</Label_Shadcn_>
+      <Label htmlFor="email">Email</Label>
       <Input type="email" id="email" placeholder="Email" />
     </div>
   )

@@ -2,7 +2,7 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { CircleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
-import { Button, cn, Input, Label_Shadcn_, Separator, TextArea } from 'ui'
+import { Button, cn, Input, Label, Separator, TextArea } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 
 interface FormData {
@@ -210,10 +210,7 @@ const TalkToPartnershipTeamForm: FC<Props> = ({ className }) => {
                   key={key}
                   className={cn('flex flex-col col-span-full gap-y-2', fieldValue.className)}
                 >
-                  <Label_Shadcn_
-                    htmlFor={fieldKey}
-                    className="text-foreground-light flex justify-between"
-                  >
+                  <Label htmlFor={fieldKey} className="text-foreground-light flex justify-between">
                     {fieldValue.label}
                     <div
                       className={cn(
@@ -223,7 +220,7 @@ const TalkToPartnershipTeamForm: FC<Props> = ({ className }) => {
                     >
                       {errors[fieldKey]}
                     </div>
-                  </Label_Shadcn_>
+                  </Label>
                   <Component
                     type="text"
                     id={fieldKey}

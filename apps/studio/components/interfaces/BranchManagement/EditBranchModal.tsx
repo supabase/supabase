@@ -21,7 +21,7 @@ import {
   FormControl,
   FormField,
   Input,
-  Label_Shadcn_ as Label,
+  Label,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'

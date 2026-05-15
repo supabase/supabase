@@ -24,7 +24,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Label_Shadcn_,
+  Label,
   TextArea,
   Tooltip,
   TooltipContent,
@@ -284,9 +284,9 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
               </div>
             </fieldset>
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="feedback">
+              <Label htmlFor="feedback">
                 Additional feedback <span className="text-foreground-muted">(optional)</span>
-              </Label_Shadcn_>
+              </Label>
               <TextArea
                 id="feedback"
                 placeholder="What was helpful or missing?"

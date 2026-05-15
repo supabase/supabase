@@ -29,7 +29,7 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  Label_Shadcn_,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -185,7 +185,7 @@ const ColumnType = ({
 
   return (
     <div className={cn('flex flex-col gap-y-2', className)}>
-      {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
+      {showLabel && <Label className="text-foreground-light">Type</Label>}
       <Popover modal open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

@@ -39,7 +39,7 @@ interface CodeEditorProps {
     explainCode: CodeEditorActions
     closeAssistant: CodeEditorActions
   }>
-  editorRef?: MutableRefObject<editor.IStandaloneCodeEditor | undefined>
+  editorRef?: MutableRefObject<editor.IStandaloneCodeEditor | null>
   onInputChange?: (value?: string) => void
 }
 
@@ -62,10 +62,10 @@ export const CodeEditor = ({
   const monaco = useMonaco()
   const { data: project } = useSelectedProjectQuery()
 
-  const hasValue = useRef<any>()
-  const ref = useRef<editor.IStandaloneCodeEditor>()
+  const hasValue = useRef<editor.IContextKey<boolean>>(null)
+  const ref = useRef<editor.IStandaloneCodeEditor>(null)
   const editorRef = editorRefProps || ref
-  const monacoRef = useRef<Monaco>()
+  const monacoRef = useRef<Monaco>(null)
 
   const { runQuery, placeholderFill, formatDocument, explainCode, closeAssistant } = {
     ...DEFAULT_ACTIONS,
@@ -175,7 +175,9 @@ export const CodeEditor = ({
   }
 
   const onChangeContent: OnChange = (value) => {
-    hasValue.current.set((value ?? '').length > 0)
+    if (hasValue.current) {
+      hasValue.current.set((value ?? '').length > 0)
+    }
     setShowPlaceholder(!value)
     onInputChange(value)
   }
@@ -191,7 +193,9 @@ export const CodeEditor = ({
       monacoRef.current !== undefined
     ) {
       const editor = editorRef.current
+      if (editor == null) return
       const monaco = monacoRef.current
+      if (monaco == null) return
 
       editor.addCommand(
         monaco.KeyCode.Tab,

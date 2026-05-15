@@ -8,7 +8,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   Input,
-  Label_Shadcn_,
+  Label,
   Textarea,
 } from 'ui'
 
@@ -38,18 +38,18 @@ export function KeyDetailsDialog({
       <DialogSectionSeparator />
       <DialogSection className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <Label_Shadcn_ htmlFor="key-id">Key ID</Label_Shadcn_>
+          <Label htmlFor="key-id">Key ID</Label>
           <Input id="key-id" value={selectedKey.id} readOnly />
         </div>
         <div className="flex flex-col gap-2">
-          <Label_Shadcn_ htmlFor="discovery-url">Discovery URL</Label_Shadcn_>
+          <Label htmlFor="discovery-url">Discovery URL</Label>
           <Input id="discovery-url" value={jwksURL.href} readOnly />
         </div>
         <div className="flex flex-col gap-2">
-          <Label_Shadcn_ htmlFor="jwk" className="flex flex-row gap-2 items-center">
+          <Label htmlFor="jwk" className="flex flex-row gap-2 items-center">
             <FileKey className="size-4 text-foreground-light" />
             Public key set (JSON Web Key Set format)
-          </Label_Shadcn_>
+          </Label>
           <div className="relative">
             <Textarea className="font-mono text-sm pr-10" rows={8} value={jwks} readOnly />
             <CopyButton

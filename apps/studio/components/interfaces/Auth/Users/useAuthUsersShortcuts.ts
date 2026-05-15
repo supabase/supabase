@@ -17,8 +17,8 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface UseAuthUsersShortcutsParams {
-  gridRef: RefObject<DataGridHandle>
-  searchInputRef: RefObject<HTMLInputElement>
+  gridRef: RefObject<DataGridHandle | null>
+  searchInputRef: RefObject<HTMLInputElement | null>
   users: User[]
   selectedUsers: Set<unknown>
   setSelectedUsers: Dispatch<SetStateAction<Set<unknown>>>
