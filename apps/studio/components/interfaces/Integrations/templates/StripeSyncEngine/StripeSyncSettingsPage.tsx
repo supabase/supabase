@@ -4,7 +4,6 @@ import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
-import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
   PageSectionContent,
