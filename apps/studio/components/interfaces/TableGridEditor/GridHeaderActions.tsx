@@ -352,7 +352,12 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" icon={<MoreVertical />} className="h-7 w-7" />
+              <Button
+                type="default"
+                icon={<MoreVertical />}
+                className="h-7 w-7"
+                aria-label="More actions"
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48">
               {isTable && realtimeEnabled && (

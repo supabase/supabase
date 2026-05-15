@@ -134,6 +134,11 @@ export const PolicyTableRowHeader = ({
                       : 'Create with Supabase Assistant',
                 },
               }}
+              aria-label={
+                !canToggleRLS || !canCreatePolicies
+                  ? 'You need additional permissions to create RLS policies'
+                  : 'Create with Supabase Assistant'
+              }
             >
               <AiIconAnimation size={16} />
             </ButtonTooltip>

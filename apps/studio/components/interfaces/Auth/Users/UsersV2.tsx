@@ -777,6 +777,7 @@ export const UsersV2 = () => {
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={handleRefresh}
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
+                  aria-label="Refresh"
                 />
                 <AddUserDropdown />
               </div>

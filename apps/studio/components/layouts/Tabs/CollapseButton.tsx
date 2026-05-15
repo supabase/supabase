@@ -27,17 +27,23 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
           onClick={handleToggle}
         >
           {showSidebar ? (
-            <PanelLeftClose
-              size={16}
-              strokeWidth={1.5}
-              className="text-foreground-lighter hover:text-foreground-light"
-            />
+            <>
+              <PanelLeftClose
+                size={16}
+                strokeWidth={1.5}
+                className="text-foreground-lighter hover:text-foreground-light"
+              />
+              <span className="sr-only">Collapse sidebar</span>
+            </>
           ) : (
-            <PanelLeftOpen
-              size={16}
-              strokeWidth={1.5}
-              className="text-foreground-lighter hover:text-foreground-light"
-            />
+            <>
+              <PanelLeftOpen
+                size={16}
+                strokeWidth={1.5}
+                className="text-foreground-lighter hover:text-foreground-light"
+              />
+              <span className="sr-only">Expand sidebar</span>
+            </>
           )}
         </button>
       </TooltipTrigger>
