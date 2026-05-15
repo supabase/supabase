@@ -3089,7 +3089,12 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 export interface UnifiedLogsRowClickedEvent {
   action: 'unified_logs_row_clicked'
   properties: {
-    logType: string
+    /**
+     * Service that produced the log row. Mirrors `LOG_TYPES` in UnifiedLogs.constants.tsx.
+     * Server values are validated against this set by zod (UnifiedLogs.schema.ts) before
+     * reaching the table; anything else is rejected upstream so the union here is exhaustive.
+     */
+    logType: 'postgres' | 'postgrest' | 'auth' | 'storage' | 'edge function'
   }
   groups: TelemetryGroups
 }
