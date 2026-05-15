@@ -1,10 +1,10 @@
+import { useParams } from 'common'
 import Link from 'next/link'
 import { Badge, Card } from 'ui'
 
 import { getMarketplaceSource, MarketplaceSourceBadge } from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface MarketplaceCardProps {
   integration: IntegrationDefinition
@@ -12,12 +12,12 @@ interface MarketplaceCardProps {
 }
 
 export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardProps) => {
-  const { data: project } = useSelectedProjectQuery()
+  const { ref } = useParams()
   const source = getMarketplaceSource(integration)
 
   return (
     <Link
-      href={`/project/${project?.ref}/integrations/${integration.id}/overview`}
+      href={`/project/${ref}/integrations/${integration.id}/overview`}
       className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
     >
       <Card className="flex min-h-[168px] h-full flex-col gap-2.5 hover:border-stronger p-4">
