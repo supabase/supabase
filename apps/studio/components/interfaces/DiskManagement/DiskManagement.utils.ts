@@ -282,7 +282,7 @@ export function getAvailableComputeOptions(
 }
 
 export const calculateMaxIopsAllowedForDiskSizeWithGp3 = (totalSize: number) => {
-  return Math.min(3000 * totalSize, 16000)
+  return Math.max(3000, Math.min(500 * totalSize, 16000))
 }
 
 export const calculateDiskSizeRequiredForIopsWithGp3 = (iops: number) => {

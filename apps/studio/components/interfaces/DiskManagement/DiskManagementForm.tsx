@@ -22,7 +22,10 @@ import { Admonition } from 'ui-patterns'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
 import { DiskManagementMessage } from './DiskManagement.types'
-import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
+import {
+  calculateDiskSizeRequiredForIopsWithGp3,
+  mapComputeSizeNameToAddonVariantId,
+} from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog'
 import { AutoScaleFields } from './fields/AutoScaleFields'
@@ -190,6 +193,14 @@ export function DiskManagementForm() {
     modifiedComputeSize &&
     !isSpendCapEnabled &&
     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
+
+  const watchedTotalSize = form.watch('totalSize') ?? 0
+  const watchedStorageType = form.watch('storageType')
+  const minDiskSizeForCustomIops = calculateDiskSizeRequiredForIopsWithGp3(
+    DISK_LIMITS[DiskType.GP3].minIops
+  )
+  const isDiskTooSmallForCustomIops =
+    watchedStorageType === 'gp3' && watchedTotalSize < minDiskSizeForCustomIops
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -524,17 +535,46 @@ export function DiskManagementForm() {
                             )
                           }
                         />
+                        <NoticeBar
+                          type="default"
+                          visible={isDiskTooSmallForCustomIops && !disableIopsThroughputConfig}
+                          title={`Disk must be at least ${minDiskSizeForCustomIops} GB to adjust IOPS or throughput`}
+                          description={`GP3 volumes allow up to 500 IOPS per GB. Increase the disk size to at least ${minDiskSizeForCustomIops} GB to provision custom IOPS and throughput.`}
+                          actions={
+                            !disableDiskSizeInput ? (
+                              <Button
+                                type="default"
+                                onClick={() => {
+                                  form.setValue('totalSize', minDiskSizeForCustomIops, {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                  })
+                                }}
+                              >
+                                Increase to {minDiskSizeForCustomIops} GB
+                              </Button>
+                            ) : undefined
+                          }
+                        />
                         <StorageTypeField
                           form={form}
                           disableInput={disableIopsThroughputConfig || disableDiskInputs}
                         />
                         <IOPSField
                           form={form}
-                          disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                          disableInput={
+                            disableIopsThroughputConfig ||
+                            disableDiskInputs ||
+                            isDiskTooSmallForCustomIops
+                          }
                         />
                         <ThroughputField
                           form={form}
-                          disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                          disableInput={
+                            disableIopsThroughputConfig ||
+                            disableDiskInputs ||
+                            isDiskTooSmallForCustomIops
+                          }
                         />
                       </div>
                     </div>
