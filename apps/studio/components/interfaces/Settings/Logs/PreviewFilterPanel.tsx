@@ -56,7 +56,7 @@ interface PreviewFilterPanelProps {
   className?: string
   selectedDatePickerValue: DatePickerValue
   setSelectedDatePickerValue: (value: DatePickerValue) => void
-  searchInputRef?: RefObject<HTMLInputElement>
+  searchInputRef?: RefObject<HTMLInputElement | null>
 }
 
 /**

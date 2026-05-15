@@ -4,7 +4,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface UseLogsPreviewShortcutsParams {
-  searchInputRef: RefObject<HTMLInputElement>
+  searchInputRef: RefObject<HTMLInputElement | null>
   hasSearch: boolean
   onResetSearch: () => void
   onRefresh: () => void
