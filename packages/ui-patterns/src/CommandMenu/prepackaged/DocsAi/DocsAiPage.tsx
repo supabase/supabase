@@ -19,7 +19,7 @@ import { StatusIcon } from 'ui/src/components/StatusIcon'
 import {
   Breadcrumb,
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   generateCommandClassNames,
   useHistoryKeys,
@@ -154,7 +154,7 @@ function PromptInput({
   })
 
   return (
-    <CommandInput
+    <CommandMenuInput
       className={cn(
         'w-full h-11',
         'border-none outline-hidden bg-transparent rounded-none rounded-t-md px-4 py-7',

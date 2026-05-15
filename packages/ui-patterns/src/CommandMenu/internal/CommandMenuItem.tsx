@@ -49,7 +49,7 @@ interface CommandItemProps extends React.ComponentPropsWithoutRef<typeof Command
   command: ICommand
 }
 
-const CommandItem = forwardRef<
+const CommandMenuItem = forwardRef<
   React.ElementRef<typeof CommandItem_Shadcn_>,
   PropsWithChildren<CommandItemProps>
 >(({ children, className, command: _command, ...props }, ref) => {
@@ -117,6 +117,6 @@ const CommandItem = forwardRef<
     </CommandItem_Shadcn_>
   )
 })
-CommandItem.displayName = CommandItem_Shadcn_.displayName
+CommandMenuItem.displayName = 'CommandMenuItem'
 
-export { CommandItem, generateCommandClassNames }
+export { CommandMenuItem, generateCommandClassNames }
