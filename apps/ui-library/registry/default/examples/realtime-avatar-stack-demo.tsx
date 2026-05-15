@@ -3,7 +3,7 @@
 import { REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
 import { useUser } from 'common'
 import { useEffect, useMemo, useState } from 'react'
-import { Label_Shadcn_, Switch } from 'ui'
+import { Label, Switch } from 'ui'
 
 import { getRandomUser } from './utils'
 import { AvatarStack } from '@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack'
@@ -97,7 +97,7 @@ const RealtimeAvatarStackDemo = () => {
       ) : user ? (
         <div className="flex items-center space-x-2">
           <Switch id="current-user" checked={dashboardUser} onCheckedChange={setDashboardUser} />
-          <Label_Shadcn_ htmlFor="current-user">Use my supabase.com account instead</Label_Shadcn_>
+          <Label htmlFor="current-user">Use my supabase.com account instead</Label>
         </div>
       ) : (
         <span className="text-sm text-foreground-light">

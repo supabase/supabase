@@ -1,13 +1,13 @@
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 
 export const IPV4SuggestionAlert = () => {
   return (
-    <Alert_Shadcn_ variant="default">
+    <Alert variant="default">
       <HelpCircle strokeWidth={2} />
-      <AlertTitle_Shadcn_>Connection issues?</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="grid gap-3">
+      <AlertTitle>Connection issues?</AlertTitle>
+      <AlertDescription className="grid gap-3">
         <p>
           Having trouble connecting to your project? It could be related to our migration from
           PGBouncer and IPv4.
@@ -27,7 +27,7 @@ export const IPV4SuggestionAlert = () => {
             </Link>
           </Button>
         </p>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }

@@ -14,7 +14,6 @@ import {
 import { useFeaturePreviews } from './useFeaturePreviews'
 import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
-import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
@@ -94,8 +93,8 @@ export const useUnifiedLogsPreview = () => {
     useIsEnterpriseOrSupabaseOrg()
 
   const isLoading = !flagsHaveLoaded || isOrgLoading
-  const isEligible = unifiedLogsEnabled && (IS_STAGING_OR_LOCAL || isEnterpriseOrSupabaseOrg)
-  const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEligible = unifiedLogsEnabled || isEnterpriseOrSupabaseOrg
+  const isEnabled = isEligible && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)

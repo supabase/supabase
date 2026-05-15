@@ -15,7 +15,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -140,7 +140,7 @@ export const CreateWorkOSIntegrationDialog = ({
                     description="Obtain your issuer URL from the WorkOS dashboard."
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder="https://api.workos.com/user_management/client_ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                       />

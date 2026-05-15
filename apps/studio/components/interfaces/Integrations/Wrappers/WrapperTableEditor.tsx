@@ -21,11 +21,11 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -115,11 +115,9 @@ const WrapperTableEditor = ({
       <SidePanel.Content>
         <div className="my-4 flex flex-col gap-y-6">
           <div className="flex flex-col gap-y-2">
-            <Label_Shadcn_ className="text-foreground-light">
-              Select a target the table will point to
-            </Label_Shadcn_>
-            <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Label className="text-foreground-light">Select a target the table will point to</Label>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
                 <Button
                   type="default"
                   role="combobox"
@@ -136,8 +134,8 @@ const WrapperTableEditor = ({
                 >
                   {!!selectedTableIndex ? tables[Number(selectedTableIndex)].label : '---'}
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ id={listboxId} className="p-0" sameWidthAsTrigger>
+              </PopoverTrigger>
+              <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Find a table..." />
                   <CommandList_Shadcn_>
@@ -170,8 +168,8 @@ const WrapperTableEditor = ({
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {selectedTable && (
@@ -223,7 +221,7 @@ const Option = ({ option, control }: { option: TableOption; control: Control<Fie
       render={({ field }) => (
         <FormItemLayout layout="vertical" label={option.label} name={option.name}>
           <FormControl>
-            <Input_Shadcn_ {...field} id={option.name} placeholder={option.placeholder ?? ''} />
+            <Input {...field} id={option.name} placeholder={option.placeholder ?? ''} />
           </FormControl>
         </FormItemLayout>
       )}
@@ -382,7 +380,7 @@ const TableForm = ({
             render={({ field }) => (
               <FormItemLayout name="schema_name" layout="vertical" label="Schema name">
                 <FormControl>
-                  <Input_Shadcn_ {...field} id="schema_name" />
+                  <Input {...field} id="schema_name" />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -400,7 +398,7 @@ const TableForm = ({
               description="You can query from this table after the wrapper is enabled."
             >
               <FormControl>
-                <Input_Shadcn_ {...field} id="table_name" />
+                <Input {...field} id="table_name" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -478,7 +476,7 @@ const TableForm = ({
                       label="Name"
                     >
                       <FormControl>
-                        <Input_Shadcn_ {...field} id={`columns.${columnIndex}.name`} />
+                        <Input {...field} id={`columns.${columnIndex}.name`} />
                       </FormControl>
                     </FormItemLayout>
                   )}

@@ -20,11 +20,11 @@ import { ComponentProps, useEffect } from 'react'
 import {
   Button,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   TreeViewItem,
 } from 'ui'
 
@@ -218,8 +218,8 @@ export const SQLEditorTreeViewItem = ({
 
   return (
     <>
-      <ContextMenu_Shadcn_ modal={false}>
-        <ContextMenuTrigger_Shadcn_ asChild>
+      <ContextMenu modal={false}>
+        <ContextMenuTrigger asChild>
           <TreeViewItem
             className={className}
             level={level}
@@ -257,71 +257,71 @@ export const SQLEditorTreeViewItem = ({
             description={element.metadata?.description || undefined}
             xPadding={16}
           />
-        </ContextMenuTrigger_Shadcn_>
-        <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
+        </ContextMenuTrigger>
+        <ContextMenuContent onCloseAutoFocus={(e) => e.stopPropagation()}>
           {isBranch ? (
             <>
               {onSelectCreate !== undefined && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectCreate()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Plus size={14} />
                   Create new snippet
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectRename !== undefined && isOwner && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectRename()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Edit size={14} />
                   Rename folder
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectDelete !== undefined && isOwner && (
                 <>
-                  <ContextMenuSeparator_Shadcn_ />
-                  <ContextMenuItem_Shadcn_
+                  <ContextMenuSeparator />
+                  <ContextMenuItem
                     className="gap-x-2"
                     onSelect={() => onSelectDelete()}
                     onFocusCapture={(e) => e.stopPropagation()}
                   >
                     <Trash size={14} />
                     Delete folder
-                  </ContextMenuItem_Shadcn_>
+                  </ContextMenuItem>
                 </>
               )}
             </>
           ) : isMultiSelected ? (
             <>
               {onSelectMove !== undefined && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectMove()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Move size={14} />
                   Move selected queries
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
-              <ContextMenuSeparator_Shadcn_ />
+              <ContextMenuSeparator />
               {onSelectDelete !== undefined && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectDelete()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Trash size={14} />
                   Delete selected queries
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
             </>
           ) : (
             <>
-              <ContextMenuItem_Shadcn_
+              <ContextMenuItem
                 asChild
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}
@@ -334,63 +334,63 @@ export const SQLEditorTreeViewItem = ({
                   <ExternalLink size={14} />
                   Open in new tab
                 </Link>
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuSeparator_Shadcn_ />
+              </ContextMenuItem>
+              <ContextMenuSeparator />
               {onSelectRename !== undefined && isOwner && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectRename()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Edit size={14} />
                   Rename query
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectMove !== undefined && isOwner && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectMove()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Move size={14} />
                   Move query
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectShare !== undefined &&
                 !isSharedSnippet &&
                 canCreateSQLSnippet &&
                 IS_PLATFORM && (
-                  <ContextMenuItem_Shadcn_
+                  <ContextMenuItem
                     className="gap-x-2"
                     onSelect={() => onSelectShare()}
                     onFocusCapture={(e) => e.stopPropagation()}
                   >
                     <Share size={14} />
                     Share query with team
-                  </ContextMenuItem_Shadcn_>
+                  </ContextMenuItem>
                 )}
               {onSelectUnshare !== undefined && isSharedSnippet && isOwner && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectUnshare()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Lock size={14} />
                   Unshare query with team
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectDuplicate !== undefined && canCreateSQLSnippet && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectDuplicate()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Copy size={14} />
                   Duplicate query
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {IS_PLATFORM && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onToggleFavorite()}
                   onFocusCapture={(e) => e.stopPropagation()}
@@ -402,31 +402,31 @@ export const SQLEditorTreeViewItem = ({
                     )}
                   />
                   {isFavorite ? 'Remove from' : 'Add to'} favorites
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectDownload !== undefined && IS_PLATFORM && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectDownload()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Download size={14} />
                   Download as migration file
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectDelete !== undefined && isOwner && (
                 <>
-                  <ContextMenuSeparator_Shadcn_ />
-                  <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={() => onSelectDelete()}>
+                  <ContextMenuSeparator />
+                  <ContextMenuItem className="gap-x-2" onSelect={() => onSelectDelete()}>
                     <Trash size={14} />
                     Delete query
-                  </ContextMenuItem_Shadcn_>
+                  </ContextMenuItem>
                 </>
               )}
             </>
           )}
-        </ContextMenuContent_Shadcn_>
-      </ContextMenu_Shadcn_>
+        </ContextMenuContent>
+      </ContextMenu>
 
       {hasNextPage && typeof element.id === 'string' && isLastItem && (
         <div

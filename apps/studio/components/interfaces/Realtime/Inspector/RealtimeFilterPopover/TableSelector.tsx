@@ -2,9 +2,9 @@ import { debounce } from 'lodash'
 import { Check, Code, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
@@ -12,9 +12,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -76,8 +76,8 @@ const TableSelector = ({
 
   return (
     <div className={className}>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
+        <PopoverTrigger asChild>
           <Button
             size={size}
             type="outline"
@@ -99,8 +99,8 @@ const TableSelector = ({
               <p className="flex text-xs text-light">Loading tables...</p>
             )}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="start">
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-64" side="bottom" align="start">
           <Command_Shadcn_>
             <CommandInput_Shadcn_
               placeholder="Find table..."
@@ -115,17 +115,15 @@ const TableSelector = ({
               )}
 
               {showError && isError && (
-                <Alert_Shadcn_ variant="warning" className="px-3! py-3! border-0! rounded-none">
-                  <AlertTitle_Shadcn_ className="text-xs text-amber-900">
-                    Failed to load tables
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="text-xs mb-2">
+                <Alert variant="warning" className="px-3! py-3! border-0! rounded-none">
+                  <AlertTitle className="text-xs text-amber-900">Failed to load tables</AlertTitle>
+                  <AlertDescription className="text-xs mb-2">
                     Error: {(error as any)?.message}
-                  </AlertDescription_Shadcn_>
+                  </AlertDescription>
                   <Button type="default" size="tiny" onClick={() => refetch()}>
                     Reload tables
                   </Button>
-                </Alert_Shadcn_>
+                </Alert>
               )}
 
               {isSuccess && (
@@ -179,8 +177,8 @@ const TableSelector = ({
               )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

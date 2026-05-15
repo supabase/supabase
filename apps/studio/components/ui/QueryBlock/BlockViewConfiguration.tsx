@@ -1,10 +1,10 @@
 import { BarChart2, Settings2, Table } from 'lucide-react'
 import {
   Checkbox,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -37,8 +37,8 @@ export const BlockViewConfiguration = ({
   updateChartConfig,
 }: BlockViewConfigurationProps) => {
   return (
-    <Popover_Shadcn_ modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover modal={false}>
+      <PopoverTrigger asChild>
         <ButtonTooltip
           id="help-popover-button"
           type="text"
@@ -46,8 +46,8 @@ export const BlockViewConfiguration = ({
           icon={<Settings2 size={14} strokeWidth={1.5} />}
           tooltip={{ content: { side: 'bottom', text: 'View data' } }}
         />
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ side="bottom" align="center" className="w-[240px] p-3">
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="center" className="w-[240px] p-3">
         <form className="grid gap-2">
           <ToggleGroup
             type="single"
@@ -108,7 +108,7 @@ export const BlockViewConfiguration = ({
               </Select_Shadcn_>
 
               <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
-                <Label_Shadcn_ htmlFor="cumulative">
+                <Label htmlFor="cumulative">
                   <Checkbox
                     id="cumulative"
                     checked={chartConfig?.cumulative}
@@ -120,8 +120,8 @@ export const BlockViewConfiguration = ({
                     }
                   />
                   Cumulative
-                </Label_Shadcn_>
-                <Label_Shadcn_ htmlFor="logScale">
+                </Label>
+                <Label htmlFor="logScale">
                   <Checkbox
                     id="logScale"
                     checked={chartConfig?.logScale}
@@ -133,12 +133,12 @@ export const BlockViewConfiguration = ({
                     }
                   />
                   Log scale
-                </Label_Shadcn_>
+                </Label>
               </div>
             </>
           )}
         </form>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

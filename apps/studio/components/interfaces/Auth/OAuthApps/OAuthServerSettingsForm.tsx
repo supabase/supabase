@@ -14,7 +14,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Switch,
 } from 'ui'
 import { PageSection, PageSectionContent } from 'ui-patterns'
@@ -258,7 +258,7 @@ export const OAuthServerSettingsForm = () => {
                           </>
                         }
                       >
-                        <Input_Shadcn_
+                        <Input
                           value={authConfig?.SITE_URL}
                           disabled
                           placeholder="https://example.com"
@@ -276,7 +276,7 @@ export const OAuthServerSettingsForm = () => {
                             description="Path where you'll implement the OAuth authorization UI (consent screens)."
                           >
                             <FormControl>
-                              <Input_Shadcn_ {...field} placeholder="/auth/authorize" />
+                              <Input {...field} placeholder="/auth/authorize" />
                             </FormControl>
                           </FormItemLayout>
                         )}

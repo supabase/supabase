@@ -39,8 +39,8 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  FieldDescription_Shadcn_,
-  Label_Shadcn_,
+  FieldDescription,
+  Label,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -101,7 +101,7 @@ const NavigateDialog = ({
           </DialogDescription>
         </DialogHeader>
         <DialogSection className="flex flex-col gap-y-2">
-          <Label_Shadcn_ htmlFor={inputId}>Path</Label_Shadcn_>
+          <Label htmlFor={inputId}>Path</Label>
           <Input
             id={inputId}
             autoFocus
@@ -114,9 +114,9 @@ const NavigateDialog = ({
               if (event.key === 'Enter') onSubmit(event)
             }}
           />
-          <FieldDescription_Shadcn_ id={descriptionId} className="text-foreground-lighter">
+          <FieldDescription id={descriptionId} className="text-foreground-lighter">
             Enter a folder path within this bucket.
-          </FieldDescription_Shadcn_>
+          </FieldDescription>
         </DialogSection>
         <DialogFooter>
           <Button type="default" onClick={onCancel}>

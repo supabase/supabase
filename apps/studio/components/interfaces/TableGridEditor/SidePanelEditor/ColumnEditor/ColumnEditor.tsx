@@ -1,4 +1,4 @@
-import type { PGColumn, PGTable } from '@supabase/pg-meta'
+import { safeSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
 import { ExternalLink, Plus } from 'lucide-react'
@@ -36,7 +36,7 @@ import type {
 import ColumnDefaultValue from './ColumnDefaultValue'
 import {
   generateColumnField,
-  generateColumnFieldFromPostgresColumn,
+  generateColumnFieldFromPGColumn,
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
   getPlaceholderText,
@@ -50,6 +50,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
+import { SafeSqlInput } from '@/components/ui/SafeSqlInput'
 import {
   Constraint,
   CONSTRAINT_TYPE,
@@ -60,13 +61,16 @@ import {
   useForeignKeyConstraintsQuery,
 } from '@/data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
+import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
+import type { DeepReadonly } from '@/lib/type-helpers'
 
 export interface ColumnEditorProps {
-  column?: Readonly<PGColumn>
-  selectedTable: PGTable
+  column?: DeepReadonly<SafePostgresColumn>
+  selectedTable: RetrieveTableResult
   visible: boolean
   closePanel: () => void
   saveChanges: (
@@ -145,7 +149,7 @@ export const ColumnEditor = ({
       setForeignKeySelectorOpen(false)
       const columnFields = isNewRecord
         ? generateColumnField({ schema: selectedTable.schema, table: selectedTable.name })
-        : generateColumnFieldFromPostgresColumn(column, selectedTable, foreignKeyMeta)
+        : generateColumnFieldFromPGColumn(column, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
       setFkRelations(formatForeignKeys(foreignKeys))
     }
@@ -324,7 +328,10 @@ export const ColumnEditor = ({
             <FormSectionContent loading={false} className="lg:col-span-8!">
               <ColumnType
                 showRecommendation
-                value={columnFields?.format ?? ''}
+                value={{
+                  format: columnFields?.format ?? '',
+                  formatSchema: columnFields?.formatSchema,
+                }}
                 layout="vertical"
                 enumTypes={enumTypes}
                 error={errors.format}
@@ -334,7 +341,9 @@ export const ColumnEditor = ({
                     : ''
                 }
                 disabled={lockColumnType}
-                onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
+                onOptionSelect={({ format, formatSchema }) =>
+                  onUpdateField({ format, formatSchema, defaultValue: null })
+                }
               />
               {columnFields.foreignKey === undefined && (
                 <div className="space-y-4">
@@ -397,12 +406,14 @@ export const ColumnEditor = ({
                 column={columnFields}
                 relations={fkRelations}
                 closePanel={closePanel}
-                onUpdateColumnType={(format: string) => {
-                  if (format[0] === '_') {
-                    onUpdateField({ format: format.slice(1), isArray: true, isIdentity: false })
-                  } else {
-                    onUpdateField({ format })
-                  }
+                onUpdateColumnType={({ format, formatSchema, isArray }) => {
+                  const bareFormat = isArray && format.startsWith('_') ? format.slice(1) : format
+                  onUpdateField({
+                    format: bareFormat,
+                    formatSchema,
+                    isArray,
+                    isIdentity: isArray ? false : columnFields.isIdentity,
+                  })
                 }}
                 onOpenChange={setForeignKeySelectorOpen}
                 onUpdateFkRelations={setFkRelations}
@@ -485,11 +496,11 @@ export const ColumnEditor = ({
               </Tooltip>
 
               <FormItemLayout isReactForm={false} label="CHECK constraint" labelOptional="Optional">
-                <Input
+                <SafeSqlInput
                   type="text"
                   placeholder={placeholder}
-                  value={columnFields?.check ?? ''}
-                  onChange={(event) => onUpdateField({ check: event.target.value })}
+                  value={columnFields?.check ?? safeSql``}
+                  onChange={(_event, value) => onUpdateField({ check: value })}
                   className="[&_input]:font-mono"
                 />
               </FormItemLayout>

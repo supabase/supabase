@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -361,7 +361,7 @@ const ReportFilterBar = ({
                 className="gap-[2px]"
                 size="tiny"
               >
-                <Input_Shadcn_
+                <Input
                   placeholder={
                     addFilterValues.compare === 'matches'
                       ? 'Provide a regex expression'

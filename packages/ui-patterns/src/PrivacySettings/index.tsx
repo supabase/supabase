@@ -3,7 +3,7 @@
 import { useConsentState } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useState } from 'react'
-import { Label_Shadcn_, Modal, Switch } from 'ui'
+import { Label, Modal, Switch } from 'ui'
 
 import { Admonition } from '../admonition'
 
@@ -137,9 +137,9 @@ function Category({
     <Modal.Content key={category.slug}>
       <div className="flex flex-row items-center justify-between gap-4">
         <div className="space-y-0.5">
-          <Label_Shadcn_ className="text-base" htmlFor={category.slug}>
+          <Label className="text-base" htmlFor={category.slug}>
             {category.label}
-          </Label_Shadcn_>
+          </Label>
           <div className="text-sm text-foreground-light" id={`${category.slug}-description`}>
             {category.description}
             <br />

@@ -18,9 +18,9 @@ import { isEmpty, noop, partition } from 'lodash'
 import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Tooltip,
   TooltipContent,
@@ -212,14 +212,14 @@ export const ColumnManagement = ({
         )}
 
         {primaryKeyColumns.length === 0 && (
-          <Alert_Shadcn_ variant="warning">
+          <Alert variant="warning">
             <WarningIcon />
-            <AlertTitle_Shadcn_>Warning: No primary keys selected</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+            <AlertTitle>Warning: No primary keys selected</AlertTitle>
+            <AlertDescription>
               Tables should have at least one column as the primary key to identify each row.
               Without a primary key, you will not be able to update or delete rows from the table.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         {primaryKeyColumns.length > 1 && (

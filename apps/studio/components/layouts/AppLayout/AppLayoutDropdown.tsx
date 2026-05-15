@@ -1,7 +1,7 @@
 import { AlertCircle, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { forwardRef, type ReactNode } from 'react'
-import { Button, cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 interface AppLayoutDropdownErrorProps {
   message: string
@@ -55,18 +55,18 @@ export function AppLayoutDropdownWithPopover({
   triggerButtonClassName,
 }: AppLayoutDropdownWithPopoverProps) {
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={onOpenChange} modal={false}>
+    <Popover open={open} onOpenChange={onOpenChange} modal={false}>
       <div className="flex items-center shrink-0">
         <Link href={linkHref} className={linkClassName}>
           {linkContent}
         </Link>
-        <PopoverTrigger_Shadcn_ asChild>
+        <PopoverTrigger asChild>
           <AppLayoutDropdownTriggerButton className={triggerButtonClassName} />
-        </PopoverTrigger_Shadcn_>
+        </PopoverTrigger>
       </div>
-      <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+      <PopoverContent className="p-0" side="bottom" align="start">
         {commandContent}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

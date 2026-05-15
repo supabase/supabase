@@ -5,7 +5,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,

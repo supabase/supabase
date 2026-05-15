@@ -8,8 +8,8 @@ import {
   Checkbox,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_,
+  Input,
+  Label,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select_Shadcn_,
@@ -111,7 +111,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
             render={({ field }) => (
               <FormItemLayout label="Name" layout="vertical" className="gap-1">
                 <FormControl>
-                  <Input_Shadcn_ {...field} placeholder="my_webhook" />
+                  <Input {...field} placeholder="my_webhook" />
                 </FormControl>
                 <p className="mt-2 text-xs text-foreground-lighter">
                   Do not use spaces/whitespaces
@@ -193,12 +193,12 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                         }}
                       />
                       <div className="grid gap-1.5 leading-none">
-                        <Label_Shadcn_
+                        <Label
                           htmlFor={`event-${event.value}`}
                           className="text-sm font-normal cursor-pointer"
                         >
                           {event.label}
-                        </Label_Shadcn_>
+                        </Label>
                         <p className="text-xs text-foreground-lighter">{event.description}</p>
                       </div>
                     </div>

@@ -4,7 +4,7 @@ import { Control, ControllerRenderProps } from 'react-hook-form'
 import {
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -72,11 +72,7 @@ export const BasicInfo = ({
         render={({ field }) => (
           <FormItemLayout name="tokenName" label="Name">
             <FormControl>
-              <Input_Shadcn_
-                id="tokenName"
-                {...field}
-                placeholder="Provide a name for your token"
-              />
+              <Input id="tokenName" {...field} placeholder="Provide a name for your token" />
             </FormControl>
           </FormItemLayout>
         )}

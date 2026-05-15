@@ -12,10 +12,10 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Input_Shadcn_ as Input,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -139,7 +139,7 @@ export const Column = ({
             disabled={hasImportContent}
             placeholder="column_name"
             className={cn(
-              'border-r-transparent rounded-r-none',
+              '[&>div>div>div>input]:py-1.5 [&>div>div>div>input]:border-r-transparent [&>div>div>div>input]:rounded-r-none',
               hasImportContent ? 'opacity-50' : ''
             )}
             onChange={(event) => onUpdateColumn({ name: event.target.value })}
@@ -147,19 +147,19 @@ export const Column = ({
           {relations.filter((r) => !r.toRemove).length === 0 ? (
             <Button
               type="dashed"
-              className="rounded-l-none h-[34px] py-0 px-2"
+              className="rounded-l-none h-[30px] py-0 px-2"
               onClick={() => onEditForeignKey()}
             >
               <Link size={12} />
             </Button>
           ) : (
-            <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
+              <PopoverTrigger asChild>
                 <Button type="default" className="rounded-l-none h-[30px] py-0 px-2">
                   <Link size={12} />
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
                 side="bottom"
                 align="center"
@@ -233,15 +233,15 @@ export const Column = ({
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
           <ColumnType
-            value={column.format}
+            value={{ format: column.format, formatSchema: column.formatSchema }}
             enumTypes={enumTypes}
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
@@ -249,9 +249,9 @@ export const Column = ({
             description={
               hasForeignKeys ? 'Column type cannot be changed as it has a foreign key relation' : ''
             }
-            onOptionSelect={(format: string) => {
+            onOptionSelect={({ format, formatSchema }) => {
               const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
-              onUpdateColumn({ format, defaultValue })
+              onUpdateColumn({ format, formatSchema, defaultValue })
             }}
           />
         </div>
@@ -269,7 +269,9 @@ export const Column = ({
             size="small"
             value={column.defaultValue ?? ''}
             disabled={column.format.includes('int') && column.isIdentity}
-            className={column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''}
+            className={`rounded-sm bg-surface-100 lg:gap-0 ${
+              column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
+            }`}
             suggestions={suggestions}
             suggestionsHeader="Suggested expressions"
             suggestionsTooltip="Suggested expressions"
@@ -296,8 +298,8 @@ export const Column = ({
       <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
       <div className="flex w-[5%] justify-end">
         {(!column.isPrimaryKey || column.format.includes('int')) && (
-          <Popover_Shadcn_>
-            <PopoverTrigger_Shadcn_
+          <Popover>
+            <PopoverTrigger
               data-testid={`${column.name}-extra-options`}
               className="group flex items-center -space-x-1"
             >
@@ -309,8 +311,8 @@ export const Column = ({
               <div className="text-foreground-light transition-colors group-hover:text-foreground">
                 <Settings size={16} strokeWidth={1} />
               </div>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ align="end" className="w-80 p-0">
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
               <div className="flex items-center justify-center bg-surface-200 gap-y-1 py-1.5 px-3 border-b border-overlay">
                 <h5 className="text-foreground">Extra options</h5>
               </div>
@@ -385,8 +387,8 @@ export const Column = ({
                   </FormItemLayout>
                 )}
               </div>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
         )}
       </div>
       {!hasImportContent && (

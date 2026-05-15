@@ -2,9 +2,6 @@
  * Custom Tailwind v4 utilities migrated from packages/config/ui.config.js
  * (addUtilities + matchUtilities) and packages/config/tailwind.config.js
  * (the .bg legacy shim).
- *
- * Note: .no-scrollbar lives in packages/config/tailwind-plugins/motion-safe-transition.js
- * and is loaded via @plugin from tailwind.config.css, so it's not duplicated here.
  */
 
 /*
@@ -68,4 +65,12 @@
  */
 @utility bg-grid-* {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='--value(--color-*)'><path d='M0 .5H31.5V32'/></svg>");
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 }

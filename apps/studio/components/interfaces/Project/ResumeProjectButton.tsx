@@ -58,7 +58,7 @@ export const ResumeProjectButton = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { setProjectStatus } = useSetProjectStatus()
 
-  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
+  const newProjectInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
   const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
   const orgSlug = selectedOrganization?.slug
   const isFreePlan = selectedOrganization?.plan?.id === 'free'
@@ -125,7 +125,7 @@ export const ResumeProjectButton = ({
       return toast.error('Unable to restore: project is required')
     }
 
-    if (!showPostgresVersionSelector) {
+    if (!newProjectInternalOnlyConfiguration) {
       return restoreProject({ ref: project.ref })
     }
 
@@ -186,7 +186,7 @@ export const ResumeProjectButton = ({
         confirmLabelLoading="Resuming"
         cancelLabel="Cancel"
       >
-        <div className={cn(showPostgresVersionSelector && 'flex flex-col gap-y-4')}>
+        <div className={cn(newProjectInternalOnlyConfiguration && 'flex flex-col gap-y-4')}>
           <p className="text-sm">
             {isFreePlan
               ? 'Your project’s data will be restored to when it was initially paused.'
@@ -194,7 +194,7 @@ export const ResumeProjectButton = ({
           </p>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onConfirmRestore)}>
-              {showPostgresVersionSelector && (
+              {newProjectInternalOnlyConfiguration && (
                 <div className="space-y-2">
                   <FormField
                     control={form.control}

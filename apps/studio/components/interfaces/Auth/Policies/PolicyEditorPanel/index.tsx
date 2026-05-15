@@ -21,7 +21,7 @@ import {
   Checkbox,
   cn,
   Form,
-  Label_Shadcn_,
+  Label,
   ScrollArea,
   Sheet,
   SheetContent,
@@ -506,9 +506,9 @@ export const PolicyEditorPanel = memo(function ({
                             setShowCheckBlock(!showCheckBlock)
                           }}
                         />
-                        <Label_Shadcn_ className="text-xs cursor-pointer" htmlFor="use-check">
+                        <Label className="text-xs cursor-pointer" htmlFor="use-check">
                           Use check expression
-                        </Label_Shadcn_>
+                        </Label>
                       </div>
                     )}
                   </div>

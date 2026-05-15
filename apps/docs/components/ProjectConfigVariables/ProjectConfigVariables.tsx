@@ -1,25 +1,14 @@
 'use client'
 
+import {
+  ComboBox,
+  ComboBoxOption,
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.ComboBox'
 import type {
   Branch,
   Org,
   Variable,
 } from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
-
-import { Check, Copy } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import CopyToClipboard from 'react-copy-to-clipboard'
-import { withErrorBoundary } from 'react-error-boundary'
-import { proxy, useSnapshot } from 'valtio'
-
-import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
-import { Button_Shadcn_ as Button, cn, Input_Shadcn_ as Input } from 'ui'
-
-import {
-  ComboBox,
-  ComboBoxOption,
-} from '~/components/ProjectConfigVariables/ProjectConfigVariables.ComboBox'
 import {
   fromBranchValue,
   fromOrgProjectValue,
@@ -41,6 +30,14 @@ import {
 } from '~/lib/fetch/projects-infinite'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
+import { Check, Copy } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+import CopyToClipboard from 'react-copy-to-clipboard'
+import { withErrorBoundary } from 'react-error-boundary'
+import { Button_Shadcn_ as Button, cn, Input } from 'ui'
+import { proxy, useSnapshot } from 'valtio'
 
 type ProjectOrgDataState =
   | 'userLoading'

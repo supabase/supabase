@@ -1,12 +1,19 @@
+import {
+  acceptUntrustedSql,
+  ident,
+  safeSql,
+  untrustedSql,
+  type DisplayableSqlFragment,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta'
 import type { PGPolicy } from '@supabase/pg-meta'
-import { ident } from '@supabase/pg-meta/src/pg-format'
 import { has, isEmpty, isEqual } from 'lodash'
 
 import {
+  DraftPostgresPolicyCreatePayload,
+  DraftPostgresPolicyUpdatePayload,
   PolicyFormField,
   PolicyForReview,
-  PostgresPolicyCreatePayload,
-  PostgresPolicyUpdatePayload,
 } from './Policies.types'
 import { generateSqlPolicy } from '@/data/ai/sql-policy-mutation'
 import type { CreatePolicyBody } from '@/data/database-policies/database-policy-create-mutation'
@@ -113,16 +120,22 @@ const createSQLStatementForUpdatePolicy = (
   return { description, statement }
 }
 
+// These constructors return DRAFT payloads — `definition`/`check` are still
+// `DisplayableSqlFragment`. Promotion to `SafeSqlFragment` must happen at the user gesture
+// (the Save click in `PolicyEditorModal`), not here, since this module has no guarantee that
+// it was reached via a deliberate user action.
 export const createPayloadForCreatePolicy = (
   policyFormFields: PolicyFormField
-): PostgresPolicyCreatePayload => {
-  const { command, definition, check, roles } = policyFormFields
+): DraftPostgresPolicyCreatePayload => {
+  const { name, schema, table, command, definition, check, roles } = policyFormFields
   return {
-    ...policyFormFields,
+    name,
+    schema,
+    table,
     action: 'PERMISSIVE',
     command: command || undefined,
-    definition: definition || undefined,
-    check: check || undefined,
+    definition: !definition ? undefined : untrustedSql(definition),
+    check: !check ? undefined : untrustedSql(check),
     roles: roles.length > 0 ? roles : undefined,
   }
 }
@@ -130,28 +143,25 @@ export const createPayloadForCreatePolicy = (
 export const createPayloadForUpdatePolicy = (
   policyFormFields: PolicyFormField,
   originalPolicyFormFields: PGPolicy
-): PostgresPolicyUpdatePayload => {
+): DraftPostgresPolicyUpdatePayload => {
   const { definition, check } = policyFormFields
-  const formattedPolicyFormFields = {
-    ...policyFormFields,
-    definition: definition ? definition.replace(/\s+/g, ' ').trim() : definition,
-    check: check ? check.replace(/\s+/g, ' ').trim() : check,
-  }
+  const formattedDefinition = definition ? definition.replace(/\s+/g, ' ').trim() : definition
+  const formattedCheck = check ? check.replace(/\s+/g, ' ').trim() : check
 
-  const payload: PostgresPolicyUpdatePayload = { id: originalPolicyFormFields.id }
+  const payload: DraftPostgresPolicyUpdatePayload = { id: originalPolicyFormFields.id }
 
-  if (!isEqual(formattedPolicyFormFields.name, originalPolicyFormFields.name)) {
-    payload.name = formattedPolicyFormFields.name
+  if (!isEqual(policyFormFields.name, originalPolicyFormFields.name)) {
+    payload.name = policyFormFields.name
   }
-  if (!isEqual(formattedPolicyFormFields.definition, originalPolicyFormFields.definition)) {
-    payload.definition = formattedPolicyFormFields.definition || undefined
+  if (!isEqual(formattedDefinition, originalPolicyFormFields.definition)) {
+    payload.definition = !formattedDefinition ? undefined : untrustedSql(formattedDefinition)
   }
-  if (!isEqual(formattedPolicyFormFields.check, originalPolicyFormFields.check)) {
-    payload.check = formattedPolicyFormFields.check || undefined
+  if (!isEqual(formattedCheck, originalPolicyFormFields.check)) {
+    payload.check = !formattedCheck ? undefined : untrustedSql(formattedCheck)
   }
-  if (!isEqual(formattedPolicyFormFields.roles, originalPolicyFormFields.roles)) {
-    if (formattedPolicyFormFields.roles.length === 0) payload.roles = ['public']
-    else payload.roles = formattedPolicyFormFields.roles || undefined
+  if (!isEqual(policyFormFields.roles, originalPolicyFormFields.roles)) {
+    if (policyFormFields.roles.length === 0) payload.roles = ['public']
+    else payload.roles = policyFormFields.roles || undefined
   }
 
   return payload
@@ -160,16 +170,42 @@ export const createPayloadForUpdatePolicy = (
 // --- Policy Generation ---
 
 /**
- * Generated policy extends CreatePolicyBody with additional fields for display.
- * - sql: Full CREATE POLICY SQL statement for preview
- * - Required fields that are optional in CreatePolicyBody
+ * A policy generated for display/staging in the table editor.
+ * `definition`/`check` are `DisplayableSqlFragment` because generators have different provenance:
+ * programmatic generation produces `SafeSqlFragment` (composed via `safeSql`), AI generation
+ * produces `UntrustedSqlFragment` (third-party output). Consumers must promote via
+ * `acceptUntrustedSql` at a user gesture before executing.
  */
 export type GeneratedPolicy = Required<
   Pick<CreatePolicyBody, 'name' | 'table' | 'schema' | 'action' | 'roles'>
 > &
-  Pick<CreatePolicyBody, 'command' | 'definition' | 'check'> & {
+  Pick<CreatePolicyBody, 'command'> & {
+    definition?: DisplayableSqlFragment
+    check?: DisplayableSqlFragment
     sql: string
   }
+
+/**
+ * A {@link GeneratedPolicy} whose `definition`/`check` have already been promoted to
+ * `SafeSqlFragment`. Producing one of these is the contract that says: the user gesture
+ * required to execute this SQL has already happened.
+ */
+export type AcceptedGeneratedPolicy = Omit<GeneratedPolicy, 'definition' | 'check'> & {
+  definition?: SafeSqlFragment
+  check?: SafeSqlFragment
+}
+
+/**
+ * Promotes a {@link GeneratedPolicy} to an {@link AcceptedGeneratedPolicy}.
+ * ONLY call from an event handler tied to a deliberate user action (e.g. the Save click
+ * on the table editor). Never call from useEffect, render, or any path that runs without
+ * a user gesture.
+ */
+export const acceptGeneratedPolicy = (policy: GeneratedPolicy): AcceptedGeneratedPolicy => ({
+  ...policy,
+  definition: policy.definition === undefined ? undefined : acceptUntrustedSql(policy.definition),
+  check: policy.check === undefined ? undefined : acceptUntrustedSql(policy.check),
+})
 
 type Relationship = {
   source_schema: string
@@ -270,23 +306,22 @@ const findPathToAuthUsers = (
 }
 
 /** Generates SQL expression for RLS policy based on FK path to auth.users */
-const buildPolicyExpression = (path: Relationship[]): string => {
-  if (path.length === 0) return ''
+const buildPolicyExpression = (path: Relationship[]): SafeSqlFragment => {
+  if (path.length === 0) return safeSql``
 
   // Direct FK to auth.users
   if (path.length === 1) {
-    return `(select auth.uid()) = ${ident(path[0].source_column_name)}`
+    return safeSql`(select auth.uid()) = ${ident(path[0].source_column_name)}`
   }
 
   // Indirect path - build EXISTS with JOINs
   const [first, ...rest] = path
-  const firstTarget = `${ident(first.target_table_schema)}.${ident(first.target_table_name)}`
-  const source = `${ident(first.source_schema)}.${ident(first.source_table_name)}`
+  const firstTarget = safeSql`${ident(first.target_table_schema)}.${ident(first.target_table_name)}`
+  const source = safeSql`${ident(first.source_schema)}.${ident(first.source_table_name)}`
   const last = path[path.length - 1]
 
-  const joins = rest
-    .slice(0, -1)
-    .map((r) => {
+  const joins = rest.slice(0, -1).reduce<SafeSqlFragment>(
+    (acc, r) => {
       const targetSchema = ident(r.target_table_schema)
       const targetTable = ident(r.target_table_name)
       const targetColumn = ident(r.target_column_name)
@@ -294,11 +329,13 @@ const buildPolicyExpression = (path: Relationship[]): string => {
       const sourceSchema = ident(r.source_schema)
       const sourceTable = ident(r.source_table_name)
       const sourceColumn = ident(r.source_column_name)
-      return `join ${targetSchema}.${targetTable} on ${targetSchema}.${targetTable}.${targetColumn} = ${sourceSchema}.${sourceTable}.${sourceColumn}`
-    })
-    .join('\n  ')
+      const join = safeSql`join ${targetSchema}.${targetTable} on ${targetSchema}.${targetTable}.${targetColumn} = ${sourceSchema}.${sourceTable}.${sourceColumn}`
+      return acc.length === 0 ? join : safeSql`${acc}\n  ${join}`
+    },
+    safeSql``
+  )
 
-  return `exists (
+  return safeSql`exists (
   select 1 from ${firstTarget}
   ${joins}
   where ${firstTarget}.${ident(first.target_column_name)} = ${source}.${ident(first.source_column_name)}
@@ -383,15 +420,13 @@ export const generateAiPoliciesForTable = async ({
   if (!connectionString) return []
 
   try {
-    const aiPolicies = await generateSqlPolicy({
+    return await generateSqlPolicy({
       tableName: table.name,
       schema: table.schema,
       columns: columns.map((col) => col.name.trim()),
       projectRef,
       connectionString: connectionString ?? '',
     })
-    // AI response now includes all structured fields
-    return aiPolicies as GeneratedPolicy[]
   } catch (error) {
     console.log('AI policy generation failed:', error)
     return []

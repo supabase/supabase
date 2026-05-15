@@ -2,7 +2,7 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { CircleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
-import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ } from 'ui'
+import { Button, cn, Input, Label, Separator, TextArea } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 
 interface FormData {
@@ -17,7 +17,7 @@ interface FormItem {
   placeholder: string
   required: boolean
   className?: string
-  component: typeof TextArea_Shadcn_ | typeof Input_Shadcn_
+  component: typeof TextArea | typeof Input
 }
 
 type FormConfig = {
@@ -35,7 +35,7 @@ const formConfig: FormConfig = {
     placeholder: 'First Name',
     required: true,
     className: 'col-span-full',
-    component: Input_Shadcn_,
+    component: Input,
   },
   secondName: {
     type: 'text',
@@ -43,7 +43,7 @@ const formConfig: FormConfig = {
     placeholder: 'Last Name',
     required: true,
     className: 'col-span-full',
-    component: Input_Shadcn_,
+    component: Input,
   },
   companyEmail: {
     type: 'text',
@@ -51,7 +51,7 @@ const formConfig: FormConfig = {
     placeholder: 'Company Email',
     required: true,
     className: '',
-    component: Input_Shadcn_,
+    component: Input,
   },
 }
 
@@ -210,10 +210,7 @@ const TalkToPartnershipTeamForm: FC<Props> = ({ className }) => {
                   key={key}
                   className={cn('flex flex-col col-span-full gap-y-2', fieldValue.className)}
                 >
-                  <Label_Shadcn_
-                    htmlFor={fieldKey}
-                    className="text-foreground-light flex justify-between"
-                  >
+                  <Label htmlFor={fieldKey} className="text-foreground-light flex justify-between">
                     {fieldValue.label}
                     <div
                       className={cn(
@@ -223,7 +220,7 @@ const TalkToPartnershipTeamForm: FC<Props> = ({ className }) => {
                     >
                       {errors[fieldKey]}
                     </div>
-                  </Label_Shadcn_>
+                  </Label>
                   <Component
                     type="text"
                     id={fieldKey}

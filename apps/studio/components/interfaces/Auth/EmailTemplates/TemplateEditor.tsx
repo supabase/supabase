@@ -13,8 +13,8 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_,
+  Input,
+  Label,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -259,7 +259,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       }
                     >
                       <FormControl>
-                        <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
+                        <Input id={x} {...field} disabled={!canUpdateConfig} />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -274,7 +274,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
           <>
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center justify-between gap-2">
-                <Label_Shadcn_>Body</Label_Shadcn_>
+                <Label>Body</Label>
                 <TwoOptionToggle
                   width={60}
                   options={['preview', 'source']}

@@ -9,9 +9,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -34,8 +34,8 @@ export const TimezoneSelection = ({
 
   return (
     <div className="w-full">
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             role="combobox"
             aria-expanded={open}
@@ -49,8 +49,8 @@ export const TimezoneSelection = ({
               ? timezoneOptions.find((option) => option === selectedTimezone.text)
               : 'Select timezone...'}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ id={listboxId} className="w-[350px] p-0">
+        </PopoverTrigger>
+        <PopoverContent id={listboxId} className="w-[350px] p-0">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
             <CommandList_Shadcn_>
@@ -84,8 +84,8 @@ export const TimezoneSelection = ({
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

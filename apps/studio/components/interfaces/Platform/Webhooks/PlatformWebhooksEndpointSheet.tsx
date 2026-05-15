@@ -13,8 +13,8 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_ as InputField,
-  Label_Shadcn_ as Label,
+  Input,
+  Label,
   Separator,
   Sheet,
   SheetContent,
@@ -24,7 +24,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  TextArea_Shadcn_ as Textarea,
+  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
@@ -286,7 +286,7 @@ export const PlatformWebhooksEndpointSheet = ({
                       className="gap-1"
                     >
                       <FormControl>
-                        <InputField {...field} placeholder="winged-envelope" maxLength={64} />
+                        <Input {...field} placeholder="winged-envelope" maxLength={64} />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -298,10 +298,7 @@ export const PlatformWebhooksEndpointSheet = ({
                   render={({ field }) => (
                     <FormItemLayout label="Endpoint URL" layout="vertical" className="gap-1">
                       <FormControl>
-                        <InputField
-                          {...field}
-                          placeholder="https://api.example.com/webhooks/supabase"
-                        />
+                        <Input {...field} placeholder="https://api.example.com/webhooks/supabase" />
                       </FormControl>
                     </FormItemLayout>
                   )}

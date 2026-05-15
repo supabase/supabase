@@ -3,10 +3,10 @@ import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Label_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Label,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -65,7 +65,7 @@ export default function RealtimeLimitsEstimater({}) {
       <h4>Set your expected parameters</h4>
       <div className="grid mb-8 gap-y-8 gap-x-8 grid-cols-2 xl:grid-cols-4">
         <div>
-          <Label_Shadcn_ htmlFor="computeAddOn">Compute:</Label_Shadcn_>
+          <Label htmlFor="computeAddOn">Compute:</Label>
           <Select_Shadcn_ onValueChange={handleComputeAddOnSelection} value={computeAddOn}>
             <SelectTrigger_Shadcn_ id="computeAddOn">
               <SelectValue_Shadcn_ className="font-mono" />
@@ -78,7 +78,7 @@ export default function RealtimeLimitsEstimater({}) {
           </Select_Shadcn_>
         </div>
         <div>
-          <Label_Shadcn_ htmlFor="filters">Filters:</Label_Shadcn_>
+          <Label htmlFor="filters">Filters:</Label>
           <Select_Shadcn_
             onValueChange={handleFiltersSelection}
             value={filters.toString()}
@@ -94,7 +94,7 @@ export default function RealtimeLimitsEstimater({}) {
           </Select_Shadcn_>
         </div>
         <div>
-          <Label_Shadcn_ htmlFor="rls">RLS:</Label_Shadcn_>
+          <Label htmlFor="rls">RLS:</Label>
           <Select_Shadcn_ onValueChange={handleRLSSelection} value={rls.toString()}>
             <SelectTrigger_Shadcn_ id="rls">
               <SelectValue_Shadcn_ className="font-mono" />
@@ -106,7 +106,7 @@ export default function RealtimeLimitsEstimater({}) {
           </Select_Shadcn_>
         </div>
         <div>
-          <Label_Shadcn_ htmlFor="concurrency">Connected clients:</Label_Shadcn_>
+          <Label htmlFor="concurrency">Connected clients:</Label>
           <Select_Shadcn_ onValueChange={handleConcurrencySelection} value={concurrency.toString()}>
             <SelectTrigger_Shadcn_ id="concurrency">
               <SelectValue_Shadcn_ className="font-mono" />
@@ -153,8 +153,8 @@ export default function RealtimeLimitsEstimater({}) {
         </div>
       )}
 
-      <Collapsible_Shadcn_ open={expandPreview} onOpenChange={setExpandPreview}>
-        <CollapsibleTrigger_Shadcn_ asChild>
+      <Collapsible open={expandPreview} onOpenChange={setExpandPreview}>
+        <CollapsibleTrigger asChild>
           <div className="py-1 flex items-center">
             <p className="text-sm">View raw throughput table</p>
             <Button
@@ -170,8 +170,8 @@ export default function RealtimeLimitsEstimater({}) {
               onClick={() => setExpandPreview(!expandPreview)}
             />
           </div>
-        </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
           <div>
             {throughputTable
               .map((l) => l.computeAddOn)
@@ -220,8 +220,8 @@ export default function RealtimeLimitsEstimater({}) {
                 </div>
               ))}
           </div>
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   )
 }

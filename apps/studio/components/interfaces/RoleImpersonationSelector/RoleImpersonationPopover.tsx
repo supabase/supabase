@@ -1,7 +1,7 @@
 import { RoleImpersonationSelector } from '.'
 import { ChevronDown, User as IconUser } from 'lucide-react'
 import { useState } from 'react'
-import { Button, cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 import type { User } from '@/data/auth/users-infinite-query'
@@ -29,8 +29,8 @@ export const RoleImpersonationPopover = ({
   const currentRole = state.role?.role ?? serviceRoleLabel ?? 'postgres'
 
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
         <Button
           size="tiny"
           type="default"
@@ -59,15 +59,15 @@ export const RoleImpersonationPopover = ({
             <ChevronDown className="text-muted" strokeWidth={1} size={12} />
           </div>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 overflow-hidden w-min" side="bottom" align={align}>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 overflow-hidden w-min" side="bottom" align={align}>
         <RoleImpersonationSelector
           header={header}
           serviceRoleLabel={serviceRoleLabel}
           disallowAuthenticatedOption={disallowAuthenticatedOption}
         />
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 
