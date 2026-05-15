@@ -13,6 +13,21 @@ interface MarketplaceDetailHeroProps {
   tabs: Array<{ label: string; href: string; active: boolean }>
 }
 
+interface BadgesComponentProps {
+  className?: string
+  source: ReturnType<typeof getMarketplaceSource>
+  integration: IntegrationDefinition
+}
+
+const BadgesComponent = ({ className, source, integration }: BadgesComponentProps) => {
+  return (
+    <div className={cn('flex items-center gap-2', className)}>
+      <MarketplaceSourceBadge source={source} />
+      {integration.status && <Badge variant="warning">{integration.status}</Badge>}
+    </div>
+  )
+}
+
 export const MarketplaceDetailHero = ({
   integration,
   description,
@@ -20,15 +35,6 @@ export const MarketplaceDetailHero = ({
   tabs,
 }: MarketplaceDetailHeroProps) => {
   const source = getMarketplaceSource(integration)
-
-  const BadgesComponent = ({ className }: { className?: string }) => {
-    return (
-      <div className={cn('flex items-center gap-2', className)}>
-        <MarketplaceSourceBadge source={source} />
-        {integration.status && <Badge variant="warning">{integration.status}</Badge>}
-      </div>
-    )
-  }
 
   return (
     <div className={cn('@container border-b bg-surface-75 pt-10')}>
@@ -46,12 +52,16 @@ export const MarketplaceDetailHero = ({
               <h1 className="m-0 text-3xl font-normal leading-tight tracking-tight">
                 {integration.name}
               </h1>
-              <BadgesComponent className="hidden @xl:flex" />
+              <BadgesComponent
+                className="hidden @xl:flex"
+                source={source}
+                integration={integration}
+              />
             </div>
             <div className="text-[13.5px] text-foreground-light">{subtitle}</div>
           </div>
         </div>
-        <BadgesComponent className="flex @xl:hidden" />
+        <BadgesComponent className="flex @xl:hidden" source={source} integration={integration} />
         {description && (
           <p className="m-0 max-w-[760px] text-lg leading-snug tracking-tight text-foreground">
             {description}
