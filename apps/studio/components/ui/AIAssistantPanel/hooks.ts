@@ -36,7 +36,7 @@ export function useAutoScroll({ enabled = true }: UseAutoScrollProps = {}) {
       clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
         if (
-          lastScrollHeightRef.current !== undefined &&
+          lastScrollHeightRef.current != null &&
           container.scrollHeight !== lastScrollHeightRef.current
         ) {
           lastScrollHeightRef.current = container.scrollHeight
