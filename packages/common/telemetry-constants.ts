@@ -175,6 +175,10 @@ export interface CronJobUpdatedEvent {
  */
 export interface CronJobRemovedEvent {
   action: 'cron_job_removed'
+  properties: {
+    /** Cron job classification, parsed from the job's command at deletion time. */
+    type: 'sql_function' | 'sql_snippet' | 'edge_function' | 'http_request'
+  }
   groups: TelemetryGroups
 }
 
