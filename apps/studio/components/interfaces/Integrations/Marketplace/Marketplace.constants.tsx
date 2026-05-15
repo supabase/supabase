@@ -15,7 +15,8 @@ import {
   Wrench,
   type LucideIcon,
 } from 'lucide-react'
-import { IconPartners } from 'ui'
+import type { ReactNode } from 'react'
+import { Badge, cn, IconPartners } from 'ui'
 
 import type {
   IntegrationDefinition,
@@ -112,7 +113,7 @@ export const getMarketplaceTypeLabel = (type: MarketplaceIntegrationType): strin
 export const MARKETPLACE_SOURCES: Array<{
   key: MarketplaceSource
   label: string
-  icon: LucideIcon
+  icon: LucideIcon | ((props: { className?: string }) => ReactNode)
 }> = [
   { key: 'Official', label: 'Official', icon: BadgeCheck },
   { key: 'Partner', label: 'Partner', icon: IconPartners },
@@ -122,4 +123,25 @@ export const MARKETPLACE_SOURCES: Array<{
 export const getMarketplaceSource = (integration: IntegrationDefinition): MarketplaceSource => {
   if (integration.source) return integration.source
   return integration.listingId ? 'Partner' : 'Official'
+}
+
+export const MarketplaceSourceBadge = ({
+  source,
+  className,
+}: {
+  source: MarketplaceSource
+  className?: string
+}) => {
+  switch (source) {
+    case 'Partner':
+      return (
+        <Badge className={cn('border-foreground-lighter/50', className)}>
+          <IconPartners size={10} /> Partner
+        </Badge>
+      )
+    case 'Community':
+      return <Badge className={className}>Community</Badge>
+    case 'Official':
+      return <Badge className={className}>Official</Badge>
+  }
 }

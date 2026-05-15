@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { Badge, Card, IconPartners } from 'ui'
+import { Badge, Card } from 'ui'
 
-import { getMarketplaceSource } from './Marketplace.constants'
+import { getMarketplaceSource, MarketplaceSourceBadge } from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -38,15 +38,7 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
                 {integration.status}
               </Badge>
             )}
-            {source === 'Partner' ? (
-              <Badge variant="success">
-                <IconPartners size={12} /> Partner
-              </Badge>
-            ) : source === 'Community' ? (
-              <Badge>Community</Badge>
-            ) : (
-              <Badge>Official</Badge>
-            )}
+            <MarketplaceSourceBadge source={source} />
           </div>
           <div className="text-xs flex items-center gap-1 text-foreground-lighter">
             <span>Built by</span>

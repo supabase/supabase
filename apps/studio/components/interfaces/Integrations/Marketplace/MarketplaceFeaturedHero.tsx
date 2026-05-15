@@ -1,9 +1,13 @@
 import { Pause, Play } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Badge, Button, cn, IconPartners } from 'ui'
+import { Badge, Button, cn } from 'ui'
 
-import { formatCategoryLabel, getMarketplaceSource } from './Marketplace.constants'
+import {
+  formatCategoryLabel,
+  getMarketplaceSource,
+  MarketplaceSourceBadge,
+} from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -106,20 +110,11 @@ export const MarketplaceFeaturedHero = ({
                     )}
                     {(() => {
                       const source = getMarketplaceSource(active)
-                      if (source === 'Partner')
-                        return (
-                          <Badge variant="success">
-                            <IconPartners size={12} /> Partner
-                          </Badge>
-                        )
-                      if (source === 'Community') return <Badge>Community</Badge>
-                      return <Badge>Official</Badge>
+                      if (source === 'Partner') return <MarketplaceSourceBadge source="Partner" />
+                      if (source === 'Community')
+                        return <MarketplaceSourceBadge source="Community" />
+                      return <MarketplaceSourceBadge source="Official" />
                     })()}
-                    {activeCategoryName && (
-                      <span className="text-[12px] text-foreground-lighter">
-                        · {activeCategoryName}
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>

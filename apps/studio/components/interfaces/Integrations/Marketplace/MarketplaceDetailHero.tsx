@@ -1,9 +1,8 @@
-import { Handshake } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { Badge, cn, IconPartners, NavMenu, NavMenuItem } from 'ui'
+import { Badge, cn, NavMenu, NavMenuItem } from 'ui'
 
-import { getMarketplaceSource } from './Marketplace.constants'
+import { getMarketplaceSource, MarketplaceSourceBadge } from './Marketplace.constants'
 import { centeredContentClass } from './MarketplaceDetail'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
@@ -25,15 +24,7 @@ export const MarketplaceDetailHero = ({
   const BadgesComponent = ({ className }: { className?: string }) => {
     return (
       <div className={cn('flex items-center gap-2', className)}>
-        {source === 'Partner' ? (
-          <Badge variant="success">
-            <IconPartners size={12} /> Partner
-          </Badge>
-        ) : source === 'Community' ? (
-          <Badge>Community</Badge>
-        ) : (
-          <Badge>Official</Badge>
-        )}
+        <MarketplaceSourceBadge source={source} />
         {integration.status && <Badge variant="warning">{integration.status}</Badge>}
       </div>
     )

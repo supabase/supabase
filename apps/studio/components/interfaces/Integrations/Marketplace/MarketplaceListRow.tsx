@@ -1,11 +1,12 @@
 import { useRouter } from 'next/router'
-import { Badge, IconPartners, TableCell, TableHead, TableRow } from 'ui'
+import { Badge, TableCell, TableHead, TableRow } from 'ui'
 
 import {
   formatCategoryLabel,
   getMarketplaceSource,
   getMarketplaceType,
   getMarketplaceTypeLabel,
+  MarketplaceSourceBadge,
 } from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
@@ -44,15 +45,7 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
                 {integration.status}
               </Badge>
             )}
-            {source === 'Partner' ? (
-              <Badge variant="success">
-                <IconPartners size={12} /> Partner
-              </Badge>
-            ) : source === 'Community' ? (
-              <Badge>Community</Badge>
-            ) : (
-              <Badge>Official</Badge>
-            )}
+            <MarketplaceSourceBadge source={source} />
           </div>
           {integration.description && (
             <p className="mt-0.5 line-clamp-1 max-w-[600px] text-xs text-foreground-light">
