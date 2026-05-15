@@ -1977,6 +1977,7 @@ export interface HomeSectionRowsMovedEvent {
  */
 export interface DpaRequestButtonClickedEvent {
   action: 'dpa_request_button_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
