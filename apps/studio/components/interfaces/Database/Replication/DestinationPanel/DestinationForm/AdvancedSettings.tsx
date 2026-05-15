@@ -169,9 +169,7 @@ export const AdvancedSettings = ({
                 >
                   <FormControl>
                     <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
-                      <SelectTrigger className="capitalize">
-                        {field.value ?? 'error'}
-                      </SelectTrigger>
+                      <SelectTrigger className="capitalize">{field.value ?? 'error'}</SelectTrigger>
                       <SelectContent>
                         <SelectItem value="error" className="[&>span]:top-2.5">
                           <p>Error</p>

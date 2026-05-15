@@ -327,10 +327,7 @@ export const ForeignKeySelector = ({
               className="gap-[2px]"
               size="tiny"
             >
-              <Select
-                value={fk.schema}
-                onValueChange={(value) => updateSelectedSchema(value)}
-              >
+              <Select value={fk.schema} onValueChange={(value) => updateSelectedSchema(value)}>
                 <SelectTrigger id="schema">
                   <SelectValue />
                 </SelectTrigger>
@@ -361,11 +358,7 @@ export const ForeignKeySelector = ({
                 </SelectTrigger>
                 <SelectContent>
                   {sortBy(tables, ['schema']).map((table) => (
-                    <SelectItem
-                      key={table.id}
-                      value={table.id.toString()}
-                      className="min-w-96"
-                    >
+                    <SelectItem key={table.id} value={table.id.toString()} className="min-w-96">
                       <div className="flex items-center gap-2">
                         {/* For aria searching to target the table name instead of schema */}
                         <span className="hidden">{table.name}</span>
@@ -450,9 +443,7 @@ export const ForeignKeySelector = ({
                               value={fk.columns[idx].target}
                               onValueChange={(value) => updateSelectedColumn(idx, 'target', value)}
                             >
-                              <SelectTrigger
-                                aria-label={`Column from ${fk.schema}.${fk.table}`}
-                              >
+                              <SelectTrigger aria-label={`Column from ${fk.schema}.${fk.table}`}>
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>

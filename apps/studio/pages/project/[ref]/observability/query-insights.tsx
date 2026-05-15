@@ -1,10 +1,4 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'ui'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 import { QueryInsights } from '@/components/interfaces/QueryInsights/QueryInsights'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'

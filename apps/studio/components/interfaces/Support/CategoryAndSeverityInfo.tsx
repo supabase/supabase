@@ -90,11 +90,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
         return (
           <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
             <FormControl>
-              <Select
-                {...fieldWithoutRef}
-                defaultValue={field.value}
-                onValueChange={onValueChange}
-              >
+              <Select {...fieldWithoutRef} defaultValue={field.value} onValueChange={onValueChange}>
                 <SelectTrigger aria-label="Select an issue" className="w-full">
                   <SelectValue placeholder="Select an issue">
                     {field.value
@@ -143,9 +139,7 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
                 onValueChange={field.onChange}
               >
                 <SelectTrigger aria-label="Select a severity" className="w-full">
-                  <SelectValue placeholder="Select a severity">
-                    {field.value}
-                  </SelectValue>
+                  <SelectValue placeholder="Select a severity">{field.value}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>

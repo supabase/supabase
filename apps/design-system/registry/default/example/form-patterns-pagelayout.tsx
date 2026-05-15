@@ -577,15 +577,9 @@ export default function FormPatternsPageLayout() {
                               <SelectValue placeholder="Select an option" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="us-east-1">
-                                US East (N. Virginia)
-                              </SelectItem>
-                              <SelectItem value="us-west-2">
-                                US West (Oregon)
-                              </SelectItem>
-                              <SelectItem value="eu-west-1">
-                                EU West (Ireland)
-                              </SelectItem>
+                              <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                              <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                              <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>

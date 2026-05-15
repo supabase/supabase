@@ -79,11 +79,7 @@ export default function RealtimeLimitsEstimater({}) {
         </div>
         <div>
           <Label htmlFor="filters">Filters:</Label>
-          <Select
-            onValueChange={handleFiltersSelection}
-            value={filters.toString()}
-            disabled
-          >
+          <Select onValueChange={handleFiltersSelection} value={filters.toString()} disabled>
             <SelectTrigger id="filters">
               <SelectValue className="font-mono" />
             </SelectTrigger>

@@ -205,10 +205,7 @@ export const TransferProjectButton = () => {
                   className="gap-[2px]"
                   size="tiny"
                 >
-                  <Select
-                    onValueChange={(slug) => setSelectedOrg(slug)}
-                    value={selectedOrg}
-                  >
+                  <Select onValueChange={(slug) => setSelectedOrg(slug)} value={selectedOrg}>
                     <SelectTrigger id="organization">
                       <SelectValue placeholder="Select Organization" />
                     </SelectTrigger>

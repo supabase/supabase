@@ -117,9 +117,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
                         value={field.value}
                         onValueChange={(value) => form.setValue('unit', value as 'hours' | 'days')}
                       >
-                        <SelectTrigger className="capitalize w-24">
-                          {field.value}
-                        </SelectTrigger>
+                        <SelectTrigger className="capitalize w-24">{field.value}</SelectTrigger>
                         <SelectContent>
                           <SelectItem value="hours">Hours</SelectItem>
                           <SelectItem value="days">Days</SelectItem>

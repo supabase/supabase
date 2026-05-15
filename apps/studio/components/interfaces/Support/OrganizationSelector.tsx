@@ -68,9 +68,7 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
                       </SelectItem>
                     ))}
                     {isSuccessOrganizations && (organizations ?? []).length === 0 && (
-                      <SelectItem value={NO_ORG_MARKER}>
-                        No specific organization
-                      </SelectItem>
+                      <SelectItem value={NO_ORG_MARKER}>No specific organization</SelectItem>
                     )}
                   </SelectGroup>
                 </SelectContent>

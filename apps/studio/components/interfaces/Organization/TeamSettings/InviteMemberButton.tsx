@@ -364,12 +364,8 @@ export const InviteMemberButton = () => {
                               <SelectItem value="auto">
                                 Automatic (based on your account)
                               </SelectItem>
-                              <SelectItem value="sso">
-                                Require SSO authentication
-                              </SelectItem>
-                              <SelectItem value="non-sso">
-                                Email/password authentication
-                              </SelectItem>
+                              <SelectItem value="sso">Require SSO authentication</SelectItem>
+                              <SelectItem value="non-sso">Email/password authentication</SelectItem>
                             </SelectGroup>
                           </SelectContent>
                         </Select>

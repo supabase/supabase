@@ -244,9 +244,7 @@ export const PolicyDetailsV2 = ({
                     value={field.value}
                     onValueChange={(value) => form.setValue('behavior', value)}
                   >
-                    <SelectTrigger className="text-sm h-10 capitalize">
-                      {field.value}
-                    </SelectTrigger>
+                    <SelectTrigger className="text-sm h-10 capitalize">{field.value}</SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectItem value="permissive" className="text-sm">

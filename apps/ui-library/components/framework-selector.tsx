@@ -1,14 +1,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'ui'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 import { componentPages, frameworkTitles } from '@/config/docs'
 import { useFramework } from '@/context/framework-context'

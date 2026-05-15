@@ -19,7 +19,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue as SelectValue,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,

@@ -1,12 +1,5 @@
 import type { RenderEditCellProps } from 'react-data-grid'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'ui'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 interface SelectEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
   TRow,
