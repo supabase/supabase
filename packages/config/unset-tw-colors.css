@@ -1,0 +1,42 @@
+/* 
+ * This file unsets all built-in Tailwind CSS colors for which we have overrides. Some of them might not exist in 
+ * Tailwind's default theme. 
+ */
+@theme {
+  --color-amber-*: initial;
+  --color-amberA-*: initial;
+  --color-blackA-*: initial;
+  --color-blue-*: initial;
+  --color-blueA-*: initial;
+  --color-crimson-*: initial;
+  --color-crimsonA-*: initial;
+  --color-gold-*: initial;
+  --color-goldA-*: initial;
+  --color-gray-*: initial;
+  --color-grayA-*: initial;
+  --color-green-*: initial;
+  --color-greenA-*: initial;
+  --color-indigo-*: initial;
+  --color-indigoA-*: initial;
+  --color-orange-*: initial;
+  --color-orangeA-*: initial;
+  --color-pink-*: initial;
+  --color-pinkA-*: initial;
+  --color-purple-*: initial;
+  --color-purpleA-*: initial;
+  --color-red-*: initial;
+  --color-redA-*: initial;
+  --color-slate-*: initial;
+  --color-slateA-*: initial;
+  --color-tomato-*: initial;
+  --color-tomatoA-*: initial;
+  --color-violet-*: initial;
+  --color-violetA-*: initial;
+  --color-whiteA-*: initial;
+  --color-yellow-*: initial;
+  --color-yellowA-*: initial;
+  --color-scale-*: initial;
+  --color-scale-fixed-*: initial;
+  --color-scaleA-*: initial;
+  --color-scaleA-fixed-*: initial;
+}

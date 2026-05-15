@@ -7,10 +7,12 @@ import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignal
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
+import { useTrack } from '@/lib/telemetry/track'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const track = useTrack()
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const { data: signalItems } = useAdvisorSignals({ projectRef })
@@ -36,6 +38,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
 
   const handleClick = () => {
+    track('header_advisor_button_clicked')
     toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
   }
 
@@ -47,6 +50,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         id="advisor-center-trigger"
         className={cn(
           'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
+          hasCriticalIssues && 'bg-destructive-200 border-destructive-500',
           isOpen && 'bg-foreground text-background'
         )}
         onClick={handleClick}
@@ -64,6 +68,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
             isOpen && 'text-background group-hover:text-background'
           )}
         />
+        <span className="sr-only">Advisor Center</span>
       </ButtonTooltip>
       {hasCriticalIssues ? (
         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-destructive" />

@@ -180,7 +180,7 @@ const PITRSidePanel = () => {
             in granularity.
           </p>
 
-          <div className="!mt-8 pb-4">
+          <div className="mt-8! pb-4">
             <div className="flex gap-3">
               {PITR_CATEGORY_OPTIONS.map((option) => {
                 const isSelected = selectedCategory === option.id
@@ -262,7 +262,7 @@ const PITRSidePanel = () => {
           ) : null}
 
           {selectedCategory === 'on' && (
-            <div className="!mt-8 pb-4">
+            <div className="mt-8! pb-4">
               {!hasAccessToPitrVariants ? (
                 <UpgradeToPro
                   className="mb-4"
@@ -310,7 +310,7 @@ const PITRSidePanel = () => {
                             <p className="text-foreground text-sm" translate="no">
                               {formatCurrency(option.price)}
                             </p>
-                            <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                            <p className="text-foreground-light translate-y-px"> / month</p>
                           </div>
                         </div>
                       </div>

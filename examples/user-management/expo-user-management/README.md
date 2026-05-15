@@ -22,9 +22,9 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 ![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
 
-**_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
+**_NOTE_**: The `secret` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
-Run `cp .env.example .env` and fill your URL and anon key in the newly created `.env` file.
+Run `cp .env.example .env` and fill your URL and publishable key in the newly created `.env` file.
 
 ### 4. Install the dependencies & run the project:
 

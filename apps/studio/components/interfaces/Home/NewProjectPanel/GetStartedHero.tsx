@@ -2,7 +2,7 @@ import { cn } from 'ui'
 
 const Checkbox = () => (
   <div className="w-[10%] h-full flex items-center border-r border-default px-2">
-    <div className="w-3 h-3 rounded border border-control" />
+    <div className="w-3 h-3 rounded-sm border border-control" />
   </div>
 )
 
@@ -90,7 +90,7 @@ export const GetStartedHero = () => {
       <div
         className={cn(
           'w-[260px] lg:w-[320px] h-[160px] lg:h-[220px] bg-surface-100 border border-default',
-          'absolute right-0 top-[50px] lg:-top-[40px] rounded-t overflow-y-hidden'
+          'absolute right-0 top-[50px] lg:top-[-40px] rounded-t overflow-y-hidden'
         )}
       >
         <Row col1="id" col2="task" col3="status" className="h-[24px] bg-surface-100" />

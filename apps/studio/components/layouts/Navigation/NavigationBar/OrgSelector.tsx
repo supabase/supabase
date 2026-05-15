@@ -59,10 +59,10 @@ export function OrgSelector() {
   const triggerButton = (
     <SidebarMenuButton
       size="lg"
-      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2 h-auto text-left group px-1.5 py-1 touch-manipulation"
+      className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground gap-2 h-auto text-left group px-1.5 py-1 touch-manipulation"
       onClick={isMobile ? () => setOpen(true) : undefined}
     >
-      <span className="flex w-8 aspect-square shrink-0 items-center justify-center rounded border bg-surface-100 text-xs font-medium text-foreground-lighter">
+      <span className="flex w-8 aspect-square shrink-0 items-center justify-center rounded-sm border bg-surface-100 text-xs font-medium text-foreground-lighter">
         {selectedOrgInitial}
       </span>
       <div className="flex min-w-0 flex-1 flex-col text-left -mb-0.5">
@@ -78,7 +78,7 @@ export function OrgSelector() {
       </div>
       <ChevronsUpDown
         strokeWidth={1}
-        className="ml-auto text-foreground-light md:hidden md:group-hover:block !w-4 !h-4"
+        className="ml-auto text-foreground-light md:hidden md:group-hover:block w-4! h-4!"
       />
     </SidebarMenuButton>
   )

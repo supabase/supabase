@@ -1,4 +1,4 @@
-import { type PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
@@ -200,8 +200,8 @@ function SnippetSelector({
     <div className="w-full grow min-h-0 grid gap-4 md:grid-cols-2">
       <CommandList_Shadcn_
         className={cn(
-          '!h-full min-h-0 max-h-[unset] py-2 overflow-hidden',
-          '[&>[cmdk-list-sizer]]:h-full [&>[cmdk-list-sizer]]:flex [&>[cmdk-list-sizer]]:flex-col'
+          'h-full! min-h-0 max-h-[unset] py-2 overflow-hidden',
+          '*:[[cmdk-list-sizer]]:h-full *:[[cmdk-list-sizer]]:flex *:[[cmdk-list-sizer]]:flex-col'
         )}
       >
         {!!snippets && snippets.length > 0 && (
@@ -237,7 +237,7 @@ function SnippetSelector({
       </CommandList_Shadcn_>
       <CodeBlock
         language="sql"
-        value={isSQLSnippet ? selectedSnippet?.content?.sql : ''}
+        value={isSQLSnippet ? selectedSnippet?.content?.unchecked_sql : ''}
         wrapperClassName="hidden md:block"
         className="w-full h-full border-0 [&>code]:overflow-scroll [&>code]:block [&>code]:w-full [&>code]:h-full"
         hideCopy
@@ -249,7 +249,7 @@ function SnippetSelector({
 function snippetValue(snippet: SqlSnippet) {
   if (snippet.type !== 'sql') return ''
   return escapeAttributeSelector(
-    `${snippet.id}-${snippet.name}-${snippet?.content?.sql.slice(0, 30)}`
+    `${snippet.id}-${snippet.name}-${snippet?.content?.unchecked_sql.slice(0, 30)}`
   ).toLowerCase()
 }
 
@@ -350,7 +350,7 @@ function TableSelector() {
   )
 }
 
-function generateSelectStatement(table: TablesData[number] & { columns?: Array<PostgresColumn> }) {
+function generateSelectStatement(table: TablesData[number] & { columns?: Array<PGColumn> }) {
   return `
 select ${
     !table.columns

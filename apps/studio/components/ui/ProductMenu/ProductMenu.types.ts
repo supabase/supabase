@@ -1,5 +1,7 @@
 import { ReactNode } from 'react'
 
+import type { ShortcutId } from '@/state/shortcuts/registry'
+
 export interface ProductMenuGroup {
   title?: string
   /** Set to "main" if page is on a '/' route */
@@ -25,6 +27,7 @@ export interface ProductMenuGroupItem {
   childIcon?: ReactNode
   childItems?: ProductMenuGroupItem[]
   pages?: string[]
+  shortcutId?: ShortcutId
 }
 
 /**

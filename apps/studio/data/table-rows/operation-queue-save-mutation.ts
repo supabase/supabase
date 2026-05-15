@@ -1,3 +1,4 @@
+import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -24,7 +25,7 @@ export type OperationQueueSaveVariables = {
  * Generates SQL for a single queued operation.
  * Extend this function as new operation types are added.
  */
-function getOperationSql(operation: QueuedOperation): string {
+function getOperationSql(operation: QueuedOperation): SafeSqlFragment {
   switch (operation.type) {
     case QueuedOperationType.EDIT_CELL_CONTENT: {
       const { payload } = operation
@@ -95,12 +96,12 @@ export async function saveOperationQueue({
   }
 
   const sortedOperations = sortOperations(operations)
-  const statements = sortedOperations.map((op) => {
+  const statements: Array<SafeSqlFragment> = sortedOperations.map((op) => {
     const sql = getOperationSql(op)
-    return sql.endsWith(';') ? sql.slice(0, -1) : sql
+    return (sql.endsWith(';') ? sql.slice(0, -1) : sql) as SafeSqlFragment
   })
 
-  const transactionSql = wrapWithTransaction(statements.join(';\n') + ';')
+  const transactionSql = wrapWithTransaction(safeSql`${joinSqlFragments(statements, ';\n')};`)
 
   const sql = wrapWithRoleImpersonation(transactionSql, roleImpersonationState)
 

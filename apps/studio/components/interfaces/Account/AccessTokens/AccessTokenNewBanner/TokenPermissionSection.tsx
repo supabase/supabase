@@ -41,7 +41,7 @@ export const TokenPermissionsSection = ({
               </div>
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+          <CollapsibleContent className="pt-3 transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
             <PermissionsList groupedPermissions={groupedPermissions} />
           </CollapsibleContent>
         </Collapsible>

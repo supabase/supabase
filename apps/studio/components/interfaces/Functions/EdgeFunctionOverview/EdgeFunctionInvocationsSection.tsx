@@ -73,7 +73,7 @@ export const EdgeFunctionInvocationsSection = ({
       <PageSectionContent>
         <PageContainer size="full">
           <div className="flex flex-col gap-5">
-            <PageSectionMeta className="!items-center">
+            <PageSectionMeta className="items-center!">
               <PageSectionSummary>
                 <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
                   <ChartMetric

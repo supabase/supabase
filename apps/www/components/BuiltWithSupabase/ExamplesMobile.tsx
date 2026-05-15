@@ -27,7 +27,7 @@ const ExamplesMobile: FC<Props> = ({ examples, className }: any) => {
         watchOverflow
         threshold={2}
         updateOnWindowResize
-        className="!px-6 w-full overflow-visible"
+        className="px-6! w-full overflow-visible"
         breakpoints={{
           320: {
             slidesPerView: 1.1,

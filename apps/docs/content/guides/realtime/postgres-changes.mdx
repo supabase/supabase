@@ -69,6 +69,9 @@ In this example we'll set up a database table, secure it with Row Level Security
     <StepHikeCompact.Code>
 
       ```sql
+      -- Grant the privileges roles need
+      GRANT SELECT ON public.todos TO anon;
+
       -- Turn on security
       alter table "todos"
       enable row level security;

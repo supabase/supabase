@@ -115,7 +115,7 @@ export const InitializeForeignSchemaDialog = ({ namespace }: { namespace: string
                 )}
               />
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <DocsButton href={`${DOCS_URL}/guides/storage/analytics/query-with-postgres`} />
               <div className="flex items-center gap-x-2">
                 <Button type="default" disabled={isCreating} onClick={() => setIsOpen(false)}>

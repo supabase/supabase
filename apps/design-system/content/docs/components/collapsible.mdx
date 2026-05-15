@@ -1,37 +1,51 @@
 ---
-title: Alert Collapsible
-description: An alert-styled block with a collapsible content section, toggled by an icon button.
+title: Collapsible
+description: An expandable content region using the shadcn Collapsible primitive.
 component: true
 ---
 
-<ComponentPreview name="alert-collapsible-demo" peekCode wide />
+Collapsible is a low-level primitive for revealing and hiding related content. Use it when a component needs custom trigger or content composition.
+
+Use Collapsible for generic disclosure behaviour: rows, sections, menus, tool details, and custom layouts. Use [Collapsible Alert](../fragments/collapsible-alert) instead when the disclosure is an alert-styled callout that should keep standard alert padding, variants, trigger styling, and toggle treatment.
+
+<ComponentPreview name="collapsible-demo" peekCode wide />
 
 ## Usage
 
 ```tsx
-import { AlertCollapsible } from 'ui'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from 'ui/src/components/shadcn/ui/collapsible'
 ```
 
 ```tsx
-<AlertCollapsible trigger="Need help?">
-  <p>Content revealed when expanded.</p>
-</AlertCollapsible>
+<Collapsible>
+  <CollapsibleTrigger>Toggle</CollapsibleTrigger>
+  <CollapsibleContent>
+    <p>Content revealed when expanded.</p>
+  </CollapsibleContent>
+</Collapsible>
 ```
 
 ### Default open
 
 ```tsx
-<AlertCollapsible trigger="Details" defaultOpen>
-  <p>This section is expanded by default.</p>
-</AlertCollapsible>
+<Collapsible defaultOpen>
+  <CollapsibleTrigger>Details</CollapsibleTrigger>
+  <CollapsibleContent>
+    <p>This section is expanded by default.</p>
+  </CollapsibleContent>
+</Collapsible>
 ```
 
-### Variants
+### Animation
 
-Supports the same `variant` prop as `Alert`: `default`, `destructive`, and `warning`.
+Add animation classes to `CollapsibleContent` when animated open and close transitions are needed.
 
 ```tsx
-<AlertCollapsible trigger="Warning" variant="warning">
-  <p>Something needs attention.</p>
-</AlertCollapsible>
+<CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down">
+  <p>Content revealed when expanded.</p>
+</CollapsibleContent>
 ```

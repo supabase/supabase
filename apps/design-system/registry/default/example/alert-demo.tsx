@@ -1,14 +1,12 @@
 import { Terminal } from 'lucide-react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert, AlertDescription, AlertTitle } from 'ui/src/components/shadcn/ui/alert'
 
 export default function AlertDemo() {
   return (
-    <Alert_Shadcn_>
+    <Alert>
       <Terminal size={16} />
-      <AlertTitle_Shadcn_>Heads up!</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
-        You can also add components to your app using the CLI.
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      <AlertTitle>Heads up!</AlertTitle>
+      <AlertDescription>You can also add components to your app using the CLI.</AlertDescription>
+    </Alert>
   )
 }

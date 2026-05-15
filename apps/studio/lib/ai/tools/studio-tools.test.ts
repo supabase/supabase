@@ -1,8 +1,18 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getStudioTools } from './studio-tools'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
+
+vi.mock('@/data/sql/execute-sql-query', () => ({
+  executeSql: vi.fn(),
+}))
 
 describe('ai/tools/studio-tools', () => {
+  beforeEach(() => {
+    vi.mocked(executeSql).mockReset()
+  })
+
   describe('getStudioTools', () => {
     it('should return an object with tool definitions', () => {
       const tools = getStudioTools()
@@ -117,6 +127,77 @@ describe('ai/tools/studio-tools', () => {
         // Skip test if schema doesn't have safeParse
         expect(schema).toBeDefined()
       }
+    })
+
+    it('should require approval for read and write SQL queries', () => {
+      const tools = getStudioTools()
+
+      expect(tools.execute_sql.needsApproval).toBe(true)
+    })
+
+    it('should sanitize execute_sql output without data opt-in', async () => {
+      vi.mocked(executeSql).mockResolvedValue({ result: [{ email: 'test@example.com' }] })
+
+      const tools = getStudioTools({
+        projectRef: 'test-project',
+        connectionString: 'encrypted-connection-string',
+        aiOptInLevel: 'schema',
+      })
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const result = await tools.execute_sql.execute(
+        {
+          sql: 'SELECT email FROM users',
+          label: 'Get emails',
+          chartConfig: { view: 'table' },
+          isWriteQuery: false,
+        },
+        { toolCallId: 'test', messages: [] }
+      )
+
+      expect(executeSql).toHaveBeenCalledWith(
+        {
+          projectRef: 'test-project',
+          connectionString: 'encrypted-connection-string',
+          sql: 'SELECT email FROM users',
+        },
+        undefined,
+        undefined
+      )
+      expect(result).toBe(NO_DATA_PERMISSIONS)
+    })
+
+    it('should return execute_sql rows with data opt-in', async () => {
+      const rows = [{ email: 'test@example.com' }]
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
+
+      const tools = getStudioTools({
+        projectRef: 'test-project',
+        connectionString: 'encrypted-connection-string',
+        aiOptInLevel: 'schema_and_log_and_data',
+      })
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const result = await tools.execute_sql.execute(
+        {
+          sql: 'SELECT email FROM users',
+          label: 'Get emails',
+          chartConfig: { view: 'table' },
+          isWriteQuery: false,
+        },
+        { toolCallId: 'test', messages: [] }
+      )
+
+      expect(executeSql).toHaveBeenCalledWith(
+        {
+          projectRef: 'test-project',
+          connectionString: 'encrypted-connection-string',
+          sql: 'SELECT email FROM users',
+        },
+        undefined,
+        undefined
+      )
+      expect(result).toEqual(rows)
     })
 
     it('should validate rename_chat input schema correctly', () => {

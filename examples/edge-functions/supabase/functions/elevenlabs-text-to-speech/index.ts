@@ -4,9 +4,10 @@ import { createClient } from 'npm:supabase-js@2'
 import { ElevenLabsClient } from 'npm:elevenlabs@1.52.0'
 import * as hash from 'npm:object-hash'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  Deno.env.get(SUPABASE_SECRET_KEYS['default'])!
 )
 
 const client = new ElevenLabsClient({
