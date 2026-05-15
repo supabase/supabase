@@ -115,7 +115,6 @@ export const getReportAttributesV2: (
       showGrid: true,
       syncId: 'database-reports',
       valuePrecision: 2,
-      useYAxisLimitAsDomainMin: true,
       YAxisProps: {
         width: 75,
         tickFormatter: (value: number) => formatBytesMinMB(value, 2),
@@ -135,11 +134,10 @@ export const getReportAttributesV2: (
           provider: 'reference-line',
           isMaxValue: true,
           omitFromTotal: true,
-          label: 'Total swap',
+          label: '512 MB',
           tooltip:
-            'Total swap available on this instance. Usage at this level indicates significant memory pressure',
+            'Minimum chart scale — the y-axis shows at least 512 MB so low swap usage is not visually exaggerated',
           customValue: 512 * 1024 * 1024,
-          useYAxisLimitAsValue: true,
         },
       ],
     },
