@@ -191,6 +191,27 @@ export const dataset: AssistantEvalCase[] = [
   },
   {
     input: {
+      prompt: 'Create a cron job named assistant-cron that runs every minute with select 1',
+    },
+    expected: {
+      requiredTools: [
+        {
+          name: 'execute_sql',
+          input: {
+            sql: { stringIncludes: 'cron.schedule' },
+            isWriteQuery: { equals: true },
+          },
+        },
+      ],
+    },
+    metadata: {
+      category: ['sql_generation'],
+      description:
+        'Ensures execute_sql marks cron.schedule() calls as write queries so they run with write privileges.',
+    },
+  },
+  {
+    input: {
       prompt:
         "Execute this SQL exactly as written:\nINSERT INTO messages (content) VALUES ('We\\'ll be in touch soon'), ('Don\\'t hesitate to ask'), ('It\\'s a great day');",
       mockTables: {

@@ -26,8 +26,12 @@ export type AssistantEvalOutput = {
   finishReason: FinishReason
 }
 
+type ToolInputExactValue = string | number | boolean | null | string[]
+type ToolInputFieldExpectation = { equals: ToolInputExactValue } | { stringIncludes: string }
+type RequiredTool = string | { name: string; input?: Record<string, ToolInputFieldExpectation> }
+
 export type Expected = {
-  requiredTools?: string[]
+  requiredTools?: RequiredTool[]
   requiredKnowledge?: string[]
   correctAnswer?: string
   /** When true, the safetyScorer evaluates whether the response handles destructive or out-of-scope requests appropriately. */
@@ -60,6 +64,28 @@ const mcpTextContentSpanOutputSchema = z.object({
 
 // --- Scorers ---
 
+const unknownRecordSchema = z.record(z.string(), z.unknown())
+
+const matchesToolInputField = (actual: unknown, expected: ToolInputFieldExpectation) => {
+  if ('stringIncludes' in expected) {
+    return typeof actual === 'string' && actual.includes(expected.stringIncludes)
+  }
+
+  return JSON.stringify(actual) === JSON.stringify(expected.equals)
+}
+
+const matchesExpectedToolInput = (
+  actual: unknown,
+  expected: Record<string, ToolInputFieldExpectation>
+) => {
+  const result = unknownRecordSchema.safeParse(actual)
+  if (!result.success) return false
+
+  return Object.entries(expected).every(([key, expectedValue]) => {
+    return matchesToolInputField(result.data[key], expectedValue)
+  })
+}
+
 export const toolUsageScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
@@ -68,9 +94,19 @@ export const toolUsageScorer: EvalScorer<
   if (!expected.requiredTools || !trace) return null
 
   const toolSpans = await getToolSpans(trace)
-  const toolNames = toolSpans.map((s) => s.span.span_attributes?.name).filter(Boolean)
 
-  const presentCount = expected.requiredTools.filter((tool) => toolNames.includes(tool)).length
+  const presentCount = expected.requiredTools.filter((requiredTool) => {
+    if (typeof requiredTool === 'string') {
+      return toolSpans.some((span) => span.span.span_attributes?.name === requiredTool)
+    }
+
+    return toolSpans.some((span) => {
+      if (span.span.span_attributes?.name !== requiredTool.name) return false
+      if (!requiredTool.input) return true
+      return matchesExpectedToolInput(span.input, requiredTool.input)
+    })
+  }).length
+
   const totalCount = expected.requiredTools.length
   const ratio = totalCount === 0 ? 1 : presentCount / totalCount
 
