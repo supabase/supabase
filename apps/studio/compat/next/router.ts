@@ -67,6 +67,27 @@ function resolveUrl(url: string | UrlObject): string {
   return `${pathname}${search}${hash}`
 }
 
+// Studio code occasionally constructs `router.push` targets via
+// `new URL().toString()` (e.g. `buildTableEditorUrl`), producing fully
+// qualified `http://localhost:8082/project/.../editor/123?...` strings.
+// Next's router tolerated those by treating same-origin absolute URLs as
+// relative paths. TanStack Router doesn't — it appends them to the current
+// path, yielding garbage like `/project/.../schemas/http:/localhost:...`.
+// Strip the origin when it matches the current page so navigation lands
+// where the caller intended. Cross-origin URLs pass through untouched so
+// TanStack can hand them to the browser as external navigations.
+function toRelativeSameOrigin(url: string): string {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) return url
+  if (typeof window === 'undefined' || !window.location) return url
+  try {
+    const parsed = new URL(url)
+    if (parsed.origin !== window.location.origin) return url
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`
+  } catch {
+    return url
+  }
+}
+
 // Next's pages-router passes a TransitionOptions bag as the 3rd arg to
 // push/replace. We accept the shape but ignore the fields TanStack has
 // no direct equivalent for (shallow, locale, scroll, unstable_skipClientCache).
@@ -105,7 +126,7 @@ export function useRouter() {
       _as?: string | UrlObject,
       options?: TransitionOptions
     ): Promise<boolean> => {
-      const to = resolveUrl(url)
+      const to = toRelativeSameOrigin(resolveUrl(url))
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await router.navigate({ to: to as any, replace: !!options?.shallow ? false : undefined })
       return true
