@@ -442,7 +442,7 @@ export const LogTable = ({
     })
   }
 
-  const LogsExplorerTableHeader = () => (
+  const logsExplorerTableHeader = (
     <div
       className={cn(
         'flex w-full items-center justify-between border-t bg-surface-100 px-5 py-2',
@@ -504,7 +504,7 @@ export const LogTable = ({
     </div>
   )
 
-  const RenderErrorAlert = () => {
+  const renderErrorAlert = () => {
     if (!error) return null
     const childProps = {
       isCustomQuery: queryType ? false : true,
@@ -523,16 +523,16 @@ export const LogTable = ({
     )
   }
 
-  const RenderNoResultAlert = () => {
+  const renderNoResultAlert = () => {
     if (EmptyState) return EmptyState
-    else return <LogsTableEmptyState />
+    return <LogsTableEmptyState />
   }
 
   if (!data) return null
 
   return (
     <section className={'h-full flex w-full flex-col flex-1'}>
-      {!queryType && <LogsExplorerTableHeader />}
+      {!queryType && logsExplorerTableHeader}
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel
           id="log-table-content"
@@ -614,8 +614,8 @@ export const LogTable = ({
                   // gridColumn: '1 / -1' makes the fallback span all CSS grid columns,
                   // including the checkbox column we prepend, so it fills the full width.
                   <div style={{ gridColumn: '1 / -1' }}>
-                    {logDataRows.length === 0 && !error && <RenderNoResultAlert />}
-                    {error && <RenderErrorAlert />}
+                    {logDataRows.length === 0 && !error && renderNoResultAlert()}
+                    {error && renderErrorAlert()}
                   </div>
                 ) : null,
               }}
