@@ -29,6 +29,7 @@ import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -139,6 +140,10 @@ const PreviewFilterPanel = ({
                 placeholder="Search events"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={onSearchInputEscape(search, (next) => {
+                  setSearch(next)
+                  handleInputSearch(next)
+                })}
                 onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
                   setSearch(e.target.value)
                   handleInputSearch(e.target.value)
