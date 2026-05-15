@@ -1,8 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
-import { LOCAL_STORAGE_KEYS, PageTelemetry, useUser } from 'common'
-import { useEffect } from 'react'
+import { LOCAL_STORAGE_KEYS, PageTelemetry, posthogClient, useUser } from 'common'
+import { useEffect, useRef } from 'react'
 import { useConsentToast } from 'ui-patterns/consent'
 
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
 
@@ -27,6 +28,21 @@ export function Telemetry() {
   const { data: organization } = useSelectedOrganizationQuery()
 
   const user = useUser()
+
+  // Mirror the user's org-list length into a PostHog person property so feature
+  // flags and analytics can segment by current org membership (e.g. "users in
+  // exactly one org") without behavioral-cohort lag. Only fires when the value
+  // changes.
+  const { data: organizations } = useOrganizationsQuery()
+  const lastSentRef = useRef<{ userId: string; orgCount: number } | null>(null)
+  useEffect(() => {
+    if (!user?.id || !organizations) return
+    const orgCount = organizations.length
+    const last = lastSentRef.current
+    if (last?.userId === user.id && last.orgCount === orgCount) return
+    lastSentRef.current = { userId: user.id, orgCount }
+    posthogClient.identify(user.id, { org_count: orgCount })
+  }, [user?.id, organizations])
 
   useEffect(() => {
     // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)

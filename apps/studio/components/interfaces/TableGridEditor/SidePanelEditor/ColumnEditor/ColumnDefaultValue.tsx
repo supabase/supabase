@@ -1,12 +1,5 @@
 import { noop } from 'lodash'
-import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
@@ -45,25 +38,25 @@ const ColumnDefaultValue = ({
       return (
         <>
           <label className="block text-foreground-light">Default Value</label>
-          <Select_Shadcn_
+          <Select
             name="select-editor"
             value={formattedValue}
             onValueChange={(value) => onUpdateField({ defaultValue: value })}
           >
-            <SelectTrigger_Shadcn_>
-              <SelectValue_Shadcn_ id="select-editor" placeholder="NULL" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
-                <SelectItem_Shadcn_ value={null as any}>NULL</SelectItem_Shadcn_>
+            <SelectTrigger>
+              <SelectValue id="select-editor" placeholder="NULL" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value={null as any}>NULL</SelectItem>
                 {enumValues.map((value) => (
-                  <SelectItem_Shadcn_ key={value} value={value}>
+                  <SelectItem key={value} value={value}>
                     {value}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </>
       )
     }

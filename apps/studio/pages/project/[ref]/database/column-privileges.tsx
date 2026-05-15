@@ -3,7 +3,7 @@ import { AlertCircle, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -241,17 +241,17 @@ const PrivilegesPage: NextPageWithLayout = () => {
           {isEnabled ? (
             <>
               {!diffWarningDismissed && (
-                <Alert_Shadcn_ variant="warning">
+                <Alert variant="warning">
                   <AlertCircle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
+                  <AlertTitle>
                     Changes to column privileges will not be reflected in migrations when running{' '}
                     <code className="text-code-inline">supabase db diff</code>.
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  </AlertTitle>
+                  <AlertDescription>
                     Column privileges are not supported in the current version of the Supabase CLI.
                     <br />
                     You will need to manually apply these changes to your database.
-                  </AlertDescription_Shadcn_>
+                  </AlertDescription>
                   <Button
                     type="outline"
                     aria-label="Dismiss"
@@ -262,16 +262,14 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   >
                     <XIcon width={14} height={14} />
                   </Button>
-                </Alert_Shadcn_>
+                </Alert>
               )}
 
               {!selectStarWarningDismissed && (
-                <Alert_Shadcn_ variant="warning">
+                <Alert variant="warning">
                   <AlertCircle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
-                    Changing column privileges can break existing queries.
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>Changing column privileges can break existing queries.</AlertTitle>
+                  <AlertDescription>
                     If you remove a column privilege for a role, that role will lose all access to
                     that column.
                     <br />
@@ -281,7 +279,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     <code className="text-code-inline">insert</code>,{' '}
                     <code className="text-code-inline">update</code>, and{' '}
                     <code className="text-code-inline">delete</code>) will fail.
-                  </AlertDescription_Shadcn_>
+                  </AlertDescription>
                   <Button
                     type="outline"
                     aria-label="Dismiss"
@@ -292,7 +290,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   >
                     <XIcon width={14} height={14} />
                   </Button>
-                </Alert_Shadcn_>
+                </Alert>
               )}
 
               <PrivilegesHead
@@ -349,19 +347,17 @@ const PrivilegesPage: NextPageWithLayout = () => {
               )}
             </>
           ) : (
-            <Alert_Shadcn_>
-              <AlertTitle_Shadcn_>
-                Column-level privileges is a dashboard feature preview
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+            <Alert>
+              <AlertTitle>Column-level privileges is a dashboard feature preview</AlertTitle>
+              <AlertDescription>
                 You may access this feature by enabling it under dashboard feature previews.
-              </AlertDescription_Shadcn_>
+              </AlertDescription>
               <div className="mt-4">
                 <Button type="default" onClick={() => toggleFeaturePreviewModal(true)}>
                   View feature previews
                 </Button>
               </div>
-            </Alert_Shadcn_>
+            </Alert>
           )}
         </div>
       </ScaffoldSection>

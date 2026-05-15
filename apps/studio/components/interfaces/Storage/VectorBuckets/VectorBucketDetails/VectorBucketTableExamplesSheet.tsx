@@ -12,9 +12,9 @@ import {
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Sheet,
   SheetContent,
   SheetHeader,
@@ -212,8 +212,8 @@ const result = await index.putVectors({
       </p>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between">
-          <Popover_Shadcn_ modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
+            <PopoverTrigger asChild>
               <div className="flex cursor-pointer">
                 <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
                   Language
@@ -226,8 +226,8 @@ const result = await index.putVectors({
                   {language === 'javascript' ? 'JavaScript' : 'SQL'}
                 </Button>
               </div>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-32" side="bottom" align="end">
+            </PopoverTrigger>
+            <PopoverContent className="p-0 w-32" side="bottom" align="end">
               <Command_Shadcn_>
                 <CommandList_Shadcn_>
                   <CommandGroup_Shadcn_>
@@ -248,8 +248,8 @@ const result = await index.putVectors({
                   </CommandGroup_Shadcn_>
                 </CommandList_Shadcn_>
               </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
 
           <DocsButton
             href={`${DOCS_URL}/guides/storage/vector/storing-vectors?queryGroups=language&language=${language}#basic-vector-insertion`}

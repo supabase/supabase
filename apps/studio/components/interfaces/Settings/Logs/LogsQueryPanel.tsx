@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -18,10 +18,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SidePanel,
   Switch,
   Tooltip,
@@ -38,7 +38,7 @@ import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL, IS_STAGING_OR_LOCAL } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -72,9 +72,8 @@ const LogsQueryPanel = ({
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
-  // Staff-only debugging affordance: only show on staging/local, never to
-  // enterprise customers running against production.
-  const otelToggleEnabled = IS_STAGING_OR_LOCAL && !!onUseOtelChange
+  const showChToggleInLogExplorer = useFlag('showChToggleInLogExplorer')
+  const otelToggleEnabled = !!showChToggleInLogExplorer && !!onUseOtelChange
 
   const {
     projectAuthAll: authEnabled,
@@ -170,12 +169,12 @@ const LogsQueryPanel = ({
                       checked={useOtel}
                       onCheckedChange={(checked) => onUseOtelChange?.(checked)}
                     />
-                    <Label_Shadcn_
+                    <Label
                       htmlFor="logs-explorer-otel-toggle"
                       className="text-xs text-foreground-light cursor-pointer"
                     >
                       OTEL endpoint
-                    </Label_Shadcn_>
+                    </Label>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs">
@@ -267,8 +266,8 @@ const LogsQueryPanel = ({
             <SidePanel.Separator />
 
             <div className="px-4 pb-4 flex flex-col gap-4">
-              <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
                   <Button
                     type="default"
                     role="combobox"
@@ -279,8 +278,8 @@ const LogsQueryPanel = ({
                   >
                     {value ? selectedSchema?.name : 'Select source...'}
                   </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" sameWidthAsTrigger>
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search source..." />
                     <CommandList_Shadcn_>
@@ -307,8 +306,8 @@ const LogsQueryPanel = ({
                       </CommandGroup_Shadcn_>
                     </CommandList_Shadcn_>
                   </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
               <Table
                 head={[
                   <Table.th className="text-xs p-2!" key="path">

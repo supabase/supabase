@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Input_Shadcn_ } from 'ui'
+import { Button, Input } from 'ui'
 
 interface BookingFormProps {
   onSubmit: (data: {
@@ -86,7 +86,7 @@ export default function BookingForm({
           <label htmlFor="hs-firstName" className="text-foreground-light text-sm font-medium">
             First name *
           </label>
-          <Input_Shadcn_
+          <Input
             id="hs-firstName"
             type="text"
             required
@@ -100,7 +100,7 @@ export default function BookingForm({
           <label htmlFor="hs-lastName" className="text-foreground-light text-sm font-medium">
             Last name *
           </label>
-          <Input_Shadcn_
+          <Input
             id="hs-lastName"
             type="text"
             required
@@ -114,7 +114,7 @@ export default function BookingForm({
           <label htmlFor="hs-email" className="text-foreground-light text-sm font-medium">
             Email *
           </label>
-          <Input_Shadcn_
+          <Input
             id="hs-email"
             type="email"
             required
