@@ -25,7 +25,7 @@ import {
   FormControl,
   FormField,
   Input,
-  Label as Label,
+  Label,
   Switch,
   Tooltip,
   TooltipContent,

@@ -220,10 +220,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
                   key={key}
                   className={cn('flex flex-col col-span-full gap-y-2', fieldValue.className)}
                 >
-                  <Label
-                    htmlFor={fieldKey}
-                    className="text-foreground-light flex justify-between"
-                  >
+                  <Label htmlFor={fieldKey} className="text-foreground-light flex justify-between">
                     {fieldValue.label}
                     <div
                       className={cn(

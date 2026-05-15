@@ -14,7 +14,7 @@ import {
   FormControl,
   FormField,
   Input,
-  Label as Label,
+  Label,
   Separator,
   Sheet,
   SheetContent,

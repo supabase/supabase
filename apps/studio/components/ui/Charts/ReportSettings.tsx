@@ -1,13 +1,6 @@
 import { Settings } from 'lucide-react'
 import { useState } from 'react'
-import {
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  Label,
-  Switch,
-} from 'ui'
+import { cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, Label, Switch } from 'ui'
 
 import { useChartHoverState } from './useChartHoverState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'

@@ -115,9 +115,7 @@ const WrapperTableEditor = ({
       <SidePanel.Content>
         <div className="my-4 flex flex-col gap-y-6">
           <div className="flex flex-col gap-y-2">
-            <Label className="text-foreground-light">
-              Select a target the table will point to
-            </Label>
+            <Label className="text-foreground-light">Select a target the table will point to</Label>
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
