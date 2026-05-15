@@ -63,11 +63,6 @@ export const RealtimeInspector = () => {
     }
   }, [hasChannel])
 
-  const handleToggleListening = useCallback(() => {
-    if (!hasChannel) return
-    setRealtimeConfig((prev) => ({ ...prev, enabled: !prev.enabled }))
-  }, [hasChannel])
-
   const handleToggleFilters = useCallback(() => {
     if (hasChannel) {
       setFilterPopoverOpen(true)
@@ -84,7 +79,6 @@ export const RealtimeInspector = () => {
     hasChannel,
     isListening,
     onJoinChannel: handleJoinChannel,
-    onToggleListening: handleToggleListening,
     onToggleFilters: handleToggleFilters,
     onBroadcast: handleBroadcast,
   })
