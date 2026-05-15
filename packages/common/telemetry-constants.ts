@@ -20,7 +20,11 @@ export const TABLE_EVENT_ACTIONS = {
   TableCreated: 'table_created',
   TableDataAdded: 'table_data_added',
   TableRLSEnabled: 'table_rls_enabled',
-} as const
+} as const satisfies {
+  TableCreated: TableCreatedEvent['action']
+  TableDataAdded: TableDataAddedEvent['action']
+  TableRLSEnabled: TableRLSEnabledEvent['action']
+}
 
 export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
 
