@@ -1,6 +1,41 @@
 @import 'tailwindcss';
+
+/* JS plugins. Tailwind v4 supports `@plugin` for both v3-style JS plugins and
+ * v4-native packages. The two local plugins use theme('spacing') /
+ * theme('transitionDuration') which resolve from v4's @theme tokens. */
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+@plugin "tailwindcss-animate";
+@plugin "./tailwind-plugins/hit-area";
+@plugin "./tailwind-plugins/motion-safe-transition";
+
+/* Raw color values + per-theme overrides. Must come before colors.css so the
+ * --colors-* references resolve to a value. */
+@import './css/radix-vars.css';
+@import './css/brand-vars.css';
 @import '../ui/build/css/source/global.css';
 @import '../ui/build/css/themes/dark.css';
 @import '../ui/build/css/themes/light.css';
+
+/* Reset Tailwind's built-in color tokens before re-defining our own, so e.g.
+ * --color-amber-* doesn't ship a default Tailwind value alongside the Radix
+ * one. */
 @import './unset-tw-colors.css';
-@config './tailwind.config.js';
+
+/* Theme tokens + utilities + variants + base layer. colors.css declares the
+ * Radix/scale CSS variables in :root; theme.css consumes them from
+ * @theme inline so Tailwind generates the utilities. */
+@import './css/colors.css';
+@import './css/theme.css';
+@import './css/animations.css';
+@import './css/utilities.css';
+@import './css/variants.css';
+@import './css/base.css';
+
+/*
+ * Typography prose / prose-toc / prose-docs overrides live in a focused JS
+ * config because @tailwindcss/typography reads its theme.typography options
+ * from the JS config — not from CSS @theme tokens. See:
+ * https://github.com/tailwindlabs/tailwindcss-typography#customizing-the-css
+ */
+@config './typography.config.js';

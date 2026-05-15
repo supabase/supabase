@@ -90,11 +90,11 @@ function MessagePartReasoning({ reasoningPart }: { reasoningPart: ReasoningUIPar
   )
 }
 
-function ToolDisplayExecuteSqlLoading() {
+function ToolDisplayExecuteSqlLoading({ label = 'Writing SQL...' }: { label?: string }) {
   return (
     <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
       <Loader2 className="w-4 h-4 animate-spin" />
-      Writing SQL...
+      {label}
     </div>
   )
 }
@@ -111,7 +111,7 @@ function MessagePartExecuteSql({
   isLastPart?: boolean
 }) {
   const { id, isLastMessage } = useMessageInfoContext()
-  const { addToolResult } = useMessageActionsContext()
+  const { addToolApprovalResponse } = useMessageActionsContext()
 
   const { toolCallId, state, input, output } = toolPart
 
@@ -123,10 +123,19 @@ function MessagePartExecuteSql({
     return <ToolDisplayExecuteSqlFailure />
   }
 
+  if (state === 'approval-responded') {
+    return <ToolDisplayExecuteSqlLoading label="Running SQL..." />
+  }
+
   const { data: chart, success } = parseExecuteSqlChartResult(input)
   if (!success) return null
 
-  if (state === 'input-available' || state === 'output-available') {
+  if (
+    state === 'input-available' ||
+    state === 'approval-requested' ||
+    state === 'output-available'
+  ) {
+    const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
     return (
       <div className="w-auto overflow-x-hidden my-4 space-y-2">
         <DisplayBlockRenderer
@@ -144,22 +153,16 @@ function MessagePartExecuteSql({
           toolState={state}
           isLastPart={isLastPart}
           isLastMessage={isLastMessage}
-          onResults={(args: { messageId: string; results: unknown }) => {
-            const results = args.results as any[]
-
-            addToolResult?.({
-              tool: 'execute_sql',
-              toolCallId: String(toolCallId),
-              output: results,
-            })
-          }}
-          onError={({ errorText }) => {
-            addToolResult?.({
-              tool: 'execute_sql',
-              toolCallId: String(toolCallId),
-              output: `Error: ${errorText}`,
-            })
-          }}
+          onApprove={
+            approvalId
+              ? () => addToolApprovalResponse?.({ id: approvalId, approved: true })
+              : undefined
+          }
+          onDeny={
+            approvalId
+              ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
+              : undefined
+          }
         />
       </div>
     )
@@ -168,11 +171,16 @@ function MessagePartExecuteSql({
   return null
 }
 
-const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set(['input-available', 'output-available'])
+const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set([
+  'input-available',
+  'approval-requested',
+  'approval-responded',
+  'output-available',
+])
 
 function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
-  const { toolCallId, state, input, output } = toolPart
-  const { addToolResult } = useMessageActionsContext()
+  const { state, input, output } = toolPart
+  const { addToolApprovalResponse } = useMessageActionsContext()
 
   if (state === 'input-streaming') {
     return (
@@ -196,20 +204,24 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   const isInitiallyDeployed =
     state === 'output-available' && parsedOutput.success && parsedOutput.data.success === true
 
+  const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
+
   return (
     <EdgeFunctionRenderer
       label={parsedInput.data.label}
       code={parsedInput.data.code}
       functionName={parsedInput.data.functionName}
-      showConfirmFooter={!output}
+      showConfirmFooter={state === 'approval-requested'}
+      isDeploying={state === 'approval-responded'}
       initialIsDeployed={isInitiallyDeployed}
-      onDeployed={(result) => {
-        addToolResult?.({
-          tool: 'deploy_edge_function',
-          toolCallId: String(toolCallId),
-          output: result,
-        })
-      }}
+      onApprove={
+        approvalId ? () => addToolApprovalResponse?.({ id: approvalId, approved: true }) : undefined
+      }
+      onDeny={
+        approvalId
+          ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
+          : undefined
+      }
     />
   )
 }
