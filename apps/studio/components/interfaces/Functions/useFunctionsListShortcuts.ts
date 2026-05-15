@@ -7,7 +7,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 const DEFAULT_SORT: EdgeFunctionsSort = 'name:asc'
 
 interface UseFunctionsListShortcutsParams {
-  searchInputRef: RefObject<HTMLInputElement>
+  searchInputRef: RefObject<HTMLInputElement | null>
   setSearch: Dispatch<SetStateAction<string>> | ((value: string) => void)
   sort: EdgeFunctionsSort
   setSort: (value: EdgeFunctionsSort) => void
