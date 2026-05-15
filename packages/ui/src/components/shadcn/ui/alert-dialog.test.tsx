@@ -132,4 +132,38 @@ describe('#AlertDialog', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
   })
+
+  it('uses the latest onOpenChange callback after a rerender', () => {
+    const firstOnOpenChange = vi.fn()
+    const secondOnOpenChange = vi.fn()
+
+    const InlineCallbackDialog = ({ label }: { label: string }) => {
+      const onOpenChange = (open: boolean) => {
+        if (label === 'first') firstOnOpenChange(label, open)
+        else secondOnOpenChange(label, open)
+      }
+
+      return (
+        <AlertDialog defaultOpen onOpenChange={onOpenChange}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm action</AlertDialogTitle>
+              <AlertDialogDescription>This action needs confirmation.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )
+    }
+
+    const { rerender } = render(<InlineCallbackDialog label="first" />)
+
+    rerender(<InlineCallbackDialog label="latest" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(firstOnOpenChange).not.toHaveBeenCalled()
+    expect(secondOnOpenChange).toHaveBeenCalledWith('latest', false)
+  })
 })

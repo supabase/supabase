@@ -26,10 +26,15 @@ const AlertDialog = ({
   open: openProp,
   ...props
 }: AlertDialogProps) => {
+  const onOpenChangeRef = React.useRef(onOpenChange)
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen)
   const [loadingActionIds, setLoadingActionIds] = React.useState<Set<symbol>>(() => new Set())
   const loading = loadingActionIds.size > 0
   const open = openProp ?? uncontrolledOpen
+
+  React.useEffect(() => {
+    onOpenChangeRef.current = onOpenChange
+  }, [onOpenChange])
 
   const setActionLoading = React.useCallback((id: symbol, actionLoading: boolean) => {
     setLoadingActionIds((currentIds) => {
@@ -50,9 +55,9 @@ const AlertDialog = ({
         setUncontrolledOpen(nextOpen)
       }
 
-      onOpenChange?.(nextOpen)
+      onOpenChangeRef.current?.(nextOpen)
     },
-    [loading, onOpenChange, openProp]
+    [loading, openProp]
   )
 
   const contextValue = React.useMemo(
@@ -101,10 +106,7 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 const AlertDialogContentVariants = cva(
   cn(
     'relative z-50 w-full max-w-screen border shadow-md dark:shadow-xs',
-    'data-[state=open]:animate-in data-[state=closed]:animate-out',
-    'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
-    'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
+    'data-open:animate-overlay-show data-closed:animate-overlay-hide',
     'sm:rounded-lg md:w-full',
     'bg-dash-sidebar'
   ),
@@ -192,6 +194,7 @@ const AlertDialogBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 )
 AlertDialogBody.displayName = 'AlertDialogBody'
 
+// Full-width alerts own the visual separator above the footer.
 const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     data-slot="alert-dialog-footer"
