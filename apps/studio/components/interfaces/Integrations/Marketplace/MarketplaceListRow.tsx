@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { Badge, TableCell, TableHead, TableRow } from 'ui'
 
 import {
@@ -21,38 +21,41 @@ const HIDE_BELOW_XL = 'hidden @3xl:table-cell'
 const HIDE_BELOW_4XL = 'hidden @4xl:table-cell'
 
 export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceListRowProps) => {
-  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const source = getMarketplaceSource(integration)
   const installMechanism = getMarketplaceTypeLabel(getMarketplaceType(integration))
   const href = `/project/${project?.ref}/integrations/${integration.id}/overview`
 
   return (
-    <TableRow
-      onClick={() => router.push(href)}
-      className="cursor-pointer transition-colors hover:bg-surface-100 [&>td]:py-2 @lg:[&>td]:py-2.5"
-    >
+    <TableRow className="group relative transition-colors hover:bg-surface-100 [&>td]:py-2 @lg:[&>td]:py-2.5">
       <TableCell className="w-10 pr-0 @lg:w-12">
         <MarketplaceLogo integration={integration} size="h-7 w-7 @lg:h-8 @lg:w-8" />
       </TableCell>
 
       <TableCell>
-        <div className="min-w-0">
+        <Link
+          href={href}
+          className="block w-full hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background rounded-md"
+        >
           <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-            <span className="text-sm font-medium @lg:text-sm">{integration.name}</span>
-            {integration.status && (
-              <Badge variant="warning" className="capitalize">
-                {integration.status}
-              </Badge>
-            )}
-            <MarketplaceSourceBadge source={source} />
+            <div className="relative z-10 text-sm font-medium @lg:text-sm after:absolute after:-inset-y-2 after:left-0 after:right-[calc(100%+6px)] after:content-[''] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground">
+              {integration.name}
+            </div>
+            <div className="relative z-10">
+              <MarketplaceSourceBadge source={source} />
+              {integration.status && (
+                <Badge variant="warning" className="capitalize">
+                  {integration.status}
+                </Badge>
+              )}
+            </div>
           </div>
           {integration.description && (
             <p className="mt-0.5 line-clamp-1 max-w-[600px] text-xs text-foreground-light">
               {integration.description}
             </p>
           )}
-        </div>
+        </Link>
       </TableCell>
 
       <TableCell className={`w-28 text-xs text-foreground-lighter ${HIDE_BELOW_XL}`}>

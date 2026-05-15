@@ -137,13 +137,14 @@ export const MarketplaceFilterBar = ({
         </button>
       )}
 
-      <div className="ml-auto flex overflow-hidden rounded-md border">
+      <div className="ml-auto flex rounded-md border">
         <button
           type="button"
           aria-label="Grid view"
           onClick={() => onViewModeChange('grid')}
           className={cn(
-            'border-r px-2 py-1.5',
+            'border-r px-2 py-1.5 rounded-l-md',
+            'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
             viewMode === 'grid'
               ? 'bg-surface-200 text-foreground'
               : 'text-foreground-light hover:bg-surface-100'
@@ -156,7 +157,8 @@ export const MarketplaceFilterBar = ({
           aria-label="List view"
           onClick={() => onViewModeChange('list')}
           className={cn(
-            'px-2 py-1.5',
+            'px-2 py-1.5 rounded-r-md',
+            'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
             viewMode === 'list'
               ? 'bg-surface-200 text-foreground'
               : 'text-foreground-light hover:bg-surface-100'

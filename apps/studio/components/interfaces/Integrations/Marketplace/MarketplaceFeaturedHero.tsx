@@ -68,6 +68,7 @@ export const MarketplaceFeaturedHero = ({
     ? formatCategoryLabel(activeCategorySlug, categoryOptions)
     : null
   const isActiveInstalled = installedIds.includes(active.id)
+  const source = getMarketplaceSource(active)
 
   const handleTabClick = (idx: number) => {
     setActiveIndex(idx)
@@ -103,18 +104,12 @@ export const MarketplaceFeaturedHero = ({
                     <span className="text-lg font-medium text-foreground">{active.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
+                    <MarketplaceSourceBadge source={source} />
                     {active.status && (
                       <Badge variant="warning" className="capitalize">
                         {active.status}
                       </Badge>
                     )}
-                    {(() => {
-                      const source = getMarketplaceSource(active)
-                      if (source === 'Partner') return <MarketplaceSourceBadge source="Partner" />
-                      if (source === 'Community')
-                        return <MarketplaceSourceBadge source="Community" />
-                      return <MarketplaceSourceBadge source="Official" />
-                    })()}
                   </div>
                 </div>
               </div>

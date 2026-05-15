@@ -16,7 +16,10 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
   const source = getMarketplaceSource(integration)
 
   return (
-    <Link href={`/project/${project?.ref}/integrations/${integration.id}/overview`}>
+    <Link
+      href={`/project/${project?.ref}/integrations/${integration.id}/overview`}
+      className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+    >
       <Card className="flex min-h-[168px] h-full flex-col gap-2.5 hover:border-stronger p-4">
         <div className="flex items-start justify-between">
           <MarketplaceLogo integration={integration} size="h-9 w-9" />
@@ -33,12 +36,12 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
         <div className="flex-1" />
         <div className="flex items-center justify-between gap-2 pt-2.5">
           <div className="flex flex-wrap items-center gap-1">
+            <MarketplaceSourceBadge source={source} />
             {integration.status && (
               <Badge variant="warning" className="capitalize">
                 {integration.status}
               </Badge>
             )}
-            <MarketplaceSourceBadge source={source} />
           </div>
           <div className="text-xs flex items-center gap-1 text-foreground-lighter">
             <span>Built by</span>
