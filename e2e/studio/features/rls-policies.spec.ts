@@ -156,12 +156,12 @@ test.describe('RLS Policies', () => {
 
         // A confirmation modal appears when toggling RLS from the policies page
         await expect(
-          page.getByRole('heading', { name: 'Disable Row Level Security?' }),
+          page.getByRole('heading', { name: 'Disable Row Level Security' }),
           'RLS disable confirmation modal should appear'
         ).toBeVisible({ timeout: 50000 })
         await expect(
           page.getByText(
-            'This table will be publicly readable and writable. Anyone can edit or delete data in this table. Auth policies will not be enforced.'
+            'This table will become publicly readable and writable. Anyone can view, add, update, or delete data in this table, and existing RLS policies will no longer apply.'
           ),
           'RLS disable confirmation should explain the access risk'
         ).toBeVisible()

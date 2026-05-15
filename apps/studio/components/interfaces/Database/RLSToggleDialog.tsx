@@ -28,12 +28,12 @@ export function RLSToggleDialog({
   onOpenChange,
   onConfirm,
 }: RLSToggleDialogProps) {
-  const title = isEnabled ? 'Disable Row Level Security?' : 'Enable Row Level Security?'
+  const title = isEnabled ? 'Disable Row Level Security' : 'Enable Row Level Security'
   const description = isEnabled
-    ? 'This table will be publicly readable and writable. Anyone can edit or delete data in this table. Auth policies will not be enforced.'
-    : 'RLS restricts table access until matching policies allow a request. Existing queries may return no rows until policies are added.'
+    ? 'This table will become publicly readable and writable. Anyone can view, add, update, or delete data in this table, and existing RLS policies will no longer apply.'
+    : 'RLS restricts table access until policies allow a request. Existing queries may stop returning rows until policies are added.'
   const confirmLabel = isEnabled ? 'Disable RLS' : 'Enable RLS'
-  const confirmVariant = isEnabled ? 'danger' : 'warning'
+  const confirmVariant = isEnabled ? 'danger' : 'primary'
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>

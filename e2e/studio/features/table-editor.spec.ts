@@ -178,10 +178,10 @@ testRunner('table editor', () => {
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
     await page.getByRole('button', { name: 'RLS disabled' }).click()
     await page.getByRole('button', { name: 'Enable RLS for this table' }).click()
-    await expect(page.getByRole('heading', { name: 'Enable Row Level Security?' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Enable Row Level Security' })).toBeVisible()
     await expect(
       page.getByText(
-        'RLS restricts table access until matching policies allow a request. Existing queries may return no rows until policies are added.'
+        'RLS restricts table access until policies allow a request. Existing queries may stop returning rows until policies are added.'
       )
     ).toBeVisible()
     await page.getByRole('button', { name: 'Cancel' }).click()
