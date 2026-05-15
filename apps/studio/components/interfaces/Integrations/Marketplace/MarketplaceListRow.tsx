@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Badge, TableCell, TableHead, TableRow } from 'ui'
+import { Badge, IconPartners, TableCell, TableHead, TableRow } from 'ui'
 
 import {
   formatCategoryLabel,
@@ -45,7 +45,9 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
               </Badge>
             )}
             {source === 'Partner' ? (
-              <Badge variant="success">Partner</Badge>
+              <Badge variant="success">
+                <IconPartners size={12} /> Partner
+              </Badge>
             ) : source === 'Community' ? (
               <Badge>Community</Badge>
             ) : (

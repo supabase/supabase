@@ -2,13 +2,19 @@ import { useParams } from 'common'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { Badge } from 'ui'
 
 interface MarketplaceDetailTopBarProps {
   title: string
   actions?: ReactNode
+  isInstalled?: boolean
 }
 
-export const MarketplaceDetailTopBar = ({ title, actions }: MarketplaceDetailTopBarProps) => {
+export const MarketplaceDetailTopBar = ({
+  title,
+  isInstalled,
+  actions,
+}: MarketplaceDetailTopBarProps) => {
   const { ref } = useParams()
 
   return (
@@ -23,6 +29,7 @@ export const MarketplaceDetailTopBar = ({ title, actions }: MarketplaceDetailTop
         </Link>
         <span className="text-foreground-muted">/</span>
         <div>{title}</div>
+        {isInstalled && <Badge variant="success">Installed</Badge>}
       </div>
       <div className="ml-auto flex items-center gap-2">{actions}</div>
     </div>

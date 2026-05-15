@@ -1,7 +1,7 @@
 import { Pause, Play } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Badge, Button, cn } from 'ui'
+import { Badge, Button, cn, IconPartners } from 'ui'
 
 import { formatCategoryLabel, getMarketplaceSource } from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
@@ -91,32 +91,43 @@ export const MarketplaceFeaturedHero = ({
           </div>
 
           <div className="flex flex-col gap-4 p-5 @3xl:p-6">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start @lg:items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <MarketplaceLogo integration={active} size="h-7 w-7" />
-                <span className="text-lg font-medium text-foreground">{active.name}</span>
-                {active.status && (
-                  <Badge variant="warning" className="capitalize">
-                    {active.status}
-                  </Badge>
-                )}
-                {(() => {
-                  const source = getMarketplaceSource(active)
-                  if (source === 'Partner') return <Badge variant="success">Partner</Badge>
-                  if (source === 'Community') return <Badge>Community</Badge>
-                  return <Badge>Official</Badge>
-                })()}
-                {isActiveInstalled && (
-                  <Badge variant="success" className="px-1.5 py-0 text-[10px]">
-                    Installed
-                  </Badge>
-                )}
-                {activeCategoryName && (
-                  <span className="text-[12px] text-foreground-lighter">
-                    · {activeCategoryName}
-                  </span>
-                )}
+                <div className="flex flex-wrap flex-col @lg:flex-row @lg:items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <MarketplaceLogo integration={active} size="h-7 w-7" />
+                    <span className="text-lg font-medium text-foreground">{active.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {active.status && (
+                      <Badge variant="warning" className="capitalize">
+                        {active.status}
+                      </Badge>
+                    )}
+                    {(() => {
+                      const source = getMarketplaceSource(active)
+                      if (source === 'Partner')
+                        return (
+                          <Badge variant="success">
+                            <IconPartners size={12} /> Partner
+                          </Badge>
+                        )
+                      if (source === 'Community') return <Badge>Community</Badge>
+                      return <Badge>Official</Badge>
+                    })()}
+                    {activeCategoryName && (
+                      <span className="text-[12px] text-foreground-lighter">
+                        · {activeCategoryName}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
+              {isActiveInstalled && (
+                <Badge variant="success" className="mt-2 @lg:mt-0 px-1.5 py-0 text-[10px]">
+                  Installed
+                </Badge>
+              )}
             </div>
 
             <div className="grow flex flex-col gap-2">

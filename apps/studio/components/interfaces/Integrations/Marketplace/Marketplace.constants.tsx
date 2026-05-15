@@ -6,7 +6,6 @@ import {
   Cpu,
   CreditCard,
   Database,
-  Handshake,
   KeyRound,
   Mail,
   Package2,
@@ -16,6 +15,7 @@ import {
   Wrench,
   type LucideIcon,
 } from 'lucide-react'
+import { IconPartners } from 'ui'
 
 import type {
   IntegrationDefinition,
@@ -115,7 +115,7 @@ export const MARKETPLACE_SOURCES: Array<{
   icon: LucideIcon
 }> = [
   { key: 'Official', label: 'Official', icon: BadgeCheck },
-  { key: 'Partner', label: 'Partner', icon: Handshake },
+  { key: 'Partner', label: 'Partner', icon: IconPartners },
   { key: 'Community', label: 'Community', icon: Users },
 ]
 

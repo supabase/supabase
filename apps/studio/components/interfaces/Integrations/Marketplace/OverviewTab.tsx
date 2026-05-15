@@ -1,4 +1,4 @@
-import { MarketplaceDetailRail } from '../MarketplaceDetailRail'
+import { MarketplaceDetailRail } from './MarketplaceDetailRail'
 import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { FilesViewer } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/FilesViewer'
 import { MarkdownContent } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/MarkdownContent'

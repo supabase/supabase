@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Badge, Card } from 'ui'
+import { Badge, Card, IconPartners } from 'ui'
 
 import { getMarketplaceSource } from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
@@ -39,7 +39,9 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
               </Badge>
             )}
             {source === 'Partner' ? (
-              <Badge variant="success">Partner</Badge>
+              <Badge variant="success">
+                <IconPartners size={12} /> Partner
+              </Badge>
             ) : source === 'Community' ? (
               <Badge>Community</Badge>
             ) : (

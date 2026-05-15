@@ -2,20 +2,22 @@ import { useParams } from 'common'
 import { ArrowUpRight, BookOpen, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { formatCategoryLabel } from './Marketplace.constants'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
 import { MarketplaceDetailTopBar } from './MarketplaceDetailTopBar'
-import { OverviewTab } from './tabs/OverviewTab'
+import { OverviewTab } from './OverviewTab'
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+
+export const centeredContentClass = 'mx-auto w-full max-w-6xl px-6 xl:px-10'
 
 export const MarketplaceDetail = () => {
   const router = useRouter()
@@ -82,13 +84,13 @@ export const MarketplaceDetail = () => {
     return (
       <>
         <MarketplaceDetailTopBar title="" />
-        <div className="border-b bg-surface-75 px-6 pt-10 xl:px-10">
+        <div className={cn(centeredContentClass, 'border-b bg-surface-75 pt-10')}>
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 pb-6">
             <ShimmeringLoader className="h-9 w-64" />
             <ShimmeringLoader className="h-4 w-96" />
           </div>
         </div>
-        <div className="mx-auto w-full max-w-6xl px-6 py-8 xl:px-10">
+        <div className={cn(centeredContentClass, 'py-8')}>
           <GenericSkeletonLoader />
         </div>
       </>
@@ -99,7 +101,7 @@ export const MarketplaceDetail = () => {
     return (
       <>
         <MarketplaceDetailTopBar title="Integration not found" />
-        <div className="mx-auto w-full max-w-6xl px-6 py-8 xl:px-10">
+        <div className={cn(centeredContentClass, 'py-8')}>
           <Admonition type="warning" title="This integration is not currently available">
             Please try again later or contact support if the problem persists.
           </Admonition>
@@ -143,6 +145,7 @@ export const MarketplaceDetail = () => {
     <>
       <MarketplaceDetailTopBar
         title={integration.name}
+        isInstalled={isInstalled}
         actions={
           <>
             {integration.docsUrl && (
@@ -168,14 +171,15 @@ export const MarketplaceDetail = () => {
         subtitle={subtitle}
         description={integration.description}
         tabs={tabs}
-        isInstalled={isInstalled}
       />
 
       {activeRoute === 'overview' ? (
-        <OverviewTab integration={integration} isInstalled={isInstalled} />
+        <div className={centeredContentClass}>
+          <OverviewTab integration={integration} isInstalled={isInstalled} />
+        </div>
       ) : CustomPageComponent ? (
         layout === 'constrained' ? (
-          <div className="mx-auto w-full max-w-6xl">
+          <div className={centeredContentClass}>
             <CustomPageComponent />
           </div>
         ) : (
