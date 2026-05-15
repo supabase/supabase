@@ -10,7 +10,7 @@ import {
   Button,
   Card,
   cn,
-  Input_Shadcn_,
+  Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -296,7 +296,7 @@ export function UnansweredThreadsTable({
           {/* Search Input */}
           <form onSubmit={handleSearchSubmit} className="relative md:max-w-xs w-full flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground-lighter" />
-            <Input_Shadcn_
+            <Input
               type="text"
               size="tiny"
               placeholder="Search threads by title..."

@@ -11,7 +11,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
 } from 'ui'
 
@@ -73,7 +73,7 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
         <DialogSection className="flex flex-col gap-y-4 py-5">
           <div className="flex flex-col gap-y-2">
             <Label_Shadcn_ htmlFor="snippet-name">Name</Label_Shadcn_>
-            <Input_Shadcn_
+            <Input
               id="snippet-name"
               autoFocus
               value={name}

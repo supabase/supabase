@@ -12,7 +12,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   SheetFooter,
   SheetHeader,
   SheetSection,
@@ -237,7 +237,7 @@ export const EditWrapperSheet = ({
                             }
                           >
                             <FormControl>
-                              <Input_Shadcn_ {...field} />
+                              <Input {...field} />
                             </FormControl>
                           </FormItemLayout>
                         )}

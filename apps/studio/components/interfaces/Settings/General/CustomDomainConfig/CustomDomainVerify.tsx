@@ -2,13 +2,7 @@ import { useParams } from 'common'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { DNSRecord } from './DNSRecord'
@@ -122,27 +116,25 @@ export const CustomDomainVerify = () => {
         </div>
 
         {hasCAAErrors && (
-          <Alert_Shadcn_>
+          <Alert>
             <WarningIcon />
-            <AlertTitle_Shadcn_>
-              Certificate Authority Authentication (CAA) error
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+            <AlertTitle>Certificate Authority Authentication (CAA) error</AlertTitle>
+            <AlertDescription>
               Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
               <code className="text-code-inline">{customDomain?.hostname}</code>. For example:{' '}
               <code className="text-code-inline">0 issue "digicert.com"</code>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         {customDomain?.ssl.status === 'validation_timed_out' ? (
-          <Alert_Shadcn_>
+          <Alert>
             <WarningIcon />
-            <AlertTitle_Shadcn_>Validation timed out</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+            <AlertTitle>Validation timed out</AlertTitle>
+            <AlertDescription>
               Please click "Verify" again to retry the validation of the records
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         ) : (
           <div className="space-y-2">
             <DNSTableHeaders display={customDomain?.ssl.txt_name ?? ''} />

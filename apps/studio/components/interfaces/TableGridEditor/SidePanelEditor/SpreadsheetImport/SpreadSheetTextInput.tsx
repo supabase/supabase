@@ -1,4 +1,4 @@
-import { TextArea_Shadcn_ as TextArea } from 'ui'
+import { TextArea } from 'ui'
 
 interface SpreadSheetTextInputProps {
   input: string

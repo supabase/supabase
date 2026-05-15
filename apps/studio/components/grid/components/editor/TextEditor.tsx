@@ -163,6 +163,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                           className="px-1"
                           onClick={() => onSelectExpand()}
                           icon={<Maximize size={12} strokeWidth={2} />}
+                          aria-label="Expand editor"
                         />
                       </TooltipTrigger>
                       <TooltipContent side="bottom">Expand editor</TooltipContent>

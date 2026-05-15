@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { COMPUTE_DISK } from 'shared-data'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   DropdownMenu,
@@ -224,7 +224,7 @@ export const ResourceExhaustionWarningBanner = () => {
   }
 
   return (
-    <Alert_Shadcn_
+    <Alert
       variant={isCritical ? 'destructive' : 'warning'}
       className={cn(
         'flex items-center justify-between',
@@ -233,8 +233,8 @@ export const ResourceExhaustionWarningBanner = () => {
     >
       <AlertTriangle />
       <div className="">
-        <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
+        <AlertTitle>{title}</AlertTitle>
+        <AlertDescription>{description}</AlertDescription>
       </div>
       <div className="flex items-center gap-x-2">
         {learnMoreUrl !== undefined && aiPrompt !== undefined ? (
@@ -304,6 +304,6 @@ export const ResourceExhaustionWarningBanner = () => {
           </Button>
         )}
       </div>
-    </Alert_Shadcn_>
+    </Alert>
   )
 }

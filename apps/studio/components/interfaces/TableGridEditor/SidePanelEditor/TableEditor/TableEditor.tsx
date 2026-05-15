@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
@@ -357,25 +358,35 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        <Input
-          data-testid="table-name-input"
-          label="Name"
+        <FormItemLayout
           id="name"
+          isReactForm={false}
           layout="horizontal"
-          type="text"
+          label="Name"
           error={errors.name ? String(errors.name) : undefined}
-          value={tableFields?.name}
-          onChange={(event) => onUpdateField({ name: event.target.value })}
-        />
-        <Input
-          label="Description"
+        >
+          <Input
+            data-testid="table-name-input"
+            id="name"
+            type="text"
+            value={tableFields?.name}
+            onChange={(event) => onUpdateField({ name: event.target.value })}
+          />
+        </FormItemLayout>
+        <FormItemLayout
           id="description"
-          placeholder="Optional"
+          isReactForm={false}
           layout="horizontal"
-          type="text"
-          value={tableFields?.comment ?? ''}
-          onChange={(event) => onUpdateField({ comment: event.target.value })}
-        />
+          label="Description"
+        >
+          <Input
+            id="description"
+            placeholder="Optional"
+            type="text"
+            value={tableFields?.comment ?? ''}
+            onChange={(event) => onUpdateField({ comment: event.target.value })}
+          />
+        </FormItemLayout>
       </SidePanel.Content>
 
       <SidePanel.Separator />

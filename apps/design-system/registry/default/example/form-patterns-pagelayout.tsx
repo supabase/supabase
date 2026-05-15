@@ -15,7 +15,7 @@ import {
   FormField,
   FormInputGroupInput,
   FormInputGroupTextArea,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -32,7 +32,7 @@ import {
   Switch,
   Textarea,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -148,7 +148,7 @@ export default function FormPatternsPageLayout() {
                         description="Single-line text entry for short values"
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} placeholder="Enter text" />
+                          <Input {...field} placeholder="Enter text" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -167,7 +167,7 @@ export default function FormPatternsPageLayout() {
                         description="Masked input for secure text entry"
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} type="password" placeholder="Enter password" />
+                          <Input {...field} type="password" placeholder="Enter password" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -186,7 +186,7 @@ export default function FormPatternsPageLayout() {
                         description="Read-only input with copy-to-clipboard functionality"
                       >
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             copy
                             readOnly
                             value={form.getValues('apiKey') || ''}
@@ -211,7 +211,7 @@ export default function FormPatternsPageLayout() {
                         description="Numeric input with min/max validation"
                       >
                         <FormControl>
-                          <Input_Shadcn_
+                          <Input
                             {...field}
                             type="number"
                             min={1}

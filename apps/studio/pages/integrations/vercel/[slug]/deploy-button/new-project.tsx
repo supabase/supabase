@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import {
   Button,
   Checkbox,
-  Input_Shadcn_ as Input,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,

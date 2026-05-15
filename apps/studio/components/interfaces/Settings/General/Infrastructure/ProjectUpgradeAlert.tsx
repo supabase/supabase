@@ -7,9 +7,9 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
   Form,
@@ -115,11 +115,9 @@ export const ProjectUpgradeAlert = () => {
 
   return (
     <>
-      <Alert_Shadcn_ title="Your project can be upgraded to the latest version of Postgres">
-        <AlertTitle_Shadcn_>
-          Your project can be upgraded to the latest version of Postgres
-        </AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
+      <Alert title="Your project can be upgraded to the latest version of Postgres">
+        <AlertTitle>Your project can be upgraded to the latest version of Postgres</AlertTitle>
+        <AlertDescription>
           <p>The latest version of Postgres ({latestPgVersion}) is available for your project.</p>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -139,8 +137,8 @@ export const ProjectUpgradeAlert = () => {
               </TooltipContent>
             )}
           </Tooltip>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        </AlertDescription>
+      </Alert>
 
       <Modal
         hideFooter
@@ -173,10 +171,10 @@ export const ProjectUpgradeAlert = () => {
                 )}
                 {/* @ts-ignore */}
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
-                  <Alert_Shadcn_ variant="destructive" title="Breaking changes">
+                  <Alert variant="destructive" title="Breaking changes">
                     <AlertCircle className="h-4 w-4" strokeWidth={2} />
-                    <AlertTitle_Shadcn_>Breaking changes</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                    <AlertTitle>Breaking changes</AlertTitle>
+                    <AlertDescription className="flex flex-col gap-3">
                       <p>
                         Your project will be upgraded across major versions of Postgres. This may
                         involve breaking changes.
@@ -193,19 +191,19 @@ export const ProjectUpgradeAlert = () => {
                           </Link>
                         </Button>
                       </div>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                    </AlertDescription>
+                  </Alert>
                 )}
                 {legacyAuthCustomRoles.length > 0 && (
-                  <Alert_Shadcn_
+                  <Alert
                     variant="warning"
                     title="Custom Postgres roles using md5 authentication have been detected"
                   >
                     <AlertTriangle className="h-4 w-4" strokeWidth={2} />
-                    <AlertTitle_Shadcn_>
+                    <AlertTitle>
                       Custom Postgres roles will not work automatically after upgrade
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                    </AlertTitle>
+                    <AlertDescription className="flex flex-col gap-3">
                       <p>You must run a series of commands after upgrading.</p>
                       <p>
                         This is because new Postgres versions use scram-sha-256 authentication by
@@ -235,8 +233,8 @@ export const ProjectUpgradeAlert = () => {
                           </Link>
                         </Button>
                       </div>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                    </AlertDescription>
+                  </Alert>
                 )}
                 <FormField
                   control={form.control}

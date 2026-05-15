@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 
 import ConfirmDisableReadOnlyModeModal from './DatabaseSettings/ConfirmDisableReadOnlyModal'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
@@ -24,12 +24,12 @@ export const DatabaseReadOnlyAlert = () => {
   return (
     <>
       {isReadOnlyMode && (
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <AlertTriangle />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             Project is in read-only mode and database is no longer accepting write requests
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          </AlertTitle>
+          <AlertDescription>
             You have reached 95% of your project's disk space, and read-only mode has been enabled
             to preserve your database's stability and prevent your project from exceeding its
             current billing plan. To resolve this, you may:
@@ -57,7 +57,7 @@ export const DatabaseReadOnlyAlert = () => {
                 </li>
               ) : null}
             </ul>
-          </AlertDescription_Shadcn_>
+          </AlertDescription>
           <div className="mt-4 flex items-center space-x-2">
             <Button type="default" onClick={() => setShowConfirmationModal(true)}>
               Disable read-only mode
@@ -72,7 +72,7 @@ export const DatabaseReadOnlyAlert = () => {
               </a>
             </Button>
           </div>
-        </Alert_Shadcn_>
+        </Alert>
       )}
       <ConfirmDisableReadOnlyModeModal
         visible={showConfirmationModal}

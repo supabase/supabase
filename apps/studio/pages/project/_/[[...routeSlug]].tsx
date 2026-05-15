@@ -4,9 +4,9 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -115,11 +115,11 @@ const GenericProjectPage: NextPage = () => {
             {isLoadingOrganizations ? (
               <LoadingCardView />
             ) : isErrorOrganizations ? (
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <AlertTriangleIcon />
-                <AlertTitle_Shadcn_>Failed to load your Supabase organizations</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>Try refreshing the page</AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                <AlertTitle>Failed to load your Supabase organizations</AlertTitle>
+                <AlertDescription>Try refreshing the page</AlertDescription>
+              </Alert>
             ) : organizations.length === 0 ? (
               <NoOrganizationsState />
             ) : !!selectedOrganization ? (

@@ -28,7 +28,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -341,7 +341,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                       <FormItem className="flex flex-col gap-y-2">
                         <FormLabel>Provide a name for your new folder</FormLabel>
                         <FormControl>
-                          <Input_Shadcn_
+                          <Input
                             autoFocus
                             {...field}
                             autoComplete="off"

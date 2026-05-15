@@ -10,7 +10,7 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Input_Shadcn_,
+  Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -116,7 +116,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                     <div className="flex items-center w-full flex-1 min-w-0">
                       {editingChatId === id ? (
                         <div className="flex items-center gap-2 w-full">
-                          <Input_Shadcn_
+                          <Input
                             value={editingChatName}
                             onChange={(e) => setEditingChatName(e.target.value)}
                             autoFocus

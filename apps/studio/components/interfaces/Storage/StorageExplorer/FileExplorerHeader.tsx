@@ -39,7 +39,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  FieldDescription_Shadcn_,
+  FieldDescription,
   Label_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -114,9 +114,9 @@ const NavigateDialog = ({
               if (event.key === 'Enter') onSubmit(event)
             }}
           />
-          <FieldDescription_Shadcn_ id={descriptionId} className="text-foreground-lighter">
+          <FieldDescription id={descriptionId} className="text-foreground-lighter">
             Enter a folder path within this bucket.
-          </FieldDescription_Shadcn_>
+          </FieldDescription>
         </DialogSection>
         <DialogFooter>
           <Button type="default" onClick={onCancel}>

@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -32,11 +32,11 @@ export default function TabsDemo() {
           <CardContent className="space-y-2">
             <div className="space-y-1">
               <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
-              <Input_Shadcn_ id="name" defaultValue="Pedro Duarte" />
+              <Input id="name" defaultValue="Pedro Duarte" />
             </div>
             <div className="space-y-1">
               <Label_Shadcn_ htmlFor="username">Username</Label_Shadcn_>
-              <Input_Shadcn_ id="username" defaultValue="@peduarte" />
+              <Input id="username" defaultValue="@peduarte" />
             </div>
           </CardContent>
           <CardFooter>
@@ -55,11 +55,11 @@ export default function TabsDemo() {
           <CardContent className="space-y-2">
             <div className="space-y-1">
               <Label_Shadcn_ htmlFor="current">Current password</Label_Shadcn_>
-              <Input_Shadcn_ id="current" type="password" />
+              <Input id="current" type="password" />
             </div>
             <div className="space-y-1">
               <Label_Shadcn_ htmlFor="new">New password</Label_Shadcn_>
-              <Input_Shadcn_ id="new" type="password" />
+              <Input id="new" type="password" />
             </div>
           </CardContent>
           <CardFooter>

@@ -7,9 +7,9 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -251,18 +251,18 @@ export const BasicAuthSettingsForm = () => {
                   />
 
                   {form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
-                    <Alert_Shadcn_
+                    <Alert
                       className="flex w-full items-center justify-between mt-4"
                       variant="warning"
                     >
                       <WarningIcon />
                       <div>
-                        <AlertTitle_Shadcn_>
+                        <AlertTitle>
                           Anonymous users will use the{' '}
                           <code className="text-code-inline">authenticated</code> role when signing
                           in
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                        </AlertTitle>
+                        <AlertDescription className="flex flex-col gap-y-3">
                           <p>
                             As a result, anonymous users will be subjected to RLS policies that
                             apply to the <code className="text-code-inline">public</code> and{' '}
@@ -281,27 +281,27 @@ export const BasicAuthSettingsForm = () => {
                               View access control docs
                             </Link>
                           </Button>
-                        </AlertDescription_Shadcn_>
+                        </AlertDescription>
                       </div>
-                    </Alert_Shadcn_>
+                    </Alert>
                   )}
 
                   {!authConfig?.SECURITY_CAPTCHA_ENABLED &&
                     form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
-                      <Alert_Shadcn_ className="mt-4">
+                      <Alert className="mt-4">
                         <WarningIcon />
-                        <AlertTitle_Shadcn_>
+                        <AlertTitle>
                           We highly recommend{' '}
                           <InlineLink href={`/project/${projectRef}/auth/protection`}>
                             enabling captcha
                           </InlineLink>{' '}
                           for anonymous sign-ins
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
+                        </AlertTitle>
+                        <AlertDescription>
                           This will prevent potential abuse on sign-ins which may bloat your
                           database and incur costs for monthly active users (MAU)
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
+                        </AlertDescription>
+                      </Alert>
                     )}
                 </CardContent>
                 <CardContent>

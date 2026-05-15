@@ -11,7 +11,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Input_Shadcn_,
+  Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -160,7 +160,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                 disabled={keyRevealed}
               >
                 <FormLayout label="Name" id="app-name">
-                  <Input_Shadcn_
+                  <Input
                     id="app-name"
                     placeholder="My integration"
                     value={name}

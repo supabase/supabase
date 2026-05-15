@@ -17,7 +17,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -108,7 +108,7 @@ export const CreatePublishableAPIKeyDialog = () => {
                     description="A short name of lowercase alphanumeric characters and underscore, must start with letter or underscore."
                   >
                     <FormControl>
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -123,7 +123,7 @@ export const CreatePublishableAPIKeyDialog = () => {
                     description="Provide a description about what this key is used for."
                   >
                     <FormControl>
-                      <Input_Shadcn_ {...field} placeholder="(Optional)" />
+                      <Input {...field} placeholder="(Optional)" />
                     </FormControl>
                   </FormItemLayout>
                 )}

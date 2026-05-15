@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
-  Input_Shadcn_,
+  Input,
   Popover_Shadcn_,
   PopoverAnchor_Shadcn_,
   PopoverContent_Shadcn_,
@@ -276,7 +276,7 @@ export function FilterCondition({
         <PopoverAnchor_Shadcn_ asChild>
           <div ref={propertyLabelRef} className="relative inline-flex items-center shrink-0">
             {isPropertyActive ? (
-              <Input_Shadcn_
+              <Input
                 type="text"
                 value={propertySearchText}
                 onChange={(e) => setPropertySearchText(e.target.value)}
@@ -329,7 +329,7 @@ export function FilterCondition({
       <Popover_Shadcn_ open={isOperatorActive && !isLoading && operatorItems.length > 0}>
         <PopoverAnchor_Shadcn_ asChild>
           <div className="relative inline-block">
-            <Input_Shadcn_
+            <Input
               ref={operatorRef}
               type="text"
               value={isOperatorActive ? localOperator : conditionOperator}
@@ -380,7 +380,7 @@ export function FilterCondition({
       <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
         <PopoverAnchor_Shadcn_ asChild>
           <div className="relative inline-block max-w-[180px]">
-            <Input_Shadcn_
+            <Input
               ref={valueRef}
               type="text"
               value={localValue}

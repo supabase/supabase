@@ -1,11 +1,11 @@
-import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { Copy } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
-  ContextMenu_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
   copyToClipboard,
 } from 'ui'
 
@@ -26,16 +26,14 @@ export const CellContextMenuWrapper = ({
   }
 
   return (
-    <ContextMenu_Shadcn_>
-      <ContextMenuTrigger_Shadcn_ className="flex items-center w-full">
-        {children}
-      </ContextMenuTrigger_Shadcn_>
+    <ContextMenu>
+      <ContextMenuTrigger className="flex items-center w-full">{children}</ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onCopyCellContent}>
+        <ContextMenuItem className="gap-x-2" onSelect={onCopyCellContent}>
           <Copy size={12} />
           <span className="text-xs">Copy cell</span>
-        </ContextMenuItem_Shadcn_>
+        </ContextMenuItem>
       </ContextMenuContent>
-    </ContextMenu_Shadcn_>
+    </ContextMenu>
   )
 }

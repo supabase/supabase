@@ -3,7 +3,7 @@ import { ExternalLink, XIcon } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
 import { useRegisterOrgMenu } from './OrganizationLayout/useRegisterOrgMenu'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -140,14 +140,14 @@ const OrganizationLayoutContent = ({
         </Head>
       )}
       {selectedOrganization && bannerConfig && !isBannerDismissed && (
-        <Alert_Shadcn_
+        <Alert
           variant="default"
           className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
         >
           <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
           <div className="flex-1">
-            <AlertTitle_Shadcn_>{bannerConfig.title}</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>{bannerConfig.description}</AlertDescription_Shadcn_>
+            <AlertTitle>{bannerConfig.title}</AlertTitle>
+            <AlertDescription>{bannerConfig.description}</AlertDescription>
           </div>
           <div className="flex items-center gap-2">
             {selectedRedirectQuery?.data?.url && (
@@ -166,7 +166,7 @@ const OrganizationLayoutContent = ({
               tooltip={{ content: { text: 'Dismiss' } }}
             />
           </div>
-        </Alert_Shadcn_>
+        </Alert>
       )}
       <main className="h-full w-full overflow-y-auto flex flex-col">{children}</main>
     </div>
