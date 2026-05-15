@@ -31,9 +31,9 @@ import {
   FormItem,
   FormMessage,
   Input_Shadcn_ as Input,
-  Popover as Popover,
-  PopoverContent as PopoverContent,
-  PopoverTrigger as PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'

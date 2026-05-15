@@ -3,14 +3,7 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Filter, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import {
-  Button,
-  Checkbox,
-  Label_Shadcn_,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from 'ui'
+import { Button, Checkbox, Label_Shadcn_, Popover, PopoverContent, PopoverTrigger } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,

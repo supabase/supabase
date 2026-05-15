@@ -1,13 +1,6 @@
 import { ChevronDown, RotateCcw, X } from 'lucide-react'
 import { Path, PathValue } from 'react-hook-form'
-import {
-  Button,
-  Checkbox,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  WarningIcon,
-} from 'ui'
+import { Button, Checkbox, Popover, PopoverContent, PopoverTrigger, WarningIcon } from 'ui'
 
 import { PermissionResourceSelector } from './PermissionResourceSelector'
 import { PermissionRow, PermissionsFormValues, PermissionsProps } from './Permissions.types'

@@ -158,12 +158,7 @@ export const ColumnType = ({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent
-                id={listboxId}
-                className="w-[460px] p-0"
-                side="bottom"
-                align="center"
-              >
+              <PopoverContent id={listboxId} className="w-[460px] p-0" side="bottom" align="center">
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_
                     placeholder="Search types..."

@@ -171,12 +171,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
           {value === null || value === '' ? <NullValue /> : jsonString}
         </div>
       </PopoverTrigger>
-      <PopoverContent
-        side="bottom"
-        align="start"
-        sideOffset={-35}
-        className="rounded-none p-0"
-      >
+      <PopoverContent side="bottom" align="start" sideOffset={-35} className="rounded-none p-0">
         {isTruncated && !isSuccess ? (
           <div className="flex items-center justify-center flex-col relative">
             <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />

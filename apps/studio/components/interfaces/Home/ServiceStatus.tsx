@@ -3,13 +3,7 @@ import dayjs from 'dayjs'
 import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import {
-  Button,
-  InfoIcon,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from 'ui'
+import { Button, InfoIcon, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBranchesQuery } from '@/data/branches/branches-query'

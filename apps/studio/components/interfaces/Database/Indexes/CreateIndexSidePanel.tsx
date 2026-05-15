@@ -179,11 +179,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
       <div className="py-6 space-y-6">
         <SidePanel.Content className="space-y-6">
           <FormItemLayout label="Select a schema" name="select-schema" isReactForm={false}>
-            <Popover
-              modal={false}
-              open={schemaDropdownOpen}
-              onOpenChange={setSchemaDropdownOpen}
-            >
+            <Popover modal={false} open={schemaDropdownOpen} onOpenChange={setSchemaDropdownOpen}>
               <PopoverTrigger asChild>
                 <Button
                   type="default"
@@ -198,12 +194,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                     : 'Choose a schema'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent
-                className="p-0"
-                side="bottom"
-                align="start"
-                sameWidthAsTrigger
-              >
+              <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_
                     placeholder="Find schema..."
@@ -250,15 +241,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             }
             isReactForm={false}
           >
-            <Popover
-              modal={false}
-              open={tableDropdownOpen}
-              onOpenChange={setTableDropdownOpen}
-            >
-              <PopoverTrigger
-                asChild
-                disabled={isSelectEntityDisabled || isLoadingEntities}
-              >
+            <Popover modal={false} open={tableDropdownOpen} onOpenChange={setTableDropdownOpen}>
+              <PopoverTrigger asChild disabled={isSelectEntityDisabled || isLoadingEntities}>
                 <Button
                   type="default"
                   size="medium"
@@ -277,12 +261,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                       : 'Choose a table'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent
-                className="p-0"
-                side="bottom"
-                align="start"
-                sameWidthAsTrigger
-              >
+              <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
                 {/* [Terry] shouldFilter context:
                 https://github.com/pacocoursey/cmdk/issues/267#issuecomment-2252717107 */}
                 <Command_Shadcn_ shouldFilter={false}>

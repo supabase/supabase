@@ -84,12 +84,7 @@ const OrganizationPicker = ({
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent
-          className="p-0 w-full"
-          side="bottom"
-          align="center"
-          sameWidthAsTrigger
-        >
+        <PopoverContent className="p-0 w-full" side="bottom" align="center" sameWidthAsTrigger>
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Search organizations..." />
             <CommandList_Shadcn_>

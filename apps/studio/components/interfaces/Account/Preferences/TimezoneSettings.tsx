@@ -102,10 +102,7 @@ export const TimezoneSettings = () => {
                     </span>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent
-                  id={listboxId}
-                  className="w-[--radix-popover-trigger-width] p-0"
-                >
+                <PopoverContent id={listboxId} className="w-[--radix-popover-trigger-width] p-0">
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
                     <CommandList_Shadcn_>

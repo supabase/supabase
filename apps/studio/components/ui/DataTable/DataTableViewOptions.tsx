@@ -8,9 +8,9 @@ import {
   CommandInput_Shadcn_ as CommandInput,
   CommandItem_Shadcn_ as CommandItem,
   CommandList_Shadcn_ as CommandList,
-  Popover as Popover,
-  PopoverContent as PopoverContent,
-  PopoverTrigger as PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'

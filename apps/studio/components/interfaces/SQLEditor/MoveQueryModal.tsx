@@ -251,12 +251,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                       </div>
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent
-                    className="p-0"
-                    side="bottom"
-                    align="start"
-                    sameWidthAsTrigger
-                  >
+                  <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
                     <Command_Shadcn_>
                       <CommandInput_Shadcn_ placeholder="Find folder..." />
                       <CommandList_Shadcn_>
