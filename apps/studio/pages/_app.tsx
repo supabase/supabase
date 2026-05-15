@@ -52,6 +52,7 @@ import { MainScrollContainerProvider } from '@/components/layouts/MainScrollCont
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
+import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useRootQueryClient } from '@/data/query-client'
 import { customFont, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -124,6 +125,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
   const { appTitle } = useCustomContent(['app:title'])
+  const { data } = useCLIReleaseVersionQuery()
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
@@ -143,7 +145,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   useThemeSandbox()
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
-  const isNonProdEnv = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+
+  // [Joshen] Should target hosted staging, local dev, and local CLI only
+  const isNonProdEnv =
+    (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || !!data?.current
 
   const cloudProvider = useDefaultProvider()
 
