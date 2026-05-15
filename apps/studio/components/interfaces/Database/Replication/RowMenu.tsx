@@ -1,18 +1,7 @@
-import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
-import { Pipeline } from 'data/replication/pipelines-query'
-import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from 'state/replication-pipeline-request-status'
-import type { ResponseError } from 'types'
+import { ArrowUpCircle, Edit, MoreVertical, Pause, Play, RotateCcw, Trash } from 'lucide-react'
+import { parseAsInteger, useQueryState } from 'nuqs'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
@@ -22,39 +11,55 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
+  getStatusName,
   PIPELINE_DISABLE_ALLOWED_FROM,
   PIPELINE_ENABLE_ALLOWED_FROM,
-  PIPELINE_ERROR_MESSAGES,
-  getStatusName,
 } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
+import AlertError from '@/components/ui/AlertError'
+import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
+import { Pipeline } from '@/data/replication/pipelines-query'
+import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
+import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
+import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
+import type { ResponseError } from '@/types'
 
 interface RowMenuProps {
+  destinationId: number
   pipeline: Pipeline | undefined
   pipelineStatus?: ReplicationPipelineStatusData['status']
   error: ResponseError | null
   isLoading: boolean
   isError: boolean
-  onEditClick: () => void
-  onDeleteClick: () => void
   hasUpdate?: boolean
+  onDeleteClick: () => void
   onUpdateClick?: () => void
 }
 
 export const RowMenu = ({
+  destinationId,
   pipeline,
   pipelineStatus,
   error,
   isLoading,
   isError,
-  onEditClick,
-  onDeleteClick,
   hasUpdate = false,
+  onDeleteClick,
   onUpdateClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
   const statusName = getStatusName(pipelineStatus)
+
+  const [, setEdit] = useQueryState(
+    'edit',
+    parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
@@ -82,46 +87,46 @@ export const RowMenu = ({
 
   const onEnablePipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
     try {
       // Only show 'enabling' when transitioning from allowed states
-      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as any)) {
+      if (PIPELINE_ENABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
         setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
       }
       await startPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+      toast.error(`Failed to start pipeline: ${(error as ResponseError).message}`)
     }
   }
 
   const onDisablePipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
     try {
       // Only show 'disabling' when transitioning from allowed states
-      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as any)) {
+      if (PIPELINE_DISABLE_ALLOWED_FROM.includes(statusName as PipelineStatusName)) {
         setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
       }
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.DISABLE_DESTINATION)
+      toast.error(`Failed to stop pipeline: ${(error as ResponseError).message}`)
     }
   }
 
   const onRestartPipeline = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
     try {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
       await restartPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
       setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+      toast.error(`Failed to restart pipeline: ${(error as ResponseError).message}`)
     }
   }
 
@@ -129,9 +134,7 @@ export const RowMenu = ({
     <div className="flex justify-end items-center space-x-2">
       {isLoading && <ShimmeringLoader />}
 
-      {isError && (
-        <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
-      )}
+      {isError && <AlertError error={error} subject="Failed to retrieve pipeline status" />}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -176,12 +179,12 @@ export const RowMenu = ({
             </>
           )}
 
-          <DropdownMenuItem className="space-x-2" onClick={onEditClick}>
+          <DropdownMenuItem className="space-x-2" onClick={() => setEdit(destinationId)}>
             <Edit size={14} />
             <p>Edit destination</p>
           </DropdownMenuItem>
           <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
-            <Trash stroke="red" size={14} />
+            <Trash size={14} />
             <p>Delete destination</p>
           </DropdownMenuItem>
         </DropdownMenuContent>

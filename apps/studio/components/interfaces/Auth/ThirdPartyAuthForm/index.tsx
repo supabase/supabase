@@ -1,22 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useDeleteThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-delete-mutation'
-import {
-  ThirdPartyAuthIntegration,
-  useThirdPartyAuthIntegrationsQuery,
-} from 'data/third-party-auth/integrations-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
   PageSection,
   PageSectionAside,
@@ -26,6 +16,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
@@ -38,6 +29,18 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDeleteThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-delete-mutation'
+import {
+  ThirdPartyAuthIntegration,
+  thirdPartyAuthIntegrationsQueryOptions,
+} from '@/data/third-party-auth/integrations-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const ThirdPartyAuthForm = () => {
   const { ref: projectRef } = useParams()
@@ -47,12 +50,17 @@ export const ThirdPartyAuthForm = () => {
     isError,
     isSuccess,
     error,
-  } = useThirdPartyAuthIntegrationsQuery({ projectRef })
+  } = useQuery(thirdPartyAuthIntegrationsQueryOptions({ projectRef }))
   const integrations = integrationsData || []
 
   const [selectedIntegration, setSelectedIntegration] = useState<INTEGRATION_TYPES>()
   const [selectedIntegrationForDeletion, setSelectedIntegrationForDeletion] =
     useState<ThirdPartyAuthIntegration>()
+  const [addIntegrationOpen, setAddIntegrationOpen] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setAddIntegrationOpen(true), {
+    label: 'Add provider',
+  })
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
@@ -86,14 +94,18 @@ export const ThirdPartyAuthForm = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
-          <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
+          <AddIntegrationDropdown
+            open={addIntegrationOpen}
+            onOpenChange={setAddIntegrationOpen}
+            onSelectIntegrationType={setSelectedIntegration}
+          />
         </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
         {isLoading && (
           <div
             className={cn(
-              'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
+              'border rounded-sm border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
             )}
           >
             <Loader2 size={24} className="animate-spin" />

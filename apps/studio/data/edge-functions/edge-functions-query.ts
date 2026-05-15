@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { edgeFunctionsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionsVariables = { projectRef?: string }
 
@@ -37,6 +37,6 @@ export const useEdgeFunctionsQuery = <TData = EdgeFunctionsData>(
   useQuery<EdgeFunctionsData, EdgeFunctionsError, TData>({
     queryKey: edgeFunctionsKeys.list(projectRef),
     queryFn: ({ signal }) => getEdgeFunctions({ projectRef }, signal),
-    enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined',
+    enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })

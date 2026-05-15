@@ -9,6 +9,12 @@ You are charged for having the feature [Advanced Multi-Factor Authentication Pho
 
 <Admonition type="note">
 
+The Advanced MFA Phone add-on is **not** covered by the [Spend Cap](/docs/guides/platform/cost-control#spend-cap).
+
+</Admonition>
+
+<Admonition type="note">
+
 Additional charges apply for each SMS or WhatsApp message sent, depending on your third-party messaging provider (such as Twilio or MessageBird).
 
 </Admonition>
@@ -71,3 +77,19 @@ All projects have MFA Phone activated throughout the entire billing cycle.
 | **Subtotal**                  |       | **<Price price="150" />** |
 | Compute Credits               |       | -<Price price="10" />     |
 | **Total**                     |       | **<Price price="140" />** |
+
+### Add-on disabled after a day
+
+Project add-ons are billed in arrears based on how many hours you used them.
+If you remove the MFA Phone add-on, you are no longer billed from the time of removal onward.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+|                               |       |                             |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />        |
+| MFA Phone Hours Project 1     | 24    | <Price price="2.46" />      |
+|                               |       |                             |
+| **Subtotal**                  |       | **<Price price="37.46" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="27.46" />** |

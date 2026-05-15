@@ -1,4 +1,4 @@
-import { VariantProps, cva } from 'class-variance-authority'
+import { cva, VariantProps } from 'class-variance-authority'
 
 const defaults = {
   bg: {
@@ -20,11 +20,11 @@ const defaults = {
   },
   placeholder: 'placeholder-border-stronger',
   focus: `
-    outline-none
+    outline-hidden
     focus:ring-current focus:ring-2
   `,
   'focus-visible': `
-    outline-none
+    outline-hidden
     transition-all
     outline-0
     focus-visible:outline-4

@@ -1,16 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
-import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Card,
@@ -18,19 +9,28 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
+import CopyButton from '@/components/ui/CopyButton'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useCheckCNAMERecordMutation } from '@/data/custom-domains/check-cname-mutation'
+import { useCustomDomainCreateMutation } from '@/data/custom-domains/custom-domains-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const schema = z.object({
   domain: z.string().trim().min(1, 'A value for your custom domain is required'),
 })
 
-const CustomDomainsConfigureHostname = () => {
+export const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -72,10 +72,11 @@ const CustomDomainsConfigureHostname = () => {
   }
 
   const domain = form.watch('domain')
+  const trimmedDomain = domain.trim()
   const isSubmitting = isCheckingRecord || isCreating
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onCreateCustomDomain)}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 gap-4">
@@ -84,7 +85,7 @@ const CustomDomainsConfigureHostname = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="domain"
                 render={({ field }) => (
@@ -94,15 +95,14 @@ const CustomDomainsConfigureHostname = () => {
                     description="Enter the subdomain you want to use."
                     className="[&>div]:md:w-1/2"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         placeholder="subdomain.example.com"
                         disabled={!canConfigureCustomDomain || isSubmitting}
                         autoComplete="off"
                       />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -115,12 +115,31 @@ const CustomDomainsConfigureHostname = () => {
               {domain ? <code className="text-code-inline">{domain}</code> : 'your custom domain'}{' '}
               resolving to{' '}
               {endpoint ? (
-                <code className="text-code-inline">{endpoint}</code>
+                <span className="inline-flex items-center gap-x-1">
+                  <code className="text-code-inline">{endpoint}</code>
+                  <CopyButton
+                    iconOnly
+                    type="text"
+                    className="h-5 w-5 min-w-0 p-0 [&_svg]:h-3 [&_svg]:w-3"
+                    text={endpoint}
+                  />
+                </span>
               ) : (
                 "your project's API URL"
               )}{' '}
               with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
               disable the proxy option.
+              <br />
+              {trimmedDomain.includes('.') ? (
+                <>
+                  Some DNS providers expect only the subdomain label{' '}
+                  <code className="text-code-inline">{trimmedDomain.split('.')[0]}</code>, while
+                  others accept the full hostname{' '}
+                  <code className="text-code-inline whitespace-nowrap">{trimmedDomain}</code>.
+                </>
+              ) : (
+                'Some DNS providers expect only the subdomain label, while others accept the full hostname.'
+              )}
             </p>
           </CardContent>
 
@@ -151,8 +170,6 @@ const CustomDomainsConfigureHostname = () => {
           </p>
         )}
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
-
-export default CustomDomainsConfigureHostname

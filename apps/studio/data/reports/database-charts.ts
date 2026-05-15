@@ -1,41 +1,74 @@
-import { numberFormatter } from 'components/ui/Charts/Charts.utils'
-import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
-import { DOCS_URL } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import type { Organization } from 'types'
-import { DiskAttributesData } from '../config/disk-attributes-query'
-import { MaxConnectionsData } from '../database/max-connections-query'
-import { Project } from '../projects/project-detail-query'
+import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
+
+import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
+import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
+import { DiskAttributesData } from '@/data/config/disk-attributes-query'
+import { MaxConnectionsData } from '@/data/database/max-connections-query'
+import { Project } from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import { formatBytes } from '@/lib/helpers'
+
+// Compute variants below 4XL run on EBS instances that draw on a burst
+// credit pool for disk IO, so the burst balance chart only makes sense for
+// these. Larger instances have dedicated IOPS and don't expose this metric.
+const BURSTABLE_IO_VARIANTS = new Set([
+  'ci_nano',
+  'ci_micro',
+  'ci_small',
+  'ci_medium',
+  'ci_large',
+  'ci_xlarge',
+  'ci_2xlarge',
+])
 
 export const getReportAttributesV2: (
-  org: Organization,
+  entitledFeatures: string[],
   project: Project,
   diskConfig?: DiskAttributesData,
   maxConnections?: MaxConnectionsData,
-  pgBouncerMaxConnections?: number
-) => ReportAttributes[] = (org, project, diskConfig, maxConnections, pgBouncerMaxConnections) => {
-  const isFreePlan = org?.plan?.id === 'free'
-  const isSpendCapEnabled =
-    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
+  pgBouncerMaxConnections?: number,
+  isSpendCapEnabled?: boolean,
+  showDiskIOBurstBalanceChart?: boolean
+) => ReportAttributes[] = (
+  entitledFeatures,
+  project,
+  diskConfig,
+  maxConnections,
+  pgBouncerMaxConnections,
+  isSpendCapEnabled,
+  showDiskIOBurstBalanceChart
+) => {
+  const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+  const provisionedDiskIops = diskConfig?.attributes?.iops
+  const computeIopsLimit = COMPUTE_MAX_IOPS[computeVariantId]
+  const effectiveMaxIops =
+    typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
+      ? Math.min(provisionedDiskIops, computeIopsLimit)
+      : provisionedDiskIops
+  const hasBurstableIO = BURSTABLE_IO_VARIANTS.has(computeVariantId)
+  const showBurstBalanceChart = !!showDiskIOBurstBalanceChart && hasBurstableIO
+  const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
+  const baselineThroughputLabel =
+    typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
 
   return [
     {
       id: 'ram-usage',
       label: 'Memory usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       showMaxValue: false,
       showGrid: true,
       syncId: 'database-reports',
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: any) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytes(value, 2),
       },
       attributes: [
         {
@@ -62,30 +95,61 @@ export const getReportAttributesV2: (
       ],
     },
     {
+      id: 'swap-usage',
+      label: 'Swap usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
+      hide: false,
+      showTooltip: true,
+      showLegend: false,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: false,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: number) => formatBytes(value, 2),
+      },
+      attributes: [
+        {
+          attribute: 'swap_usage',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+          tooltip:
+            'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
+        },
+      ],
+    },
+    {
       id: 'cpu-usage',
       label: 'CPU usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#cpu-usage`,
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
+      normalizeVisibleStackToPercent: true,
       YAxisProps: {
-        width: 45,
-        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'cpu_usage_busy_system',
           provider: 'infra-monitoring',
           label: 'System',
           format: '%',
+          color: { light: '#EDC35E', dark: '#EDD35E' },
+          fill: { light: '#F6D99F', dark: '#5C5230' },
           tooltip:
             'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead',
         },
@@ -94,6 +158,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'User',
           format: '%',
+          color: { light: '#0063E8', dark: '#65BCD9' },
+          fill: { light: '#80B1F4', dark: '#2A3D45' },
           tooltip:
             'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries',
         },
@@ -102,6 +168,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IOwait',
           format: '%',
+          color: { light: '#DB3A34', dark: '#FF6B6B' },
+          fill: { light: '#F2A7A3', dark: '#5C2A2A' },
           tooltip:
             'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks',
         },
@@ -110,6 +178,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IRQs',
           format: '%',
+          color: { light: '#DA760B', dark: '#DA760B' },
+          fill: { light: '#FFB885', dark: '#5C3D0A' },
           tooltip: 'CPU time handling hardware interrupt requests (IRQ)',
         },
         {
@@ -117,8 +187,20 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'Other',
           format: '%',
+          color: { light: '#B616A6', dark: '#DB8DF9' },
+          fill: { light: '#DB8BD3', dark: '#4A3D5C' },
           tooltip:
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
+        },
+        {
+          attribute: 'cpu_usage_busy_idle',
+          provider: 'infra-monitoring',
+          label: 'Idle',
+          format: '%',
+          omitFromTotal: true,
+          color: { light: '#6EA85F', dark: '#A3FFC2' },
+          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
+          tooltip: 'CPU time spent idle and available for new work',
         },
         {
           attribute: 'cpu_usage_max',
@@ -131,11 +213,42 @@ export const getReportAttributesV2: (
       ],
     },
     {
+      id: 'network-throughput',
+      label: 'Network throughput',
+      syncId: 'database-reports',
+      hide: false,
+      showTooltip: true,
+      format: 'bytes-per-second',
+      valuePrecision: 1,
+      showLegend: true,
+      showMaxValue: false,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 70,
+        tickFormatter: (value: number) => `${formatBytes(value, 1)}/s`,
+      },
+      defaultChartStyle: 'stackedAreaLine',
+      attributes: [
+        {
+          attribute: 'network_receive_bytes',
+          provider: 'infra-monitoring',
+          label: 'Network in',
+          tooltip: 'Inbound network throughput (bytes per second)',
+        },
+        {
+          attribute: 'network_transmit_bytes',
+          provider: 'infra-monitoring',
+          label: 'Network out',
+          tooltip: 'Outbound network throughput (bytes per second)',
+        },
+      ],
+    },
+    {
       id: 'disk-iops',
       label: 'Disk Input/Output operations per second (IOPS)',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
       syncId: 'database-reports',
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       valuePrecision: 0,
@@ -144,10 +257,10 @@ export const getReportAttributesV2: (
       showGrid: true,
       showMaxValue: true,
       YAxisProps: {
-        width: 35,
-        tickFormatter: (value: any) => numberFormatter(value, 0),
+        width: 55,
+        tickFormatter: (value: number) => compactNumberFormatter(value),
       },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'disk_iops_write',
@@ -167,9 +280,9 @@ export const getReportAttributesV2: (
           attribute: 'disk_iops_max',
           provider: 'reference-line',
           label: 'Max IOPS',
-          value: diskConfig?.attributes?.iops,
+          value: effectiveMaxIops,
           tooltip:
-            'Maximum IOPS (Input/Output Operations Per Second) for your current compute size',
+            'Effective maximum IOPS for your current compute and disk configuration. Equal to the lower of the compute IOPS limit and the provisioned disk IOPS',
           isMaxValue: true,
         },
       ],
@@ -179,7 +292,6 @@ export const getReportAttributesV2: (
       label: 'Disk throughput',
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
-      availableIn: ['team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       format: 'bytes-per-second',
@@ -190,7 +302,7 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 70,
-        tickFormatter: (value: any) => `${formatBytes(value, 1)}/s`,
+        tickFormatter: (value: number) => `${formatBytes(value, 1)}/s`,
       },
       defaultChartStyle: 'stackedAreaLine',
       attributes: [
@@ -221,20 +333,50 @@ export const getReportAttributesV2: (
       ],
     },
     {
+      id: 'disk-io-burst-balance',
+      label: 'Disk IO Burst Balance',
+      titleTooltip: `The burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
+      docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
+      syncId: 'database-reports',
+      hide: !showBurstBalanceChart,
+      format: '%',
+      valuePrecision: 0,
+      showTooltip: true,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
+      },
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'disk_io_budget',
+          provider: 'infra-monitoring',
+          label: 'Burst credits remaining',
+          format: '%',
+          tooltip: `Percentage of EBS burst credits remaining. Drops only matter while the instance is bursting above its baseline IO. At 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
+        },
+      ],
+    },
+    {
       // Client Connections metric for free tier
       id: 'client-connections-basic',
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['free'],
-      hide: !isFreePlan,
+      hide: entitledFeatures.includes('database'),
       showTooltip: false,
       showLegend: false,
       showMaxValue: true,
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
@@ -259,15 +401,16 @@ export const getReportAttributesV2: (
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
@@ -323,15 +466,16 @@ export const getReportAttributesV2: (
       label: 'Dedicated Pooler Client Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
@@ -355,15 +499,16 @@ export const getReportAttributesV2: (
       label: 'Shared Pooler (Supavisor) client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: false,
       showLegend: false,
       showMaxValue: false,
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'supavisor_connections_active',
@@ -378,7 +523,6 @@ export const getReportAttributesV2: (
       label: 'Disk Usage',
       syncId: 'database-reports',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -386,10 +530,10 @@ export const getReportAttributesV2: (
       showGrid: true,
       YAxisProps: {
         width: 65,
-        tickFormatter: (value: any) => formatBytes(value, 1),
+        tickFormatter: (value: number) => formatBytes(value, 1),
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-size`,
       attributes: [
         {
@@ -422,7 +566,7 @@ export const getReportAttributesV2: (
           label: 'Disk Size',
           tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
-        !isFreePlan &&
+        entitledFeatures.includes('database') &&
           (isSpendCapEnabled
             ? {
                 attribute: 'pg_database_size_percent_paid_spendCap',
@@ -431,7 +575,7 @@ export const getReportAttributesV2: (
                 strokeDasharray: '4 2',
                 label: 'Spend cap enabled',
                 value: diskConfig?.attributes?.size_gb! * 1024 * 1024 * 1024,
-                className: '[&_line]:!stroke-yellow-800 [&_line]:!opacity-100',
+                className: '[&_line]:stroke-yellow-800! [&_line]:opacity-100!',
                 opacity: 1,
               }
             : {
@@ -439,7 +583,7 @@ export const getReportAttributesV2: (
                 provider: 'reference-line',
                 isReferenceLine: true,
                 label: '90% - Disk resize threshold',
-                className: '[&_line]:!stroke-yellow-800',
+                className: '[&_line]:stroke-yellow-800!',
                 value: diskConfig?.attributes?.size_gb! * 1024 * 1024 * 1024 * 0.9,
               }),
       ],

@@ -1,7 +1,8 @@
+import { Loader2 } from 'lucide-react'
 import { ReactNode } from 'react'
 import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Loader2 } from 'lucide-react'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+
+import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 
 export type OverviewTableColumn<T> = {
   key: keyof T | string
@@ -21,15 +22,12 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
   const hasData = !isLoading && data.length > 0
 
   return (
-    <Table>
+    <Table className="border-t mt-4">
       {hasData && (
         <TableHeader>
           <TableRow>
             {columns.map((col) => (
-              <TableHead
-                key={String(col.key)}
-                className={cn(col.className, 'bg-surface-200 border-t h-8 px-6')}
-              >
+              <TableHead key={String(col.key)} className={cn(col.className)}>
                 {col.header}
               </TableHead>
             ))}
@@ -61,14 +59,13 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
           (data as unknown as T[]).map((row, idx) => (
             <TableRow key={idx}>
               {columns.map((col) => (
-                <TableCell key={String(col.key)} className={cn('py-1.5 pl-6 pr-4', col.className)}>
+                <TableCell key={String(col.key)} className={cn(col.className)}>
                   {col.render ? col.render(row) : (row as any)[col.key as string]}
                 </TableCell>
               ))}
             </TableRow>
           ))
         )}
-        {data.length > 0 && <span className="h-2 flex w-full" />}
       </TableBody>
     </Table>
   )

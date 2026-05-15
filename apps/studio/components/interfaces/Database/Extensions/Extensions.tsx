@@ -1,17 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
 import { AlertCircle, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
-import { useParams } from 'common'
-import InformationBox from 'components/ui/InformationBox'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useEffect, useRef, useState } from 'react'
 import {
   Card,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   ShadowScrollArea,
   Table,
   TableBody,
@@ -21,32 +17,55 @@ import {
   TableRow,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ExtensionRow } from './ExtensionRow'
 import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
+import InformationBox from '@/components/ui/InformationBox'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const Extensions = () => {
   const { filter } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { data, isPending: isLoading } = useDatabaseExtensionsQuery({
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search extensions' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+  })
+
+  const { data = [], isPending: isLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
+  const visibleExtensions = data.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
   const extensions =
     filterString.length === 0
-      ? data ?? []
-      : (data ?? []).filter((ext) => {
+      ? visibleExtensions
+      : visibleExtensions.filter((ext) => {
           const nameMatchesSearch = ext.name.toLowerCase().includes(filterString.toLowerCase())
           const searchTermsMatchesSearch = (SEARCH_TERMS[ext.name] || []).some((x) =>
             x.includes(filterString.toLowerCase())
           )
           return nameMatchesSearch || searchTermsMatchesSearch
         })
-  const extensionsWithoutHidden = extensions.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
   const [enabledExtensions, disabledExtensions] = partition(
-    extensionsWithoutHidden,
+    extensions,
     (ext) => !isNull(ext.installed_version)
   )
 
@@ -62,14 +81,19 @@ export const Extensions = () => {
   return (
     <>
       <div className="mb-4">
-        <Input
-          size="tiny"
-          placeholder="Search for an extension"
-          value={filterString}
-          onChange={(e) => setFilterString(e.target.value)}
-          className="w-52"
-          icon={<Search />}
-        />
+        <InputGroup className="w-52">
+          <InputGroupInput
+            ref={searchInputRef}
+            size="tiny"
+            placeholder="Search for an extension"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+          />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+        </InputGroup>
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (
@@ -88,19 +112,23 @@ export const Extensions = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead key="name">Name</TableHead>
-                  <TableHead key="version">Version</TableHead>
+                  <TableHead key="version" className="w-28">
+                    Version
+                  </TableHead>
                   <TableHead key="schema">Schema</TableHead>
-                  <TableHead key="description">Description</TableHead>
+                  <TableHead key="description" className="min-w-80">
+                    Description
+                  </TableHead>
                   <TableHead key="used-by">Used by</TableHead>
                   <TableHead key="links">Links</TableHead>
-                  {/* 
-                    [Joshen] All these classes are just to make the last column sticky 
+                  {/*
+                    [Joshen] All these classes are just to make the last column sticky
                     I reckon we can pull these out into the Table component where we can declare
                     sticky columns via props, but we can do that if we start to have more tables
                     in the dashboard with sticky columns
                   */}
                   <TableHead key="enabled" className="px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l">
+                    <div className="bg-200! px-4 w-full h-full flex items-center border-l">
                       Enabled
                     </div>
                   </TableHead>
@@ -114,7 +142,7 @@ export const Extensions = () => {
                   <TableRow>
                     <TableCell colSpan={7}>
                       <NoSearchResults
-                        className="border-none !p-0 bg-transparent"
+                        className="border-none p-0! bg-transparent"
                         searchString={filterString}
                         onResetFilter={() => setFilterString('')}
                       />

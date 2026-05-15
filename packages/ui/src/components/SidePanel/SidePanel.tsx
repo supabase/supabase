@@ -1,7 +1,8 @@
 'use client'
 
-import * as Dialog from '@radix-ui/react-dialog'
+import { Dialog } from 'radix-ui'
 import React from 'react'
+
 import { Button } from '../../components/Button/Button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../components/shadcn/ui/tooltip'
 import styleHandler from '../../lib/theme/styleHandler'
@@ -9,7 +10,8 @@ import styleHandler from '../../lib/theme/styleHandler'
 export type SidePanelProps = RadixProps & CustomProps
 
 interface RadixProps
-  extends Dialog.DialogProps,
+  extends
+    Dialog.DialogProps,
     Pick<
       Dialog.DialogContentProps,
       | 'onOpenAutoFocus'

@@ -1,4 +1,5 @@
 import React from 'react'
+
 // @ts-ignore
 // import TitleStyles from './Title.module.css'
 
@@ -9,7 +10,7 @@ interface Props {
   style?: React.CSSProperties
 }
 
-function Title({ className, level = 1, children, style }: Props) {
+function Title({ level = 1, children, style }: Props) {
   // let classes = [TitleStyles['sbui-typography-title']]
   // if (className) {
   //   classes.push(className)

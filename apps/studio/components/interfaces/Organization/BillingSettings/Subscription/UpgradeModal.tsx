@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { includes, without } from 'lodash'
 import { useReducer, useState } from 'react'
 import { toast } from 'sonner'
+import { Modal, TextArea_Shadcn_ as TextArea } from 'ui'
 
-import { useParams } from 'common'
-import { useSendUpgradeFeedbackMutation } from 'data/feedback/upgrade-survey-send'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { Input, Modal } from 'ui'
 import { generateUpgradeReasons } from '../helpers'
+import { useSendUpgradeFeedbackMutation } from '@/data/feedback/upgrade-survey-send'
+import type { OrgSubscription } from '@/data/subscriptions/types'
 
 export interface UpgradeSurveyModalProps {
   visible: boolean
@@ -84,12 +84,12 @@ const UpgradeSurveyModal = ({
                   <label
                     key={option}
                     className={`
-                      flex cursor-pointer items-center space-x-2 rounded-md py-1 
+                      flex cursor-pointer items-center space-x-2 rounded-md py-1
                       pl-2 pr-3 text-center text-sm
-                      shadow-sm transition-all duration-100
+                      shadow-xs transition-all duration-100
                       ${
                         active
-                          ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                          ? ` bg-foreground text-background opacity-100 hover:bg-foreground/75`
                           : ` bg-border-strong text-foreground opacity-25 hover:opacity-50`
                       }
                   `}
@@ -106,13 +106,16 @@ const UpgradeSurveyModal = ({
                 )
               })}
             </div>
-            <div className="text-area-text-sm">
-              <Input.TextArea
+            <div className="text-area-text-sm flex flex-col gap-y-2">
+              <label htmlFor="message" className="text-sm whitespace-pre-line wrap-break-word">
+                Anything else that we can improve on?
+              </label>
+              <TextArea
                 id="message"
                 name="message"
                 value={message}
                 onChange={(event: any) => setMessage(event.target.value)}
-                label="Anything else that we can improve on?"
+                rows={3}
               />
             </div>
           </div>

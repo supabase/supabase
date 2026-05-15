@@ -2,15 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
-import { useProjectCloneMutation } from 'data/projects/clone-mutation'
-import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
-import { generateStrongPassword } from 'lib/project'
 import {
   Button,
   Dialog,
@@ -20,15 +11,23 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
 import { NewProjectPrice } from './RestoreToNewProject.utils'
+import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
+import { useProjectCloneMutation } from '@/data/projects/clone-mutation'
+import { useCloneBackupsQuery } from '@/data/projects/clone-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import { generateStrongPassword } from '@/lib/project'
 
 interface CreateNewProjectDialogProps {
   open: boolean
@@ -37,6 +36,7 @@ interface CreateNewProjectDialogProps {
   onOpenChange: (value: boolean) => void
   onCloneSuccess: () => void
   additionalMonthlySpend: NewProjectPrice
+  hasAccess?: boolean
 }
 
 export const CreateNewProjectDialog = ({
@@ -46,10 +46,9 @@ export const CreateNewProjectDialog = ({
   onOpenChange,
   onCloneSuccess,
   additionalMonthlySpend,
+  hasAccess,
 }: CreateNewProjectDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
 
@@ -66,11 +65,9 @@ export const CreateNewProjectDialog = ({
     },
   })
 
-  const isFreePlan = organization?.plan?.id === 'free'
-
   const { data: cloneBackups } = useCloneBackupsQuery(
     { projectRef: project?.ref },
-    { enabled: !isFreePlan }
+    { enabled: hasAccess }
   )
   const hasPITREnabled = cloneBackups?.pitr_enabled
 
@@ -105,7 +102,7 @@ export const CreateNewProjectDialog = ({
             This process will create a new project and restore your database to it.
           </DialogDescription>
         </DialogHeader>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id={'create-new-project-form'}
             onSubmit={form.handleSubmit((data) => {
@@ -137,30 +134,40 @@ export const CreateNewProjectDialog = ({
             })}
           >
             <DialogSection className="pb-6 space-y-4 text-sm">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout label="New Project Name">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ placeholder="Enter a name" type="text" {...field} />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItemLayout>
-                    <FormControl_Shadcn_>
+                  <FormItemLayout
+                    label="Database password"
+                    description={
+                      <PasswordStrengthBar
+                        passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
+                        password={field.value}
+                        passwordStrengthMessage={passwordStrengthMessage}
+                        generateStrongPassword={generatePassword}
+                      />
+                    }
+                  >
+                    <FormControl>
                       <Input
                         id="db-password"
-                        label="Database password"
                         type="password"
                         placeholder="Type in a strong password"
                         value={field.value}
                         copy={field.value?.length > 0}
+                        reveal
                         onChange={(e) => {
                           const value = e.target.value
                           field.onChange(value)
@@ -169,16 +176,8 @@ export const CreateNewProjectDialog = ({
                             setPasswordStrengthMessage('')
                           } else checkPasswordStrength(value)
                         }}
-                        descriptionText={
-                          <PasswordStrengthBar
-                            passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
-                            password={field.value}
-                            passwordStrengthMessage={passwordStrengthMessage}
-                            generateStrongPassword={generatePassword}
-                          />
-                        }
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -193,7 +192,7 @@ export const CreateNewProjectDialog = ({
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

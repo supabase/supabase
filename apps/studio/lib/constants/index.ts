@@ -4,6 +4,21 @@ export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 
+/**
+ * Indicates that the app is running in a test environment (E2E tests).
+ * Set via NEXT_PUBLIC_NODE_ENV=test in the generateLocalEnv.js script.
+ */
+export const IS_TEST_ENV = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
+/**
+ * True when running against the staging or local environments. Used to gate
+ * staff-only debugging affordances (e.g. the unified logs OTEL toggle) that
+ * should never be visible to customers on production.
+ */
+export const IS_STAGING_OR_LOCAL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+
 export const API_URL = (() => {
   if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
   //  If running in platform, use API_URL from the env var
@@ -56,3 +71,5 @@ export const OPT_IN_TAGS = {
 export const GB = 1024 * 1024 * 1024
 export const MB = 1024 * 1024
 export const KB = 1024
+
+export const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

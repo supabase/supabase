@@ -1,21 +1,84 @@
 'use client'
 
-import * as Collapsible from '@radix-ui/react-collapsible'
-
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
+import { isElementInViewport } from '~/features/ui/helpers.dom'
+import { BASE_PATH } from '~/lib/constants'
 import { debounce } from 'lodash-es'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Collapsible } from 'radix-ui'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren } from 'react'
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react'
 import { cn } from 'ui'
 
-import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { isElementInViewport } from '~/features/ui/helpers.dom'
-import { BASE_PATH } from '~/lib/constants'
-
 export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(false)
+
+let patchCount = 0
+let originalPushState: typeof history.pushState | null = null
+let originalReplaceState: typeof history.replaceState | null = null
+const pathnameListeners = new Set<() => void>()
+
+function notifyPathnameListeners() {
+  pathnameListeners.forEach((callback) => callback())
+}
+
+function subscribeToPathname(callback: () => void) {
+  pathnameListeners.add(callback)
+
+  if (patchCount === 0) {
+    window.addEventListener('popstate', notifyPathnameListeners)
+
+    originalPushState = history.pushState.bind(history)
+    history.pushState = (...args) => {
+      originalPushState!(...args)
+      notifyPathnameListeners()
+    }
+
+    originalReplaceState = history.replaceState.bind(history)
+    history.replaceState = (...args) => {
+      originalReplaceState!(...args)
+      notifyPathnameListeners()
+    }
+  }
+  patchCount++
+
+  return () => {
+    pathnameListeners.delete(callback)
+    patchCount--
+
+    if (patchCount === 0) {
+      window.removeEventListener('popstate', notifyPathnameListeners)
+      history.pushState = originalPushState!
+      history.replaceState = originalReplaceState!
+      originalPushState = null
+      originalReplaceState = null
+    }
+  }
+}
+
+function getPathname() {
+  if (typeof window === 'undefined') return ''
+  const pathname = window.location.pathname
+  return pathname.startsWith(BASE_PATH) ? pathname.slice(BASE_PATH.length) : pathname
+}
+
+function getServerPathname() {
+  return ''
+}
+
+function useCurrentPathname() {
+  return useSyncExternalStore(subscribeToPathname, getPathname, getServerPathname)
+}
 
 export function ReferenceContentScrollHandler({
   libPath,
@@ -184,7 +247,7 @@ export function RefLink({
 }) {
   const ref = useRef<HTMLAnchorElement>(null)
 
-  const pathname = usePathname()
+  const pathname = useCurrentPathname()
   const href = deriveHref(basePath, section)
   const isActive =
     pathname === href || (pathname === basePath && href.replace(basePath, '') === '/introduction')
@@ -230,7 +293,7 @@ export function RefLink({
 function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceSection) {
   const [open, _setOpen] = useState(false)
 
-  const pathname = usePathname()
+  const pathname = useCurrentPathname()
   const parentHref = deriveHref(basePath, section)
   const isParentActive = pathname === parentHref
 

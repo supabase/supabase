@@ -1,13 +1,9 @@
-import type { Sort } from 'components/grid/types'
-import { ArrowDown, ArrowUp, ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, Copy, Edit, Lock, Trash, Unlock } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
-
-import { useTableSort } from 'components/grid/hooks/useTableSort'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,6 +13,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
+import { useTableSort } from '@/components/grid/hooks/useTableSort'
+import type { Sort } from '@/components/grid/types'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
@@ -93,9 +94,19 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           <ArrowDown size={14} strokeWidth={currentSort && !currentSort.ascending ? 3 : 1.5} />
           <span>Sort Descending</span>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="space-x-2"
+          onClick={(e) => {
+            e.stopPropagation()
+            copyToClipboard(columnName)
+          }}
+        >
+          <Copy size={12} />
+          <span>Copy name</span>
+        </DropdownMenuItem>
         {snap.editable && (
           <>
-            <DropdownMenuSeparator />
             <Tooltip>
               <TooltipTrigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
                 <DropdownMenuItem
@@ -153,6 +164,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             onClick={(e) => {
               e.stopPropagation()
             }}
+            aria-label={`Column ${column.name} actions`}
             icon={<ChevronDown />}
           />
         </DropdownMenuTrigger>

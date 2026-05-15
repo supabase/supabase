@@ -1,20 +1,9 @@
+import { useParams } from 'common'
 import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
-import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Card,
@@ -29,16 +18,31 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
-import CreateIndexSidePanel from './CreateIndexSidePanel'
 
-const Indexes = () => {
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
+import { CreateIndexSidePanel } from './CreateIndexSidePanel'
+import AlertError from '@/components/ui/AlertError'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useDatabaseIndexDeleteMutation } from '@/data/database-indexes/index-delete-mutation'
+import { useIndexesQuery, type DatabaseIndex } from '@/data/database-indexes/indexes-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+export const Indexes = () => {
   const { data: project } = useSelectedProjectQuery()
   const { schema: urlSchema, table } = useParams()
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const deletingIndexNameRef = useRef<string | null>(null)
 
   const {
     data: allIndexes,
@@ -54,24 +58,14 @@ const Indexes = () => {
 
   const [showCreateIndex, setShowCreateIndex] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false)
   )
 
-  const { setValue: setSelectedIndexName, value: selectedIndex } = useQueryStateWithSelect({
-    urlKey: 'edit',
-    select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-    enabled: !!allIndexes,
-    onError: () => toast.error(`Index not found`),
-  })
+  const [editIndexId, setEditIndexId] = useQueryState('edit', parseAsString)
+  const selectedIndex = allIndexes?.find((idx) => idx.name === editIndexId)
 
-  const { setValue: setSelectedIndexNameToDelete, value: selectedIndexToDelete } =
-    useQueryStateWithSelect({
-      urlKey: 'delete',
-      select: (id) => (id ? allIndexes?.find((idx) => idx.name === id) : undefined),
-      enabled: !!allIndexes,
-      onError: (_error, selectedId) =>
-        handleErrorOnDelete(deletingIndexNameRef, selectedId, `Index not found`),
-    })
+  const [deleteIndexId, setDeleteIndexId] = useQueryState('delete', parseAsString)
+  const selectedIndexToDelete = allIndexes?.find((idx) => idx.name === deleteIndexId)
 
   const {
     data: schemas,
@@ -83,14 +77,31 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const { mutate: deleteIndex, isPending: isExecuting } = useDatabaseIndexDeleteMutation({
+  const {
+    mutate: deleteIndex,
+    isPending: isExecuting,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      setSelectedIndexNameToDelete(null)
+      setDeleteIndexId(null)
       toast.success('Successfully deleted index')
     },
   })
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search indexes' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setSearch('')
+  })
 
   const sortedIndexes = sortBy(allIndexes ?? [], (index) => index.name.toLocaleLowerCase())
   const indexes =
@@ -100,8 +111,6 @@ const Indexes = () => {
 
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
     if (!project) return console.error('Project is required')
-
-    deletingIndexNameRef.current = index.name
     deleteIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,
@@ -121,6 +130,20 @@ const Indexes = () => {
     if (table !== undefined) setSearch(table)
   }, [table])
 
+  useEffect(() => {
+    if (isSuccessIndexes && !!editIndexId && !selectedIndex) {
+      toast('Index not found')
+      setEditIndexId(null)
+    }
+  }, [isSuccessIndexes, editIndexId, selectedIndex, setEditIndexId])
+
+  useEffect(() => {
+    if (isSuccessIndexes && !!deleteIndexId && !selectedIndexToDelete && !isSuccessDelete) {
+      toast('Index not found')
+      setDeleteIndexId(null)
+    }
+  }, [isSuccessIndexes, deleteIndexId, selectedIndexToDelete, isSuccessDelete, setDeleteIndexId])
+
   return (
     <>
       <div className="pb-8">
@@ -128,38 +151,57 @@ const Indexes = () => {
           <div className="flex items-center gap-2 flex-wrap">
             {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
             {isErrorSchemas && (
-              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded-sm flex items-center space-x-2">
                 <AlertCircle strokeWidth={2} size={16} />
                 <p>Failed to load schemas</p>
               </div>
             )}
             {isSuccessSchemas && (
-              <SchemaSelector
-                className="w-full lg:w-[180px]"
-                size="tiny"
-                showError={false}
-                selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
-              />
+              <Shortcut
+                id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+                onTrigger={() => setSchemaSelectorOpen(true)}
+                side="bottom"
+                tooltipOpen={schemaSelectorOpen ? false : undefined}
+              >
+                <SchemaSelector
+                  className="w-full lg:w-[180px]"
+                  size="tiny"
+                  showError={false}
+                  selectedSchemaName={selectedSchema}
+                  onSelectSchema={setSelectedSchema}
+                  open={schemaSelectorOpen}
+                  onOpenChange={setSchemaSelectorOpen}
+                />
+              </Shortcut>
             )}
             <Input
+              ref={searchInputRef}
               size="tiny"
               value={search}
               className="w-full lg:w-52"
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={onSearchInputEscape(search, setSearch)}
               placeholder="Search for an index"
               icon={<Search />}
             />
 
             {!isSchemaLocked && (
-              <Button
-                className="ml-auto flex-grow lg:flex-grow-0"
-                type="primary"
-                onClick={() => setShowCreateIndex(true)}
-                disabled={!isSuccessSchemas}
+              <Shortcut
+                id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                label="Create new index"
+                onTrigger={() => setShowCreateIndex(true)}
+                options={{ enabled: isSuccessSchemas }}
+                side="bottom"
               >
-                Create index
-              </Button>
+                <Button
+                  className="ml-auto grow lg:grow-0"
+                  type="primary"
+                  onClick={() => setShowCreateIndex(true)}
+                  disabled={!isSuccessSchemas}
+                >
+                  Create index
+                </Button>
+              </Shortcut>
             )}
           </div>
 
@@ -218,10 +260,7 @@ const Indexes = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end items-center space-x-2">
-                              <Button
-                                type="default"
-                                onClick={() => setSelectedIndexName(index.name)}
-                              >
+                              <Button type="default" onClick={() => setEditIndexId(index.name)}>
                                 View definition
                               </Button>
                               {!isSchemaLocked && (
@@ -230,7 +269,7 @@ const Indexes = () => {
                                   type="text"
                                   className="px-1"
                                   icon={<Trash />}
-                                  onClick={() => setSelectedIndexNameToDelete(index.name)}
+                                  onClick={() => setDeleteIndexId(index.name)}
                                 />
                               )}
                             </div>
@@ -254,7 +293,7 @@ const Indexes = () => {
             <code className="text-sm ml-2">{selectedIndex?.name}</code>
           </>
         }
-        onCancel={() => setSelectedIndexName(null)}
+        onCancel={() => setEditIndexId(null)}
       >
         <div className="h-full">
           <div className="relative h-full">
@@ -277,7 +316,8 @@ const Indexes = () => {
         visible={!!selectedIndexToDelete}
         title={
           <>
-            Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
+            Confirm to delete index{' '}
+            <code className="text-code-inline">{selectedIndexToDelete?.name}</code>
           </>
         }
         confirmLabel="Confirm delete"
@@ -285,12 +325,13 @@ const Indexes = () => {
         onConfirm={() =>
           selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
         }
-        onCancel={() => setSelectedIndexNameToDelete(null)}
+        onCancel={() => setDeleteIndexId(null)}
         alert={{
           title: 'This action cannot be undone',
           description:
             'Deleting an index that is still in use will cause queries to slow down, and in some cases causing significant performance issues.',
         }}
+        className="pt-0"
       >
         <ul className="mt-4 space-y-5">
           <li className="flex gap-3">
@@ -310,5 +351,3 @@ const Indexes = () => {
     </>
   )
 }
-
-export default Indexes

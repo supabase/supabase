@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
+
 import pgMeta from '../src/index'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
@@ -40,6 +41,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16451.1",
           "identity_generation": null,
           "is_generated": false,
@@ -60,6 +62,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16451.2",
           "identity_generation": null,
           "is_generated": false,
@@ -83,6 +86,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
+          "format_schema": "public",
           "id": "16451.3",
           "identity_generation": null,
           "is_generated": false,
@@ -147,6 +151,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16451.1",
           "identity_generation": null,
           "is_generated": false,
@@ -167,6 +172,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16451.2",
           "identity_generation": null,
           "is_generated": false,
@@ -190,6 +196,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
+          "format_schema": "public",
           "id": "16451.3",
           "identity_generation": null,
           "is_generated": false,
@@ -233,6 +240,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
+          "format_schema": "pg_catalog",
           "id": "16451.1",
           "identity_generation": null,
           "is_generated": false,
@@ -253,6 +261,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16451.2",
           "identity_generation": null,
           "is_generated": false,
@@ -276,6 +285,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
+          "format_schema": "public",
           "id": "16451.3",
           "identity_generation": null,
           "is_generated": false,

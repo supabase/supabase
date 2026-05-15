@@ -1,24 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuthError } from 'common'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import z from 'zod'
-
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { useAuthError } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { useSignOut } from 'lib/auth'
-import { getReturnToPath } from 'lib/gotrue'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import z from 'zod'
+
 import { SupportLink } from '../Support/SupportLink'
+import AlertError from '@/components/ui/AlertError'
+import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useSignOut } from '@/lib/auth'
+import { getReturnToPath } from '@/lib/gotrue'
 
 const schema = z.object({
   code: z.string().min(1, 'MFA Code is required'),
@@ -34,11 +34,14 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
+
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { code: '' },
   })
+
+  const { code } = form.watch()
 
   const {
     data: factors,
@@ -89,6 +92,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     }
   }, [factors?.totp, isSuccessFactors, router, queryClient])
 
+  useEffect(() => {
+    if (code.length === 6) form.handleSubmit(onSubmit)()
+  }, [code])
+
   const error = useAuthError()
 
   if (error) {
@@ -112,9 +119,9 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       {isErrorFactors && <AlertError error={factorsError} subject="Failed to retrieve factors" />}
 
       {isSuccessFactors && (
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+            <FormField
               key="code"
               name="code"
               control={form.control}
@@ -127,14 +134,14 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                       : null
                   }
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground-light [&_svg]:stroke-[1.5] [&_svg]:h-[20px] [&_svg]:w-[20px]">
                         <Lock />
                       </div>
                       <Input_Shadcn_
                         id="code"
-                        className="pl-10"
+                        className="pl-10 font-mono"
                         {...field}
                         autoFocus
                         autoComplete="off"
@@ -145,12 +152,12 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                         disabled={isVerifying}
                       />
                     </div>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <div className="flex items-center justify-between space-x-2">
+            <div className="flex items-center justify-between gap-x-2">
               <Button
                 block
                 type="outline"
@@ -173,7 +180,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               </Button>
             </div>
           </form>
-        </Form_Shadcn_>
+        </Form>
       )}
 
       <div className="my-8">

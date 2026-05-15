@@ -1,10 +1,9 @@
-import dynamic from 'next/dynamic'
+import { CubeIcon } from '@heroicons/react/outline'
 import {
   ArrowLeftRight,
   Check,
   ClipboardCheck,
   FolderLock,
-  Globe2,
   HeartPulse,
   InfoIcon,
   Lightbulb,
@@ -17,30 +16,29 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
-import { Image } from 'ui'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Image } from 'ui-patterns/Image'
 
+import { companyStats } from '../company-stats'
 import MainProducts from '../MainProducts'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { TwoColumnsSectionProps } from 'components/Solutions/TwoColumnsSection'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 import {
   FrameworkLink,
+  getEditors,
   type FeaturesSection,
   type FrameworkLinkProps,
   type HeroSection,
   type Metadata,
   type Quotes,
-  getEditors,
 } from './solutions.utils'
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { companyStats } from '../company-stats'
+import type { SecuritySectionProps } from '@/components/Enterprise/Security'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import RealtimeLogs from '@/components/Products/Functions/RealtimeLogs'
+import type { DXSectionProps } from '@/components/Solutions/DeveloperExperienceSection'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from '@/components/Solutions/ResultsSection'
+import type { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -143,7 +141,7 @@ const data: {
       },
       {
         icon: '/images/logos/publicity/brthrs.svg',
-        avatar: '/images/avatars/zimo-holdijk.jpeg',
+        avatar: '/images/avatars/zimo-holdijk.png',
         author: 'Zimo Holdijk',
         authorTitle: 'Lead Product Manager, Brthrs',
         quote: (
@@ -301,15 +299,15 @@ const data: {
             magic links, OAuth (Google, GitHub, Twitter, etc.), SAML, SSO, and phone/SMS OTP.
           </>
         ),
-        className: '!border-l-0 sm:!border-l sm:!border-t-0',
-        image: <AuthVisual className="2xl:!-bottom-20" />,
+        className: 'border-l-0! sm:border-l! sm:border-t-0!',
+        image: <AuthVisual className="2xl:-bottom-20!" />,
       },
       {
         id: 'rbac',
         title: 'Role-Based Access Control',
         icon: 'M17.6874 22.888V20.3886C17.6874 17.5888 15.4178 15.3192 12.618 15.3192C9.8182 15.3192 7.54852 17.5888 7.54852 20.3886V22.888M21.5531 11.5235C21.8189 14.1669 20.9393 16.9038 18.9141 18.9289C18.5359 19.3072 18.1328 19.6455 17.7101 19.9438M20.8038 8.70448C20.3598 7.71036 19.7299 6.77911 18.9141 5.96334C15.3338 2.38299 9.52889 2.38299 5.94855 5.96334C4.17501 7.73687 3.28 10.0562 3.26352 12.3807M24.0875 13.1161L23.2046 12.2332C22.3264 11.355 20.9026 11.355 20.0244 12.2332L19.1415 13.1161M0.875198 10.9503L1.75809 11.8331C2.63629 12.7113 4.06012 12.7113 4.93832 11.8331L5.82121 10.9503M7.49904 20.4919C5.77226 19.4557 4.37848 17.8555 3.62143 15.8584M15.6799 12.1942C15.6799 13.9201 14.2808 15.3192 12.5549 15.3192C10.829 15.3192 9.42993 13.9201 9.42993 12.1942C9.42993 10.4683 10.829 9.06917 12.5549 9.06917C14.2808 9.06917 15.6799 10.4683 15.6799 12.1942Z',
         subheading: <>Secure your data properly.</>,
-        className: '!border-l-0',
+        className: 'border-l-0!',
         image: (
           <Image
             draggable={false}
@@ -335,7 +333,7 @@ const data: {
             collaborative applications.
           </>
         ),
-        className: '!border-l-0 sm:!border-l',
+        className: 'border-l-0! sm:border-l!',
         image: (
           <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
         ),
@@ -350,7 +348,7 @@ const data: {
             managing files, images, and videos.
           </>
         ),
-        className: '!border-l-0 lg:!border-l',
+        className: 'border-l-0! lg:border-l!',
         image: (
           <Image
             draggable={false}
@@ -380,7 +378,7 @@ const data: {
             globally for low-latency execution.
           </>
         ),
-        className: '!border-l-0 sm:!border-l lg:!border-l-0',
+        className: 'border-l-0! sm:border-l! lg:border-l-0!',
         image: <FunctionsVisual />,
       },
       {
@@ -393,7 +391,7 @@ const data: {
             for AI/ML applications, enabling fast semantic search and embedding storage.
           </>
         ),
-        className: '!border-l-0 lg:!border-l',
+        className: 'border-l-0! lg:border-l!',
         image: (
           <Image
             draggable={false}
@@ -437,7 +435,7 @@ const data: {
   },
   developerExperience: {
     id: 'developer-experience',
-    className: '[&_h2]:!max-w-sm',
+    className: '[&_h2]:max-w-sm!',
     title: (
       <>
         <span className="text-foreground">Build faster</span> with Supabase
@@ -545,8 +543,9 @@ const data: {
         icon: 'M10.2805 18.2121C11.2419 18.6711 12.3325 18.8932 13.4711 18.8084C15.2257 18.6776 16.7596 17.843 17.8169 16.6015M8.21496 8.36469C9.27117 7.14237 10.7928 6.322 12.5311 6.19248C13.7196 6.10392 14.8558 6.34979 15.8474 6.85054M21.7152 12.8129C21.7152 11.4644 21.4115 10.1867 20.8688 9.0447M12.925 21.6032C14.2829 21.6032 15.5689 21.2952 16.717 20.7454M16.717 20.7454C17.2587 21.5257 18.1612 22.0366 19.1831 22.0366C20.84 22.0366 22.1831 20.6935 22.1831 19.0366C22.1831 17.3798 20.84 16.0366 19.1831 16.0366C17.5263 16.0366 16.1831 17.3798 16.1831 19.0366C16.1831 19.6716 16.3804 20.2605 16.717 20.7454ZM4.96506 16.5471C4.16552 17.086 3.63965 17.9999 3.63965 19.0366C3.63965 20.6935 4.98279 22.0366 6.63965 22.0366C8.2965 22.0366 9.63965 20.6935 9.63965 19.0366C9.63965 17.3798 8.2965 16.0366 6.63965 16.0366C6.01951 16.0366 5.44333 16.2248 4.96506 16.5471ZM9.12614 4.88371C8.58687 4.08666 7.67444 3.56274 6.63965 3.56274C4.98279 3.56274 3.63965 4.90589 3.63965 6.56274C3.63965 8.2196 4.98279 9.56274 6.63965 9.56274C8.2965 9.56274 9.63965 8.2196 9.63965 6.56274C9.63965 5.94069 9.45032 5.36285 9.12614 4.88371ZM20.8688 9.0447C21.6621 8.50486 22.1831 7.59464 22.1831 6.56274C22.1831 4.90589 20.84 3.56274 19.1831 3.56274C17.5263 3.56274 16.1831 4.90589 16.1831 6.56274C16.1831 8.2196 17.5263 9.56274 19.1831 9.56274C19.8081 9.56274 20.3884 9.37165 20.8688 9.0447Z',
         subheading: (
           <>
-            Connect Supabase to <span className="text-foreground">Redshift, BigQuery, MySQL</span>{' '}
-            and external APIs for seamless integrations with your clients’ existing systems.
+            Connect Supabase to{' '}
+            <span className="text-foreground">BigQuery, Snowflake, ClickHouse</span> and external
+            APIs for seamless integrations with your clients’ existing systems.
           </>
         ),
         image: (
@@ -624,7 +623,7 @@ const data: {
           <RealtimeLogs
             isActive={false}
             isInView={true}
-            className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:!bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]"
+            className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]!"
           />
         ),
       },

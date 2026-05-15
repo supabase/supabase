@@ -1,13 +1,7 @@
-import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
-import React, { useState } from 'react'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useTrack } from 'lib/telemetry/track'
+import { MoreHorizontal, TrashIcon } from 'lucide-react'
+import { cloneElement, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -25,14 +19,20 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsCard } from './LogDrainsCard'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { VoteLink } from './VoteLink'
+import AlertError from '@/components/ui/AlertError'
+import { useDeleteLogDrainMutation } from '@/data/log-drains/delete-log-drain-mutation'
+import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useTrack } from '@/lib/telemetry/track'
 
 export function LogDrains({
   onNewDrainClick,
-  onUpdateDrainClick,
+  onUpdateDrainClick: _onUpdateDrainClick,
 }: {
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
@@ -46,7 +46,6 @@ export function LogDrains({
   const {
     data: logDrains,
     isPending: isLoading,
-    refetch,
     error,
     isError,
   } = useLogDrainsQuery(
@@ -56,6 +55,11 @@ export function LogDrains({
     }
   )
   const sentryEnabled = useFlag('SentryLogDrain')
+  const s3Enabled = useFlag('S3logdrain')
+  const axiomEnabled = useFlag('axiomLogDrain')
+  const otlpEnabled = useFlag('otlpLogDrain')
+  const last9Enabled = useFlag('Last9LogDrain')
+  const syslogEnabled = useFlag('syslogLogDrain')
   const hasLogDrains = !!logDrains?.length
 
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
@@ -89,8 +93,16 @@ export function LogDrains({
   if (!isLoading && !hasLogDrains) {
     return (
       <>
-        <div className="grid lg:grid-cols-2 gap-4">
-          {LOG_DRAIN_TYPES.filter((t) => t.value !== 'sentry' || sentryEnabled).map((src) => (
+        <div className="grid lg:grid-cols-3 gap-4">
+          {LOG_DRAIN_TYPES.filter((t) => {
+            if (t.value === 'sentry') return sentryEnabled
+            if (t.value === 's3') return s3Enabled
+            if (t.value === 'axiom') return axiomEnabled
+            if (t.value === 'otlp') return otlpEnabled
+            if (t.value === 'last9') return last9Enabled
+            if (t.value === 'syslog') return syslogEnabled
+            return true
+          }).map((src) => (
             <LogDrainsCard
               key={src.value}
               title={src.name}
@@ -142,13 +154,16 @@ export function LogDrains({
                   </TableCell>
                   <TableCell className="text-foreground-light">
                     <div className="flex items-center gap-2">
-                      {React.cloneElement(
-                        LOG_DRAIN_TYPES.find((t) => t.value === drain.type)
-                          ?.icon as React.ReactElement,
-                        { width: 16, height: 16 }
+                      {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.icon && (
+                        <span className="text-foreground-light">
+                          {cloneElement(LOG_DRAIN_TYPES.find((t) => t.value === drain.type)!.icon, {
+                            height: 16,
+                            width: 16,
+                          })}
+                        </span>
                       )}
                       <span className="truncate max-w-40">
-                        {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name}
+                        {LOG_DRAIN_TYPES.find((t) => t.value === drain.type)?.name ?? drain.type}
                       </span>
                     </div>
                   </TableCell>
@@ -157,11 +172,12 @@ export function LogDrains({
                       <DropdownMenuTrigger asChild>
                         <Button
                           type="text"
-                          className="px-1 opacity-50 hover:opacity-100 !bg-transparent flex-shrink-0"
+                          className="px-1 opacity-50 hover:opacity-100 bg-transparent! shrink-0"
                           icon={<MoreHorizontal />}
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="max-w-[140px]" align="end">
+                        {/* Jordi: Updating log drains is disabled temporarily.
                         <DropdownMenuItem
                           onClick={() => {
                             onUpdateDrainClick(drain)
@@ -169,7 +185,7 @@ export function LogDrains({
                         >
                           <Pencil className="h-4 w-4 mr-2" />
                           Update
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                         <DropdownMenuItem
                           onClick={() => {
                             setSelectedLogDrain(drain)
@@ -195,10 +211,7 @@ export function LogDrains({
               if (selectedLogDrain && ref) {
                 deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
                 track('log_drain_confirm_button_submitted', {
-                  destination: selectedLogDrain.type as Exclude<
-                    LogDrainType,
-                    'elastic' | 'postgres' | 'bigquery' | 'clickhouse' | 's3' | 'axiom'
-                  >,
+                  destination: selectedLogDrain.type,
                 })
               }
             }}

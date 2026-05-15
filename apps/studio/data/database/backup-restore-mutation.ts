@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import type { components } from '@/data/api'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BackupRestoreVariables = {
   ref: string
@@ -17,7 +17,7 @@ export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables)
   if (backup.isPhysicalBackup) {
     const { data, error } = await post('/platform/database/{ref}/backups/restore-physical', {
       params: { path: { ref } },
-      body: { id: backup.id, recovery_time_target: backup.inserted_at },
+      body: { id: backup.id },
     })
     if (error) throw error
     return data

@@ -1,8 +1,9 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
-import { useRouter } from 'next/navigation'
 
 export function LogoutButton() {
   const router = useRouter()

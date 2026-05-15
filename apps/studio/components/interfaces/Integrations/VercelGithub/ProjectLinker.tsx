@@ -1,37 +1,37 @@
 import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import {
-  IntegrationConnectionsCreateVariables,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
-import { EMPTY_ARR } from 'lib/void'
-import Link from 'next/link'
 import {
   Badge,
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
 } from 'ui'
+
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import {
+  IntegrationConnectionsCreateVariables,
+  IntegrationProjectConnection,
+} from '@/data/integrations/integrations.types'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from '@/lib/constants'
+import { openInstallGitHubIntegrationWindow } from '@/lib/github'
+import { EMPTY_ARR } from '@/lib/void'
 
 export interface Project {
   name: string
@@ -170,10 +170,10 @@ const ProjectLinker = ({
   const oppositeMissingEntity = noSupabaseProjects ? mode : 'Supabase'
 
   return (
-    <div className="flex flex-col bg border shadow rounded-lg overflow-hidden">
+    <div className="flex flex-col bg border shadow-sm rounded-lg overflow-hidden">
       <div className="relative p-12 border-b border-muted">
         <div
-          className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
+          className="absolute inset-0 bg-grid-black/5 mask-[linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:mask-[linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
         />
 
@@ -195,7 +195,7 @@ const ProjectLinker = ({
         ) : (
           <div className="flex justify-center gap-0 w-full relative">
             <Panel>
-              <div className="bg-white shadow border rounded p-1 w-12 h-12 flex justify-center items-center">
+              <div className="bg-white shadow-sm border rounded-sm p-1 w-12 h-12 flex justify-center items-center">
                 <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-6" />
               </div>
 
@@ -213,7 +213,7 @@ const ProjectLinker = ({
                   return (
                     <div className={cn('w-full flex items-center justify-between')}>
                       <div className="flex items-center gap-x-2">
-                        <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                        <div className="bg-white shadow-sm border rounded-sm p-1 w-6 h-6 flex justify-center items-center">
                           <img
                             src={`${BASE_PATH}/img/supabase-logo.svg`}
                             alt="Supabase"
@@ -245,7 +245,7 @@ const ProjectLinker = ({
                       }
                     >
                       <div className="flex items-center gap-x-2">
-                        <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                        <div className="bg-white shadow-sm border rounded-sm p-1 w-6 h-6 flex justify-center items-center">
                           <img
                             src={`${BASE_PATH}/img/supabase-logo.svg`}
                             alt="Supabase"
@@ -292,7 +292,7 @@ const ProjectLinker = ({
             <div className="border border-foreground-lighter h-px w-8 border-dashed self-end mb-4" />
 
             <Panel>
-              <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
+              <div className="bg-black shadow-sm rounded-sm p-1 w-12 h-12 flex justify-center items-center">
                 {integrationIcon}
               </div>
 
@@ -310,7 +310,7 @@ const ProjectLinker = ({
                     icon={
                       <div>
                         {selectedForeignProject
-                          ? getForeignProjectIcon?.(selectedForeignProject) ?? integrationIcon
+                          ? (getForeignProjectIcon?.(selectedForeignProject) ?? integrationIcon)
                           : integrationIcon}
                       </div>
                     }
@@ -328,11 +328,10 @@ const ProjectLinker = ({
                   side="bottom"
                   align="center"
                   sameWidthAsTrigger
-                  portal
                 >
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search for a project" />
-                    <CommandList_Shadcn_ className="!max-h-[170px]">
+                    <CommandList_Shadcn_ className="max-h-[170px]!">
                       <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                       <CommandGroup_Shadcn_>
                         {foreignProjects.map((project, i) => {

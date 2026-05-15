@@ -1,19 +1,11 @@
-import { useEffect, type Dispatch, type MouseEventHandler } from 'react'
-import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 // End of third-party imports
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
-import { getProjectAuthConfig } from 'data/auth/auth-config-query'
-import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
-import { type OrganizationPlanID } from 'data/organizations/organization-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
-import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
-import { detectBrowser } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { DialogSectionSeparator, Form_Shadcn_ } from 'ui'
+import { type Dispatch, type MouseEventHandler } from 'react'
+import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
+import { DialogSectionSeparator, Form } from 'ui'
+
 import {
   AffectedServicesSelector,
   CATEGORIES_WITHOUT_AFFECTED_SERVICES,
@@ -21,26 +13,36 @@ import {
 import { AttachmentUploadDisplay, useAttachmentUpload } from './AttachmentUpload'
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
 import { ClientLibraryInfo } from './ClientLibraryInfo'
+import {
+  DASHBOARD_LOG_CATEGORIES,
+  getSanitizedBreadcrumbs,
+  uploadDashboardLog,
+} from './dashboard-logs'
 import { DashboardLogsToggle } from './DashboardLogsToggle'
 import { MessageField } from './MessageField'
 import { OrganizationSelector } from './OrganizationSelector'
 import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
 import { SubjectAndSuggestionsInfo } from './SubjectAndSuggestionsInfo'
 import { SubmitButton } from './SubmitButton'
-import { SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
+import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
 import type { SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions, SupportFormState } from './SupportForm.state'
 import {
   formatMessage,
+  formatStudioVersion,
   getOrgSubscriptionPlan,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
 } from './SupportForm.utils'
-import {
-  DASHBOARD_LOG_CATEGORIES,
-  getSanitizedBreadcrumbs,
-  uploadDashboardLog,
-} from './dashboard-logs'
+import { getProjectAuthConfig } from '@/data/auth/auth-config-query'
+import { useSendSupportTicketMutation } from '@/data/feedback/support-ticket-send'
+import { type OrganizationPlanID } from '@/data/organizations/organization-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useGenerateAttachmentURLsMutation } from '@/data/support/generate-attachment-urls-mutation'
+import { useDeploymentCommitQuery } from '@/data/utils/deployment-commit-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { detectBrowser } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
 
 const useIsSimplifiedForm = (slug: string, subscriptionPlanId?: OrganizationPlanID) => {
   const simplifiedSupportForm = useFlag('simplifiedSupportForm')
@@ -76,6 +78,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const { data: organizations } = useOrganizationsQuery()
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)
   const simplifiedSupportForm = useIsSimplifiedForm(organizationSlug, subscriptionPlanId)
+  const showClientLibraries = useIsFeatureEnabled('support:show_client_libraries')
 
   const attachmentUpload = useAttachmentUpload()
   const { mutateAsync: uploadDashboardLogFn } = useGenerateAttachmentURLsMutation()
@@ -104,6 +107,21 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   })
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (formValues) => {
+    // Library is required when selecting "APIs and Client Libraries" category,
+    // but only when the library selector is visible (not in simplified form)
+    if (
+      !simplifiedSupportForm &&
+      showClientLibraries &&
+      formValues.category === SupportCategories.PROBLEM &&
+      !formValues.library
+    ) {
+      form.setError('library', {
+        type: 'manual',
+        message: "Please select the library that you're facing issues with",
+      })
+      return
+    }
+
     dispatch({ type: 'SUBMIT' })
 
     const { attachDashboardLogs: formAttachDashboardLogs, ...values } = formValues
@@ -127,12 +145,12 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
     const payload = {
       ...values,
-      category,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
       projectRef: values.projectRef ?? NO_PROJECT_MARKER,
-      allowSupportAccess: SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-        ? values.allowSupportAccess
-        : false,
+      allowSupportAccess:
+        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
+          ? values.allowSupportAccess
+          : false,
       library:
         values.category === SupportCategories.PROBLEM && selectedLibrary !== undefined
           ? selectedLibrary.key
@@ -141,8 +159,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         message: values.message,
         attachments,
         error: initialError,
-        commit,
-        dashboardLogUrl: dashboardLogUrl?.[0],
       }),
       verified: true,
       tags: ['dashboard-support-form'],
@@ -155,6 +171,8 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
             .map((x) => x.trim().replace(/ /g, '_').toLowerCase())
             .join(';'),
       browserInformation: detectBrowser(),
+      dashboardLogs: dashboardLogUrl?.[0],
+      dashboardStudioVersion: commit ? formatStudioVersion(commit) : undefined,
     }
 
     if (values.projectRef !== NO_PROJECT_MARKER) {
@@ -178,17 +196,8 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     handleFormSubmit(event)
   }
 
-  useEffect(() => {
-    if (simplifiedSupportForm) {
-      form.setValue('category', 'Others')
-    } else {
-      form.setValue('category', '' as any)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [simplifiedSupportForm])
-
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form id="support-form" className="flex flex-col gap-y-6">
         <h3 className="px-6 text-xl">How can we help?</h3>
 
@@ -201,14 +210,12 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
             subscriptionPlanId={subscriptionPlanId}
             category={category}
           />
-          {!simplifiedSupportForm && (
-            <CategoryAndSeverityInfo
-              form={form}
-              category={category}
-              severity={severity}
-              projectRef={projectRef}
-            />
-          )}
+          <CategoryAndSeverityInfo
+            form={form}
+            category={category}
+            severity={severity}
+            projectRef={projectRef}
+          />
         </div>
 
         <DialogSectionSeparator />
@@ -229,14 +236,14 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         {DASHBOARD_LOG_CATEGORIES.includes(category) && (
           <>
-            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
+            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}
 
-        {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+        {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
           <>
-            <SupportAccessToggle form={form} />
+            <SupportAccessToggle form={form} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}
@@ -249,6 +256,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           />
         </div>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

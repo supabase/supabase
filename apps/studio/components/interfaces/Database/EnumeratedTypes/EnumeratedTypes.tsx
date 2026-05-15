@@ -1,16 +1,7 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useRef, useState } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Card,
@@ -18,7 +9,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
   Table,
   TableBody,
   TableCell,
@@ -26,20 +16,35 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
-import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
 import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useEnumeratedTypeDeleteMutation } from '@/data/enumerated-types/enumerated-type-delete-mutation'
+import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const EnumeratedTypes = () => {
   const { data: project } = useSelectedProjectQuery()
   const [search, setSearch] = useState('')
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const deletingTypeIdRef = useRef<string | null>(null)
 
   const {
-    data,
+    data = [],
     error,
     isPending: isLoading,
     isError,
@@ -49,25 +54,27 @@ export const EnumeratedTypes = () => {
     connectionString: project?.connectionString,
   })
 
+  const {
+    mutate: deleteEnumeratedType,
+    isPending: isDeleting,
+    isSuccess: isSuccessDelete,
+  } = useEnumeratedTypeDeleteMutation({
+    onSuccess: (_, vars) => {
+      toast.success(`Successfully deleted type "${vars.name}"`)
+      setSelectedTypeIdToDelete(null)
+    },
+  })
+
   const [showCreateTypePanel, setShowCreateTypePanel] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false)
   )
 
-  const { value: typeToEdit, setValue: setSelectedTypeIdToEdit } = useQueryStateWithSelect({
-    urlKey: 'edit',
-    select: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
-    enabled: !!data,
-    onError: () => toast.error(`Enumerated Type not found`),
-  })
+  const [selectedTypeIdToEdit, setSelectedTypeIdToEdit] = useQueryState('edit', parseAsString)
+  const typeToEdit = data?.find((type) => type.id.toString() === selectedTypeIdToEdit)
 
-  const { value: typeToDelete, setValue: setSelectedTypeIdToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (id) => (id ? data?.find((type) => type.id.toString() === id) : undefined),
-    enabled: !!data,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingTypeIdRef, selectedId, `Enumerated Type not found`),
-  })
+  const [selectedTypeIdToDelete, setSelectedTypeIdToDelete] = useQueryState('delete', parseAsString)
+  const typeToDelete = data?.find((type) => type.id.toString() === selectedTypeIdToDelete)
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
   const filteredEnumeratedTypes =
@@ -79,22 +86,74 @@ export const EnumeratedTypes = () => {
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search enumerated types' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setSearch('')
+  })
+
+  const onConfirmDeleteType = () => {
+    if (typeToDelete === undefined) return console.error('No enumerated type selected')
+    if (project?.ref === undefined) return console.error('Project ref required')
+    if (project?.connectionString === undefined)
+      return console.error('Project connectionString required')
+
+    deleteEnumeratedType({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      name: typeToDelete.name,
+      schema: typeToDelete.schema,
+    })
+  }
+
+  useEffect(() => {
+    if (isSuccess && !!selectedTypeIdToEdit && !typeToEdit) {
+      toast('Type cannot be found')
+      setSelectedTypeIdToEdit(null)
+    }
+  }, [isSuccess, selectedTypeIdToEdit, setSelectedTypeIdToEdit, typeToEdit])
+
+  useEffect(() => {
+    if (isSuccess && !!selectedTypeIdToDelete && !typeToDelete && !isSuccessDelete) {
+      toast('Type cannot be found')
+      setSelectedTypeIdToDelete(null)
+    }
+  }, [isSuccess, selectedTypeIdToDelete, setSelectedTypeIdToDelete, typeToDelete, isSuccessDelete])
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
         <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
-          <SchemaSelector
-            className="w-full lg:w-[180px]"
-            size="tiny"
-            showError={false}
-            selectedSchemaName={selectedSchema}
-            onSelectSchema={setSelectedSchema}
-          />
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+            onTrigger={() => setSchemaSelectorOpen(true)}
+            side="bottom"
+            tooltipOpen={schemaSelectorOpen ? false : undefined}
+          >
+            <SchemaSelector
+              className="w-full lg:w-[180px]"
+              size="tiny"
+              showError={false}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
+              open={schemaSelectorOpen}
+              onOpenChange={setSchemaSelectorOpen}
+            />
+          </Shortcut>
           <Input
+            ref={searchInputRef}
             size="tiny"
             value={search}
             className="w-full lg:w-52"
             onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={onSearchInputEscape(search, setSearch)}
             placeholder="Search for a type"
             icon={<Search />}
           />
@@ -103,13 +162,20 @@ export const EnumeratedTypes = () => {
         <div className="flex items-center gap-2">
           <DocsButton href="https://www.postgresql.org/docs/current/datatype-enum.html" />
           {!isSchemaLocked && (
-            <Button
-              className="ml-auto flex-1"
-              type="primary"
-              onClick={() => setShowCreateTypePanel(true)}
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Create new enumerated type"
+              onTrigger={() => setShowCreateTypePanel(true)}
+              side="bottom"
             >
-              Create type
-            </Button>
+              <Button
+                className="ml-auto flex-1"
+                type="primary"
+                onClick={() => setShowCreateTypePanel(true)}
+              >
+                Create type
+              </Button>
+            </Shortcut>
           )}
         </div>
       </div>
@@ -212,16 +278,33 @@ export const EnumeratedTypes = () => {
         onClose={() => setSelectedTypeIdToEdit(null)}
       />
 
-      <DeleteEnumeratedTypeModal
+      <ConfirmationModal
+        variant="destructive"
+        size="medium"
+        loading={isDeleting}
         visible={!!typeToDelete}
-        selectedEnumeratedType={typeToDelete}
-        onClose={() => setSelectedTypeIdToDelete(null)}
-        onDelete={() => {
-          if (typeToDelete) {
-            deletingTypeIdRef.current = typeToDelete.id.toString()
-          }
+        title={
+          <>
+            Confirm to delete enumerated type <code className="text-sm">{typeToDelete?.name}</code>
+          </>
+        }
+        confirmLabel="Confirm delete"
+        confirmLabelLoading="Deleting..."
+        onCancel={() => setSelectedTypeIdToDelete(null)}
+        onConfirm={() => onConfirmDeleteType()}
+        alert={{
+          title: 'This action cannot be undone',
+          description:
+            'You will need to re-create the enumerated type if you want to revert the deletion.',
         }}
-      />
+      >
+        <p className="text-sm">Before deleting this enumerated type, consider:</p>
+        <ul className="space-y-2 mt-2 text-sm text-foreground-light">
+          <li className="list-disc ml-6">
+            This enumerated type is no longer in use in any tables or functions
+          </li>
+        </ul>
+      </ConfirmationModal>
     </div>
   )
 }

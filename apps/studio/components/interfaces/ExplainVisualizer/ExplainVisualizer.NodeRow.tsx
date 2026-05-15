@@ -1,9 +1,10 @@
+import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-import { ChevronRight, ChevronDown } from 'lucide-react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { parseDetailLines } from './ExplainVisualizer.parser'
 import { RowCountIndicator } from './ExplainVisualizer.RowCountIndicator'
 import type { ExplainNode } from './ExplainVisualizer.types'
-import { parseDetailLines } from './ExplainVisualizer.parser'
 import { formatNodeDuration, getScanBarColor, getScanBorderColor } from './ExplainVisualizer.utils'
 
 interface ExplainNodeRowProps {
@@ -36,7 +37,7 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
         {/* Main row */}
         <div
           className={cn(
-            'flex items-stretch border-b-border-muted border-b border-l-4 transition-colors bg-studio group-hover:bg-surface-100/50',
+            'flex items-stretch border-l-4 transition-colors bg-studio group-hover:bg-surface-100/50',
             borderColorClass
           )}
         >
@@ -51,7 +52,7 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
               onClick={() => canExpand && setIsExpanded(!isExpanded)}
               disabled={!canExpand}
               className={cn(
-                'flex items-center justify-center w-5 h-5 rounded border border-border-muted shrink-0',
+                'flex items-center justify-center w-5 h-5 rounded-sm border border-border-muted shrink-0',
                 canExpand ? 'hover:bg-surface-200 cursor-pointer' : 'opacity-30 cursor-default'
               )}
               aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
@@ -117,12 +118,12 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
         {isExpanded && detailLines.length > 0 && (
           <div
             className={cn(
-              'border-b-border-muted border-b border-l-4 bg-studio group-hover:bg-surface-100/50',
+              'border-t-border-muted border-t border-l-4 bg-studio group-hover:bg-surface-100/50',
               borderColorClass
             )}
             style={{ paddingLeft: `${16 + indentPx + 32}px` }}
           >
-            <div className="px-4 py-3 space-y-2 font-mono text-xs">
+            <div className="px-0 py-3 space-y-2 font-mono text-xs">
               {detailLines.map((line, idx) => (
                 <div key={idx} className="flex items-start gap-1">
                   {line.label && <span className="text-foreground-muted">{line.label}</span>}

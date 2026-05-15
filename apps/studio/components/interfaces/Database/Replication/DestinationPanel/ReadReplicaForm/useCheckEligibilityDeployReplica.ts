@@ -1,23 +1,23 @@
+import { useParams } from 'common'
 import { useMemo } from 'react'
 
-import { useParams } from 'common'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
+import { useOverdueInvoicesQuery } from '@/data/invoices/invoices-overdue-query'
 import {
-  MAX_REPLICAS_ABOVE_XL,
-  MAX_REPLICAS_BELOW_XL,
+  getMaxReplicas,
+  READ_REPLICA_COMPUTE_CAPS,
   useReadReplicasQuery,
-} from 'data/read-replicas/replicas-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+} from '@/data/read-replicas/replicas-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useCheckEligibilityDeployReplica = () => {
   const { ref: projectRef } = useParams()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-
-  const isFreePlan = org?.plan.id === 'free'
+  const { hasAccess: hasReadReplicaAccess } = useCheckEntitlements('instances.read_replicas')
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
   const isNotOnHigherPlan = useMemo(
@@ -41,14 +41,10 @@ export const useCheckEligibilityDeployReplica = () => {
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )?.variant.identifier
-  const isMinimallyOnSmallCompute =
-    currentComputeAddon !== undefined && currentComputeAddon !== 'ci_micro'
 
-  const maxNumberOfReplicas = ['ci_micro', 'ci_small', 'ci_medium', 'ci_large'].includes(
-    currentComputeAddon ?? 'ci_micro'
-  )
-    ? MAX_REPLICAS_BELOW_XL
-    : MAX_REPLICAS_ABOVE_XL
+  const isBelowSmallCompute =
+    currentComputeAddon === undefined || READ_REPLICA_COMPUTE_CAPS[currentComputeAddon] === 0
+  const maxNumberOfReplicas = getMaxReplicas(currentComputeAddon)
   const isReachedMaxReplicas =
     (databases ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
 
@@ -60,13 +56,12 @@ export const useCheckEligibilityDeployReplica = () => {
     !isReachedMaxReplicas &&
     currentPgVersion >= 15 &&
     isAWSProvider &&
-    !isFreePlan &&
+    hasReadReplicaAccess &&
     isWalgEnabled &&
-    currentComputeAddon !== undefined &&
     !hasOverdueInvoices &&
     !isAwsK8s &&
     !isProWithSpendCapEnabled &&
-    isMinimallyOnSmallCompute
+    !isBelowSmallCompute
 
   return {
     can: canDeployReplica,
@@ -74,7 +69,7 @@ export const useCheckEligibilityDeployReplica = () => {
     isAWSProvider,
     isAwsK8s,
     isPgVersionBelow15: currentPgVersion < 15,
-    isBelowSmallCompute: !isMinimallyOnSmallCompute,
+    isBelowSmallCompute,
     isWalgNotEnabled: !isWalgEnabled,
     isProWithSpendCapEnabled,
     isReachedMaxReplicas,

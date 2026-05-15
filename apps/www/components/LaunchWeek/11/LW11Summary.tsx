@@ -16,7 +16,7 @@ const LW11Summary = () => {
           <Image
             src="/images/launchweek/ga/ga-black.svg"
             alt="GA logo"
-            className="dark:hidden w-5 aspect-[104/57] h-auto"
+            className="dark:hidden w-5 aspect-104/57 h-auto"
             priority
             width={30}
             height={30}
@@ -24,7 +24,7 @@ const LW11Summary = () => {
           <Image
             src="/images/launchweek/ga/ga-white.svg"
             alt="GA logo"
-            className="hidden dark:block w-5 aspect-[104/57] h-auto"
+            className="hidden dark:block w-5 aspect-104/57 h-auto"
             priority
             width={30}
             height={30}

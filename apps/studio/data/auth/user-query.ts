@@ -1,12 +1,11 @@
+import { getUserSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
-import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { getUserSQL } from 'data/sql/queries/get-user'
-import { UseCustomQueryOptions } from 'types'
 import { authKeys } from './keys'
 import { User } from './users-infinite-query'
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+import { executeSql, type ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UUID_REGEX } from '@/lib/constants'
+import { UseCustomQueryOptions } from '@/types'
 
 type UserVariables = {
   projectRef?: string
@@ -22,6 +21,7 @@ export async function getUser(
   if (!UUID_REGEX.test(userId)) throw new Error('Invalid user ID format')
 
   const sql = getUserSQL(userId)
+
   const { result } = await executeSql(
     { projectRef, connectionString, sql, queryKey: [`user-${userId}`] },
     signal

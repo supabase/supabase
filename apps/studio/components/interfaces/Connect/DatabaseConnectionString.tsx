@@ -1,50 +1,51 @@
+import { useParams } from 'common'
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { HTMLAttributes, ReactNode, useEffect, useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import AlertError from 'components/ui/AlertError'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { InlineLink } from 'components/ui/InlineLink'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
-import { pluckObjectFields } from 'lib/helpers'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
 import {
   Badge,
   Button,
-  CodeBlock,
+  cn,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   DIALOG_PADDING_X,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Separator,
-  cn,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   CONNECTION_PARAMETERS,
-  type ConnectionStringMethod,
+  connectionStringMethodOptions,
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
   IPV4_ADDON_TEXT,
   PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT,
-  connectionStringMethodOptions,
+  type ConnectionStringMethod,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
-import examples, { Example } from './DirectConnectionExamples'
+import { examples, type Example } from './DirectConnectionExamples'
+import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import AlertError from '@/components/ui/AlertError'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { pluckObjectFields } from '@/lib/helpers'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const StepLabel = ({
   number,
@@ -67,6 +68,12 @@ export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
+  const {
+    hasAccess: hasDedicatedPooler,
+    isLoading: isLoadingEntitlement,
+    isSuccess: isSuccessEntitlement,
+  } = useCheckEntitlements('dedicated_pooler')
+  const sharedPoolerPreferred = !hasDedicatedPooler
 
   // URL state management
   const [queryType, setQueryType] = useQueryState('type', parseAsString.withDefault('uri'))
@@ -75,10 +82,6 @@ export const DatabaseConnectionString = () => {
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
   const [selectedMethod, setSelectedMethod] = useState<ConnectionStringMethod>('direct')
-
-  const sharedPoolerPreferred = useMemo(() => {
-    return org?.plan?.id === 'free'
-  }, [org])
 
   // Sync URL state with component state on mount and when URL changes
   useEffect(() => {
@@ -177,9 +180,9 @@ export const DatabaseConnectionString = () => {
       : isSuccessSupavisorConfig
 
   const error = poolerError || readReplicasError
-  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
+  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas || isLoadingEntitlement
   const isError = isErrorPoolerConfig || isErrorReadReplicas
-  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
+  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas && isSuccessEntitlement
 
   const sharedPoolerConfig = supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
   const poolingConfiguration = sharedPoolerPreferred ? sharedPoolerConfig : pgbouncerConfig
@@ -221,7 +224,7 @@ export const DatabaseConnectionString = () => {
     connectionInfo,
     poolingInfo: {
       connectionString: sharedPoolerConfig?.connection_string ?? '',
-      db_host: isReplicaSelected ? connectionInfo.db_host : sharedPoolerConfig?.db_host ?? '',
+      db_host: isReplicaSelected ? connectionInfo.db_host : (sharedPoolerConfig?.db_host ?? ''),
       db_name: sharedPoolerConfig?.db_name ?? '',
       db_port: sharedPoolerConfig?.db_port ?? 0,
       db_user: sharedPoolerConfig?.db_user ?? '',
@@ -233,11 +236,11 @@ export const DatabaseConnectionString = () => {
     connectionInfo,
     poolingInfo: {
       connectionString: isReplicaSelected
-        ? poolingConfiguration?.connection_string.replace(
+        ? (poolingConfiguration?.connection_string.replace(
             poolingConfiguration?.db_host,
             connectionInfo.db_host
-          ) ?? ''
-        : poolingConfiguration?.connection_string ?? '',
+          ) ?? '')
+        : (poolingConfiguration?.connection_string ?? ''),
       db_host: isReplicaSelected ? connectionInfo.db_host : poolingConfiguration?.db_host,
       db_name: poolingConfiguration?.db_name ?? '',
       db_port: poolingConfiguration?.db_port ?? 0,
@@ -300,10 +303,10 @@ export const DatabaseConnectionString = () => {
             </Select_Shadcn_>
           </div>
           <DatabaseSelector
-            portal={false}
+            align="start"
             buttonProps={{
               size: 'small',
-              className: 'w-full justify-between pr-2.5 [&_svg]:h-4',
+              className: 'w-full pr-2.5 [&_svg]:h-4',
             }}
             className="w-full md:w-auto [&>span]:w-1/2 [&>span]:md:w-auto"
             onSelectId={handleDatabaseChange}
@@ -462,7 +465,12 @@ export const DatabaseConnectionString = () => {
                   }}
                   notice={['Does not support PREPARE statements']}
                   parameters={[
-                    { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
+                    {
+                      ...CONNECTION_PARAMETERS.host,
+                      value: isReplicaSelected
+                        ? connectionInfo.db_host
+                        : (poolingConfiguration?.db_host ?? ''),
+                    },
                     {
                       ...CONNECTION_PARAMETERS.port,
                       value: poolingConfiguration?.db_port.toString() ?? '6543',
@@ -482,15 +490,15 @@ export const DatabaseConnectionString = () => {
                       <Collapsible_Shadcn_ className="group">
                         <CollapsibleTrigger_Shadcn_
                           asChild
-                          className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light px-3"
+                          className="w-full justify-start !last:rounded-b group-data-open:rounded-b-none px-3"
                         >
                           <Button
                             type="default"
                             size="large"
                             iconRight={
-                              <ChevronDown className="transition group-data-[state=open]:rotate-180" />
+                              <ChevronDown className="transition group-data-open:rotate-180" />
                             }
-                            className="text-foreground !bg-dash-sidebar justify-between"
+                            className="text-foreground bg-dash-sidebar! justify-between"
                           >
                             <div className="text-xs flex items-center gap-x-2 py-2 px-1">
                               <span>Using the Shared Pooler</span>
@@ -582,7 +590,7 @@ export const DatabaseConnectionString = () => {
         <>
           <Separator />
           <Collapsible_Shadcn_ className="px-8 py-5">
-            <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
+            <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:-rotate-180!">
               <div className="flex items-center gap-x-2 w-full">
                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                   Connecting to SQL Alchemy

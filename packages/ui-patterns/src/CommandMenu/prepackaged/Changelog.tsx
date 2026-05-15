@@ -1,6 +1,6 @@
+import { useRegisterCommands } from '..'
 import { Inbox } from 'lucide-react'
 
-import { useRegisterCommands } from '..'
 import { BASE_PATH } from './shared/constants'
 
 const useChangelogCommand = ({ enabled = true }: { enabled?: boolean } = {}) => {

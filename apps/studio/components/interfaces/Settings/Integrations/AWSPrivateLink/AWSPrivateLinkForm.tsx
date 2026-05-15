@@ -2,18 +2,12 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAWSAccountCreateMutation } from 'data/aws-accounts/aws-account-create-mutation'
-import type { AWSAccount } from 'data/aws-accounts/aws-accounts-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Sheet,
   SheetContent,
@@ -25,6 +19,12 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAWSAccountCreateMutation } from '@/data/aws-accounts/aws-account-create-mutation'
+import type { AWSAccount } from '@/data/aws-accounts/aws-accounts-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface AWSPrivateLinkFormProps {
   account?: AWSAccount
@@ -112,7 +112,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
             <InlineLink href={`${DOCS_URL}/guides/platform/privatelink`}>Learn more</InlineLink>
           </SheetDescription>
         </SheetHeader>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1">
             <SheetSection className="space-y-4 flex-1">
               {!isNew && account && (
@@ -172,7 +172,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                   />
                 </>
               )}
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="awsAccountId"
                 render={({ field }) => (
@@ -180,7 +180,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                     label="AWS Account ID"
                     description="The ID of the AWS account you want to connect to."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         readOnly={!isNew}
@@ -191,11 +191,11 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                           }
                         }}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="accountName"
                 render={({ field }) => (
@@ -203,7 +203,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                     label="Account Name"
                     description="A name for this account connection."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         readOnly={!isNew}
@@ -213,7 +213,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                           }
                         }}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -230,7 +230,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
               )}
             </SheetFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </SheetContent>
     </Sheet>
   )

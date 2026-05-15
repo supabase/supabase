@@ -1,36 +1,49 @@
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/query/table-row-query'
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-
-import { useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import type { Sort } from 'components/grid/types'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  type RoleImpersonationState,
-  useRoleImpersonationStateSnapshot,
-} from 'state/role-impersonation-state'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { DropdownControl } from '../../common/DropdownControl'
 import SortRow from './SortRow'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import type { Sort } from '@/components/grid/types'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationState,
+} from '@/state/role-impersonation-state'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface SortPopoverPrimitiveProps {
   buttonText?: string
   sorts: Sort[]
   onApplySorts: (sorts: Sort[]) => void
-  portal?: boolean
   defaultOpen?: boolean
   tableQueriesEnabled?: boolean
 }
@@ -48,7 +61,6 @@ export const SortPopoverPrimitive = ({
   buttonText,
   sorts,
   onApplySorts,
-  portal = true,
   defaultOpen = false,
   tableQueriesEnabled = true,
 }: SortPopoverPrimitiveProps) => {
@@ -74,7 +86,6 @@ export const SortPopoverPrimitive = ({
   const { data: countData } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
@@ -217,6 +228,13 @@ export const SortPopoverPrimitive = ({
     }
   }, [sorts])
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
   return (
     <>
       <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -225,19 +243,37 @@ export const SortPopoverPrimitive = ({
             {displayButtonText}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={portal}>
+        <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="center">
           <div className="space-y-2 py-2">
-            {localSorts.map((sort, index) => (
-              <SortRow
-                key={getSortRowKey(sort, index)}
-                index={index}
-                columnName={sort.column}
-                sort={sort}
-                onDelete={onDeleteSort}
-                onToggle={onToggleSort}
-                onDrag={onDragSort}
-              />
-            ))}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(result) => {
+                if (result.over == null) return
+                const activeIndex = localSorts.findIndex((sort) => sort.column === result.active.id)
+                const overIndex = localSorts.findIndex((sort) => sort.column === result.over!.id)
+                if (activeIndex === -1 || overIndex === -1) return
+
+                setLocalSorts(arrayMove(localSorts, activeIndex, overIndex))
+              }}
+            >
+              <SortableContext
+                items={localSorts.map((sort) => sort.column)}
+                strategy={verticalListSortingStrategy}
+              >
+                {localSorts.map((sort, index) => (
+                  <SortRow
+                    key={getSortRowKey(sort, index)}
+                    index={index}
+                    columnName={sort.column}
+                    sort={sort}
+                    onDelete={onDeleteSort}
+                    onToggle={onToggleSort}
+                    onDrag={onDragSort}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
             {localSorts.length === 0 && (
               <div className="space-y-1 px-3">
                 <h5 className="text-xs text-foreground-light">No sorts applied to this view</h5>
@@ -280,8 +316,10 @@ export const SortPopoverPrimitive = ({
                       const hasSortNotPK = localSorts.some(
                         (x) => !snap.table.columns.find((y) => x.column === y.name)?.isPrimaryKey
                       )
-                      if (hasSortNotPK) setShowWarning(true)
-                    } else onSelectApplySorts()
+                      if (hasSortNotPK) return setShowWarning(true)
+                    }
+
+                    onSelectApplySorts()
                   }}
                 >
                   Apply sorting

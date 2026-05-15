@@ -1,15 +1,21 @@
 import { useMemo } from 'react'
 
-import type { ConnectionVars } from 'data/common.types'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { isApiAccessRole, isApiPrivilegeType, type ApiPrivilegesByRole } from 'lib/data-api-types'
-import type { Prettify } from 'lib/type-helpers'
-import type { UseCustomQueryOptions } from 'types'
 import {
   useTablePrivilegesQuery,
   type TablePrivilegesData,
   type TablePrivilegesError,
 } from './table-privileges-query'
+import type { ConnectionVars } from '@/data/common.types'
+import { useIsSchemaExposed } from '@/hooks/misc/useIsSchemaExposed'
+import {
+  API_ACCESS_ROLES,
+  API_PRIVILEGE_TYPES,
+  isApiAccessRole,
+  isApiPrivilegeType,
+  type ApiPrivilegesByRole,
+} from '@/lib/data-api-types'
+import type { Prettify } from '@/lib/type-helpers'
+import type { UseCustomQueryOptions } from '@/types'
 
 // The contents of this array are never used, so any will allow
 // it to be used anywhere an array of any type is required.
@@ -17,24 +23,13 @@ import {
 const STABLE_EMPTY_ARRAY: any[] = []
 const STABLE_EMPTY_OBJECT = {}
 
-/**
- * Parses the exposed schema string returned from PostgREST config.
- *
- * @param schemaString - e.g., `public,graphql_public`
- */
-const parseDbSchemaString = (schemaString: string): string[] => {
-  return schemaString
-    .split(',')
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0)
-}
-
 const getApiPrivilegesByRole = (
   privileges: TablePrivilegesData[number]['privileges']
 ): ApiPrivilegesByRole => {
   const privilegesByRole: ApiPrivilegesByRole = {
     anon: [],
     authenticated: [],
+    service_role: [],
   }
 
   privileges.forEach((privilege) => {
@@ -72,32 +67,57 @@ export type UseTableApiAccessQueryParams = Prettify<
   }
 >
 
+export type DataApiAccessType = 'none' | 'exposed-schema-no-grants' | 'access'
+
+/**
+ * Mirrors the "granted | custom | revoked" classification used by the Data API
+ * settings page (see getTableGrantsCTEs in packages/pg-meta privileges.ts).
+ * - `granted`: all 3 API roles (anon/authenticated/service_role) have all 4
+ *    CRUD privileges — the standard Data API exposure.
+ * - `custom`: at least one grant exists but it's not the full standard set.
+ * - `revoked`: no API role has any privilege (mapped to `exposed-schema-no-grants`).
+ */
+export type TableGrantStatus = 'granted' | 'custom'
+
 export type TableApiAccessData =
   | {
-      hasApiAccess: true
+      apiAccessType: 'access'
+      grantStatus: TableGrantStatus
       privileges: ApiPrivilegesByRole
     }
   | {
-      hasApiAccess: false
+      apiAccessType: 'none' | 'exposed-schema-no-grants'
     }
 
-export type TableApiAccessMap = Record<string, TableApiAccessData>
+/**
+ * Matches the "granted" branch of getTableGrantsCTEs in packages/pg-meta's
+ * privileges.ts — all 3 API roles must have all 4 CRUD privileges.
+ */
+export const isFullyGranted = (privileges: ApiPrivilegesByRole): boolean =>
+  API_ACCESS_ROLES.every((role) =>
+    API_PRIVILEGE_TYPES.every((priv) => privileges[role].includes(priv))
+  )
+
+export type TableApiAccessMap = Prettify<Record<string, TableApiAccessData>>
 
 export type UseTableApiAccessQueryReturn =
   | {
       data: TableApiAccessMap
+      status: 'success'
       isSuccess: true
       isPending: false
       isError: false
     }
   | {
       data: undefined
+      status: 'pending'
       isSuccess: false
       isPending: true
       isError: false
     }
   | {
       data: undefined
+      status: 'error'
       isSuccess: false
       isPending: false
       isError: true
@@ -118,52 +138,43 @@ export const useTableApiAccessQuery = (
     'enabled'
   > = {}
 ): UseTableApiAccessQueryReturn => {
-  const {
-    data: dbSchemaString,
-    isPending: isConfigPending,
-    isError: isConfigError,
-  } = useProjectPostgrestConfigQuery(
-    { projectRef },
-    { enabled, select: ({ db_schema }) => db_schema }
-  )
-  const exposedSchemas = useMemo((): string[] => {
-    if (!dbSchemaString) return []
-    return parseDbSchemaString(dbSchemaString)
-  }, [dbSchemaString])
-
   const uniqueTableNames = useMemo(() => {
     return new Set(
       tableNames.filter((tableName) => typeof tableName === 'string' && tableName.length > 0)
     )
   }, [tableNames])
   const hasTables = uniqueTableNames.size > 0
-  const isSchemaExposed = exposedSchemas.includes(schemaName)
-  const enablePrivilegesQuery = enabled && isSchemaExposed && hasTables
 
-  const {
-    data: privileges,
-    isPending: isPrivilegesPending,
-    isError: isPrivilegesError,
-  } = useTablePrivilegesQuery(
+  const schemaExposureStatus = useIsSchemaExposed({ projectRef, schemaName }, { enabled })
+  const isSchemaExposed = schemaExposureStatus.isSuccess && schemaExposureStatus.data === true
+
+  const enablePrivilegesQuery = enabled && hasTables
+  const privilegeStatus = useTablePrivilegesQuery(
     { projectRef, connectionString },
     { enabled: enablePrivilegesQuery, ...options }
   )
 
   const result: UseTableApiAccessQueryReturn = useMemo(() => {
-    const isPending = isConfigPending || (enablePrivilegesQuery && isPrivilegesPending)
+    const isPending =
+      !enabled ||
+      schemaExposureStatus.status === 'pending' ||
+      (enablePrivilegesQuery && privilegeStatus.isPending)
     if (isPending) {
       return {
         data: undefined,
+        status: 'pending',
         isSuccess: false,
         isPending: true,
         isError: false,
       }
     }
 
-    const isError = isConfigError || (enablePrivilegesQuery && isPrivilegesError)
+    const isError =
+      schemaExposureStatus.status === 'error' || (enablePrivilegesQuery && privilegeStatus.isError)
     if (isError) {
       return {
         data: undefined,
+        status: 'error',
         isSuccess: false,
         isPending: false,
         isError: true,
@@ -173,6 +184,7 @@ export const useTableApiAccessQuery = (
     if (!hasTables) {
       return {
         data: STABLE_EMPTY_OBJECT,
+        status: 'success',
         isSuccess: true,
         isPending: false,
         isError: false,
@@ -181,42 +193,50 @@ export const useTableApiAccessQuery = (
 
     const resultData: TableApiAccessMap = {}
     const tablePrivilegesByName = isSchemaExposed
-      ? mapPrivilegesByTableName(privileges, schemaName, uniqueTableNames)
+      ? mapPrivilegesByTableName(privilegeStatus.data, schemaName, uniqueTableNames)
       : {}
 
     uniqueTableNames.forEach((tableName) => {
       if (!isSchemaExposed) {
-        resultData[tableName] = { hasApiAccess: false }
+        resultData[tableName] = { apiAccessType: 'none' }
         return
       }
 
-      const tablePrivileges = tablePrivilegesByName[tableName] ?? { anon: [], authenticated: [] }
-      const hasAnonOrAuthenticatedPrivileges =
-        tablePrivileges.anon.length > 0 || tablePrivileges.authenticated.length > 0
+      const tablePrivileges = tablePrivilegesByName[tableName] ?? {
+        anon: [],
+        authenticated: [],
+        service_role: [],
+      }
+      const hasApiPrivileges =
+        tablePrivileges.anon.length > 0 ||
+        tablePrivileges.authenticated.length > 0 ||
+        tablePrivileges.service_role.length > 0
 
-      resultData[tableName] = hasAnonOrAuthenticatedPrivileges
+      resultData[tableName] = hasApiPrivileges
         ? {
-            hasApiAccess: true,
+            apiAccessType: 'access',
+            grantStatus: isFullyGranted(tablePrivileges) ? 'granted' : 'custom',
             privileges: tablePrivileges,
           }
-        : { hasApiAccess: false }
+        : { apiAccessType: 'exposed-schema-no-grants' }
     })
 
     return {
       data: resultData,
+      status: 'success',
       isSuccess: true,
       isPending: false,
       isError: false,
     }
   }, [
+    enabled,
     enablePrivilegesQuery,
     hasTables,
-    isConfigError,
-    isConfigPending,
-    isPrivilegesError,
-    isPrivilegesPending,
+    schemaExposureStatus.status,
     isSchemaExposed,
-    privileges,
+    privilegeStatus.isPending,
+    privilegeStatus.isError,
+    privilegeStatus.data,
     schemaName,
     uniqueTableNames,
   ])

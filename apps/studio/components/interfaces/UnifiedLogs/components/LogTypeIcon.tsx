@@ -1,7 +1,7 @@
-import { BookHeart, Box, Cpu, Database, Globe } from 'lucide-react'
-
 import { Auth, EdgeFunctions, Storage } from 'icons'
+import { Box, Code2, Database } from 'lucide-react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { type LOG_TYPES } from '../UnifiedLogs.constants'
 
 interface LogTypeIconProps {
@@ -20,7 +20,7 @@ export const LogTypeIcon = ({
   // [Alaister]: commented out types coming in the future
   const iconMap: Record<(typeof LOG_TYPES)[number], () => React.ReactNode> = {
     // edge: () => <Globe size={size} strokeWidth={strokeWidth} className={className} />,
-    postgrest: () => <BookHeart size={size} strokeWidth={strokeWidth} className={className} />,
+    postgrest: () => <Code2 size={size} strokeWidth={strokeWidth} className={className} />,
     auth: () => <Auth size={size} strokeWidth={strokeWidth} className={className} />,
     'edge function': () => (
       <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />

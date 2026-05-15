@@ -1,9 +1,9 @@
 'use client'
 
-import * as RadixAccordion from '@radix-ui/react-accordion'
+import { ChevronDown } from 'lucide-react'
+import { Accordion as RadixAccordion } from 'radix-ui'
 import React, { createContext, useContext, useState } from 'react'
 
-import { ChevronDown } from 'lucide-react'
 import styleHandler from '../../lib/theme/styleHandler'
 
 type Type = 'default' | 'bordered'
@@ -68,7 +68,6 @@ function Accordion({
 
   function handleOnChange(e: string | string[]) {
     if (onChange) onChange(e)
-    const value = e == typeof String ? e.split(' ') : e
     // setCurrentItems(e)
     // console.log('about to change state')
     // currentItems = e
@@ -117,7 +116,7 @@ export function Item({ children, className, header, id, disabled }: ItemProps) {
   let chevronClasses = [__styles.chevron.base, __styles.chevron.align[chevronAlign]]
 
   if (open && !disabled) {
-    chevronClasses.unshift('!rotate-180')
+    chevronClasses.unshift('rotate-180!')
   }
 
   return (

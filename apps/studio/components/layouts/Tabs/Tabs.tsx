@@ -7,13 +7,10 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-
-import { useParams } from 'common'
-import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
-import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
 import {
   cn,
   ContextMenu_Shadcn_,
@@ -24,10 +21,14 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
+
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
+import { useTabsScroll } from './Tabs.utils'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { editorEntityTypes, useTabsStateSnapshot, type Tab } from '@/state/tabs'
 
 export const EditorTabs = () => {
   const { ref, id } = useParams()
@@ -132,18 +133,21 @@ export const EditorTabs = () => {
     tabs.handleTabNavigation(id, router)
   }
 
+  const { tabsListRef } = useTabsScroll({ activeTab: tabs.activeTab, tabCount: editorTabs.length })
+
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <Tabs_Shadcn_
         className="w-full flex"
-        value={hasNewTab ? 'new' : tabs.activeTab ?? undefined}
+        value={hasNewTab ? 'new' : (tabs.activeTab ?? undefined)}
         onValueChange={handleTabChange}
       >
         <CollapseButton hideTabs={false} />
         <TabsList_Shadcn_
+          ref={tabsListRef}
           className={cn(
-            'rounded-b-none gap-0 h-10 flex items-center w-full z-[1]',
-            'bg-surface-200 dark:bg-alternative border-none overflow-clip overflow-x-auto'
+            'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
+            'bg-surface-200 dark:bg-alternative border-none text-clip overflow-x-auto'
           )}
         >
           <SortableContext
@@ -187,7 +191,7 @@ export const EditorTabs = () => {
                 'flex items-center gap-2 px-3 text-xs',
                 'bg-dash-sidebar/50 dark:bg-surface-100/50',
                 'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                'relative group h-full border-t-2 !border-b-0',
+                'relative group h-full border-t-2 border-b-0!',
                 'hover:bg-surface-300 dark:hover:bg-surface-100'
               )}
             >
@@ -201,7 +205,7 @@ export const EditorTabs = () => {
                   e.preventDefault()
                   e.stopPropagation()
                 }}
-                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
+                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
                 onMouseDown={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -214,14 +218,14 @@ export const EditorTabs = () => {
               >
                 <X size={12} className="text-foreground-light" />
               </span>{' '}
-              <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+              <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
             </TabsTrigger_Shadcn_>
           )}
 
           <AnimatePresence initial={false}>
             {!hasNewTab && (
               <motion.button
-                className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
+                className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
                 onClick={() =>
                   router.push(
                     `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`

@@ -1,12 +1,9 @@
 'use client'
 
-import { CircleIcon, LaptopIcon, MoonIcon, SunIcon, Search } from 'lucide-react'
+import { CircleIcon, LaptopIcon, MoonIcon, Search, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
-
-import { docsConfig } from '@/config/docs'
-import { cn } from '@/lib/utils'
 import {
   Button,
   CommandDialog,
@@ -19,6 +16,9 @@ import {
   DialogProps,
   DialogTitle,
 } from 'ui'
+
+import { docsConfig } from '@/config/docs'
+import { cn } from '@/lib/utils'
 
 export function CommandMenu({ ...props }: DialogProps) {
   const router = useRouter()
@@ -56,7 +56,7 @@ export function CommandMenu({ ...props }: DialogProps) {
       <Button
         type="outline"
         className={cn(
-          `lg:flex hidden relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12 md:w-40 lg:w-64 hover:border-foreground-muted hover:bg-surface-100 hover:text-foreground-lighter
+          `lg:flex hidden relative h-8 w-full justify-start rounded-lg bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12 md:w-40 lg:w-64 hover:border-foreground-muted hover:bg-surface-100 hover:text-foreground-lighter
           `
         )}
         onClick={() => setOpen(true)}
@@ -64,7 +64,7 @@ export function CommandMenu({ ...props }: DialogProps) {
       >
         <span className="hidden lg:inline-flex">Search Design System...</span>
         <span className="inline-flex lg:hidden">Search...</span>
-        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded border bg-surface-200 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex text-foreground-light">
+        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded-sm border bg-surface-200 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex text-foreground-light">
           <span className="text-sm">⌘</span>K
         </kbd>
       </Button>

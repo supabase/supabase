@@ -1,10 +1,10 @@
 'use client'
 
-import * as SheetPrimitive from '@radix-ui/react-dialog'
+import { Dialog as SheetPrimitive } from 'radix-ui'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { X } from 'lucide-react'
 import * as React from 'react'
 
-import { X } from 'lucide-react'
 import { cn } from '../../../lib/utils/cn'
 
 const Sheet = SheetPrimitive.Root
@@ -26,8 +26,7 @@ const portalVariants = cva('fixed inset-0 z-50 flex', {
 })
 
 interface SheetPortalProps
-  extends SheetPrimitive.DialogPortalProps,
-    VariantProps<typeof portalVariants> {}
+  extends SheetPrimitive.DialogPortalProps, VariantProps<typeof portalVariants> {}
 
 const SheetPortal = ({ side, children, ...props }: SheetPortalProps) => (
   <SheetPrimitive.Portal {...props}>{children}</SheetPrimitive.Portal>
@@ -40,7 +39,7 @@ const SheetOverlay = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
-      'fixed inset-0 z-50 bg-alternative/90 backdrop-blur-sm transition-all duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in',
+      'fixed inset-0 z-50 bg-alternative/90 backdrop-blur-xs transition-all duration-100 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in',
       className
     )}
     {...props}
@@ -148,7 +147,8 @@ const sheetVariants = cva(classes, {
 })
 
 export interface DialogContentProps
-  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
+  extends
+    React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {
   showClose?: boolean
   hasOverlay?: boolean
@@ -169,8 +169,8 @@ const SheetContent = React.forwardRef<
       {showClose ? (
         <SheetPrimitive.Close
           className={cn(
-            'absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary',
-            'before:content-[""] before:block before:absolute before:top-1/2 before:left-1/2 before:w-full before:h-full before:outline-red-500 before:outline-2 before:min-w-6 before:min-h-6 before:z-50 before:-translate-x-1/2 before:-translate-y-1/2'
+            'absolute right-4 top-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary',
+            'hit-area-6'
           )}
         >
           <X className="h-4 w-4" />

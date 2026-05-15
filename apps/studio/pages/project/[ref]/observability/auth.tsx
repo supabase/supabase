@@ -1,44 +1,42 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { parseAsJson, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
-import { ReportSectionHeader } from 'components/interfaces/Reports/v2/ReportSectionHeader'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
-import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
+import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
+import { SharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
+import { useSharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
+import { ReportChartV2 } from '@/components/interfaces/Reports/v2/ReportChartV2'
+import { ReportSectionHeader } from '@/components/interfaces/Reports/v2/ReportSectionHeader'
 import {
-  ReportsNumericFilter,
   numericFilterSchema,
-} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+  ReportsNumericFilter,
+} from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 import {
   ReportsSelectFilter,
   selectFilterSchema,
-} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
-import { ReportSettings } from 'components/ui/Charts/ReportSettings'
+} from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { ChartHighlightAction } from '@/components/ui/Charts/ChartHighlightActions'
+import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import {
   createErrorsReportConfig,
   createLatencyReportConfig,
   createUsageReportConfig,
-} from 'data/reports/v2/auth.config'
-import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
-import { useRouter } from 'next/router'
-import { parseAsJson, useQueryState } from 'nuqs'
-import type { NextPageWithLayout } from 'types'
-import { ObservabilityLink } from 'components/ui/ObservabilityLink'
+} from '@/data/reports/v2/auth.config'
+import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import type { NextPageWithLayout } from '@/types'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -88,7 +86,6 @@ const AuthUsage = () => {
     end: selectedDateRange?.period_end?.date,
   })
 
-  const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   const [monitoringStatusCodeFilter, setMonitoringStatusCodeFilter] = useQueryState(
@@ -176,7 +173,7 @@ const AuthUsage = () => {
       id: 'api-gateway-logs',
       label: 'Open in API Gateway Logs',
       icon: <LogsIcon size={12} />,
-      onSelect: ({ start, end, clear, chartId }) => {
+      onSelect: ({ start, end, chartId }) => {
         let url = `/project/${ref}/logs/edge-logs?its=${start}&ite=${end}`
 
         if (chartId?.includes('errors')) {
@@ -192,7 +189,7 @@ const AuthUsage = () => {
       id: 'auth-logs',
       label: 'Open in Auth Logs',
       icon: <LogsIcon size={12} />,
-      onSelect: ({ start, end, clear }) => {
+      onSelect: ({ start, end }) => {
         const url = `/project/${ref}/logs/auth-logs?its=${start}&ite=${end}`
         router.push(url)
       },

@@ -2,9 +2,9 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import React, { createContext, useContext } from 'react'
-
 import { cn } from 'ui'
 import { Breadcrumb } from 'ui/src/components/shadcn/ui/breadcrumb'
+
 import { PageContainer } from '../PageContainer'
 
 // ============================================================================
@@ -198,8 +198,8 @@ const PageHeaderMeta = ({ className, children, ...props }: PageHeaderMetaProps) 
         data-slot="page-header-meta"
         className={cn(
           'flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4',
-          '[&>[data-slot="page-header-icon"]]:shrink-0',
-          '[&>[data-slot="page-header-summary"]]:flex-1',
+          '*:data-[slot="page-header-icon"]:shrink-0',
+          '*:data-[slot="page-header-summary"]:flex-1',
           className
         )}
         {...props}

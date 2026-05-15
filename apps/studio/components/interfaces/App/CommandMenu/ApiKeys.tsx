@@ -1,36 +1,35 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { toast } from 'sonner'
 import { Badge, copyToClipboard } from 'ui'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
   useRegisterCommands,
   useRegisterPage,
+  useResetCommandMenu,
   useSetCommandMenuOpen,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
-import { toast } from 'sonner'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
 
 export function useApiKeysCommands() {
   const setIsOpen = useSetCommandMenuOpen()
+  const resetCommandMenu = useResetCommandMenu()
   const setPage = useSetPage()
 
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
-    '*'
-  )
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef: project?.ref, reveal: true },
@@ -51,6 +50,7 @@ export function useApiKeysCommands() {
               toast.success('Publishable key copied to clipboard')
             })
             setIsOpen(false)
+            resetCommandMenu()
           },
           badge: () => (
             <span className="flex items-center gap-x-1">
@@ -69,6 +69,7 @@ export function useApiKeysCommands() {
                 toast.success('Secret key copied to clipboard')
               })
               setIsOpen(false)
+              resetCommandMenu()
             },
             badge: () => (
               <span className="flex items-center gap-x-1">
@@ -88,6 +89,7 @@ export function useApiKeysCommands() {
               toast.success('Anonymous API key copied to clipboard')
             })
             setIsOpen(false)
+            resetCommandMenu()
           },
           badge: () => (
             <span className="flex items-center gap-x-1">
@@ -107,6 +109,7 @@ export function useApiKeysCommands() {
               toast.success('Service key copied to clipboard')
             })
             setIsOpen(false)
+            resetCommandMenu()
           },
           badge: () => (
             <span className="flex items-center gap-x-1">
@@ -124,7 +127,7 @@ export function useApiKeysCommands() {
         icon: () => <Key />,
       },
     ].filter(Boolean) as ICommand[]
-  }, [apiKeys, canReadAPIKeys, project, ref, setIsOpen])
+  }, [apiKeys, canReadAPIKeys, project, ref, resetCommandMenu, setIsOpen])
 
   useRegisterPage(
     API_KEYS_PAGE_NAME,

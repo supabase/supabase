@@ -12,7 +12,7 @@ const LW14Summary = () => {
         fontFamily:
           "SuisseIntl-Book, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
       }}
-      className="w-full border bg-alternative flex flex-col rounded text-foreground-lighter mt-12 overflow-hidden"
+      className="w-full border bg-alternative flex flex-col rounded-sm text-foreground-lighter mt-12 overflow-hidden"
     >
       <div className="w-full uppercase p-4 flex justify-between items-center">
         <Link

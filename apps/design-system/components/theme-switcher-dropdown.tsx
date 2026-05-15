@@ -12,8 +12,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Theme,
   singleThemes,
+  Theme,
 } from 'ui'
 
 const ThemeSwitcherDropdown = () => {
@@ -33,7 +33,7 @@ const ThemeSwitcherDropdown = () => {
     return null
   }
 
-  const iconClasses = 'text-foreground-lighter group-data-[state=open]:text-foreground'
+  const iconClasses = 'text-foreground-lighter group-data-open:text-foreground'
 
   return (
     <>

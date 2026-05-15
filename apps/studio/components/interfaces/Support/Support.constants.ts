@@ -10,7 +10,6 @@ export const CATEGORY_OPTIONS: {
   label: string
   description: string
   query?: string
-  hidden?: boolean
 }[] = [
   {
     value: SupportCategories.PROBLEM,
@@ -78,13 +77,6 @@ export const CATEGORY_OPTIONS: {
           query: undefined,
         },
       ]),
-  {
-    value: 'Others' as const,
-    label: 'Others',
-    description: 'Issues that are not related to any of the other categories',
-    query: undefined,
-    hidden: true,
-  },
 ]
 
 export const SEVERITY_OPTIONS = [

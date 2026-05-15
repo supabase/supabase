@@ -1,20 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { noop } from 'lodash'
 import { Lock, Table } from 'lucide-react'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Badge, CardTitle } from 'ui'
+
 import type { PolicyTable } from './PolicyTableRow.types'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface PolicyTableRowHeaderProps {
   table: PolicyTable
   isLocked: boolean
+  hasApiAccess: boolean
+  isLoadingApiAccess: boolean
   onSelectToggleRLS: (table: PolicyTable) => void
   onSelectCreatePolicy: (table: PolicyTable) => void
 }
@@ -22,6 +24,8 @@ interface PolicyTableRowHeaderProps {
 export const PolicyTableRowHeader = ({
   table,
   isLocked,
+  hasApiAccess,
+  isLoadingApiAccess,
   onSelectToggleRLS = noop,
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
@@ -55,6 +59,11 @@ export const PolicyTableRowHeader = ({
           {!table.rls_enabled && (
             <Badge variant="warning" className="shrink-0">
               RLS Disabled
+            </Badge>
+          )}
+          {!isLoadingApiAccess && !hasApiAccess && (
+            <Badge variant="default" className="shrink-0">
+              API Disabled
             </Badge>
           )}
         </EditorTablePageLink>

@@ -1,16 +1,15 @@
 import dayjs from 'dayjs'
 import { TextSearch } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-
-import AlertError from 'components/ui/AlertError'
-import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
-import type { ResponseError } from 'types'
-import { Badge, Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import { Badge, Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
+import AlertError from '@/components/ui/AlertError'
+import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
+import type { ResponseError } from '@/types'
 
 interface QueueDataGridProps {
   error?: ResponseError | null
@@ -118,7 +117,7 @@ const columns = messagesCols.map((col) => {
             col.id === 'id' && 'ml-8'
           )}
         >
-          <p className="!text-foreground">{col.name}</p>
+          <p className="text-foreground!">{col.name}</p>
         </div>
       )
     },
@@ -138,7 +137,6 @@ export const QueueMessagesDataGrid = ({
   fetchNextPage,
 }: QueueDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
-  const router = useRouter()
 
   const [selectedMessageId, setSelectedMessageId] = useQueryState('messageId', parseAsInteger)
 
@@ -165,7 +163,7 @@ export const QueueMessagesDataGrid = ({
         rowClass={() => {
           return cn(
             'cursor-pointer',
-            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-8'
           )
         }}
@@ -179,8 +177,6 @@ export const QueueMessagesDataGrid = ({
                   if (typeof idx === 'number' && idx >= 0) {
                     setSelectedMessageId(props.row.msg_id)
                     gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                    const { messageId, ...rest } = router.query
-                    router.push({ ...router, query: { ...rest, messageId: props.row.msg_id } })
                   }
                 }}
               />
@@ -211,11 +207,11 @@ export const QueueMessagesDataGrid = ({
         }}
       />
       <ResizablePanelGroup
-        direction="horizontal"
+        orientation="horizontal"
         className="absolute inset-0 z-10 pointer-events-none"
         autoSaveId="queue-messages-layout-v1"
       >
-        <ResizablePanel defaultSize={1} />
+        <ResizablePanel />
         {selectedMessage && (
           <>
             <ResizableHandle withHandle className="pointer-events-auto" />

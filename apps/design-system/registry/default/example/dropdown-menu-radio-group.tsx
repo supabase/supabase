@@ -1,9 +1,8 @@
 'use client'
 
 import * as React from 'react'
-
-import { Button } from 'ui'
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,

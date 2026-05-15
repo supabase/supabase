@@ -1,6 +1,7 @@
-import { Slot } from '@radix-ui/react-slot'
+import { Slot as SlotPrimitive } from 'radix-ui'
 import { ChevronRightIcon } from 'lucide-react'
 import * as React from 'react'
+
 import { cn } from '../../../lib/utils'
 
 const Breadcrumb = React.forwardRef<
@@ -16,7 +17,7 @@ const BreadcrumbList = React.forwardRef<HTMLOListElement, React.ComponentPropsWi
     <ol
       ref={ref}
       className={cn(
-        'flex flex-wrap items-center gap-0.5 break-words text-sm text-muted-foreground sm:gap-1.5',
+        'flex flex-wrap items-center gap-0.5 wrap-break-word text-sm text-muted-foreground sm:gap-1.5',
         className
       )}
       {...props}
@@ -45,7 +46,7 @@ const BreadcrumbLink = React.forwardRef<
     asChild?: boolean
   }
 >(({ asChild, className, ...props }, ref) => {
-  const Comp = asChild ? Slot : 'a'
+  const Comp = asChild ? SlotPrimitive.Slot : 'a'
 
   return (
     <Comp

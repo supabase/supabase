@@ -23,7 +23,7 @@ supabase functions new cloudflare-turnstile
 And add the code to the `index.ts` file:
 
 ```ts index.ts
-import { corsHeaders } from '../_shared/cors.ts'
+import { corsHeaders } from '@supabase/supabase-js/cors' // v2.95.0+
 
 console.log('Hello from Cloudflare Trunstile!')
 

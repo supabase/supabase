@@ -1,28 +1,22 @@
+// End of third-party imports
+
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
-// End of third-party imports
-
-import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import {
-  cn,
-  Button,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-} from 'ui'
+import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_, FormControl, FormField } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+import CopyButton from '@/components/ui/CopyButton'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ProjectAndPlanProps {
   form: UseFormReturn<SupportFormValues>
@@ -30,16 +24,14 @@ interface ProjectAndPlanProps {
   projectRef: string | null
   category: ExtendedSupportCategories
   subscriptionPlanId: string | undefined
-  showPlanExpectationInfo?: boolean
 }
 
 export function ProjectAndPlanInfo({
   form,
   orgSlug,
   projectRef,
-  category,
-  subscriptionPlanId,
-  showPlanExpectationInfo = true,
+  category: _category,
+  subscriptionPlanId: _subscriptionPlanId,
 }: ProjectAndPlanProps) {
   const hasProjectSelected = projectRef && projectRef !== NO_PROJECT_MARKER
 
@@ -49,14 +41,6 @@ export function ProjectAndPlanInfo({
       <ProjectRefHighlighted projectRef={projectRef} />
 
       {!hasProjectSelected && <Admonition type="default" title="No project has been selected" />}
-
-      {showPlanExpectationInfo &&
-        orgSlug &&
-        subscriptionPlanId !== 'enterprise' &&
-        subscriptionPlanId !== 'platform' &&
-        category !== 'Login_issues' && (
-          <PlanExpectationInfoBox orgSlug={orgSlug} planId={subscriptionPlanId} />
-        )}
     </div>
   )
 }
@@ -71,12 +55,12 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
   const { projectRef: urlProjectRef } = useParams()
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="projectRef"
       control={form.control}
       render={({ field }) => (
         <FormItemLayout hideMessage layout="vertical" label="Which project is affected?">
-          <FormControl_Shadcn_>
+          <FormControl>
             <OrganizationProjectSelector
               key={orgSlug}
               sameWidthAsTrigger
@@ -89,13 +73,15 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
               }}
               onSelect={(project) => field.onChange(project.ref)}
-              renderTrigger={({ isLoading, project }) => {
+              renderTrigger={({ isLoading, project, listboxId, open }) => {
                 return (
                   <Button
                     block
                     type="default"
                     role="combobox"
                     aria-label="Select a project"
+                    aria-expanded={open}
+                    aria-controls={listboxId}
                     size="small"
                     className="justify-between"
                     iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
@@ -105,7 +91,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                     ) : !field.value || field.value === NO_PROJECT_MARKER ? (
                       'No specific project'
                     ) : (
-                      project?.name ?? 'Unknown project'
+                      (project?.name ?? 'Unknown project')
                     )}
                   </Button>
                 )
@@ -127,7 +113,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 </CommandGroup_Shadcn_>
               )}
             />
-          </FormControl_Shadcn_>
+          </FormControl>
         </FormItemLayout>
       )}
     />
@@ -153,7 +139,7 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
         >
           <p className="text-sm transition text-foreground-lighter">
             Project ID:{' '}
-            <code className="text-code-inline !text-foreground-light">{projectRef}</code>
+            <code className="text-code-inline text-foreground-light!">{projectRef}</code>
           </p>
           <CopyButton
             iconOnly
@@ -167,66 +153,60 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
   )
 }
 
-interface PlanExpectationInfoBoxProps {
+interface PlanExpectationInfoContentProps {
   orgSlug: string
   planId?: string
 }
 
-const PlanExpectationInfoBox = ({ orgSlug, planId }: PlanExpectationInfoBoxProps) => {
+export const PlanExpectationInfoContent = ({
+  orgSlug,
+  planId,
+}: PlanExpectationInfoContentProps) => {
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
   const shouldShowUpgradeActions = billingAll && planId !== 'enterprise'
 
   return (
-    <Admonition
-      type="default"
-      title="Expected response times are based on your organization’s plan"
-      description={
-        <>
-          {planId === 'free' && (
-            <p>
-              Support on the Free plan is provided through the community and by the team on a
-              best-effort basis. For a guaranteed response time, we recommend upgrading to the Pro
-              plan. Enhanced support SLAs are available on the Enterprise plan.
-            </p>
-          )}
+    <div className="flex flex-col gap-y-3 text-sm text-foreground-light">
+      {planId === 'free' && (
+        <p>
+          Support on the Free plan is provided through the community and by the team on a
+          best-effort basis. For a guaranteed response time, we recommend upgrading to the Pro plan.
+          Enhanced support SLAs are available on the Enterprise plan.
+        </p>
+      )}
 
-          {planId === 'pro' && (
-            <p>
-              The Pro plan includes email support. In most cases, you can expect a response within 1
-              business day for all severities. For prioritized ticketing on all issues and
-              prioritized escalation to product engineering, we recommend upgrading to the Team
-              plan. Enhanced support SLAs are available on the Enterprise plan.
-            </p>
-          )}
+      {planId === 'pro' && (
+        <p>
+          Pro includes email support with typical 1-business-day responses; upgrade to Team for
+          prioritized ticketing and engineering escalation, or Enterprise for enhanced SLAs.
+        </p>
+      )}
 
-          {planId === 'team' && (
-            <p>
-              The Team plan includes email support with prioritized ticketing and escalation to
-              product engineering. Low, normal, and high-severity tickets are typically handled
-              within 1 business day. Urgent issues are handled within 1 day, 365 days a year.
-              Enhanced support SLAs are available on the Enterprise plan.
-            </p>
-          )}
-        </>
-      }
-      actions={
-        shouldShowUpgradeActions && (
-          <>
-            <Button asChild>
-              <Link
-                href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
-              >
-                Upgrade plan
-              </Link>
-            </Button>
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
-                Enquire about Enterprise
-              </Link>
-            </Button>
-          </>
-        )
-      }
-    />
+      {planId === 'team' && (
+        <p>
+          The Team plan includes email support with prioritized ticketing and escalation to product
+          engineering. Low, normal, and high-severity tickets are typically handled within 1
+          business day. Urgent issues are handled within 1 day, 365 days a year. Enhanced support
+          SLAs are available on the Enterprise plan.
+        </p>
+      )}
+
+      {shouldShowUpgradeActions && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button asChild size="tiny">
+            <Link
+              href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
+            >
+              Upgrade plan
+            </Link>
+          </Button>
+          <Button asChild type="default" size="tiny" icon={<ExternalLink />}>
+            <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
+              Enquire about Enterprise
+            </Link>
+          </Button>
+        </div>
+      )}
+    </div>
   )
 }

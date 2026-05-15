@@ -1,5 +1,6 @@
-import { IS_PLATFORM } from 'lib/constants'
 import type { NextRequest } from 'next/server'
+
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const config = {
   matcher: '/api/:function*',
@@ -13,10 +14,11 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/code/complete',
   '/ai/sql/cron-v2',
   '/ai/sql/title-v2',
+  '/ai/sql/filter-v1',
   '/ai/onboarding/design',
   '/ai/feedback/classify',
   '/ai/docs',
-  '/ai/table-quickstart/generate-schemas',
+  '/ai/sql/parse-client-code',
   '/get-ip-address',
   '/get-utc-time',
   '/get-deployment-commit',
@@ -25,7 +27,11 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/body',
   '/generate-attachment-url',
   '/incident-status',
+  '/incident-banner',
+  '/status-override',
   '/api/integrations/stripe-sync',
+  '/content/graphql',
+  '/parse-query',
 ]
 
 export function proxy(request: NextRequest) {

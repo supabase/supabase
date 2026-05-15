@@ -1,15 +1,10 @@
 import { ArrowRight, ExternalLink, Info, Key, Timer } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   DialogDescription,
   DialogFooter,
@@ -20,8 +15,13 @@ import {
   Label_Shadcn_,
   Skeleton,
 } from 'ui'
+
 import { algorithmLabels } from '../algorithm-details'
 import { statusColors } from '../jwt.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
+import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
 export function RotateKeyDialog({
   projectRef,
@@ -142,7 +142,7 @@ export function RotateKeyDialog({
               htmlFor="understands-standby"
               className="flex items-top gap-4 text-sm leading-none"
             >
-              <Checkbox_Shadcn_
+              <Checkbox
                 id="understands-standby"
                 className="mt-0.5"
                 checked={isStandbyUnderstood}
@@ -178,7 +178,7 @@ export function RotateKeyDialog({
               htmlFor="understands-previously-used"
               className="flex items-top gap-4 text-sm leading-none"
             >
-              <Checkbox_Shadcn_
+              <Checkbox
                 className="mt-0.5"
                 id="understands-previously-used"
                 checked={isPreviouslyUsedUnderstood}
@@ -215,7 +215,7 @@ export function RotateKeyDialog({
 
             {verifyJWTEdgeFunctions.length > 0 && (
               <Label_Shadcn_ htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
-                <Checkbox_Shadcn_
+                <Checkbox
                   id="edge-functions-verify-jwt"
                   className="mt-0.5"
                   checked={isEdgeFunctionsVerifyJWTUnderstood}
@@ -227,6 +227,7 @@ export function RotateKeyDialog({
                   {verifyJWTEdgeFunctions
                     .map(({ name }) => (
                       <a
+                        key={name}
                         className=""
                         href={`../../functions/${name}/details`}
                         target="_blank"

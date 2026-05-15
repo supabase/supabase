@@ -1,13 +1,6 @@
+import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useRouter } from 'next/router'
 import { UseFormReturn } from 'react-hook-form'
-
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
-import { OrgProject } from 'data/projects/org-projects-infinite-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -20,8 +13,15 @@ import {
   TableRow,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ProjectCreationFooterProps {
   form: UseFormReturn<CreateProjectForm>

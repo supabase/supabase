@@ -280,7 +280,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             ```bash
               npx prisma migrate diff \
               --from-empty \
-              --to-schema-datamodel prisma/schema.prisma \
+              --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="tip" label="conflict management">
@@ -308,7 +308,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             ```bash
               pnpx prisma migrate diff \
               --from-empty \
-              --to-schema-datamodel prisma/schema.prisma \
+              --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="note" label="conflict management">
@@ -336,7 +336,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             ```bash
               npx prisma migrate diff \
               --from-empty \
-              --to-schema-datamodel prisma/schema.prisma \
+              --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="note" label="conflict management">
@@ -364,7 +364,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             ```bash
               bunx prisma migrate diff \
               --from-empty \
-              --to-schema-datamodel prisma/schema.prisma \
+              --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="note" label="conflict management">

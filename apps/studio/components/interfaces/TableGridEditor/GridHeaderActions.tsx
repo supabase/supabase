@@ -1,61 +1,80 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Lightbulb, Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
+import { useParams } from 'common'
+import { Realtime } from 'icons'
+import { BookOpenText, Lightbulb, Lock, MoreVertical, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import {
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useParams } from 'common'
-import { RefreshButton } from 'components/grid/components/header/RefreshButton'
-import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
-import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { EnableIndexAdvisorDialog } from '../QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
+import { InsertButton } from './InsertButton'
+import { RealtimeToggleDialog } from './RealtimeToggleDialog'
+import { SecurityDefinerViewPopover } from './SecurityDefinerViewPopover'
+import { ViewEntityAutofixSecurityModal } from './ViewEntityAutofixSecurityModal'
+import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
+import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import {
+  getEntityLintDetails,
+  getTablePoliciesUrl,
+} from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useIsTableRealtimeEnabled } from '@/data/database-publications/database-publications-query'
+import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import {
   Entity,
   isTableLike,
   isForeignTable as isTableLikeForeignTable,
   isMaterializedView as isTableLikeMaterializedView,
   isView as isTableLikeView,
-} from 'data/table-editor/table-editor-types'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import {
-  Button,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  cn,
-} from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
-import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
+} from '@/data/table-editor/table-editor-types'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface GridHeaderActionsProps {
   table: Entity
   isRefetching: boolean
 }
-
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
-  const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
+  const { ref } = useParams()
+  const appSnap = useAppStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
+  const [realtimeDialogOpen, setRealtimeDialogOpen] = useState(false)
+  const [indexAdvisorDialogOpen, setIndexAdvisorDialogOpen] = useState(false)
+  const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
 
   const [showWarning, setShowWarning] = useQueryState(
     'showWarning',
@@ -77,6 +96,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
+  const isRealtimeEnabled = useIsTableRealtimeEnabled({ id: table.id })
+
   const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
@@ -86,11 +107,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     },
   })
 
-  const [showEnableRealtime, setShowEnableRealtime] = useState(false)
-  const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
-  const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
-
-  const snap = useTableEditorTableStateSnapshot()
   const showHeaderActions = snap.selectedRows.size === 0
 
   const projectRef = project?.ref
@@ -101,53 +117,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const policies = (data ?? []).filter(
     (policy) => policy.schema === table.schema && policy.table === table.name
   )
-
-  const { data: publications } = useDatabasePublicationsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const realtimePublication = (publications ?? []).find(
-    (publication) => publication.name === 'supabase_realtime'
-  )
-  const realtimeEnabledTables = realtimePublication?.tables ?? []
-  const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === table?.id)
-
-  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    projectInsertedAt: project?.inserted_at,
-    isTable,
-    isRealtimeEnabled,
-  })
-
-  const { mutate: updatePublications, isPending: isTogglingRealtime } =
-    useDatabasePublicationUpdateMutation({
-      onSuccess: () => {
-        setShowEnableRealtime(false)
-
-        track(isRealtimeEnabled ? 'table_realtime_disabled' : 'table_realtime_enabled', {
-          method: 'ui',
-          schema_name: table.schema,
-          table_name: table.name,
-        })
-      },
-      onError: (error) => {
-        toast.error(`Failed to toggle realtime for ${table.name}: ${error.message}`)
-      },
-    })
-
-  const { data: triggersData } = useDatabaseTriggersQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      enabled: isTable,
-    }
-  )
-  const tableTriggers = (triggersData ?? []).filter(
-    (trigger) => trigger.schema === table.schema && trigger.table === table.name
-  )
-
-  const tableTriggersCount = tableTriggers.length
 
   const { can: canSqlWriteTables, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -160,6 +129,14 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isReadOnly = !isLoadingPermissions && !canSqlWriteTables && !canSqlWriteColumns
   // This will change when we allow autogenerated API docs for schemas other than `public`
   const doesHaveAutoGeneratedAPIDocs = table.schema === 'public'
+
+  const { hasLint: tableHasLints } = getEntityLintDetails(
+    table.name,
+    'rls_disabled_in_public',
+    ['ERROR'],
+    lints,
+    table.schema
+  )
 
   const { hasLint: viewHasLints, matchingLint: matchingViewLint } = getEntityLintDetails(
     table.name,
@@ -178,34 +155,26 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       table.schema
     )
 
-  const manageTriggersHref = `/project/${ref}/database/triggers?schema=${table.schema}`
-
-  const toggleRealtime = async () => {
-    if (!project || !realtimePublication) return
-
-    const exists = realtimeEnabledTables.some((x) => x.id === table.id)
-    const tables = !exists
-      ? [`${table.schema}.${table.name}`].concat(
-          realtimeEnabledTables.map((t) => `${t.schema}.${t.name}`)
-        )
-      : realtimeEnabledTables.filter((x) => x.id !== table.id).map((x) => `${x.schema}.${x.name}`)
-
-    track('realtime_toggle_table_clicked', {
-      newState: exists ? 'disabled' : 'enabled',
-      origin: 'tableGridHeader',
-    })
-
-    updatePublications({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: realtimePublication.id,
-      tables,
-    })
-  }
-
   const closeConfirmModal = () => {
     setRlsConfirmModalOpen(false)
   }
+
+  const onViewAPIDocs = () => {
+    appSnap.setActiveDocsSection(['entities', table.name])
+    appSnap.setShowProjectApiDocs(true)
+
+    sendEvent({
+      action: 'api_docs_opened',
+      properties: {
+        source: 'table_editor',
+      },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+  }
+
   const onToggleRLS = async () => {
     const payload = {
       id: table.id,
@@ -235,7 +204,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           {isReadOnly && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="border border-strong rounded bg-overlay-hover px-3 py-1 text-xs">
+                <div className="border border-strong rounded-sm bg-overlay-hover px-3 py-1 text-xs">
                   Viewing as read-only
                 </div>
               </TooltipTrigger>
@@ -262,10 +231,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       },
                     }}
                   >
-                    <Link
-                      passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.name}&schema=${table.schema}`}
-                    >
+                    <Link passHref href={getTablePoliciesUrl(projectRef, table.schema, table.name)}>
                       Add RLS policy
                     </Link>
                   </ButtonTooltip>
@@ -292,28 +258,20 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       )
                     }
                   >
-                    <Link
-                      passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.name}&schema=${table.schema}`}
-                    >
+                    <Link passHref href={getTablePoliciesUrl(projectRef, table.schema, table.name)}>
                       RLS {policies.length > 1 ? 'policies' : 'policy'}
                     </Link>
                   </Button>
                 )}
               </>
-            ) : (
+            ) : tableHasLints ? (
               <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
                 <PopoverTrigger_Shadcn_ asChild>
                   <Button type="danger" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
                 </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_
-                  // using `portal` for a safari fix. issue with rendering outside of body element
-                  portal
-                  className="w-80 text-sm"
-                  align="end"
-                >
+                <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
                   <h4 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
                   </h4>
@@ -338,177 +296,20 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </div>
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
-            )
+            ) : null
           ) : null}
 
-          {isTable && isIndexAdvisorAvailable && !isIndexAdvisorEnabled && (
-            <Popover_Shadcn_ modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="default" icon={<Lightbulb strokeWidth={1.5} />}>
-                  Index Advisor
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ portal className="w-80 text-sm" align="end">
-                <h4 className="flex items-center gap-2">
-                  <Lightbulb size={16} /> Index Advisor
-                </h4>
-                <div className="grid gap-2 mt-4 text-foreground-light text-xs">
-                  <p>
-                    Index Advisor recommends indexes to improve query performance on this table.
-                  </p>
-                  <p>
-                    Enable Index Advisor to get recommendations based on your actual query patterns.
-                  </p>
-                  <div className="mt-2">
-                    <EnableIndexAdvisorButton />
-                  </div>
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
-          )}
-
-          {isTable && activeRealtimeVariant === RealtimeButtonVariant.TRIGGERS ? (
-            <Button
-              asChild
-              type={'default'}
-              size="tiny"
-              icon={
-                <div
-                  className={cn(
-                    'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
-                    tableTriggersCount > 9 ? 'px-1' : 'w-[16px]'
-                  )}
-                >
-                  <span className="text-[11px] text-foreground font-mono text-center">
-                    {tableTriggersCount}
-                  </span>
-                </div>
-              }
-            >
-              <Link href={manageTriggersHref}>
-                {tableTriggersCount === 1 ? 'Trigger' : 'Triggers'}
-              </Link>
-            </Button>
-          ) : (
-            activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON &&
-            realtimeEnabled && (
-              <ButtonTooltip
-                type="default"
-                size="tiny"
-                icon={
-                  <MousePointer2
-                    strokeWidth={1.5}
-                    className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
-                  />
-                }
-                onClick={() => setShowEnableRealtime(true)}
-                className={cn(isRealtimeEnabled && 'w-7 h-7 p-0 text-brand hover:text-brand-hover')}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: isRealtimeEnabled
-                      ? 'Click to disable realtime for this table'
-                      : 'Click to enable realtime for this table',
-                  },
-                }}
-              >
-                {!isRealtimeEnabled && 'Enable Realtime'}
-              </ButtonTooltip>
-            )
-          )}
-
           {isView && viewHasLints && (
-            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
-                  Security Definer view
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                // using `portal` for a safari fix. issue with rendering outside of body element
-                portal
-                className="min-w-[395px] text-sm"
-                align="end"
-              >
-                <h3 className="flex items-center gap-2">
-                  <Unlock size={16} /> Secure your View
-                </h3>
-                <div className="grid gap-2 mt-4 text-foreground-light text-sm">
-                  <p>
-                    This view is defined with the Security Definer property, giving it permissions
-                    of the view's creator (Postgres), rather than the permissions of the querying
-                    user.
-                  </p>
-
-                  <p>
-                    Since this view is in the public schema, it is accessible via your project's
-                    APIs.
-                  </p>
-
-                  <div className="mt-2 flex items-center gap-2">
-                    <Button
-                      type="secondary"
-                      onClick={() => {
-                        setIsAutofixViewSecurityModalOpen(true)
-                      }}
-                    >
-                      Autofix
-                    </Button>
-                    <Button type="default" asChild>
-                      <Link
-                        target="_blank"
-                        href={`/project/${ref}/advisors/security?preset=${matchingViewLint?.level}&id=${matchingViewLint?.cache_key}`}
-                      >
-                        Learn more
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+            <SecurityDefinerViewPopover
+              lint={matchingViewLint}
+              onAutofix={() => {
+                setIsAutofixViewSecurityModalOpen(true)
+              }}
+            />
           )}
 
           {isMaterializedView && materializedViewHasLints && (
-            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
-                  Security Definer view
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                // using `portal` for a safari fix. issue with rendering outside of body element
-                portal
-                className="min-w-[395px] text-sm"
-                align="end"
-              >
-                <h3 className="flex items-center gap-2">
-                  <Unlock size={16} /> Secure your View
-                </h3>
-                <div className="grid gap-2 mt-4 text-foreground-light text-sm">
-                  <p>
-                    This view is defined with the Security Definer property, giving it permissions
-                    of the view's creator (Postgres), rather than the permissions of the querying
-                    user.
-                  </p>
-
-                  <p>
-                    Since this view is in the public schema, it is accessible via your project's
-                    APIs.
-                  </p>
-
-                  <div className="mt-2">
-                    <Button type="default" asChild>
-                      <Link
-                        target="_blank"
-                        href={`/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
-                      >
-                        Learn more
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+            <SecurityDefinerViewPopover lint={matchingMaterializedViewLint} />
           )}
 
           {isForeignTable && table.schema === 'public' && (
@@ -518,12 +319,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   Unprotected Data API access
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                // using `portal` for a safari fix. issue with rendering outside of body element
-                portal
-                className="min-w-[395px] text-sm"
-                align="end"
-              >
+              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure Foreign table
                 </h3>
@@ -549,40 +345,45 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             </Popover_Shadcn_>
           )}
 
-          <RoleImpersonationPopover serviceRoleLabel="postgres" />
+          <RoleImpersonationPopover header="View data as a role" align="center" />
 
-          {doesHaveAutoGeneratedAPIDocs && (
-            <APIDocsButton section={['entities', table.name]} source="table_editor" />
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" icon={<MoreVertical />} className="h-7 w-7" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              {isTable && realtimeEnabled && (
+                <DropdownMenuItem className="gap-x-2" onClick={() => setRealtimeDialogOpen(true)}>
+                  <Realtime size={14} className={isRealtimeEnabled ? 'text-brand' : ''} />
+                  <span>{isRealtimeEnabled ? 'Disable' : 'Enable'} Realtime</span>
+                </DropdownMenuItem>
+              )}
+              {doesHaveAutoGeneratedAPIDocs && (
+                <DropdownMenuItem className="gap-x-2" onClick={() => onViewAPIDocs()}>
+                  <BookOpenText size={14} />
+                  <span>View API docs</span>
+                </DropdownMenuItem>
+              )}
+              {isTable && isIndexAdvisorAvailable && !isIndexAdvisorEnabled && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    onClick={() => setIndexAdvisorDialogOpen(true)}
+                  >
+                    <Lightbulb size={14} />
+                    <span>Enable Index Advisor</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <RefreshButton tableId={table.id} isRefetching={isRefetching} />
+
+          {showHeaderActions && <InsertButton />}
         </div>
       )}
-      <ConfirmationModal
-        visible={showEnableRealtime}
-        loading={isTogglingRealtime}
-        title={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime for ${table.name}`}
-        confirmLabel={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime`}
-        confirmLabelLoading={`${isRealtimeEnabled ? 'Disabling' : 'Enabling'} realtime`}
-        onCancel={() => setShowEnableRealtime(false)}
-        onConfirm={() => toggleRealtime()}
-      >
-        <div className="space-y-2">
-          <p className="text-sm">
-            Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will{' '}
-            {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized subscribers.
-          </p>
-          {!isRealtimeEnabled && (
-            <p className="text-sm">
-              You may also select which events to broadcast to subscribers on the{' '}
-              <Link href={`/project/${ref}/database/publications`} className="text-brand">
-                database publications
-              </Link>{' '}
-              settings.
-            </p>
-          )}
-        </div>
-      </ConfirmationModal>
 
       <ViewEntityAutofixSecurityModal
         table={table}
@@ -605,6 +406,14 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           onConfirm={onToggleRLS}
         />
       )}
+
+      <RealtimeToggleDialog
+        table={table}
+        open={realtimeDialogOpen}
+        setOpen={setRealtimeDialogOpen}
+      />
+
+      <EnableIndexAdvisorDialog open={indexAdvisorDialogOpen} setOpen={setIndexAdvisorDialogOpen} />
     </div>
   )
 }

@@ -3,9 +3,6 @@ import { Plus } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { parseAsString, useQueryState } from 'nuqs'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import * as z from 'zod'
-
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
   Button,
   Dialog,
@@ -17,12 +14,15 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
@@ -38,10 +38,7 @@ export const CreatePublishableAPIKeyDialog = () => {
   const params = useParams()
   const projectRef = params?.ref as string
 
-  const [visible, setVisible] = useQueryState(
-    'new',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [visible, setVisible] = useQueryState('new', parseAsString.withDefault(''))
 
   const onOpenChange = (value: boolean) => {
     if (value) setVisible('publishable')
@@ -95,13 +92,13 @@ export const CreatePublishableAPIKeyDialog = () => {
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               className="flex flex-col gap-4"
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -110,13 +107,13 @@ export const CreatePublishableAPIKeyDialog = () => {
                     label="Name"
                     description="A short name of lowercase alphanumeric characters and underscore, must start with letter or underscore."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 key="description"
                 name="description"
                 control={form.control}
@@ -125,14 +122,14 @@ export const CreatePublishableAPIKeyDialog = () => {
                     label="Description"
                     description="Provide a description about what this key is used for."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} placeholder="(Optional)" />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>

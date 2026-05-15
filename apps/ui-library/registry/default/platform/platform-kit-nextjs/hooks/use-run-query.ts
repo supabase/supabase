@@ -1,9 +1,10 @@
 'use client'
 
-import { client } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api'
 import { useMutation } from '@tanstack/react-query'
 import { type AxiosError } from 'axios'
 import { toast } from 'sonner'
+
+import { client } from '@/registry/default/platform/platform-kit-nextjs/lib/management-api'
 
 // RUN SQL Query
 export const runQuery = async ({

@@ -1,33 +1,27 @@
+import { useCallback, useMemo } from 'react'
+
+import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import type {
   Entitlement,
   EntitlementConfig,
   EntitlementType,
   FeatureKey,
-} from 'data/entitlements/entitlements-query'
-import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { useMemo } from 'react'
-import { useSelectedOrganizationQuery } from './useSelectedOrganization'
+} from '@/data/entitlements/entitlements-query'
+import { useEntitlementsQuery } from '@/data/entitlements/entitlements-query'
+import { IS_PLATFORM } from '@/lib/constants'
 
 function isNumericConfig(
-  config: EntitlementConfig,
+  _config: EntitlementConfig,
   type: EntitlementType
-): config is { enabled: boolean; unlimited: boolean; value: number } {
+): _config is { enabled: boolean; unlimited: boolean; value: number } {
   return type === 'numeric'
 }
 
 function isSetConfig(
-  config: EntitlementConfig,
+  _config: EntitlementConfig,
   type: EntitlementType
-): config is { enabled: boolean; set: string[] } {
+): _config is { enabled: boolean; set: string[] } {
   return type === 'set'
-}
-
-function isBooleanConfig(
-  config: EntitlementConfig,
-  type: EntitlementType
-): config is { enabled: boolean } {
-  return type === 'boolean'
 }
 
 function getEntitlementNumericValue(entitlement: Entitlement | null): number | undefined {
@@ -53,6 +47,32 @@ function getEntitlementSetValues(entitlement: Entitlement | null): string[] {
   return entitlementConfig && entitlement.type && isSetConfig(entitlementConfig, entitlement.type)
     ? entitlementConfig.set
     : []
+}
+
+function getEntitlementMax(entitlement: Entitlement | null): number | undefined {
+  return isEntitlementUnlimited(entitlement)
+    ? Number.MAX_SAFE_INTEGER
+    : getEntitlementNumericValue(entitlement)
+}
+
+export function useHasEntitlementAccess(organizationSlug?: string) {
+  const shouldGetSelectedOrg = !organizationSlug
+  const { data: selectedOrg } = useSelectedOrganizationQuery({
+    enabled: shouldGetSelectedOrg,
+  })
+
+  const finalOrgSlug = organizationSlug || selectedOrg?.slug
+  const enabled = IS_PLATFORM && !!finalOrgSlug
+
+  const { data: entitlementsData } = useEntitlementsQuery({ slug: finalOrgSlug! }, { enabled })
+
+  return useCallback(
+    (key: string) =>
+      IS_PLATFORM
+        ? (entitlementsData?.entitlements.find((e) => e.feature.key === key)?.hasAccess ?? false)
+        : true,
+    [entitlementsData]
+  )
 }
 
 export function useCheckEntitlements(
@@ -104,11 +124,12 @@ export function useCheckEntitlements(
     : isSuccessEntitlements
 
   return {
-    hasAccess: IS_PLATFORM ? entitlement?.hasAccess ?? false : true,
+    hasAccess: IS_PLATFORM ? (entitlement?.hasAccess ?? false) : true,
     isLoading: IS_PLATFORM ? isLoading : false,
     isSuccess: IS_PLATFORM ? isSuccess : true,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),
     isEntitlementUnlimited: () => isEntitlementUnlimited(entitlement),
     getEntitlementSetValues: () => getEntitlementSetValues(entitlement),
+    getEntitlementMax: () => getEntitlementMax(entitlement),
   }
 }

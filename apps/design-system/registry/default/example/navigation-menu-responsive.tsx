@@ -1,11 +1,11 @@
 'use client'
 
-import * as React from 'react'
 import Link from 'next/link'
-
-import { NavigationMenuViewport, ScrollArea, ScrollBar, buttonVariants, cn } from 'ui'
+import * as React from 'react'
 // import { Icons } from '@/components/icons'
 import {
+  buttonVariants,
+  cn,
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
@@ -13,6 +13,9 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
+  NavigationMenuViewport,
+  ScrollArea,
+  ScrollBar,
 } from 'ui'
 
 const components: { title: string; href: string; description: string }[] = [
@@ -63,7 +66,7 @@ export default function NavigationMenuDemo() {
                 <li className="row-span-3">
                   <NavigationMenuLink asChild>
                     <a
-                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-linear-to-b from-muted/50 to-muted p-6 no-underline outline-hidden focus:shadow-md"
                       href="/"
                     >
                       {/* <Icons.logo className="h-6 w-6" /> */}
@@ -167,7 +170,7 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
           <a
             ref={ref}
             className={cn(
-              'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-surface-100 hover:text-accent-foreground focus:bg-surface-100 focus:text-accent-foreground',
+              'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-surface-100 hover:text-accent-foreground focus:bg-surface-100 focus:text-accent-foreground',
               className
             )}
             {...props}

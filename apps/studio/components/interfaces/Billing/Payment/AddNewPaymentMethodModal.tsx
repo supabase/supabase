@@ -6,11 +6,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
 
-import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
 import { getStripeElementsAppearanceOptions } from './Payment.utils'
+import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
 interface AddNewPaymentMethodModalProps {
   visible: boolean
@@ -108,15 +108,15 @@ const AddNewPaymentMethodModal = ({
         size="invisible"
         onOpen={() => {
           // [Joshen] This is to ensure that hCaptcha popup remains clickable
-          if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.add('pointer-events-auto!')
         }}
         onClose={() => {
           onLocalCancel()
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onVerify={(token) => {
           setCaptchaToken(token)
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onExpire={() => {
           setCaptchaToken(null)

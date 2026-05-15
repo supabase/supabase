@@ -1,17 +1,13 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { DEFAULT_SIDEBAR_BEHAVIOR } from 'components/interfaces/Sidebar'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BASE_PATH } from 'lib/constants'
 import {
   Card,
   CardContent,
   Label_Shadcn_,
-  RadioGroup_Shadcn_,
-  RadioGroupLargeItem_Shadcn_,
+  RadioGroup,
+  RadioGroupLargeItem,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -30,6 +26,10 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+import { DEFAULT_SIDEBAR_BEHAVIOR } from '@/components/interfaces/Sidebar'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { BASE_PATH } from '@/lib/constants'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
@@ -50,7 +50,7 @@ export const ThemeSettings = () => {
 
   function SingleThemeSelection() {
     return (
-      <RadioGroup_Shadcn_
+      <RadioGroup
         name="theme"
         onValueChange={setTheme}
         aria-label="Choose a theme"
@@ -59,16 +59,16 @@ export const ThemeSettings = () => {
         className="grid grid-cols-2 gap-4"
       >
         {singleThemes.map((theme: Theme) => (
-          <RadioGroupLargeItem_Shadcn_
+          <RadioGroupLargeItem
             className="p-3 w-full"
             key={theme.value}
             value={theme.value}
             label={theme.name}
           >
             <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg?v=2`} />
-          </RadioGroupLargeItem_Shadcn_>
+          </RadioGroupLargeItem>
         ))}
-      </RadioGroup_Shadcn_>
+      </RadioGroup>
     )
   }
 

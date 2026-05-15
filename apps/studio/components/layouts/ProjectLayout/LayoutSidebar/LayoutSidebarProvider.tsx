@@ -1,30 +1,51 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { PropsWithChildren, useEffect } from 'react'
+import { useEffect, type PropsWithChildren } from 'react'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { AdvisorPanel } from 'components/ui/AdvisorPanel/AdvisorPanel'
-import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import useLatest from 'hooks/misc/useLatest'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import useLatest from '@/hooks/misc/useLatest'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+import {
+  sidebarManagerState,
+  useRegisterSidebar,
+  useSidebarManagerSnapshot,
+} from '@/state/sidebar-manager-state'
+
+const AdvisorPanel = dynamic(() =>
+  import('@/components/ui/AdvisorPanel/AdvisorPanel').then((m) => m.AdvisorPanel)
+)
+const AIAssistant = dynamic(() =>
+  import('@/components/ui/AIAssistantPanel/AIAssistant').then((m) => m.AIAssistant)
+)
+const EditorPanel = dynamic(() =>
+  import('@/components/ui/EditorPanel/EditorPanel').then((m) => m.EditorPanel)
+)
+const HelpPanel = dynamic(() =>
+  import('@/components/ui/HelpPanel/HelpPanel').then((m) => m.HelpPanel)
+)
 
 export const SIDEBAR_KEYS = {
   AI_ASSISTANT: 'ai-assistant',
   EDITOR_PANEL: 'editor-panel',
   ADVISOR_PANEL: 'advisor-panel',
+  HELP_PANEL: 'help-panel',
 } as const
+
+export type TYPEOF_SIDEBAR_KEYS = (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
 
 export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
-  const { openSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const { openSidebar, closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   const [sidebarURLParam, setSidebarUrlParam] = useQueryState('sidebar', parseAsString)
   const [sidebarLocalStorage, setSidebarLocalStorage, { isSuccess: isLoadedLocalStorage }] =
@@ -33,9 +54,32 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const sidebarURLParamRef = useLatest(sidebarURLParam)
   const sidebarLocalStorageRef = useLatest(sidebarLocalStorage)
 
-  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, 'i', !!project)
-  useRegisterSidebar(SIDEBAR_KEYS.EDITOR_PANEL, () => <EditorPanel />, {}, 'e', !!project)
-  useRegisterSidebar(SIDEBAR_KEYS.ADVISOR_PANEL, () => <AdvisorPanel />, {}, undefined, true)
+  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, !!project)
+  useRegisterSidebar(SIDEBAR_KEYS.EDITOR_PANEL, () => <EditorPanel />, {}, !!project)
+  useRegisterSidebar(SIDEBAR_KEYS.ADVISOR_PANEL, () => <AdvisorPanel />, {}, true)
+  useRegisterSidebar(
+    SIDEBAR_KEYS.HELP_PANEL,
+    () => (
+      <HelpPanel
+        onClose={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
+        projectRef={project?.ref}
+        supportLinkQueryParams={getSupportLinkQueryParams(
+          project,
+          org,
+          router.query.ref as string | undefined
+        )}
+      />
+    ),
+    {},
+    true
+  )
+
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE, () =>
+    sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+  )
+  useShortcut(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE, () =>
+    sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+  )
 
   useEffect(() => {
     if (!!project) {

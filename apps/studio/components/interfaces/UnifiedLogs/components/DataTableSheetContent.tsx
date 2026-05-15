@@ -1,10 +1,10 @@
 import { Table } from '@tanstack/react-table'
 import { HTMLAttributes, memo } from 'react'
-
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
-import { DataTableSheetRowAction } from 'components/ui/DataTable/DataTableSheetRowAction'
 import { cn, Skeleton } from 'ui'
+
 import { SheetField } from '../UnifiedLogs.types'
+import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
+import { DataTableSheetRowAction } from '@/components/ui/DataTable/DataTableSheetRowAction'
 
 interface SheetDetailsContentSkeletonProps<TData, TMeta> {
   fields: SheetField<TData, TMeta>[]
@@ -85,6 +85,7 @@ export function DataTableSheetContent<TData, TMeta>({
                   'flex gap-4 my-1 py-1 text-sm justify-between items-center w-full',
                   field.className
                 )}
+                label={field.label}
               >
                 <dt className="shrink-0 text-muted-foreground">{field.label}</dt>
                 <dd className="font-mono w-full text-right truncate">

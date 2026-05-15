@@ -1,16 +1,16 @@
+import { useParams } from 'common'
 import { AlertCircleIcon } from 'lucide-react'
 import Link from 'next/link'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 
-import { useParams } from 'common'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const BranchingPostgresVersionNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
   return (
-    <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 !border-t-0 !border-l-0 !border-r-0">
+    <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 border-t-0! border-l-0! border-r-0!">
       <AlertCircleIcon />
       <AlertTitle_Shadcn_ className="text-base">
         Your project needs to be on Postgres 15 to enable branching
