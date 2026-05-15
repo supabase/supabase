@@ -2428,17 +2428,17 @@ export interface LogDrainSaveButtonClickedEvent {
 }
 
 /**
- * User confirmed addition of log drain destination.
+ * User confirmed deletion of a log drain destination in the delete-confirm modal.
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/settings/log-drains (LogDrains)
+ * @page /dashboard/project/{ref}/settings/log-drains
  */
-export interface LogDrainConfirmButtonSubmittedEvent {
-  action: 'log_drain_confirm_button_submitted'
+export interface LogDrainDeletedEvent {
+  action: 'log_drain_deleted'
   properties: {
     /**
-     * Type of the destination confirmed
+     * Type of the destination deleted
      */
     destination:
       | 'postgres'
@@ -3408,7 +3408,7 @@ export type TelemetryEvent =
   | QueueOperationsSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
-  | LogDrainConfirmButtonSubmittedEvent
+  | LogDrainDeletedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
