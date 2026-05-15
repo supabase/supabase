@@ -5,7 +5,7 @@ import { cn } from 'ui'
 
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
 import { MessageActions } from './Message.Actions'
-import type { AddToolResult, MessageInfo } from './Message.Context'
+import type { AddToolApprovalResponse, MessageInfo } from './Message.Context'
 import { MessageProvider, useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 import { MessageDisplay } from './Message.Display'
 
@@ -92,7 +92,7 @@ interface MessageProps {
   isLoading: boolean
   readOnly?: boolean
   variant?: 'default' | 'warning'
-  addToolResult?: AddToolResult
+  addToolApprovalResponse?: AddToolApprovalResponse
   onDelete: (id: string) => void
   onEdit: (id: string) => void
   isAfterEditedMessage: boolean
@@ -123,7 +123,7 @@ export function Message(props: MessageProps) {
   } satisfies MessageInfo
 
   const messageActions = {
-    addToolResult: props.addToolResult,
+    addToolApprovalResponse: props.addToolApprovalResponse,
     onDelete: props.onDelete,
     onEdit: props.onEdit,
     onCancelEdit: props.onCancelEdit,

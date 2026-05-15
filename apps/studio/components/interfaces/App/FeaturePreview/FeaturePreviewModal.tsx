@@ -96,7 +96,7 @@ export const FeaturePreviewModal = () => {
 
   return (
     <Dialog open={showFeaturePreviewModal} onOpenChange={toggleFeaturePreviewModal}>
-      <DialogContent size="xlarge" className="flex flex-col !max-w-4xl h-[90dvh] md:h-auto">
+      <DialogContent size="xlarge" className="flex flex-col max-w-4xl! h-[90dvh] md:h-auto">
         <DialogHeader>
           <DialogTitle>Dashboard feature previews</DialogTitle>
           <DialogDescription>Get early access to new features and give feedback</DialogDescription>
@@ -104,7 +104,7 @@ export const FeaturePreviewModal = () => {
 
         <DialogSectionSeparator />
 
-        <DialogSection className="!p-0 flex-1 min-h-0 h-full">
+        <DialogSection className="p-0! flex-1 min-h-0 h-full">
           {allFeaturePreviews.length > 0 ? (
             <div className="max-h-full flex-1 min-h-0 h-full flex flex-col gap-y-1 md:gap-y-4 md:flex-row">
               <div>
@@ -136,7 +136,7 @@ export const FeaturePreviewModal = () => {
                       {selectedFeature.isNew && <Badge variant="success">New</Badge>}
                     </div>
                   </SelectTrigger>
-                  <SelectContent className="!p-0 [&>div]:!w-full [&>div]:!p-0 [&>div]:!flex [&>div]:!flex-col w-full flex">
+                  <SelectContent className="p-0! [&>div]:w-full! [&>div]:p-0! [&>div]:flex! [&>div]:flex-col! w-full flex">
                     {allFeaturePreviews.map((feature) => (
                       <SelectItem
                         key={feature.key}
@@ -226,7 +226,7 @@ const FeaturePreviewItem = ({
       key={feature.key}
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(
-        '!w-full flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
+        'w-full! flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
         selectedFeature?.key === feature.key ? 'bg-surface-300' : 'bg-surface-100',
         className
       )}

@@ -52,6 +52,8 @@ const pgTableZod = z.object({
 const pgTableArrayZod = z.array(pgTableZod)
 
 export type PGTable = z.infer<typeof pgTableZod>
+export type PGTablePrimaryKey = z.infer<typeof pgTablePrimaryKeyZod>
+export type PGTableRelationship = z.infer<typeof pgTableRelationshipZod>
 
 type TableWithoutColumns = Omit<PGTable, 'columns'>
 type TableWithColumns = PGTable

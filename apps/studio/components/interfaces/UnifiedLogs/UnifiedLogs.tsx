@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { useDebounce, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useDebounce, useParams } from 'common'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -39,8 +39,11 @@ import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
+import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
+import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
+import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
 import { DataTableFilterCommand } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
 import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
@@ -108,6 +111,11 @@ export const UnifiedLogs = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>(defaultRowSelection)
 
+  const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
+    LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK,
+    'bottom'
+  )
+
   const [columnVisibility, setColumnVisibility] = useLocalStorageQuery<VisibilityState>(
     'data-table-visibility',
     defaultColumnVisibility
@@ -128,7 +136,7 @@ export const UnifiedLogs = () => {
           }
           return acc
         },
-        {} as Record<string, any>
+        {} as Record<string, unknown>
       ) as QuerySearchParamsType,
     [search]
   )
@@ -192,18 +200,22 @@ export const UnifiedLogs = () => {
 
   // Create a filtered version of the chart config based on selected levels
   const filteredChartConfig = useMemo(() => {
-    const levelFilter = search.level || ['success', 'warning', 'error']
+    const levelFilter = search.level || LEVELS
     return Object.fromEntries(
-      Object.entries(CHART_CONFIG).filter(([key]) => levelFilter.includes(key as any))
+      Object.entries(CHART_CONFIG).filter(([key]) =>
+        levelFilter.includes(key as (typeof LEVELS)[number])
+      )
     ) as ChartConfig
   }, [search.level])
 
-  const getRowClassName = <TData extends { date: Date; level: string; timestamp: number }>(
+  const getRowClassName = <
+    TData extends { date: Date; level: (typeof LEVELS)[number]; timestamp: number },
+  >(
     row: Row<TData>
   ) => {
     const rowTimestamp = row.original.timestamp
     const isPast = rowTimestamp <= (liveMode.timestamp || -1)
-    const levelClassName = getLevelRowClassName(row.original.level as any)
+    const levelClassName = getLevelRowClassName(row.original.level)
     return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
   }
 
@@ -212,7 +224,7 @@ export const UnifiedLogs = () => {
     return generateDynamicColumns(flatData)
   }, [flatData])
 
-  const table: Table<any> = useReactTable({
+  const table: Table<ColumnSchema> = useReactTable({
     data: flatData,
     columns: dynamicColumns,
     state: {
@@ -261,22 +273,15 @@ export const UnifiedLogs = () => {
       if (!facetsField) return field
 
       // For hardcoded enum fields, keep the predefined options (facets only used for counts)
-      const isHardcodedField = ['log_type', 'method', 'level'].includes(field.value as string)
-      if (isHardcodedField) {
-        return field // Keep original predefined options
+      if (field.value === 'log_type' || field.value === 'method' || field.value === 'level') {
+        return field
       }
 
       // For dynamic fields, use faceted options
-      const options = facetsField.rows.map(({ value }) => ({ label: `${value}`, value }))
-
-      if (field.type === ('slider' as any)) {
-        return {
-          ...(field as any),
-          min: facetsField.min ?? (field as any).min,
-          max: facetsField.max ?? (field as any).max,
-          options,
-        }
-      }
+      const options: Option[] = facetsField.rows.map(({ value }) => ({
+        label: `${value}`,
+        value,
+      }))
 
       return { ...field, options }
     })
@@ -399,7 +404,7 @@ export const UnifiedLogs = () => {
                     </p>
                   </TooltipContent>
                 </Tooltip>
-                <div className="order-first w-full min-w-0 sm:order-none sm:w-auto sm:flex-1 [&_[cmdk-input-wrapper]]:!px-3 [&_button]:!px-3 [&_button>span]:!h-[26px] [&_button>span]:!py-0 [&_input]:!h-[26px] [&_input]:!py-0">
+                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 **:[[cmdk-input-wrapper]]:px-3! [&_button]:px-3! [&_button>span]:h-[26px]! [&_button>span]:py-0! [&_input]:h-[26px]! [&_input]:py-0!">
                   <DataTableFilterCommand
                     placeholder="Search logs..."
                     searchParamsParser={SEARCH_PARAMS_PARSER}
@@ -408,7 +413,7 @@ export const UnifiedLogs = () => {
                 <div className="block sm:hidden">
                   <DataTableFilterControlsDrawer />
                 </div>
-                <div className="ml-auto flex items-center gap-2">
+                <div className="ml-auto flex items-center gap-x-2">
                   <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
@@ -430,16 +435,29 @@ export const UnifiedLogs = () => {
                 chartConfig={filteredChartConfig}
               />
             </div>
-            <ResizablePanelGroup key="main-logs" orientation="vertical" className="flex-1">
+            <ResizablePanelGroup
+              key="main-logs"
+              className="flex-1"
+              orientation={dock === 'bottom' ? 'vertical' : 'horizontal'}
+            >
               <ResizablePanel
                 defaultSize="100"
-                minSize="30"
+                minSize="10"
                 className={cn(
                   'bg',
                   isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                 )}
               >
-                <div className="h-full [&>div]:h-full [&_thead_tr]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:![border-top:none] [&_thead_th]:![border-bottom:none] [&_thead_th]:![box-shadow:inset_0_-1px_0_hsl(var(--border-default))] [&_thead_tr]:!border-b-0 [&_tbody_tr]:!border-b-0 [&_thead_tr:hover]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:!text-foreground-lighter">
+                <div
+                  className={cn(
+                    'h-full [&>div]:h-full',
+                    '[&_thead_tr]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]!',
+                    '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
+                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]!',
+                    '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0! [&_thead_tr:hover]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]!',
+                    '[&_thead_th]:text-foreground-lighter!'
+                  )}
+                >
                   <DataTableInfinite
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}
@@ -453,13 +471,18 @@ export const UnifiedLogs = () => {
                   />
                 </div>
               </ResizablePanel>
-              <LogsListPanel selectedRow={selectedRow} />
-              {selectedRowKey && (
-                <ServiceFlowPanel
-                  selectedRow={selectedRow?.original}
-                  selectedRowKey={selectedRowKey}
-                  searchParameters={searchParameters}
-                />
+
+              {!!selectedRow && (
+                <>
+                  <LogsListPanel selectedRow={selectedRow} />
+                  <ServiceFlowPanel
+                    dock={dock}
+                    setDock={setDock}
+                    selectedRow={selectedRow?.original}
+                    selectedRowKey={selectedRowKey}
+                    searchParameters={searchParameters}
+                  />
+                </>
               )}
             </ResizablePanelGroup>
           </ResizablePanel>

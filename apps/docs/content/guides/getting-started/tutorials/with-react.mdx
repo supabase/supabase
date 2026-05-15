@@ -10,7 +10,7 @@ description: 'Learn how to use Supabase in your React App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/react-user-management).
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/react-user-management).
 
 </Admonition>
 
@@ -29,14 +29,13 @@ npm create vite@latest supabase-react -- --template react
 cd supabase-react
 ```
 
-Install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js).
+Install [supabase-js](https://github.com/supabase/supabase-js):
 
 ```bash
 npm install @supabase/supabase-js
 ```
 
-And finally, save the environment variables in a `.env.local` file.
-Use the Project URL and the key that you copied [earlier](#get-api-details).
+Save the environment variables in a `.env.local` file, using the Project URL and the key that you copied [earlier](#get-api-details).
 
 <$CodeSample
 path="/user-management/react-user-management/.env.example"
@@ -44,8 +43,7 @@ lines={[[1, -1]]}
 meta="name=.env"
 />
 
-With the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed
-on the browser, and that's fine as you have [Row Level Security](/docs/guides/auth#row-level-security) enabled on the Database.
+With the API credentials in place, create a helper file to initialize the Supabase client. The application exposes these variables in the browser, and that's fine as Supabase enables [Row Level Security](/docs/guides/database/postgres/row-level-security) by default on all tables.
 
 Create and edit `src/supabaseClient.js`:
 
@@ -57,12 +55,18 @@ meta="name=src/supabaseClient.js"
 
 ### App styling (optional)
 
-An optional step is to update the CSS file `src/index.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
+An optional step is to update the CSS file `src/index.css` to make the app look better.
+You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ### Set up a login component
 
-Create a React component to manage logins and sign-ups. It uses Magic Links, so users can sign in with their email without using passwords.
+You need a React component to manage logins and sign-ups. It uses [Magic Links](/docs/guides/auth/auth-email-passwordless#with-magic-link), so users can sign in with their email without using passwords.
+
+<Admonition type="tip" label="Did you know?">
+
+You can customize other emails sent out to new users, including the email's looks, content, and query parameters from [the **Authentication > Email**](/dashboard/project/_/auth/templates) section of the Dashboard.
+
+</Admonition>
 
 Create and edit `src/Auth.jsx`:
 
@@ -74,15 +78,23 @@ meta="name=src/Auth.jsx"
 
 ### Account page
 
-Users also need a way to edit their profile details and manage their accounts after signing in.
+After a user signs in, they need a way to edit their profile details and manage their accounts.
+
+Create a new component called `src/Account.jsx` and add the following code:
+
+<$CodeSample
+path="/user-management/react-user-management/src/Account.jsx"
+lines={[[1, 2], [4, 66], [74, -1]]}
+meta="name=src/Account.jsx"
+/>
+
+## Profile photos
+
+Add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
-
-Create an avatar for the user so that they can upload a profile photo. Start by creating a new component:
-
-Create and edit `src/Avatar.jsx`:
+Create `src/Avatar.jsx` and add the following code:
 
 <$CodeSample
 path="/user-management/react-user-management/src/Avatar.jsx"
@@ -90,9 +102,9 @@ lines={[[1, -1]]}
 meta="name=src/Avatar.jsx"
 />
 
-After a user is signed in, allow them to edit their profile details and manage their account.
+### Update the Account component
 
-Create a new component for that called `src/Account.jsx` and also add the `Avatar` component created earlier.
+With the Avatar component created, update `src/Account.jsx` to include it:
 
 <$CodeSample
 path="/user-management/react-user-management/src/Account.jsx"
@@ -102,7 +114,9 @@ meta="name=src/Account.jsx"
 
 ### Launch!
 
-Now that you have all the components in place, update `src/App.jsx`, which fetches the current user via the [`getUser`](/docs/reference/javascript/auth-getuser) method if there is an existing session. This method performs a network request to the Supabase Auth server.
+With all the components in place, change the contents of `src/App.jsx` to include the new components and Auth logic.
+
+<$Partial path="auth_methods.mdx" />
 
 <$CodeSample
 path="/user-management/react-user-management/src/App.jsx"
@@ -118,6 +132,6 @@ npm run dev
 
 And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
-![Supabase React](/docs/img/supabase-react-demo.png)
+![Screenshot of the Supabase React application running in a browser](/docs/img/supabase-react-demo.png)
 
 At this stage you have a fully functional application!

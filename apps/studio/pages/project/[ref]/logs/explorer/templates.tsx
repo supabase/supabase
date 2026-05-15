@@ -58,7 +58,7 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
       icon={
         <div
           className={cn(
-            'duration-400 flex h-6 w-6 items-center justify-center rounded transition-colors',
+            'duration-400 flex h-6 w-6 items-center justify-center rounded-sm transition-colors',
             'border bg-background-200',
             'group-hover:bg-brand-300 group-hover:text-brand-600 group-hover:border-brand-500',
             'dark:border-background-selection dark:bg-background-200 dark:text-foreground',
@@ -81,7 +81,7 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
             className="rounded-lg bg-alternative"
             size="content"
             overlay={
-              <pre className="whitespace-pre-line break-words rounded-lg bg-alternative p-4 text-sm">
+              <pre className="whitespace-pre-line wrap-break-word rounded-lg bg-alternative p-4 text-sm">
                 {template.searchString}
               </pre>
             }

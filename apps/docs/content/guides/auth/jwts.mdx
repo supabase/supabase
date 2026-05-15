@@ -66,17 +66,16 @@ A [digital signature](https://en.wikipedia.org/wiki/Digital_signature) using a [
 
 Supabase creates JWTs in these cases for you:
 
-1. When using Supabase Auth, an access token (JWT) is created for each user while they remain signed in. These are short lived, so they are continuously issued as your user interacts with Supabase APIs.
-2. As the legacy JWT-based [API keys](/docs/guides/getting-started/api-keys) `anon` and `service_role`. These have a 10 year expiry and are signed with a shared secret, making them hard to rotate or expire. These JWTs express public access via the `anon` key, or elevated access via the `service_role` key. We strongly recommend switching to publishable and secret API keys.
-3. On-the-fly when using publishable or secret API keys. Each API key is transformed into a short-lived JWT that is then used to authorize access to your data. Accessing these short-lived tokens is generally not possible.
+1. **When using Supabase Auth, an access token (JWT) is created for each user while they remain signed in**. These are short lived, so they are continuously issued as your user interacts with Supabase APIs.
+2. **On-the-fly when using publishable or secret API keys**. Each API key is transformed into a short-lived JWT that is then used to authorize access to your data. Accessing these short-lived tokens is generally not possible.
 
-In addition to creating JWTs, Supabase can also accept JWTs from other Auth servers via the [Third-Party Auth](/docs/guides/auth/third-party/overview) feature or ones you've made yourself using the legacy JWT secret or if you've imported in [JWT Signing Key](/docs/guides/auth/signing-keys).
+In addition to creating JWTs, Supabase can also accept JWTs from other authentication servers via the [Third-Party Auth](/docs/guides/auth/third-party/overview) feature or ones that have been minted externally via an imported [JWT Signing Key](/docs/guides/auth/signing-keys).
 
 ## Using custom or third-party JWTs
 
 <Admonition type="note">
 
-The `supabase.auth.getClaims()` method is meant to be used only with JWTs issued by Supabase Auth. If you make your own JWTs using the legacy JWT secret or a key you've imported, the verification may fail. We strongly recommend using a JWT verification library for your language to verify this type of JWT based on the claims you're adding in them.
+The `supabase.auth.getClaims()` method is meant to be used only with JWTs issued by Supabase Auth. If you mint your own JWTs using a key you've imported, the verification may fail. We strongly recommend using a JWT verification library for your language to verify this type of JWT based on the claims you're adding in them.
 
 </Admonition>
 
@@ -84,7 +83,7 @@ Your Supabase project accepts a JWT in the `Authorization: Bearer <jwt>` header.
 
 If you are already using Supabase Auth, when a user is signed in, their access token JWT is automatically managed and sent for you with every API call.
 
-If you wish to send a JWT from a Third-Party Auth provider, or one you made yourself by using the legacy JWT secret or a JWT signing key you imported, you can pass it to the client library using the `accessToken` option.
+If you wish to send a JWT from a Third-Party Auth provider, or one you made yourself by using a JWT signing key you imported, you can pass it to the client library using the `accessToken` option.
 
 <Tabs type="underlined" queryGroup="language">
 
@@ -113,7 +112,7 @@ const supabase = createClient(
 ```dart
 await Supabase.initialize(
   url: supabaseUrl,
-  anonKey: supabaseKey,
+  publishableKey: supabaseKey,
   debug: false,
   accessToken: () async {
     return "<your JWT here>";
@@ -212,7 +211,7 @@ Make sure that you do not cache this data for longer in your application, as it 
 Below is an example of how to use the [jose TypeScript JWT verification library](https://github.com/panva/jose) with Supabase JWTs:
 
 ```typescript
-import { jwtVerify, createRemoteJWKSet } from 'jose'
+import { createRemoteJWKSet, jwtVerify } from 'jose'
 
 const PROJECT_JWKS = createRemoteJWKSet(
   new URL('https://project-id.supabase.co/auth/v1/.well-known/jwks.json')
@@ -226,13 +225,13 @@ async function verifyProjectJWT(jwt: string) {
 }
 ```
 
-### Verifying with the legacy JWT secret or a shared secret signing key
+### Verifying with a shared secret signing key
 
-If your project is still using the legacy JWT secret, or you're using a shared secret (HS256) signing key, we recommend always verifying a user access token directly with the Auth server by sending a request like so:
+If your project is using a shared secret (HS256) signing key, we recommend always verifying a user access token directly with the Auth server by sending a request like so:
 
 ```http
 GET https://project-id.supabase.co/auth/v1/user
-apikey: publishable or anon legacy API key
+apikey: publishable key
 Authorization: Bearer <JWT>
 ```
 
@@ -240,7 +239,7 @@ If the server responds with HTTP 200 OK, the JWT is valid, otherwise it is not.
 
 Because the Auth server runs only in your project's specified region and is not globally distributed, doing this check can be quite slow depending on where you're performing the check. Avoid doing checks like this from servers or functions running on the edge, and prefer routing to a server within the same geographical region as your project.
 
-If you are using the legacy JWT secret, or you've imported your own shared secret (HS256) signing key, you may wish to verify using the shared secret. **We strongly recommend against this approach.**
+If you are using a shared secret (HS256) signing key, you may wish to verify using the shared secret. **We strongly recommend against this approach.**
 
 <Admonition type="caution">
 
@@ -258,7 +257,7 @@ Consider the following:
 
 </Admonition>
 
-Check the JWT verification libraries for your language on how to securely verify JWTs signed with the legacy JWT secret or a shared secret (HS256) signing key. We strongly recommend relying on the Auth server as described above, or switching to a different signing key based on public key cryptography (RSA, Elliptic Curves) instead.
+Check the JWT verification libraries for your language on how to securely verify JWTs signed with a shared secret (HS256) signing key. We strongly recommend relying on the Auth server as described above, or switching to a different signing key based on public key cryptography (RSA, Elliptic Curves) instead.
 
 ## Resources
 

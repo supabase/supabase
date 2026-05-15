@@ -1,4 +1,4 @@
-import { ident } from '@supabase/pg-meta/src/pg-format'
+import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useEffect, useState, type ReactNode } from 'react'
@@ -38,7 +38,7 @@ function persistDismiss(projectRef: string, bucketId: string): void {
 }
 
 function generatePolicyRemovalSql(policyName: string) {
-  return `DROP POLICY IF EXISTS ${ident(policyName)} ON storage.objects;`
+  return safeSql`DROP POLICY IF EXISTS ${ident(policyName)} ON storage.objects;`
 }
 
 export interface PublicBucketWarningProps {
@@ -198,8 +198,11 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
       >
         <div className="flex flex-col gap-3">
           <p className="text-sm text-foreground-light">
-            This will drop {hasMultiplePolicies ? 'one' : 'the'} <code>SELECT</code> policy that
-            makes the bucket&apos;s contents listable. Object URLs will continue to work.
+            This will drop {hasMultiplePolicies ? 'one' : 'the'}{' '}
+            <code className="text-code-inline">SELECT</code>
+            {
+              ' policy that makes the bucket’s contents listable. Object URLs will continue to work.'
+            }
             {hasMultiplePolicies
               ? ` ${policyCount - 1} matching ${
                   policyCount - 1 === 1 ? 'policy' : 'policies'
@@ -211,7 +214,7 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
               hideLineNumbers
               language="sql"
               value={generatePolicyRemovalSql(policyName)}
-              wrapperClassName="[&_pre]:px-4 [&_pre]:py-3 [&>pre]:rounded-none [&>pre]:border-0 [&_pre>*]:!whitespace-pre-wrap"
+              wrapperClassName="[&_pre]:px-4 [&_pre]:py-3 [&>pre]:rounded-none [&>pre]:border-0 [&_pre>*]:whitespace-pre-wrap!"
               className="[&_code]:text-foreground"
             />
           </div>

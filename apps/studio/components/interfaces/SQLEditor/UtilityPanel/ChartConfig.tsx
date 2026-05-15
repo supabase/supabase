@@ -176,7 +176,7 @@ export const ChartConfig = ({
       <ResizablePanel
         defaultSize="25"
         minSize="15"
-        className="px-3 py-3 space-y-4 !overflow-y-auto"
+        className="px-3 py-3 space-y-4 overflow-y-auto!"
       >
         <div className="flex justify-between items-center h-5">
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>
@@ -217,7 +217,7 @@ export const ChartConfig = ({
               <Badge variant="success">New</Badge>
               <p className="text-xs">Add this chart to custom reports</p>
             </div>
-            <p className="text-xs text-foreground-light !mt-1">
+            <p className="text-xs text-foreground-light mt-1!">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
             <Button asChild size="tiny" type="default" className="mt-1">

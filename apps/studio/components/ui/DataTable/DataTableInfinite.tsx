@@ -3,8 +3,9 @@ import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Fragment, ReactNode, UIEvent, useCallback, useRef } from 'react'
+import { Fragment, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { formatCompactNumber } from './DataTable.utils'
 import { useDataTable } from './providers/DataTableProvider'
@@ -23,7 +24,6 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   isLoading?: boolean
   hasNextPage?: boolean
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
-  renderLiveRow?: (props?: { row: Row<TData> }) => ReactNode
   setColumnOrder: (columnOrder: string[]) => void
   setColumnVisibility: (columnVisibility: VisibilityState) => void
 
@@ -40,7 +40,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   totalRows = 0,
   filterRows = 0,
   totalRowsFetched = 0,
-  renderLiveRow,
   setColumnOrder,
   setColumnVisibility,
   searchParamsParser,
@@ -71,7 +70,13 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   })
 
   return (
-    <Table ref={tableRef} onScroll={onScroll}>
+    <Table
+      ref={tableRef}
+      onScroll={onScroll}
+      className={
+        isLoading ? '[mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]' : ''
+      }
+    >
       <TableHeader>
         <TableRow className="bg-surface-75">
           {headers.map((header) => {
@@ -83,7 +88,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             return (
               <TableHead
                 key={header.id}
-                className={headerClassName}
+                id={header.id}
+                className={cn('w-full', headerClassName)}
                 aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}
               >
                 {header.isPlaceholder
@@ -105,6 +111,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           })}
         </TableRow>
       </TableHeader>
+
       <TableBody
         id="content"
         tabIndex={-1}
@@ -114,46 +121,52 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         {rows.length ? (
           rows.map((row) => (
             // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
-            <Fragment key={row.id}>
-              {renderLiveRow?.({ row: row as any })}
-              <DataTableRow
-                row={row}
-                table={table}
-                searchParamsParser={searchParamsParser}
-                selected={row.getIsSelected()}
-              />
-            </Fragment>
+            <DataTableRow
+              key={row.id}
+              row={row}
+              table={table}
+              searchParamsParser={searchParamsParser}
+              selected={row.getIsSelected()}
+            />
           ))
+        ) : isLoading ? (
+          <Fragment>
+            {new Array(15).fill(0).map((_, x) => (
+              <TableRow
+                key={x}
+                className="h-[30px] hover:!bg-transparent [&>td]:group-hover:!bg-transparent"
+              >
+                {table.getAllLeafColumns().map((col, idx) => (
+                  <TableCell key={col.id}>
+                    <ShimmeringLoader className={cn('py-2', idx % 2 === 0 && 'opacity-50')} />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </Fragment>
         ) : (
           <Fragment>
-            {renderLiveRow?.()}
             <TableRow>
               <TableCell colSpan={columns.length} className="h-[32vh] text-center">
                 <div className="flex flex-col items-center justify-center h-full gap-3">
-                  {isLoading ? (
-                    <>
-                      <LoaderCircle className="h-6 w-6 animate-spin text-foreground-muted" />
-                      <p className="text-foreground-light text-sm">Retrieving logs...</p>
-                    </>
-                  ) : (
-                    <p className="text-foreground-light text-sm">No results found</p>
-                  )}
+                  <p className="text-foreground-light text-sm">No results found</p>
                 </div>
               </TableCell>
             </TableRow>
           </Fragment>
         )}
+
         {/* Only show load more section if we have rows OR if we're not in initial loading state */}
         {(rows.length > 0 || (!isLoading && !rows.length)) && (
           <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
-            <TableCell colSpan={columns.length} className="text-center !py-2">
+            <TableCell colSpan={columns.length} className="text-center py-2!">
               {hasNextPage || isFetching ? (
                 <div className="flex flex-col items-center gap-2">
                   <Button
                     disabled={isFetching}
                     onClick={() => fetchNextPage()}
                     size="small"
-                    type="outline"
+                    type="default"
                     icon={
                       isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
                     }

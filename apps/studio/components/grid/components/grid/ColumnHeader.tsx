@@ -88,7 +88,7 @@ export function ColumnHeader<R>({
                   onClick={() => openSheet(column.name as string)}
                 >
                   <span className="sr-only">View {column.name} index suggestion</span>
-                  <Lightbulb size={14} strokeWidth={2} className="!text-warning" />
+                  <Lightbulb size={14} strokeWidth={2} className="text-warning!" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
@@ -124,20 +124,20 @@ function ColumnIcon({
             <div className="font-normal">
               <p className="text-xs text-foreground-light">Foreign key relation:</p>
               <div className="flex items-center space-x-1">
-                <p className="text-xs !text-foreground">{name}</p>
-                <ArrowRight size={14} strokeWidth={1.5} className="!text-foreground-light" />
-                <p className="text-xs !text-foreground">
+                <p className="text-xs text-foreground!">{name}</p>
+                <ArrowRight size={14} strokeWidth={1.5} className="text-foreground-light!" />
+                <p className="text-xs text-foreground!">
                   {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
                   {foreignKey?.targetColumnName}
                 </p>
               </div>
               {foreignKey?.updateAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
-                <p className="text-xs !text-foreground mt-1">
+                <p className="text-xs text-foreground! mt-1">
                   On update: {getForeignKeyCascadeAction(foreignKey?.updateAction)}
                 </p>
               )}
               {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
-                <p className="text-xs !text-foreground mt-1">
+                <p className="text-xs text-foreground! mt-1">
                   On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
                 </p>
               )}

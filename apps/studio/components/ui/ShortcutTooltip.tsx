@@ -17,6 +17,12 @@ interface ShortcutTooltipProps {
    * action is a narrower/contextual variant of the registered shortcut.
    */
   label?: string
+  /**
+   * Controlled open state for the tooltip. Pass `false` to force the tooltip
+   * closed (e.g. while a popover or dialog opened by the wrapped element is
+   * visible). Leave `undefined` for default uncontrolled behavior.
+   */
+  open?: boolean
 }
 
 /**
@@ -39,12 +45,13 @@ export const ShortcutTooltip = ({
   sideOffset,
   delayDuration,
   label: labelOverride,
+  open,
 }: ShortcutTooltipProps) => {
   const def = SHORTCUT_DEFINITIONS[shortcutId]
   const label = labelOverride ?? def.label
 
   return (
-    <Tooltip delayDuration={delayDuration}>
+    <Tooltip delayDuration={delayDuration} open={open}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent
         side={side}

@@ -58,7 +58,7 @@ export const ChartIntervalDropdown = ({
               return (
                 <Tooltip key={i.key}>
                   <TooltipTrigger asChild>
-                    <DropdownMenuRadioItem disabled value={i.key} className="!pointer-events-auto">
+                    <DropdownMenuRadioItem disabled value={i.key} className="pointer-events-auto!">
                       {i.label}
                     </DropdownMenuRadioItem>
                   </TooltipTrigger>

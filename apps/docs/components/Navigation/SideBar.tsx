@@ -56,9 +56,9 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
           </Link>
           {referenceMeta !== undefined && (
             <div className="my-5 flex items-center space-x-4">
-              <div className="h-10 w-10 rounded bg-surface-100 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-sm bg-surface-100 flex items-center justify-center">
                 <Image
-                  className="rounded"
+                  className="rounded-sm"
                   width={24}
                   height={24}
                   alt={referenceMeta.name}
@@ -77,7 +77,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
               <div
                 key={item.name}
                 className={[
-                  'py-1.5 px-5 rounded text-sm transition',
+                  'py-1.5 px-5 rounded-sm text-sm transition',
                   `${
                     item.url === pathname
                       ? 'bg-background text-brand-link'
@@ -116,7 +116,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                       <Link href={section.url || '#'} key={section.name}>
                         <div
                           className={[
-                            'py-1.5 px-5 rounded text-sm transition',
+                            'py-1.5 px-5 rounded-sm text-sm transition',
                             `${
                               section.url === pathname
                                 ? 'bg-background text-brand-link'
@@ -154,7 +154,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                                 <div
                                   key={item.name}
                                   className={[
-                                    'py-1.5 ml-4 px-5 rounded text-sm transition',
+                                    'py-1.5 ml-4 px-5 rounded-sm text-sm transition',
                                     `${
                                       item.url === pathname
                                         ? 'bg-background text-brand-link'

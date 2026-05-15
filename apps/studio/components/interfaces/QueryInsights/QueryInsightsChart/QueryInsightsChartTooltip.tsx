@@ -12,7 +12,7 @@ export const QueryInsightsChartTooltip = ({ active, payload }: TooltipProps<numb
   const localTimeZone = guessLocalTimezone()
 
   return (
-    <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl">
+    <div className="grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl">
       <p className="text-foreground-light text-xs">{localTimeZone}</p>
       <p className="font-medium">{dayjs(time).format('MMM D, hh:mm:ssa')}</p>
       <div className="grid gap-0">

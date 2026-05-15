@@ -3,6 +3,7 @@ import { expect } from '@playwright/test'
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { createTable, dropTable, query } from '../utils/db/index.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import {
@@ -50,12 +51,20 @@ test.describe('Database', () => {
 );`,
       })
 
+      await expect(page.getByText('Successfully copied as SQL')).toBeVisible({ timeout: 15000 })
+      await dismissToastsIfAny(page)
+      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
+
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
       await page.getByRole('button', { name: 'Export options' }).click()
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
+
+      await expect(page.getByText('Successfully downloaded as PNG')).toBeVisible({ timeout: 15000 })
+      await dismissToastsIfAny(page)
+      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
 
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
@@ -261,9 +270,15 @@ test.describe('Database', () => {
           await dropTable(databaseTableNameDuplicate)
         }
       )
+      const databaseLoadWait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
       // Wait for database tables to be populated
-      await waitForDatabaseToLoad(page, ref)
+      await databaseLoadWait
 
       // create a new table
       await page.getByRole('button', { name: 'New table' }).click()
@@ -476,10 +491,11 @@ test.describe('Database', () => {
 
   test.describe('Triggers', () => {
     test('actions works as expected', async ({ page, ref }) => {
+      const triggersLoadWait = createApiResponseWaiter(page, 'pg-meta', ref, 'triggers')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
       // Wait for database triggers to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'triggers')
+      await triggersLoadWait
 
       const newTriggerButton = page.getByRole('button', { name: 'New trigger' }).first()
       // create new trigger button to exist in public schema
@@ -517,10 +533,11 @@ test.describe('Database', () => {
         }
       )
 
+      const triggersCrudLoadWait = createApiResponseWaiter(page, 'pg-meta', ref, 'triggers')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
       // Wait for database triggers to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'triggers')
+      await triggersCrudLoadWait
 
       // create new trigger
       await page.getByRole('button', { name: 'New trigger' }).first().click()
@@ -594,10 +611,16 @@ test.describe('Database', () => {
 
   test.describe('Database Indexes', () => {
     test('actions works as expected', async ({ page, ref }) => {
+      const indexesLoadWait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'query?key=indexes-public'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/indexes?schema=public`))
 
       // Wait for database indexes to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
+      await indexesLoadWait
 
       // create new index button exists in public schema
       await expect(page.getByRole('button', { name: 'Create index' })).toBeVisible()
@@ -651,16 +674,26 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
+      const indexWait = waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/indexes?schema=public`))
 
       // Wait for database indexes to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
+      await indexWait
 
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
       await page.getByRole('button', { name: 'Choose a table' }).click()
+
+      const columnsWait = waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        `query?key=table-columns-public-${databaseTableName}`
+      )
       await page.getByRole('option', { name: databaseTableName, exact: true }).click()
-      await page.getByText('Choose which columns to create an index on').click()
+      await columnsWait
+
+      await page.getByRole('combobox', { name: 'Select up to 32 columns' }).click()
       await page.getByRole('option', { name: databaseColumnName }).click()
       await page.getByRole('button', { name: 'Create index' }).click()
       await expect(
@@ -697,10 +730,16 @@ test.describe('Database', () => {
 
   test.describe('Roles', () => {
     test('actions works as expected', async ({ page, ref }) => {
+      const rolesLoadWait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'query?key=database-roles'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/roles`))
 
       // Wait for database roles list to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-roles')
+      await rolesLoadWait
 
       // filter between active and all roles
       await page.getByRole('button', { name: 'Active roles' }).click()
@@ -715,10 +754,16 @@ test.describe('Database', () => {
 
     test('CRUD operations works as expected', async ({ page, ref }) => {
       const databaseRoleName = 'pw_database_role'
+      const databaseRolesWait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'query?key=database-roles'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/roles`))
 
       // Wait for database roles to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=database-roles')
+      await databaseRolesWait
 
       // delete role if exists
       const exists = (await page.getByRole('button', { name: databaseRoleName }).count()) > 0
@@ -1136,9 +1181,7 @@ test.describe('Database Enumerated Types', () => {
     await quotedEnumCreateWait
     const quotedEnumRow = page.getByRole('row', { name: `${quotedEnumName}` })
     await expect(quotedEnumRow).toContainText(quotedEnumName)
-    await expect(quotedEnumRow).toContainText(
-      `${quotedEnumValue1Name}, ${quotedEnumValue2Name}`
-    )
+    await expect(quotedEnumRow).toContainText(`${quotedEnumValue1Name}, ${quotedEnumValue2Name}`)
 
     await quotedEnumRow.getByRole('button').click()
     await page.getByRole('menuitem', { name: 'Update type' }).click()

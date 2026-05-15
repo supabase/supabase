@@ -19,6 +19,7 @@ import {
 } from 'ui-patterns/PageHeader'
 
 import { DocsButton } from '@/components/ui/DocsButton'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 
 interface PlatformWebhooksHeaderProps {
   hasSelectedEndpoint: boolean
@@ -28,6 +29,7 @@ interface PlatformWebhooksHeaderProps {
   endpointActions?: ReactNode
   webhooksHref: string
   scopeLabel: string
+  featureKey: string
 }
 
 export const PlatformWebhooksHeader = ({
@@ -38,6 +40,7 @@ export const PlatformWebhooksHeader = ({
   endpointActions,
   webhooksHref,
   scopeLabel,
+  featureKey,
 }: PlatformWebhooksHeaderProps) => {
   return (
     <PageHeader size="default" className="pb-6">
@@ -59,7 +62,7 @@ export const PlatformWebhooksHeader = ({
       <PageHeaderMeta>
         <PageHeaderSummary className="min-w-0">
           <PageHeaderTitle className="min-w-0 w-full">
-            <span className="flex w-full min-w-0 items-center gap-2">
+            <span className="flex w-full min-w-0 items-center gap-x-4">
               <span className="block min-w-0 truncate leading-tight">{headerTitle}</span>
               {hasSelectedEndpoint && endpointStatus && (
                 <Badge
@@ -69,6 +72,7 @@ export const PlatformWebhooksHeader = ({
                   {endpointStatus === 'enabled' ? 'Enabled' : 'Disabled'}
                 </Badge>
               )}
+              {!hasSelectedEndpoint && <FeaturePreviewBadge featureKey={featureKey} />}
             </span>
           </PageHeaderTitle>
           <PageHeaderDescription>{headerDescription}</PageHeaderDescription>

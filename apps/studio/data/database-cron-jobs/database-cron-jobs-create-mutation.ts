@@ -1,3 +1,4 @@
+import type { SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -8,7 +9,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type DatabaseCronJobCreateVariables = {
   projectRef: string
   connectionString?: string | null
-  query: string
+  query: SafeSqlFragment
   searchTerm?: string
   identifier?: string | number
 }

@@ -36,7 +36,7 @@ export const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => 
         loading={isRefetching}
         icon={<RefreshCw />}
         onClick={() => onClick()}
-        className="w-7 h-7 p-0"
+        className="w-7 p-0"
       />
     </Shortcut>
   )

@@ -59,14 +59,14 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
 
     if (document !== undefined) {
       // [Joshen] This is to ensure that any 3DS popup from Stripe remains clickable
-      document.body.classList.add('!pointer-events-auto')
+      document.body.classList.add('pointer-events-auto!')
     }
 
     if (isPrimaryBillingAddress && isTaxIdError) {
       toast.error('Unable to load current tax ID. Please try again.')
       setIsSaving(false)
       if (document !== undefined) {
-        document.body.classList.remove('!pointer-events-auto')
+        document.body.classList.remove('pointer-events-auto!')
       }
       return
     }
@@ -80,7 +80,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
     if (isPrimaryBillingAddress && !formValues) {
       setIsSaving(false)
       if (document !== undefined) {
-        document.body.classList.remove('!pointer-events-auto')
+        document.body.classList.remove('pointer-events-auto!')
       }
       return
     }
@@ -98,7 +98,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         toast.error(error instanceof Error ? error.message : 'Failed to validate billing profile')
         setIsSaving(false)
         if (document !== undefined) {
-          document.body.classList.remove('!pointer-events-auto')
+          document.body.classList.remove('pointer-events-auto!')
         }
         return
       }
@@ -171,7 +171,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
     }
 
     if (document !== undefined) {
-      document.body.classList.remove('!pointer-events-auto')
+      document.body.classList.remove('pointer-events-auto!')
     }
   }
 

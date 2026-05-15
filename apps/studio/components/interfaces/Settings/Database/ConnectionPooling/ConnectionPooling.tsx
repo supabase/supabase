@@ -261,7 +261,7 @@ export const ConnectionPooling = () => {
                               {defaultPoolSize} based on your compute size of {computeSize}.
                             </p>
                           }
-                          className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
+                          className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full"
                         >
                           <FormControl>
                             <InputGroup>
@@ -311,7 +311,7 @@ export const ConnectionPooling = () => {
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Max client connections"
-                          className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
+                          className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full"
                           description={
                             <>
                               <p>

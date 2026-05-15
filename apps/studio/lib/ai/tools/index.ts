@@ -25,7 +25,7 @@ export const getTools = async ({
   baseUrl?: string
 }) => {
   // Always include studio tools
-  let tools: ToolSet = getStudioTools()
+  let tools: ToolSet = getStudioTools({ projectRef, connectionString, authorization, aiOptInLevel })
 
   // If self-hosted, only add fallback tools
   if (!IS_PLATFORM) {

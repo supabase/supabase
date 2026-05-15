@@ -88,7 +88,7 @@ export function JitDbAccessRoleGrantFields({
           className="mt-0.5"
         />
         <div className="min-w-0 flex-1">
-          <code className="text-code-inline dark:!bg-surface-300 dark:!border-control !tracking-normal">
+          <code className="text-code-inline dark:bg-surface-300! dark:border-control! tracking-normal!">
             {role.label}
           </code>
         </div>

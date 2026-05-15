@@ -1,16 +1,16 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface DeleteTriggerProps {
-  trigger?: PostgresTrigger
+  trigger?: PGTrigger
   visible: boolean
   setVisible: (value: string | null) => void
   onDelete: (params: {
     projectRef: string
     connectionString?: string | null
-    trigger: PostgresTrigger
+    trigger: PGTrigger
   }) => void
   isLoading: boolean
 }
