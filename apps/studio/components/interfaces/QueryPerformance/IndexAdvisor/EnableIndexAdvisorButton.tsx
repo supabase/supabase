@@ -92,7 +92,7 @@ export const EnableIndexAdvisorDialog = ({
 
   return (
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
-      <AlertDialogContent size="medium">
+      <AlertDialogContent size="small">
         <AlertDialogHeader>
           <AlertDialogTitle>Enable Index Advisor</AlertDialogTitle>
           <AlertDialogDescription className="flex flex-col gap-y-2">
@@ -101,9 +101,10 @@ export const EnableIndexAdvisorDialog = ({
               on your actual query patterns.
             </p>
             <p>
-              Enable this will install the <code className="text-code-inline">index_advisor</code>{' '}
-              and <code className="text-code-inline">hypopg</code> Postgres extensions so Index
-              Advisor can analyse queries and suggest performance-improving indexes.
+              This will install the{' '}
+              <code className="text-code-inline break-normal!">index_advisor</code> and{' '}
+              <code className="text-code-inline break-normal!">hypopg</code> Postgres extensions so
+              Index Advisor can analyse queries and suggest performance-improving indexes.
             </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
