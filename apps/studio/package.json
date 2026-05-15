@@ -6,8 +6,9 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "NODE_OPTIONS=--max-old-space-size=8192 vite dev --port ${STUDIO_PORT:-8082}",
-    "build": "vite build",
-    "start": "vite preview --port 8082",
+    "build": "vite build --mode ${MODE:-production}",
+    "start": "node scripts/serve.js",
+    "preview": "vite preview --mode ${MODE:-production} --port 8082",
     "dev:next": "next dev -p ${STUDIO_PORT:-8082}",
     "build:next": "next build && if [ \"$SKIP_ASSET_UPLOAD\" != \"1\" ]; then ./../../scripts/upload-static-assets.sh; fi",
     "start:next": "next start -p 8082",

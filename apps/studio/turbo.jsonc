@@ -98,6 +98,15 @@
         "STATUSPAGE_PAGE_ID",
         "INCIDENT_IO_API_KEY",
         "LIVE_SUPABASE_SECRET_KEY",
+        // Selects the build mode for the studio's `build`/`start` scripts
+        // (e.g. e2e sets `MODE=test`). Listed so turbo invalidates the
+        // cache when it changes — without this, switching between test and
+        // production builds reuses a stale cached output.
+        "MODE",
+        // Read by scripts/serve.js (the Node host for `pnpm start`).
+        // Declared here so the studio-package turbo env lint rule passes
+        // even though turbo doesn't directly drive `start`.
+        "PORT",
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
@@ -106,7 +115,12 @@
         "SNIPPETS_MANAGEMENT_FOLDER",
         "EDGE_FUNCTIONS_MANAGEMENT_FOLDER",
       ],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**/*",
+        "dist/**",
+      ],
     },
   },
 }

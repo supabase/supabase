@@ -228,8 +228,10 @@ function assertNoChunkCycles(): Plugin {
 
 export default defineConfig(({ mode }) => {
   // Inline NEXT_PUBLIC_* env vars at build time so `process.env.NEXT_PUBLIC_*`
-  // works in the browser bundle (mirrors Next.js behaviour). loadEnv reads the
-  // standard .env file hierarchy and merges with process.env.
+  // works in the browser bundle (mirrors Next.js behaviour). For e2e the
+  // build is invoked with `--mode test` (no shell `NODE_ENV=test`, which
+  // would force the React plugin onto the dev JSX runtime), so `.env.test`
+  // overrides whatever a developer has in `.env.local`.
   const env = loadEnv(mode, rootDir, '')
   const publicEnvDefines = Object.fromEntries(
     Object.entries(env)
@@ -384,7 +386,13 @@ export default defineConfig(({ mode }) => {
       // `import pkg from 'react-use'` + destructure. Works locally but
       // Vercel's Node resolves it differently and fails at module instantiate
       // (`ModuleJob._instantiate`). Inlining sidesteps the interop entirely.
-      noExternal: ['lodash', /^next(\/|$)/, 'tslib', 'react-use'],
+      // `awesome-debounce-promise`'s CJS entry only emits
+      // `exports.default = fn` (no `module.exports = fn`, no `__esModule`
+      // flag). Node's CJS→ESM bridge therefore makes the default import the
+      // entire exports object `{ default: fn }`, and call sites like
+      // `AwesomeDebouncePromise(fn, 500)` crash with "is not a function" at
+      // SSR module evaluation. Surfaces on routes that load the table grid.
+      noExternal: ['lodash', /^next(\/|$)/, 'tslib', 'react-use', 'awesome-debounce-promise'],
     },
     plugins: [
       nextCompat(),
