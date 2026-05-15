@@ -6,7 +6,7 @@ import {
   Button,
   Checkbox,
   cn,
-  Label_Shadcn_,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -92,7 +92,7 @@ export const FilterPopover = <T extends Record<string, any>>({
     const icon = iconKey ? option[iconKey] : undefined
 
     const defaultLabel = (
-      <Label_Shadcn_
+      <Label
         htmlFor={option[valueKey]}
         className={cn('flex items-center gap-x-2 text-xs cursor-pointer', labelClass)}
       >
@@ -100,7 +100,7 @@ export const FilterPopover = <T extends Record<string, any>>({
           <img src={icon} alt={option[labelKey]} className={cn('w-4 h-4', option.iconClass)} />
         )}
         <span>{option[labelKey]}</span>
-      </Label_Shadcn_>
+      </Label>
     )
 
     const label = renderLabel ? renderLabel(option, value) : defaultLabel

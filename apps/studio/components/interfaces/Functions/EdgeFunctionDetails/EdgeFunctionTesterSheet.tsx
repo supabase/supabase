@@ -11,7 +11,7 @@ import {
   FormControl,
   FormField,
   Input,
-  Label_Shadcn_ as Label,
+  Label,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,

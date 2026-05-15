@@ -7,7 +7,7 @@ import {
   Badge,
   Button,
   Checkbox,
-  Label_Shadcn_,
+  Label,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -227,7 +227,7 @@ export const ChartConfig = ({
         )}
 
         <div>
-          <Label_Shadcn_ className="text-xs text-foreground-light">X Axis</Label_Shadcn_>
+          <Label className="text-xs text-foreground-light">X Axis</Label>
           <Select_Shadcn_
             value={config.xKey}
             onValueChange={(value) => {
@@ -248,7 +248,7 @@ export const ChartConfig = ({
         </div>
 
         <div>
-          <Label_Shadcn_ className="text-xs text-foreground-light">Y Axis</Label_Shadcn_>
+          <Label className="text-xs text-foreground-light">Y Axis</Label>
           <Select_Shadcn_
             value={config.yKey}
             onValueChange={(value) => {
@@ -268,7 +268,7 @@ export const ChartConfig = ({
           </Select_Shadcn_>
         </div>
         <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
-          <Label_Shadcn_ className="" htmlFor="cumulative">
+          <Label className="" htmlFor="cumulative">
             <Checkbox
               id="cumulative"
               name="cumulative"
@@ -276,9 +276,9 @@ export const ChartConfig = ({
               onClick={() => onConfigChange({ ...config, cumulative: !config.cumulative })}
             />
             Cumulative
-          </Label_Shadcn_>
+          </Label>
 
-          <Label_Shadcn_ htmlFor="showLabels">
+          <Label htmlFor="showLabels">
             <Checkbox
               id="showLabels"
               name="showLabels"
@@ -286,9 +286,9 @@ export const ChartConfig = ({
               onClick={() => onConfigChange({ ...config, showLabels: !config.showLabels })}
             />
             Show labels
-          </Label_Shadcn_>
+          </Label>
 
-          <Label_Shadcn_ htmlFor="showGrid">
+          <Label htmlFor="showGrid">
             <Checkbox
               id="showGrid"
               name="showGrid"
@@ -296,7 +296,7 @@ export const ChartConfig = ({
               onClick={() => onConfigChange({ ...config, showGrid: !config.showGrid })}
             />
             Show grid
-          </Label_Shadcn_>
+          </Label>
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>

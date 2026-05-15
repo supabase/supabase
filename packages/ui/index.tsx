@@ -130,7 +130,7 @@ export {
 
 export * from './src/components/shadcn/ui/text-area'
 
-export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
+export * from './src/components/shadcn/ui/label'
 
 export * from './src/components/shadcn/ui/input-group'
 

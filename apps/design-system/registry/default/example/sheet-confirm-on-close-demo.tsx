@@ -10,7 +10,7 @@ import {
   AlertDialogTitle,
   Button,
   Input,
-  Label_Shadcn_ as Label,
+  Label as Label,
   Separator,
   Sheet,
   SheetContent,

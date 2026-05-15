@@ -3,7 +3,7 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Filter, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, Checkbox, Label_Shadcn_, Popover, PopoverContent, PopoverTrigger } from 'ui'
+import { Button, Checkbox, Label, Popover, PopoverContent, PopoverTrigger } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -244,9 +244,9 @@ export const TableEditorMenu = () => {
                               }
                             }}
                           />
-                          <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
+                          <Label htmlFor={key} className="capitalize text-xs">
                             {key.toLowerCase().replace('_', ' ')}
-                          </Label_Shadcn_>
+                          </Label>
                         </div>
                         <Button
                           size="tiny"

@@ -21,7 +21,7 @@ import {
   FormField,
   FormItem,
   Input,
-  Label_Shadcn_,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -380,7 +380,7 @@ const NewFunctionPage = () => {
           className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 gap-3"
         >
           <div className="flex items-center gap-3">
-            <Label_Shadcn_ htmlFor="functionName">Function name</Label_Shadcn_>
+            <Label htmlFor="functionName">Function name</Label>
             <FormField
               control={form.control}
               name="functionName"

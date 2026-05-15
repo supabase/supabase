@@ -10,7 +10,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Label_Shadcn_,
+  Label,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -164,7 +164,7 @@ export const CreateKeyDialog = ({
       <DialogSectionSeparator />
       <DialogSection className="flex flex-col gap-4">
         <div className="flex flex-col gap-4">
-          <Label_Shadcn_ htmlFor="algorithm">Choose signing algorithm:</Label_Shadcn_>
+          <Label htmlFor="algorithm">Choose signing algorithm:</Label>
           <Select_Shadcn_
             name="algorithm"
             value={newKeyAlgorithm}
@@ -186,12 +186,12 @@ export const CreateKeyDialog = ({
           </Select_Shadcn_>
         </div>
         <div className="flex flex-col gap-4">
-          <Label_Shadcn_ htmlFor="byok" className="flex items-center gap-x-2">
+          <Label htmlFor="byok" className="flex items-center gap-x-2">
             <Checkbox id="byok" checked={isBYOK} onCheckedChange={(value) => setBYOK(!!value)} />
             {newKeyAlgorithm === 'HS256'
               ? 'Import an existing secret'
               : 'Import an existing private key'}
-          </Label_Shadcn_>
+          </Label>
           {isBYOK && (
             <div className="flex flex-col gap-2">
               <Textarea
@@ -215,14 +215,14 @@ export const CreateKeyDialog = ({
           )}
           {isBYOK && newKeyAlgorithm === 'HS256' && (
             <>
-              <Label_Shadcn_ htmlFor="base64" className="flex items-center gap-x-2">
+              <Label htmlFor="base64" className="flex items-center gap-x-2">
                 <Checkbox
                   id="base64"
                   checked={isBase64}
                   onCheckedChange={(value) => setBase64(!!value)}
                 />
                 Secret is already Base64 encoded
-              </Label_Shadcn_>
+              </Label>
             </>
           )}
         </div>

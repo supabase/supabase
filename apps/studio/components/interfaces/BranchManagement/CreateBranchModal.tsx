@@ -25,7 +25,7 @@ import {
   FormControl,
   FormField,
   Input,
-  Label_Shadcn_ as Label,
+  Label as Label,
   Switch,
   Tooltip,
   TooltipContent,

@@ -12,7 +12,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   Input,
-  Label_Shadcn_,
+  Label,
 } from 'ui'
 
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
@@ -72,7 +72,7 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-4 py-5">
           <div className="flex flex-col gap-y-2">
-            <Label_Shadcn_ htmlFor="snippet-name">Name</Label_Shadcn_>
+            <Label htmlFor="snippet-name">Name</Label>
             <Input
               id="snippet-name"
               autoFocus

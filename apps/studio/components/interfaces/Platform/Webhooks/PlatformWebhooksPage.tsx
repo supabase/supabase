@@ -19,7 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label_Shadcn_,
+  Label,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -483,7 +483,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
           {/* Content */}
           <div className="space-y-4 mx-5 pb-5">
             <div className="space-y-1">
-              <Label_Shadcn_>Signing secret</Label_Shadcn_>
+              <Label>Signing secret</Label>
               <Input
                 copy
                 readOnly

@@ -12,7 +12,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Label_Shadcn_,
+  Label,
   Skeleton,
 } from 'ui'
 
@@ -138,7 +138,7 @@ export function RotateKeyDialog({
           <>
             <div className="text-sm">To proceed please confirm:</div>
 
-            <Label_Shadcn_
+            <Label
               htmlFor="understands-standby"
               className="flex items-top gap-4 text-sm leading-none"
             >
@@ -172,9 +172,9 @@ export function RotateKeyDialog({
                   },
                 }}
               />
-            </Label_Shadcn_>
+            </Label>
 
-            <Label_Shadcn_
+            <Label
               htmlFor="understands-previously-used"
               className="flex items-top gap-4 text-sm leading-none"
             >
@@ -211,10 +211,10 @@ export function RotateKeyDialog({
                   },
                 }}
               />
-            </Label_Shadcn_>
+            </Label>
 
             {verifyJWTEdgeFunctions.length > 0 && (
-              <Label_Shadcn_ htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
+              <Label htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
                 <Checkbox
                   id="edge-functions-verify-jwt"
                   className="mt-0.5"
@@ -268,7 +268,7 @@ export function RotateKeyDialog({
                     },
                   }}
                 />
-              </Label_Shadcn_>
+              </Label>
             )}
           </>
         )}
