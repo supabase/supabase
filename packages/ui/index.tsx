@@ -99,7 +99,7 @@ export * from './src/components/shadcn/ui/select'
 
 export * from './src/components/shadcn/ui/radio-group'
 
-export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
+export * from './src/components/shadcn/ui/slider'
 
 export * from './src/components/shadcn/ui/input'
 
