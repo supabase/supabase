@@ -542,7 +542,11 @@ export function DiskManagementForm() {
                         />
                         <NoticeBar
                           type="default"
-                          visible={isDiskTooSmallForCustomIops && !disableIopsThroughputConfig}
+                          visible={
+                            isDiskTooSmallForCustomIops &&
+                            !disableIopsThroughputConfig &&
+                            !disableDiskInputs
+                          }
                           title={`Increase disk size to adjust IOPS or throughput`}
                           description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are locked for 4 hours after each resize).`}
                           actions={
