@@ -95,6 +95,11 @@ Unlike a generic [Dialog](../components/dialog), an Alert Dialog cannot be dismi
 
 This enforced decision helps prevent accidental dismissal of critical warnings or destructive actions.
 
+Supabase’s Alert Dialog extends the Radix/Shadcn version with async action handling. When an
+`AlertDialogAction` returns a Promise, the dialog keeps focus trapped, blocks dismissal, and shows
+loading until the Promise resolves. Rejected Promises keep the dialog open so consumers can render
+inline error feedback.
+
 ## Guidelines
 
 - **Keep content concise:** AlertDialogDescription renders as a single paragraph and must not contain block-level elements such as lists, multiple paragraphs, or complex layouts.
@@ -113,6 +118,13 @@ When an action returns a Promise, Alert Dialog keeps the dialog open, shows a lo
 action button, and disables dismissal until the Promise resolves.
 
 <ComponentPreview name="alert-dialog-async" peekCode wide />
+
+### Async action error
+
+Catch errors to show inline feedback, then rethrow so Alert Dialog can reset the loading state and
+keep the dialog open.
+
+<ComponentPreview name="alert-dialog-async-error" peekCode wide />
 
 ### Close only
 
