@@ -14,8 +14,8 @@ catalog:
   '@supabase/ssr': 0.10.2
   '@supabase/supabase-js': 2.105.4
   '@types/node': ^22.0.0
-  '@types/react': ^18.3.0
-  '@types/react-dom': ^18.3.0
+  '@types/react': ^19.2.14
+  '@types/react-dom': ^19.2.3
   '@vitejs/plugin-react': ^6.0.1
   '@vitest/coverage-v8': ^4.1.4
   '@vitest/ui': ^4.1.4
@@ -25,8 +25,8 @@ catalog:
   next-themes: ^0.4.6
   postcss: ^8.5.10
   radix-ui: ^1.4.3
-  react: ^18.3.0
-  react-dom: ^18.3.0
+  react: ^19.2.6
+  react-dom: ^19.2.6
   recharts: ^2.15.4
   tailwindcss: ^4.2.4
   tsx: 4.20.3

@@ -40,7 +40,7 @@
     "sonner": "^1.5.0",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "catalog:",
-    "vaul": "^0.9.9"
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.0",

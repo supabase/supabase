@@ -7,7 +7,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface UseFilesBucketsShortcutsParams {
-  searchInputRef: RefObject<HTMLInputElement>
+  searchInputRef: RefObject<HTMLInputElement | null>
   setFilterString: Dispatch<SetStateAction<string>>
   sortBucket: STORAGE_BUCKET_SORT
   setSortBucket: (value: STORAGE_BUCKET_SORT) => void
