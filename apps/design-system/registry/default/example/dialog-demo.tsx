@@ -9,7 +9,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
 } from 'ui'
 
@@ -28,11 +28,11 @@ export default function DialogDemo() {
         <DialogSection className="space-y-4">
           <div>
             <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
-            <Input_Shadcn_ id="name" defaultValue="Pedro Duarte" />
+            <Input id="name" defaultValue="Pedro Duarte" />
           </div>
           <div>
             <Label_Shadcn_ htmlFor="username">Username</Label_Shadcn_>
-            <Input_Shadcn_ id="username" defaultValue="@peduarte" />
+            <Input id="username" defaultValue="@peduarte" />
           </div>
         </DialogSection>
         <DialogFooter>

@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   PopoverSeparator,
-  TextArea_Shadcn_,
+  TextArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -197,7 +197,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   ) : (
     <>
       <div className="p-4">
-        <TextArea_Shadcn_
+        <TextArea
           placeholder="My idea for improving Supabase is..."
           rows={6}
           value={feedback}

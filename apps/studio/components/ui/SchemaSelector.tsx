@@ -2,9 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { ComponentPropsWithoutRef, forwardRef, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
@@ -105,17 +105,15 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
         )}
 
         {showError && isSchemasError && (
-          <Alert_Shadcn_ variant="warning" className="px-3! py-3!">
-            <AlertTitle_Shadcn_ className="text-xs text-amber-900">
-              Failed to load schemas
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="text-xs mb-2 wrap-break-word">
+          <Alert variant="warning" className="px-3! py-3!">
+            <AlertTitle className="text-xs text-amber-900">Failed to load schemas</AlertTitle>
+            <AlertDescription className="text-xs mb-2 wrap-break-word">
               Error: {(schemasError as any)?.message}
-            </AlertDescription_Shadcn_>
+            </AlertDescription>
             <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
               Reload schemas
             </Button>
-          </Alert_Shadcn_>
+          </Alert>
         )}
 
         {isSchemasSuccess && (

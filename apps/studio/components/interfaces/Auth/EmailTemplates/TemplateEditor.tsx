@@ -13,7 +13,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
   Tooltip,
   TooltipContent,
@@ -259,7 +259,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       }
                     >
                       <FormControl>
-                        <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
+                        <Input id={x} {...field} disabled={!canUpdateConfig} />
                       </FormControl>
                     </FormItemLayout>
                   )}

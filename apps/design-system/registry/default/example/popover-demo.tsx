@@ -1,4 +1,4 @@
-import { Button, Input_Shadcn_, Label_Shadcn_, Popover, PopoverContent, PopoverTrigger } from 'ui'
+import { Button, Input, Label_Shadcn_, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 export default function PopoverDemo() {
   return (
@@ -15,19 +15,19 @@ export default function PopoverDemo() {
           <div className="grid gap-2">
             <div className="grid grid-cols-3 items-center gap-4">
               <Label_Shadcn_ htmlFor="width">Width</Label_Shadcn_>
-              <Input_Shadcn_ id="width" defaultValue="100%" className="col-span-2 h-8" />
+              <Input id="width" defaultValue="100%" className="col-span-2 h-8" />
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <Label_Shadcn_ htmlFor="maxWidth">Max. width</Label_Shadcn_>
-              <Input_Shadcn_ id="maxWidth" defaultValue="300px" className="col-span-2 h-8" />
+              <Input id="maxWidth" defaultValue="300px" className="col-span-2 h-8" />
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <Label_Shadcn_ htmlFor="height">Height</Label_Shadcn_>
-              <Input_Shadcn_ id="height" defaultValue="25px" className="col-span-2 h-8" />
+              <Input id="height" defaultValue="25px" className="col-span-2 h-8" />
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <Label_Shadcn_ htmlFor="maxHeight">Max. height</Label_Shadcn_>
-              <Input_Shadcn_ id="maxHeight" defaultValue="none" className="col-span-2 h-8" />
+              <Input id="maxHeight" defaultValue="none" className="col-span-2 h-8" />
             </div>
           </div>
         </div>

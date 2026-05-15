@@ -12,7 +12,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -96,7 +96,7 @@ export const CustomDomainsConfigureHostname = () => {
                     className="[&>div]:md:w-1/2"
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder="subdomain.example.com"
                         disabled={!canConfigureCustomDomain || isSubmitting}

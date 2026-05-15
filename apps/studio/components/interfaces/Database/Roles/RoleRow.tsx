@@ -6,9 +6,9 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -94,7 +94,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
   const formId = `role-update-form-${role.id}`
 
   return (
-    <Collapsible_Shadcn_
+    <Collapsible
       open={isExpanded}
       className={cn(
         'bg-surface-100',
@@ -110,7 +110,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
       )}
     >
       <div className={cn('flex items-center relative', !disabled && 'pr-(--card-padding-x)')}>
-        <CollapsibleTrigger_Shadcn_ asChild>
+        <CollapsibleTrigger asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
@@ -151,7 +151,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               </p>
             </div>
           </button>
-        </CollapsibleTrigger_Shadcn_>
+        </CollapsibleTrigger>
         {!disabled && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -177,7 +177,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           </DropdownMenu>
         )}
       </div>
-      <CollapsibleContent_Shadcn_>
+      <CollapsibleContent>
         <Form {...form}>
           <form
             id={formId}
@@ -229,7 +229,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             )}
           </form>
         </Form>
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }

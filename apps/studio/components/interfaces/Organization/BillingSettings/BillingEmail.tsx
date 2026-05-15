@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { FormMessage, Input_Shadcn_ } from 'ui'
+import { FormMessage, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
@@ -141,7 +141,7 @@ const BillingEmail = () => {
                       render={({ field }) => (
                         <FormItemLayout label="Email address">
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               type="email"
                               {...field}
                               placeholder="Email"

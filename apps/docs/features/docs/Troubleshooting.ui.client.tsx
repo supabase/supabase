@@ -1,20 +1,13 @@
 'use client'
 
+import { useBreakpoint } from 'common'
 import { ChevronDown, RotateCw, Search, X } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useRef, useState, Suspense, useCallback, useMemo } from 'react'
-
-import { useBreakpoint } from 'common'
-import {
-  Input_Shadcn_,
-  cn,
-  Button_Shadcn_,
-  Collapsible_Shadcn_ as Collapsible,
-  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
-  CollapsibleContent_Shadcn_ as CollapsibleContent,
-} from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Button_Shadcn_, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Input } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
   TROUBLESHOOTING_CONTAINER_ID,
@@ -251,7 +244,7 @@ function TroubleshootingFilterInternal({
           </MultiSelector.Content>
         </MultiSelector>
         <div className="relative">
-          <Input_Shadcn_
+          <Input
             id="troubleshooting-search"
             ref={searchInputRef}
             type="text"

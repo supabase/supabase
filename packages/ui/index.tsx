@@ -31,8 +31,6 @@ export * from './src/components/AnimatedCounter'
 export * from './src/lib/utils'
 
 // DATA ENTRY
-
-export * from './src/components/Input'
 export * from './src/components/ExpandingTextArea'
 
 // layout
@@ -98,11 +96,7 @@ export {
 
 export * from './src/components/shadcn/ui/dialog'
 
-export {
-  Alert as Alert_Shadcn_,
-  AlertTitle as AlertTitle_Shadcn_,
-  AlertDescription as AlertDescription_Shadcn_,
-} from './src/components/shadcn/ui/alert'
+export * from './src/components/shadcn/ui/alert'
 
 export {
   Field as Field_Shadcn_,
@@ -145,7 +139,7 @@ export * from './src/components/shadcn/ui/radio-group'
 
 export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
 
-export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+export * from './src/components/shadcn/ui/input'
 
 export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
@@ -161,7 +155,7 @@ export {
   BreadcrumbSeparator as BreadcrumbSeparator_Shadcn_,
 } from './src/components/shadcn/ui/breadcrumb'
 
-export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
+export * from './src/components/shadcn/ui/text-area'
 
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
 
@@ -180,11 +174,7 @@ export * from './src/components/shadcn/ui/aspect-ratio'
 export * from './src/components/shadcn/ui/table'
 export * from './src/components/ShadowScrollArea'
 
-export {
-  Collapsible as Collapsible_Shadcn_,
-  CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
-  CollapsibleContent as CollapsibleContent_Shadcn_,
-} from './src/components/shadcn/ui/collapsible'
+export * from './src/components/shadcn/ui/collapsible'
 
 export {
   Tabs as Tabs_Shadcn_,

@@ -11,7 +11,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -36,7 +36,7 @@ import {
   Switch,
   Textarea,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -153,7 +153,7 @@ export default function FormPatternsSidePanel() {
                       description="Single-line text entry for short values"
                     >
                       <FormControl className="col-span-6">
-                        <Input_Shadcn_ {...field} placeholder="Enter text" />
+                        <Input {...field} placeholder="Enter text" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -174,7 +174,7 @@ export default function FormPatternsSidePanel() {
                       description="Masked input for secure text entry"
                     >
                       <FormControl className="col-span-6">
-                        <Input_Shadcn_ {...field} type="password" placeholder="Enter password" />
+                        <Input {...field} type="password" placeholder="Enter password" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -195,7 +195,7 @@ export default function FormPatternsSidePanel() {
                       description="Read-only input with copy-to-clipboard functionality"
                     >
                       <FormControl className="col-span-6">
-                        <Input
+                        <PasswordInput
                           copy
                           readOnly
                           className="input-mono"
@@ -223,7 +223,7 @@ export default function FormPatternsSidePanel() {
                       description="Numeric input with min/max validation"
                     >
                       <FormControl className="col-span-6">
-                        <Input_Shadcn_
+                        <Input
                           {...field}
                           type="number"
                           min={1}

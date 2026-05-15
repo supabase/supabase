@@ -19,9 +19,9 @@ import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   LoadingLine,
@@ -534,7 +534,7 @@ export const UsersV2 = () => {
         <FormHeader className="py-4 px-6 mb-0! border-b" title="Users" />
 
         {showImprovedSearchOptIn && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 relative">
+          <Alert className="rounded-none mb-0 border-0 relative">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setImprovedSearchDismissed(true)}
@@ -545,8 +545,8 @@ export const UsersV2 = () => {
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>
             <InfoIcon className="size-4" />
-            <AlertTitle_Shadcn_>Upgrade to an improved search experience</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="flex justify-between items-center">
+            <AlertTitle>Upgrade to an improved search experience</AlertTitle>
+            <AlertDescription className="flex justify-between items-center">
               <div>
                 Enable faster and more reliable searching, sorting, and filtering of your users.
               </div>
@@ -558,15 +558,15 @@ export const UsersV2 = () => {
               >
                 Upgrade search
               </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         {indexWorkerInProgress && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t">
+          <Alert className="rounded-none mb-0 border-0 border-t">
             <InfoIcon className="size-4" />
-            <AlertTitle_Shadcn_>Index creation is in progress</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="flex justify-between items-center">
+            <AlertTitle>Index creation is in progress</AlertTitle>
+            <AlertDescription className="flex justify-between items-center">
               <div>
                 The indexes are currently being created. This process may take some time depending
                 on the number of users in your project.
@@ -580,8 +580,8 @@ export const UsersV2 = () => {
                   View logs
                 </Link>
               </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">

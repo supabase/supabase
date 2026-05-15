@@ -2,7 +2,7 @@
 
 import {
   Button,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
   Sheet,
   SheetClose,
@@ -38,13 +38,13 @@ export default function SheetSide() {
                 <Label_Shadcn_ htmlFor="name" className="text-right">
                   Name
                 </Label_Shadcn_>
-                <Input_Shadcn_ id="name" value="Pedro Duarte" className="col-span-3" />
+                <Input id="name" value="Pedro Duarte" className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label_Shadcn_ htmlFor="username" className="text-right">
                   Username
                 </Label_Shadcn_>
-                <Input_Shadcn_ id="username" value="@peduarte" className="col-span-3" />
+                <Input id="username" value="@peduarte" className="col-span-3" />
               </div>
             </div>
             <SheetFooter>

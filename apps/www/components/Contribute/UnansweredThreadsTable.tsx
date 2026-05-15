@@ -1,5 +1,6 @@
 'use client'
 
+import type { ThreadRow } from '~/types/contribute'
 import { Filter, MessageSquareReply, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -10,7 +11,7 @@ import {
   Button,
   Card,
   cn,
-  Input_Shadcn_,
+  Input,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -23,7 +24,6 @@ import {
   TableRow,
 } from 'ui'
 
-import type { ThreadRow } from '~/types/contribute'
 import { FilterPopover } from './FilterPopover'
 import { ChannelIcon, DiscordIcon, GitHubIcon, RedditIcon } from './Icons'
 
@@ -296,7 +296,7 @@ export function UnansweredThreadsTable({
           {/* Search Input */}
           <form onSubmit={handleSearchSubmit} className="relative md:max-w-xs w-full flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground-lighter" />
-            <Input_Shadcn_
+            <Input
               type="text"
               size="tiny"
               placeholder="Search threads by title..."

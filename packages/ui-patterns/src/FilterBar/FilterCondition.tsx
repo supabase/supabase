@@ -2,7 +2,7 @@
 
 import { X } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, cn, Input_Shadcn_, Popover, PopoverAnchor, PopoverContent } from 'ui'
+import { Button, cn, Input, Popover, PopoverAnchor, PopoverContent } from 'ui'
 
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
@@ -269,7 +269,7 @@ export function FilterCondition({
         <PopoverAnchor asChild>
           <div ref={propertyLabelRef} className="relative inline-flex items-center shrink-0">
             {isPropertyActive ? (
-              <Input_Shadcn_
+              <Input
                 type="text"
                 value={propertySearchText}
                 onChange={(e) => setPropertySearchText(e.target.value)}
@@ -322,7 +322,7 @@ export function FilterCondition({
       <Popover open={isOperatorActive && !isLoading && operatorItems.length > 0}>
         <PopoverAnchor asChild>
           <div className="relative inline-block">
-            <Input_Shadcn_
+            <Input
               ref={operatorRef}
               type="text"
               value={isOperatorActive ? localOperator : conditionOperator}
@@ -373,7 +373,7 @@ export function FilterCondition({
       <Popover open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
         <PopoverAnchor asChild>
           <div className="relative inline-block max-w-[180px]">
-            <Input_Shadcn_
+            <Input
               ref={valueRef}
               type="text"
               value={localValue}

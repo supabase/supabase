@@ -5,7 +5,7 @@ import {
   Button,
   Card,
   Checkbox,
-  Input_Shadcn_ as Input,
+  Input,
   Label_Shadcn_ as Label,
   Separator,
   Switch,

@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react'
 import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -147,9 +147,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
         {isLoadingPermissions ? (
           <GenericSkeletonLoader />
         ) : !canManageLogDrains ? (
-          <Alert_Shadcn_ variant="default">
-            You do not have permission to manage log drains
-          </Alert_Shadcn_>
+          <Alert variant="default">You do not have permission to manage log drains</Alert>
         ) : (
           <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
         )}

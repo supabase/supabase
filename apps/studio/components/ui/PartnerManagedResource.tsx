@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertTitle, Button } from 'ui'
 
 import PartnerIcon from './PartnerIcon'
 import { useAwsRedirectQuery } from '@/data/integrations/aws-redirect-query'
@@ -78,10 +78,10 @@ function PartnerManagedResource({
       : `${resource} are managed by ${PARTNER_TO_NAME[managedBy]}`)
 
   return (
-    <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none bg-none">
+    <Alert className="flex flex-col items-center gap-y-2 border-0 rounded-none bg-none">
       <PartnerIcon organization={{ managed_by: managedBy }} showTooltip={false} size="large" />
 
-      <AlertTitle_Shadcn_ className="text-sm font-normal">{partnerHeading}</AlertTitle_Shadcn_>
+      <AlertTitle className="text-sm font-normal">{partnerHeading}</AlertTitle>
 
       {details && <div className="text-sm text-foreground-light text-center">{details}</div>}
 
@@ -92,7 +92,7 @@ function PartnerManagedResource({
           </a>
         </Button>
       )}
-    </Alert_Shadcn_>
+    </Alert>
   )
 }
 

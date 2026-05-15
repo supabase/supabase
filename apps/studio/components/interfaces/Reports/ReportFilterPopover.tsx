@@ -10,7 +10,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Input_Shadcn_ as Input,
+  Input,
   Popover,
   PopoverContent,
   PopoverSeparator,

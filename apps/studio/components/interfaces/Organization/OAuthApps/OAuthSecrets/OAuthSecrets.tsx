@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useState } from 'react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, InfoIcon } from 'ui'
+import { Alert, AlertTitle, InfoIcon } from 'ui'
 
 import { SecretRow } from './SecretRow'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -71,12 +71,12 @@ export const OAuthSecrets = ({ selectedApp }: Props) => {
       </div>
 
       {createdSecret && (
-        <Alert_Shadcn_ variant="default">
+        <Alert variant="default">
           <InfoIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             Make sure to copy your new client secret now. You won't be able to see it again.
-          </AlertTitle_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertTitle>
+        </Alert>
       )}
 
       <div className="-space-y-px">

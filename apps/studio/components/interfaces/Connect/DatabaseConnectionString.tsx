@@ -6,9 +6,9 @@ import {
   Badge,
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DIALOG_PADDING_X,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -487,8 +487,8 @@ export const DatabaseConnectionString = () => {
                   {!sharedPoolerPreferred && !ipv4Addon && (
                     <>
                       <Separator className="w-full" />
-                      <Collapsible_Shadcn_ className="group">
-                        <CollapsibleTrigger_Shadcn_
+                      <Collapsible className="group">
+                        <CollapsibleTrigger
                           asChild
                           className="w-full justify-start !last:rounded-b group-data-open:rounded-b-none px-3"
                         >
@@ -505,8 +505,8 @@ export const DatabaseConnectionString = () => {
                               <Badge variant="success">IPv4 compatible</Badge>
                             </div>
                           </Button>
-                        </CollapsibleTrigger_Shadcn_>
-                        <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="bg-dash-sidebar rounded-b border text-xs">
                           <CodeBlock
                             wrapperClassName={cn(
                               '[&_pre]:border-x-0 [&_pre]:border-t-0 [&_pre]:px-4 [&_pre]:py-3',
@@ -522,8 +522,8 @@ export const DatabaseConnectionString = () => {
                             Only recommended when your network does not support IPv6. Added latency
                             compared to dedicated pooler.
                           </p>
-                        </CollapsibleContent_Shadcn_>
-                      </Collapsible_Shadcn_>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </>
                   )}
                 </ConnectionPanel>
@@ -589,8 +589,8 @@ export const DatabaseConnectionString = () => {
       {selectedTab === 'python' && (
         <>
           <Separator />
-          <Collapsible_Shadcn_ className="px-8 py-5">
-            <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:-rotate-180!">
+          <Collapsible className="px-8 py-5">
+            <CollapsibleTrigger className="group [&[data-state=open]>div>svg]:-rotate-180!">
               <div className="flex items-center gap-x-2 w-full">
                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                   Connecting to SQL Alchemy
@@ -601,8 +601,8 @@ export const DatabaseConnectionString = () => {
                   size={14}
                 />
               </div>
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="my-2">
+            </CollapsibleTrigger>
+            <CollapsibleContent className="my-2">
               <div className="text-foreground-light text-xs grid gap-2">
                 <p>
                   Please use <code>postgresql://</code> instead of <code>postgres://</code> as your
@@ -614,8 +614,8 @@ export const DatabaseConnectionString = () => {
                 </p>
                 <p className="text-sm font-mono tracking-tight text-foreground-lighter"></p>
               </div>
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
+            </CollapsibleContent>
+          </Collapsible>
         </>
       )}
 

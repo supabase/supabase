@@ -9,7 +9,7 @@ import {
   IconBroadcast,
   IconDatabaseChanges,
   IconPresence,
-  Input_Shadcn_ as Input,
+  Input,
   Popover,
   PopoverContent,
   PopoverTrigger,

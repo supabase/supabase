@@ -1,12 +1,6 @@
 import { Check, ChevronDown, Edit, X } from 'lucide-react'
 import { useMemo } from 'react'
-import {
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  WarningIcon,
-} from 'ui'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, WarningIcon } from 'ui'
 
 import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -107,10 +101,10 @@ export const RLSTableCard = ({
   ])
 
   return (
-    <Collapsible_Shadcn_
+    <Collapsible
       className={cn('border rounded-sm', !isRLSEnabled && 'bg-warning-300 border-warning-500')}
     >
-      <CollapsibleTrigger_Shadcn_ className="flex items-center justify-between px-3 py-2 w-full [&[data-state=open]>div>svg]:-rotate-180!">
+      <CollapsibleTrigger className="flex items-center justify-between px-3 py-2 w-full [&[data-state=open]>div>svg]:-rotate-180!">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-x-2">
             {!isRLSEnabled ? (
@@ -140,16 +134,16 @@ export const RLSTableCard = ({
           </p>
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </div>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_
+      </CollapsibleTrigger>
+      <CollapsibleContent
         className={cn(
           'border-t p-3 text-sm text-foreground-light',
           !isRLSEnabled && 'border-warning-500'
         )}
       >
         {tableAccessDescription}
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
 

@@ -5,9 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
@@ -87,19 +87,15 @@ const FunctionSelector = ({
       )}
 
       {showError && isError && (
-        <Alert_Shadcn_ variant="warning" className="px-3! py-3!">
-          <AlertTitle_Shadcn_ className="text-xs text-amber-900">
-            Failed to load functions
-          </AlertTitle_Shadcn_>
+        <Alert variant="warning" className="px-3! py-3!">
+          <AlertTitle className="text-xs text-amber-900">Failed to load functions</AlertTitle>
 
-          <AlertDescription_Shadcn_ className="text-xs mb-2">
-            Error: {error.message}
-          </AlertDescription_Shadcn_>
+          <AlertDescription className="text-xs mb-2">Error: {error.message}</AlertDescription>
 
           <Button type="default" size="tiny" onClick={() => refetch()}>
             Reload functions
           </Button>
-        </Alert_Shadcn_>
+        </Alert>
       )}
 
       {isSuccess && (

@@ -12,7 +12,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  Input_Shadcn_,
+  Input,
   RadioGroupCard,
   RadioGroupCardItem,
   Select_Shadcn_,
@@ -29,7 +29,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  TextArea_Shadcn_,
+  TextArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
@@ -309,7 +309,7 @@ function LogDrainFormItem({
       render={({ field }) => (
         <FormItemLayout layout="horizontal" label={label} description={description || ''}>
           <FormControl>
-            <Input_Shadcn_ type={type || 'text'} placeholder={placeholder} {...field} />
+            <Input type={type || 'text'} placeholder={placeholder} {...field} />
           </FormControl>
         </FormItemLayout>
       )}
@@ -918,7 +918,7 @@ export function LogDrainDestinationSheetForm({
                               description="PEM encoded CA certificate for verifying the server. Falls back to the system CA bundle if omitted."
                             >
                               <FormControl>
-                                <TextArea_Shadcn_
+                                <TextArea
                                   className="font-mono text-xs"
                                   placeholder="-----BEGIN CERTIFICATE-----"
                                   rows={4}
@@ -938,7 +938,7 @@ export function LogDrainDestinationSheetForm({
                               description="PEM encoded client certificate for mTLS."
                             >
                               <FormControl>
-                                <TextArea_Shadcn_
+                                <TextArea
                                   className="font-mono text-xs"
                                   placeholder="-----BEGIN CERTIFICATE-----"
                                   rows={4}
@@ -958,7 +958,7 @@ export function LogDrainDestinationSheetForm({
                               description="PEM encoded client private key for mTLS. Required when a client certificate is provided."
                             >
                               <FormControl>
-                                <TextArea_Shadcn_
+                                <TextArea
                                   className="font-mono text-xs"
                                   placeholder="-----BEGIN PRIVATE KEY-----"
                                   rows={4}

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { cn, Input_Shadcn_, Popover, PopoverAnchor, PopoverContent } from 'ui'
+import { cn, Input, Popover, PopoverAnchor, PopoverContent } from 'ui'
 
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
@@ -179,7 +179,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         <Popover open={isActive && !isLoading && items.length > 0 && !highlightedConditionPath}>
           <PopoverAnchor asChild>
             {isRootGroup ? (
-              <Input_Shadcn_
+              <Input
                 ref={freeformInputRef}
                 type="text"
                 value={isActive ? freeformText : localFreeformValue}
@@ -200,7 +200,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
               />
             ) : (
               <div className="relative inline-block py-1">
-                <Input_Shadcn_
+                <Input
                   ref={freeformInputRef}
                   type="text"
                   value={isActive ? freeformText : localFreeformValue}

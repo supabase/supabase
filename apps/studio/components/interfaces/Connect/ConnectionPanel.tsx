@@ -6,9 +6,9 @@ import {
   Badge,
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -234,8 +234,8 @@ export const ConnectionPanel = ({
           )}
 
           {IS_PLATFORM && ipv4Status.type === 'error' && (
-            <Collapsible_Shadcn_ className="group -space-y-px">
-              <CollapsibleTrigger_Shadcn_
+            <Collapsible className="group -space-y-px">
+              <CollapsibleTrigger
                 asChild
                 className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-muted"
               >
@@ -253,8 +253,8 @@ export const ConnectionPanel = ({
                 >
                   Some platforms are IPv4-only:
                 </Button>
-              </CollapsibleTrigger_Shadcn_>
-              <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border px-3 py-2">
+              </CollapsibleTrigger>
+              <CollapsibleContent className="bg-dash-sidebar rounded-b border px-3 py-2">
                 <div className="flex flex-col gap-2">
                   <p className="text-xs text-foreground-light max-w-xs">
                     A few major platforms are IPv4-only and may not work with a Direct Connection:
@@ -282,8 +282,8 @@ export const ConnectionPanel = ({
                     a IPv4 network.
                   </p>
                 </div>
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </div>
         {children}

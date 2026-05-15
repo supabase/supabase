@@ -10,7 +10,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_ as Input,
+  Input,
   Label_Shadcn_ as Label,
   ResizableHandle,
   ResizablePanel,
@@ -29,7 +29,7 @@ import {
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  TextArea_Shadcn_ as Textarea,
+  Textarea,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
