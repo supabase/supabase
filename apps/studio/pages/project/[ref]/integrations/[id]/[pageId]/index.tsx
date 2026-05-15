@@ -29,7 +29,6 @@ import {
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
@@ -56,7 +55,6 @@ const LegacyIntegrationPage = () => {
   const { ref, id, pageId, childId } = useParams()
 
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -216,15 +214,9 @@ const LegacyIntegrationPage = () => {
               <PageHeaderDescription className="">{pageSubTitle}</PageHeaderDescription>
             </PageHeaderSummary>
 
-            {integration?.type === 'oauth' ? (
+            {integration?.type === 'oauth' && (
               <InstallOAuthIntegrationButton integration={integration} />
-            ) : isMarketplaceEnabled && !!integration && !isInstalled ? (
-              <InstallIntegrationSheet integration={integration} />
-            ) : isMarketplaceEnabled && isInstalled ? (
-              <Button disabled type="outline">
-                Installed
-              </Button>
-            ) : null}
+            )}
           </PageHeaderMeta>
         )}
 
