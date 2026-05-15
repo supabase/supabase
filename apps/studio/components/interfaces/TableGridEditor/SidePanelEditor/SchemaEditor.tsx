@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Input, SidePanel } from 'ui'
+import { Input_Shadcn_ as Input, SidePanel } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -63,14 +64,18 @@ export const SchemaEditor = ({ visible, onSuccess, closePanel }: SchemaEditorPro
       <>
         <SidePanel.Content>
           <div className="space-y-10 py-6">
-            <Input
-              label="Schema name"
+            <FormItemLayout
+              isReactForm={false}
               layout="vertical"
-              type="text"
+              label="Schema name"
               error={errors?.name}
-              value={name}
-              onChange={(event: any) => setName(event.target.value)}
-            />
+            >
+              <Input
+                type="text"
+                value={name}
+                onChange={(event: any) => setName(event.target.value)}
+              />
+            </FormItemLayout>
           </div>
         </SidePanel.Content>
       </>

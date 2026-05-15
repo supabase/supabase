@@ -1,3 +1,4 @@
+import { keyword, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { toString as CronToString } from 'cronstrue'
 import { Column } from 'react-data-grid'
 import { cn } from 'ui'
@@ -7,12 +8,13 @@ import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.const
 import { CronJobTableCell } from './CronJobTableCell'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 
-const escapeSqlLiteral = (value = '') => value.replaceAll("'", "''")
-const unescapeSqlLiteral = (value = '') => value.replaceAll("''", "'")
+const unescapeSqlLiteral = (value = '', isEscapeString = false) => {
+  const unescaped = value.replaceAll("''", "'")
+  return isEscapeString ? unescaped.replaceAll('\\\\', '\\') : unescaped
+}
 
-export function buildCronQuery(name: string, schedule: string, command: string) {
-  const escapedName = escapeSqlLiteral(name)
-  return `select cron.schedule('${escapedName}', '${schedule}', ${command});`
+export function buildCronQuery(name: string, schedule: string, command: string): SafeSqlFragment {
+  return safeSql`select cron.schedule(${literal(name)}, ${literal(schedule)}, ${literal(command)});`
 }
 
 export const buildHttpRequestCommand = (
@@ -21,18 +23,18 @@ export const buildHttpRequestCommand = (
   headers: HTTPHeader[] = [],
   body: string | undefined,
   timeout: number
-) => {
-  return `
+): SafeSqlFragment => {
+  const funcName = keyword(method === 'GET' ? 'http_get' : 'http_post')
+  const headersJson = JSON.stringify(
+    Object.fromEntries(headers.filter((v) => v.name && v.value).map((v) => [v.name, v.value]))
+  )
+  const bodyPart = method === 'POST' && body ? safeSql`\n      body:=${literal(body)},` : safeSql``
+  return safeSql`
 select
-  net.${method === 'GET' ? 'http_get' : 'http_post'}(
-      url:='${escapeSqlLiteral(url)}',
-      headers:=jsonb_build_object(${headers
-        .filter((v) => v.name && v.value)
-        .map((v) => `'${escapeSqlLiteral(v.name)}', '${escapeSqlLiteral(v.value)}'`)
-        .join(
-          ', '
-        )}), ${method === 'POST' && body ? `\n      body:='${escapeSqlLiteral(body)}',` : ''}
-      timeout_milliseconds:=${timeout}
+  net.${funcName}(
+      url:=${literal(url)},
+      headers:=${literal(headersJson)}::jsonb, ${bodyPart}
+      timeout_milliseconds:=${literal(timeout)}
   );`
 }
 
@@ -52,11 +54,11 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     const methodMatch = command.match(/select\s+net\.([^']+)\(\s*url:=/i)
     const method = methodMatch?.[1] || ''
 
-    const urlMatch = command.match(/url:='((?:''|[^'])*)'/i)
-    const url = unescapeSqlLiteral(urlMatch?.[1])
+    const urlMatch = command.match(/url:=(E)?'((?:''|[^'])*)'/i)
+    const url = unescapeSqlLiteral(urlMatch?.[2], Boolean(urlMatch?.[1]))
 
-    const bodyMatch = command.match(/body:='((?:''|[^'])*)'/i)
-    const body = unescapeSqlLiteral(bodyMatch?.[1])
+    const bodyMatch = command.match(/body:=(E)?'((?:''|[^'])*)'/i)
+    const body = unescapeSqlLiteral(bodyMatch?.[2], Boolean(bodyMatch?.[1]))
 
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
     const timeout = timeoutMatch?.[1] || ''
@@ -76,8 +78,9 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         }
       }
     } else {
-      const headersStringMatch = command.match(/headers:='((?:''|[^'])*)'/i)
-      const headersString = unescapeSqlLiteral(headersStringMatch?.[1]) || '{}'
+      const headersStringMatch = command.match(/headers:=(E)?'((?:''|[^'])*)'/i)
+      const headersString =
+        unescapeSqlLiteral(headersStringMatch?.[2], Boolean(headersStringMatch?.[1])) || '{}'
       try {
         const parsedHeaders = JSON.parse(headersString)
         headersObjs = Object.entries(parsedHeaders).map(([name, value]) => ({
@@ -132,7 +135,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
   const regexDBFunction = /select\s+[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\s*\(\)/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
-      .replace('SELECT ', '')
+      .replace(/^select\s+/i, '')
       .replace(/\(.*\);*/, '')
 
       .trim()

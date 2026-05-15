@@ -4,8 +4,8 @@ export default function AdmonitionSuccess() {
   return (
     <Admonition
       type="success"
-      title="Success"
-      description="Your connection has been confirmed. You can now close this tab."
+      title="Connection confirmed"
+      description="You can now close this tab."
     />
   )
 }

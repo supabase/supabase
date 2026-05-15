@@ -5,7 +5,6 @@ import { Download, Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert,
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -23,14 +22,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+} from 'ui-patterns/PageSection'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -186,15 +186,18 @@ export const SSLConfiguration = () => {
               </AlertDialog>
             </FormLayout>
             {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
-              <Alert
-                withIcon
-                variant="warning"
+              <Admonition
+                type="warning"
+                layout="horizontal"
                 title="SSL enforcement was not updated successfully"
-              >
-                Please try updating again, or contact{' '}
-                <SupportLink className={InlineLinkClassName}>support</SupportLink> if this error
-                persists
-              </Alert>
+                description={
+                  <>
+                    Please try updating again, or contact{' '}
+                    <SupportLink className={InlineLinkClassName}>support</SupportLink> if this error
+                    persists
+                  </>
+                }
+              />
             )}
           </CardContent>
           <CardContent>

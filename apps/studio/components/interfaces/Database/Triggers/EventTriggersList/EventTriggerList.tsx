@@ -15,19 +15,20 @@ import {
   TableRow,
 } from 'ui'
 
+import type { EventTrigger } from './EventTriggerList.utils'
 import { SUPABASE_ROLES } from '@/components/interfaces/Database/Roles/Roles.constants'
+import { getDatabaseFunctionsHref } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 
 interface EventTriggerListProps {
   filterString: string
-  eventTriggers: DatabaseEventTrigger[]
+  eventTriggers: EventTrigger[]
   ownerFilter: string[]
   canEdit: boolean
-  onEditTrigger: (trigger: DatabaseEventTrigger) => void
-  onEditTriggerWithAssistant: (trigger: DatabaseEventTrigger) => void
-  onDuplicateTrigger: (trigger: DatabaseEventTrigger) => void
-  onDeleteTrigger: (trigger: DatabaseEventTrigger) => void
+  onEditTrigger: (trigger: EventTrigger) => void
+  onEditTriggerWithAssistant: (trigger: EventTrigger) => void
+  onDuplicateTrigger: (trigger: EventTrigger) => void
+  onDeleteTrigger: (trigger: EventTrigger) => void
 }
 
 const SYSTEM_OWNERS = new Set<string>(SUPABASE_ROLES)
@@ -126,7 +127,11 @@ export const EventTriggerList = ({
             <TableCell className="space-x-2">
               {trigger.function_name ? (
                 <Link
-                  href={`/project/${projectRef}/database/functions?search=${trigger.function_name}&schema=${trigger.function_schema}`}
+                  href={getDatabaseFunctionsHref(
+                    projectRef,
+                    trigger.function_schema,
+                    trigger.function_name
+                  )}
                   className="text-link-table-cell block max-w-40 text-foreground-light"
                 >
                   {trigger.function_name}

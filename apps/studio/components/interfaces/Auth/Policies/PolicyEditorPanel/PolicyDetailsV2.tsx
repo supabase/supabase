@@ -1,3 +1,9 @@
+import {
+  ident,
+  joinSqlFragments,
+  safeSql,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta/src/pg-format'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -55,6 +61,7 @@ interface PolicyDetailsV2Props {
     roles: string
   }>
   onUpdateCommand: (command: string) => void
+  onRolesChange?: (fragment: SafeSqlFragment) => void
   authContext: 'database' | 'realtime'
 }
 
@@ -65,6 +72,7 @@ export const PolicyDetailsV2 = ({
   isEditing,
   form,
   onUpdateCommand,
+  onRolesChange,
   authContext,
 }: PolicyDetailsV2Props) => {
   const { data: project } = useSelectedProjectQuery()
@@ -309,7 +317,17 @@ export const PolicyDetailsV2 = ({
                 </FormLabel>
                 <FormControl>
                   <MultiSelector
-                    onValuesChange={(roles) => field.onChange(roles.join(', '))}
+                    onValuesChange={(roles) => {
+                      field.onChange(roles.join(', '))
+                      onRolesChange?.(
+                        roles.length === 0
+                          ? safeSql`public`
+                          : joinSqlFragments(
+                              roles.map((r) => ident(r)),
+                              ', '
+                            )
+                      )
+                    }}
                     disabled={!canUpdatePolicies}
                     values={field.value.length === 0 ? [] : field.value?.split(', ')}
                     size="small"

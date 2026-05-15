@@ -3,11 +3,13 @@ import { PropsWithChildren } from 'react'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
-import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
+import { FlyDeprecationBanner } from '@/components/layouts/AppLayout/FlyDeprecationBanner'
+import { NoticeBanner, NoticeBanner2 } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
+  const showNoticeBanner2 = useFlag('showNoticeBanner2')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
   return (
@@ -15,6 +17,8 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
       <div className="shrink-0">
         <StatusPageBanner />
         {showNoticeBanner && <NoticeBanner />}
+        {showNoticeBanner2 && <NoticeBanner2 />}
+        <FlyDeprecationBanner />
         <OrganizationResourceBanner />
         {/* Disabled until reintroduced or removed altogether. */}
         {/* <TaxIdBanner /> */}

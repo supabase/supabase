@@ -127,22 +127,20 @@ const inputGroupButtonVariants = cva('', {
   },
 })
 
-function InputGroupButton({
-  className,
-  type = 'text',
-  size = 'tiny',
-  ...props
-}: Omit<React.ComponentProps<typeof Button>, 'size'> &
-  VariantProps<typeof inputGroupButtonVariants>) {
+const InputGroupButton = React.forwardRef<
+  HTMLButtonElement,
+  Omit<React.ComponentProps<typeof Button>, 'size'> & VariantProps<typeof inputGroupButtonVariants>
+>(function InputGroupButton({ className, type = 'text', size = 'tiny', ...props }, ref) {
   return (
     <Button
       type={type}
       size={size}
       className={cn(inputGroupButtonVariants({ size }), className)}
+      ref={ref}
       {...props}
     />
   )
-}
+})
 
 function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
   return (
@@ -159,29 +157,32 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
 /*
  * If you need to use this component inside a <Form>, use FormInputGroupInput instead.
  */
-function InputGroupInput({ className, ...props }: InputProps) {
-  return (
+const InputGroupInput = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, ...props }, ref) => (
     <Input
+      ref={ref}
       data-slot="input-group-control"
       className={cn(
-        'flex-1 rounded-none border border-transparent -m-px bg-transparent shadow-none',
+        'flex-1 block rounded-none border border-transparent -m-px bg-transparent shadow-none',
         'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
         'read-only:border-transparent',
-        'aria-invalid:border-transparent aria-invalid:bg-transparent',
-        'aria-invalid:focus:border-transparent aria-invalid:focus-visible:border-transparent',
+        'aria-[invalid=true]:border-transparent aria-[invalid=true]:bg-transparent',
+        'aria-[invalid=true]:focus:border-transparent aria-[invalid=true]:focus-visible:border-transparent',
         className
       )}
       {...props}
     />
   )
-}
+)
+InputGroupInput.displayName = 'InputGroupInput'
 
 /*
  * If you need to use this component inside a <Form>, use FormInputGroupTextArea instead.
  */
-function InputGroupTextarea({ className, ...props }: TextareaProps) {
-  return (
+const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, ...props }, ref) => (
     <Textarea
+      ref={ref}
       data-slot="input-group-control"
       className={cn(
         'flex-1 resize-none rounded-none border border-transparent bg-transparent py-0 shadow-none',
@@ -191,7 +192,8 @@ function InputGroupTextarea({ className, ...props }: TextareaProps) {
       {...props}
     />
   )
-}
+)
+InputGroupTextarea.displayName = 'InputGroupTextarea'
 
 export {
   InputGroup,

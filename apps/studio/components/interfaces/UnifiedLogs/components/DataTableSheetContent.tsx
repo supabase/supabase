@@ -85,6 +85,7 @@ export function DataTableSheetContent<TData, TMeta>({
                   'flex gap-4 my-1 py-1 text-sm justify-between items-center w-full',
                   field.className
                 )}
+                label={field.label}
               >
                 <dt className="shrink-0 text-muted-foreground">{field.label}</dt>
                 <dd className="font-mono w-full text-right truncate">

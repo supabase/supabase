@@ -4,7 +4,7 @@ description: Displays a callout for user attention.
 fragment: true
 ---
 
-Admonition provides focus for situations that require a callout.
+Admonition provides the standard product callout pattern for situations that require user attention.
 
 <ComponentPreview
   name="admonition-demo"
@@ -13,13 +13,15 @@ Admonition provides focus for situations that require a callout.
   wide
 />
 
-Use Admonition instead of [Alert](../components/alert) unless you specifically need the primitives. If in doubt, stick with Admonition.
+Use Admonition instead of the low-level [Alert](../components/alert) primitive unless you specifically need custom composition. If in doubt, stick with Admonition.
 
-Use `title` for the heading slot and `description` for short body copy. The `description` should always end in a period.
+Use [Collapsible Alert](./collapsible-alert) when the callout needs to remain visible while optional detail can be expanded. Use [Collapsible](../components/collapsible) for generic disclosure behaviour that is not itself a callout.
 
-Use `children` instead of `description` when the body needs rich React or MDX content such as links, lists, or multiple paragraphs, and this cannot be achieved via a React Fragment as a `description` value.
+Use `title` for the heading slot when the callout needs its own heading. `title` is optional: short callouts may use `description` without a title when nearby content already provides enough context.
 
-Avoid `label` in new code. It is a legacy alias for `title` that still exists for older docs content.
+Avoid title-only Admonitions in new code. A callout with `title` should also include `description` or `children` so it does not read like an incomplete heading.
+
+`label` is still supported for older Docs content, but new code should use `title`.
 
 ## Usage
 
@@ -53,7 +55,7 @@ Only ever use the `primary` (green) button `type` on a `default` Admonition. Eve
   className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
 />
 
-### Responsive
+## Responsive
 
 Resize your browser to see the button(s) change `layout` based on the Admonition’s width.
 
@@ -78,16 +80,9 @@ There are several components that wrap the `warning` Admonition type with reusab
 
 AlertError for example rolls up consistent error handling and support contact methods.
 
-### Destructive
-
-<ComponentPreview
-  name="admonition-destructive"
-  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
-/>
-
 ### Description only
 
-You may omit the title when the Admonition is short and sits near a heading that already provides enough context. Do not do the inverse: a title-only Admonition usually reads like an incomplete sentence and should include supporting description copy.
+Use description-only Admonitions for short callouts that sit near a heading or form label with enough context.
 
 <ComponentPreview
   name="admonition-description-only"
@@ -96,10 +91,17 @@ You may omit the title when the Admonition is short and sits near a heading that
 
 ### Success
 
-Use `success` strictly for positive, completed states where the user does not need to take corrective action.
+Use `success` for positive, completed states where the user does not need to take corrective action.
 
 <ComponentPreview
   name="admonition-success"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+### Destructive
+
+<ComponentPreview
+  name="admonition-destructive"
   className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
 />
 

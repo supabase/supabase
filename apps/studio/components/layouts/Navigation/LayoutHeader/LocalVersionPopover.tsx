@@ -25,11 +25,12 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const LocalVersionPopover = () => {
+  const track = useTrack()
   const { data, isSuccess } = useCLIReleaseVersionQuery()
-  const currentCliVersion = data?.current
-  const latestCliVersion = data?.latest
+  const { current: currentCliVersion, latest: latestCliVersion } = data || {}
   const hasLatestCLIVersion = isSuccess && !!latestCliVersion
 
   const current = getSemver(currentCliVersion)
@@ -49,7 +50,11 @@ export const LocalVersionPopover = () => {
   if (!isSuccess || !currentCliVersion) return null
 
   return (
-    <Popover_Shadcn_>
+    <Popover_Shadcn_
+      onOpenChange={(open) => {
+        if (open) track('header_local_version_popover_opened')
+      }}
+    >
       <PopoverTrigger_Shadcn_ className="flex items-center">
         <Badge variant={isBeta ? 'warning' : hasUpdate ? 'success' : 'default'}>
           {isBeta ? 'Beta' : hasUpdate ? 'Update available' : 'Latest'}

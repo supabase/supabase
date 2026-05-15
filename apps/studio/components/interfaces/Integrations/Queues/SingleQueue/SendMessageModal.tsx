@@ -3,7 +3,16 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, Input, Modal } from 'ui'
+import {
+  Form,
+  FormControl,
+  FormField,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Modal,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -102,12 +111,12 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                   description="Time in seconds before the message becomes available for reading."
                 >
                   <FormControl>
-                    <Input
-                      {...rest}
-                      type="number"
-                      placeholder="1"
-                      actions={<p className="text-foreground-light pr-2">sec</p>}
-                    />
+                    <InputGroup>
+                      <InputGroupInput {...rest} type="number" placeholder="1" />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>sec</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
                   </FormControl>
                 </FormItemLayout>
               )}
