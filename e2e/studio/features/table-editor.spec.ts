@@ -502,7 +502,15 @@ testRunner('table editor', () => {
     await expect(page.locator('.view-lines')).toContainText(`security_invoker = true`)
 
     const openInSqlEditorLink = page.getByRole('link', { name: 'Open in SQL Editor' })
-    await expect(openInSqlEditorLink).toHaveAttribute('href', /security_invoker%20%3D%20true/)
+    // Accept either percent-encoded spaces (`%20%3D%20`) or form-encoded
+    // (`+%3D+`). Next's Link forwards the raw href; the TanStack-router
+    // shim round-trips the search params through URLSearchParams, which
+    // emits `+` for spaces. Both decode to the same SQL once the SQL
+    // editor consumes the `content` param.
+    await expect(openInSqlEditorLink).toHaveAttribute(
+      'href',
+      /security_invoker(%20|\+)%3D(%20|\+)true/
+    )
     await openInSqlEditorLink.click()
     await page.waitForURL(/\/sql\/new/)
     await expect(page.locator('.view-lines')).toContainText(`create view public.${viewName}`)
@@ -1263,9 +1271,15 @@ testRunner('table editor', () => {
     await expect(foreignKeySchemaSelect).not.toBeVisible()
     await expect(foreignKeyLink).toBeVisible()
 
-    const updateColumnPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=column-update', {
-      method: 'POST',
-    })
+    const updateColumnPromise = waitForApiResponse(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=column-update',
+      {
+        method: 'POST',
+      }
+    )
     await columnEditor.getByRole('button', { name: 'Save' }).click()
     await updateColumnPromise
     await expect(columnEditor).not.toBeVisible()
