@@ -64,9 +64,7 @@ export * from './src/components/shadcn/ui/skeleton'
 export * from './src/components/shadcn/ui/slider'
 export * from './src/components/shadcn/ui/textarea'
 export * from './src/components/shadcn/ui/toggle-group'
-
-export { Toggle as Toggle_Shadcn_ } from './src/components/shadcn/ui/toggle'
-
+export * from './src/components/shadcn/ui/toggle'
 export * from './src/components/shadcn/ui/card'
 
 export {
