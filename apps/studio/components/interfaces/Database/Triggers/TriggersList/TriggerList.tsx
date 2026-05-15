@@ -16,7 +16,11 @@ import {
   TableRow,
 } from 'ui'
 
-import { generateTriggerCreateSQL, type PostgresTrigger } from './TriggerList.utils'
+import {
+  generateTriggerCreateSQL,
+  getDatabaseFunctionsHref,
+  type PostgresTrigger,
+} from './TriggerList.utils'
 import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -131,7 +135,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
           <TableCell className="space-x-2">
             {x.function_name ? (
               <Link
-                href={`/project/${projectRef}/database/functions?search=${x.function_name}&schema=${x.function_schema}`}
+                href={getDatabaseFunctionsHref(projectRef, x.function_schema, x.function_name)}
                 className="text-link-table-cell block max-w-40 text-foreground-light"
               >
                 {x.function_name}

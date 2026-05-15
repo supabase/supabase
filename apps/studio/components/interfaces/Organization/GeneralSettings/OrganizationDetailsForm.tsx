@@ -94,7 +94,7 @@ export const OrganizationDetailsForm = () => {
           </CardContent>
           <CardContent>
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
-              <Input copy disabled id="slug" value={selectedOrganization?.slug ?? ''} />
+              <Input copy readOnly id="slug" value={selectedOrganization?.slug ?? ''} />
             </FormItemLayout>
           </CardContent>
           <CardFooter className="flex justify-end p-4 md:px-8">

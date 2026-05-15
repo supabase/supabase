@@ -144,7 +144,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                       onCheckedChange={(value) => field.onChange(value)}
                     />
                   </FormControl>
-                  <FormLabel>Auto Confirm User?</FormLabel>
+                  <FormLabel>Auto confirm user?</FormLabel>
                 </FormItem>
               )}
             />

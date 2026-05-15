@@ -11,7 +11,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import DNSRecord from './DNSRecord'
+import { DNSRecord } from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -88,10 +88,8 @@ export const CustomDomainVerify = () => {
           </h4>
           <p className="text-sm text-foreground-light">
             Set the following TXT record(s) in your DNS provider, then click verify to confirm your
-            control over the domain.
-          </p>
-          <p className="text-sm text-foreground-light">
-            Records which have been successfully verified will be removed from this list below.
+            control over the domain. Records which have been successfully verified will be removed
+            from this list below.
           </p>
           {!isValidating && (
             <div className="mt-4 mb-2">

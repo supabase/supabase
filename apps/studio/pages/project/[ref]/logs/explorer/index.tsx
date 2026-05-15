@@ -72,7 +72,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
   const [editorId] = useState<string>(uuidv4())
-  const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
+  const { search, setSearch, timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
   const defaultHelper = useMemo(() => getDefaultHelper(EXPLORER_DATEPICKER_HELPERS), [])
   const initialDatePickerValue = useMemo<DatePickerValue>(() => {
     if (timestampStart && timestampEnd) {
@@ -103,6 +103,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
     []
+  )
+
+  const [useOtelEndpoint, setUseOtelEndpoint] = useLocalStorage<boolean>(
+    `logs-explorer-use-otel-endpoint-${projectRef}`,
+    false
   )
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
@@ -136,7 +141,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       iso_timestamp_start: resolvedRange.from,
       iso_timestamp_end: resolvedRange.to,
     },
-    true
+    true,
+    { useOtel: useOtelEndpoint }
   )
 
   const results = logData
@@ -194,7 +200,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     addRecentLogSqlSnippet({ sql: template.searchString })
   }
 
-  const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
+  const handleRun = (value?: string | React.MouseEvent) => {
     track('log_explorer_query_run_button_clicked', { is_saved_query: !!queryId })
 
     const query = typeof value === 'string' ? value || editorValue : editorValue
@@ -211,15 +217,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     } else {
       setTimeRange('', '')
     }
-    const queryParams: Record<string, string | string[] | undefined> = { ...router.query, q: query }
-    if (datePickerValue.isHelper) {
-      delete queryParams.its
-      delete queryParams.ite
-    }
-    router.push({
-      pathname: router.pathname,
-      query: queryParams,
-    })
+    setSearch(query)
     addRecentLogSqlSnippet({ sql: query })
   }
 
@@ -320,10 +318,13 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    if (q) {
+    if (search) {
+      setEditorValue(search)
+    } else if (q) {
       setEditorValue(q)
+      setSearch(q)
     }
-  }, [q])
+  }, [q, search, setSearch])
 
   useEffect(() => {
     // prevents overwriting when the user selects a helper.
@@ -379,6 +380,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
+            useOtel={useOtelEndpoint}
+            onUseOtelChange={setUseOtelEndpoint}
           />
           <ShimmerLine active={isLoading} />
           <CodeEditor

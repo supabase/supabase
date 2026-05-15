@@ -14,6 +14,7 @@ export const LOCAL_STORAGE_KEYS = {
   INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
   MAINTENANCE_BANNER_DISMISSED: (id: string) => `maintenance-banner-dismissed-${id}`,
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
+  UNIFIED_LOGS_DOCK: 'unified-logs-dock',
 
   UI_TIMEZONE: 'supabase-ui-timezone',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
