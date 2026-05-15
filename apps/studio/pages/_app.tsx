@@ -1,10 +1,9 @@
-import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
 import '@/styles/editor.css'
 import '@/styles/focus.css'
+import '@/styles/globals.css'
 import '@/styles/graphiql-base.css'
 import '@/styles/grid.css'
-import '@/styles/globals.css'
 import '@/styles/markdown-preview.css'
 import '@/styles/monaco.css'
 import '@/styles/react-data-grid-logs.css'
@@ -12,6 +11,7 @@ import '@/styles/reactflow.css'
 import '@/styles/storage.css'
 import '@/styles/stripe.css'
 import '@/styles/ui.css'
+import 'react-data-grid/lib/styles.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 
 import { loader } from '@monaco-editor/react'
@@ -52,10 +52,7 @@ import { MainScrollContainerProvider } from '@/components/layouts/MainScrollCont
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
-import {
-  getCLIReleaseVersion,
-  useCLIReleaseVersionQuery,
-} from '@/data/misc/cli-release-version-query'
+import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
 import { useRootQueryClient } from '@/data/query-client'
 import { customFont, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
