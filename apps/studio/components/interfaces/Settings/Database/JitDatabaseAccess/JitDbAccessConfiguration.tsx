@@ -123,16 +123,17 @@ export const JitDbAccessConfiguration = () => {
       },
     })
 
-  const { mutate: revokeUserAccess, isPending: isRevokingAccess } = useJitDbAccessRevokeMutation({
-    onSuccess: (_, variables) => {
-      toast.success('Successfully revoked user access')
-      setSelectedUserToDelete(null)
-      if (ruleIdToEdit === variables.userId) resetSheetState()
-    },
-    onError: (error) => {
-      toast.error(`Failed to revoke user access: ${error.message}`)
-    },
-  })
+  const { mutateAsync: revokeUserAccess, isPending: isRevokingAccess } =
+    useJitDbAccessRevokeMutation({
+      onSuccess: (_, variables) => {
+        toast.success('Successfully revoked user access')
+        setSelectedUserToDelete(null)
+        if (ruleIdToEdit === variables.userId) resetSheetState()
+      },
+      onError: (error) => {
+        toast.error(`Failed to revoke user access: ${error.message}`)
+      },
+    })
 
   const isMutating = isUpdatingJitDbAccess || isRevokingAccess
   const disableRuleActions = isMutating || isLoadingDatabaseRoles || isLoadingOrganizationMembers
@@ -246,10 +247,10 @@ export const JitDbAccessConfiguration = () => {
     setSelectedUserToDelete(user)
   }
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!ref) return console.error('Project ref is required')
     if (!selectedUserToDelete) return toast.error('User is required')
-    revokeUserAccess({ projectRef: ref, userId: selectedUserToDelete.memberId })
+    await revokeUserAccess({ projectRef: ref, userId: selectedUserToDelete.memberId })
   }
 
   const switchDisabled = isLoadingConfiguration || isUpdatingJitDbAccess || !canUpdateJitDbAccess

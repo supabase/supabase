@@ -7,7 +7,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  Button,
 } from 'ui'
 
 import type { JitUserRule } from './JitDbAccess.types'
@@ -16,7 +15,7 @@ interface JitDbAccessDeleteDialogProps {
   user: JitUserRule | null
   isDeleting: boolean
   onClose: () => void
-  onConfirm: () => void
+  onConfirm: () => unknown
 }
 
 export function JitDbAccessDeleteDialog({
@@ -47,17 +46,8 @@ export function JitDbAccessDeleteDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="danger" asChild>
-            <Button
-              loading={isDeleting}
-              disabled={isDeleting}
-              onClick={(e) => {
-                e.preventDefault()
-                onConfirm()
-              }}
-            >
-              Delete rule
-            </Button>
+          <AlertDialogAction variant="danger" loading={isDeleting} onClick={onConfirm}>
+            Delete rule
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

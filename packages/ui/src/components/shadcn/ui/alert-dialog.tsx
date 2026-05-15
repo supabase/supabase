@@ -5,9 +5,70 @@ import { cva, VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
-import { ButtonVariantProps, buttonVariants } from './../../Button'
+import { Button, ButtonVariantProps, buttonVariants } from './../../Button'
 
-const AlertDialog = AlertDialogPrimitive.Root
+type AlertDialogContextValue = {
+  loading: boolean
+  setActionLoading: (id: symbol, loading: boolean) => void
+  setOpen: (open: boolean, options?: { force?: boolean }) => void
+}
+
+const AlertDialogContext = React.createContext<AlertDialogContextValue | null>(null)
+
+const useAlertDialogContext = () => React.useContext(AlertDialogContext)
+
+type AlertDialogProps = React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Root>
+
+const AlertDialog = ({
+  children,
+  defaultOpen = false,
+  onOpenChange,
+  open: openProp,
+  ...props
+}: AlertDialogProps) => {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen)
+  const [loadingActionIds, setLoadingActionIds] = React.useState<Set<symbol>>(() => new Set())
+  const loading = loadingActionIds.size > 0
+  const open = openProp ?? uncontrolledOpen
+
+  const setActionLoading = React.useCallback((id: symbol, actionLoading: boolean) => {
+    setLoadingActionIds((currentIds) => {
+      const nextIds = new Set(currentIds)
+
+      if (actionLoading) nextIds.add(id)
+      else nextIds.delete(id)
+
+      return nextIds
+    })
+  }, [])
+
+  const setOpen = React.useCallback(
+    (nextOpen: boolean, options?: { force?: boolean }) => {
+      if (loading && !nextOpen && !options?.force) return
+
+      if (openProp === undefined) {
+        setUncontrolledOpen(nextOpen)
+      }
+
+      onOpenChange?.(nextOpen)
+    },
+    [loading, onOpenChange, openProp]
+  )
+
+  const contextValue = React.useMemo(
+    () => ({ loading, setActionLoading, setOpen }),
+    [loading, setActionLoading, setOpen]
+  )
+
+  return (
+    <AlertDialogContext.Provider value={contextValue}>
+      <AlertDialogPrimitive.Root open={open} onOpenChange={setOpen} {...props}>
+        {children}
+      </AlertDialogPrimitive.Root>
+    </AlertDialogContext.Provider>
+  )
+}
+AlertDialog.displayName = AlertDialogPrimitive.Root.displayName
 
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 
@@ -73,19 +134,45 @@ const AlertDialogContent = React.forwardRef<
       dialogOverlayProps?: React.ComponentPropsWithoutRef<typeof AlertDialogOverlay>
       centered?: boolean
     }
->(({ className, children, size, dialogOverlayProps, centered = true, ...props }, ref) => (
-  <AlertDialogPortal>
-    <AlertDialogOverlay centered={centered} {...dialogOverlayProps}>
-      <AlertDialogPrimitive.Content
-        ref={ref}
-        className={cn(AlertDialogContentVariants({ size }), className)}
-        {...props}
-      >
-        {children}
-      </AlertDialogPrimitive.Content>
-    </AlertDialogOverlay>
-  </AlertDialogPortal>
-))
+>(
+  (
+    {
+      className,
+      children,
+      size,
+      dialogOverlayProps,
+      centered = true,
+      onEscapeKeyDown,
+      onFocusOutside,
+      ...props
+    },
+    ref
+  ) => {
+    const alertDialogContext = useAlertDialogContext()
+
+    return (
+      <AlertDialogPortal>
+        <AlertDialogOverlay centered={centered} {...dialogOverlayProps}>
+          <AlertDialogPrimitive.Content
+            ref={ref}
+            className={cn(AlertDialogContentVariants({ size }), className)}
+            onEscapeKeyDown={(event) => {
+              onEscapeKeyDown?.(event)
+              if (alertDialogContext?.loading) event.preventDefault()
+            }}
+            onFocusOutside={(event) => {
+              onFocusOutside?.(event)
+              if (alertDialogContext?.loading) event.preventDefault()
+            }}
+            {...props}
+          >
+            {children}
+          </AlertDialogPrimitive.Content>
+        </AlertDialogOverlay>
+      </AlertDialogPortal>
+    )
+  }
+)
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
 
 const AlertDialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
@@ -133,33 +220,133 @@ const AlertDialogDescription = React.forwardRef<
 ))
 AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName
 
-type AlertDialogActionProps = React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action> & {
+const isPromiseLike = (value: unknown): value is PromiseLike<unknown> => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'then' in value &&
+    typeof value.then === 'function'
+  )
+}
+
+type AlertDialogActionProps = Omit<
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>,
+  'onClick'
+> & {
   variant?: NonNullable<ButtonVariantProps['type']>
+  loading?: boolean
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => unknown
 }
 
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
   AlertDialogActionProps
->(({ className, variant = 'primary', type = 'button', ...props }, ref) => (
-  <AlertDialogPrimitive.Action
-    ref={ref}
-    type={type}
-    className={cn(buttonVariants({ type: variant, size: 'tiny' }), className)}
-    {...props}
-  />
-))
+>(
+  (
+    {
+      asChild,
+      children,
+      className,
+      disabled,
+      loading: loadingProp = false,
+      onClick,
+      variant = 'primary',
+      type = 'button',
+      ...props
+    },
+    ref
+  ) => {
+    const alertDialogContext = useAlertDialogContext()
+    const dialogLoading = alertDialogContext?.loading ?? false
+    const setActionLoading = alertDialogContext?.setActionLoading
+    const setOpen = alertDialogContext?.setOpen
+    const actionId = React.useRef(Symbol('AlertDialogAction'))
+    const [internalLoading, setInternalLoading] = React.useState(false)
+    const loading = loadingProp || internalLoading
+    const isDisabled = disabled || loading || dialogLoading
+
+    React.useEffect(() => {
+      setActionLoading?.(actionId.current, loading)
+
+      return () => {
+        setActionLoading?.(actionId.current, false)
+      }
+    }, [loading, setActionLoading])
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (isDisabled) {
+        event.preventDefault()
+        return
+      }
+
+      const result = onClick?.(event)
+
+      if (!isPromiseLike(result)) return
+
+      event.preventDefault()
+      setInternalLoading(true)
+
+      void (async () => {
+        try {
+          await result
+          setOpen?.(false, { force: true })
+        } catch {
+          // Keep the dialog open so consumers can surface mutation errors in context.
+        } finally {
+          setInternalLoading(false)
+        }
+      })()
+    }
+
+    if (asChild) {
+      return (
+        <AlertDialogPrimitive.Action
+          ref={ref}
+          asChild
+          className={cn(buttonVariants({ type: variant, size: 'tiny' }), className)}
+          disabled={isDisabled}
+          onClick={handleClick}
+          type={type}
+          {...props}
+        >
+          {children}
+        </AlertDialogPrimitive.Action>
+      )
+    }
+
+    return (
+      <AlertDialogPrimitive.Action asChild onClick={handleClick} {...props}>
+        <Button
+          ref={ref}
+          className={className}
+          disabled={isDisabled}
+          htmlType={type}
+          loading={loading}
+          type={variant}
+        >
+          {children}
+        </Button>
+      </AlertDialogPrimitive.Action>
+    )
+  }
+)
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName
 
 const AlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>
->(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Cancel
-    ref={ref}
-    className={cn(buttonVariants({ type: 'default', size: 'tiny' }), 'mt-2 sm:mt-0', className)}
-    {...props}
-  />
-))
+>(({ className, disabled, ...props }, ref) => {
+  const alertDialogContext = useAlertDialogContext()
+
+  return (
+    <AlertDialogPrimitive.Cancel
+      ref={ref}
+      className={cn(buttonVariants({ type: 'default', size: 'tiny' }), 'mt-2 sm:mt-0', className)}
+      disabled={disabled || alertDialogContext?.loading}
+      {...props}
+    />
+  )
+})
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName
 
 export {

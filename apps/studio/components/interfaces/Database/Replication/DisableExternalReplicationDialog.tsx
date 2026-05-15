@@ -9,7 +9,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  Button,
 } from 'ui'
 
 import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-tenant-mutation'
@@ -54,18 +53,8 @@ export const DisableExternalReplicationDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="danger" asChild>
-            <Button
-              type="danger"
-              loading={isSubmitting}
-              disabled={isSubmitting}
-              onClick={(e) => {
-                e.preventDefault()
-                onConfirm()
-              }}
-            >
-              Disable external replication
-            </Button>
+          <AlertDialogAction variant="danger" loading={isSubmitting} onClick={onConfirm}>
+            Disable external replication
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

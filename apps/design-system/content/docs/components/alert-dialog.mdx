@@ -107,6 +107,13 @@ See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate
 
 ## Examples
 
+### Async action
+
+When an action returns a Promise, Alert Dialog keeps the dialog open, shows a loading state on the
+action button, and disables dismissal until the Promise resolves.
+
+<ComponentPreview name="alert-dialog-async" peekCode wide />
+
 ### Close only
 
 <ComponentPreview name="alert-dialog-close-only" />

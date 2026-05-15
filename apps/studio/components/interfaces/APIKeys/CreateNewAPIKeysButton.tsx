@@ -18,14 +18,12 @@ import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation
 export const CreateNewAPIKeysButton = () => {
   const { ref: projectRef } = useParams()
 
-  const [isCreatingKeys, setIsCreatingKeys] = useState(false)
   const [createKeysDialogOpen, setCreateKeysDialogOpen] = useState(false)
 
   const { mutateAsync: createAPIKey } = useAPIKeyCreateMutation()
 
   const handleCreateNewApiKeys = async () => {
     if (!projectRef) return
-    setIsCreatingKeys(true)
 
     try {
       // Create publishable key
@@ -38,8 +36,7 @@ export const CreateNewAPIKeysButton = () => {
       toast.success('Successfully created a new set of API keys!')
     } catch (error) {
       console.error('Failed to create API keys:', error)
-    } finally {
-      setIsCreatingKeys(false)
+      throw error
     }
   }
 
@@ -57,9 +54,7 @@ export const CreateNewAPIKeysButton = () => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleCreateNewApiKeys} disabled={isCreatingKeys}>
-            {isCreatingKeys ? 'Creating...' : 'Create keys'}
-          </AlertDialogAction>
+          <AlertDialogAction onClick={handleCreateNewApiKeys}>Create keys</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

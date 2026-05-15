@@ -86,6 +86,7 @@ export const EnableIndexAdvisorDialog = ({
       setOpen(false)
     } catch (error: any) {
       toast.error(`Failed to enable Index Advisor: ${error.message}`)
+      throw error
     }
   }
 
@@ -109,12 +110,11 @@ export const EnableIndexAdvisorDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={(e) => {
-              e.preventDefault()
-              onEnableIndexAdvisor()
+            loading={isEnablingExtension}
+            onClick={() => {
               track('index_advisor_dialog_enable_button_clicked')
+              return onEnableIndexAdvisor()
             }}
-            disabled={isEnablingExtension}
           >
             {isEnablingExtension ? 'Enabling...' : 'Enable'}
           </AlertDialogAction>

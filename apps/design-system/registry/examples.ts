@@ -80,6 +80,12 @@ export const examples: Registry = [
     files: ['example/alert-dialog-close-only.tsx'],
   },
   {
+    name: 'alert-dialog-async',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button'],
+    files: ['example/alert-dialog-async.tsx'],
+  },
+  {
     name: 'alert-dialog-destructive',
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],
