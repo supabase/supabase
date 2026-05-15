@@ -64,8 +64,6 @@ const mcpTextContentSpanOutputSchema = z.object({
 
 // --- Scorers ---
 
-const unknownRecordSchema = z.record(z.string(), z.unknown())
-
 const matchesToolInputField = (actual: unknown, expected: ToolInputFieldExpectation) => {
   if ('stringIncludes' in expected) {
     return typeof actual === 'string' && actual.includes(expected.stringIncludes)
@@ -78,11 +76,10 @@ const matchesExpectedToolInput = (
   actual: unknown,
   expected: Record<string, ToolInputFieldExpectation>
 ) => {
-  const result = unknownRecordSchema.safeParse(actual)
-  if (!result.success) return false
+  if (typeof actual !== 'object' || actual === null || Array.isArray(actual)) return false
 
   return Object.entries(expected).every(([key, expectedValue]) => {
-    return matchesToolInputField(result.data[key], expectedValue)
+    return matchesToolInputField(Reflect.get(actual, key), expectedValue)
   })
 }
 
