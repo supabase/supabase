@@ -1,11 +1,12 @@
 import { useParams } from 'common'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { EmptyRealtime } from './EmptyRealtime'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
+import { useRealtimeInspectorShortcuts } from './useRealtimeInspectorShortcuts'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -32,6 +33,8 @@ export const RealtimeInspector = () => {
     ((realtimePublication?.tables ?? []).length > 0 || realtimePublication?.tables === null)
 
   const [sendMessageShown, setSendMessageShown] = useState(false)
+  const [channelPopoverOpen, setChannelPopoverOpen] = useState(false)
+  const [filterPopoverOpen, setFilterPopoverOpen] = useState(false)
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
     enabled: false,
     projectRef: ref!,
@@ -51,6 +54,41 @@ export const RealtimeInspector = () => {
   const { mutate: sendEvent } = useSendEventMutation()
   const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
 
+  const hasChannel = realtimeConfig.channelName.length > 0
+  const isListening = realtimeConfig.enabled
+
+  const handleJoinChannel = useCallback(() => {
+    if (!hasChannel) {
+      setChannelPopoverOpen(true)
+    }
+  }, [hasChannel])
+
+  const handleToggleListening = useCallback(() => {
+    if (!hasChannel) return
+    setRealtimeConfig((prev) => ({ ...prev, enabled: !prev.enabled }))
+  }, [hasChannel])
+
+  const handleToggleFilters = useCallback(() => {
+    if (hasChannel) {
+      setFilterPopoverOpen(true)
+    }
+  }, [hasChannel])
+
+  const handleBroadcast = useCallback(() => {
+    if (isListening) {
+      setSendMessageShown(true)
+    }
+  }, [isListening])
+
+  useRealtimeInspectorShortcuts({
+    hasChannel,
+    isListening,
+    onJoinChannel: handleJoinChannel,
+    onToggleListening: handleToggleListening,
+    onToggleFilters: handleToggleFilters,
+    onBroadcast: handleBroadcast,
+  })
+
   // Update enableDbChanges when publications change
   useEffect(() => {
     setRealtimeConfig((prev) => ({ ...prev, enableDbChanges: isRealtimeAvailable }))
@@ -58,13 +96,20 @@ export const RealtimeInspector = () => {
 
   return (
     <div className="flex flex-col grow h-full">
-      <Header config={realtimeConfig} onChangeConfig={setRealtimeConfig} />
+      <Header
+        config={realtimeConfig}
+        onChangeConfig={setRealtimeConfig}
+        channelPopoverOpen={channelPopoverOpen}
+        onChannelPopoverChange={setChannelPopoverOpen}
+        filterPopoverOpen={filterPopoverOpen}
+        onFilterPopoverChange={setFilterPopoverOpen}
+      />
       <div className="relative flex flex-col grow">
         <div className="flex grow">
           {(logData ?? []).length > 0 ? (
             <MessagesTable
-              hasChannelSet={realtimeConfig.channelName.length > 0}
-              enabled={realtimeConfig.enabled}
+              hasChannelSet={hasChannel}
+              enabled={isListening}
               data={logData}
               showSendMessage={() => setSendMessageShown(true)}
             />

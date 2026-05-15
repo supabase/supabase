@@ -29,12 +29,29 @@ import { DOCS_URL } from '@/lib/constants'
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig
   onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 const FormSchema = z.object({ channel: z.string(), isPrivate: z.boolean() })
 
-export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
-  const [open, setOpen] = useState(false)
+export const ChooseChannelPopover = ({
+  config,
+  onChangeConfig,
+  open: controlledOpen,
+  onOpenChange,
+}: ChooseChannelPopoverProps) => {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+
+  const setOpen = (v: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(v)
+    } else {
+      setInternalOpen(v)
+    }
+  }
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()

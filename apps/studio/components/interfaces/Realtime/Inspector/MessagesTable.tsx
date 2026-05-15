@@ -14,10 +14,12 @@ import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 import { DocsButton } from '@/components/ui/DocsButton'
 import NoPermission from '@/components/ui/NoPermission'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { DOCS_URL } from '@/lib/constants'
 
 export const isErrorLog = (l: LogData) => {
@@ -169,13 +171,15 @@ const MessagesTable = ({
                       : `No message found yet...`}
                   </div>
                 </div>
-                <Button
-                  type="default"
-                  onClick={showSendMessage}
-                  icon={<Megaphone strokeWidth={1.5} />}
-                >
-                  <span>Broadcast a message</span>
-                </Button>
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
+                  <Button
+                    type="default"
+                    onClick={showSendMessage}
+                    icon={<Megaphone strokeWidth={1.5} />}
+                  >
+                    <span>Broadcast a message</span>
+                  </Button>
+                </ShortcutTooltip>
               </div>
             )}
 

@@ -30,10 +30,27 @@ import { DOCS_URL } from '@/lib/constants'
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig
   onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilterPopoverProps) => {
-  const [open, setOpen] = useState(false)
+export const RealtimeFilterPopover = ({
+  config,
+  onChangeConfig,
+  open: controlledOpen,
+  onOpenChange,
+}: RealtimeFilterPopoverProps) => {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+
+  const setOpen = (v: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(v)
+    } else {
+      setInternalOpen(v)
+    }
+  }
   const [applyConfigOpen, setApplyConfigOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
 

@@ -1,13 +1,16 @@
 import { useParams } from 'common'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
-import { Button, cn } from 'ui'
+import { toast } from 'sonner'
+import { Button, cn, copyToClipboard } from 'ui'
 
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
 import CopyButton from '@/components/ui/CopyButton'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export interface MessageSelectionProps {
   log: LogData | null
@@ -22,6 +25,18 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const handleCopy = () => {
+    if (!log) return
+    copyToClipboard(selectionText)
+    toast.success('Message copied to clipboard')
+  }
+
+  useShortcut(SHORTCUT_IDS.INSPECTOR_COPY_MESSAGE, handleCopy, {
+    enabled: !!log,
+    ignoreInputs: true,
+    registerInCommandMenu: true,
+  })
 
   return (
     <div className={cn('relative flex h-full grow flex-col border-l overflow-y-scroll bg-200')}>
