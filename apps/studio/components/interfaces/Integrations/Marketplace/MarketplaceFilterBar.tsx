@@ -1,11 +1,5 @@
 import { LayoutGrid, List, Search } from 'lucide-react'
-import {
-  cn,
-  Select_Shadcn_ as Select,
-  SelectContent_Shadcn_ as SelectContent,
-  SelectItem_Shadcn_ as SelectItem,
-  SelectTrigger_Shadcn_ as SelectTrigger,
-} from 'ui'
+import { cn, Select, SelectContent, SelectItem, SelectTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import {

@@ -3,7 +3,7 @@ import { ArrowUpRight, BookOpen, ChevronRight, LayoutGrid, PlusSquare } from 'lu
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, type ReactNode } from 'react'
-import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import {
   FEATURED_CATEGORIES,
@@ -44,8 +44,8 @@ const CollapsibleSection = ({
   )
 
   return (
-    <Collapsible_Shadcn_ open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger_Shadcn_
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger
         className={cn(
           sectionLabelCls,
           'group flex w-full items-center justify-between gap-2 hover:text-foreground-light'
@@ -56,11 +56,9 @@ const CollapsibleSection = ({
           size={12}
           className="text-foreground-muted transition-transform group-data-[state=open]:rotate-90"
         />
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="flex flex-col gap-y-0.5">
-        {children}
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="flex flex-col gap-y-0.5">{children}</CollapsibleContent>
+    </Collapsible>
   )
 }
 
