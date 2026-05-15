@@ -966,7 +966,7 @@ export interface WwwPricingPlanCtaClickedEvent {
  * @page /events/*
  */
 export interface EventPageCtaClickedEvent {
-  action: 'www_pricing_plan_cta_clicked'
+  action: 'www_event_page_cta_clicked'
   properties: {
     /**
      * The title of the event clicked.
