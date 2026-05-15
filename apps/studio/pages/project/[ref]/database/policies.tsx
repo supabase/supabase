@@ -22,6 +22,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useIsRLSTesterEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTesterSheet'
 import { Policies } from '@/components/interfaces/Database/Policies/Policies'
 import { PoliciesDataProvider } from '@/components/interfaces/Database/Policies/PoliciesDataContext'
 import { getGeneralPolicyTemplates } from '@/components/interfaces/Database/Policies/PolicyEditorModal/PolicyEditorModal.constants'
@@ -30,7 +31,6 @@ import {
   generatePolicyUpdateSQL,
   type Policy,
 } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
-import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTesterSheet'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
