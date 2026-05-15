@@ -287,24 +287,6 @@ export interface TimezonePickerClickedEvent {
   groups: TelemetryGroups
 }
 /**
- * User was exposed to the project creation form (exposure event for RLS option experiment).
- *
- * @group Events
- * @source studio
- * @page new/{slug}
- */
-export interface ProjectCreationRlsOptionExperimentExposedEvent {
-  action: 'project_creation_rls_option_experiment_exposed'
-  properties: {
-    /**
-     * Experiment variant: 'control' (checkbox hidden) or 'test' (checkbox shown)
-     */
-    variant: 'control' | 'test'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * Top-of-funnel event for the dataApiRevokeOnCreateDefault rollout. Fires once per
  * mount after the flag resolves so cohort attribution is clean — pair with
  * project_creation_simple_version_submitted to measure the flag's impact on
@@ -1913,24 +1895,6 @@ export interface HomeCustomReportBlockRemovedEvent {
 }
 
 /**
- * User was exposed to the HomeV2 experiment (shown the new home page).
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeNewExperimentExposedEvent {
-  action: 'home_new_experiment_exposed'
-  properties: {
-    /**
-     * The experiment variant shown to the user
-     */
-    variant: string
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * Connect section was shown to the user on the project homepage.
  *
  * @group Events
@@ -2160,68 +2124,6 @@ export interface RLSGeneratedPolicyRemovedEvent {
  */
 export interface RLSGeneratedPoliciesCreatedEvent {
   action: 'rls_generated_policies_created'
-  groups: TelemetryGroups
-}
-
-/**
- * Conversion event for the generate policies experiment.
- * Fires when a user in the experiment creates a new table via table editor.
- * This is separate from TableCreatedEvent to keep experiment tracking isolated.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
-  action: 'table_create_generate_policies_experiment_converted'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'tableCreateGeneratePolicies'
-    /**
-     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
-     */
-    variant: 'control' | 'variation'
-    /**
-     * Whether RLS was enabled on the table
-     */
-    has_rls_enabled: boolean
-    /**
-     * Whether the table was created with any RLS policies (manual or generated)
-     */
-    has_rls_policies: boolean
-    /**
-     * Whether AI-generated policies were used (only possible in variation)
-     */
-    has_generated_policies: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User was exposed to the generate policies experiment (shown or not shown the Generate Policies button).
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface TableCreateGeneratePoliciesExperimentExposedEvent {
-  action: 'table_create_generate_policies_experiment_exposed'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'tableCreateGeneratePolicies'
-    /**
-     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
-     */
-    variant: 'control' | 'variation'
-    /**
-     * Days since project creation (to segment by new user cohorts)
-     */
-    days_since_project_creation: number
-  }
   groups: TelemetryGroups
 }
 
@@ -3405,7 +3307,6 @@ export type TelemetryEvent =
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | TimezonePickerClickedEvent
-  | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationDefaultPrivilegesExposedEvent
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
@@ -3501,7 +3402,6 @@ export type TelemetryEvent =
   | BranchSelectorCreateClickedEvent
   | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
-  | HomeNewExperimentExposedEvent
   | HomeConnectSectionExposedEvent
   | HomeConnectActionClickedEvent
   | ConnectSheetOpenedEvent
@@ -3520,8 +3420,6 @@ export type TelemetryEvent =
   | RLSGeneratePoliciesClickedEvent
   | RLSGeneratedPolicyRemovedEvent
   | RLSGeneratedPoliciesCreatedEvent
-  | TableCreateGeneratePoliciesExperimentExposedEvent
-  | TableCreateGeneratePoliciesExperimentConvertedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuClosedEvent
