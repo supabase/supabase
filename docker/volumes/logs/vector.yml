@@ -53,8 +53,19 @@ transforms:
           url, split_err = split(req.request, " ")
           if split_err == null {
               .metadata.request.method = url[0]
-              .metadata.request.path = url[1]
+              raw_path = url[1]
               .metadata.request.protocol = url[2]
+              # Split path and query string so .metadata.request.search is populated.
+              # BigQuery queries on edge_logs join on request.search; without this
+              # field the column is always null on self-hosted setups.
+              path_parts, qs_err = split(raw_path, "?", limit: 2)
+              if qs_err == null && length(path_parts) == 2 {
+                  .metadata.request.path = path_parts[0]
+                  .metadata.request.search = "?" + path_parts[1]
+              } else {
+                  .metadata.request.path = raw_path
+                  .metadata.request.search = ""
+              }
           }
       }
       if err != null {
@@ -158,6 +169,7 @@ transforms:
       .metadata.host = "db-default"
       .metadata.parsed.timestamp = .timestamp
 
+      # --- error_severity ---
       parsed, err = parse_regex(.event_message, r'.*(?P<level>INFO|NOTICE|WARNING|ERROR|LOG|FATAL|PANIC?):.*', numeric_groups: true)
 
       if err != null || parsed == null {
@@ -170,6 +182,36 @@ transforms:
           .metadata.parsed.error_severity = "log"
       }
       .metadata.parsed.error_severity = upcase!(.metadata.parsed.error_severity)
+
+      # --- Structured Postgres stderr fields (csvlog / standard prefix format) ---
+      # Postgres stderr lines look like:
+      #   2024-01-01 00:00:00 UTC [12345]: user=myuser,db=mydb,app=psql,client=127.0.0.1 LOG:  00000: message
+      # We extract user_name, database_name, application_name, and sql_state_code so
+      # that these columns are never NULL in BigQuery. Missing any of them causes
+      # UNNEST of the parsed array to fail schema validation on empty tables.
+
+      pg_meta, pg_err = parse_regex(
+        .event_message,
+        r'user=(?P<user_name>[^,]+),db=(?P<database_name>[^,]+),app=(?P<application_name>[^,]+)'
+      )
+      if pg_err == null {
+        .metadata.parsed.user_name        = pg_meta.user_name
+        .metadata.parsed.database_name    = pg_meta.database_name
+        .metadata.parsed.application_name = pg_meta.application_name
+      } else {
+        .metadata.parsed.user_name        = ""
+        .metadata.parsed.database_name    = ""
+        .metadata.parsed.application_name = ""
+      }
+
+      # sql_state_code is the 5-char SQLSTATE that follows the severity and colon.
+      # Example: LOG:  00000: statement: SELECT 1
+      state_meta, state_err = parse_regex(.event_message, r'[A-Z]+:\s+(?P<sql_state_code>[0-9A-Z]{5}):')
+      if state_err == null {
+        .metadata.parsed.sql_state_code = state_meta.sql_state_code
+      } else {
+        .metadata.parsed.sql_state_code = ""
+      }
 
 sinks:
   logflare_auth:

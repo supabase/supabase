@@ -323,10 +323,12 @@ const calcChartStart = (
   return [its.add(-extendValue, trunc), trunc]
 }
 
-// TODO(qiao): workaround for self-hosted cron logs error until logflare is fixed
+// Use standard CAST() instead of Postgres-specific ::text so this works on both
+// PostgreSQL (self-hosted Logflare) and BigQuery (self-hosted Logflare + BigQuery backend).
+// regexp_contains() is BigQuery-only, so we use CAST+LIKE for cross-dialect compatibility.
 const basePgCronWhere = IS_PLATFORM
-  ? `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
-  : `where ( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
+  ? `where ( parsed.application_name = 'pg_cron' or CAST(event_message AS VARCHAR) LIKE '%cron job%' )`
+  : `where ( parsed.application_name = 'pg_cron' or CAST(event_message AS VARCHAR) LIKE '%cron job%' )`
 /**
  *
  * generates log event chart query
