@@ -454,72 +454,6 @@ export interface TableApiAccessToggleClickedEvent {
 }
 
 /**
- * On the InitialStep.tsx screen, where user can chose to prompt, start blank or migrate, at least 5 characters were typed
- * in the prompt textarea indicating an intention to use the prompt.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationInitialStepPromptIntendedEvent {
-  action: 'project_creation_initial_step_prompt_intended'
-  /**
-   * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
-   * words, was this not just an edit. In this case, it should always be true.
-   */
-  properties: {
-    isNewPrompt: boolean
-  }
-}
-
-/**
- * First step of project creation was submitted, where the user writes a prompt or select to start blank or to migrate.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationInitialStepSubmittedEvent {
-  action: 'project_creation_initial_step_submitted'
-  properties: {
-    /**
-     * Records what the user selected in the first step of project creation.
-     */
-    onboardingPath: 'use_prompt' | 'start_blank' | 'migrate'
-  }
-}
-
-/**
- * After the InitialStep screen, at least 5 characters were typed in the prompt textarea indicating an intention to use the prompt.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationSecondStepPromptIntendedEvent {
-  action: 'project_creation_second_step_prompt_intended'
-  properties: {
-    /**
-     * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
-     * words, was this not just an edit.
-     */
-    isNewPrompt: boolean
-  }
-}
-
-/**
- * Second and final step of project creation was submitted. More precisely, right after the user clicks on "Create Project". To check,
- * if the project creation was successful, please refer to project_created event.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationSecondStepSubmittedEvent {
-  action: 'project_creation_second_step_submitted'
-}
-
-/**
  * User clicked either "Listening to channel" or "Start listening" button after selecting a channel.
  *
  * @group Events
@@ -3477,10 +3411,6 @@ export type TelemetryEvent =
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | TableApiAccessToggleClickedEvent
-  | ProjectCreationInitialStepPromptIntendedEvent
-  | ProjectCreationInitialStepSubmittedEvent
-  | ProjectCreationSecondStepPromptIntendedEvent
-  | ProjectCreationSecondStepSubmittedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
   | RealtimeInspectorMessageClickedEvent
