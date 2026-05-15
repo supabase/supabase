@@ -6,9 +6,9 @@ import { useEffect, useState } from 'react'
 import {
   Button,
   InfoIcon,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -306,8 +306,8 @@ export const ServiceStatus = () => {
   }, [isProjectNew])
 
   return (
-    <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover modal={false} open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           type="default"
           icon={
@@ -324,8 +324,8 @@ export const ServiceStatus = () => {
         >
           {isBranch ? 'Branch' : 'Project'} Status
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
@@ -377,7 +377,7 @@ export const ServiceStatus = () => {
             </div>
           </div>
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

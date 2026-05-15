@@ -8,9 +8,9 @@ import {
   Button,
   cn,
   LoadingLine,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Separator,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -192,17 +192,17 @@ export const QueueTab = () => {
               )}
             </>
           ) : (
-            <Popover_Shadcn_
+            <Popover
               modal={false}
               open={openRlsPopover}
               onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
             >
-              <PopoverTrigger_Shadcn_ asChild>
+              <PopoverTrigger asChild>
                 <Button type={isExposed ? 'warning' : 'default'} icon={<Lock strokeWidth={1.5} />}>
                   RLS disabled
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
+              </PopoverTrigger>
+              <PopoverContent className="w-80 text-sm" align="end">
                 <h3 className="text-xs flex items-center gap-x-2">
                   <Lock size={14} /> Row Level Security (RLS)
                 </h3>
@@ -241,8 +241,8 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
                     </>
                   )}
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
           <Button type="primary" onClick={() => setSendMessageModalShown(true)}>

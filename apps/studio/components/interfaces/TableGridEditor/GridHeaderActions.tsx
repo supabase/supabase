@@ -14,9 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -265,13 +265,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 )}
               </>
             ) : tableHasLints ? (
-              <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+                <PopoverTrigger asChild>
                   <Button type="danger" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
+                </PopoverTrigger>
+                <PopoverContent className="w-80 text-sm" align="end">
                   <h4 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
                   </h4>
@@ -294,8 +294,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       </Button>
                     )}
                   </div>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
             ) : null
           ) : null}
 
@@ -313,13 +313,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           )}
 
           {isForeignTable && table.schema === 'public' && (
-            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+              <PopoverTrigger asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Unprotected Data API access
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              </PopoverTrigger>
+              <PopoverContent className="min-w-[395px] text-sm" align="end">
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure Foreign table
                 </h3>
@@ -341,8 +341,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </Button>
                   </div>
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
           <RoleImpersonationPopover header="View data as a role" align="center" />

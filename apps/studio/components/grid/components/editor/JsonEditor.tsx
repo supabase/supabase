@@ -4,9 +4,9 @@ import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
 import {
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -160,8 +160,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Popover_Shadcn_ open={isPopoverOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={isPopoverOpen}>
+      <PopoverTrigger asChild>
         <div
           className={`${
             !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
@@ -170,8 +170,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
         >
           {value === null || value === '' ? <NullValue /> : jsonString}
         </div>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         side="bottom"
         align="start"
         sideOffset={-35}
@@ -226,7 +226,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
             </div>
           </BlockKeys>
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

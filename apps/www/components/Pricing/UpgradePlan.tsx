@@ -25,9 +25,9 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { Organization } from '~/data/organizations'
 
@@ -58,8 +58,8 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
         </DialogHeader>
 
         <DialogSection className="py-2">
-          <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
               <Button
                 type="default"
                 role="combobox"
@@ -79,8 +79,8 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
                   'Select an organization...'
                 )}
               </Button>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[300px] p-0">
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] p-0">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Select organization..." />
                 <CommandList_Shadcn_>
@@ -127,8 +127,8 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
                   </CommandGroup_Shadcn_>
                 </CommandList_Shadcn_>
               </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
         </DialogSection>
 
         <DialogSection>

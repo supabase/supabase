@@ -112,7 +112,7 @@ function Close() {
 }
 
 /**
- * @deprecated Use ./PopoverSeparator_Shadcn_ instead
+ * @deprecated Use ./PopoverSeparator instead
  */
 function Separator() {
   const __styles = styleHandler('popover')

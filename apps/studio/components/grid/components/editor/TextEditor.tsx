@@ -6,9 +6,9 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -114,8 +114,8 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   return (
     <>
-      <Popover_Shadcn_ open={isPopoverOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={isPopoverOpen}>
+        <PopoverTrigger asChild>
           <div
             className={cn(
               !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
@@ -125,13 +125,8 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
           >
             {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
           </div>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          className="rounded-none p-0"
-          side="bottom"
-          align="start"
-          sideOffset={-35}
-        >
+        </PopoverTrigger>
+        <PopoverContent className="rounded-none p-0" side="bottom" align="start" sideOffset={-35}>
           {isTruncated && !isSuccess ? (
             <div className="flex items-center justify-center flex-col relative">
               <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />
@@ -196,8 +191,8 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
               )}
             </BlockKeys>
           )}
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
       <ConfirmationModal
         visible={isConfirmNextModalOpen}
         title="Confirm setting value to NULL"

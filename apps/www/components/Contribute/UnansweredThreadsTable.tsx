@@ -11,9 +11,9 @@ import {
   Card,
   cn,
   Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Table,
   TableBody,
   TableCaption,
@@ -507,8 +507,8 @@ function ThreadRow({
                     )
                   })}
                   {filteredStack.length > 5 && (
-                    <Popover_Shadcn_>
-                      <PopoverTrigger_Shadcn_ asChild>
+                    <Popover>
+                      <PopoverTrigger asChild>
                         <button
                           type="button"
                           onClick={(e) => {
@@ -534,8 +534,8 @@ function ThreadRow({
                             + {filteredStack.length - 5}
                           </Badge>
                         </button>
-                      </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_ className="max-w-[300px] p-3">
+                      </PopoverTrigger>
+                      <PopoverContent className="max-w-[300px] p-3">
                         <div className="flex flex-wrap gap-2">
                           {overflowStacks.map((tech: string) => {
                             const isActive = currentStack === tech
@@ -559,8 +559,8 @@ function ThreadRow({
                             )
                           })}
                         </div>
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
+                      </PopoverContent>
+                    </Popover>
                   )}
                 </>
               )

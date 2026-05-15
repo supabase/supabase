@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { CodeIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button, cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 import { TEMPLATES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
@@ -75,8 +75,8 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
       description={template.description}
       footer={
         <div className="flex flex-row justify-end">
-          <Popover_Shadcn_ onOpenChange={setShowPreview} open={showPreview}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover onOpenChange={setShowPreview} open={showPreview}>
+            <PopoverTrigger asChild>
               <Button
                 asChild
                 type="default"
@@ -87,13 +87,13 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
               >
                 <span>Preview</span>
               </Button>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="rounded-lg bg-alternative p-0">
+            </PopoverTrigger>
+            <PopoverContent className="rounded-lg bg-alternative p-0">
               <pre className="whitespace-pre-line wrap-break-word rounded-lg bg-alternative p-4 text-sm">
                 {template.searchString}
               </pre>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
         </div>
       }
     />

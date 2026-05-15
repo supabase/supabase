@@ -30,9 +30,9 @@ import {
   FormMessage,
   Input_Shadcn_,
   Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import * as z from 'zod'
@@ -230,8 +230,8 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
             <DialogSection className="py-5 flex flex-col gap-y-4">
               <div className="flex flex-col gap-y-2">
                 <Label_Shadcn_ className="text-foreground-light">Select a folder</Label_Shadcn_>
-                <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                  <PopoverTrigger_Shadcn_ asChild>
+                <Popover open={open} onOpenChange={setOpen} modal={false}>
+                  <PopoverTrigger asChild>
                     <Button
                       block
                       size="small"
@@ -250,8 +250,8 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                         {isCurrentFolder && ` (Current)`}
                       </div>
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_
+                  </PopoverTrigger>
+                  <PopoverContent
                     className="p-0"
                     side="bottom"
                     align="start"
@@ -328,8 +328,8 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                         </CommandGroup_Shadcn_>
                       </CommandList_Shadcn_>
                     </Command_Shadcn_>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {selectedId === 'new-folder' && (

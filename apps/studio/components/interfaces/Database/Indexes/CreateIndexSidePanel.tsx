@@ -11,9 +11,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -179,12 +179,12 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
       <div className="py-6 space-y-6">
         <SidePanel.Content className="space-y-6">
           <FormItemLayout label="Select a schema" name="select-schema" isReactForm={false}>
-            <Popover_Shadcn_
+            <Popover
               modal={false}
               open={schemaDropdownOpen}
               onOpenChange={setSchemaDropdownOpen}
             >
-              <PopoverTrigger_Shadcn_ asChild>
+              <PopoverTrigger asChild>
                 <Button
                   type="default"
                   size={'medium'}
@@ -197,8 +197,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                     ? selectedSchema
                     : 'Choose a schema'}
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 className="p-0"
                 side="bottom"
                 align="start"
@@ -236,8 +236,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           </FormItemLayout>
 
           <FormItemLayout
@@ -250,12 +250,12 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             }
             isReactForm={false}
           >
-            <Popover_Shadcn_
+            <Popover
               modal={false}
               open={tableDropdownOpen}
               onOpenChange={setTableDropdownOpen}
             >
-              <PopoverTrigger_Shadcn_
+              <PopoverTrigger
                 asChild
                 disabled={isSelectEntityDisabled || isLoadingEntities}
               >
@@ -276,8 +276,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                       ? 'No tables available in schema'
                       : 'Choose a table'}
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 className="p-0"
                 side="bottom"
                 align="start"
@@ -328,8 +328,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           </FormItemLayout>
 
           {selectedEntity && (

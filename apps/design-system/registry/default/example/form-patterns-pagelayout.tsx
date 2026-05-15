@@ -19,9 +19,9 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select_Shadcn_,
@@ -673,8 +673,8 @@ export default function FormPatternsPageLayout() {
                         description="Date selection with calendar popover"
                       >
                         <FormControl>
-                          <Popover_Shadcn_>
-                            <PopoverTrigger_Shadcn_ asChild>
+                          <Popover>
+                            <PopoverTrigger asChild>
                               <Button
                                 type="outline"
                                 className="bg-control w-full justify-start text-left font-normal px-3 py-4"
@@ -682,16 +682,16 @@ export default function FormPatternsPageLayout() {
                               >
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                               </Button>
-                            </PopoverTrigger_Shadcn_>
-                            <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 initialFocus
                               />
-                            </PopoverContent_Shadcn_>
-                          </Popover_Shadcn_>
+                            </PopoverContent>
+                          </Popover>
                         </FormControl>
                       </FormItemLayout>
                     )}

@@ -13,9 +13,9 @@ import {
   Drawer,
   DrawerContent,
   DrawerTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { useMediaQuery } from '@/hooks/use-media-query'
@@ -55,8 +55,8 @@ export default function ComboBoxResponsive() {
 
   if (isDesktop) {
     return (
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             type="default"
             size="small"
@@ -65,11 +65,11 @@ export default function ComboBoxResponsive() {
           >
             {selectedStatus ? <>{selectedStatus.label}</> : <>Set status</>}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-[200px] p-0" align="start">
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0" align="start">
           <StatusList setOpen={setOpen} setSelectedStatus={setSelectedStatus} />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     )
   }
 
