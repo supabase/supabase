@@ -1104,7 +1104,7 @@ export interface ImportDataButtonClickedEvent {
  * @page /dashboard/project/{ref}/editor
  */
 export interface ImportDataFileDroppedEvent {
-  action: 'import_data_dropzone_file_added'
+  action: 'import_data_dropzone_file_dropped'
   groups: TelemetryGroups
 }
 

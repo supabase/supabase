@@ -58,7 +58,7 @@ export function useCsvFileDrop({
 
       onFileDropped(file)
 
-      onTelemetryEvent?.('import_data_dropzone_file_added')
+      onTelemetryEvent?.('import_data_dropzone_file_dropped')
     },
     [enabled, onDragOver, onFileDropped, onTelemetryEvent]
   )
