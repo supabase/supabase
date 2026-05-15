@@ -241,7 +241,7 @@ export const Column = ({
       <div className="w-[25%]">
         <div className="w-[95%]">
           <ColumnType
-            value={column.format}
+            value={{ format: column.format, formatSchema: column.formatSchema }}
             enumTypes={enumTypes}
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
@@ -249,9 +249,9 @@ export const Column = ({
             description={
               hasForeignKeys ? 'Column type cannot be changed as it has a foreign key relation' : ''
             }
-            onOptionSelect={(format: string) => {
+            onOptionSelect={({ format, formatSchema }) => {
               const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
-              onUpdateColumn({ format, defaultValue })
+              onUpdateColumn({ format, formatSchema, defaultValue })
             }}
           />
         </div>

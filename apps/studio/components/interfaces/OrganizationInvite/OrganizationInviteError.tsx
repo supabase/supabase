@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
-import { cn } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
-import AlertError from '@/components/ui/AlertError'
 import { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
 import { useSignOut } from '@/lib/auth'
 import { useProfile } from '@/lib/profile'
@@ -11,58 +11,79 @@ interface OrganizationInviteError {
   data?: OrganizationInviteByToken
   error?: ResponseError | null
   isError: boolean
+  isInvalidInvite?: boolean
 }
 
-export const OrganizationInviteError = ({ data, error, isError }: OrganizationInviteError) => {
+export const OrganizationInviteError = ({
+  data,
+  error,
+  isError,
+  isInvalidInvite,
+}: OrganizationInviteError) => {
   const router = useRouter()
   const signOut = useSignOut()
   const { profile } = useProfile()
 
-  return (
-    <div className={cn('flex flex-col items-center justify-center gap-y-1 text-sm')}>
-      {isError ? (
-        <AlertError
-          error={error}
-          subject="Failed to retrieve token"
-          className="border-0 rounded-b [&>h5]:text-left [&>div]:items-start rounded-t-none"
+  const handleSignOut = async () => {
+    await signOut()
+    router.reload()
+  }
+
+  if (isInvalidInvite) {
+    return (
+      <Admonition
+        type="warning"
+        description="Open the full invite link again, or ask the organization owner for a new invite."
+      />
+    )
+  }
+
+  if (isError) {
+    return (
+      <Admonition
+        type="danger"
+        description={error?.message ?? 'Open the full invite link again, or ask for a new invite.'}
+      />
+    )
+  }
+
+  if (!data?.email_match) {
+    return (
+      <div className="flex flex-col gap-3">
+        <Admonition
+          type="warning"
+          description={
+            profile?.primary_email ? (
+              <>
+                You are signed in as{' '}
+                <span className="font-medium text-foreground">{profile.primary_email}</span>. Sign
+                in with the email address that received this invite.
+              </>
+            ) : (
+              'Sign in with the email address that received this invite.'
+            )
+          }
         />
-      ) : !data?.email_match ? (
-        <div className="p-4 flex flex-col gap-y-1">
-          <p>
-            Your email address {profile?.primary_email} does not match the email address this
-            invitation was sent to.
-          </p>
-          <p className="text-foreground-lighter">
-            To accept this invitation, you will need to{' '}
-            <a
-              className="cursor-pointer text-brand"
-              onClick={async () => {
-                await signOut()
-                router.reload()
-              }}
-            >
-              sign out
-            </a>{' '}
-            and then sign in or create a new account using the same email address used in the
-            invitation.
-          </p>
-        </div>
-      ) : data.expired_token ? (
-        <div className="p-4 flex flex-col gap-y-1">
-          <p>The invite token has expired.</p>
-          <p className="text-foreground-lighter">
-            Please request a new one from the organization owner.
-          </p>
-        </div>
-      ) : (
-        <div className="p-4 flex flex-col gap-y-1">
-          <p>The invite token is invalid.</p>
-          <p className="text-foreground-lighter">
-            You could be logged in with the wrong account. Try copying and pasting the link from the
-            invite email, or ask the organization owner to invite you again.
-          </p>
-        </div>
-      )}
-    </div>
+        <Button type="default" block onClick={handleSignOut}>
+          Sign out
+        </Button>
+      </div>
+    )
+  }
+
+  if (data.expired_token) {
+    return (
+      <Admonition
+        type="warning"
+        description="Ask the organization owner to send you a new invite."
+      />
+    )
+  }
+
+  return (
+    <Admonition
+      type="warning"
+      description="Open the full invite link again, or ask the organization owner for a new invite."
+    />
   )
 }

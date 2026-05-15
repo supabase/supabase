@@ -4,6 +4,8 @@ packages:
   - blocks/*
   - e2e/*
 
+blockExoticSubdeps: true
+
 catalog:
   '@sentry/nextjs': ^10.26.0
   '@supabase/auth-js': 2.105.4
@@ -56,9 +58,9 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  - braintrust # Included for bugfix in v3.9.0
-  - '@next/*'
-  - next
+  # The following are excluded to fix vulnerablities.
+  - mermaid
+  - '@mermaid-js/parser'
 
 onlyBuiltDependencies:
   - node-pty
@@ -72,8 +74,8 @@ overrides:
   '@rollup/plugin-terser>serialize-javascript': ^7.0.5
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
-  express-rate-limit>ip-address: ^10.1.1
   esbuild: ^0.25.2
+  express-rate-limit>ip-address: ^10.1.1
   lodash: 'catalog:'
   lodash-es: 'catalog:'
   node-gyp>tar: ^7.5.11

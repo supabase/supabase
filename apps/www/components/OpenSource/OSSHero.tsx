@@ -1,8 +1,8 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import { useWindowSize } from 'react-use'
 import { useBreakpoint } from 'common'
+import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
+import React from 'react'
+import { useWindowSize } from 'react-use'
 import { cn } from 'ui'
 
 import styles from './hero.module.css'
@@ -152,7 +152,7 @@ const HeroGrid = () => {
         >
           <stop stopColor={svgGridOptions.color} stopOpacity="0" />
           <stop stopColor={svgGridOptions.color} stopOpacity="0.8" />
-          <stop offset="1" stopColor="var(--colors-brand9)" stopOpacity="0" />
+          <stop offset="1" stopColor="var(--color-brand-900)" stopOpacity="0" />
         </motion.linearGradient>
         <motion.linearGradient
           animate={{
@@ -172,7 +172,7 @@ const HeroGrid = () => {
         >
           <stop stopColor={svgGridOptions.color} stopOpacity="0" />
           <stop stopColor={svgGridOptions.color} stopOpacity="0.8" />
-          <stop offset="1" stopColor="var(--colors-brand9)" stopOpacity="0" />
+          <stop offset="1" stopColor="var(--color-brand-900)" stopOpacity="0" />
         </motion.linearGradient>
       </defs>
     </svg>

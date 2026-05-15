@@ -1,5 +1,5 @@
 import { ident, safeSql } from '@supabase/pg-meta'
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Search, X } from 'lucide-react'
@@ -66,11 +66,7 @@ import type { NextPageWithLayout } from '@/types'
  *
  * @returns list of table
  */
-const getTableFilterState = (
-  tables: PostgresTable[],
-  policies: Array<Policy>,
-  searchString?: string
-) => {
+const getTableFilterState = (tables: PGTable[], policies: Array<Policy>, searchString?: string) => {
   const sortedTables = tables.slice().sort((a, b) => a.name.localeCompare(b.name))
   const visibleTableIds = new Set<number>()
 

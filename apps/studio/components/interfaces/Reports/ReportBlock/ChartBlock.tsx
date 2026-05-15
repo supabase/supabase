@@ -9,6 +9,7 @@ import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { timestampFormatter } from '@/components/ui/Charts/Charts.utils'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import {
   checkHasNonPositiveValues,
@@ -74,6 +75,13 @@ export const ChartBlock = ({
   const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
   const formatChartDate = useFormatDateTime()
+  const formatTooltipDate = useCallback(
+    (value: string | number, format: string) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(String(value))
+        ? timestampFormatter(String(value), format, true)
+        : formatChartDate(value, format),
+    [formatChartDate]
+  )
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -318,7 +326,7 @@ export const ChartBlock = ({
                     <ChartTooltipContent
                       className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
-                      labelFormatter={(x) => formatChartDate(x as string | number, 'DD MMM YYYY')}
+                      labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />
@@ -345,7 +353,7 @@ export const ChartBlock = ({
                   content={
                     <ChartTooltipContent
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
-                      labelFormatter={(x) => formatChartDate(x as string | number, 'DD MMM YYYY')}
+                      labelFormatter={(x) => formatTooltipDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />

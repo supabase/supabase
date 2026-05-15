@@ -27,7 +27,6 @@ import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -272,7 +271,7 @@ export const Destinations = () => {
         {hasErrorsFetchingData && (
           <AlertError
             error={destinationsError || databasesError}
-            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
+            subject="Failed to retrieve destinations"
           />
         )}
 

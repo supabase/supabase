@@ -14,6 +14,7 @@ import {
   TableRow,
 } from 'ui'
 
+import { getDatabaseTriggersHref } from './FunctionList.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
@@ -125,7 +126,7 @@ const FunctionList = ({
             <TableCell className="table-cell">
               {x.return_type === 'trigger' ? (
                 <Link
-                  href={`/project/${projectRef}/database/triggers?search=${x.name}`}
+                  href={getDatabaseTriggersHref(projectRef, x.name)}
                   className="truncate text-link"
                   title={x.return_type}
                 >
