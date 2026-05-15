@@ -50,7 +50,12 @@ export function DataTableViewOptions() {
       </PopoverTrigger>
       <PopoverContent id={listboxId} side="bottom" align="end" className="w-[200px] p-0">
         <Command>
-          <CommandInput value={search} onValueChange={setSearch} placeholder="Search columns..." />
+          <CommandInput
+            value={search}
+            onValueChange={setSearch}
+            placeholder="Search columns..."
+            className="text-xs"
+          />
           <CommandList>
             <CommandEmpty>No option found.</CommandEmpty>
             <CommandGroup>
