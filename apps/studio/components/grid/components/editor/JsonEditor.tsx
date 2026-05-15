@@ -3,7 +3,14 @@ import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
-import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
@@ -153,31 +160,31 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Popover
-      open={isPopoverOpen}
-      side="bottom"
-      align="start"
-      sideOffset={-35}
-      className="rounded-none"
-      overlay={
-        isTruncated && !isSuccess ? (
-          <div
-            style={{ width: `${column.width}px` }}
-            className="flex items-center justify-center flex-col relative"
-          >
-            <MonacoEditor
-              readOnly
-              onChange={() => {}}
-              width={`${column.width}px`}
-              value={value ?? ''}
-              language="markdown"
-            />
+    <Popover_Shadcn_ open={isPopoverOpen}>
+      <PopoverTrigger_Shadcn_ asChild>
+        <div
+          className={`${
+            !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
+          } sb-grid-json-editor__trigger`}
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        >
+          {value === null || value === '' ? <NullValue /> : jsonString}
+        </div>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_
+        side="bottom"
+        align="start"
+        sideOffset={-35}
+        className="rounded-none p-0"
+      >
+        {isTruncated && !isSuccess ? (
+          <div className="flex items-center justify-center flex-col relative">
+            <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />
             <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
           </div>
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
             <MonacoEditor
-              width={`${column.width}px`}
               value={value ?? ''}
               language="json"
               readOnly={!isEditable}
@@ -218,17 +225,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               </Tooltip>
             </div>
           </BlockKeys>
-        )
-      }
-    >
-      <div
-        className={`${
-          !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
-        } sb-grid-json-editor__trigger`}
-        onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-      >
-        {value === null || value === '' ? <NullValue /> : jsonString}
-      </div>
-    </Popover>
+        )}
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }

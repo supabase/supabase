@@ -3,7 +3,16 @@ import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
-import { Button, cn, Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  cn,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { BlockKeys } from '../common/BlockKeys'
@@ -105,25 +114,27 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   return (
     <>
-      <Popover
-        open={isPopoverOpen}
-        side="bottom"
-        align="start"
-        sideOffset={-35}
-        className="rounded-none"
-        overlay={
-          isTruncated && !isSuccess ? (
-            <div
-              style={{ width: `${column.width}px` }}
-              className="flex items-center justify-center flex-col relative"
-            >
-              <MonacoEditor
-                readOnly
-                onChange={() => {}}
-                width={`${column.width}px`}
-                value={value ?? ''}
-                language="markdown"
-              />
+      <Popover_Shadcn_ open={isPopoverOpen}>
+        <PopoverTrigger_Shadcn_ asChild>
+          <div
+            className={cn(
+              !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
+              'sb-grid-text-editor__trigger'
+            )}
+            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+          >
+            {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
+          </div>
+        </PopoverTrigger_Shadcn_>
+        <PopoverContent_Shadcn_
+          className="rounded-none p-0"
+          side="bottom"
+          align="start"
+          sideOffset={-35}
+        >
+          {isTruncated && !isSuccess ? (
+            <div className="flex items-center justify-center flex-col relative">
+              <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />
               <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
             </div>
           ) : (
@@ -133,12 +144,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
               onEnter={saveChanges}
               ignoreOutsideClicks={isConfirmNextModalOpen}
             >
-              <MonacoEditor
-                width={`${column.width}px`}
-                value={value ?? ''}
-                readOnly={!isEditable}
-                onChange={onChange}
-              />
+              <MonacoEditor value={value ?? ''} readOnly={!isEditable} onChange={onChange} />
               {isEditable && (
                 <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
                   <div className="space-y-1">
@@ -189,19 +195,9 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                 </div>
               )}
             </BlockKeys>
-          )
-        }
-      >
-        <div
-          className={cn(
-            !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
-            'sb-grid-text-editor__trigger'
           )}
-          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-        >
-          {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
-        </div>
-      </Popover>
+        </PopoverContent_Shadcn_>
+      </Popover_Shadcn_>
       <ConfirmationModal
         visible={isConfirmNextModalOpen}
         title="Confirm setting value to NULL"

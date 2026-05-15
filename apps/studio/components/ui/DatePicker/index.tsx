@@ -5,9 +5,9 @@ import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Calendar as CalendarPicker,
-  Popover,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
 import { ButtonProps } from 'ui/src/components/Button/Button'
@@ -307,7 +307,7 @@ export function DatePicker({
             from: startDate?.toISOString() || null,
             to: endDate?.toISOString() || null,
           })}
-          <Popover.Separator />
+          <PopoverSeparator_Shadcn_ />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
             {!hideClear && (
               <Button type="default" onClick={() => handleClear()}>
