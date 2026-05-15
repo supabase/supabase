@@ -25,6 +25,7 @@ import {
   TableFooter,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
   Tooltip,
   TooltipContent,
@@ -34,7 +35,14 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
-import { formatAllEntities } from './Tables.utils'
+import {
+  DEFAULT_TABLE_LIST_SORT,
+  formatAllEntities,
+  handleTableListSortChange,
+  isTableListSort,
+  sortEntities,
+  type TableListSort,
+} from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -80,6 +88,14 @@ export const TableList = ({
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [filterString, setFilterString] = useQueryState('search', parseAsString.withDefault(''))
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsString.withDefault(DEFAULT_TABLE_LIST_SORT)
+  )
+  const activeSort: TableListSort = isTableListSort(sort) ? sort : DEFAULT_TABLE_LIST_SORT
+  const onSortChange = (column: string) =>
+    handleTableListSortChange(activeSort, column, (next) => setSort(next))
+
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -187,8 +203,18 @@ export const TableList = ({
     (publication) => publication.name === 'supabase_realtime'
   )
 
-  const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
-    (x) => visibleTypes.includes(x.type)
+  const realtimeEnabledIds = new Set(
+    (realtimePublication?.tables ?? [])
+      .map((table) => table.id)
+      .filter((id): id is number => typeof id === 'number')
+  )
+
+  const entities = sortEntities(
+    formatAllEntities({ tables, views, materializedViews, foreignTables }).filter((x) =>
+      visibleTypes.includes(x.type)
+    ),
+    activeSort,
+    realtimeEnabledIds
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -207,6 +233,7 @@ export const TableList = ({
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setVisibleTypes(Object.values(ENTITY_TYPE))
     setFilterString('')
+    setSort(DEFAULT_TABLE_LIST_SORT)
   })
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
@@ -350,12 +377,50 @@ export const TableList = ({
                 <TableRow>
                   <TableHead key="icon" className="w-0 px-0!" />
                   <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
-                    Name
+                    <TableHeadSort
+                      column="name"
+                      currentSort={activeSort}
+                      onSortChange={onSortChange}
+                    >
+                      Name
+                    </TableHeadSort>
                   </TableHead>
-                  <TableHead key="columns">Columns</TableHead>
-                  <TableHead key="rows">Rows (Estimated)</TableHead>
-                  <TableHead key="size">Size (Estimated)</TableHead>
-                  <TableHead key="realtime">Realtime</TableHead>
+                  <TableHead key="columns">
+                    <TableHeadSort
+                      column="columns"
+                      currentSort={activeSort}
+                      onSortChange={onSortChange}
+                    >
+                      Columns
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead key="rows">
+                    <TableHeadSort
+                      column="rows"
+                      currentSort={activeSort}
+                      onSortChange={onSortChange}
+                    >
+                      Rows (Estimated)
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead key="size">
+                    <TableHeadSort
+                      column="size"
+                      currentSort={activeSort}
+                      onSortChange={onSortChange}
+                    >
+                      Size (Estimated)
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead key="realtime">
+                    <TableHeadSort
+                      column="realtime"
+                      currentSort={activeSort}
+                      onSortChange={onSortChange}
+                    >
+                      Realtime
+                    </TableHeadSort>
+                  </TableHead>
                   <TableHead key="buttons"></TableHead>
                 </TableRow>
               </TableHeader>
