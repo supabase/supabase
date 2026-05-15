@@ -1,5 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { Search } from 'lucide-react'
+import JSZip from 'jszip'
+import { Archive, Download, Search } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -22,18 +23,29 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { DatePicker } from '@/components/ui/DatePicker'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { formatMigrationVersionLabel, parseMigrationVersion } from '@/lib/migration-utils'
+import {
+  downloadTextFile,
+  filterMigrationsByDateRange,
+  formatMigrationVersionLabel,
+  getMigrationFilename,
+  getMigrationSqlContent,
+  parseMigrationVersion,
+} from '@/lib/migration-utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
+  const [dateFrom, setDateFrom] = useState<string | null>(null)
+  const [dateTo, setDateTo] = useState<string | null>(null)
+  const [isExporting, setIsExporting] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useShortcut(
@@ -58,12 +70,53 @@ const Migrations = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const migrations =
+
+  // Original search filter — untouched
+  const searchFiltered =
     search.length === 0
       ? data
       : (data.filter(
           (migration) => migration.version.includes(search) || migration.name?.includes(search)
         ) ?? [])
+
+  // Additional date range filter on top of search
+  const migrations = filterMigrationsByDateRange(searchFiltered, dateFrom, dateTo)
+
+  const hasDateFilter = dateFrom !== null || dateTo !== null
+
+  /** Downloads the currently-filtered migrations as a numbered ZIP archive. */
+  async function handleDownloadZip() {
+    if (migrations.length === 0) return
+    setIsExporting(true)
+    try {
+      const zip = new JSZip()
+      migrations.forEach((migration, index) => {
+        zip.file(
+          getMigrationFilename(index, migrations.length, migration),
+          getMigrationSqlContent(migration)
+        )
+      })
+      const blob = await zip.generateAsync({ type: 'blob' })
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = 'migrations.zip'
+      anchor.click()
+      URL.revokeObjectURL(url)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  /** Downloads the currently-filtered migrations as a single combined SQL file. */
+  function handleDownloadSql() {
+    if (migrations.length === 0) return
+    const parts = migrations.map((migration, index) => {
+      const filename = getMigrationFilename(index, migrations.length, migration)
+      return `-- ============================================================\n-- File: ${filename}\n-- ============================================================\n${getMigrationSqlContent(migration)}`
+    })
+    downloadTextFile('migrations.sql', parts.join('\n'))
+  }
 
   return (
     <>
@@ -109,15 +162,84 @@ const Migrations = () => {
 
             {data.length > 0 && (
               <div className="flex flex-col gap-y-4">
-                <Input
-                  ref={searchInputRef}
-                  size="tiny"
-                  placeholder="Search for a migration"
-                  value={search}
-                  className="w-full lg:w-52"
-                  onChange={(e: any) => setSearch(e.target.value)}
-                  icon={<Search />}
-                />
+                {/* Toolbar: search (original) + date filter + export buttons (new) */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <Input
+                    ref={searchInputRef}
+                    size="tiny"
+                    placeholder="Search for a migration"
+                    value={search}
+                    className="w-full lg:w-52"
+                    onChange={(e: any) => setSearch(e.target.value)}
+                    icon={<Search />}
+                  />
+
+                  {/* Date filter — new */}
+                  <DatePicker
+                    hideTime={false}
+                    selectsRange
+                    hideClear={false}
+                    from={dateFrom ?? undefined}
+                    to={dateTo ?? undefined}
+                    triggerButtonSize="tiny"
+                    triggerButtonType={hasDateFilter ? 'primary' : 'default'}
+                    maxDate={new Date()}
+                    onChange={({ from, to }) => {
+                      setDateFrom(from ?? null)
+                      setDateTo(to ?? null)
+                    }}
+                  >
+                    {hasDateFilter ? 'Date filter active' : 'Filter by date'}
+                  </DatePicker>
+                  {hasDateFilter && (
+                    <Button
+                      type="text"
+                      size="tiny"
+                      onClick={() => { setDateFrom(null); setDateTo(null) }}
+                    >
+                      Clear
+                    </Button>
+                  )}
+
+                  {/* Export buttons — new */}
+                  {migrations.length > 0 && (
+                    <div className="flex items-center gap-2 ml-auto">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="default"
+                            size="tiny"
+                            icon={<Download size={14} />}
+                            onClick={handleDownloadSql}
+                          >
+                            Download SQL
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          Download {migrations.length} migration{migrations.length !== 1 ? 's' : ''} as a single SQL file
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="default"
+                            size="tiny"
+                            icon={<Archive size={14} />}
+                            loading={isExporting}
+                            onClick={handleDownloadZip}
+                          >
+                            Download ZIP
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          Download {migrations.length} migration{migrations.length !== 1 ? 's' : ''} as numbered SQL files in a ZIP
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  )}
+                </div>
+
+                {/* Table — original, untouched except per-row download button added */}
                 <Card>
                   <Table>
                     <TableHeader>
@@ -132,7 +254,7 @@ const Migrations = () => {
                     </TableHeader>
                     <TableBody>
                       {migrations.length > 0 ? (
-                        migrations.map((migration) => {
+                        migrations.map((migration, index) => {
                           const versionDayjs = parseMigrationVersion(migration.version)
                           const label = formatMigrationVersionLabel(migration.version)
                           const insertedAt = versionDayjs ? versionDayjs.toISOString() : undefined
@@ -175,12 +297,35 @@ const Migrations = () => {
                                 </Tooltip>
                               </TableCell>
                               <TableCell align="right">
-                                <Button
-                                  type="default"
-                                  onClick={() => setSelectedMigration(migration)}
-                                >
-                                  View migration SQL
-                                </Button>
+                                <div className="flex items-center justify-end gap-2">
+                                  {/* Per-row download — new */}
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        type="text"
+                                        size="tiny"
+                                        icon={<Download size={14} />}
+                                        onClick={() =>
+                                          downloadTextFile(
+                                            getMigrationFilename(index, migrations.length, migration),
+                                            getMigrationSqlContent(migration)
+                                          )
+                                        }
+                                      />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="left">
+                                      Download as SQL
+                                    </TooltipContent>
+                                  </Tooltip>
+
+                                  {/* Original button — untouched */}
+                                  <Button
+                                    type="default"
+                                    onClick={() => setSelectedMigration(migration)}
+                                  >
+                                    View migration SQL
+                                  </Button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           )
@@ -204,6 +349,7 @@ const Migrations = () => {
         )}
       </div>
 
+      {/* Side panel — original, completely untouched */}
       <SidePanel
         size="large"
         visible={selectedMigration !== undefined}
