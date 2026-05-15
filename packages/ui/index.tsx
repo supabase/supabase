@@ -105,7 +105,7 @@ export * from './src/components/shadcn/ui/input'
 
 export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
-export { ButtonGroup, ButtonGroupItem } from './src/components/shadcn/ui/button-group'
+export * from './src/components/shadcn/ui/button-group'
 
 export * from './src/components/shadcn/ui/breadcrumb'
 
@@ -137,21 +137,15 @@ export {
   TabsTrigger as TabsTrigger_Shadcn_,
 } from './src/components/shadcn/ui/tabs'
 
-export {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipPortal,
-} from './src/components/shadcn/ui/tooltip'
+export * from './src/components/shadcn/ui/tooltip'
 
 export * from './src/components/shadcn/ui/hover-card'
 
 export * from './src/components/shadcn/ui/calendar'
 
-export { ScrollArea, ScrollBar, ScrollViewport } from './src/components/shadcn/ui/scroll-area'
+export * from './src/components/shadcn/ui/scroll-area'
 
-export { Separator } from './src/components/shadcn/ui/separator'
+export * from './src/components/shadcn/ui/separator'
 
 export * from './src/components/shadcn/ui/resizable'
 
