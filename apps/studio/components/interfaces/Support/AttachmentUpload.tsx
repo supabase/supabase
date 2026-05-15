@@ -138,7 +138,7 @@ export function useAttachmentUpload() {
 }
 
 interface AttachmentUploadDisplayProps {
-  uploadButtonRef: RefObject<HTMLInputElement>
+  uploadButtonRef: RefObject<HTMLInputElement | null>
   isFull: boolean
   uploadedDataUrls: string[]
   addFile: () => void

@@ -48,7 +48,7 @@ export const RLSCodeEditor = ({
   editorRef,
   monacoRef,
 }: RLSCodeEditorProps) => {
-  const hasValue = useRef<any>()
+  const hasValue = useRef<editor.IContextKey<boolean>>(null)
   const monaco = useMonaco()
 
   const placeholderId = `monaco-placeholder-${id}`
@@ -104,7 +104,9 @@ export const RLSCodeEditor = ({
   }
 
   const onChangeContent: OnChange = (value) => {
-    hasValue.current.set((value ?? '').length > 0)
+    if (hasValue.current) {
+      hasValue.current.set((value ?? '').length > 0)
+    }
 
     const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
     if (placeholderEl) {

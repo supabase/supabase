@@ -56,7 +56,7 @@ vi.mock('next/head', async () => {
         (child) => React.isValidElement(child) && child.type === 'title'
       )
 
-      if (!React.isValidElement(titleElement)) return
+      if (!React.isValidElement<{ children: ReactNode }>(titleElement)) return
 
       const titleText = React.Children.toArray(titleElement.props.children).join('')
       document.title = titleText
