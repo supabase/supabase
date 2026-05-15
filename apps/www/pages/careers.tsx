@@ -157,7 +157,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
         </SectionContainer>
 
         <div className="py-[1.25px] bg-linear-to-r from-background via-border to-background">
-          <div className="bg-alternative text-clip">
+          <div className="bg-alternative text-clip overflow-hidden">
             <SectionContainer className="md:pt-16! md:grid md:max-h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
               <div
                 className="
@@ -331,7 +331,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   mission.
                 </p>
               </div>
-              <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60 max-w-full overflow-hidden">
+              <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60">
                 {contributors.map((contributor, i) => {
                   return (
                     <div
