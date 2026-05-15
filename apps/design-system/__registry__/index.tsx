@@ -192,13 +192,13 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "expandable-alert-demo": {
-      name: "expandable-alert-demo",
+    "collapsible-alert-demo": {
+      name: "collapsible-alert-demo",
       type: "components:example",
-      registryDependencies: ["expandable-alert"],
-      component: React.lazy(() => import("@/registry/default/example/expandable-alert-demo")),
+      registryDependencies: ["collapsible-alert"],
+      component: React.lazy(() => import("@/registry/default/example/collapsible-alert-demo")),
       source: "",
-      files: ["registry/default/example/expandable-alert-demo.tsx"],
+      files: ["registry/default/example/collapsible-alert-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

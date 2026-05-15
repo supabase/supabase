@@ -714,9 +714,9 @@
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"
     },
-    "./expandable-alert": {
-      "import": "./src/expandable-alert.tsx",
-      "types": "./src/expandable-alert.tsx"
+    "./collapsible-alert": {
+      "import": "./src/collapsible-alert.tsx",
+      "types": "./src/collapsible-alert.tsx"
     },
     "./form/FormItemLayout/FormItemLayout": {
       "import": "./src/form/FormItemLayout/FormItemLayout.tsx",

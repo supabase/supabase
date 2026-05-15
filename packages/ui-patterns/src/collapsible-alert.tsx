@@ -11,13 +11,13 @@ import {
   CollapsibleTrigger,
 } from 'ui/src/components/shadcn/ui/collapsible'
 
-export interface ExpandableAlertProps
+export interface CollapsibleAlertProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof alertVariants> {
   trigger: React.ReactNode
   defaultOpen?: boolean
 }
 
-const ExpandableAlert = React.forwardRef<HTMLDivElement, ExpandableAlertProps>(
+const CollapsibleAlert = React.forwardRef<HTMLDivElement, CollapsibleAlertProps>(
   ({ className, variant = 'default', trigger, defaultOpen, children, ...props }, ref) => (
     <div
       ref={ref}
@@ -47,6 +47,6 @@ const ExpandableAlert = React.forwardRef<HTMLDivElement, ExpandableAlertProps>(
     </div>
   )
 )
-ExpandableAlert.displayName = 'ExpandableAlert'
+CollapsibleAlert.displayName = 'CollapsibleAlert'
 
-export { ExpandableAlert }
+export { CollapsibleAlert }

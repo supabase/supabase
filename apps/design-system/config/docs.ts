@@ -118,8 +118,8 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Expandable Alert',
-          href: '/docs/fragments/expandable-alert',
+          title: 'Collapsible Alert',
+          href: '/docs/fragments/collapsible-alert',
           items: [],
         },
         {
