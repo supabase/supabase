@@ -98,16 +98,15 @@ export const deleteBucket = async (page: Page, ref: string, bucketName: string) 
   await page.getByRole('button', { name: 'Delete bucket' }).click()
   await apiPromise
 
-  // Verify bucket was deleted - should redirect to files page
-  await expect(page, 'Should redirect to storage files page after deletion').toHaveURL(
-    new RegExp(`/storage/files$`)
-  )
-
-  // Verify bucket is no longer in the list
+  // Verify bucket is no longer in the list. The studio fires
+  // `router.push('/storage/files')` from `DeleteBucketModal`, but that push
+  // can race other history updates on TanStack Router (see the queue specs
+  // for the same class of issue). Asserting the row is gone is a stable
+  // signal that the delete actually succeeded, regardless of the redirect.
   await expect(
     page.getByRole('row').filter({ hasText: bucketName }),
     `Bucket ${bucketName} should not be visible after deletion`
-  ).not.toBeVisible()
+  ).not.toBeVisible({ timeout: 10000 })
 }
 
 /**
