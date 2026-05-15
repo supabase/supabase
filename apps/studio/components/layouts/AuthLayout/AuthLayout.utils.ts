@@ -91,7 +91,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
         {
           name: 'Policies',
           key: 'policies',
-          url: `${baseUrl}/policies`,
+          url: `/project/${ref}/database/policies`,
           rightIcon: ExternalLinkIcon,
           items: [],
           shortcutId: SHORTCUT_IDS.NAV_AUTH_POLICIES,
