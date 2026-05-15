@@ -161,10 +161,16 @@ test.describe('RLS Policies', () => {
         ).toBeVisible({ timeout: 50000 })
         await expect(
           page.getByText(
-            'Without RLS, clients using anon or authenticated keys may be able to read, modify, or delete rows in this table.'
+            'This table will be publicly readable and writable. Anyone can edit or delete data in this table. Auth policies will not be enforced.'
           ),
           'RLS disable confirmation should explain the access risk'
         ).toBeVisible()
+        await expect(
+          page.getByRole('alertdialog').getByRole('link', { name: 'Learn more' })
+        ).toHaveAttribute(
+          'href',
+          'https://supabase.com/docs/guides/database/postgres/row-level-security'
+        )
 
         // Confirm disabling RLS
         await page.getByRole('button', { name: 'Disable RLS' }).click()

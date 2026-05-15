@@ -9,6 +9,9 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
+
 interface RLSToggleDialogProps {
   open: boolean
   tableName?: string
@@ -27,7 +30,7 @@ export function RLSToggleDialog({
 }: RLSToggleDialogProps) {
   const title = isEnabled ? 'Disable Row Level Security?' : 'Enable Row Level Security?'
   const description = isEnabled
-    ? 'Without RLS, clients using anon or authenticated keys may be able to read, modify, or delete rows in this table.'
+    ? 'This table will be publicly readable and writable. Anyone can edit or delete data in this table. Auth policies will not be enforced.'
     : 'RLS restricts table access until matching policies allow a request. Existing queries may return no rows until policies are added.'
   const confirmLabel = isEnabled ? 'Disable RLS' : 'Enable RLS'
   const confirmVariant = isEnabled ? 'danger' : 'warning'
@@ -37,7 +40,13 @@ export function RLSToggleDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogDescription>
+            {description}{' '}
+            <InlineLink href={`${DOCS_URL}/guides/database/postgres/row-level-security`}>
+              Learn more
+            </InlineLink>
+            .
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
