@@ -1210,26 +1210,17 @@ export interface MetricsAPIBannerDismissButtonClickedEvent {
 }
 
 /**
- * Index Advisor banner enable button clicked event.
+ * User clicked the enable button for Index Advisor, either from the banner or the confirmation dialog.
  *
  * @group Events
  * @source studio
  * @page /observability/query-performance
  */
-export interface IndexAdvisorBannerEnableButtonClickedEvent {
-  action: 'index_advisor_banner_enable_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * Index Advisor dialog enable button clicked event.
- *
- * @group Events
- * @source studio
- * @page /observability/query-performance
- */
-export interface IndexAdvisorDialogEnableButtonClickedEvent {
-  action: 'index_advisor_dialog_enable_button_clicked'
+export interface IndexAdvisorEnableButtonClickedEvent {
+  action: 'index_advisor_enable_button_clicked'
+  properties: {
+    origin: 'banner' | 'dialog'
+  }
   groups: TelemetryGroups
 }
 
@@ -3358,9 +3349,8 @@ export type TelemetryEvent =
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
   | MetricsAPIBannerDismissButtonClickedEvent
-  | IndexAdvisorBannerEnableButtonClickedEvent
+  | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
-  | IndexAdvisorDialogEnableButtonClickedEvent
   | IndexAdvisorTabClickedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
