@@ -886,6 +886,7 @@ export interface WwwPricingPlanCtaClickedEvent {
     section: 'main' | 'comparison_table'
     tableMode?: 'mobile' | 'desktop'
   }
+  groups?: Partial<TelemetryGroups>
 }
 
 /**

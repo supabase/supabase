@@ -41,6 +41,7 @@ const MobileHeader = ({
   hasExistingOrganizations?: boolean
 }) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const orgSlug = organizations?.[0]?.slug
 
   const selectedPlan = plans.find((p) => p.name === plan)!
   const isUpgradablePlan = selectedPlan.name === 'Pro' || selectedPlan.name === 'Team'
@@ -74,6 +75,7 @@ const MobileHeader = ({
                 section: 'comparison_table',
                 tableMode: 'mobile',
               },
+              ...(orgSlug && { groups: { organization: orgSlug } }),
             })
           }
           size="medium"
@@ -92,6 +94,7 @@ const MobileHeader = ({
                   section: 'comparison_table',
                   tableMode: 'mobile',
                 },
+                ...(orgSlug && { groups: { organization: orgSlug } }),
               })
             }
           >
@@ -115,6 +118,7 @@ const PricingComparisonTable = ({
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const orgSlug = organizations?.[0]?.slug
 
   return (
     <div
@@ -428,6 +432,7 @@ const PricingComparisonTable = ({
                                   section: 'comparison_table',
                                   tableMode: 'desktop',
                                 },
+                                ...(orgSlug && { groups: { organization: orgSlug } }),
                               })
                             }
                             size="tiny"
@@ -451,6 +456,7 @@ const PricingComparisonTable = ({
                                     section: 'comparison_table',
                                     tableMode: 'desktop',
                                   },
+                                  ...(orgSlug && { groups: { organization: orgSlug } }),
                                 })
                               }
                             >
