@@ -1,4 +1,4 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PGPolicy } from '@supabase/pg-meta'
 import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -19,7 +19,7 @@ export const PolicyEditorPanelHeader = ({
   showTools,
   setShowTools,
 }: {
-  selectedPolicy?: PostgresPolicy
+  selectedPolicy?: PGPolicy
   showTools: boolean
   setShowTools: (v: boolean) => void
 }) => {

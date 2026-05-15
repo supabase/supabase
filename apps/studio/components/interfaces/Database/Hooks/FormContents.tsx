@@ -1,4 +1,4 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Image from 'next/legacy/image'
@@ -42,7 +42,7 @@ import { uuidv4 } from '@/lib/helpers'
 
 export interface FormContentsProps {
   form: UseFormReturn<WebhookFormValues>
-  selectedHook?: PostgresTrigger
+  selectedHook?: PGTrigger
 }
 
 export const FormContents = ({ form, selectedHook }: FormContentsProps) => {

@@ -52,6 +52,16 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should return a sql function command for lowercase select', () => {
+    const command = 'select lowercase.issue ()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'lowercase',
+      functionName: 'issue',
+      snippet: command,
+    })
+  })
+
   it('should return a sql snippet command when the command is SELECT public.test_fn(1, 2)', () => {
     const command = 'SELECT public.test_fn(1, 2)'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({

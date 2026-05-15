@@ -1,9 +1,9 @@
+import type { PGPolicy } from '@supabase/pg-meta'
 import { ident, keyword, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
-import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEqual } from 'lodash'
 
 // [Joshen] Not used but keeping this for now in case we do an inline editor
-export const generatePlaceholder = (policy?: PostgresPolicy) => {
+export const generatePlaceholder = (policy?: PGPolicy) => {
   if (policy === undefined) {
     return `
 -- Press tab to use this code\n
@@ -78,7 +78,7 @@ export const generateCreatePolicyQuery = ({
 }
 
 export const checkIfPolicyHasChanged = (
-  selectedPolicy: PostgresPolicy,
+  selectedPolicy: PGPolicy,
   policyForm: {
     name: string
     roles: string[]

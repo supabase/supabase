@@ -11,7 +11,7 @@ const page: GoPageInput = {
   metadata: {
     title: 'Executive Dinner | Supabase',
     description:
-      'Join Supabase leaders for an intimate dinner at Manhatta Restaurant. Cocktails at 6:30 PM, dinner at 7:00 PM.',
+      'Join Supabase leaders for an intimate dinner at Manhatta Restaurant on June 10, 2026. Cocktails at 6:30 PM, dinner at 7:00 PM.',
   },
   hero: {
     title: 'The future of scalable databases',
@@ -38,7 +38,9 @@ const page: GoPageInput = {
       title: 'Details',
       children: (
         <div className="flex flex-col items-center gap-2 text-foreground-light">
-          <p className="text-lg font-medium text-foreground">Location</p>
+          <p className="text-lg font-medium text-foreground">Date</p>
+          <p>June 10, 2026</p>
+          <p className="mt-4 text-lg font-medium text-foreground">Location</p>
           <p>Manhatta Restaurant</p>
           <p>28 Liberty St, 60th Floor</p>
           <p className="mt-4 text-lg font-medium text-foreground">Schedule</p>
@@ -119,8 +121,22 @@ const page: GoPageInput = {
           type: 'text',
           name: 'company_name',
           label: 'Company',
-          placeholder: 'Company name',
+          placeholder: 'ACME, Inc.',
           required: true,
+        },
+        {
+          type: 'text',
+          name: 'job_title',
+          label: 'Job Title',
+          placeholder: 'VP of Engineering',
+          required: false,
+        },
+        {
+          type: 'text',
+          name: 'phone_number',
+          label: 'Phone Number',
+          placeholder: '+1 212 555 1212',
+          required: false,
         },
       ],
       submitLabel: 'Confirm RSVP',
@@ -134,7 +150,9 @@ const page: GoPageInput = {
             first_name: 'firstname',
             last_name: 'lastname',
             email_address: 'email',
-            company_name: 'company',
+            company_name: 'name',
+            job_title: 'jobtitle',
+            phone_number: 'phone',
           },
           consent:
             'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
@@ -146,6 +164,8 @@ const page: GoPageInput = {
             last_name: 'Last Name',
             email_address: 'Email',
             company_name: 'Company',
+            job_title: 'Job Title',
+            phone_number: 'Phone Number',
           },
         },
       },

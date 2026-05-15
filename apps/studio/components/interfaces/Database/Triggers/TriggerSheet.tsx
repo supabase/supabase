@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -76,7 +76,7 @@ const defaultValues: z.infer<typeof FormSchema> = {
 }
 
 interface TriggerSheetProps {
-  selectedTrigger?: PostgresTrigger
+  selectedTrigger?: PGTrigger
   isDuplicatingTrigger?: boolean
   open: boolean
   onClose: () => void
