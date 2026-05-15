@@ -81,23 +81,7 @@ export {
   CommandSeparator as CommandSeparator_Shadcn_,
 } from './src/components/shadcn/ui/command'
 
-export {
-  ContextMenu as ContextMenu_Shadcn_,
-  ContextMenuTrigger as ContextMenuTrigger_Shadcn_,
-  ContextMenuContent as ContextMenuContent_Shadcn_,
-  ContextMenuItem as ContextMenuItem_Shadcn_,
-  ContextMenuSeparator as ContextMenuSeparator_Shadcn_,
-  ContextMenuLabel as ContextMenuLabel_Shadcn_,
-  ContextMenuRadioGroup as ContextMenuRadioGroup_Shadcn_,
-  ContextMenuRadioItem as ContextMenuRadioItem_Shadcn_,
-  ContextMenuShortcut as ContextMenuShortcut_Shadcn_,
-  ContextMenuSub as ContextMenuSub_Shadcn_,
-  ContextMenuSubContent as ContextMenuSubContent_Shadcn_,
-  ContextMenuSubTrigger as ContextMenuSubTrigger_Shadcn_,
-  ContextMenuCheckboxItem as ContextMenuCheckboxItem_Shadcn_,
-  ContextMenuGroup as ContextMenuGroup_Shadcn_,
-  ContextMenuPortal as ContextMenuPortal_Shadcn_,
-} from './src/components/shadcn/ui/context-menu'
+export * from './src/components/shadcn/ui/context-menu'
 
 export * from './src/components/shadcn/ui/dialog'
 

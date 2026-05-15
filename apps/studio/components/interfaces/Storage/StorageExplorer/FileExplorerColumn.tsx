@@ -7,14 +7,14 @@ import { toast } from 'sonner'
 import {
   Checkbox,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuSub_Shadcn_,
-  ContextMenuSubContent_Shadcn_,
-  ContextMenuSubTrigger_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -181,8 +181,8 @@ export const FileExplorerColumn = ({
   }
 
   return (
-    <ContextMenu_Shadcn_ modal={false}>
-      <ContextMenuTrigger_Shadcn_ asChild>
+    <ContextMenu modal={false}>
+      <ContextMenuTrigger asChild>
         <div
           ref={fileExplorerColumnRef}
           className={cn(
@@ -342,70 +342,70 @@ export const FileExplorerColumn = ({
             </div>
           )}
         </div>
-      </ContextMenuTrigger_Shadcn_>
-      <ContextMenuContent_Shadcn_>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
         {canUpdateStorage && (
           <>
-            <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onSelectCreateFolder}>
+            <ContextMenuItem className="gap-x-2" onSelect={onSelectCreateFolder}>
               <FolderPlus size={14} />
               <span className="text-xs">New folder</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuSeparator_Shadcn_ />
+            </ContextMenuItem>
+            <ContextMenuSeparator />
           </>
         )}
-        <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onSelectAllItems}>
+        <ContextMenuItem className="gap-x-2" onSelect={onSelectAllItems}>
           <Copy size={14} />
           <span className="text-xs">Select all items</span>
-        </ContextMenuItem_Shadcn_>
-        <ContextMenuSub_Shadcn_>
-          <ContextMenuSubTrigger_Shadcn_ className="gap-x-2">
+        </ContextMenuItem>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger className="gap-x-2">
             <Eye size={14} />
             <span className="text-xs">View</span>
-          </ContextMenuSubTrigger_Shadcn_>
-          <ContextMenuSubContent_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setView(STORAGE_VIEWS.COLUMNS)}>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuItem onSelect={() => setView(STORAGE_VIEWS.COLUMNS)}>
               <span className="text-xs">As columns</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setView(STORAGE_VIEWS.LIST)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setView(STORAGE_VIEWS.LIST)}>
               <span className="text-xs">As list</span>
-            </ContextMenuItem_Shadcn_>
-          </ContextMenuSubContent_Shadcn_>
-        </ContextMenuSub_Shadcn_>
-        <ContextMenuSub_Shadcn_>
-          <ContextMenuSubTrigger_Shadcn_ className="gap-x-2">
+            </ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger className="gap-x-2">
             <ChevronsDown size={14} />
             <span className="text-xs">Sort by</span>
-          </ContextMenuSubTrigger_Shadcn_>
-          <ContextMenuSubContent_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.NAME)}>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.NAME)}>
               <span className="text-xs">Name</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.CREATED_AT)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.CREATED_AT)}>
               <span className="text-xs">Last created</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.UPDATED_AT)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.UPDATED_AT)}>
               <span className="text-xs">Last modified</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.LAST_ACCESSED_AT)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setSortBy(STORAGE_SORT_BY.LAST_ACCESSED_AT)}>
               <span className="text-xs">Last accessed</span>
-            </ContextMenuItem_Shadcn_>
-          </ContextMenuSubContent_Shadcn_>
-        </ContextMenuSub_Shadcn_>
-        <ContextMenuSub_Shadcn_>
-          <ContextMenuSubTrigger_Shadcn_ className="gap-x-2">
+            </ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger className="gap-x-2">
             <ChevronsUp size={14} />
             <span className="text-xs">Sort by order</span>
-          </ContextMenuSubTrigger_Shadcn_>
-          <ContextMenuSubContent_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuItem onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>
               <span className="text-xs">Ascending</span>
-            </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.DESC)}>
+            </ContextMenuItem>
+            <ContextMenuItem onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.DESC)}>
               <span className="text-xs">Descending</span>
-            </ContextMenuItem_Shadcn_>
-          </ContextMenuSubContent_Shadcn_>
-        </ContextMenuSub_Shadcn_>
-      </ContextMenuContent_Shadcn_>
-    </ContextMenu_Shadcn_>
+            </ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }
