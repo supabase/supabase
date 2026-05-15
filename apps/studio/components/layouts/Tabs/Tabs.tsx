@@ -13,10 +13,10 @@ import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
   Tabs_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -155,8 +155,8 @@ export const EditorTabs = () => {
             strategy={horizontalListSortingStrategy}
           >
             {editorTabs.map((tab, index) => (
-              <ContextMenu_Shadcn_ key={tab.id}>
-                <ContextMenuTrigger_Shadcn_>
+              <ContextMenu key={tab.id}>
+                <ContextMenuTrigger>
                   <SortableTab
                     key={tab.id}
                     tab={tab}
@@ -164,22 +164,18 @@ export const EditorTabs = () => {
                     openTabs={openTabs}
                     onClose={() => handleClose(tab.id)}
                   />
-                </ContextMenuTrigger_Shadcn_>
-                <ContextMenuContent_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={() => handleClose(tab.id)}>
-                    Close
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseOthers(tab.id)}>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
+                  <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
                     Close Others
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseRight(tab.id)}>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
                     Close to the Right
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={handleCloseAll}>
-                    Close All
-                  </ContextMenuItem_Shadcn_>
-                </ContextMenuContent_Shadcn_>
-              </ContextMenu_Shadcn_>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             ))}
           </SortableContext>
 

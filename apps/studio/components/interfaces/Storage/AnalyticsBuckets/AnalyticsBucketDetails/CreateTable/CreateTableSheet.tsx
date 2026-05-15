@@ -11,7 +11,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   Select_Shadcn_,
@@ -193,10 +193,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     render={({ field }) => (
                       <FormItemLayout name="newNamespace" label="Name of new namespace">
                         <FormControl>
-                          <Input_Shadcn_
-                            {...field}
-                            placeholder="Provide a name for your new namespace"
-                          />
+                          <Input {...field} placeholder="Provide a name for your new namespace" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -214,10 +211,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     render={({ field }) => (
                       <FormItemLayout name="name" label="Name of table">
                         <FormControl>
-                          <Input_Shadcn_
-                            {...field}
-                            placeholder="Provide a name for your new table"
-                          />
+                          <Input {...field} placeholder="Provide a name for your new table" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -258,7 +252,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                   render={({ field }) => (
                                     <FormItemLayout>
                                       <FormControl>
-                                        <Input_Shadcn_
+                                        <Input
                                           {...field}
                                           placeholder="Provide a column name"
                                           disabled={isCreating}

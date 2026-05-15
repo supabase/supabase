@@ -16,7 +16,7 @@ import {
   FormControl,
   FormField,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -210,7 +210,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                     labelOptional="Cannot be changed after creation"
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="name"
                         data-1p-ignore
                         data-lpignore="true"
@@ -301,7 +301,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                         <div className="grid grid-cols-12 gap-x-2">
                           <div className="col-span-8">
                             <FormControl>
-                              <Input_Shadcn_
+                              <Input
                                 id="formatted_size_limit"
                                 aria-label="File size limit"
                                 type="number"
@@ -391,7 +391,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                       description="Wildcards are allowed, e.g. image/*."
                     >
                       <FormControl>
-                        <Input_Shadcn_
+                        <Input
                           id="allowed_mime_types"
                           {...field}
                           placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"

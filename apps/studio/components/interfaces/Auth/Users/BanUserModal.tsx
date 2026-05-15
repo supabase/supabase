@@ -10,7 +10,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Modal,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -101,7 +101,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
                 render={({ field }) => (
                   <FormItemLayout className="[&>div>div]:mt-0" label="Set a ban duration">
                     <FormControl>
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}

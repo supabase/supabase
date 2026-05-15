@@ -22,10 +22,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroup,
   RadioGroupLargeItem,
   ScrollArea,
@@ -131,7 +131,7 @@ export const PolicyDetailsV2 = ({
               <FormItem className="col-span-6 flex flex-col gap-y-1">
                 <FormLabel>Policy Name</FormLabel>
                 <FormControl>
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     disabled={!canUpdatePolicies}
                     className="bg-control border-control"
@@ -154,8 +154,8 @@ export const PolicyDetailsV2 = ({
                 </FormLabel>
                 {authContext === 'database' && (
                   <FormControl>
-                    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                      <PopoverTrigger_Shadcn_ asChild>
+                    <Popover open={open} onOpenChange={setOpen} modal={false}>
+                      <PopoverTrigger asChild>
                         <Button
                           type="default"
                           disabled={!canUpdatePolicies}
@@ -174,9 +174,9 @@ export const PolicyDetailsV2 = ({
                             </span>
                           </div>
                         </Button>
-                      </PopoverTrigger_Shadcn_>
+                      </PopoverTrigger>
 
-                      <PopoverContent_Shadcn_
+                      <PopoverContent
                         className="p-0"
                         side="bottom"
                         align="start"
@@ -211,13 +211,13 @@ export const PolicyDetailsV2 = ({
                             </CommandGroup_Shadcn_>
                           </CommandList_Shadcn_>
                         </Command_Shadcn_>
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                 )}
                 {authContext === 'realtime' && (
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       disabled
                       value="messages.realtime"
                       className="bg-control border-control"

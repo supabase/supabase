@@ -20,6 +20,7 @@ import { generateTableChangeKey } from '@/components/grid/utils/queueOperationUt
 import { ForeignKey } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
 import type { Dictionary } from '@/types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
@@ -33,7 +34,7 @@ type ForeignKeyState = {
 export type SidePanel =
   | { type: 'cell'; value?: { column: string; row: Dictionary<any> } }
   | { type: 'row'; row?: Dictionary<any> }
-  | { type: 'column'; column?: PGColumn }
+  | { type: 'column'; column?: SafePostgresColumn }
   | { type: 'table'; mode: 'new' | 'edit' | 'duplicate'; templateData?: Partial<TableField> }
   | { type: 'schema'; mode: 'new' | 'edit' }
   | { type: 'json'; jsonValue: EditValue }
@@ -46,7 +47,7 @@ export type SidePanel =
 
 export type ConfirmationDialog =
   | { type: 'table'; isDeleteWithCascade: boolean }
-  | { type: 'column'; column: PGColumn; isDeleteWithCascade: boolean }
+  | { type: 'column'; column: SafePostgresColumn; isDeleteWithCascade: boolean }
   // [Joshen] Just FYI callback, numRows, allRowsSelected is a temp workaround so that
   // DeleteConfirmationDialog can trigger dispatch methods after the successful deletion of rows.
   // Once we deprecate react tracked and move things to valtio, we can remove this.
@@ -142,13 +143,13 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'column' },
       }
     },
-    onEditColumn: (column: PGColumn) => {
+    onEditColumn: (column: SafePostgresColumn) => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'column', column },
       }
     },
-    onDeleteColumn: (column: PGColumn) => {
+    onDeleteColumn: (column: SafePostgresColumn) => {
       state.ui = {
         open: 'confirmation-dialog',
         confirmationDialog: { type: 'column', column, isDeleteWithCascade: false },

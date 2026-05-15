@@ -11,10 +11,10 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Sheet,
   SheetContent,
@@ -160,7 +160,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                 disabled={keyRevealed}
               >
                 <FormLayout label="Name" id="app-name">
-                  <Input_Shadcn_
+                  <Input
                     id="app-name"
                     placeholder="My integration"
                     value={name}
@@ -190,12 +190,12 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                           disabled={isLoading}
                         />
                       )}
-                      <Popover_Shadcn_
+                      <Popover
                         open={permissionSearchOpen}
                         onOpenChange={setPermissionSearchOpen}
                         modal
                       >
-                        <PopoverTrigger_Shadcn_ asChild>
+                        <PopoverTrigger asChild>
                           <Button
                             type="default"
                             size="tiny"
@@ -204,8 +204,8 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                           >
                             Add permission
                           </Button>
-                        </PopoverTrigger_Shadcn_>
-                        <PopoverContent_Shadcn_ className="w-[400px] p-0" align="end">
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[400px] p-0" align="end">
                           <Command_Shadcn_>
                             <CommandInput_Shadcn_ placeholder="Search permissions..." />
                             <CommandList_Shadcn_>
@@ -236,8 +236,8 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                               </CommandGroup_Shadcn_>
                             </CommandList_Shadcn_>
                           </Command_Shadcn_>
-                        </PopoverContent_Shadcn_>
-                      </Popover_Shadcn_>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
 

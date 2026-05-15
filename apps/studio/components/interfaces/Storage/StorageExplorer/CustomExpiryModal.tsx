@@ -6,7 +6,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Modal,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -99,7 +99,7 @@ export const CustomExpiryModal = () => {
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Duration">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         type="number"
                         onChange={(e) => {

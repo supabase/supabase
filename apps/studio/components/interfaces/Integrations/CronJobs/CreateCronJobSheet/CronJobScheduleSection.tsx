@@ -13,11 +13,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   SheetSection,
   Switch,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { useDebounce } from 'use-debounce'
 
 import { formatScheduleString, getScheduleMessage } from '../CronJobs.utils'
@@ -103,7 +102,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                     onChange={(e) => setInputValue(e.target.value)}
                   />
                 ) : (
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     autoComplete="off"
                     placeholder="* * * * *"

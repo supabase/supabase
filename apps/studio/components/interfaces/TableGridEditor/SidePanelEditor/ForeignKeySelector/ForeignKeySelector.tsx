@@ -4,9 +4,9 @@ import { sortBy } from 'lodash'
 import { ArrowRight, HelpCircle, Loader2, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -18,6 +18,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
+import { displayColumnType, normalizeFormatSchema } from '../ColumnEditor/ColumnEditor.utils'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
@@ -52,7 +53,14 @@ interface ForeignKeySelectorProps {
   table: {
     id: number
     name: string
-    columns: { id: string; name: string; format: string; isNewColumn: boolean }[]
+    columns: {
+      id: string
+      name: string
+      format: string
+      formatSchema?: string
+      isArray?: boolean
+      isNewColumn: boolean
+    }[]
   }
   column?: ColumnField // For ColumnEditor, to prefill when adding a new foreign key
   foreignKey?: ForeignKey
@@ -145,11 +153,23 @@ export const ForeignKeySelector = ({
     const updatedRelations = fk.columns.map((x, i) => {
       if (i === idx) {
         if (key === 'target') {
-          const targetType = selectedTable?.columns?.find((col) => col.name === value)?.format
-          return { ...x, [key]: value, targetType }
+          const targetCol = selectedTable?.columns?.find((col) => col.name === value)
+          return {
+            ...x,
+            [key]: value,
+            targetType: targetCol?.format,
+            targetTypeSchema: normalizeFormatSchema(targetCol?.format_schema),
+            targetIsArray: targetCol?.data_type === 'ARRAY',
+          }
         } else {
-          const sourceType = table.columns.find((col) => col.name === value)?.format as string
-          return { ...x, [key]: value, sourceType }
+          const sourceCol = table.columns.find((col) => col.name === value)
+          return {
+            ...x,
+            [key]: value,
+            sourceType: sourceCol?.format,
+            sourceTypeSchema: normalizeFormatSchema(sourceCol?.formatSchema),
+            sourceIsArray: sourceCol?.isArray ?? false,
+          }
         }
       } else {
         return x
@@ -186,32 +206,70 @@ export const ForeignKeySelector = ({
     const typeErrors: SelectorTypeError[] = []
 
     fk.columns.forEach((column) => {
-      const { source, target, sourceType: sType, targetType: tType } = column
+      const {
+        source,
+        target,
+        sourceType: sType,
+        sourceTypeSchema: sSchema,
+        sourceIsArray: sArr,
+        targetType: tType,
+        targetTypeSchema: tSchema,
+        targetIsArray: tArr,
+      } = column
       const sourceColumn = table.columns.find((col) => col.name === source)
+      const targetColumn = selectedTable?.columns?.find((col) => col.name === target)
       const sourceType = sType ?? sourceColumn?.format ?? ''
-      const targetType =
-        tType ?? selectedTable?.columns?.find((col) => col.name === target)?.format ?? ''
+      const targetType = tType ?? targetColumn?.format ?? ''
+      const sourceTypeSchema = sSchema ?? normalizeFormatSchema(sourceColumn?.formatSchema)
+      const targetTypeSchema = tSchema ?? normalizeFormatSchema(targetColumn?.format_schema)
+      const sourceIsArray = sArr ?? sourceColumn?.isArray ?? false
+      const targetIsArray = tArr ?? targetColumn?.data_type === 'ARRAY'
 
       // [Joshen] Doing this way so that its more readable
       // If either source or target not selected yet, thats okay
       if (source === '' || target === '') return
 
-      // If source and target are in the same type of data types, thats okay
+      // pg-meta emits `_X` as the format string for arrays of X. Normalize before
+      // running family checks so that an array column is never accidentally classified
+      // as a member of a scalar family.
+      const bareSource =
+        sourceIsArray && sourceType.startsWith('_') ? sourceType.slice(1) : sourceType
+      const bareTarget =
+        targetIsArray && targetType.startsWith('_') ? targetType.slice(1) : targetType
+
+      // Same-family scalars are interchangeable; arrays must match exactly.
       if (
-        (NUMERICAL_TYPES.includes(sourceType) && NUMERICAL_TYPES.includes(targetType)) ||
-        (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
-        (sourceType === 'uuid' && targetType === 'uuid')
+        !sourceIsArray &&
+        !targetIsArray &&
+        ((NUMERICAL_TYPES.includes(sourceType) && NUMERICAL_TYPES.includes(targetType)) ||
+          (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
+          (sourceType === 'uuid' && targetType === 'uuid'))
       )
         return
 
-      // Otherwise just check if the format is equal to each other
-      if (sourceType === targetType) return
+      // Otherwise require an exact match across the full (format, format_schema, isArray) triple.
+      if (
+        bareSource === bareTarget &&
+        sourceTypeSchema === targetTypeSchema &&
+        sourceIsArray === targetIsArray
+      )
+        return
 
+      const entry: SelectorTypeError = {
+        source,
+        sourceType,
+        sourceTypeSchema,
+        sourceIsArray,
+        target,
+        targetType,
+        targetTypeSchema,
+        targetIsArray,
+      }
       if (sourceColumn?.isNewColumn && targetType !== '') {
-        return typeNotice.push({ source, sourceType, target, targetType })
+        return typeNotice.push(entry)
       }
 
-      typeErrors.push({ source, sourceType, target, targetType })
+      typeErrors.push(entry)
     })
 
     setErrors({ types: typeErrors, typeNotice })
@@ -344,11 +402,11 @@ export const ForeignKeySelector = ({
                         {fk.schema}.{fk.table}
                       </div>
                       {fk.columns.length === 0 && (
-                        <Alert_Shadcn_ className="col-span-10 py-2 px-3">
-                          <AlertDescription_Shadcn_>
+                        <Alert className="col-span-10 py-2 px-3">
+                          <AlertDescription>
                             There are no foreign key relations between the tables
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
+                          </AlertDescription>
+                        </Alert>
                       )}
                       {fk.columns.map((_, idx) => (
                         <Fragment key={`${fk.schema}-${fk.table}-${idx}`}>
@@ -370,7 +428,13 @@ export const ForeignKeySelector = ({
                                       <div className="flex items-center gap-2">
                                         <span className="text-foreground">{column.name}</span>
                                         <span className="text-foreground-lighter">
-                                          {column.format === '' ? '-' : column.format}
+                                          {column.format === ''
+                                            ? '-'
+                                            : displayColumnType(
+                                                column.format,
+                                                column.formatSchema,
+                                                column.isArray
+                                              )}
                                         </span>
                                       </div>
                                     </SelectItem_Shadcn_>
@@ -397,7 +461,13 @@ export const ForeignKeySelector = ({
                                     <div className="flex items-center gap-2">
                                       <span className="text-foreground">{column.name}</span>
                                       <span className="text-foreground-lighter">
-                                        {column.format === '' ? '-' : column.format}
+                                        {column.format === ''
+                                          ? '-'
+                                          : displayColumnType(
+                                              column.format,
+                                              column.format_schema,
+                                              column.data_type === 'ARRAY'
+                                            )}
                                       </span>
                                     </div>
                                   </SelectItem_Shadcn_>
@@ -423,34 +493,43 @@ export const ForeignKeySelector = ({
                       </Button>
                       {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
                       {hasTypeErrors && (
-                        <Alert_Shadcn_ variant="warning">
-                          <AlertTitle_Shadcn_>Column types do not match</AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
+                        <Alert variant="warning">
+                          <AlertTitle>Column types do not match</AlertTitle>
+                          <AlertDescription>
                             The following columns cannot be referenced as they are not of the same
                             type:
-                          </AlertDescription_Shadcn_>
+                          </AlertDescription>
                           <ul className="list-disc pl-5 mt-2 text-foreground-light">
                             {(errors?.types ?? []).map((x, idx: number) => {
                               if (x === undefined) return null
                               return (
                                 <li key={`type-error-${idx}`}>
                                   <code className="text-code-inline">{x.source}</code> (
-                                  {x.sourceType}) and{' '}
-                                  <code className="text-code-inline">{x.target}</code>(
-                                  {x.targetType})
+                                  {displayColumnType(
+                                    x.sourceType,
+                                    x.sourceTypeSchema,
+                                    x.sourceIsArray
+                                  )}
+                                  ) and <code className="text-code-inline">{x.target}</code>(
+                                  {displayColumnType(
+                                    x.targetType,
+                                    x.targetTypeSchema,
+                                    x.targetIsArray
+                                  )}
+                                  )
                                 </li>
                               )
                             })}
                           </ul>
-                        </Alert_Shadcn_>
+                        </Alert>
                       )}
                       {hasTypeNotices && (
-                        <Alert_Shadcn_>
-                          <AlertTitle_Shadcn_>Column types will be updated</AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
+                        <Alert>
+                          <AlertTitle>Column types will be updated</AlertTitle>
+                          <AlertDescription>
                             The following columns will have their types updated to match their
                             referenced column
-                          </AlertDescription_Shadcn_>
+                          </AlertDescription>
                           <ul className="list-disc pl-5 mt-2 text-foreground-light">
                             {(errors?.typeNotice ?? []).map((x, idx: number) => {
                               if (x === undefined) return null
@@ -458,13 +537,18 @@ export const ForeignKeySelector = ({
                                 <li key={`type-error-${idx}`}>
                                   <div className="flex items-center gap-x-1">
                                     <code className="text-code-inline">{x.source}</code>{' '}
-                                    <ArrowRight size={14} /> {x.targetType}
+                                    <ArrowRight size={14} />{' '}
+                                    {displayColumnType(
+                                      x.targetType,
+                                      x.targetTypeSchema,
+                                      x.targetIsArray
+                                    )}
                                   </div>
                                 </li>
                               )
                             })}
                           </ul>
-                        </Alert_Shadcn_>
+                        </Alert>
                       )}
                     </div>
                   </div>

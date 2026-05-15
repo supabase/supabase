@@ -2,7 +2,7 @@ import type { PGTable } from '@supabase/pg-meta'
 import { ArrowRight } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Popover, PopoverContent, PopoverTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { SupaRow } from '../../types'
@@ -73,8 +73,8 @@ export const ForeignKeyFormatter = (props: Props) => {
             </div>
           )}
           {!isLoadingTargetTable && targetTable !== undefined && (
-            <Popover_Shadcn_>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover>
+              <PopoverTrigger asChild>
                 <ButtonTooltip
                   type="default"
                   className="w-6 h-6"
@@ -83,8 +83,8 @@ export const ForeignKeyFormatter = (props: Props) => {
                   onClick={(e) => e.stopPropagation()}
                   tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
                 />
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 align="end"
                 className="p-0 w-96"
                 onDoubleClick={(e) => {
@@ -100,8 +100,8 @@ export const ForeignKeyFormatter = (props: Props) => {
                   column={relationship.target_column_name}
                   value={formattedValue}
                 />
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
         </>
       )}

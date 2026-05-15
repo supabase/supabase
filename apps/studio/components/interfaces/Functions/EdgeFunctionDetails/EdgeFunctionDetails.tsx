@@ -6,9 +6,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -346,15 +346,13 @@ export const EdgeFunctionDetails = () => {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
-              <Alert_Shadcn_ variant="destructive">
+              <Alert variant="destructive">
                 <CriticalIcon />
-                <AlertTitle_Shadcn_>
-                  Once your function is deleted, it can no longer be restored
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
+                <AlertTitle>Once your function is deleted, it can no longer be restored</AlertTitle>
+                <AlertDescription>
                   Make sure you have made a backup if you want to restore your edge function
-                </AlertDescription_Shadcn_>
-                <AlertDescription_Shadcn_ className="mt-3">
+                </AlertDescription>
+                <AlertDescription className="mt-3">
                   <Button
                     type="danger"
                     disabled={!canUpdateEdgeFunction}
@@ -363,8 +361,8 @@ export const EdgeFunctionDetails = () => {
                   >
                     Delete edge function
                   </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             </PageSectionContent>
           </PageSection>
           <ConfirmationModal

@@ -8,9 +8,9 @@ import {
   Card,
   CardContent,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -98,7 +98,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
 
   return (
     <>
-      <Collapsible_Shadcn_
+      <Collapsible
         id={lint.name}
         open={expandedLint === lint.name}
         onOpenChange={(open) => {
@@ -106,7 +106,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
           else setExpandedLint(undefined)
         }}
       >
-        <CollapsibleTrigger_Shadcn_ asChild className="[&[data-state=open]>div>svg]:rotate-90!">
+        <CollapsibleTrigger asChild className="[&[data-state=open]>div>svg]:rotate-90!">
           <Card className="border-b-0 rounded-none">
             <CardContent className="py-3 flex items-center justify-between text-sm gap-4 cursor-pointer transition hover:bg-surface-200">
               <div className="flex items-center justify-center [&>svg]:text-foreground-lighter">
@@ -135,8 +135,8 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
               <ChevronRight strokeWidth={1.5} size={16} className="transition" />
             </CardContent>
           </Card>
-        </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_
+        </CollapsibleTrigger>
+        <CollapsibleContent
           className={cn(
             'bg-surface border-x border-t rounded-none!',
             rules.length > 0 ? 'divide-y' : ''
@@ -200,8 +200,8 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
               )}
             </>
           )}
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+        </CollapsibleContent>
+      </Collapsible>
 
       <CreateRuleSheet lint={lint} open={open} onOpenChange={setOpen} />
 

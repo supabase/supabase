@@ -1,6 +1,6 @@
 import { Plus, Trash } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { Button, FormControl, FormField, FormItem, FormMessage, Input_Shadcn_ } from 'ui'
+import { Button, FormControl, FormField, FormItem, FormMessage, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { SSOConfigFormSchema } from './SSOConfig'
@@ -43,7 +43,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
-                      <Input_Shadcn_ {...field} autoComplete="off" placeholder="example.com" />
+                      <Input {...field} autoComplete="off" placeholder="example.com" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

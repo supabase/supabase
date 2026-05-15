@@ -9,9 +9,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import {
@@ -39,13 +39,13 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={onOpenChange} modal={true}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={onOpenChange} modal={true}>
+      <PopoverTrigger asChild>
         <Button type="default" size="tiny" icon={<Plus className="h-4 w-4" />}>
           Add permission
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[400px] p-0" align={align}>
+      </PopoverTrigger>
+      <PopoverContent className="w-[400px] p-0" align={align}>
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search resources..." />
           <CommandList_Shadcn_>
@@ -84,7 +84,7 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

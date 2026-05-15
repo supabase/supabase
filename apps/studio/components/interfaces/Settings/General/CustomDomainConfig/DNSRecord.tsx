@@ -6,29 +6,15 @@ export type DNSRecordProps = {
   value: string
 }
 
-const DNSRecord = ({ type, name, value }: DNSRecordProps) => {
+export const DNSRecord = ({ type, name, value }: DNSRecordProps) => {
   return (
     <div className="flex gap-4 items-center">
       <div className="w-[50px]">
         <p className="font-mono text-base">{type.toUpperCase()}</p>
       </div>
 
-      <Input
-        readOnly
-        copy
-        disabled
-        containerClassName="flex-1"
-        className="font-mono"
-        value={name}
-      />
-      <Input
-        readOnly
-        copy
-        disabled
-        containerClassName="flex-1"
-        className="font-mono"
-        value={value}
-      />
+      <Input readOnly copy containerClassName="flex-1" className="font-mono" value={name} />
+      <Input readOnly copy containerClassName="flex-1" className="font-mono" value={value} />
     </div>
   )
 }

@@ -12,9 +12,9 @@ import {
   CommandSeparator_Shadcn_,
   FormControl,
   FormField,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -151,8 +151,8 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
               </Button>
             </FormControl>
           ) : (
-            <Popover_Shadcn_ open={isRepoSelectorOpen} onOpenChange={setIsRepoSelectorOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover open={isRepoSelectorOpen} onOpenChange={setIsRepoSelectorOpen}>
+              <PopoverTrigger asChild>
                 <FormControl>
                   <Button
                     type="default"
@@ -172,13 +172,8 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                       (isLoading ? 'Loading GitHub repositories...' : placeholder)}
                   </Button>
                 </FormControl>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                className="p-0"
-                side="bottom"
-                align="start"
-                sameWidthAsTrigger
-              >
+              </PopoverTrigger>
+              <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Search repositories..." />
                   <CommandList_Shadcn_ className="!max-h-[220px]">
@@ -250,8 +245,8 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                     )}
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
         </FormItemLayout>
       )}

@@ -10,10 +10,10 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -85,8 +85,8 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
   }
 
   return (
-    <Popover_Shadcn_ open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
+      <PopoverTrigger asChild>
         <Button
           type="text"
           size="tiny"
@@ -95,8 +95,8 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
         >
           {currentChat}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[250px] p-0" align="start">
+      </PopoverTrigger>
+      <PopoverContent className="w-[250px] p-0" align="start">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ className="text-xs" placeholder="Search chats..." />
           <CommandList_Shadcn_>
@@ -116,7 +116,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                     <div className="flex items-center w-full flex-1 min-w-0">
                       {editingChatId === id ? (
                         <div className="flex items-center gap-2 w-full">
-                          <Input_Shadcn_
+                          <Input
                             value={editingChatName}
                             onChange={(e) => setEditingChatName(e.target.value)}
                             autoFocus
@@ -211,7 +211,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

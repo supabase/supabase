@@ -10,7 +10,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -106,7 +106,7 @@ export const ProfileInformation = () => {
                   render={({ field }) => (
                     <FormItemLayout label="First name" layout="flex-row-reverse">
                       <FormControl className="col-span-8">
-                        <Input_Shadcn_ {...field} placeholder="First name" className="w-full" />
+                        <Input {...field} placeholder="First name" className="w-full" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -119,7 +119,7 @@ export const ProfileInformation = () => {
                   render={({ field }) => (
                     <FormItemLayout label="Last name" layout="flex-row-reverse">
                       <FormControl className="col-span-8">
-                        <Input_Shadcn_ {...field} placeholder="Last name" className="w-full" />
+                        <Input {...field} placeholder="Last name" className="w-full" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -180,7 +180,7 @@ export const ProfileInformation = () => {
                     >
                       <FormControl className="col-span-8">
                         <div className="flex flex-col gap-1">
-                          <Input_Shadcn_
+                          <Input
                             {...field}
                             className="w-full"
                             placeholder="Username"

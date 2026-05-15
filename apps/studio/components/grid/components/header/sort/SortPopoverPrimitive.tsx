@@ -18,13 +18,7 @@ import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Button,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
+import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DropdownControl } from '../../common/DropdownControl'
@@ -237,13 +231,13 @@ export const SortPopoverPrimitive = ({
 
   return (
     <>
-      <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover modal={false} open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button type={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
             {displayButtonText}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="center">
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-96" side="bottom" align="center">
           <div className="space-y-2 py-2">
             <DndContext
               sensors={sensors}
@@ -283,7 +277,7 @@ export const SortPopoverPrimitive = ({
               </div>
             )}
 
-            <PopoverSeparator_Shadcn_ />
+            <PopoverSeparator />
             <div className="px-3 flex flex-row justify-between">
               {dropdownOptions && dropdownOptions.length > 0 ? (
                 <DropdownControl
@@ -327,8 +321,8 @@ export const SortPopoverPrimitive = ({
               </div>
             </div>
           </div>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
 
       <ConfirmationModal
         size="medium"

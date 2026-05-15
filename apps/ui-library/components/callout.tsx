@@ -1,4 +1,4 @@
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert, AlertDescription, AlertTitle } from 'ui'
 
 interface CalloutProps {
   icon?: string
@@ -8,10 +8,10 @@ interface CalloutProps {
 
 export function Callout({ title, children, icon, ...props }: CalloutProps) {
   return (
-    <Alert_Shadcn_ {...props}>
+    <Alert {...props}>
       {icon && <span className="mr-4 text-2xl">{icon}</span>}
-      {title && <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>}
-      <AlertDescription_Shadcn_>{children}</AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      {title && <AlertTitle>{title}</AlertTitle>}
+      <AlertDescription>{children}</AlertDescription>
+    </Alert>
   )
 }

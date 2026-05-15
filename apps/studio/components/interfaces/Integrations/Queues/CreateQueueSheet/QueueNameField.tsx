@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { FormControl, FormField, Input_Shadcn_, SheetSection } from 'ui'
+import { FormControl, FormField, Input, SheetSection } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateQueueForm } from './CreateQueueSheet.schema'
@@ -13,7 +13,7 @@ export function QueueNameField({ form }: { form: UseFormReturn<CreateQueueForm> 
         render={({ field }) => (
           <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
             <FormControl>
-              <Input_Shadcn_ {...field} />
+              <Input {...field} />
             </FormControl>
             <span className="text-foreground-lighter text-xs absolute top-0 right-0">
               Can include letters, numbers, underscores, and hyphens

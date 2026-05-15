@@ -10,9 +10,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -90,8 +90,8 @@ export const ExposedTableSelector = ({
   }, [entry?.isIntersecting, hasNextPage, isFetching, isFetchingNextPage, isPending, fetchNextPage])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <Button
           size="small"
           disabled={disabled}
@@ -113,8 +113,8 @@ export const ExposedTableSelector = ({
             </p>
           </div>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
         align="start"
@@ -275,8 +275,8 @@ export const ExposedTableSelector = ({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 

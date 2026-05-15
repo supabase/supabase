@@ -11,7 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -309,7 +309,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                       render={({ field }) => (
                         <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
                           <FormControl>
-                            <Input_Shadcn_ {...field} disabled={isEditing} />
+                            <Input {...field} disabled={isEditing} />
                           </FormControl>
                           <span className="text-foreground-lighter text-xs absolute top-0 right-0">
                             Cron jobs cannot be renamed once created

@@ -7,16 +7,16 @@ import React, {
   useState,
 } from 'react'
 import {
+  Input as BaseInput,
   cn,
   copyToClipboard,
-  Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from 'ui'
 
-export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'onCopy'> {
+export interface Props extends Omit<ComponentProps<typeof BaseInput>, 'onCopy'> {
   copy?: boolean
   showCopyOnHover?: boolean
   onCopy?: () => void
@@ -28,8 +28,8 @@ export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'onCop
 }
 
 const Input = forwardRef<
-  ElementRef<typeof Input_Shadcn_>,
-  ComponentPropsWithoutRef<typeof Input_Shadcn_> & Props
+  ElementRef<typeof BaseInput>,
+  ComponentPropsWithoutRef<typeof BaseInput> & Props
 >(
   (
     {

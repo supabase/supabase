@@ -11,14 +11,14 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select_Shadcn_,
@@ -36,7 +36,7 @@ import {
   Switch,
   Textarea,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -153,7 +153,7 @@ export default function FormPatternsSidePanel() {
                       description="Single-line text entry for short values"
                     >
                       <FormControl className="col-span-6">
-                        <Input_Shadcn_ {...field} placeholder="Enter text" />
+                        <Input {...field} placeholder="Enter text" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -174,7 +174,7 @@ export default function FormPatternsSidePanel() {
                       description="Masked input for secure text entry"
                     >
                       <FormControl className="col-span-6">
-                        <Input_Shadcn_ {...field} type="password" placeholder="Enter password" />
+                        <Input {...field} type="password" placeholder="Enter password" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -195,7 +195,7 @@ export default function FormPatternsSidePanel() {
                       description="Read-only input with copy-to-clipboard functionality"
                     >
                       <FormControl className="col-span-6">
-                        <Input
+                        <PasswordInput
                           copy
                           readOnly
                           className="input-mono"
@@ -223,7 +223,7 @@ export default function FormPatternsSidePanel() {
                       description="Numeric input with min/max validation"
                     >
                       <FormControl className="col-span-6">
-                        <Input_Shadcn_
+                        <Input
                           {...field}
                           type="number"
                           min={1}
@@ -669,8 +669,8 @@ export default function FormPatternsSidePanel() {
                       description="Date selection with calendar popover"
                     >
                       <FormControl className="col-span-6">
-                        <Popover_Shadcn_>
-                          <PopoverTrigger_Shadcn_ asChild>
+                        <Popover>
+                          <PopoverTrigger asChild>
                             <Button
                               type="outline"
                               className="bg-control w-full justify-start text-left font-normal px-3 py-4"
@@ -678,16 +678,16 @@ export default function FormPatternsSidePanel() {
                             >
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                             </Button>
-                          </PopoverTrigger_Shadcn_>
-                          <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
                               initialFocus
                             />
-                          </PopoverContent_Shadcn_>
-                        </Popover_Shadcn_>
+                          </PopoverContent>
+                        </Popover>
                       </FormControl>
                     </FormItemLayout>
                   )}

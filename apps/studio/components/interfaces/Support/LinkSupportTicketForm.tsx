@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import type { SubmitHandler } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, DialogSectionSeparator, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, DialogSectionSeparator, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
@@ -117,7 +117,7 @@ export const LinkSupportTicketForm = ({
               render={({ field }) => (
                 <FormItemLayout hideMessage layout="vertical" label="Conversation ID">
                   <FormControl>
-                    <Input_Shadcn_ {...field} readOnly />
+                    <Input {...field} readOnly />
                   </FormControl>
                 </FormItemLayout>
               )}

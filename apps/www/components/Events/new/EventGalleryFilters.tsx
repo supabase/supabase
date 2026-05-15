@@ -2,7 +2,7 @@
 
 import { useEvents } from '~/app/events/context'
 import { SearchIcon } from 'lucide-react'
-import { Badge, Input_Shadcn_ as Input } from 'ui'
+import { Badge, Input } from 'ui'
 
 const CATEGORIES_FILTERS = [
   { name: 'All', value: 'all' },

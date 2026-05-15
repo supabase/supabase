@@ -11,9 +11,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   SidebarMenu,
   SidebarMenuButton,
@@ -104,9 +104,9 @@ export function OrgSelector() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild>{triggerButton}</PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
+          <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
+          <PopoverContent className="p-0" side="bottom" align="start">
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Find organization..." />
               <CommandList_Shadcn_>
@@ -164,8 +164,8 @@ export function OrgSelector() {
                 )}
               </CommandList_Shadcn_>
             </Command_Shadcn_>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
       </SidebarMenuItem>
     </SidebarMenu>
   )

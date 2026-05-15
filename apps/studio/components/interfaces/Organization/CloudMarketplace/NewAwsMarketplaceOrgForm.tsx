@@ -4,7 +4,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -70,7 +70,7 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
               <FormItemLayout label="Name" layout="horizontal">
                 <FormControl>
                   <>
-                    <Input_Shadcn_ {...field} placeholder="Organization name" />
+                    <Input {...field} placeholder="Organization name" />
                     <div className="mt-1">
                       <Label_Shadcn_
                         htmlFor="name"

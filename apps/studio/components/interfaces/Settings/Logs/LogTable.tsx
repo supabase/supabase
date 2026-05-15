@@ -10,9 +10,9 @@ import {
   Button,
   Checkbox,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuTrigger,
   copyToClipboard,
   ResizableHandle,
   ResizablePanel,
@@ -502,12 +502,12 @@ export const LogTable = ({
                 }}
               />
             </div>
-            <ContextMenu_Shadcn_ modal={false}>
-              <ContextMenuTrigger_Shadcn_ asChild>
+            <ContextMenu modal={false}>
+              <ContextMenuTrigger asChild>
                 <div ref={triggerRef} className="fixed pointer-events-none w-0 h-0" />
-              </ContextMenuTrigger_Shadcn_>
+              </ContextMenuTrigger>
               <ContextMenuContent key={contextMenuKey}>
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => {
                     const eventMessage = activeRow?.event_message
@@ -520,9 +520,9 @@ export const LogTable = ({
                 >
                   <Copy size={14} />
                   <span className="text-xs">Copy event message</span>
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               </ContextMenuContent>
-            </ContextMenu_Shadcn_>
+            </ContextMenu>
             <DataGrid
               role="table"
               style={{ flex: '1 1 0%', minHeight: 0 }}

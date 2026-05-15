@@ -5,14 +5,7 @@ import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 // @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
 import type { Popover as PopoverPrimitive } from 'radix-ui'
 import React, { useEffect } from 'react'
-import {
-  Badge,
-  cn,
-  Popover_Shadcn_ as Popover,
-  PopoverAnchor_Shadcn_ as PopoverAnchor,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverContentProps_Shadcn_ as PopoverContentProps,
-} from 'ui'
+import { Badge, cn, Popover, PopoverAnchor, PopoverContent, PopoverContentProps } from 'ui'
 import {
   Command,
   CommandEmpty,

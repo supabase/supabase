@@ -12,9 +12,9 @@ import {
 import Link from 'next/link'
 import { ReactNode, useId, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   Command_Shadcn_,
@@ -25,14 +25,14 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   CriticalIcon,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
   Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -48,8 +48,10 @@ import {
 import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 
+export type ColumnTypeSelection = { format: string; formatSchema?: string }
+
 interface ColumnTypeProps {
-  value: string
+  value: ColumnTypeSelection
   enumTypes: EnumeratedType[]
   className?: string
   error?: any
@@ -58,8 +60,17 @@ interface ColumnTypeProps {
   layout?: 'horizontal' | 'vertical'
   description?: ReactNode
   showRecommendation?: boolean
-  onOptionSelect: (value: string) => void
+  onOptionSelect: (selection: ColumnTypeSelection) => void
 }
+
+const renderValue = ({ format, formatSchema }: ColumnTypeSelection) =>
+  formatSchema ? `${formatSchema}.${format}` : format
+
+const matchesBuiltin = (optionName: string, value: ColumnTypeSelection) =>
+  !value.formatSchema && optionName === value.format
+
+const matchesEnum = (option: { name: string; schema: string }, value: ColumnTypeSelection) =>
+  option.name === value.format && option.schema === (value.formatSchema || 'public')
 
 const ColumnType = ({
   value,
@@ -75,22 +86,25 @@ const ColumnType = ({
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
   const listboxId = useId()
-  const availableTypes = POSTGRES_DATA_TYPES.concat(
-    enumTypes.map((type) => type.format.replaceAll('"', ''))
-  )
-  const isAvailableType = value ? availableTypes.includes(value) : true
-  const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
+  const hasValue = value.format.length > 0
+  const isAvailableType =
+    !hasValue ||
+    POSTGRES_DATA_TYPES.some((name) => matchesBuiltin(name, value)) ||
+    enumTypes.some((option) => matchesEnum(option, value))
+  const recommendation = !value.formatSchema
+    ? RECOMMENDED_ALTERNATIVE_DATA_TYPE[value.format]
+    : undefined
+  const displayValue = renderValue(value)
 
   const unsupportedDataTypeText = `This column's data type cannot be changed via the Table Editor as it is not supported yet. You can do so through the SQL Editor instead.`
 
-  const getOptionByName = (name: string) => {
-    // handle built in types
-    const pgOption = POSTGRES_DATA_TYPE_OPTIONS.find((option) => option.name === name)
-    if (pgOption) return pgOption
-
-    // handle custom enums
-    const enumType = enumTypes.find((type) => type.format === name)
-    return enumType ? { ...enumType, type: 'enum' } : undefined
+  const getOptionType = (selection: ColumnTypeSelection) => {
+    const pgOption = POSTGRES_DATA_TYPE_OPTIONS.find((option) =>
+      matchesBuiltin(option.name, selection)
+    )
+    if (pgOption) return pgOption.type
+    const enumType = enumTypes.find((type) => matchesEnum(type, selection))
+    return enumType ? 'enum' : ''
   }
 
   const inferIcon = (type: string) => {
@@ -131,9 +145,9 @@ const ColumnType = ({
             isReactForm={false}
           >
             <InputGroup>
-              <InputGroupInput readOnly disabled size="small" value={value} />
+              <InputGroupInput readOnly disabled size="small" value={displayValue} />
               <InputGroupAddon align="inline-start">
-                {inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
+                {inferIcon(getOptionType(value))}
               </InputGroupAddon>
             </InputGroup>
           </FormItemLayout>
@@ -157,7 +171,7 @@ const ColumnType = ({
             description={showLabel ? unsupportedDataTypeText : undefined}
             isReactForm={false}
           >
-            <Input readOnly disabled size="small" value={value} />
+            <Input readOnly disabled size="small" value={displayValue} />
           </FormItemLayout>
         </TooltipTrigger>
         {!showLabel && description && (
@@ -172,37 +186,29 @@ const ColumnType = ({
   return (
     <div className={cn('flex flex-col gap-y-2', className)}>
       {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
-      <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover modal open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             type={error ? 'danger' : 'default'}
             role="combobox"
             size={'small'}
             aria-expanded={open}
             aria-controls={listboxId}
-            className={cn(
-              'w-full bg-foreground/[.026]! justify-between',
-              !value && 'text-foreground-lighter'
-            )}
+            className={cn('w-full justify-between', !hasValue && 'text-foreground-lighter')}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
-            title={value && value.replaceAll('"', '')}
+            title={displayValue}
           >
-            {value ? (
+            {hasValue ? (
               <div className="flex gap-2 items-center">
-                <span>{inferIcon(getOptionByName(value)?.type ?? '')}</span>
-                <span className="block truncate">{value.replaceAll('"', '')}</span>
+                <span>{inferIcon(getOptionType(value))}</span>
+                <span className="block truncate">{displayValue}</span>
               </div>
             ) : (
               'Choose a column type...'
             )}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          id={listboxId}
-          className="w-[460px] p-0"
-          side="bottom"
-          align="center"
-        >
+        </PopoverTrigger>
+        <PopoverContent id={listboxId} className="w-[460px] p-0" side="bottom" align="center">
           <Command_Shadcn_>
             <CommandInput_Shadcn_
               placeholder="Search types..."
@@ -215,94 +221,97 @@ const ColumnType = ({
             <CommandList_Shadcn_>
               <ScrollArea className="h-[240px]">
                 <CommandGroup_Shadcn_ heading="Postgres data types">
-                  {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => (
-                    <CommandItem_Shadcn_
-                      key={option.name}
-                      value={option.name}
-                      className={cn('relative', option.name === value ? 'bg-surface-200' : '')}
-                      onSelect={(value: string) => {
-                        onOptionSelect(value)
-                        setOpen(false)
-                      }}
-                    >
-                      <div className="flex items-center gap-2 pr-6">
-                        <span>{inferIcon(option.type)}</span>
-                        <span className="text-foreground">{option.name}</span>
-                        <span className="text-foreground-lighter">{option.description}</span>
-                      </div>
-                      <span className="absolute right-3 top-2">
-                        {option.name === value ? <Check className="text-brand" size={14} /> : ''}
-                      </span>
-                    </CommandItem_Shadcn_>
-                  ))}
+                  {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => {
+                    const isSelected = matchesBuiltin(option.name, value)
+                    return (
+                      <CommandItem_Shadcn_
+                        key={option.name}
+                        value={option.name}
+                        className={cn('relative', isSelected ? 'bg-surface-200' : '')}
+                        onSelect={() => {
+                          onOptionSelect({ format: option.name })
+                          setOpen(false)
+                        }}
+                      >
+                        <div className="flex items-center gap-2 pr-6">
+                          <span>{inferIcon(option.type)}</span>
+                          <span className="text-foreground">{option.name}</span>
+                          <span className="text-foreground-lighter">{option.description}</span>
+                        </div>
+                        <span className="absolute right-3 top-2">
+                          {isSelected ? <Check className="text-brand" size={14} /> : ''}
+                        </span>
+                      </CommandItem_Shadcn_>
+                    )
+                  })}
                 </CommandGroup_Shadcn_>
 
                 {enumTypes.length > 0 && (
                   <>
                     <CommandSeparator_Shadcn_ />
                     <CommandGroup_Shadcn_ heading="Other types">
-                      {enumTypes.map((option) => (
-                        <CommandItem_Shadcn_
-                          key={option.id}
-                          value={option.format}
-                          className={cn(
-                            'relative',
-                            option.format === value ? 'bg-surface-200' : ''
-                          )}
-                          onSelect={(value: string) => {
-                            // [Joshen] For camel case types specifically, format property includes escaped double quotes
-                            // which will cause the POST columns call to error out. So we strip it specifically in this context
-                            onOptionSelect(
-                              option.schema === 'public' ? value.replaceAll('"', '') : value
-                            )
-                            setOpen(false)
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div>
-                              <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
+                      {enumTypes.map((option) => {
+                        const isSelected = matchesEnum(option, value)
+                        return (
+                          <CommandItem_Shadcn_
+                            key={option.id}
+                            value={option.format}
+                            className={cn('relative', isSelected ? 'bg-surface-200' : '')}
+                            onSelect={() => {
+                              onOptionSelect({
+                                format: option.name,
+                                formatSchema:
+                                  option.schema === 'public' ? undefined : option.schema,
+                              })
+                              setOpen(false)
+                            }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div>
+                                <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
+                              </div>
+                              <span className="text-foreground">
+                                {option.format.replaceAll('"', '')}
+                              </span>
+                              {option.comment !== undefined && (
+                                <span
+                                  title={option.comment ?? ''}
+                                  className="text-foreground-lighter"
+                                >
+                                  {option.comment}
+                                </span>
+                              )}
+                              {isSelected && (
+                                <span className="absolute right-3 top-2">
+                                  <Check className="text-brand" size={14} />
+                                </span>
+                              )}
                             </div>
-                            <span className="text-foreground">
-                              {option.format.replaceAll('"', '')}
-                            </span>
-                            {option.comment !== undefined && (
-                              <span
-                                title={option.comment ?? ''}
-                                className="text-foreground-lighter"
-                              >
-                                {option.comment}
-                              </span>
-                            )}
-                            {option.format === value && (
-                              <span className="absolute right-3 top-2">
-                                <Check className="text-brand" size={14} />
-                              </span>
-                            )}
-                          </div>
-                        </CommandItem_Shadcn_>
-                      ))}
+                          </CommandItem_Shadcn_>
+                        )
+                      })}
                     </CommandGroup_Shadcn_>
                   </>
                 )}
               </ScrollArea>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
 
       {showRecommendation && recommendation !== undefined && (
-        <Alert_Shadcn_ variant="warning" className="mt-2">
+        <Alert variant="warning" className="mt-2">
           <CriticalIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             {' '}
             It is recommended to use{' '}
             <code className="text-code-inline">{recommendation.alternative}</code> instead
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          </AlertTitle>
+          <AlertDescription>
             <p>
               Postgres recommends against using the data type{' '}
-              <code className="text-code-inline">{value}</code> unless you have a very specific use
-              case.
+              <code className="text-code-inline">{displayValue}</code> unless you have a very
+              specific use case.
             </p>
             <div className="flex items-center space-x-2 mt-3">
               <Button asChild type="default" icon={<ExternalLink />}>
@@ -310,12 +319,15 @@ const ColumnType = ({
                   Read more
                 </Link>
               </Button>
-              <Button type="primary" onClick={() => onOptionSelect(recommendation.alternative)}>
+              <Button
+                type="primary"
+                onClick={() => onOptionSelect({ format: recommendation.alternative })}
+              >
                 Use {recommendation.alternative}
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   )

@@ -6,6 +6,7 @@ import { useCallback } from 'react'
 
 import { tableKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type TablesVariables = {
@@ -61,10 +62,10 @@ export async function getTables(
 
   // Sort the data if the sortByName option is true
   if (Array.isArray(data) && sortByProperty) {
-    return sortBy(data, (t) => t[sortByProperty]) as PGTable[]
+    return sortBy(data, (t) => t[sortByProperty]) as SafePostgresTable[]
   }
 
-  return data as PGTable[]
+  return data as SafePostgresTable[]
 }
 
 export type TablesData = Awaited<ReturnType<typeof getTables>>
