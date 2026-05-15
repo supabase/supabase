@@ -7,18 +7,18 @@ import {
   Button,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectSeparator_Shadcn_,
   SelectTrigger_Shadcn_,
-  TextArea_Shadcn_,
+  TextArea,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
@@ -45,7 +45,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="The Google Cloud project ID where data will be sent"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="my-gcp-project" />
+                <Input {...field} placeholder="my-gcp-project" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -61,7 +61,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="The BigQuery dataset where replicated tables will be created"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="my_dataset" />
+                <Input {...field} placeholder="my_dataset" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -77,7 +77,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Service account credentials JSON for authenticating with BigQuery"
             >
               <FormControl>
-                <TextArea_Shadcn_
+                <TextArea
                   {...field}
                   rows={5}
                   maxLength={5000}
@@ -120,7 +120,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="A PostgreSQL connection string for the DuckLake catalog"
             >
               <FormControl>
-                <Input
+                <PasswordInput
                   value={field.value ?? ''}
                   type={showCatalogUrl ? 'text' : 'password'}
                   placeholder="postgres://user:pass@host:5432/ducklake_catalog"
@@ -151,11 +151,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="An S3 path where DuckLake data files will be written"
             >
               <FormControl>
-                <Input_Shadcn_
-                  {...field}
-                  placeholder="s3://bucket/path"
-                  value={field.value ?? ''}
-                />
+                <Input {...field} placeholder="s3://bucket/path" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -171,7 +167,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Optional number of concurrent DuckDB connections to use"
             >
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   type="number"
                   min={1}
                   max={6}
@@ -207,7 +203,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Required access key ID for the object storage provider"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="my-access-key" value={field.value ?? ''} />
+                <Input {...field} placeholder="my-access-key" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -224,7 +220,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               className="relative"
             >
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   {...field}
                   type={showSecretAccessKey ? 'text' : 'password'}
                   placeholder="my-secret-key"
@@ -251,7 +247,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Required region for the object storage provider"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="us-east-1" value={field.value ?? ''} />
+                <Input {...field} placeholder="us-east-1" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -267,11 +263,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Required endpoint without the protocol scheme, for example `127.0.0.1:5000/s3`"
             >
               <FormControl>
-                <Input_Shadcn_
-                  {...field}
-                  placeholder="127.0.0.1:5000/s3"
-                  value={field.value ?? ''}
-                />
+                <Input {...field} placeholder="127.0.0.1:5000/s3" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -345,7 +337,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Schema used for DuckLake metadata tables in PostgreSQL"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="ducklake" value={field.value ?? ''} />
+                <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -361,7 +353,7 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Optional snapshot retention interval, for example `7 days`"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="7 days" value={field.value ?? ''} />
+                <Input {...field} placeholder="7 days" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -593,7 +585,7 @@ export const AnalyticsBucketFields = ({
                 description="A unique name for the new namespace"
               >
                 <FormControl>
-                  <Input_Shadcn_ {...field} placeholder="new_namespace" value={field.value || ''} />
+                  <Input {...field} placeholder="new_namespace" value={field.value || ''} />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -616,7 +608,7 @@ export const AnalyticsBucketFields = ({
                 </>
               }
             >
-              <Input
+              <PasswordInput
                 disabled
                 value={field.value}
                 type={showCatalogToken ? 'text' : 'password'}
@@ -736,7 +728,7 @@ export const AnalyticsBucketFields = ({
                 description="The secret key corresponding to your selected access key ID"
               >
                 <FormControl>
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     type={showSecretAccessKey ? 'text' : 'password'}
                     value={field.value ?? ''}

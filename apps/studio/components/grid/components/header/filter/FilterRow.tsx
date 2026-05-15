@@ -1,6 +1,6 @@
 import { ChevronDown, X } from 'lucide-react'
 import { KeyboardEvent, memo } from 'react'
-import { Button, Input_Shadcn_ as Input } from 'ui'
+import { Button, Input } from 'ui'
 
 import { FilterOperatorOptions } from './Filter.constants'
 import { DropdownControl } from '@/components/grid/components/common/DropdownControl'

@@ -11,7 +11,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
 } from 'ui'
 
@@ -33,11 +33,7 @@ export default function DialogCloseButton() {
               <Label_Shadcn_ htmlFor="link" className="sr-only">
                 Link
               </Label_Shadcn_>
-              <Input_Shadcn_
-                id="link"
-                defaultValue="https://ui.shadcn.com/docs/installation"
-                readOnly
-              />
+              <Input id="link" defaultValue="https://ui.shadcn.com/docs/installation" readOnly />
             </div>
             <Button htmlType="submit" size="small" type="secondary" className="px-3">
               <span className="sr-only">Copy</span>

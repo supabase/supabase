@@ -5,8 +5,8 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Card, CardContent, CardFooter, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -83,10 +83,7 @@ export const OrganizationDetailsForm = () => {
               render={({ field }) => (
                 <FormItemLayout label="Organization name" layout="flex-row-reverse">
                   <FormControl>
-                    <Input_Shadcn_
-                      {...field}
-                      disabled={!canUpdateOrganization || isUpdatingDetails}
-                    />
+                    <Input {...field} disabled={!canUpdateOrganization || isUpdatingDetails} />
                   </FormControl>
                 </FormItemLayout>
               )}
@@ -94,7 +91,7 @@ export const OrganizationDetailsForm = () => {
           </CardContent>
           <CardContent>
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
-              <Input copy readOnly id="slug" value={selectedOrganization?.slug ?? ''} />
+              <PasswordInput copy disabled id="slug" value={selectedOrganization?.slug ?? ''} />
             </FormItemLayout>
           </CardContent>
           <CardFooter className="flex justify-end p-4 md:px-8">

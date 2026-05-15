@@ -17,7 +17,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -431,7 +431,7 @@ export const NewOrgForm = ({
                     description="What's the name of your company or team? You can change this later."
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         autoFocus
                         type="text"
                         placeholder="Organization name"

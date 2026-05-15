@@ -4,9 +4,9 @@ import { sortBy } from 'lodash'
 import { ArrowRight, HelpCircle, Loader2, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -402,11 +402,11 @@ export const ForeignKeySelector = ({
                         {fk.schema}.{fk.table}
                       </div>
                       {fk.columns.length === 0 && (
-                        <Alert_Shadcn_ className="col-span-10 py-2 px-3">
-                          <AlertDescription_Shadcn_>
+                        <Alert className="col-span-10 py-2 px-3">
+                          <AlertDescription>
                             There are no foreign key relations between the tables
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
+                          </AlertDescription>
+                        </Alert>
                       )}
                       {fk.columns.map((_, idx) => (
                         <Fragment key={`${fk.schema}-${fk.table}-${idx}`}>
@@ -493,12 +493,12 @@ export const ForeignKeySelector = ({
                       </Button>
                       {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
                       {hasTypeErrors && (
-                        <Alert_Shadcn_ variant="warning">
-                          <AlertTitle_Shadcn_>Column types do not match</AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
+                        <Alert variant="warning">
+                          <AlertTitle>Column types do not match</AlertTitle>
+                          <AlertDescription>
                             The following columns cannot be referenced as they are not of the same
                             type:
-                          </AlertDescription_Shadcn_>
+                          </AlertDescription>
                           <ul className="list-disc pl-5 mt-2 text-foreground-light">
                             {(errors?.types ?? []).map((x, idx: number) => {
                               if (x === undefined) return null
@@ -521,15 +521,15 @@ export const ForeignKeySelector = ({
                               )
                             })}
                           </ul>
-                        </Alert_Shadcn_>
+                        </Alert>
                       )}
                       {hasTypeNotices && (
-                        <Alert_Shadcn_>
-                          <AlertTitle_Shadcn_>Column types will be updated</AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
+                        <Alert>
+                          <AlertTitle>Column types will be updated</AlertTitle>
+                          <AlertDescription>
                             The following columns will have their types updated to match their
                             referenced column
-                          </AlertDescription_Shadcn_>
+                          </AlertDescription>
                           <ul className="list-disc pl-5 mt-2 text-foreground-light">
                             {(errors?.typeNotice ?? []).map((x, idx: number) => {
                               if (x === undefined) return null
@@ -548,7 +548,7 @@ export const ForeignKeySelector = ({
                               )
                             })}
                           </ul>
-                        </Alert_Shadcn_>
+                        </Alert>
                       )}
                     </div>
                   </div>

@@ -16,7 +16,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -152,7 +152,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
                         https://cognito-idp.{awsRegion}.amazonaws.com/
                       </Button>
                       <FormControl>
-                        <Input_Shadcn_ className="rounded-l-none border-l-0 z-50" {...field} />
+                        <Input className="rounded-l-none border-l-0 z-50" {...field} />
                       </FormControl>
                     </div>
                   </FormItemLayout>

@@ -4,7 +4,7 @@ import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertTitle, Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -102,18 +102,18 @@ const CostControl = ({}: CostControlProps) => {
               {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
 
               {isSuccess && costControlDisabled && (
-                <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none">
+                <Alert className="flex flex-col items-center gap-y-2 border-0 rounded-none">
                   <PartnerIcon
                     organization={{ managed_by: selectedOrganization?.managed_by }}
                     showTooltip={false}
                     size="large"
                   />
 
-                  <AlertTitle_Shadcn_ className="text-sm">
+                  <AlertTitle className="text-sm">
                     The Spend Cap is not available for organizations managed by{' '}
                     {PARTNER_TO_NAME[selectedOrganization?.managed_by]}.
-                  </AlertTitle_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertTitle>
+                </Alert>
               )}
 
               {isSuccess && !costControlDisabled && (

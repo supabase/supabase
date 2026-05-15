@@ -5,9 +5,9 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Dialog,
   DialogContent,
@@ -21,7 +21,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -115,7 +115,7 @@ export const CreateSecretAPIKeyDialog = () => {
                     description="A short, unique name of lowercased letters, digits and underscore"
                   >
                     <FormControl>
-                      <Input_Shadcn_ {...field} placeholder="Example: my_super_secret_key_123" />
+                      <Input {...field} placeholder="Example: my_super_secret_key_123" />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -127,7 +127,7 @@ export const CreateSecretAPIKeyDialog = () => {
                 render={({ field }) => (
                   <FormItemLayout label="Description" labelOptional="Optional">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder="Short notes on how or where this key will be used"
                       />
@@ -137,10 +137,10 @@ export const CreateSecretAPIKeyDialog = () => {
               />
             </form>
           </Form>
-          <Alert_Shadcn_ variant="warning">
+          <Alert variant="warning">
             <ShieldCheck />
-            <AlertTitle_Shadcn_>Securing your API key</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="">
+            <AlertTitle>Securing your API key</AlertTitle>
+            <AlertDescription className="">
               <ul className="list-disc">
                 <li>Keep this key secret.</li>
                 <li>Do not use on the web, in mobile or desktop apps.</li>
@@ -156,8 +156,8 @@ export const CreateSecretAPIKeyDialog = () => {
                   immediately.
                 </li>
               </ul>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         </DialogSection>
         <DialogFooter>
           <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>

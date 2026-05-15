@@ -14,7 +14,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   ScrollArea,
@@ -186,7 +186,7 @@ export const CreateFunction = ({
                       layout="horizontal"
                     >
                       <FormControl>
-                        <Input_Shadcn_ {...field} placeholder="Name of function" />
+                        <Input {...field} placeholder="Name of function" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -440,7 +440,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
-                      <Input_Shadcn_ {...field} disabled={readonly} placeholder="argument_name" />
+                      <Input {...field} disabled={readonly} placeholder="argument_name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -452,7 +452,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                   <FormItem className="flex-1">
                     <FormControl>
                       {readonly ? (
-                        <Input_Shadcn_ value={field.value} disabled readOnly className="h-auto" />
+                        <Input value={field.value} disabled readOnly className="h-auto" />
                       ) : (
                         <>
                           <Select_Shadcn_

@@ -6,7 +6,7 @@ import {
   FormLabel,
   FormMessage,
   SheetSection,
-  TextArea_Shadcn_,
+  TextArea,
 } from 'ui'
 
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
@@ -25,7 +25,7 @@ export const HttpBodyFieldSection = ({ form }: HttpBodyFieldSectionProps) => {
           <FormItem className="gap-1 flex flex-col">
             <FormLabel>HTTP Request Body</FormLabel>
             <FormControl>
-              <TextArea_Shadcn_
+              <TextArea
                 className="h-72 rounded-none px-4 outline-hidden"
                 value={field.value}
                 onChange={field.onChange}

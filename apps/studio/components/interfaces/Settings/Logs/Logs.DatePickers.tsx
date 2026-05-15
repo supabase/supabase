@@ -10,7 +10,7 @@ import {
   Calendar,
   cn,
   copyToClipboard,
-  Input_Shadcn_,
+  Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -332,7 +332,7 @@ export const LogsDatePicker = ({
         {...popoverContentProps}
       >
         <div className="border-r p-2 flex flex-col gap-px">
-          <Input_Shadcn_
+          <Input
             type="text"
             placeholder="e.g. 2h, 30m, 7d"
             value={customValue}

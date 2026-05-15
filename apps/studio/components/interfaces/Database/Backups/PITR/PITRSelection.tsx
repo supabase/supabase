@@ -2,14 +2,7 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  Modal,
-  WarningIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, Modal, WarningIcon } from 'ui'
 
 import { BackupsEmpty } from '../BackupsEmpty'
 import { BackupsStorageAlert } from '../BackupsStorageAlert'
@@ -84,15 +77,15 @@ export const PITRSelection = () => {
       ) : (
         <>
           {hasReadReplicas && (
-            <Alert_Shadcn_ variant="warning">
+            <Alert variant="warning">
               <WarningIcon />
-              <AlertTitle_Shadcn_>
+              <AlertTitle>
                 Unable to restore from PITR as project has read replicas enabled
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertTitle>
+              <AlertDescription>
                 You will need to remove all read replicas first from your project's infrastructure
                 settings prior to starting a PITR restore.
-              </AlertDescription_Shadcn_>
+              </AlertDescription>
               <div className="flex items-center gap-x-2 mt-2">
                 {/* [Joshen] Ideally we have some links to a docs to explain why so */}
                 <Button type="default">
@@ -101,7 +94,7 @@ export const PITRSelection = () => {
                   </Link>
                 </Button>
               </div>
-            </Alert_Shadcn_>
+            </Alert>
           )}
           {!showConfiguration ? (
             <PITRStatus
@@ -164,16 +157,14 @@ export const PITRSelection = () => {
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content>
-          <Alert_Shadcn_ variant="warning">
+          <Alert variant="warning">
             <WarningIcon />
-            <AlertTitle_Shadcn_>
-              This action cannot be undone, not canceled once started
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+            <AlertTitle>This action cannot be undone, not canceled once started</AlertTitle>
+            <AlertDescription>
               Any changes made to your database after this point in time will be lost. This includes
               any changes to your project's storage and authentication.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content>

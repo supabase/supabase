@@ -7,7 +7,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -84,7 +84,7 @@ export const SSOMetadata = ({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       {...field}
                       placeholder="https://example.com/metadata.xml"
                       autoComplete="off"

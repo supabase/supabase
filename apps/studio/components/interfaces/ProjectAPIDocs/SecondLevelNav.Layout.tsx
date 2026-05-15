@@ -1,9 +1,9 @@
 import { ChevronLeft, Code } from 'lucide-react'
 import { useMemo, useState, type PropsWithChildren, type ReactNode } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   Popover_Shadcn_,
@@ -169,11 +169,11 @@ type MoreInformationProps = {
 
 const MoreInformation = ({ docsUrl }: MoreInformationProps) => {
   return (
-    <Alert_Shadcn_ className="p-3">
-      <AlertTitle_Shadcn_>
+    <Alert className="p-3">
+      <AlertTitle>
         <p className="text-xs">Unable to find what you're looking for?</p>
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="space-y-1">
+      </AlertTitle>
+      <AlertDescription className="space-y-1">
         <p className="text-xs leading-normal!">
           The API methods shown here are only the commonly used ones to get you started building
           quickly.
@@ -182,7 +182,7 @@ const MoreInformation = ({ docsUrl }: MoreInformationProps) => {
           Head over to our docs site for the full API documentation.
         </p>
         <DocsButton className="mt-2!" href={docsUrl} />
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }

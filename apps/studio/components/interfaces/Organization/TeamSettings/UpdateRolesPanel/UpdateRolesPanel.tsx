@@ -3,14 +3,14 @@ import { isEqual } from 'lodash'
 import { ChevronDown, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -198,30 +198,28 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               )}
 
               {projectsRoleConfiguration.length === 0 && (
-                <Alert_Shadcn_>
+                <Alert>
                   <WarningIcon />
-                  <AlertTitle_Shadcn_>
-                    Team members need to be assigned at least one role
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>Team members need to be assigned at least one role</AlertTitle>
+                  <AlertDescription>
                     You may not remove all roles from a team member
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertDescription>
+                </Alert>
               )}
 
               {!isApplyingRoleToAllProjects &&
                 projectsRoleConfiguration.length > 0 &&
                 projectsRoleConfiguration.length < totalNumOrgProjects && (
-                  <Collapsible_Shadcn_ className="bg-alternative border rounded-lg py-4 group">
-                    <CollapsibleTrigger_Shadcn_ className="w-full text-left px-4 flex items-center justify-between">
+                  <Collapsible className="bg-alternative border rounded-lg py-4 group">
+                    <CollapsibleTrigger className="w-full text-left px-4 flex items-center justify-between">
                       <span className="text-sm">
                         {hasNoChanges
                           ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
                           : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
                       </span>
                       <ChevronDown size={14} className="transition group-data-open:-rotate-180" />
-                    </CollapsibleTrigger_Shadcn_>
-                    <CollapsibleContent_Shadcn_ className="text-foreground-light text-sm px-4">
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="text-foreground-light text-sm px-4">
                       <p>
                         {member.username} {hasNoChanges ? 'does' : 'will'} not have access to the
                         following {noAccessProjects.length} project
@@ -232,8 +230,8 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           return <li key={project.ref}>{project.name}</li>
                         })}
                       </ul>
-                    </CollapsibleContent_Shadcn_>
-                  </Collapsible_Shadcn_>
+                    </CollapsibleContent>
+                  </Collapsible>
                 )}
 
               <div className="flex flex-col divide-y divide-border">

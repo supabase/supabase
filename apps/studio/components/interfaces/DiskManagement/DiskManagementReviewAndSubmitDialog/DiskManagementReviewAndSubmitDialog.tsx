@@ -2,8 +2,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ArrowRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertTitle,
   Button,
   ButtonProps,
   Dialog,
@@ -288,10 +288,10 @@ export const DiskManagementReviewAndSubmitDialog = ({
           <>
             <DialogSectionSeparator />
             <DialogSection>
-              <Alert_Shadcn_ variant={message.type === 'error' ? 'destructive' : 'default'}>
+              <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
                 <WarningIcon />
-                <AlertTitle_Shadcn_>{message.message}</AlertTitle_Shadcn_>
-              </Alert_Shadcn_>
+                <AlertTitle>{message.message}</AlertTitle>
+              </Alert>
             </DialogSection>
           </>
         )}

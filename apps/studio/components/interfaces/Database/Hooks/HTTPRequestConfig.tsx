@@ -5,7 +5,7 @@ import {
   Button,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -82,7 +82,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
                 description="URL of the HTTP request. Must include HTTP/HTTPS"
               >
                 <FormControl>
-                  <Input_Shadcn_ {...field} placeholder="http://api.com/path/resource" />
+                  <Input {...field} placeholder="http://api.com/path/resource" />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -144,7 +144,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
             >
               <FormControl>
                 <div className="relative">
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     type="number"
                     onChange={(e) => field.onChange(Number(e.target.value))}

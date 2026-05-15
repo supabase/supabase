@@ -4,7 +4,7 @@ import { uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormField, Input_Shadcn_, Modal, Separator } from 'ui'
+import { Button, Form, FormField, Input, Modal, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -184,7 +184,7 @@ export const ImportForeignSchemaDialog = ({
                   label="Target schema"
                   description="Where your analytics tables will be stored."
                 >
-                  <Input_Shadcn_ {...field} placeholder="Enter schema name" />
+                  <Input {...field} placeholder="Enter schema name" />
                 </FormItemLayout>
               )}
             />
