@@ -38,6 +38,7 @@ import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import {
   DISK_LIMITS,
   DiskType,
+  PLAN_DETAILS,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
@@ -196,9 +197,13 @@ export function DiskManagementForm() {
 
   const watchedTotalSize = form.watch('totalSize') ?? 0
   const watchedStorageType = form.watch('storageType')
+  // Minimum disk size where the platform API will accept an IOPS payload (500 IOPS/GB rule).
   const minDiskSizeForCustomIops = calculateDiskSizeRequiredForIopsWithGp3(
     DISK_LIMITS[DiskType.GP3].minIops
   )
+  // Suggested target when prompting a resize, sits above the floor so users
+  // aren't pinned at the minimum during the 4-hour disk-config cooldown.
+  const suggestedDiskSizeForCustomIops = PLAN_DETAILS.pro.includedDiskGB.gp3
   const isDiskTooSmallForCustomIops =
     watchedStorageType === 'gp3' && watchedTotalSize < minDiskSizeForCustomIops
 
@@ -224,13 +229,13 @@ export function DiskManagementForm() {
   const { mutateAsync: updateDiskConfiguration, isPending: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({
       // this is to suppress to toast message
-      onError: () => {},
+      onError: () => { },
       onSuccess: () => setRefetchInterval(2000),
     })
   const { mutateAsync: updateSubscriptionAddon, isPending: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
       // this is to suppress to toast message
-      onError: () => {},
+      onError: () => { },
       onSuccess: () => {
         //Manually set project status to RESIZING, Project status should be RESIZING on next project status request.
         if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
@@ -239,7 +244,7 @@ export function DiskManagementForm() {
   const { mutateAsync: updateDiskAutoscaleConfig, isPending: isUpdatingDiskAutoscaleConfig } =
     useUpdateDiskAutoscaleConfigMutation({
       // this is to suppress to toast message
-      onError: () => {},
+      onError: () => { },
     })
 
   const isUpdatingConfig = isUpdatingDisk || isUpdatingCompute || isUpdatingDiskAutoscaleConfig
@@ -385,26 +390,26 @@ export function DiskManagementForm() {
         {(isProjectResizing ||
           isProjectRequestingDiskChanges ||
           (isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions)) && (
-          <div className="relative flex flex-col gap-10">
-            <DiskMangementRestartRequiredSection
-              visible={isProjectResizing}
-              title="Your project will now automatically restart."
-              description="Your project will be unavailable for up to 2 mins."
-            />
-            <NoticeBar
-              type="default"
-              visible={isProjectRequestingDiskChanges}
-              title="Disk configuration changes have been requested"
-              description="The requested changes will be applied to your disk shortly"
-            />
-            <NoticeBar
-              type="default"
-              visible={isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions}
-              title="You do not have permission to update disk configuration"
-              description="Please contact your organization administrator to update your disk configuration"
-            />
-          </div>
-        )}
+            <div className="relative flex flex-col gap-10">
+              <DiskMangementRestartRequiredSection
+                visible={isProjectResizing}
+                title="Your project will now automatically restart."
+                description="Your project will be unavailable for up to 2 mins."
+              />
+              <NoticeBar
+                type="default"
+                visible={isProjectRequestingDiskChanges}
+                title="Disk configuration changes have been requested"
+                description="The requested changes will be applied to your disk shortly"
+              />
+              <NoticeBar
+                type="default"
+                visible={isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions}
+                title="You do not have permission to update disk configuration"
+                description="Please contact your organization administrator to update your disk configuration"
+              />
+            </div>
+          )}
 
         <Separator />
       </ScaffoldContainer>
@@ -538,20 +543,20 @@ export function DiskManagementForm() {
                         <NoticeBar
                           type="default"
                           visible={isDiskTooSmallForCustomIops && !disableIopsThroughputConfig}
-                          title={`Disk must be at least ${minDiskSizeForCustomIops} GB to adjust IOPS or throughput`}
-                          description={`GP3 volumes allow up to 500 IOPS per GB. Increase the disk size to at least ${minDiskSizeForCustomIops} GB to provision custom IOPS and throughput.`}
+                          title={`Increase disk size to adjust IOPS or throughput`}
+                          description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are locked for 4 hours after each resize).`}
                           actions={
                             !disableDiskSizeInput ? (
                               <Button
                                 type="default"
                                 onClick={() => {
-                                  form.setValue('totalSize', minDiskSizeForCustomIops, {
+                                  form.setValue('totalSize', suggestedDiskSizeForCustomIops, {
                                     shouldDirty: true,
                                     shouldValidate: true,
                                   })
                                 }}
                               >
-                                Increase to {minDiskSizeForCustomIops} GB
+                                Increase to {suggestedDiskSizeForCustomIops} GB
                               </Button>
                             ) : undefined
                           }
