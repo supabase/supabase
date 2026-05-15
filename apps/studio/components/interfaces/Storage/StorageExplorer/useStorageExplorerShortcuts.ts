@@ -36,8 +36,7 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
     SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
     () => {
       refreshAll()
-    },
-    { enabled: selectedItems.length === 0 }
+    }
   )
 
   useShortcut(
@@ -61,7 +60,7 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
   useShortcut(
     SHORTCUT_IDS.STORAGE_EXPLORER_DELETE_SELECTED,
     () => setSelectedItemsToDelete(selectedItems),
-    { enabled: selectedItems.length > 0 }
+    { enabled: selectedItems.length > 0 && canUpdateFiles }
   )
 
   useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_EXIT_SELECTION, () => clearSelectedItems(), {
