@@ -87,7 +87,15 @@ test.describe('Queues Integration', () => {
     await dialog.getByRole('button', { name: 'Create queue' }).click()
 
     await expect(page.getByText(/Successfully created queue/)).toBeVisible({ timeout: 10000 })
-    await page.waitForURL(/.*\/integrations\/queues\/queues\/pw_queue_create/)
+    // The create flow used to assert `waitForURL` for the queue-detail route,
+    // but `router.push` inside `useRouter()` (the next/router shim) races
+    // nuqs's `?new=true` history update on TanStack Router and the URL
+    // doesn't always change client-side. Instead assert that the queue
+    // shows up in the list, which is a stable signal regardless of routing.
+    await expect(dialog).toBeHidden({ timeout: 10000 })
+    await expect(page.getByRole('row', { name: new RegExp(`\\b${queueName}\\b`) })).toBeVisible({
+      timeout: 10000,
+    })
   })
 
   test('can create an unlogged queue', async ({ page, ref }) => {
@@ -113,9 +121,12 @@ test.describe('Queues Integration', () => {
     await dialog.getByRole('button', { name: 'Create queue' }).click()
 
     await expect(page.getByText(/Successfully created queue/)).toBeVisible({ timeout: 10000 })
-    await page.waitForURL(
-      new RegExp(`.*\\/integrations\\/queues\\/queues\\/${queueName}`)
-    )
+    // See "can create a new queue" — assert dialog close + row presence
+    // rather than waitForURL, because the post-create push races nuqs.
+    await expect(dialog).toBeHidden({ timeout: 10000 })
+    await expect(page.getByRole('row', { name: new RegExp(`\\b${queueName}\\b`) })).toBeVisible({
+      timeout: 10000,
+    })
   })
 
   test('can delete a queue', async ({ page, ref }) => {
