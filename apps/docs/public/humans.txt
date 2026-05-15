@@ -12,6 +12,7 @@ Alaister Young
 Alan De Los Santos
 Aleksi Immonen
 Alex Hall
+Alex Hsu
 Alexander Korotkov
 Ali Waseem
 Allan S
@@ -128,6 +129,7 @@ Jenny Kibiri
 Jeremias Menichelli
 Jess Fink
 Jess Shears
+Jesse White
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
@@ -156,6 +158,7 @@ Kang Ming Tay
 Karan S
 Karlo Ison
 Katerina Skroumpelou
+Keith Resar
 Keith Fiske
 Kemal Y
 Kevin Brolly

@@ -45,10 +45,13 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
 import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 const VIEW_OPTIONS = [
@@ -211,9 +214,9 @@ export const FileExplorerHeader = ({
   const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   const [isPathDialogOpen, setIsPathDialogOpen] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const previousBreadcrumbs = useRef<string[] | null>(null)
 
   const {
@@ -225,6 +228,8 @@ export const FileExplorerHeader = ({
     popOpenedFoldersAtIndex,
     fetchFoldersByPath,
     refetchAllOpenedFolders,
+    refreshAll,
+    isRefreshing,
     addNewFolderPlaceholder,
     clearOpenedFolders,
     setSelectedFilePreview,
@@ -241,6 +246,17 @@ export const FileExplorerHeader = ({
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
+  useFileExplorerHeaderShortcuts({
+    uploadButtonRef,
+    searchInputRef,
+    canUpdateStorage,
+    hasBreadcrumbs: breadcrumbs.length > 0,
+    isSearching: snap.isSearching,
+    setIsSearching: snap.setIsSearching,
+    addNewFolderPlaceholder,
+    setView,
+  })
 
   const setSortBy = async (value: STORAGE_SORT_BY) => {
     setPreferenceSortBy(value)
@@ -339,9 +355,7 @@ export const FileExplorerHeader = ({
   }
 
   const refreshData = async () => {
-    setIsRefreshing(true)
-    await refetchAllOpenedFolders()
-    setIsRefreshing(false)
+    await refreshAll()
   }
 
   const onOpenNavigate = () => {
@@ -394,15 +408,17 @@ export const FileExplorerHeader = ({
                   Navigate
                 </Button>
               )}
-              <Button
-                size="tiny"
-                icon={<RefreshCw />}
-                type="text"
-                loading={isRefreshing}
-                onClick={refreshData}
-              >
-                Reload
-              </Button>
+              <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH} side="bottom">
+                <Button
+                  size="tiny"
+                  icon={<RefreshCw />}
+                  type="text"
+                  loading={isRefreshing}
+                  onClick={refreshData}
+                >
+                  Reload
+                </Button>
+              </ShortcutTooltip>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -473,44 +489,57 @@ export const FileExplorerHeader = ({
               <div className="hidden">
                 <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
               </div>
-              <ButtonTooltip
-                icon={<Upload size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={onSelectUpload}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canUpdateStorage
-                      ? 'You need additional permissions to upload files'
-                      : undefined,
-                  },
-                }}
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_UPLOAD}
+                side="bottom"
+                open={!canUpdateStorage ? false : undefined}
               >
-                Upload files
-              </ButtonTooltip>
-              <ButtonTooltip
-                icon={<FolderPlus size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={() => addNewFolderPlaceholder(-1)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canUpdateStorage
-                      ? 'You need additional permissions to create folders'
-                      : undefined,
-                  },
-                }}
+                <ButtonTooltip
+                  icon={<Upload size={16} strokeWidth={2} />}
+                  type="text"
+                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                  onClick={onSelectUpload}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canUpdateStorage
+                        ? 'You need additional permissions to upload files'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Upload files
+                </ButtonTooltip>
+              </ShortcutTooltip>
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_NEW_FOLDER}
+                side="bottom"
+                open={!canUpdateStorage ? false : undefined}
               >
-                Create folder
-              </ButtonTooltip>
+                <ButtonTooltip
+                  icon={<FolderPlus size={16} strokeWidth={2} />}
+                  type="text"
+                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                  onClick={() => addNewFolderPlaceholder(-1)}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canUpdateStorage
+                        ? 'You need additional permissions to create folders'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Create folder
+                </ButtonTooltip>
+              </ShortcutTooltip>
             </div>
 
             <div className="h-6 shrink-0 border-r border-control" />
             <div className="flex shrink-0 items-center px-2">
               {snap.isSearching ? (
                 <Input
+                  ref={searchInputRef}
                   size="tiny"
                   autoFocus
                   className="w-52"
@@ -531,13 +560,19 @@ export const FileExplorerHeader = ({
                   onChange={(event) => setItemSearchString(event.target.value)}
                 />
               ) : (
-                <Button
-                  icon={<Search />}
-                  size="tiny"
-                  type="text"
-                  className="px-1"
-                  onClick={toggleSearch}
-                />
+                <ShortcutTooltip
+                  shortcutId={SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH}
+                  label="Search files"
+                  side="bottom"
+                >
+                  <Button
+                    icon={<Search />}
+                    size="tiny"
+                    type="text"
+                    className="px-1"
+                    onClick={toggleSearch}
+                  />
+                </ShortcutTooltip>
               )}
             </div>
           </div>

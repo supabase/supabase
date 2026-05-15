@@ -38,7 +38,7 @@ You need the following installed on your system:
   - **macOS**: Install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)
   - **Windows**: Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-- OpenSSL and Node.js 16+ (when switching to the [new API keys](/docs/guides/self-hosting/self-hosted-auth-keys) and new auth)
+- OpenSSL
 
 
 ## System requirements
@@ -63,7 +63,9 @@ size="small"
 type="underlined"
 defaultActiveId="general"
 
-> <TabPanel id="general" label="General">
+>
+
+<TabPanel id="general" label="General">
 
 ```sh
 # Get the code
@@ -91,13 +93,16 @@ docker compose pull
 ```
 
 </TabPanel>
+
 <TabPanel id="advanced" label="Advanced">
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet https://github.com/supabase/supabase
 cd supabase
-git sparse-checkout set --cone docker && git checkout master
+git sparse-checkout init --cone
+git sparse-checkout set docker
+git checkout --quiet
 cd ..
 
 # Make your new supabase project directory
@@ -122,6 +127,7 @@ docker compose pull
 ```
 
 </TabPanel>
+
 </Tabs>
 
 <Admonition type="tip">

@@ -1,4 +1,3 @@
-import { PostgresTable } from '@supabase/postgres-meta'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useState } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -71,7 +70,14 @@ const DatabaseTables: NextPageWithLayout = () => {
           </TableEditorTableStateContextProvider>
         )}
 
-      <SidePanelEditor includeColumns selectedTable={selectedTableToEdit as PostgresTable} />
+      <SidePanelEditor
+        includeColumns
+        selectedTable={
+          selectedTableToEdit !== undefined && isTableLike(selectedTableToEdit)
+            ? selectedTableToEdit
+            : undefined
+        }
+      />
     </>
   )
 }

@@ -1,14 +1,17 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { handleError, post } from '@/data/fetchers'
 import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsChart(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -37,11 +40,12 @@ export async function getUnifiedLogsChart(
   }
 
   // Get SQL query from utility function (with dynamic bucketing)
-  const sql = getLogsChartQuery(search)
+  const sql = pickLogsQueryBuilder(useOtel, getLogsChartQuery, getLogsChartQueryBq)(search)
 
   let headers = new Headers(headersInit)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+  const endpoint = logsAllEndpointUrl(useOtel)
+  const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { sql, iso_timestamp_start: dateStart, iso_timestamp_end: dateEnd },
     signal,
@@ -69,9 +73,13 @@ export async function getUnifiedLogsChart(
 
   if (data?.result) {
     data.result.forEach((row: any) => {
-      // The API returns timestamps in microseconds (needs to be converted to milliseconds for JS Date)
-      const microseconds = Number(row.time_bucket)
-      const milliseconds = Math.floor(microseconds / 1000)
+      // Disambiguate by format rather than Number.isFinite — see
+      // unified-logs-infinite-query.ts for the reasoning.
+      const ts = String(row.time_bucket ?? '')
+      const looksLikeIso = /[T-]/.test(ts)
+      const milliseconds = looksLikeIso
+        ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`).getTime()
+        : Math.floor(Number(ts) / 1000)
 
       // Create chart data point
       const dataPoint = {
@@ -103,14 +111,11 @@ export async function getUnifiedLogsChart(
   const timeRangeHours = (endTimeMs - startTimeMs) / (1000 * 60 * 60)
 
   let bucketSizeMs: number
-  if (timeRangeHours > 72) {
-    // Day-level bucketing (for ranges > 3 days)
+  if (timeRangeHours >= 48) {
     bucketSizeMs = 24 * 60 * 60 * 1000
   } else if (timeRangeHours > 12) {
-    // Hour-level bucketing (for ranges > 12 hours)
     bucketSizeMs = 60 * 60 * 1000
   } else {
-    // Minute-level bucketing (for shorter ranges)
     bucketSizeMs = 60 * 1000
   }
 
@@ -150,12 +155,14 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
-) =>
-  useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
-    queryKey: logsKeys.unifiedLogsChart(projectRef, search),
-    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search }, signal),
+) => {
+  const useOtel = useFlag('otelUnifiedLogs')
+  return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
+    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
+    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
   })
+}

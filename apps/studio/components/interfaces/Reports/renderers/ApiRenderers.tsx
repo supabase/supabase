@@ -181,6 +181,7 @@ export const TopApiRoutesRenderer = (
     <>
       <Table
         className="rounded-t-none"
+        containerClassName="overflow-x-auto"
         head={
           <>
             <Table.th className={headerClasses}>Request</Table.th>
@@ -206,11 +207,11 @@ export const TopApiRoutesRenderer = (
                       <Table.td className={[cellClasses].join(' ')}>
                         <RouteTdContent {...datum} />
                       </Table.td>
-                      <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                      <Table.td className={[cellClasses, 'text-right'].join(' ')}>
                         {datum.count}
                       </Table.td>
                       {props.data[0].avg !== undefined && (
-                        <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                        <Table.td className={[cellClasses, 'text-right'].join(' ')}>
                           {Number(datum.avg).toFixed(2)}ms
                         </Table.td>
                       )}

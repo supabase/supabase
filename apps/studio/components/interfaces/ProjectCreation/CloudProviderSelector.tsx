@@ -13,7 +13,6 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
-import Panel from '@/components/ui/Panel'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { PROVIDERS } from '@/lib/constants'
 
@@ -28,52 +27,50 @@ export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
 
   return (
-    <Panel.Content>
-      <FormField
-        control={form.control}
-        name="cloudProvider"
-        render={({ field }) => (
-          <FormItemLayout
-            label="Cloud provider"
-            layout="horizontal"
-            description={
-              highAvailability ? (
-                <p className="text-warning">
-                  High availability is only supported on AWS (Revamped)
-                </p>
-              ) : undefined
-            }
+    <FormField
+      control={form.control}
+      name="cloudProvider"
+      render={({ field }) => (
+        <FormItemLayout
+          label="Cloud provider"
+          layout="horizontal"
+          description={
+            highAvailability ? (
+              <p className="text-warning">High availability is only supported on AWS (Revamped)</p>
+            ) : (
+              'Select which cloud provider to spin up project from'
+            )
+          }
+        >
+          <Select_Shadcn_
+            onValueChange={(value) => field.onChange(value)}
+            defaultValue={field.value}
+            value={field.value}
           >
-            <Select_Shadcn_
-              onValueChange={(value) => field.onChange(value)}
-              defaultValue={field.value}
-              value={field.value}
-            >
-              <FormControl>
-                <SelectTrigger_Shadcn_>
-                  <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
-                </SelectTrigger_Shadcn_>
-              </FormControl>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
-                  {Object.values(PROVIDERS)
-                    .filter((provider) => validCloudProviders?.includes(provider.id) ?? true)
-                    .map((providerObj) => {
-                      const label = providerObj['name']
-                      const value = providerObj['id']
-                      const isDisabled = highAvailability && !HA_SUPPORTED_PROVIDERS.includes(value)
-                      return (
-                        <SelectItem_Shadcn_ key={value} value={value} disabled={isDisabled}>
-                          {label}
-                        </SelectItem_Shadcn_>
-                      )
-                    })}
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-          </FormItemLayout>
-        )}
-      />
-    </Panel.Content>
+            <FormControl>
+              <SelectTrigger_Shadcn_>
+                <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
+              </SelectTrigger_Shadcn_>
+            </FormControl>
+            <SelectContent_Shadcn_>
+              <SelectGroup_Shadcn_>
+                {Object.values(PROVIDERS)
+                  .filter((provider) => validCloudProviders?.includes(provider.id) ?? true)
+                  .map((providerObj) => {
+                    const label = providerObj['name']
+                    const value = providerObj['id']
+                    const isDisabled = highAvailability && !HA_SUPPORTED_PROVIDERS.includes(value)
+                    return (
+                      <SelectItem_Shadcn_ key={value} value={value} disabled={isDisabled}>
+                        {label}
+                      </SelectItem_Shadcn_>
+                    )
+                  })}
+              </SelectGroup_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
+        </FormItemLayout>
+      )}
+    />
   )
 }
