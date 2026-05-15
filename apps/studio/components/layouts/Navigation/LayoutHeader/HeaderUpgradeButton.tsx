@@ -4,7 +4,8 @@ import { useTrackExperimentExposure } from '@/hooks/misc/useTrackExperimentExpos
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { useTrack } from '@/lib/telemetry/track'
 
-const EXPERIMENT_ID = 'headerUpgradeCta'
+const EXPERIMENT_FLAG_KEY = 'headerUpgradeCta'
+const EXPERIMENT_EXPOSURE_NAME = 'header_upgrade_cta'
 type HeaderUpgradeCtaVariant = 'control' | 'test'
 
 interface HeaderUpgradeButtonProps {
@@ -14,15 +15,14 @@ interface HeaderUpgradeButtonProps {
 export const HeaderUpgradeButton = ({ className }: HeaderUpgradeButtonProps) => {
   const track = useTrack()
   const { data: organization } = useSelectedOrganizationQuery()
-  const flagValue = usePHFlag<HeaderUpgradeCtaVariant | false>(EXPERIMENT_ID)
+  const flagValue = usePHFlag<HeaderUpgradeCtaVariant | false>(EXPERIMENT_FLAG_KEY)
 
   const isFreePlan = organization?.plan?.id === 'free'
   const isInExperiment = flagValue === 'control' || flagValue === 'test'
   const showButton = flagValue === 'test'
 
-  // Track experiment exposure for all free-plan users in the experiment (both control and test)
   const variant = isFreePlan && isInExperiment ? (flagValue as string) : undefined
-  useTrackExperimentExposure(EXPERIMENT_ID, variant)
+  useTrackExperimentExposure(EXPERIMENT_EXPOSURE_NAME, variant)
 
   if (!isFreePlan) return null
   if (!showButton) return null
@@ -31,5 +31,7 @@ export const HeaderUpgradeButton = ({ className }: HeaderUpgradeButtonProps) => 
     track('header_upgrade_cta_clicked')
   }
 
-  return <UpgradePlanButton source={EXPERIMENT_ID} className={className} onClick={handleClick} />
+  return (
+    <UpgradePlanButton source={EXPERIMENT_FLAG_KEY} className={className} onClick={handleClick} />
+  )
 }
