@@ -572,7 +572,7 @@ export function FeaturesSection() {
           </h3>
           <p className="text-foreground-lighter text-sm lg:text-base">
             Social logins, email/password, magic links, phone auth, and more — with enterprise-grade
-            security built on PostgreSQL&apos;s Row Level Security.
+            security built on Postgres&apos; Row Level Security.
           </p>
         </div>
       </div>

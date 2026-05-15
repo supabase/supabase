@@ -80,7 +80,7 @@ const Products: React.FC<Props> = (props) => {
         title={props.products['functions'].name}
         subtitle={
           <>
-            Easily write custom code
+            Write custom code
             <br className="hidden sm:inline-block" />{' '}
             <strong>without deploying or scaling servers.</strong>
           </>

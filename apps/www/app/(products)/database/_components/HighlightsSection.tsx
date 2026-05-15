@@ -6,7 +6,6 @@ import { Badge, Button } from 'ui'
 const HIGHLIGHTS = [
   {
     title: 'Branching',
-    badge: 'New',
     features: [
       'Branch your Supabase project',
       'Sync with your git branches',
@@ -21,7 +20,6 @@ const HIGHLIGHTS = [
   },
   {
     title: 'Read Replicas',
-    badge: 'New',
     features: [
       'Serve data closer to your users',
       'Provide data redundancy',

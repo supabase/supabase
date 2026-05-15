@@ -21,7 +21,7 @@ export function Hero() {
         </div>
         <p className="text-foreground-lighter text-sm lg:text-base">
           Every Supabase project comes with a complete user management system. Including
-          PostgreSQL&apos;s Row Level Security for fine-grained access control.
+          Postgres&apos; Row Level Security for fine-grained access control.
         </p>
       </div>
     </div>

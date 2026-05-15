@@ -355,7 +355,7 @@ export function CustomerStoriesSection() {
                 <span className="text-foreground">of AI builders</span>
               </h3>
               <p className="text-sm text-foreground-lighter leading-relaxed text-pretty max-w-sm">
-                Create full backend experiences in behalf of your users with Supabase for Platforms,
+                Create full backend experiences on behalf of your users with Supabase for Platforms,
                 the all-in-one solution for building AI-native platforms and marketplaces.
               </p>
 

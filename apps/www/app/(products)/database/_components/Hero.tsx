@@ -20,7 +20,7 @@ export function Hero() {
           </div>
         </div>
         <p className="text-foreground-lighter text-sm lg:text-base">
-          Every Supabase project is a dedicated PostgreSQL database. 100% portable with no vendor
+          Every Supabase project is a dedicated Postgres database. 100% portable with no vendor
           lock-in.
         </p>
       </div>

@@ -20,7 +20,7 @@ const FEATURES = [
   },
   {
     title: 'Secure by default',
-    description: "Leveraging Postgres's proven Row Level Security.",
+    description: "Built on Postgres' proven Row Level Security.",
     detail: 'Integrated with JWT authentication which controls exactly what your users can access.',
     visual: RLSSkeleton,
   },
@@ -121,7 +121,14 @@ function PostgresSkeleton() {
           strokeWidth="0.75"
           opacity="0.4"
         />
-        <circle cx="240" cy="240" r="140" stroke="hsl(var(--brand-default))" strokeWidth="0.75" opacity="0.3" />
+        <circle
+          cx="240"
+          cy="240"
+          r="140"
+          stroke="hsl(var(--brand-default))"
+          strokeWidth="0.75"
+          opacity="0.3"
+        />
         <line
           x1="240"
           y1="0"
