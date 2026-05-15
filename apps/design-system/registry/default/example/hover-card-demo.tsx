@@ -4,18 +4,18 @@ import {
   AvatarFallback,
   AvatarImage,
   Button,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
 } from 'ui'
 
 export default function HoverCardDemo() {
   return (
-    <HoverCard_Shadcn_>
-      <HoverCardTrigger_Shadcn_ asChild>
+    <HoverCard>
+      <HoverCardTrigger asChild>
         <Button type="link">@nextjs</Button>
-      </HoverCardTrigger_Shadcn_>
-      <HoverCardContent_Shadcn_ className="w-80">
+      </HoverCardTrigger>
+      <HoverCardContent className="w-80">
         <div className="flex justify-between space-x-4">
           <Avatar>
             <AvatarImage src="https://github.com/vercel.png" />
@@ -30,7 +30,7 @@ export default function HoverCardDemo() {
             </div>
           </div>
         </div>
-      </HoverCardContent_Shadcn_>
-    </HoverCard_Shadcn_>
+      </HoverCardContent>
+    </HoverCard>
   )
 }

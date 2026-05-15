@@ -1,6 +1,6 @@
 import { X } from 'lucide-react'
 import React from 'react'
-import { Button, HoverCard_Shadcn_, HoverCardContent_Shadcn_, HoverCardTrigger_Shadcn_ } from 'ui'
+import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { type SqlSnippet } from './AIAssistant.types'
@@ -35,8 +35,8 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
   return (
     <div className={`w-full overflow-x-auto flex ${className}`}>
       {snippets.map((snippet, idx) => (
-        <HoverCard_Shadcn_ key={idx}>
-          <HoverCardTrigger_Shadcn_ asChild>
+        <HoverCard key={idx}>
+          <HoverCardTrigger asChild>
             <div
               tabIndex={0}
               className="border bg inline-flex gap-1 items-center shrink-0 py-1 pl-2 rounded-full pr-1 text-xs cursor-pointer"
@@ -56,8 +56,8 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
                 />
               )}
             </div>
-          </HoverCardTrigger_Shadcn_>
-          <HoverCardContent_Shadcn_ className="w-96 max-h-64 overflow-auto p-0">
+          </HoverCardTrigger>
+          <HoverCardContent className="w-96 max-h-64 overflow-auto p-0">
             <CodeBlock
               hideLineNumbers
               className="text-xs font-mono whitespace-pre-wrap wrap-break-word p-2 border-0"
@@ -65,8 +65,8 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
             >
               {getSnippetContent(snippet)}
             </CodeBlock>
-          </HoverCardContent_Shadcn_>
-        </HoverCard_Shadcn_>
+          </HoverCardContent>
+        </HoverCard>
       ))}
     </div>
   )

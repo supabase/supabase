@@ -25,9 +25,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   KeyboardShortcut,
   Popover,
   PopoverContent,
@@ -383,8 +383,8 @@ export const EditorPanel = () => {
                     <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
                       {templates.map((template) => (
-                        <HoverCard_Shadcn_ key={template.name}>
-                          <HoverCardTrigger_Shadcn_ asChild>
+                        <HoverCard key={template.name}>
+                          <HoverCardTrigger asChild>
                             <CommandItem_Shadcn_
                               value={template.name}
                               onSelect={() => onSelectTemplate(template.content)}
@@ -405,16 +405,16 @@ export const EditorPanel = () => {
                                 </div>
                               </div>
                             </CommandItem_Shadcn_>
-                          </HoverCardTrigger_Shadcn_>
-                          <HoverCardContent_Shadcn_ side="left" className="w-[500px] p-0">
+                          </HoverCardTrigger>
+                          <HoverCardContent side="left" className="w-[500px] p-0">
                             <CodeBlock
                               language="sql"
                               className="language-sql border-none"
                               hideLineNumbers
                               value={template.content}
                             />
-                          </HoverCardContent_Shadcn_>
-                        </HoverCard_Shadcn_>
+                          </HoverCardContent>
+                        </HoverCard>
                       ))}
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>

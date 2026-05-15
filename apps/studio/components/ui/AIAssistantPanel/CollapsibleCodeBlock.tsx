@@ -1,11 +1,5 @@
 import { Code, X } from 'lucide-react'
-import {
-  Button,
-  cn,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { CodeBlock, type CodeBlockProps } from 'ui-patterns/CodeBlock'
 
 interface CollapsibleCodeBlockProps extends CodeBlockProps {
@@ -25,21 +19,21 @@ export const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBloc
           props.className
         )}
       >
-        <HoverCard_Shadcn_>
-          <HoverCardTrigger_Shadcn_ asChild>
+        <HoverCard>
+          <HoverCardTrigger asChild>
             <div className="flex flex-1 items-center gap-2 text-foreground-light px-2 hover:text-foreground cursor-pointer overflow-hidden">
               <Code size={14} strokeWidth={1.5} />
               <span className="text-xs font-mono flex-1 truncate pointer">{firstLine}...</span>
             </div>
-          </HoverCardTrigger_Shadcn_>
-          <HoverCardContent_Shadcn_ className="w-96 max-h-96 overflow-auto p-0">
+          </HoverCardTrigger>
+          <HoverCardContent className="w-96 max-h-96 overflow-auto p-0">
             <CodeBlock
               {...props}
               value={codeString}
               className={cn('text-xs font-mono border-none p-3')}
             />
-          </HoverCardContent_Shadcn_>
-        </HoverCard_Shadcn_>
+          </HoverCardContent>
+        </HoverCard>
 
         {onRemove && (
           <Button
