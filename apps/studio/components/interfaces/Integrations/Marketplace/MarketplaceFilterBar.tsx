@@ -11,7 +11,9 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   formatCategoryLabel,
   INTEGRATION_TYPES,
+  MARKETPLACE_SOURCES,
   type MarketplaceIntegrationType,
+  type MarketplaceSource,
 } from './Marketplace.constants'
 
 export type ViewMode = 'list' | 'grid'
@@ -25,6 +27,8 @@ interface MarketplaceFilterBarProps {
   categoryOptions: Array<{ slug: string; name: string }>
   type: MarketplaceIntegrationType | null
   onTypeChange: (value: MarketplaceIntegrationType | null) => void
+  source: MarketplaceSource | null
+  onSourceChange: (value: MarketplaceSource | null) => void
   viewMode: ViewMode
   onViewModeChange: (value: ViewMode) => void
   hasActiveFilter: boolean
@@ -44,6 +48,8 @@ export const MarketplaceFilterBar = ({
   categoryOptions,
   type,
   onTypeChange,
+  source,
+  onSourceChange,
   viewMode,
   onViewModeChange,
   hasActiveFilter,
@@ -52,6 +58,9 @@ export const MarketplaceFilterBar = ({
   const showClear = hasActiveFilter || search.length > 0
   const categoryLabel = category ? formatCategoryLabel(category, categoryOptions) : 'All'
   const typeLabel = type ? (INTEGRATION_TYPES.find((t) => t.key === type)?.label ?? type) : 'All'
+  const sourceLabel = source
+    ? (MARKETPLACE_SOURCES.find((s) => s.key === source)?.label ?? source)
+    : 'All'
 
   return (
     <div
@@ -96,6 +105,23 @@ export const MarketplaceFilterBar = ({
           {INTEGRATION_TYPES.map((t) => (
             <SelectItem key={t.key} value={t.key}>
               {t.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={source ?? ALL}
+        onValueChange={(v) => onSourceChange(v === ALL ? null : (v as MarketplaceSource))}
+      >
+        <SelectTrigger size="tiny" className={triggerCls}>
+          <span className="truncate">Source: {sourceLabel}</span>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL}>All</SelectItem>
+          {MARKETPLACE_SOURCES.map((s) => (
+            <SelectItem key={s.key} value={s.key}>
+              {s.label}
             </SelectItem>
           ))}
         </SelectContent>

@@ -68,6 +68,7 @@ export const useAvailableIntegrations = () => {
           status,
           featured: !!featured,
           type: 'oauth' as const, // Currently marketplace only supports oauth apps
+          source: 'Partner' as const,
           categories: Array.isArray(categories)
             ? (categories as Array<{ slug: string }>).map((x) => x.slug)
             : [],

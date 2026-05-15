@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Badge, Button, cn } from 'ui'
 
-import { formatCategoryLabel, getMarketplaceTier } from './Marketplace.constants'
+import { formatCategoryLabel, getMarketplaceSource } from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -100,11 +100,12 @@ export const MarketplaceFeaturedHero = ({
                     {active.status}
                   </Badge>
                 )}
-                {getMarketplaceTier(active) === 'Partner' ? (
-                  <Badge variant="success">Partner</Badge>
-                ) : (
-                  <Badge>Official</Badge>
-                )}
+                {(() => {
+                  const source = getMarketplaceSource(active)
+                  if (source === 'Partner') return <Badge variant="success">Partner</Badge>
+                  if (source === 'Community') return <Badge>Community</Badge>
+                  return <Badge>Official</Badge>
+                })()}
                 {isActiveInstalled && (
                   <Badge variant="success" className="px-1.5 py-0 text-[10px]">
                     Installed

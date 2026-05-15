@@ -3,7 +3,7 @@ import { Badge, TableCell, TableHead, TableRow } from 'ui'
 
 import {
   formatCategoryLabel,
-  getMarketplaceTier,
+  getMarketplaceSource,
   getMarketplaceType,
   getMarketplaceTypeLabel,
 } from './Marketplace.constants'
@@ -25,7 +25,7 @@ const HIDE_BELOW_LG = 'hidden @lg:table-cell'
 export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceListRowProps) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
-  const tier = getMarketplaceTier(integration)
+  const source = getMarketplaceSource(integration)
   const installMechanism = getMarketplaceTypeLabel(getMarketplaceType(integration))
   const href = `/project/${project?.ref}/integrations/${integration.id}/overview`
 
@@ -47,8 +47,10 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
                 {integration.status}
               </Badge>
             )}
-            {tier === 'Partner' ? (
+            {source === 'Partner' ? (
               <Badge variant="success">Partner</Badge>
+            ) : source === 'Community' ? (
+              <Badge>Community</Badge>
             ) : (
               <Badge>Official</Badge>
             )}

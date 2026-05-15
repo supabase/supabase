@@ -1,20 +1,28 @@
 import {
+  BadgeCheck,
   BarChart3,
   Boxes,
   Cable,
   Cpu,
   CreditCard,
   Database,
+  Handshake,
   KeyRound,
   Mail,
   Package2,
   Plug,
   ShieldCheck,
+  Users,
   Wrench,
   type LucideIcon,
 } from 'lucide-react'
 
-import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+import type {
+  IntegrationDefinition,
+  MarketplaceSource,
+} from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+
+export type { MarketplaceSource } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
 // Launch-partner pin list for the featured rail. Order here is the order
 // shown. Stripe is the only first-party template in the set (id matches the
@@ -101,8 +109,17 @@ export const getMarketplaceType = (
 export const getMarketplaceTypeLabel = (type: MarketplaceIntegrationType): string =>
   INTEGRATION_TYPES.find((t) => t.key === type)?.label ?? type
 
-export type MarketplaceTier = 'Partner' | 'Official'
+export const MARKETPLACE_SOURCES: Array<{
+  key: MarketplaceSource
+  label: string
+  icon: LucideIcon
+}> = [
+  { key: 'Official', label: 'Official', icon: BadgeCheck },
+  { key: 'Partner', label: 'Partner', icon: Handshake },
+  { key: 'Community', label: 'Community', icon: Users },
+]
 
-export const getMarketplaceTier = (integration: IntegrationDefinition): MarketplaceTier => {
+export const getMarketplaceSource = (integration: IntegrationDefinition): MarketplaceSource => {
+  if (integration.source) return integration.source
   return integration.listingId ? 'Partner' : 'Official'
 }

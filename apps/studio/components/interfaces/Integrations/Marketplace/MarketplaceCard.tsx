@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Badge, Card } from 'ui'
 
-import { formatCategoryLabel, getMarketplaceTier } from './Marketplace.constants'
+import { getMarketplaceSource } from './Marketplace.constants'
 import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -13,7 +13,7 @@ interface MarketplaceCardProps {
 
 export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const tier = getMarketplaceTier(integration)
+  const source = getMarketplaceSource(integration)
 
   return (
     <Link href={`/project/${project?.ref}/integrations/${integration.id}/overview`}>
@@ -38,15 +38,18 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
                 {integration.status}
               </Badge>
             )}
-            {tier === 'Partner' ? (
+            {source === 'Partner' ? (
               <Badge variant="success">Partner</Badge>
+            ) : source === 'Community' ? (
+              <Badge>Community</Badge>
             ) : (
               <Badge>Official</Badge>
             )}
           </div>
-          <span className="text-xs text-foreground-lighter">
-            {formatCategoryLabel(integration.categories?.[0])}
-          </span>
+          <div className="text-xs flex items-center gap-1 text-foreground-lighter">
+            <span>Built by</span>
+            <span>{integration.author?.name}</span>
+          </div>
         </div>
       </Card>
     </Link>

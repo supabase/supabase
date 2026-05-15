@@ -8,42 +8,61 @@ import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger
 import {
   FEATURED_CATEGORIES,
   getCategoryIcon,
+  getMarketplaceSource,
   getMarketplaceType,
   INTEGRATION_TYPES,
+  MARKETPLACE_SOURCES,
   type MarketplaceIntegrationType,
+  type MarketplaceSource,
 } from './Marketplace.constants'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'
 
 const sectionLabelCls =
-  'px-2 pt-4 pb-1.5 font-mono text-[10px] uppercase tracking-wider text-foreground-lighter'
+  'px-2 pt-4 pb-1.5 font-mono text-xs uppercase tracking-wider text-foreground-lighter'
+
+const SIDEBAR_SECTION_STORAGE_PREFIX = 'supabase.marketplaceSidebar.section'
 
 interface CollapsibleSectionProps {
   title: string
+  storageKey: string
   defaultOpen?: boolean
   children: ReactNode
 }
 
-const CollapsibleSection = ({ title, defaultOpen = true, children }: CollapsibleSectionProps) => (
-  <Collapsible_Shadcn_ defaultOpen={defaultOpen}>
-    <CollapsibleTrigger_Shadcn_
-      className={cn(
-        sectionLabelCls,
-        'group flex w-full items-center justify-between gap-2 hover:text-foreground-light'
-      )}
-    >
-      <span>{title}</span>
-      <ChevronRight
-        size={12}
-        className="text-foreground-muted transition-transform group-data-[state=open]:rotate-90"
-      />
-    </CollapsibleTrigger_Shadcn_>
-    <CollapsibleContent_Shadcn_ className="flex flex-col gap-y-0.5">
-      {children}
-    </CollapsibleContent_Shadcn_>
-  </Collapsible_Shadcn_>
-)
+const CollapsibleSection = ({
+  title,
+  storageKey,
+  defaultOpen = true,
+  children,
+}: CollapsibleSectionProps) => {
+  const [open, setOpen] = useLocalStorageQuery<boolean>(
+    `${SIDEBAR_SECTION_STORAGE_PREFIX}.${storageKey}`,
+    defaultOpen
+  )
+
+  return (
+    <Collapsible_Shadcn_ open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger_Shadcn_
+        className={cn(
+          sectionLabelCls,
+          'group flex w-full items-center justify-between gap-2 hover:text-foreground-light'
+        )}
+      >
+        <span>{title}</span>
+        <ChevronRight
+          size={12}
+          className="text-foreground-muted transition-transform group-data-[state=open]:rotate-90"
+        />
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_ className="flex flex-col gap-y-0.5">
+        {children}
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
+  )
+}
 
 interface SidebarLinkProps {
   href: string
@@ -69,7 +88,7 @@ const SidebarLink = ({ href, active, icon, label, count, className }: SidebarLin
       {label}
     </span>
     {count !== undefined && (
-      <span className="font-mono text-[10.5px] text-foreground-lighter">{count}</span>
+      <span className="font-mono text-xs text-foreground-lighter">{count}</span>
     )}
   </Link>
 )
@@ -96,6 +115,7 @@ export const MarketplaceSidebar = () => {
   const activeType = new URLSearchParams(queryString).get(
     'type'
   ) as MarketplaceIntegrationType | null
+  const activeSource = new URLSearchParams(queryString).get('source') as MarketplaceSource | null
 
   const { data: availableIntegrations = [] } = useAvailableIntegrations()
   const { installedIntegrations } = useInstalledIntegrations()
@@ -113,6 +133,18 @@ export const MarketplaceSidebar = () => {
     return counts
   }, [availableIntegrations])
 
+  const sourceCounts = useMemo(() => {
+    const counts: Record<MarketplaceSource, number> = {
+      Official: 0,
+      Partner: 0,
+      Community: 0,
+    }
+    availableIntegrations.forEach((integration) => {
+      counts[getMarketplaceSource(integration)] += 1
+    })
+    return counts
+  }, [availableIntegrations])
+
   const categoriesWithCounts = useMemo(
     () =>
       FEATURED_CATEGORIES.map((category) => {
@@ -125,7 +157,7 @@ export const MarketplaceSidebar = () => {
   )
 
   const baseHref = `/project/${ref}/integrations`
-  const isDiscoverActive = !activeCategory && !activeType
+  const isDiscoverActive = !activeCategory && !activeType && !activeSource
   const onIndexRoute = router.pathname === '/project/[ref]/integrations'
   const activeIntegrationId = typeof router.query.id === 'string' ? router.query.id : undefined
 
@@ -138,21 +170,8 @@ export const MarketplaceSidebar = () => {
         label="Explore All"
       />
 
-      <CollapsibleSection title="Integration type">
-        {INTEGRATION_TYPES.map(({ key, label, icon: Icon }) => (
-          <SidebarLink
-            key={key}
-            href={`${baseHref}?type=${key}`}
-            active={onIndexRoute && activeType === key}
-            icon={<Icon size={13} />}
-            label={`${label}s`}
-            count={typeCounts[key]}
-          />
-        ))}
-      </CollapsibleSection>
-
       {categoriesWithCounts.length > 0 && (
-        <CollapsibleSection title="Categories">
+        <CollapsibleSection title="Categories" storageKey="categories">
           {categoriesWithCounts.map((category) => {
             const Icon = getCategoryIcon(category.slug)
             return (
@@ -168,6 +187,32 @@ export const MarketplaceSidebar = () => {
           })}
         </CollapsibleSection>
       )}
+
+      <CollapsibleSection title="Integration type" storageKey="type">
+        {INTEGRATION_TYPES.map(({ key, label, icon: Icon }) => (
+          <SidebarLink
+            key={key}
+            href={`${baseHref}?type=${key}`}
+            active={onIndexRoute && activeType === key}
+            icon={<Icon size={13} />}
+            label={`${label}s`}
+            count={typeCounts[key]}
+          />
+        ))}
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Source" storageKey="source" defaultOpen={false}>
+        {MARKETPLACE_SOURCES.map(({ key, label, icon: Icon }) => (
+          <SidebarLink
+            key={key}
+            href={`${baseHref}?source=${key}`}
+            active={onIndexRoute && activeSource === key}
+            icon={<Icon size={13} />}
+            label={label}
+            count={sourceCounts[key]}
+          />
+        ))}
+      </CollapsibleSection>
 
       {installedIntegrations.length > 0 && (
         <>

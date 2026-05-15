@@ -13,8 +13,10 @@ import {
 
 import {
   FEATURED_INTEGRATION_IDS,
+  getMarketplaceSource,
   getMarketplaceType,
   type MarketplaceIntegrationType,
+  type MarketplaceSource,
 } from './Marketplace.constants'
 import { MarketplaceCard } from './MarketplaceCard'
 import { MarketplaceFeaturedHero } from './MarketplaceFeaturedHero'
@@ -50,6 +52,12 @@ export const MarketplaceIndex = () => {
       'wrapper',
     ]).withOptions({ clearOnDefault: true })
   )
+  const [source, setSource] = useQueryState(
+    'source',
+    parseAsStringEnum<MarketplaceSource>(['Official', 'Partner', 'Community']).withOptions({
+      clearOnDefault: true,
+    })
+  )
 
   const [viewMode, setViewMode] = useLocalStorageQuery<ViewMode>(
     MARKETPLACE_VIEW_MODE_STORAGE_KEY,
@@ -84,7 +92,7 @@ export const MarketplaceIndex = () => {
     [marketplaceCategories]
   )
 
-  const hasActiveFilter = !!(category || type)
+  const hasActiveFilter = !!(category || type || source)
   const hasSearchOrFilter = hasActiveFilter || search.length > 0
 
   const filtered = useMemo(() => {
@@ -95,6 +103,9 @@ export const MarketplaceIndex = () => {
     }
     if (type) {
       result = result.filter((i) => getMarketplaceType(i) === type)
+    }
+    if (source) {
+      result = result.filter((i) => getMarketplaceSource(i) === source)
     }
     if (search.length > 0) {
       const needle = search.toLowerCase()
@@ -108,7 +119,7 @@ export const MarketplaceIndex = () => {
       if (!aInstalled && bInstalled) return 1
       return a.name.localeCompare(b.name)
     })
-  }, [availableIntegrations, category, type, search, installedIds])
+  }, [availableIntegrations, category, type, source, search, installedIds])
 
   const featured = useMemo(() => {
     if (hasSearchOrFilter) return []
@@ -121,6 +132,7 @@ export const MarketplaceIndex = () => {
   const clearAll = () => {
     setCategory(null)
     setType(null)
+    setSource(null)
     setSearch('')
   }
 
@@ -175,6 +187,8 @@ export const MarketplaceIndex = () => {
               categoryOptions={categoryOptions}
               type={type}
               onTypeChange={(v) => setType(v)}
+              source={source}
+              onSourceChange={(v) => setSource(v)}
               viewMode={viewMode}
               onViewModeChange={(v) => setViewMode(v)}
               hasActiveFilter={hasActiveFilter}

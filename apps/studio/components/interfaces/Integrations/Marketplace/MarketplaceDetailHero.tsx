@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { Badge, cn, NavMenu, NavMenuItem } from 'ui'
 
-import { getMarketplaceTier } from './Marketplace.constants'
+import { getMarketplaceSource } from './Marketplace.constants'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
 interface MarketplaceDetailHeroProps {
@@ -20,7 +20,7 @@ export const MarketplaceDetailHero = ({
   tabs,
   isInstalled,
 }: MarketplaceDetailHeroProps) => {
-  const tier = getMarketplaceTier(integration)
+  const source = getMarketplaceSource(integration)
 
   return (
     <div className="border-b bg-surface-75 px-6 pt-10 xl:px-10">
@@ -38,8 +38,10 @@ export const MarketplaceDetailHero = ({
               <h1 className="m-0 text-3xl font-normal leading-tight tracking-tight">
                 {integration.name}
               </h1>
-              {tier === 'Partner' ? (
+              {source === 'Partner' ? (
                 <Badge variant="success">Partner</Badge>
+              ) : source === 'Community' ? (
+                <Badge>Community</Badge>
               ) : (
                 <Badge>Official</Badge>
               )}
