@@ -31,7 +31,10 @@ import { SecurityDefinerViewPopover } from './SecurityDefinerViewPopover'
 import { ViewEntityAutofixSecurityModal } from './ViewEntityAutofixSecurityModal'
 import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
 import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
-import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  getEntityLintDetails,
+  getTablePoliciesUrl,
+} from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useIsTableRealtimeEnabled } from '@/data/database-publications/database-publications-query'
@@ -228,10 +231,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       },
                     }}
                   >
-                    <Link
-                      passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.name}&schema=${table.schema}`}
-                    >
+                    <Link passHref href={getTablePoliciesUrl(projectRef, table.schema, table.name)}>
                       Add RLS policy
                     </Link>
                   </ButtonTooltip>
@@ -258,10 +258,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       )
                     }
                   >
-                    <Link
-                      passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.name}&schema=${table.schema}`}
-                    >
+                    <Link passHref href={getTablePoliciesUrl(projectRef, table.schema, table.name)}>
                       RLS {policies.length > 1 ? 'policies' : 'policy'}
                     </Link>
                   </Button>

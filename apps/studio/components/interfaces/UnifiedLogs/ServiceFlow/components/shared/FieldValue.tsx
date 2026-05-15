@@ -29,8 +29,7 @@ export const FieldValue = ({ config, value, wrap }: FieldValueProps): ReactNode 
       <span
         className={cn(
           'font-mono text-xs text-foreground',
-          wrap ? 'break-all text-right max-w-[calc(100%-12rem)]' : 'truncate text-right',
-          'group-hover:underline'
+          wrap ? 'break-all text-right' : 'truncate text-right'
         )}
       >
         {value}
