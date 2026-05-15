@@ -1,15 +1,13 @@
 import { ColumnDef } from '@tanstack/react-table'
-
-import { DataTableColumnHeader } from 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader'
-import { DataTableColumnLevelIndicator } from 'components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
+
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
-import { AuthUserHoverCard } from './AuthUserHoverCard'
+import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { TextWithTooltip } from './TextWithTooltip'
+import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -52,7 +50,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       size: 48,
       minSize: 48,
       maxSize: 48,
@@ -64,19 +62,19 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
     // Date column - always visible
     {
       accessorKey: 'date',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+      header: 'Date',
       cell: ({ row }) => {
         const date = new Date(row.getValue<ColumnSchema['date']>('date'))
         return <HoverCardTimestamp date={date} />
       },
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 130,
       minSize: 130,
       maxSize: 130,
       meta: {
-        cellClassName: 'font-mono w-[130px]',
+        cellClassName: 'font-mono tracking-tight w-[130px]',
         headerClassName: 'w-[130px]',
       },
     },
@@ -93,7 +91,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
         )
       },
       enableHiding: false,
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 40,
@@ -144,7 +142,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
           </div>
         )
       },
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 70,
@@ -170,7 +168,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       minSize: 70,
       maxSize: 70,
       meta: {
-        cellClassName: 'w-[70px]',
+        cellClassName: 'font-mono tracking-tight w-[70px]',
         headerClassName: 'w-[70px]',
       },
     },
@@ -188,14 +186,14 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       minSize: 200,
       maxSize: 200,
       meta: {
-        cellClassName: 'max-w-[320px]',
+        cellClassName: 'font-mono tracking-tight max-w-[320px]',
         headerClassName: 'max-w-[320px]',
       },
     },
     // Event message column - controlled by columnVisibility
     {
       accessorKey: 'event_message',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Event message" />,
+      header: 'Event message',
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
         const logCount = row.original.log_count
@@ -227,6 +225,9 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       size: 200,
       minSize: 200,
       maxSize: 400,
+      meta: {
+        cellClassName: 'font-mono tracking-tight',
+      },
     },
   ]
 

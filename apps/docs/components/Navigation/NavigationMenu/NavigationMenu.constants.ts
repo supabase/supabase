@@ -58,6 +58,8 @@ const {
   'sdk:swift',
 ])
 
+const aiToolsEnabled = true
+
 const jsOnly =
   !sdkCsharpEnabled && !sdkDartEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
 
@@ -148,6 +150,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Build',
       menuItems: [
         [
+          {
+            label: 'AI Tools',
+            icon: 'ai-tools',
+            href: '/guides/ai-tools' as `/${string}`,
+            level: 'ai_tools',
+            enabled: aiToolsEnabled,
+          },
           {
             label: 'Local Development & CLI',
             icon: 'dev-cli',
@@ -327,7 +336,9 @@ export const gettingstarted: NavMenuConstant = {
   title: 'Start with Supabase',
   url: '/guides/getting-started',
   items: [
-    { name: 'Features', url: '/guides/getting-started/features' },
+    { name: 'Build with AI tools', url: '/guides/ai-tools' },
+    { name: 'API Keys', url: '/guides/getting-started/api-keys' },
+    { name: 'Local Development', url: '/guides/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
       name: 'Framework Quickstarts',
@@ -340,6 +351,10 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'React',
           url: '/guides/getting-started/quickstarts/reactjs',
+        },
+        {
+          name: 'Astro',
+          url: '/guides/getting-started/quickstarts/astrojs',
         },
         {
           name: 'Nuxt',
@@ -488,28 +503,6 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Swift',
           url: '/guides/getting-started/tutorials/with-swift' as `/${string}`,
           enabled: sdkSwiftEnabled,
-        },
-      ],
-    },
-    {
-      name: 'AI Tools',
-      url: undefined,
-      items: [
-        {
-          name: 'Prompts',
-          url: '/guides/getting-started/ai-prompts' as `/${string}`,
-        },
-        {
-          name: 'Agent Skills',
-          url: '/guides/getting-started/ai-skills' as `/${string}`,
-        },
-        {
-          name: 'Supabase MCP server',
-          url: '/guides/getting-started/mcp' as `/${string}`,
-        },
-        {
-          name: 'Deploy MCP servers',
-          url: '/guides/getting-started/byo-mcp' as `/${string}`,
         },
       ],
     },
@@ -675,6 +668,7 @@ export const PhoneLoginsItems = [
 export const auth: NavMenuConstant = {
   icon: 'auth',
   title: 'Auth',
+  url: '/guides/auth',
   items: [
     {
       name: 'Overview',
@@ -692,6 +686,10 @@ export const auth: NavMenuConstant = {
         {
           name: 'Next.js',
           url: '/guides/auth/quickstarts/nextjs' as `/${string}`,
+        },
+        {
+          name: 'Astro',
+          url: '/guides/auth/quickstarts/astrojs',
         },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
         {
@@ -1032,6 +1030,10 @@ export const database: NavMenuConstant = {
           name: 'Implementing cascade deletes',
           url: '/guides/database/postgres/cascade-deletes' as `/${string}`,
         },
+        {
+          name: 'Deleting data and dropping objects safely',
+          url: '/guides/database/postgres/data-deletion' as `/${string}`,
+        },
         { name: 'Managing enums', url: '/guides/database/postgres/enums' },
         {
           name: 'Managing database functions',
@@ -1161,18 +1163,24 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'Replication',
-          url: '/guides/database/replication/replication-setup' as `/${string}`,
+          name: 'External replication',
+          url: '/guides/database/replication/external-replication-setup' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/replication-setup' as `/${string}`,
+              url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+              items: [
+                {
+                  name: 'BigQuery',
+                  url: '/guides/database/replication/bigquery' as `/${string}`,
+                },
+              ],
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/external-replication-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/external-replication-faq' },
           ],
         },
         {
@@ -1403,7 +1411,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/first-row-in-group' as `/${string}`,
         },
         {
-          name: 'Print PostgreSQL Version',
+          name: 'Print Postgres Version',
           url: '/guides/database/postgres/which-version-of-postgres' as `/${string}`,
         },
         {
@@ -1480,9 +1488,7 @@ export const api: NavMenuConstant = {
       name: 'Security',
       url: '/guides/api',
       items: [
-        { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
-        { name: 'Hardening the Data API', url: '/guides/api/hardening-data-api' },
         {
           name: 'Custom Claims & RBAC',
           url: '/guides/api/custom-claims-and-role-based-access-control-rbac',
@@ -1984,6 +1990,7 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
             { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+            { name: 'Download Objects', url: '/guides/storage/management/download-objects' },
           ],
         },
         {
@@ -2290,6 +2297,47 @@ export const ai: NavMenuConstant = {
   ],
 }
 
+export const ai_tools: NavMenuConstant = {
+  icon: 'ai-tools',
+  title: 'AI Tools',
+  url: '/guides/ai-tools',
+  enabled: aiToolsEnabled,
+  items: [
+    { name: 'Overview', url: '/guides/ai-tools' },
+    {
+      name: 'Agent Plugin',
+      url: '/guides/ai-tools/plugins' as `/${string}`,
+    },
+    {
+      name: 'MCP server',
+      url: '/guides/ai-tools/mcp' as `/${string}`,
+    },
+    {
+      name: 'Agent Skills',
+      url: '/guides/ai-tools/ai-skills' as `/${string}`,
+    },
+    {
+      name: 'Prompts',
+      url: '/guides/ai-tools/ai-prompts' as `/${string}`,
+    },
+
+    {
+      name: 'Build AI features',
+      url: undefined,
+      items: [
+        {
+          name: 'Deploy MCP servers',
+          url: '/guides/ai-tools/byo-mcp' as `/${string}`,
+        },
+        {
+          name: 'Vectors / Embeddings ',
+          url: '/guides/ai' as `/${string}`,
+        },
+      ],
+    },
+  ],
+}
+
 export const local_development: NavMenuConstant = {
   icon: 'dev-cli',
   title: 'Local Dev / CLI',
@@ -2472,7 +2520,7 @@ export const security: NavMenuConstant = {
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
-        { name: 'Hardening the Data API', url: '/guides/api/hardening-data-api' },
+        { name: 'Securing your API', url: '/guides/api/securing-your-api' },
       ],
     },
   ],
@@ -2575,12 +2623,28 @@ export const platform: NavMenuConstant = {
           enabled: fullPlatformEnabled,
           items: [
             { name: 'Overview', url: '/guides/platform/sso' as `/${string}` },
+            {
+              name: 'Understanding Login Flows',
+              url: '/guides/platform/sso/login-flows' as `/${string}`,
+            },
+            {
+              name: 'Choosing a Login Flow',
+              url: '/guides/platform/sso/choosing-login-flow' as `/${string}`,
+            },
             { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
             {
               name: 'SSO with Google Workspace',
               url: '/guides/platform/sso/gsuite' as `/${string}`,
             },
             { name: 'SSO with Okta', url: '/guides/platform/sso/okta' },
+            {
+              name: 'Multiple SSO Providers',
+              url: '/guides/platform/sso/multiple-providers' as `/${string}`,
+            },
+            {
+              name: 'Testing and Best Practices',
+              url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
+            },
           ],
         },
       ],
@@ -2856,15 +2920,20 @@ export const self_hosting: NavMenuConstant = {
           name: 'Add Reverse Proxy with HTTPS',
           url: '/guides/self-hosting/self-hosted-proxy-https',
         },
+        { name: 'Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
+        { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',
         },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+        { name: 'Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
+        { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
       ],
     },
     {
@@ -3037,6 +3106,10 @@ export const integrations: NavMenuConstant = {
         {
           name: 'Supabase for Platforms',
           url: '/guides/integrations/supabase-for-platforms',
+        },
+        {
+          name: 'Supabase partner integration guide',
+          url: '/guides/integrations/partner-integration-guide',
         },
       ],
     },

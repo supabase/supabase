@@ -1,21 +1,28 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { ChevronRight, ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { ChevronRight, ExternalLink } from 'lucide-react'
 import { pricing } from 'shared-data/pricing'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Button, Collapsible, SidePanel, cn } from 'ui'
+import { toast } from 'sonner'
+import {
+  Button,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  SidePanel,
+} from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import Table from '@/components/to-be-cleaned/Table'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from '@/lib/constants'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -104,7 +111,7 @@ const SpendCapSidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       header={
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between w-full">
           <h4>Spend cap</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
@@ -126,8 +133,8 @@ const SpendCapSidePanel = () => {
             exceed the included quota allowance of any billed line item in a billing cycle
           </p>
 
-          <Collapsible open={showUsageCosts} onOpenChange={setShowUsageCosts}>
-            <Collapsible.Trigger asChild>
+          <Collapsible_Shadcn_ open={showUsageCosts} onOpenChange={setShowUsageCosts}>
+            <CollapsibleTrigger_Shadcn_ asChild>
               <div className="flex items-center space-x-2 cursor-pointer">
                 <ChevronRight
                   strokeWidth={1.5}
@@ -138,8 +145,8 @@ const SpendCapSidePanel = () => {
                   How are each resource charged after exceeding the included quota?
                 </p>
               </div>
-            </Collapsible.Trigger>
-            <Collapsible.Content asChild>
+            </CollapsibleTrigger_Shadcn_>
+            <CollapsibleContent_Shadcn_ asChild>
               <Table
                 className="mt-4"
                 head={
@@ -171,7 +178,11 @@ const SpendCapSidePanel = () => {
                               <p className="text-xs pl-4">{item.title}</p>
                             </Table.td>
                             <Table.td>
-                              <p className="text-xs pl-4">{item.plans['pro']}</p>
+                              <p className="text-xs pl-4">
+                                {Array.isArray(item.plans['pro'])
+                                  ? item.plans['pro']?.join(', ')
+                                  : item.plans['pro']}
+                              </p>
                             </Table.td>
                           </Table.tr>
                         )
@@ -180,8 +191,8 @@ const SpendCapSidePanel = () => {
                   )
                 })}
               />
-            </Collapsible.Content>
-          </Collapsible>
+            </CollapsibleContent_Shadcn_>
+          </Collapsible_Shadcn_>
 
           {isFreePlan && (
             <Admonition
@@ -197,7 +208,7 @@ const SpendCapSidePanel = () => {
             />
           )}
 
-          <div className="!mt-8 pb-4">
+          <div className="mt-8! pb-4">
             <div className="flex gap-3">
               {SPEND_CAP_OPTIONS.map((option) => {
                 const isSelected = selectedOption === option.value

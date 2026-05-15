@@ -1,21 +1,21 @@
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { VIOLATION_TYPE_LABELS } from 'data/usage/constants'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import { usePathname } from 'next/navigation'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   CriticalIcon,
   WarningIcon,
 } from 'ui'
+
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { VIOLATION_TYPE_LABELS } from '@/data/usage/constants'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 export const Restriction = () => {
   const { data: org } = useSelectedOrganizationQuery()
@@ -107,7 +107,7 @@ export const Restriction = () => {
           <AlertTitle_Shadcn_>Your grace period has started.</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             <p className="leading-tight">
-              Your organization is over its quota
+              Your organization went over its quota in the previous billing cycle
               {violationLabels && ` ${violationLabels}`}. You can continue with your projects until
               your grace period ends on{' '}
               <span className="text-foreground">

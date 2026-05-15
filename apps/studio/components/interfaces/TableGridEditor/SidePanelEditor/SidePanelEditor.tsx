@@ -1,39 +1,10 @@
 import * as Sentry from '@sentry/nextjs'
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useTableRowOperations } from 'components/grid/hooks/useTableRowOperations'
-import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import type { Constraint } from 'data/database/constraints-query'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import { databaseKeys } from 'data/database/keys'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { lintKeys } from 'data/lint/keys'
-import { privilegeKeys } from 'data/privileges/keys'
-import { tableEditorKeys } from 'data/table-editor/keys'
-import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
-import { tableRowKeys } from 'data/table-rows/keys'
-import { tableKeys } from 'data/tables/keys'
-import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
-import { getTables } from 'data/tables/tables-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
-import { useUrlState } from 'hooks/ui/useUrlState'
-import { useTrack } from 'lib/telemetry/track'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useTableEditorStateSnapshot, type TableEditorState } from 'state/table-editor'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 
 import { ColumnEditor } from './ColumnEditor/ColumnEditor'
@@ -63,10 +34,44 @@ import {
 } from './TableEditor/ApiAccessToggle'
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import {
+  acceptGeneratedPolicy,
+  type GeneratedPolicy,
+} from '@/components/interfaces/Auth/Policies/Policies.utils'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { useDatabasePublicationCreateMutation } from '@/data/database-publications/database-publications-create-mutation'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import type { Constraint } from '@/data/database/constraints-query'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import { databaseKeys } from '@/data/database/keys'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { lintKeys } from '@/data/lint/keys'
+import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { tableEditorKeys } from '@/data/table-editor/keys'
+import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { tableKeys } from '@/data/tables/keys'
+import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
+import { getTables } from '@/data/tables/tables-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useUrlState } from '@/hooks/ui/useUrlState'
+import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
+import { isObjectContainingKeys } from '@/lib/helpers'
+import type { SafePostgresTable } from '@/lib/postgres-types'
+import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
+import { useTableEditorStateSnapshot, type TableEditorState } from '@/state/table-editor'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import type { Dictionary } from '@/types'
 
 export type SaveTableParams =
   | SaveTableParamsNew
@@ -135,16 +140,12 @@ const DUMMY_TABLE_API_ACCESS_PARAMS: TableApiAccessParams = {
 }
 
 const createTableApiAccessHandlerParams = ({
-  enabled,
   snap,
   selectedTable,
 }: {
-  enabled: boolean
   snap: DeepReadonly<TableEditorState>
-  selectedTable?: PostgresTable
+  selectedTable?: PGTable
 }): TableApiAccessParams | undefined => {
-  if (!enabled) return undefined
-
   const tableSidePanel = snap.sidePanel?.type === 'table' ? snap.sidePanel : undefined
   if (!tableSidePanel) return undefined
 
@@ -173,7 +174,7 @@ const createTableApiAccessHandlerParams = ({
 
 export interface SidePanelEditorProps {
   editable?: boolean
-  selectedTable?: PostgresTable
+  selectedTable?: SafePostgresTable
   includeColumns?: boolean // This is mainly used for invalidating useTablesQuery
 
   // Because the panel is shared between grid editor and database pages
@@ -196,11 +197,11 @@ export const SidePanelEditor = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
+  const csvImportKey = useVisibleKey(snap.sidePanel?.type === 'csv-import')
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
@@ -208,7 +209,6 @@ export const SidePanelEditor = ({
   })
 
   const tableApiAccessParams = createTableApiAccessHandlerParams({
-    enabled: isApiGrantTogglesEnabled,
     snap,
     selectedTable,
   })
@@ -358,8 +358,15 @@ export const SidePanelEditor = ({
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      saveRow(value, isNewRecord, configuration, () => {})
-    } catch (error) {}
+      await saveRow(value, isNewRecord, configuration, (error) => {
+        if (error) {
+          toast.error(`Failed to save row: ${error?.message ?? 'Unknown error'}`)
+        }
+      })
+    } catch (error: any) {
+      toast.error(`Failed to save row: ${error?.message ?? 'Unknown error'}`)
+      Sentry.captureException(error, { tags: { workflow: 'save-foreign-row' } })
+    }
   }
 
   const saveColumn = async (
@@ -374,32 +381,39 @@ export const SidePanelEditor = ({
     },
     resolve: any
   ) => {
-    const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
+    const selectedColumnToEdit =
+      snap.sidePanel?.type === 'column' ? snap.sidePanel.column : undefined
     const { primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
 
     if (!project || selectedTable === undefined) {
       return console.error('no project or table selected')
     }
 
-    const response = isNewRecord
-      ? await createColumn({
-          projectRef: project?.ref!,
-          connectionString: project?.connectionString,
-          payload: payload as CreateColumnPayload,
-          selectedTable,
-          primaryKey,
-          foreignKeyRelations,
-        })
-      : await updateColumn({
-          projectRef: project?.ref!,
-          connectionString: project?.connectionString,
-          originalColumn: selectedColumnToEdit as PostgresColumn,
-          payload: payload as UpdateColumnPayload,
-          selectedTable,
-          primaryKey,
-          foreignKeyRelations,
-          existingForeignKeyRelations,
-        })
+    let response
+    if (isNewRecord) {
+      response = await createColumn({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        payload: payload as CreateColumnPayload,
+        selectedTable,
+        primaryKey,
+        foreignKeyRelations,
+      })
+    } else {
+      if (!selectedColumnToEdit) {
+        return console.error('no column selected to update')
+      }
+      response = await updateColumn({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        originalColumn: selectedColumnToEdit,
+        payload: payload as UpdateColumnPayload,
+        selectedTable,
+        primaryKey,
+        foreignKeyRelations,
+        existingForeignKeyRelations,
+      })
+    }
 
     if (response?.error) {
       toast.error(response.error.message)
@@ -585,7 +599,7 @@ export const SidePanelEditor = ({
     let toastId
     let saveTableError = false
 
-    if (isApiGrantTogglesEnabled && !apiAccessToggleHandler.isSuccess) {
+    if (!apiAccessToggleHandler.isSuccess) {
       if (apiAccessToggleHandler.isPending) {
         toast.info(
           'Cannot save table yet because Data API settings are still loading. Please try again in a moment.'
@@ -655,6 +669,12 @@ export const SidePanelEditor = ({
             })
 
             try {
+              // The Save click is the explicit user gesture that promotes generated policy
+              // SQL (programmatic or AI) to executable. Programmatic fragments are already
+              // SafeSqlFragment; AI fragments are UntrustedSqlFragment — both are accepted
+              // here before being passed into createTable.
+              const acceptedPolicies = generatedPolicies.map(acceptGeneratedPolicy)
+
               const { table, failedPolicies } = await createTable({
                 projectRef: project?.ref!,
                 connectionString: project?.connectionString,
@@ -665,7 +685,7 @@ export const SidePanelEditor = ({
                 isRLSEnabled,
                 importContent,
                 organizationSlug: org?.slug,
-                generatedPolicies,
+                generatedPolicies: acceptedPolicies,
                 onCreatePoliciesSuccess: () => track('rls_generated_policies_created'),
               })
 
@@ -677,13 +697,11 @@ export const SidePanelEditor = ({
                 async () => {
                   if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
-                  if (isApiGrantTogglesEnabled) {
-                    const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
-                      ? apiAccessToggleHandler.data.privileges
-                      : undefined
-                    if (privilegesToSet) {
-                      await updateTableApiAccess(table, privilegesToSet)
-                    }
+                  const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
+                    ? apiAccessToggleHandler.data.privileges
+                    : undefined
+                  if (privilegesToSet) {
+                    await updateTableApiAccess(table, privilegesToSet)
                   }
                 }
               )
@@ -752,13 +770,11 @@ export const SidePanelEditor = ({
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
-        if (isApiGrantTogglesEnabled) {
-          const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
-            ? apiAccessToggleHandler.data.privileges
-            : undefined
-          if (privilegesToSet) {
-            await updateTableApiAccess(table, privilegesToSet)
-          }
+        const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
+          ? apiAccessToggleHandler.data.privileges
+          : undefined
+        if (privilegesToSet) {
+          await updateTableApiAccess(table, privilegesToSet)
         }
 
         await Promise.all([
@@ -798,13 +814,11 @@ export const SidePanelEditor = ({
         }
         if (isTableLike(table)) {
           await updateTableRealtime(table, isRealtimeEnabled)
-          if (isApiGrantTogglesEnabled) {
-            const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
-              ? apiAccessToggleHandler.data.privileges
-              : undefined
-            if (privilegesToSet) {
-              await updateTableApiAccess(table, privilegesToSet)
-            }
+          const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
+            ? apiAccessToggleHandler.data.privileges
+            : undefined
+          if (privilegesToSet) {
+            await updateTableApiAccess(table, privilegesToSet)
           }
         }
 
@@ -839,20 +853,20 @@ export const SidePanelEditor = ({
       return console.error('no project or table selected')
     }
 
-    const { file, rowCount, selectedHeaders, resolve } = importContent
+    const { file, rowCount, selectedHeaders, emptyStringAsNullHeaders, resolve } = importContent
     const toastId = toast.loading(
       `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`
     )
 
     if (file && rowCount > 0) {
-      // CSV file upload
-      const res: any = await insertRowsViaSpreadsheet(
-        project.ref!,
-        project.connectionString,
+      const res = await insertRowsViaSpreadsheet({
+        projectRef: project.ref!,
+        connectionString: project.connectionString,
         file,
-        selectedTable,
+        table: selectedTable,
         selectedHeaders,
-        (progress: number) => {
+        emptyStringAsNullHeaders,
+        onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
               progress={progress}
@@ -860,21 +874,24 @@ export const SidePanelEditor = ({
             />,
             { id: toastId }
           )
-        }
-      )
+        },
+      })
       if (res.error) {
-        toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
+        const message = isObjectContainingKeys(res.error, ['message'])
+          ? res.error.message
+          : 'An unknown error occurred during import'
+        toast.error(`Failed to import data: ${message}`, { id: toastId })
         return resolve()
       }
     } else {
-      // Text paste
-      const res: any = await insertTableRows(
-        project.ref!,
-        project.connectionString,
-        selectedTable,
-        importContent.rows,
+      const res = await insertTableRows({
+        projectRef: project.ref!,
+        connectionString: project.connectionString,
+        table: selectedTable,
+        rows: importContent.rows,
         selectedHeaders,
-        (progress: number) => {
+        emptyStringAsNullHeaders,
+        onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
               progress={progress}
@@ -884,10 +901,13 @@ export const SidePanelEditor = ({
             />,
             { id: toastId }
           )
-        }
-      )
+        },
+      })
       if (res.error) {
-        toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
+        const message = isObjectContainingKeys(res.error, ['message'])
+          ? res.error.message
+          : 'An unknown error occurred during import'
+        toast.error(`Failed to import data: ${message}`, { id: toastId })
         return resolve()
       }
     }
@@ -919,11 +939,7 @@ export const SidePanelEditor = ({
       )}
       {!isUndefined(selectedTable) && (
         <ColumnEditor
-          column={
-            snap.sidePanel?.type === 'column'
-              ? (snap.sidePanel.column as unknown as PostgresColumn)
-              : undefined
-          }
+          column={snap.sidePanel?.type === 'column' ? snap.sidePanel.column : undefined}
           selectedTable={selectedTable}
           visible={snap.sidePanel?.type === 'column'}
           closePanel={onClosePanel}
@@ -990,6 +1006,7 @@ export const SidePanelEditor = ({
         onSelect={onSaveForeignRow}
       />
       <SpreadsheetImport
+        key={csvImportKey}
         visible={snap.sidePanel?.type === 'csv-import'}
         selectedTable={selectedTable}
         saveContent={onImportData}

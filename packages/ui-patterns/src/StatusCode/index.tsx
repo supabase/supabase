@@ -76,7 +76,7 @@ export const StatusCode = ({ method, statusCode, className }: StatusCodeProps) =
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <span className="flex-shrink-0 flex text-xs font-mono items-start justify-start">
+      <span className="shrink-0 flex text-xs font-mono items-start justify-start">
         {method && (
           <span className="flex items-center justify-end">
             <span className="select-text py-0.5 px-2 text-right rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0 w-auto">

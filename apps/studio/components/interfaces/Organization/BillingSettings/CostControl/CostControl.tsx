@@ -1,30 +1,31 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import SpendCapSidePanel from './SpendCapSidePanel'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { PARTNER_TO_NAME } from '@/components/ui/PartnerManagedResource'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 export interface CostControlProps {}
 
@@ -118,23 +119,28 @@ const CostControl = ({}: CostControlProps) => {
               {isSuccess && !costControlDisabled && (
                 <div className="space-y-6">
                   {['team', 'enterprise', 'platform'].includes(currentPlan?.id || '') ? (
-                    <Alert
-                      withIcon
-                      variant="info"
-                      title={`You will be charged for any additional usage on the ${
-                        currentPlan?.name || ''
-                      } plan`}
-                    >
-                      {currentPlan?.name || ''} plan requires you to have spend cap off at all
-                      times. Your projects will never become unresponsive. Only when your{' '}
-                      <Link
-                        href={`/org/${slug}/usage`}
-                        className="text-green-900 transition hover:text-green-1000"
-                      >
-                        included usage
-                      </Link>{' '}
-                      is exceeded will you be charged for any additional usage.
-                    </Alert>
+                    <>
+                      <Admonition
+                        type="default"
+                        layout="horizontal"
+                        title={`You will be charged for any additional usage on the ${
+                          currentPlan?.name || ''
+                        } plan`}
+                        description={
+                          <>
+                            {currentPlan?.name || ''} plan requires you to have spend cap off at all
+                            times. Your projects will never become unresponsive. Only when your{' '}
+                            <Link
+                              href={`/org/${slug}/usage`}
+                              className="text-green-900 transition hover:text-green-1000"
+                            >
+                              included usage
+                            </Link>{' '}
+                            is exceeded will you be charged for any additional usage.
+                          </>
+                        }
+                      />
+                    </>
                   ) : (
                     <p className="text-sm text-foreground-light">
                       If you need to go beyond the included quota, simply switch off your spend cap
@@ -144,7 +150,7 @@ const CostControl = ({}: CostControlProps) => {
 
                   <div className="flex flex-col md:flex-row gap-6">
                     <div>
-                      <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                      <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow-sm">
                         <Image
                           alt="Spend Cap"
                           width={160}

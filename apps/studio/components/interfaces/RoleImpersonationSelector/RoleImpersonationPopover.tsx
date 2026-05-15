@@ -1,13 +1,14 @@
-import { useState } from 'react'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
-
-import type { User } from 'data/auth/users-infinite-query'
-import { ChevronDown, User as IconUser } from 'lucide-react'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { RoleImpersonationSelector } from '.'
+import { ChevronDown, User as IconUser } from 'lucide-react'
+import { useState } from 'react'
+import { Button, cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
+import type { User } from '@/data/auth/users-infinite-query'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 export interface RoleImpersonationPopoverProps {
+  header?: string
   serviceRoleLabel?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
@@ -15,6 +16,7 @@ export interface RoleImpersonationPopoverProps {
 }
 
 export const RoleImpersonationPopover = ({
+  header,
   serviceRoleLabel,
   variant = 'regular',
   align = 'end',
@@ -24,7 +26,7 @@ export const RoleImpersonationPopover = ({
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const currentRole = state.role?.role ?? serviceRoleLabel ?? 'service role'
+  const currentRole = state.role?.role ?? serviceRoleLabel ?? 'postgres'
 
   return (
     <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
@@ -60,6 +62,7 @@ export const RoleImpersonationPopover = ({
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 overflow-hidden w-min" side="bottom" align={align}>
         <RoleImpersonationSelector
+          header={header}
           serviceRoleLabel={serviceRoleLabel}
           disallowAuthenticatedOption={disallowAuthenticatedOption}
         />

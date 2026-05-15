@@ -13,10 +13,13 @@ export const handle: Handle = async ({ event, resolve }) => {
        * requiring this to be set, setting the path to `/`
        * will replicate previous/standard behaviour (https://kit.svelte.dev/docs/types#public-types-cookies)
        */
-      setAll: (cookiesToSet) => {
+      setAll: (cookiesToSet, headers) => {
         cookiesToSet.forEach(({ name, value, options }) => {
           event.cookies.set(name, value, { ...options, path: '/' })
         })
+        if (Object.keys(headers).length > 0) {
+          event.setHeaders(headers)
+        }
       },
     },
   })

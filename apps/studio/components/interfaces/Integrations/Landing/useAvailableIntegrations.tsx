@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
+import { fullImageUrl } from 'common/marketplace-client'
 import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import { useContext, useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -33,69 +35,97 @@ export const useAvailableIntegrations = () => {
 
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
-  const marketplaceIntegrations: IntegrationDefinition[] = (data ?? [])?.map((integration) => {
-    const {
-      id,
-      type,
-      categories,
-      title: name,
-      summary: description,
-      documentation_url: docsUrl,
-      url: siteUrl,
-      content,
-      files,
-    } = integration
+  const marketplaceIntegrations: IntegrationDefinition[] = useMemo(
+    () =>
+      (data ?? [])?.map((integration) => {
+        const {
+          id: listingId,
+          slug,
+          categories,
+          featured,
+          title,
+          description,
+          documentation_url: docsUrl,
+          website_url: siteUrl,
+          installation_url: installUrl,
+          installation_url_type: installUrlType,
+          installation_identification_method: installMethod,
+          secret_key_prefix: secretKeyPrefix,
+          edge_function_secret_name: edgeFunctionSecretName,
+          images,
+          content,
+          partner_name: authorName,
+          listing_logo: listingLogo,
+        } = integration
 
-    const status = undefined
-    const author = { name: '', websiteUrl: '' }
+        const status = undefined
+        const author = { name: authorName ?? '', websiteUrl: '' }
 
-    return {
-      id: id.toString(),
-      name,
-      status,
-      type,
-      categories: categories.map((x) => x.slug),
-      content,
-      files,
-      description,
-      docsUrl,
-      siteUrl,
-      author,
-      requiredExtensions: [],
-      icon: ({ className, ...props } = {}) => (
-        <Boxes className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
-      ),
-      navigation: [
-        {
-          route: 'overview',
-          label: 'Overview',
-        },
-      ],
-      navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
-        switch (pageId) {
-          case 'overview':
-            return dynamic(
-              () =>
-                import('components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index').then(
-                  (mod) => mod.IntegrationOverviewTabV2
-                ),
-              {
-                loading: Loading,
-              }
-            )
-          case 'secrets':
-            return dynamic(
-              () =>
-                import('../Vault/Secrets/SecretsManagement').then((mod) => mod.SecretsManagement),
-              {
-                loading: Loading,
-              }
-            )
+        return {
+          id: slug ?? '',
+          name: title ?? '',
+          status,
+          featured: !!featured,
+          type: 'oauth' as const, // Currently marketplace only supports oauth apps
+          categories: Array.isArray(categories)
+            ? (categories as Array<{ slug: string }>).map((x) => x.slug)
+            : [],
+          content,
+          files: images?.map((image) => fullImageUrl(image)),
+          description,
+          docsUrl,
+          siteUrl,
+          installUrl,
+          installUrlType: installUrlType ?? undefined,
+          installIdentificationMethod: installMethod ?? undefined,
+          secretKeyPrefix: secretKeyPrefix ?? undefined,
+          edgeFunctionSecretName: edgeFunctionSecretName ?? undefined,
+          listingId: listingId ?? undefined,
+          author,
+          requiredExtensions: [],
+          icon: ({ className, ...props } = {}) => (
+            <div className="relative w-full h-full">
+              {listingLogo ? (
+                <Image
+                  fill
+                  src={fullImageUrl(listingLogo)}
+                  alt=""
+                  className={cn('p-2', className)}
+                  {...props}
+                />
+              ) : (
+                <Boxes
+                  className={cn('inset-0 p-2 text-black w-full h-full', className)}
+                  {...props}
+                />
+              )}
+            </div>
+          ),
+          navigation: [
+            {
+              route: 'overview',
+              label: 'Overview',
+            },
+          ],
+          navigate: ({ pageId = 'overview' }) => {
+            switch (pageId) {
+              case 'overview':
+                return dynamic(
+                  () =>
+                    import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index').then(
+                      (mod) => mod.IntegrationOverviewTabV2
+                    ),
+                  {
+                    loading: Loading,
+                  }
+                )
+            }
+            return null
+          },
         }
-        return null
-      },
-    }
-  })
+      }),
+    [data]
+  )
 
   // [Joshen] Existing integrations that are defined within studio
   // Available integrations are all integrations that can be installed. If an integration can't be installed (needed
@@ -117,13 +147,14 @@ export const useAvailableIntegrations = () => {
     })
   }, [integrationsWrappers, isCLI])
 
-  const availableIntegrations = useMemo(
-    () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
-    [allIntegrations]
-  )
+  const dataWithMarketplace = useMemo(() => {
+    return [...marketplaceIntegrations, ...allIntegrations].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    )
+  }, [marketplaceIntegrations, allIntegrations])
 
   return {
-    data: [...marketplaceIntegrations, ...availableIntegrations],
+    data: dataWithMarketplace,
     error,
     isPending,
     isSuccess,

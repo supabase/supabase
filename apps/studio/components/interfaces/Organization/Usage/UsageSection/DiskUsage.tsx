@@ -1,14 +1,6 @@
 import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-
-import AlertError from 'components/ui/AlertError'
-import Panel from 'components/ui/Panel'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { PROJECT_STATUS } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -18,8 +10,16 @@ import {
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
+import AlertError from '@/components/ui/AlertError'
+import Panel from '@/components/ui/Panel'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { OrgUsageResponse } from '@/data/usage/org-usage-query'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export interface DiskUsageProps {
   slug: string
@@ -189,7 +189,7 @@ export const DiskUsage = ({
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center h-6 gap-3">
                           <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-                            <span className="text-foreground font-semibold -mt-[2px]">
+                            <span className="text-foreground font-semibold mt-[-2px]">
                               <MotionNumber
                                 value={totalDiskUsage}
                                 style={{ lineHeight: 0.8 }}

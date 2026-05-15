@@ -1,10 +1,10 @@
 import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useMutation } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { UseCustomMutationOptions } from 'types'
 
-import type { ConnectionVars } from '../common.types'
+import type { ConnectionVars } from '@/data/common.types'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateDefaultPrivilegesVariables = ConnectionVars & {
   granted: boolean

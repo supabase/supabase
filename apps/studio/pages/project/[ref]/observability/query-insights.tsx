@@ -1,12 +1,3 @@
-import { QueryInsights } from 'components/interfaces/QueryInsights/QueryInsights'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import {
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -14,6 +5,16 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+
+import { QueryInsights } from '@/components/interfaces/QueryInsights/QueryInsights'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const PRESETS = [
   REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,

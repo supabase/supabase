@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, Webhook } from 'lucide-react'
+import { Badge } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
-import { Badge, Input, copyToClipboard } from 'ui'
 import { Hook } from './hooks.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 
 interface HookCardProps {
   hook: Hook
@@ -17,11 +18,11 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
   const { can: canUpdateAuthHook } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
 
   return (
-    <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
-      <div className="">
+    <div className="bg-surface-100 border-default overflow-hidden border shadow-sm px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
+      <div>
         <Webhook size={21} strokeWidth="1" />
       </div>
-      <div className="flex flex-col flex-0 overflow-y-auto w-full">
+      <div className="flex flex-col grow overflow-y-auto w-full">
         <span className="text-sm text-foreground">{hook.title}</span>
         <span className="text-sm text-foreground-lighter">{hook.subtitle}</span>
         <div className="text-sm flex flex-row space-x-5 py-4">
@@ -32,31 +33,33 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
                 <span className="text-foreground">Postgres function</span>
               </div>
               <div className="flex flex-row items-center">
-                <span className="text-foreground-light w-20">schema</span>
+                <label htmlFor="schema" className="text-foreground-light w-20">
+                  schema
+                </label>
                 <Input
+                  id="schema"
                   title={hook.method.schema}
                   copy
                   readOnly
                   disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  containerClassName="flex-1"
+                  className="font-mono text-xs md:text-xs disabled:text-foreground-light opacity-100"
                   value={hook.method.schema}
-                  onCopy={() =>
-                    hook.method.type === 'postgres' && copyToClipboard(hook.method.schema)
-                  }
                 />
               </div>
               <div className="flex flex-row items-center">
-                <span className="text-foreground-light w-20">function</span>
+                <label htmlFor="functionName" className="text-foreground-light w-20">
+                  function
+                </label>
                 <Input
+                  id="functionName"
                   title={hook.method.functionName}
                   copy
                   readOnly
                   disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  containerClassName="flex-1"
+                  className="font-mono text-xs md:text-xs disabled:text-foreground-light opacity-100"
                   value={hook.method.functionName}
-                  onCopy={() =>
-                    hook.method.type === 'postgres' && copyToClipboard(hook.method.functionName)
-                  }
                 />
               </div>
             </div>
@@ -67,26 +70,33 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
                 <span className="text-foreground">HTTPS endpoint</span>
               </div>
               <div className="flex flex-row items-center">
-                <span className="text-foreground-light w-20">endpoint</span>
+                <label htmlFor="url" className="text-foreground-light w-20">
+                  endpoint
+                </label>
                 <Input
+                  id="url"
                   title={hook.method.url}
                   copy
                   readOnly
                   disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  containerClassName="flex-1"
+                  className="font-mono text-xs md:text-xs disabled:text-foreground-light opacity-100"
                   value={hook.method.url}
-                  onCopy={() => hook.method.type === 'https' && copyToClipboard(hook.method.url)}
                 />
               </div>
               <div className="flex flex-row items-center">
-                <span className="text-foreground-light w-20">secret</span>
+                <label htmlFor="secret" className="text-foreground-light w-20">
+                  secret
+                </label>
                 <Input
+                  id="secret"
                   copy
                   title={hook.method.secret}
                   reveal={true}
                   readOnly
                   disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  containerClassName="flex-1"
+                  className="font-mono text-xs md:text-xs disabled:text-foreground-light opacity-100"
                   value={hook.method.secret}
                 />
               </div>
@@ -112,7 +122,7 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
           <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </div>
       </div>
-      <div className="flex-1">
+      <div>
         {hook.enabled ? (
           <Badge className="space-x-1" variant="success">
             <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">

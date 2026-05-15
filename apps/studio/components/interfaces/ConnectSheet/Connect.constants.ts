@@ -1,5 +1,6 @@
-import { DOCS_URL } from 'lib/constants'
-import { CodeBlockLang } from 'ui'
+import { type CodeBlockLang } from 'ui-patterns/CodeBlock'
+
+import { DOCS_URL } from '@/lib/constants'
 
 export type DatabaseConnectionType =
   | 'uri'

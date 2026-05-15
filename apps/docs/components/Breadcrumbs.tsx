@@ -1,18 +1,18 @@
 'use client'
 
+import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
+import { useBreakpoint } from 'common'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { Fragment, Suspense } from 'react'
-
-import { useBreakpoint } from 'common'
 import {
   Breadcrumb_Shadcn_ as Breadcrumb,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
+  BreadcrumbEllipsis_Shadcn_ as BreadcrumbEllipsis,
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbList_Shadcn_ as BreadcrumbList,
   BreadcrumbPage_Shadcn_ as BreadcrumbPage,
-  BreadcrumbEllipsis_Shadcn_ as BreadcrumbEllipsis,
+  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
   cn,
   Drawer,
@@ -25,9 +25,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-
-import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
-import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 
 interface BreadcrumbsProps extends React.HTMLAttributes<HTMLDivElement> {
   minLength?: number
@@ -159,56 +156,5 @@ const BreadcrumbsInternal = ({
 
 function useBreadcrumbs() {
   const pathname = usePathname()
-
-  const isTroubleshootingPage = pathname.startsWith('/guides/troubleshooting')
-  if (isTroubleshootingPage) {
-    const breadcrumbs = [{ name: 'Troubleshooting', url: '/guides/troubleshooting' }]
-    return breadcrumbs
-  }
-
-  const isAiPromptsPage = pathname.startsWith('/guides/getting-started/ai-prompts')
-  if (isAiPromptsPage) {
-    const breadcrumbs = [
-      { name: 'Getting started', url: '/guides/getting-started' },
-      { name: 'AI Tools' },
-      { name: 'Prompts', url: '/guides/getting-started/ai-prompts' },
-    ]
-    return breadcrumbs
-  }
-
-  // TODO: Breadcrumbs currently can't infer the "AI Tools" parent for /guides/getting-started/ai-* routes,
-  // so we special-case these paths here. Remove when Breadcrumbs can derive this hierarchy from NavigationMenu.
-  const isAiSkillsPage = pathname.startsWith('/guides/getting-started/ai-skills')
-  if (isAiSkillsPage) {
-    const breadcrumbs = [
-      { name: 'Getting started', url: '/guides/getting-started' },
-      { name: 'AI Tools' },
-      { name: 'Agent Skills', url: '/guides/getting-started/ai-skills' },
-    ]
-    return breadcrumbs
-  }
-
-  const menuId = getMenuId(pathname)
-  const menu = NavItems[menuId]
-  return findMenuItemByUrl(menu, pathname, [])
-}
-
-function findMenuItemByUrl(menu: any, targetUrl: string, parents: any[] = []) {
-  // If the menu has items, recursively search through them
-  if (menu.items) {
-    for (let item of menu.items) {
-      const result = findMenuItemByUrl(item, targetUrl, [...parents, menu])
-      if (result) {
-        return result
-      }
-    }
-  }
-
-  // Check if the current menu object itself has the target URL
-  if (menu.url === targetUrl) {
-    return [...parents, menu]
-  }
-
-  // If the URL is not found, return null
-  return null
+  return resolveBreadcrumbs(pathname)
 }

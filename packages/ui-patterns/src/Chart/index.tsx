@@ -1,9 +1,9 @@
 'use client'
 
-import { Slot } from '@radix-ui/react-slot'
 import dayjs from 'dayjs'
 import { HelpCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { Slot } from 'radix-ui'
 import * as React from 'react'
 import { useContext, useMemo, useRef, useState } from 'react'
 import {
@@ -62,7 +62,7 @@ interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
 }
 
-const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:!bg-transparent [&_thead_th]:!py-2 [&_thead_th]:!px-card [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-card [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
+const chartTableClasses = `[&_tr]:border-b [&_tr]:border-border [&_thead_tr]:bg-transparent! [&_thead_th]:py-2! [&_thead_th]:!px-card [&_thead_th]:h-auto [&_tbody_td]:py-2.5 [&_tbody_td]:px-card [&_tbody_td]:text-xs [&_table]:mb-1 [&_table]:border-b [&_table]:border-border`
 
 const Chart = React.forwardRef<HTMLDivElement, ChartProps>(
   ({ children, isLoading = false, isDisabled = false, className, ...props }, ref) => {
@@ -86,7 +86,7 @@ interface ChartCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   ({ children, className, asChild, ...props }, ref) => {
-    const Comp = asChild ? Slot : Card
+    const Comp = asChild ? Slot.Slot : Card
     return (
       <Comp ref={ref} className={cn('relative w-full', className)} {...props}>
         {children}
@@ -263,7 +263,7 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
           {status && (
             <span
               className={cn(
-                'flex-shrink-0 w-1.5 h-1.5 rounded-full flex',
+                'shrink-0 w-1.5 h-1.5 rounded-full flex',
                 status === 'positive' && 'bg-brand',
                 status === 'negative' && 'bg-destructive',
                 status === 'warning' && 'bg-warning',
@@ -546,7 +546,7 @@ const ChartSparklineTooltip = ({ active, payload, label }: RechartsTooltipProps<
   }
 
   return (
-    <div className="bg-black/90 text-white p-2 rounded text-xs">
+    <div className="bg-black/90 text-white p-2 rounded-sm text-xs">
       {label && (
         <div className="dark:text-foreground-light text-white/60">
           {formatTimestamp(payload[0].payload.timestamp)}

@@ -63,7 +63,7 @@ const { data: todos, error } = await supabase.schema('myschema').from('todos').s
 // Initialize the Flutter client
 await Supabase.initialize(
   url: supabaseUrl,
-  anonKey: supabaseKey,
+  publishableKey: publishableKey,
   postgrestOptions: const PostgrestClientOptions(schema: 'myschema'),
 );
 final supabase = Supabase.instance.client;

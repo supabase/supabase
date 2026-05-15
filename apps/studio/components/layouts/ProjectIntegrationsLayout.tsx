@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { ProjectLayout } from 'components/layouts/ProjectLayout'
-import AlertError from 'components/ui/AlertError'
-import { ProductMenuItem } from 'components/ui/ProductMenu/ProductMenuItem'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { Menu, Separator } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
+import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { ProjectLayout } from '@/components/layouts/ProjectLayout'
+import AlertError from '@/components/ui/AlertError'
+import { ProductMenu } from '@/components/ui/ProductMenu'
 import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
+import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 /**
  * Layout component for the Integrations section
@@ -55,9 +56,23 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const { data: categories = [], isPending: isPendingCategories } = useQuery(
     marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled })
   )
+  const { data: listings = [], isPending: isPendingListings } = useQuery(
+    marketplaceIntegrationsQueryOptions({ enabled: isMarketplaceEnabled })
+  )
+
+  const populatedCategoryIds = new Set(
+    listings.flatMap((listing) =>
+      Array.isArray(listing.categories)
+        ? (listing.categories as Array<{ id: string }>).map((c) => c.id)
+        : []
+    )
+  )
+  const nonEmptyCategories = categories.filter(
+    (category) => category.id && populatedCategoryIds.has(category.id)
+  )
 
   const isLoading = IS_PLATFORM
-    ? !flagsLoaded || (isMarketplaceEnabled && isPendingCategories)
+    ? !flagsLoaded || (isMarketplaceEnabled && (isPendingCategories || isPendingListings))
     : false
 
   const allCategories = [
@@ -84,27 +99,30 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
       url: `/project/${ref}/integrations?category=postgres_extension`,
       items: [],
     },
-    ...categories.map((category) => ({
-      name: category.title,
-      key: category.slug,
+    ...nonEmptyCategories.map((category) => ({
+      name: category.name ?? '',
+      key: category.slug ?? '',
       url: `/project/${ref}/integrations?category=${category.slug}`,
       items: [],
     })),
   ]
 
   return (
-    <div className="px-4 py-6 md:px-6">
-      <Menu.Group title={<span className="uppercase font-mono">Explore</span>} />
+    <>
       {isLoading ? (
-        <GenericSkeletonLoader />
-      ) : (
-        <div>
-          {allCategories.map((item) => (
-            <ProductMenuItem key={item.key} isActive={pageKey === item.key} item={item} />
-          ))}
+        <div className="px-4 py-6 md:px-6">
+          <Menu type="pills">
+            <Menu.Group title={<span className="uppercase font-mono">Explore</span>} />
+          </Menu>
+          <GenericSkeletonLoader />
         </div>
+      ) : (
+        <ProductMenu
+          page={pageKey}
+          menu={[{ key: 'explore', title: 'Explore', items: allCategories }]}
+        />
       )}
-    </div>
+    </>
   )
 }
 
@@ -125,7 +143,7 @@ const InstalledIntegrationsMenu = ({ page }: { page: string }) => {
     key: `integrations/${integration.id}`,
     url: `/project/${ref}/integrations/${integration.id}/overview`,
     icon: (
-      <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
+      <div className="relative w-6 h-6 bg-white border rounded-sm flex items-center justify-center">
         {integration.icon({ className: 'p-1' })}
       </div>
     ),
@@ -133,23 +151,28 @@ const InstalledIntegrationsMenu = ({ page }: { page: string }) => {
   }))
 
   return (
-    <div className="px-4 py-6 md:px-6">
-      <Menu.Group title={<span className="uppercase font-mono">Installed</span>} />
-      {isLoading && <GenericSkeletonLoader />}
-      {isError && (
-        <AlertError
-          showIcon={false}
-          error={error}
-          subject="Failed to retrieve installed integrations"
-        />
-      )}
-      {isSuccess && (
-        <div>
-          {installedIntegrationItems.map((item) => (
-            <ProductMenuItem key={item.key} isActive={page === item.key} item={item} />
-          ))}
+    <>
+      {(isLoading || isError) && (
+        <div className="px-4 py-6 md:px-6">
+          <Menu type="pills">
+            <Menu.Group title={<span className="uppercase font-mono">Installed</span>} />
+          </Menu>
+          {isLoading && <GenericSkeletonLoader />}
+          {isError && (
+            <AlertError
+              showIcon={false}
+              error={error}
+              subject="Failed to retrieve installed integrations"
+            />
+          )}
         </div>
       )}
-    </div>
+      {isSuccess && (
+        <ProductMenu
+          page={page}
+          menu={[{ key: 'installed', title: 'Installed', items: installedIntegrationItems }]}
+        />
+      )}
+    </>
   )
 }

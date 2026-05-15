@@ -6,13 +6,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -45,38 +45,38 @@ export default function SelectForm() {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem_Shadcn_>
-              <FormLabel_Shadcn_>Email</FormLabel_Shadcn_>
+            <FormItem>
+              <FormLabel>Email</FormLabel>
               <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl_Shadcn_>
+                <FormControl>
                   <SelectTrigger_Shadcn_>
                     <SelectValue_Shadcn_ placeholder="Select a verified email to display" />
                   </SelectTrigger_Shadcn_>
-                </FormControl_Shadcn_>
+                </FormControl>
                 <SelectContent_Shadcn_>
                   <SelectItem_Shadcn_ value="m@example.com">m@example.com</SelectItem_Shadcn_>
                   <SelectItem_Shadcn_ value="m@google.com">m@google.com</SelectItem_Shadcn_>
                   <SelectItem_Shadcn_ value="m@support.com">m@support.com</SelectItem_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-              <FormDescription_Shadcn_>
+              <FormDescription>
                 You can manage email addresses in your{' '}
                 <Link href="/examples/forms">email settings</Link>.
-              </FormDescription_Shadcn_>
-              <FormMessage_Shadcn_ />
-            </FormItem_Shadcn_>
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
           )}
         />
         <Button htmlType="submit" type="secondary">
           Submit
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

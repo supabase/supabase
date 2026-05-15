@@ -3,6 +3,29 @@ import Papa from 'papaparse'
 
 type ResultRow = Record<string, unknown>
 
+export function formatClipboardValue(value: unknown) {
+  if (value === null) return ''
+  if (typeof value == 'object' || Array.isArray(value)) {
+    return JSON.stringify(value)
+  }
+  return String(value)
+}
+
+export function formatCellValue(value: unknown) {
+  if (value === null) return 'NULL'
+  if (typeof value === 'string') return value
+  return JSON.stringify(value)
+}
+
+const LARGE_VALUE_CHAR_THRESHOLD = 60
+
+export function isLargeValue(value: unknown) {
+  if (value === null || value === undefined) return false
+  if (typeof value === 'object') return true
+  const str = String(value)
+  return str.length > LARGE_VALUE_CHAR_THRESHOLD || str.includes('\n')
+}
+
 export function formatResults(
   results: ResultRow[]
 ): Record<string, string | number | boolean | null | undefined>[] {

@@ -1,11 +1,10 @@
-import dayjs from 'dayjs'
 import type { ReactNode } from 'react'
 
-import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restriction.constants'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsFeatureEnabled } from './useIsFeatureEnabled'
+import { RESTRICTION_MESSAGES } from '@/components/interfaces/Organization/restriction.constants'
+import { useOverdueInvoicesQuery } from '@/data/invoices/invoices-overdue-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export type WarningBannerProps = {
   variant: 'danger' | 'warning' | 'note'
@@ -69,7 +68,7 @@ export function useOrganizationRestrictions() {
       variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD.title,
       description: RESTRICTION_MESSAGES.GRACE_PERIOD.description(
-        dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY'),
+        org?.restriction_data?.['grace_period_end'] ?? '',
         org.slug
       ),
     })

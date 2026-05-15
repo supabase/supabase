@@ -6,6 +6,7 @@ import withYaml from 'next-plugin-yaml'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 import { parse as parseToml } from 'smol-toml'
+
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -153,6 +154,23 @@ const nextConfig = {
         destination: 'https://supabase.com/blog/:path*',
         basePath: false,
         permanent: false,
+      },
+
+      // Redirect old external replication slugs in dev/preview envs
+      {
+        source: '/guides/database/replication/replication-setup',
+        destination: '/guides/database/replication/external-replication-setup',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/replication-monitoring',
+        destination: '/guides/database/replication/external-replication-monitoring',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/replication-faq',
+        destination: '/guides/database/replication/external-replication-faq',
+        permanent: true,
       },
     ]
   },

@@ -4,8 +4,8 @@ import type { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import { formatSql } from 'lib/formatSql'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { formatSql } from '@/lib/formatSql'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
 // Feels like we're creating multiple copies of Editor. I'm keen to make this one the defacto as well so lets make sure
@@ -33,6 +33,7 @@ interface RLSCodeEditorProps {
 export const RLSCodeEditor = ({
   id,
   defaultValue,
+  onInputChange,
   wrapperClassName,
   className,
   value,
@@ -115,6 +116,7 @@ export const RLSCodeEditor = ({
     }
 
     onChange()
+    onInputChange?.(value)
   }
 
   // when the value has changed, trigger the onChange callback so that the height of the container can be adjusted.
@@ -170,8 +172,8 @@ export const RLSCodeEditor = ({
         <div
           id={placeholderId}
           className={cn(
-            'monaco-placeholder absolute top-[0px] left-[57px] text-sm pointer-events-none font-mono tracking-tighter',
-            '[&>div>p]:text-foreground-lighter [&>div>p]:!m-0'
+            'monaco-placeholder absolute top-0 left-[57px] text-sm pointer-events-none font-mono tracking-tighter',
+            '[&>div>p]:text-foreground-lighter [&>div>p]:m-0!'
           )}
           style={{ display: 'none' }}
         >

@@ -1,24 +1,25 @@
 import { useParams } from 'common'
-import BarChart from 'components/ui/Charts/BarChart'
-import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
-import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
-import Panel from 'components/ui/Panel'
-import {
-  ProjectLogStatsVariables,
-  UsageApiCounts,
-  useProjectLogStatsQuery,
-} from 'data/analytics/project-log-stats-query'
 import dayjs from 'dayjs'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Auth, Database, Realtime, Storage } from 'icons'
 import sumBy from 'lodash/sumBy'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Loading } from 'ui'
+
+import BarChart from '@/components/ui/Charts/BarChart'
+import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
+import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
+import Panel from '@/components/ui/Panel'
+import {
+  ProjectLogStatsVariables,
+  UsageApiCounts,
+  useProjectLogStatsQuery,
+} from '@/data/analytics/project-log-stats-query'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 type ChartIntervalKey = ProjectLogStatsVariables['interval']
 
@@ -113,7 +114,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                   <Database strokeWidth={1.5} size={16} />
                 </div>
               }
@@ -139,7 +140,7 @@ const ProjectUsage = () => {
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
-                  <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                  <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                     <Auth strokeWidth={1.5} size={16} />
                   </div>
                 }
@@ -165,7 +166,7 @@ const ProjectUsage = () => {
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
-                  <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                  <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                     <Storage strokeWidth={1.5} size={16} />
                   </div>
                 }
@@ -191,7 +192,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                   <Realtime strokeWidth={1.5} size={16} />
                 </div>
               }

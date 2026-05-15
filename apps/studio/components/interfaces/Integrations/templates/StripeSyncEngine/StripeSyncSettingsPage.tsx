@@ -1,5 +1,5 @@
+import { useParams } from 'common'
 import { formatRelative } from 'date-fns'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
@@ -18,15 +18,12 @@ import { isInstalled, isSyncRunning, isUninstalling } from './stripe-sync-status
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 export const StripeSyncSettingsPage = () => {
-  const { data: project } = useSelectedProjectQuery()
+  const { ref } = useParams()
 
   const {
     schemaComment: { status: installationStatus },
     syncState,
-  } = useStripeSyncStatus({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useStripeSyncStatus()
   const installed = isInstalled(installationStatus)
   const isSyncing = isSyncRunning(syncState)
   const uninstalling = isUninstalling(installationStatus)
@@ -111,15 +108,13 @@ export const StripeSyncSettingsPage = () => {
                   <h5 className="text-sm">View Stripe data in Table Editor</h5>
                   <p className="text-sm text-foreground-light text-balance">
                     The Stripe Sync Engine stores all synced data in the{' '}
-                    <code className="text-code-inline !break-keep">stripe</code> schema. You can
+                    <code className="text-code-inline break-keep!">stripe</code> schema. You can
                     view and query this data directly in the Table Editor.
                   </p>
                 </div>
 
                 <Button asChild type="default" className="ml-8 @md:ml-0">
-                  <Link href={`/project/${project?.ref}/editor?schema=stripe`}>
-                    Open Table Editor
-                  </Link>
+                  <Link href={`/project/${ref}/editor?schema=stripe`}>Open Table Editor</Link>
                 </Button>
               </div>
             </CardContent>

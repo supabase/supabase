@@ -1,12 +1,12 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { getAccessToken } from 'common'
-import { databaseKeys } from 'data/database/keys'
-import { BASE_PATH } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
 
 import { stripeSyncKeys } from './keys'
+import { databaseKeys } from '@/data/database/keys'
+import { BASE_PATH } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import type { ResponseError } from '@/types'
 
 export type StripeSyncInstallVariables = {
   projectRef: string
@@ -68,6 +68,7 @@ export const useStripeSyncInstallMutation = ({
 
       track('integration_install_submitted', {
         integrationName: 'stripe_sync_engine',
+        method: 'template',
       })
 
       // Invalidate schemas query to refresh installation status

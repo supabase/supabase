@@ -110,7 +110,7 @@ export const getMenuId = (pathname: string | null) => {
   pathname = (pathname ??= '').replace(/^\/guides\//, '')
 
   switch (true) {
-    case pathname.startsWith('ai'):
+    case pathname.startsWith('ai') && !pathname.startsWith('ai-tools'):
       return MenuId.Ai
     case pathname.startsWith('api'):
       return MenuId.Api
@@ -132,6 +132,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Integrations
     case pathname.startsWith('local-development'):
       return MenuId.LocalDevelopment
+    case pathname.startsWith('ai-tools'):
+      return MenuId.AiTools
     case pathname.startsWith('telemetry'):
       return MenuId.Telemetry
     case pathname.startsWith('platform'):

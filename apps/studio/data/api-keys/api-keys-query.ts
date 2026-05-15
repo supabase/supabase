@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { apiKeysKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type LegacyKeys = {
   api_key: string
@@ -48,7 +48,7 @@ interface APIKeysVariables {
   reveal?: boolean
 }
 
-type APIKey = LegacyKeys | SecretKeys | PublishableKeys
+export type APIKey = LegacyKeys | SecretKeys | PublishableKeys
 
 async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')

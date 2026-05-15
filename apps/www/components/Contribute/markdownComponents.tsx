@@ -7,7 +7,7 @@ export const markdownComponents: Components = {
     ) : (
       <code
         {...props}
-        className="bg-surface-200 text-foreground px-1.5 py-0.5 rounded text-sm font-mono"
+        className="bg-surface-200 text-foreground px-1.5 py-0.5 rounded-sm text-sm font-mono"
       />
     ),
   pre: ({ node, ...props }) => (

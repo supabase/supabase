@@ -1,15 +1,17 @@
 import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
-import { getModel } from 'lib/ai/model'
-import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
+
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import apiWrapper from '@/lib/api/apiWrapper'
 import {
   filterGroupSchemaForAI,
   requestSchema,
   serializeOperators,
   serializeOptions,
   validateFilterGroup,
-} from 'lib/api/filterHelpers'
-import { NextApiRequest, NextApiResponse } from 'next'
+} from '@/lib/api/filterHelpers'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -34,13 +36,9 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { prompt, filterProperties } = parseResult.data
 
   try {
-    const {
-      model,
-      error: modelError,
-      providerOptions,
-    } = await getModel({
+    const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
-      routingKey: 'sql',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
@@ -62,8 +60,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }))
 
     const result = await generateText({
-      model,
-      providerOptions,
+      ...modelParams,
       output: Output.object({ schema: filterGroupSchemaForAI }),
       prompt: source`
         You are an expert Postgres filter builder. Convert the user's request into structured filters.

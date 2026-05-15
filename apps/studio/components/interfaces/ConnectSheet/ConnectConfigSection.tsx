@@ -80,7 +80,7 @@ export function ConnectConfigSection({
                       className="flex-1 rounded-lg text-left"
                     >
                       <div className="flex items-center gap-2">
-                        {option.icon && <ConnectionIcon icon={option.icon} />}
+                        {option.icon && <ConnectionIcon supportsDarkMode icon={option.icon} />}
                         <span className="text-sm">{option.label}</span>
                       </div>
                     </RadioGroupStackedItem>
@@ -175,7 +175,7 @@ export function ConnectConfigSection({
                 layout="horizontal"
                 label={field.label}
                 description={field.description}
-                className="[&>div>label>span]:!break-keep [&>div>label>span]:text-balance"
+                className="[&>div>label>span]:break-keep! [&>div>label>span]:text-balance"
               >
                 <Switch
                   id={field.id}

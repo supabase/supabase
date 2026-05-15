@@ -1,15 +1,6 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Edit, MoreVertical, Trash } from 'lucide-react'
-
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   DropdownMenu,
@@ -23,12 +14,21 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import { generatePolicyUpdateSQL } from './PolicyTableRow.utils'
+import type { Policy } from './PolicyTableRow.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface PolicyRowProps {
-  policy: PostgresPolicy
-  onSelectEditPolicy: (policy: PostgresPolicy) => void
-  onSelectDeletePolicy: (policy: PostgresPolicy) => void
+  policy: Policy
+  onSelectEditPolicy: (policy: Policy) => void
+  onSelectDeletePolicy: (policy: Policy) => void
   isLocked?: boolean
 }
 
@@ -79,14 +79,14 @@ export const PolicyRow = ({
         </div>
       </TableCell>
       <TableCell className="w-[20%] truncate">
-        <code className="text-foreground-light text-xs">{policy.command}</code>
+        <code className="text-code-inline">{policy.command}</code>
       </TableCell>
       <TableCell className="w-[30%] truncate">
         <div className="flex items-center gap-x-1">
           <div className="text-foreground-lighter text-sm truncate">
             {displayedRoles.slice(0, 2).map((role, i) => (
               <span key={`policy-${role}-${i}`}>
-                <code className="text-foreground-light text-xs">{role}</code>
+                <code className="text-code-inline">{role}</code>
                 {i < Math.min(displayedRoles.length, 2) - 1 ? ', ' : ' '}
               </span>
             ))}
@@ -95,13 +95,24 @@ export const PolicyRow = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <div>
-                  <code key="policy-etc" className="text-foreground-light text-xs">
+                  <span key="policy-etc" className="text-foreground-light text-xs">
                     + {displayedRoles.length - 2} more
-                  </code>
+                  </span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent side="bottom" align="center">
-                {displayedRoles.join(', ')}
+              <TooltipContent
+                side="bottom"
+                align="center"
+                className="max-w-80 font-mono flex flex-wrap justify-center gap-y-1"
+              >
+                {displayedRoles.slice(2).map((role, i, arr) => (
+                  <>
+                    <code key={role} className="text-code-inline break-keep!">
+                      {role}
+                    </code>
+                    {i < arr.length - 1 && ', '}
+                  </>
+                ))}
               </TooltipContent>
             </Tooltip>
           )}

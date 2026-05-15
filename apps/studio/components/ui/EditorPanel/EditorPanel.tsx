@@ -1,27 +1,8 @@
 import type { Monaco } from '@monaco-editor/react'
+import { acceptUntrustedSql, safeSql, untrustedSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
-import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import {
-  createSqlSnippetSkeletonV2,
-  suffixWithLimit,
-} from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useAddDefinitions } from 'components/interfaces/SQLEditor/useAddDefinitions'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useContentIdQuery } from 'data/content/content-id-query'
-import { useContentQuery, type Content } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { contentKeys } from 'data/content/keys'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
-import { useProfile } from 'lib/profile'
+import { useParams } from 'common'
 import {
   AlertCircle,
   Book,
@@ -35,13 +16,9 @@ import {
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { editorPanelState, useEditorPanelStateSnapshot } from 'state/editor-panel-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   cn,
-  CodeBlock,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -57,7 +34,8 @@ import {
   PopoverTrigger_Shadcn_,
   SQL_ICON,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { AIEditor } from '../AIEditor'
@@ -65,6 +43,30 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { formatSqlError } from './EditorPanel.utils'
 import { SaveSnippetDialog } from './SaveSnippetDialog'
+import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import {
+  createSqlSnippetSkeletonV2,
+  suffixWithLimit,
+} from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
+import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
+import { SqlRunButton } from '@/components/interfaces/SQLEditor/UtilityPanel/RunButton'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useContentIdQuery } from '@/data/content/content-id-query'
+import { useContentQuery, type Content } from '@/data/content/content-query'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { contentKeys } from '@/data/content/keys'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
+import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export const EditorPanel = () => {
   const {
@@ -107,16 +109,10 @@ export const EditorPanel = () => {
     setActiveSnippet({ ...activeSnippet, name: newName })
     setIsEditingTitle(false)
   }
-  const [isInlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
-    true
-  )
-  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
-    true
-  )
+  const isInlineEditorHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE)
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
 
-  const currentValue = value || ''
+  const currentValue = value || safeSql``
 
   const { ref } = useParams()
   const router = useRouter()
@@ -178,7 +174,7 @@ export const EditorPanel = () => {
   useEffect(() => {
     if (!snippetById || !activeSnippetId) return
     const sqlSnippet = snippetById as unknown as Extract<Content, { type: 'sql' }>
-    const sql = sqlSnippet.content.sql ?? ''
+    const sql = sqlSnippet.content.unchecked_sql ?? safeSql``
     setValue(sql)
     setActiveSnippet(sqlSnippet)
     originalSnippetRef.current = { sql, name: sqlSnippet.name }
@@ -233,7 +229,7 @@ export const EditorPanel = () => {
     }
 
     executeSql({
-      sql: suffixWithLimit(currentValue, 100),
+      sql: suffixWithLimit(acceptUntrustedSql(currentValue), 100),
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       isStatementTimeoutDisabled: true,
@@ -248,8 +244,8 @@ export const EditorPanel = () => {
   const isValidExplainQuery = isExplainQuery(results ?? [])
 
   const handleChange = (value: string) => {
-    setValue(value)
-    onChange?.(value)
+    setValue(untrustedSql(value))
+    onChange?.(untrustedSql(value))
   }
 
   const onSelectTemplate = (content: string) => {
@@ -277,7 +273,7 @@ export const EditorPanel = () => {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-[var(--header-height)]">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-(--header-height)">
         {isEditingTitle ? (
           <input
             ref={titleInputRef}
@@ -288,7 +284,7 @@ export const EditorPanel = () => {
               if (e.key === 'Enter') commitRename()
               if (e.key === 'Escape') setIsEditingTitle(false)
             }}
-            className="text-xs bg-transparent border-b border-foreground-lighter outline-none w-48 py-0.5"
+            className="text-xs bg-transparent border-b border-foreground-lighter outline-hidden w-48 py-0.5"
             autoFocus
           />
         ) : (
@@ -499,6 +495,7 @@ export const EditorPanel = () => {
               projectRef: project?.ref,
               connectionString: project?.connectionString,
               orgSlug: org?.slug,
+              language: 'sql',
             }}
             initialPrompt={initialPrompt}
             options={{

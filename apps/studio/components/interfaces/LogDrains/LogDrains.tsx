@@ -1,10 +1,5 @@
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useTrack } from 'lib/telemetry/track'
-import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
+import { MoreHorizontal, TrashIcon } from 'lucide-react'
 import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -29,10 +24,15 @@ import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsCard } from './LogDrainsCard'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { VoteLink } from './VoteLink'
+import AlertError from '@/components/ui/AlertError'
+import { useDeleteLogDrainMutation } from '@/data/log-drains/delete-log-drain-mutation'
+import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useTrack } from '@/lib/telemetry/track'
 
 export function LogDrains({
   onNewDrainClick,
-  onUpdateDrainClick,
+  onUpdateDrainClick: _onUpdateDrainClick,
 }: {
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
@@ -46,7 +46,6 @@ export function LogDrains({
   const {
     data: logDrains,
     isPending: isLoading,
-    refetch,
     error,
     isError,
   } = useLogDrainsQuery(
@@ -60,6 +59,7 @@ export function LogDrains({
   const axiomEnabled = useFlag('axiomLogDrain')
   const otlpEnabled = useFlag('otlpLogDrain')
   const last9Enabled = useFlag('Last9LogDrain')
+  const syslogEnabled = useFlag('syslogLogDrain')
   const hasLogDrains = !!logDrains?.length
 
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
@@ -100,6 +100,7 @@ export function LogDrains({
             if (t.value === 'axiom') return axiomEnabled
             if (t.value === 'otlp') return otlpEnabled
             if (t.value === 'last9') return last9Enabled
+            if (t.value === 'syslog') return syslogEnabled
             return true
           }).map((src) => (
             <LogDrainsCard
@@ -171,7 +172,7 @@ export function LogDrains({
                       <DropdownMenuTrigger asChild>
                         <Button
                           type="text"
-                          className="px-1 opacity-50 hover:opacity-100 !bg-transparent flex-shrink-0"
+                          className="px-1 opacity-50 hover:opacity-100 bg-transparent! shrink-0"
                           icon={<MoreHorizontal />}
                         />
                       </DropdownMenuTrigger>

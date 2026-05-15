@@ -50,12 +50,12 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
       <div className="absolute inset-0 z-30 h-full w-full pointer-events-none">
         <nav
           className={cn(
-            'sticky z-30 flex items-center bg-background/90 w-full border-b backdrop-blur-sm pointer-events-auto top-[65px]',
+            'sticky z-30 flex items-center bg-background/90 w-full border-b backdrop-blur-xs pointer-events-auto top-[65px]',
             className
           )}
         >
           {/* mobile */}
-          <SectionContainer className="!p-2 flex items-start md:hidden">
+          <SectionContainer className="p-2! flex items-start md:hidden">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -80,7 +80,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
             </DropdownMenu>
           </SectionContainer>
           {/* desktop */}
-          <SectionContainer className="!py-0 hidden md:flex gap-3 items-center">
+          <SectionContainer className="py-0! hidden md:flex gap-3 items-center">
             {items.map((item: any) => {
               const isActive = item.id === activeItem
 

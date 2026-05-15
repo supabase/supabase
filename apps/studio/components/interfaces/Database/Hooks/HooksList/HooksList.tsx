@@ -1,21 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
 import { Search } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { Input } from 'ui'
+import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { HooksListEmpty } from './HooksListEmpty'
 import { SchemaTable } from './SchemaTable'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const HooksList = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -47,14 +47,17 @@ export const HooksList = () => {
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
-        <Input
-          placeholder="Search for a webhook"
-          size="tiny"
-          icon={<Search />}
-          value={filterString}
-          className="w-52"
-          onChange={(e) => setFilterString(e.target.value)}
-        />
+        <InputGroup className="w-52">
+          <InputGroupInput
+            size="tiny"
+            placeholder="Search for a webhook"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+          />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+        </InputGroup>
         <div className="flex items-center gap-x-2">
           <DocsButton href={`${DOCS_URL}/guides/database/webhooks`} />
           <ButtonTooltip

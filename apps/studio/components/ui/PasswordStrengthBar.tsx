@@ -1,6 +1,6 @@
-import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from 'lib/constants'
-import { PasswordStrengthScore } from 'lib/password-strength'
 import { InlineLinkClassName } from './InlineLink'
+import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from '@/lib/constants'
+import { PasswordStrengthScore } from '@/lib/password-strength'
 
 interface Props {
   passwordStrengthScore: PasswordStrengthScore
@@ -24,7 +24,7 @@ export const PasswordStrengthBar = ({
           aria-valuenow={PASSWORD_STRENGTH_PERCENTAGE[passwordStrengthScore]}
           aria-valuetext={`${PASSWORD_STRENGTH_PERCENTAGE[passwordStrengthScore]}%`}
           role="progressbar"
-          className="mb-2 overflow-hidden transition-all border rounded bg-200 w-full"
+          className="mb-2 overflow-hidden transition-all border rounded-sm bg-200 w-full"
         >
           <div
             style={{

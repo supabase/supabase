@@ -1,25 +1,9 @@
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { HelpCircle, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import {
-  TablePrivilegesGrant,
-  useTablePrivilegesGrantMutation,
-} from 'data/privileges/table-privileges-grant-mutation'
-import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
-import {
-  TablePrivilegesRevoke,
-  useTablePrivilegesRevokeMutation,
-} from 'data/privileges/table-privileges-revoke-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Sheet,
@@ -43,7 +27,24 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { pgmqArchiveTable, pgmqQueueTable } from '../Queues.utils'
 import { getQueueFunctionsMapping } from './Queue.utils'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import {
+  TablePrivilegesGrant,
+  useTablePrivilegesGrantMutation,
+} from '@/data/privileges/table-privileges-grant-mutation'
+import { useTablePrivilegesQuery } from '@/data/privileges/table-privileges-query'
+import {
+  TablePrivilegesRevoke,
+  useTablePrivilegesRevokeMutation,
+} from '@/data/privileges/table-privileges-revoke-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
 const ROLES = ['anon', 'authenticated', 'postgres', 'service_role']
@@ -83,15 +84,17 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = queueTables?.find((x) => x.name === `q_${name}`)
-  const archiveTable = queueTables?.find((x) => x.name === `a_${name}`)
+  const queueRelname = name ? pgmqQueueTable(name) : undefined
+  const archiveRelname = name ? pgmqArchiveTable(name) : undefined
+  const queueTable = queueTables?.find((x) => x.name === queueRelname)
+  const archiveTable = queueTables?.find((x) => x.name === archiveRelname)
 
   const { data: allTablePrivileges, isSuccess: isSuccessPrivileges } = useTablePrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const queuePrivileges = allTablePrivileges?.find(
-    (x) => x.schema === 'pgmq' && x.name === `q_${name}`
+    (x) => x.schema === 'pgmq' && x.name === queueRelname
   )
 
   const { mutateAsync: grantPrivilege } = useTablePrivilegesGrantMutation()
@@ -255,7 +258,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           </SheetDescription>
         </SheetHeader>
 
-        <SheetSection className="p-0 flex-grow">
+        <SheetSection className="p-0 grow">
           {!isExposed ? (
             <Admonition
               type="default"

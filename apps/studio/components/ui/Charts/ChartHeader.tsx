@@ -1,7 +1,4 @@
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import dayjs from 'dayjs'
-import { formatBytes } from 'lib/helpers'
 import {
   Activity,
   BarChartIcon,
@@ -11,12 +8,13 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { cn } from 'ui'
-import { Badge } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
+import { formatBytes } from '@/lib/helpers'
 
 export interface ChartHeaderProps {
   title?: string
@@ -84,6 +82,10 @@ export const ChartHeader = ({
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
 
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker.
+  const formatPickerDate = useFormatDateTime()
+
   const formatHighlightedValue = (value: any) => {
     if (typeof value !== 'number') {
       return value
@@ -147,11 +149,11 @@ export const ChartHeader = ({
         // Update highlighted label based on sync state
         let newLabel = highlightedLabel
         if (xAxisIsDate && activeDataPoint[xAxisKey]) {
-          const day = (value: number | string) =>
-            displayDateInUtc ? dayjs(value).utc() : dayjs(value)
-          newLabel = day(activeDataPoint[xAxisKey]).format(
-            customDateFormat || 'YYYY-MM-DD HH:mm:ss'
-          )
+          const value = activeDataPoint[xAxisKey] as number | string
+          const fmt = customDateFormat || 'YYYY-MM-DD HH:mm:ss'
+          newLabel = displayDateInUtc
+            ? formatDateTime(value, { tz: 'UTC', format: fmt })
+            : formatPickerDate(value, fmt)
         } else if (activeDataPoint[xAxisKey]) {
           newLabel = activeDataPoint[xAxisKey]
         }
@@ -175,6 +177,7 @@ export const ChartHeader = ({
     highlightedValue,
     highlightedLabel,
     attributes,
+    formatPickerDate,
   ])
 
   const chartTitle = (
@@ -183,9 +186,30 @@ export const ChartHeader = ({
         <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
           {title}
         </h3>
-        {titleTooltip && <InfoTooltip>{titleTooltip}</InfoTooltip>}
+        {titleTooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InfoIcon className="w-4 h-4 text-foreground-lighter" />
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              {titleTooltip}
+              {docsUrl && (
+                <>
+                  {' '}
+                  <Link
+                    href={docsUrl}
+                    target="_blank"
+                    className="underline text-foreground hover:text-foreground-light"
+                  >
+                    Read docs
+                  </Link>
+                </>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
-      {docsUrl && (
+      {!titleTooltip && docsUrl && (
         <ButtonTooltip
           type="text"
           className="px-1"
@@ -234,7 +258,7 @@ export const ChartHeader = ({
   return (
     <div
       className={cn(
-        'flex-grow flex justify-between items-start min-h-16',
+        'grow flex justify-between items-start min-h-16',
         hideHighlightArea && 'hidden'
       )}
     >
