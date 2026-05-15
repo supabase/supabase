@@ -45,7 +45,12 @@ export const MarketplaceDetail = () => {
   }, [integration, isInstalled])
 
   const activeRoute = pageId ?? 'overview'
-  const isKnownRoute = navigationItems.some((nav) => nav.route === activeRoute)
+  const activeNav = useMemo(
+    () => navigationItems.find((nav) => nav.route === activeRoute),
+    [navigationItems, activeRoute]
+  )
+  const isKnownRoute = !!activeNav
+  const layout = activeNav?.layout ?? 'full'
 
   const CustomPageComponent = useMemo(
     () =>
@@ -169,7 +174,13 @@ export const MarketplaceDetail = () => {
       {activeRoute === 'overview' ? (
         <OverviewTab integration={integration} isInstalled={isInstalled} />
       ) : CustomPageComponent ? (
-        <CustomPageComponent />
+        layout === 'constrained' ? (
+          <div className="mx-auto w-full max-w-6xl">
+            <CustomPageComponent />
+          </div>
+        ) : (
+          <CustomPageComponent />
+        )
       ) : null}
     </>
   )

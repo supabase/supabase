@@ -26,7 +26,7 @@ const RailRow = ({ label, value, href, mono }: RailRowProps) => {
   )
   return (
     <div className="flex flex-col gap-1">
-      <div className="text-[11.5px] text-foreground-lighter">{label}</div>
+      <div className="text-xs text-foreground-lighter">{label}</div>
       {href ? (
         <a href={href} target="_blank" rel="noreferrer" className={valueCls}>
           {content}

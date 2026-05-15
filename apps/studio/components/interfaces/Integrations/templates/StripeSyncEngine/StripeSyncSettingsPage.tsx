@@ -15,6 +15,7 @@ import {
 } from 'ui-patterns/PageSection'
 
 import { isInstalled, isSyncRunning, isUninstalling } from './stripe-sync-status'
+import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 export const StripeSyncSettingsPage = () => {
@@ -30,17 +31,17 @@ export const StripeSyncSettingsPage = () => {
 
   if (!installed || uninstalling) {
     return (
-      <PageContainer className="mx-0">
+      <ConstrainedIntegrationTabScaffold>
         <PageSection>
           <Admonition type="default" title="Stripe Sync Engine is not installed" />
         </PageSection>
-      </PageContainer>
+      </ConstrainedIntegrationTabScaffold>
     )
   }
 
   return (
-    <PageContainer className="mx-0">
-      <PageSection>
+    <ConstrainedIntegrationTabScaffold>
+      <PageSection className="py-0!">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Manage Stripe data</PageSectionTitle>
@@ -121,6 +122,6 @@ export const StripeSyncSettingsPage = () => {
           </Card>
         </PageSectionContent>
       </PageSection>
-    </PageContainer>
+    </ConstrainedIntegrationTabScaffold>
   )
 }

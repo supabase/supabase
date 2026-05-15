@@ -10,6 +10,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import {
@@ -193,7 +194,7 @@ export const QueuesSettings = () => {
 
   return (
     <>
-      <div className="w-full flex flex-col gap-y-4 p-10">
+      <ConstrainedIntegrationTabScaffold className="flex flex-col gap-y-4">
         <FormHeader
           className="mb-0"
           title="Settings"
@@ -351,7 +352,7 @@ export const QueuesSettings = () => {
             </FormPanelContainer>
           </form>
         </Form>
-      </div>
+      </ConstrainedIntegrationTabScaffold>
 
       <ConfirmationModal
         visible={rlsConfirmModalOpen}

@@ -79,7 +79,7 @@ export const MarketplaceFeaturedHero = ({
           aria-label={isPaused ? 'Resume auto-rotation' : 'Pause auto-rotation'}
           type="default"
           size="tiny"
-          className="px-1"
+          className="px-1.5"
           icon={isPaused ? <Play size={10} /> : <Pause size={10} />}
           onClick={() => setIsPaused((p) => !p)}
         />
@@ -152,16 +152,14 @@ export const MarketplaceFeaturedHero = ({
                 <div className="min-w-0 flex-1">
                   <div
                     className={cn(
-                      'truncate text-[12.5px] font-medium',
+                      'truncate text-sm',
                       isActive ? 'text-foreground' : 'text-foreground-light'
                     )}
                   >
                     {integration.name}
                   </div>
                   {categoryLabel && (
-                    <div className="truncate text-[11px] text-foreground-lighter">
-                      {categoryLabel}
-                    </div>
+                    <div className="truncate text-xs text-foreground-lighter">{categoryLabel}</div>
                   )}
                 </div>
                 {isActive && (

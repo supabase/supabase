@@ -61,13 +61,11 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
         </div>
       </TableCell>
 
-      <TableCell className={`w-28 text-[11.5px] text-foreground-lighter ${HIDE_BELOW_MD}`}>
+      <TableCell className={`w-28 text-xs text-foreground-lighter ${HIDE_BELOW_MD}`}>
         {formatCategoryLabel(integration.categories?.[0]) || '—'}
       </TableCell>
 
-      <TableCell
-        className={`w-32 font-mono text-[11.5px] text-foreground-lighter ${HIDE_BELOW_LG}`}
-      >
+      <TableCell className={`w-32 font-mono text-xs text-foreground-lighter ${HIDE_BELOW_LG}`}>
         {installMechanism}
       </TableCell>
 

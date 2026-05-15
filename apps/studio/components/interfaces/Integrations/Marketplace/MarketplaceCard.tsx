@@ -44,7 +44,7 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
               <Badge>Official</Badge>
             )}
           </div>
-          <span className="text-[11.5px] text-foreground-lighter">
+          <span className="text-xs text-foreground-lighter">
             {formatCategoryLabel(integration.categories?.[0])}
           </span>
         </div>

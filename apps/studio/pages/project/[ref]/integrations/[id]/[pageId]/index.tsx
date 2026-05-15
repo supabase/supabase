@@ -183,7 +183,7 @@ const LegacyIntegrationPage = () => {
   return (
     <>
       <PageHeader size="full">
-        <PageHeaderBreadcrumb className="mx-auto w-full max-w-6xl">
+        <PageHeaderBreadcrumb className="mx-auto w-full">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
@@ -198,7 +198,7 @@ const LegacyIntegrationPage = () => {
         </PageHeaderBreadcrumb>
 
         {isAvailableIntegrationsLoading ? (
-          <PageHeaderMeta className="mx-auto w-full max-w-6xl">
+          <PageHeaderMeta className="mx-auto w-full">
             <PageHeaderSummary>
               <PageHeaderTitle>
                 <ShimmeringLoader className="w-64 py-4" />
@@ -209,7 +209,7 @@ const LegacyIntegrationPage = () => {
             </PageHeaderSummary>
           </PageHeaderMeta>
         ) : (
-          <PageHeaderMeta className="mx-auto w-full max-w-6xl">
+          <PageHeaderMeta className="mx-auto w-full">
             {pageIcon && <PageHeaderIcon>{pageIcon}</PageHeaderIcon>}
             <PageHeaderSummary className="gap-y-0.5">
               <PageHeaderTitle>{pageTitle}</PageHeaderTitle>
@@ -229,7 +229,7 @@ const LegacyIntegrationPage = () => {
         )}
 
         {navigationItems.length > 0 && (
-          <PageHeaderNavigationTabs className="mx-auto w-full max-w-6xl">
+          <PageHeaderNavigationTabs className="mx-auto w-full">
             <NavMenu>
               {navigationItems.map((nav) => (
                 <NavMenuItem key={nav.href} active={nav.active ?? false}>
@@ -241,7 +241,7 @@ const LegacyIntegrationPage = () => {
         )}
       </PageHeader>
 
-      <div className="mx-auto w-full max-w-6xl">{content}</div>
+      <div className="mx-auto w-full">{content}</div>
     </>
   )
 }

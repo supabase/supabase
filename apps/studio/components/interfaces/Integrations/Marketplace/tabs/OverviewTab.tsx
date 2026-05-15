@@ -1,4 +1,5 @@
 import { MarketplaceDetailRail } from '../MarketplaceDetailRail'
+import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { FilesViewer } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/FilesViewer'
 import { MarkdownContent } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/MarkdownContent'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
@@ -12,7 +13,7 @@ export const OverviewTab = ({ integration, isInstalled }: OverviewTabProps) => {
   const { content, files = [] } = integration
 
   return (
-    <div className="px-6 py-8 xl:px-10">
+    <ConstrainedIntegrationTabScaffold>
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-start gap-10 @4xl:grid-cols-[minmax(0,760px)_240px]">
         <div className="min-w-0">
           {files.length > 0 && <FilesViewer files={files} />}
@@ -20,6 +21,6 @@ export const OverviewTab = ({ integration, isInstalled }: OverviewTabProps) => {
         </div>
         <MarketplaceDetailRail integration={integration} isInstalled={isInstalled} />
       </div>
-    </div>
+    </ConstrainedIntegrationTabScaffold>
   )
 }

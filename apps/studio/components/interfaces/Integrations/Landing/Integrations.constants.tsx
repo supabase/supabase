@@ -20,12 +20,15 @@ import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
+export type NavigationContentLayout = 'constrained' | 'full'
+
 export type Navigation = {
   route: string
   label: string
   hasChild?: boolean
   childIcon?: React.ReactNode
   children?: Navigation[]
+  layout?: NavigationContentLayout // applies only to the new marketplace
 }
 
 // [Joshen] Basing this on template.json for now
@@ -153,6 +156,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'settings',
         label: 'Settings',
+        layout: 'constrained',
       },
     ],
     navigate: ({ pageId = 'overview', childId }) => {
@@ -302,6 +306,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'webhooks',
         label: 'Webhooks',
+        layout: 'constrained',
       },
     ],
     navigate: ({ pageId = 'overview' }) => {
@@ -355,6 +360,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'settings',
         label: 'Settings',
+        layout: 'constrained',
       },
       {
         route: 'docs',
@@ -535,6 +541,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'settings',
         label: 'Settings',
+        layout: 'constrained',
       },
     ],
     navigate: ({ pageId = 'overview' }) => {

@@ -10,7 +10,7 @@ export const ServiceList = () => {
   const { data: project, isPending: isLoading } = useSelectedProjectQuery()
 
   return (
-    <ScaffoldSection isFullWidth id="api-settings" className="gap-6">
+    <ScaffoldSection isFullWidth id="api-settings" className="gap-6 py-0!">
       {!isLoading && project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
         <Alert_Shadcn_ variant="destructive">
           <AlertCircle size={16} />
