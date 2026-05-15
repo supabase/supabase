@@ -3,7 +3,16 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, Input, Modal } from 'ui'
+import {
+  Form,
+  FormControl,
+  FormField,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Modal,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -88,7 +97,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
         <Form {...form}>
           <form
             id={FORM_ID}
-            className="flex-grow overflow-auto gap-2 flex flex-col"
+            className="grow overflow-auto gap-2 flex flex-col"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField
@@ -102,12 +111,12 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                   description="Time in seconds before the message becomes available for reading."
                 >
                   <FormControl>
-                    <Input
-                      {...rest}
-                      type="number"
-                      placeholder="1"
-                      actions={<p className="text-foreground-light pr-2">sec</p>}
-                    />
+                    <InputGroup>
+                      <InputGroupInput {...rest} type="number" placeholder="1" />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>sec</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
                   </FormControl>
                 </FormItemLayout>
               )}
@@ -122,7 +131,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                       id="message-payload"
                       language="json"
                       autofocus={false}
-                      className="!mb-0 h-32 overflow-hidden rounded border"
+                      className="mb-0! h-32 overflow-hidden rounded-sm border"
                       onInputChange={(e: string | undefined) => field.onChange(e)}
                       options={{ wordWrap: 'off', contextmenu: false }}
                       value={field.value}

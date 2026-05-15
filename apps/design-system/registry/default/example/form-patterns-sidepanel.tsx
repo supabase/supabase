@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import {
   Button,
   Calendar,
-  Checkbox_Shadcn_,
+  Checkbox,
   Form,
   FormControl,
   FormField,
@@ -139,7 +139,7 @@ export default function FormPatternsSidePanel() {
             <form
               id={formId}
               onSubmit={form.handleSubmit(onSubmit)}
-              className="overflow-auto flex-grow px-0"
+              className="overflow-auto grow px-0"
             >
               {/* Text Input */}
               <SheetSection>
@@ -424,7 +424,7 @@ export default function FormPatternsSidePanel() {
                                 {uploadedFiles.map((file, idx) => (
                                   <div
                                     key={`${file.name}-${idx}`}
-                                    className="flex items-center justify-between gap-2 p-2 bg rounded border"
+                                    className="flex items-center justify-between gap-2 p-2 bg rounded-sm border"
                                   >
                                     <span className="text-sm text-foreground-light truncate flex-1">
                                       {file.name}
@@ -484,7 +484,7 @@ export default function FormPatternsSidePanel() {
                       render={({ field }) => (
                         <div className="flex items-center w-full justify-start space-x-2">
                           <FormControl>
-                            <Checkbox_Shadcn_
+                            <Checkbox
                               id="enable-rls"
                               checked={field.value}
                               onCheckedChange={field.onChange}
@@ -505,7 +505,7 @@ export default function FormPatternsSidePanel() {
                       render={({ field }) => (
                         <div className="flex items-center w-full justify-start space-x-2">
                           <FormControl>
-                            <Checkbox_Shadcn_
+                            <Checkbox
                               id="enable-notifications"
                               checked={field.value}
                               onCheckedChange={field.onChange}
@@ -526,7 +526,7 @@ export default function FormPatternsSidePanel() {
                       render={({ field }) => (
                         <div className="flex items-center w-full justify-start space-x-2">
                           <FormControl>
-                            <Checkbox_Shadcn_
+                            <Checkbox
                               id="enable-analytics"
                               checked={field.value}
                               onCheckedChange={field.onChange}
@@ -607,7 +607,7 @@ export default function FormPatternsSidePanel() {
                             badgeLimit="wrap"
                             showIcon={false}
                             deletableBadge
-                            className="w-full !min-w-lg"
+                            className="w-full min-w-lg!"
                           />
                           <MultiSelectorContent>
                             <MultiSelectorList>

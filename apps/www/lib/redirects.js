@@ -11,12 +11,22 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/api/api-keys',
+    destination: '/docs/guides/getting-started/api-keys',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/hardening-data-api',
     destination: '/docs/guides/api/securing-your-api',
   },
   {
     permanent: true,
     source: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/data-api',
     destination: '/docs/guides/api/securing-your-api',
   },
   {
@@ -1816,7 +1826,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/features',
-    destination: '/docs/guides/getting-started/features',
+    destination: '/features',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/features',
+    destination: '/features',
   },
   {
     permanent: true,
@@ -3089,6 +3104,42 @@ module.exports = [
     destination: '/docs/guides/database/overview',
   },
 
+  // AI tools move
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/plugins',
+    destination: '/docs/guides/ai-tools/plugins',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts/:slug',
+    destination: '/docs/guides/ai-tools/ai-prompts/:slug',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/mcp',
+    destination: '/docs/guides/ai-tools/mcp',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/byo-mcp',
+    destination: '/docs/guides/ai-tools/byo-mcp',
+  },
   // design
   {
     permanent: true,
@@ -3127,4 +3178,13 @@ module.exports = [
     source: '/docs/llms-full.txt',
     destination: '/llms-full.txt',
   },
+  // Legacy product .txt URLs → new .md routes
+  { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
+  { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
+  { permanent: true, source: '/llms/database.txt', destination: '/database.md' },
+  { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
+  { permanent: true, source: '/llms/realtime.txt', destination: '/realtime.md' },
+  { permanent: true, source: '/llms/storage.txt', destination: '/storage.md' },
+  { permanent: true, source: '/llms/vector.txt', destination: '/vector.md' },
+  { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
 ]

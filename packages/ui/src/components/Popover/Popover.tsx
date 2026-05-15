@@ -1,14 +1,13 @@
 'use client'
 
-import type * as RadixPopoverTypes from '@radix-ui/react-popover'
-import * as RadixPopover from '@radix-ui/react-popover'
 import { X } from 'lucide-react'
+import { Popover as RadixPopover } from 'radix-ui'
 import * as React from 'react'
 
 import styleHandler from '../../lib/theme/styleHandler'
 
 interface RootProps {
-  align?: RadixPopoverTypes.PopoverContentProps['align']
+  align?: RadixPopover.PopoverContentProps['align']
   ariaLabel?: string
   arrow?: boolean
   children?: React.ReactNode
@@ -16,12 +15,12 @@ interface RootProps {
   defaultOpen?: boolean
   disabled?: boolean
   modal?: boolean
-  onOpenChange?: RadixPopoverTypes.PopoverProps['onOpenChange']
+  onOpenChange?: RadixPopover.PopoverProps['onOpenChange']
   open?: boolean
   overlay?: React.ReactNode
   showClose?: boolean
-  side?: RadixPopoverTypes.PopoverContentProps['side']
-  sideOffset?: RadixPopoverTypes.PopoverContentProps['sideOffset']
+  side?: RadixPopover.PopoverContentProps['side']
+  sideOffset?: RadixPopover.PopoverContentProps['sideOffset']
   style?: React.CSSProperties
   header?: React.ReactNode
   footer?: React.ReactNode

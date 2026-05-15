@@ -604,15 +604,8 @@ const nextConfig = {
         : []),
     ],
   },
-  transpilePackages: [
-    'ui',
-    'ui-patterns',
-    'common',
-    'shared-data',
-    'api-types',
-    'icons',
-    'libpg-query',
-  ],
+  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
+  serverExternalPackages: ['libpg-query'],
   turbopack: {
     rules: {
       '*.md': {

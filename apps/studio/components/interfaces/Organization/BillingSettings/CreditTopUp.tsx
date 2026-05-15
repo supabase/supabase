@@ -29,6 +29,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
 import type { PaymentMethodElementRef } from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
@@ -45,6 +46,7 @@ import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -177,7 +179,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const [paymentIntentSecret, setPaymentIntentSecret] = useState('')
   const [paymentIntentConfirmation, setPaymentIntentConfirmation] = useState<PaymentIntentResult>()
 
-  const onSubmit: SubmitHandler<CreditTopUpForm> = async ({ amount, paymentMethod }) => {
+  const onSubmit: SubmitHandler<CreditTopUpForm> = async ({ amount }) => {
     setPaymentIntentConfirmation(undefined)
 
     const token = await initHcaptcha()
@@ -244,7 +246,10 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
   const onSuccessfulPayment = async () => {
     onTopUpDialogVisibilityChange(false)
-    await queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) })
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+      queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgBalance(slug) }),
+    ])
     toast.success(
       'Successfully topped up balance. It may take a minute to reflect in your account.'
     )
@@ -278,14 +283,14 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           size="invisible"
           onOpen={() => {
             // [Joshen] This is to ensure that hCaptcha popup remains clickable
-            if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.add('pointer-events-auto!')
           }}
           onClose={() => {
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
           }}
           onVerify={(token) => {
             setCaptchaToken(token)
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
           }}
           onExpire={() => {
             setCaptchaToken(null)
@@ -295,9 +300,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           <DialogTitle>Top Up Credits</DialogTitle>
           <DialogDescription className="space-y-2">
             <p className="prose text-sm">
-              On successful payment, an invoice will be issued and you'll be granted credits.
-              Credits will be applied to future invoices only and are not refundable. The topped up
-              credits do not expire.
+              On successful payment, an invoice will be issued and you'll be granted credits equal
+              to the pre-tax amount. Credits will be applied to future invoices only and are not
+              refundable. The topped up credits do not expire.
             </p>
             <p className="prose text-sm">
               For larger discounted credit packages, please reach out to us via{' '}
@@ -381,6 +386,14 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 </Alert_Shadcn_>
               )}
 
+              {!!validAmount && !creditPreviewInitialized && creditPreviewIsFetching && (
+                <div className="space-y-2 mt-4">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              )}
+
               {creditPreviewInitialized && !!validAmount && (
                 <div className="mt-4">
                   <ChargeBreakdown
@@ -397,6 +410,13 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                     taxStatus={creditPreview.tax_status}
                     isFetching={creditPreviewIsFetching}
                   />
+                  {creditPreview.tax_status === 'calculated' &&
+                    creditPreview.tax &&
+                    creditPreview.tax.tax_amount > 0 && (
+                      <p className="mt-2 text-xs text-foreground-light">
+                        You'll receive {formatCurrency(creditPreview.amount)} in credits.
+                      </p>
+                    )}
                 </div>
               )}
             </DialogSection>
@@ -406,7 +426,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 <Button
                   htmlType="submit"
                   type="primary"
-                  loading={executingTopUp || paymentConfirmationLoading}
+                  loading={
+                    form.formState.isSubmitting || executingTopUp || paymentConfirmationLoading
+                  }
                   disabled={isPreviewStale || creditPreviewIsFetching}
                 >
                   Top Up

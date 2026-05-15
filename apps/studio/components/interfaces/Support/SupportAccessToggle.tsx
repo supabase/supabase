@@ -25,9 +25,11 @@ export const DISABLE_SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
 
 interface SupportAccessToggleProps {
   form: UseFormReturn<SupportFormValues>
+  align?: 'left' | 'right'
+  className?: string
 }
 
-export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
+export function SupportAccessToggle({ form, align = 'left', className }: SupportAccessToggleProps) {
   return (
     <FormField
       name="allowSupportAccess"
@@ -37,12 +39,13 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
           <FormItemLayout
             hideMessage
             name="allowSupportAccess"
-            className="px-6"
+            className={className}
             layout="flex"
+            align={align}
             label={
               <div className="flex items-center gap-x-2">
                 <span className="text-foreground">Allow support access to your project</span>
-                <Badge className="bg-opacity-100">Recommended</Badge>
+                <Badge>Recommended</Badge>
               </div>
             }
             description={
@@ -53,12 +56,12 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
                 <Collapsible_Shadcn_ className="mt-2">
                   <CollapsibleTrigger_Shadcn_
                     className={
-                      'group flex items-center gap-x-1 group-data-[state=open]:text-foreground hover:text-foreground transition'
+                      'group flex items-center gap-x-1 group-data-open:text-foreground hover:text-foreground transition'
                     }
                   >
                     <ChevronRight
                       size={14}
-                      className="transition-all group-data-[state=open]:rotate-90 text-foreground-muted -ml-1"
+                      className="transition-all group-data-open:rotate-90 text-foreground-muted -ml-1"
                     />
                     <span className="text-sm">More information</span>
                   </CollapsibleTrigger_Shadcn_>

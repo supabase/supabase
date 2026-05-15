@@ -286,7 +286,7 @@ export const ColumnManagement = ({
                     isNewRecord ? '' : '-mx-3'
                   }`}
                 >
-                  {primaryKeyColumns.map((column: ColumnField, index: number) => (
+                  {primaryKeyColumns.map((column: ColumnField) => (
                     <Column
                       key={column.id}
                       column={column}
@@ -317,7 +317,7 @@ export const ColumnManagement = ({
           >
             <SortableContext items={otherColumns} strategy={verticalListSortingStrategy}>
               <div className={`space-y-2 py-2 ${isNewRecord ? 'px-3 ' : ''}`}>
-                {otherColumns.map((column: ColumnField, index: number) => (
+                {otherColumns.map((column: ColumnField) => (
                   <Column
                     key={column.id}
                     column={column}
@@ -343,7 +343,7 @@ export const ColumnManagement = ({
         </div>
 
         {!hasImportContent && (
-          <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
+          <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
             <Button type="default" onClick={() => onAddColumn()}>
               Add column
             </Button>

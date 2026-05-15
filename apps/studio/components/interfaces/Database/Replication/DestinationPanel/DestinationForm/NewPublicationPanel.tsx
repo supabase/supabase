@@ -22,6 +22,7 @@ import { z } from 'zod'
 
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface NewPublicationPanelProps {
   visible: boolean
@@ -31,12 +32,19 @@ interface NewPublicationPanelProps {
 
 export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const { mutateAsync: createPublication, isPending: creatingPublication } =
-    useCreatePublicationMutation()
-  const { data: tables } = useReplicationTablesQuery({
-    projectRef,
-    sourceId,
-  })
+  const { data: project } = useSelectedProjectQuery()
+
+  const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId })
+
+  const { mutate: createPublication, isPending: creatingPublication } =
+    useCreatePublicationMutation({
+      onSuccess: () => {
+        toast.success('Successfully created publication')
+        form.reset(defaultValues)
+        onClose()
+      },
+    })
+
   const formId = 'publication-editor'
   const FormSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -55,23 +63,21 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
     if (!sourceId) return console.error('Source id is required')
-    try {
-      await createPublication({
-        projectRef,
-        sourceId,
-        name: data.name,
-        tables: data.tables.map((table) => {
-          const [schema, name] = table.split('.')
-          return { schema, name }
-        }),
-      })
-      toast.success('Successfully created publication')
-      onClose()
-    } catch (error) {
-      toast.error('Failed to create publication')
-    }
-    form.reset(defaultValues)
+
+    const tables = data.tables.map((table) => {
+      const [schema, name] = table.split('.')
+      return { schema, name }
+    })
+
+    createPublication({
+      projectRef,
+      sourceId,
+      name: data.name,
+      tables,
+      connectionString: project.connectionString,
+    })
   }
 
   return (
@@ -83,7 +89,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
               <SheetTitle>Create a new Publication</SheetTitle>
               <SheetDescription>Replicate table changes to destinations</SheetDescription>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-auto">
+            <SheetSection className="grow overflow-auto">
               <Form {...form}>
                 <form
                   id={formId}

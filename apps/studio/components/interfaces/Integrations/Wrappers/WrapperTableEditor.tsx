@@ -445,11 +445,11 @@ const TableForm = ({
                       badgeLimit="wrap"
                       showIcon={false}
                       deletableBadge
-                      className="w-full !min-w-lg"
+                      className="w-full min-w-lg!"
                     />
                     <MultiSelectorContent>
                       <MultiSelectorList>
-                        {table.availableColumns!.map((availableColumn, index) => (
+                        {table.availableColumns!.map((availableColumn) => (
                           <MultiSelectorItem
                             key={availableColumn.name}
                             value={availableColumn.name}

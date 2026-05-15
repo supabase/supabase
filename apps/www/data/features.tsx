@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react'
+import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
 import {
   Activity,
   BarChart,
@@ -34,14 +34,14 @@ import {
   UserX,
   Zap,
 } from 'lucide-react'
-import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
+import type { LucideIcon } from 'lucide-react'
+import { FunctionComponent } from 'react'
 import {
   PRODUCT,
   PRODUCT_MODULE,
   PRODUCT_MODULES_SHORTNAMES,
   PRODUCT_SHORTNAMES,
 } from 'shared-data/products'
-import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
   PLATFORM = 'platform',
@@ -302,6 +302,46 @@ By using custom domains, you create a more cohesive brand experience and gain fl
     },
   },
   {
+    title: 'Custom Identity Providers',
+    subtitle: 'Connect any OAuth2 or OIDC identity provider to Supabase Auth.',
+    description: `Supabase Auth ships with 20+ built-in providers. For providers not on that list, Custom Identity Providers lets you add them in two ways:
+
+- **OIDC providers** — supply an issuer URL and Supabase auto-fetches the discovery document, JWKS, and endpoints automatically.
+- **OAuth2-only providers** — supply the authorization, token, and userinfo endpoint URLs directly for providers that don't expose an OIDC discovery document.
+
+Once configured, your users sign in with \`signInWithOAuth({ provider: 'custom:my-provider' })\`, the same call used for any built-in provider. Same client libraries (JS, Flutter, Swift, Kotlin), same RLS enforcement, no special client-side handling required.
+
+## Key benefits
+1. Auto-discovery (OIDC): Supply an issuer URL and Supabase resolves the discovery document, JWKS, and endpoints automatically. No manual endpoint wiring.
+2. Manual endpoint control (OAuth2): Supply the authorization URL, token URL, and userinfo URL directly for providers without OIDC discovery.
+3. Any provider: GitHub Enterprise Server, regional compliance IdPs, internal OAuth2 servers, and proprietary identity systems. If it speaks OAuth2 or OIDC, it works.
+4. PKCE by default: All custom providers use PKCE (Proof Key for Code Exchange) automatically. No client-side changes needed.
+5. Same sign-in flow: One code path for all OAuth flows. Same client libraries and RLS enforcement as built-in providers.
+6. Multi-platform support: List additional client IDs via \`acceptable_client_ids\` for web, iOS, and Android apps.
+7. Full management via Dashboard and Admin API: Create, update, rotate secrets, toggle enabled state, or delete providers without touching your code.
+8. Email-optional: Providers that don't return an email address are supported via the \`email_optional\` setting.
+9. Custom authorization params: Append extra query parameters to the authorization URL for consent screens, offline access, login hints, and more.
+
+## Custom Identity Providers are valuable for:
+- Teams using a SAML-to-OIDC bridge, GitHub Enterprise Server, or GitLab self-managed for SSO
+- Applications in regulated industries with mandated regional identity providers
+- Internal tools authenticating against a company's custom OAuth2 server
+- Platforms with proprietary OAuth2 implementations that don't expose a discovery document
+- Platforms integrating with niche identity networks (gaming, healthcare, device-based auth)
+- Multi-platform apps (web, iOS, Android) needing unified auth across client IDs
+- Enterprise buyers evaluating Supabase Auth for compliance-sensitive deployments
+- Developers who need precise control over endpoint configuration`,
+    icon: Shield,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: 'https://www.youtube-nocookie.com/embed/WrX3FfKj6I8',
+    docsUrl: 'https://supabase.com/docs/guides/auth/custom-oauth-providers',
+    slug: 'custom-oidc-providers',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
     title: 'Network restrictions',
     subtitle: 'Restrict IP ranges that can connect to your database.',
     description: `
@@ -379,32 +419,33 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
   },
   {
     title: 'Branching',
-    subtitle: 'Test and preview changes using Supabase Branches.',
+    subtitle: 'Test schema changes without touching production.',
     description: `
-Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. Branching 2.0 (currently in public alpha) removes the Git requirement—spin up branches directly from the dashboard, CLI, or Management API, with or without GitHub integration.
+Branching without Git is now the default for all Supabase projects. Create a branch directly from the Supabase Dashboard, make schema changes, review the diff, and merge. No Git configuration required. Git-based branching remains fully supported for teams that manage migrations in version control. You can start with dashboard branching and add a Git integration later.
+
+## Two ways to branch
+
+**Dashboard branching (default)**
+Create branches directly from the Supabase Dashboard. Each branch gets its own Postgres instance with your current production schema. Make changes using the SQL Editor or Table Editor, preview the diff, and merge. The whole workflow stays inside Supabase.
+
+**Git-based branching**
+Connect a GitHub repo to your Supabase project. Migrations live in version control, and branches are created automatically when you open a pull request and cleaned up when it closes.
 
 ## Key features
-1. No-Git workflows: Create branches directly from dashboard or CLI without requiring GitHub connection.
-2. Git-based workflow: Optionally integrate with GitHub, creating preview branches for each pull request.
+1. No-Git workflow: Create and merge branches entirely from the dashboard. No GitHub connection needed.
+2. Git-based workflow: Optionally integrate with GitHub for pull request-driven schema reviews.
 3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
 4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
-5. Data seeding: Preview branches can be seeded with sample data using ./supabase/seed.sql.
+5. Data seeding: Seed branches with sample data using ./supabase/seed.sql.
 6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
 7. Merge requests: Review schema diffs and merge changes directly in the dashboard.
 
-## Benefits:
-- Risk-free experimentation: Test changes without affecting the production environment.
-- Improved collaboration: Multiple team members can work on different features simultaneously.
-- Streamlined reviews: Facilitate thorough checks of database changes before merging.
-- Rapid iteration: Quickly prototype and validate database-driven features.
-- Flexible workflows: Use Git integration, dashboard creation, or combine both approaches.
-
-## Supabase Branching is valuable for:
-- Agile teams working on multiple features concurrently
-- Projects with complex database schemas requiring careful management
-- Applications undergoing significant refactoring or upgrades
-- CI/CD pipelines integrating database changes
-- Teams preferring no-code or database-first development workflows
+## When to use branching
+- Developers prototyping schema changes who want fast iteration without upfront configuration
+- AI agents that need to create and manage database branches programmatically
+- Teams managing database migrations in Git who want PR-driven schema reviews
+- Projects with complex schemas requiring careful diff review before merging
+- CI/CD pipelines integrating database changes alongside application code
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],

@@ -1,4 +1,4 @@
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PGSchema } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Background,
@@ -11,16 +11,15 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
-import { toPng, toSvg } from 'html-to-image'
 import { Check, ChevronDown, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,6 +54,7 @@ import { useExportSchemaToImage } from './useExportSchemaToImage'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -64,6 +64,9 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { tablesToSQL } from '@/lib/helpers'
+import type { SafePostgresTable } from '@/lib/postgres-types'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
@@ -73,7 +76,7 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [selectedTable, setSelectedTable] = useState<PostgresTable | null>(null)
+  const [selectedTable, setSelectedTable] = useState<SafePostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
   const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 
@@ -203,10 +206,43 @@ export const SchemaGraph = () => {
     exportSchemaToImage({ element: reactflowViewport, format, x, y, zoom, projectRef: ref })
   }
 
+  const copyAsSQL = () => {
+    if (!tables) return
+    copyToClipboard(tablesToSQL(tables))
+    setCopied(true)
+    toast.success('Successfully copied as SQL')
+  }
+
+  const copyAsMarkdown = () => {
+    const tableNodes = reactFlowInstance
+      .getNodes()
+      .filter((node) => node.type === 'table')
+      .map((node) => node.data as TableNodeData)
+    copyToClipboard(getSchemaAsMarkdown(selectedSchema, tableNodes))
+    setCopied(true)
+    toast.success('Successfully copied as Markdown')
+  }
+
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const [autoLayoutDialogOpen, setAutoLayoutDialogOpen] = useState(false)
+
+  const shortcutsEnabled = isSuccessSchemas && !hasNoTables
+
+  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_COPY_SQL, copyAsSQL, { enabled: shortcutsEnabled })
+  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_COPY_MARKDOWN, copyAsMarkdown, {
+    enabled: shortcutsEnabled,
+  })
+  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_PNG, () => downloadImage('png'), {
+    enabled: shortcutsEnabled,
+  })
+  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_SVG, () => downloadImage('svg'), {
+    enabled: shortcutsEnabled,
+  })
+
   const isFirstLoad = useRef(true)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
-      const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
+      const schema = schemas.find((s) => s.name === selectedSchema) as PGSchema
       getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
@@ -255,22 +291,32 @@ export const SchemaGraph = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-muted h-[var(--header-height)]">
+      <div className="flex items-center justify-between p-4 border-b border-muted h-(--header-height)">
         {isLoadingSchemas && (
-          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
+          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded-sm shimmering-loader" />
         )}
 
         {isErrorSchemas && <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />}
 
         {isSuccessSchemas && (
           <>
-            <SchemaSelector
-              className="w-[180px]"
-              size="tiny"
-              showError={false}
-              selectedSchemaName={selectedSchema}
-              onSelectSchema={setSelectedSchema}
-            />
+            <Shortcut
+              id={SHORTCUT_IDS.SCHEMA_VISUALIZER_FOCUS_SCHEMA}
+              onTrigger={() => setSchemaSelectorOpen(true)}
+              options={{ enabled: isSuccessSchemas }}
+              side="bottom"
+              tooltipOpen={schemaSelectorOpen ? false : undefined}
+            >
+              <SchemaSelector
+                className="w-[180px]"
+                size="tiny"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+                open={schemaSelectorOpen}
+                onOpenChange={setSchemaSelectorOpen}
+              />
+            </Shortcut>
             {!hasNoTables && (
               <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-0">
@@ -278,12 +324,7 @@ export const SchemaGraph = () => {
                     type="default"
                     className="rounded-r-none border-r-0"
                     icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
-                    onClick={() => {
-                      if (tables) {
-                        copyToClipboard(tablesToSQL(tables))
-                        setCopied(true)
-                      }
-                    }}
+                    onClick={copyAsSQL}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -317,13 +358,7 @@ export const SchemaGraph = () => {
                         className="flex items-center space-x-2 whitespace-nowrap"
                         onClick={(e) => {
                           e.stopPropagation()
-                          const tables = reactFlowInstance
-                            .getNodes()
-                            .filter((node) => node.type === 'table')
-                            .map((node) => node.data as TableNodeData)
-
-                          copyToClipboard(getSchemaAsMarkdown(selectedSchema, tables))
-                          setCopied(true)
+                          copyAsMarkdown()
                         }}
                       >
                         <Copy size={12} />
@@ -352,20 +387,18 @@ export const SchemaGraph = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <ButtonTooltip
-                      type="default"
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: 'Automatically arrange the layout of all nodes',
-                        },
-                      }}
-                    >
-                      Auto layout
-                    </ButtonTooltip>
-                  </AlertDialogTrigger>
+                <AlertDialog open={autoLayoutDialogOpen} onOpenChange={setAutoLayoutDialogOpen}>
+                  <Shortcut
+                    id={SHORTCUT_IDS.SCHEMA_VISUALIZER_AUTO_LAYOUT}
+                    onTrigger={() => setAutoLayoutDialogOpen(true)}
+                    options={{ enabled: shortcutsEnabled }}
+                    side="bottom"
+                    tooltipOpen={autoLayoutDialogOpen ? false : undefined}
+                  >
+                    <AlertDialogTrigger asChild>
+                      <Button type="default">Auto layout</Button>
+                    </AlertDialogTrigger>
+                  </Shortcut>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Confirm to rearrange all nodes</AlertDialogTitle>
@@ -443,7 +476,7 @@ export const SchemaGraph = () => {
                 >
                   <Background
                     gap={16}
-                    className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                    className="*:stroke-foreground-muted opacity-25"
                     variant={BackgroundVariant.Dots}
                     color={'inherit'}
                   />
@@ -452,7 +485,7 @@ export const SchemaGraph = () => {
                     zoomable
                     nodeColor={miniMapNodeColor}
                     maskColor={miniMapMaskColor}
-                    className="border rounded-md shadow-sm"
+                    className="border rounded-md shadow-xs"
                   />
                   <SchemaGraphLegend />
                 </ReactFlow>

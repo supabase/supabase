@@ -1,11 +1,11 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Image from 'next/legacy/image'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   FormControl,
   FormField,
   Input_Shadcn_,
@@ -42,7 +42,7 @@ import { uuidv4 } from '@/lib/helpers'
 
 export interface FormContentsProps {
   form: UseFormReturn<WebhookFormValues>
-  selectedHook?: PostgresTrigger
+  selectedHook?: PGTrigger
 }
 
 export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
@@ -103,8 +103,8 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
 
   return (
     <div>
-      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+      <FormSection header={<FormSectionLabel className="lg:col-span-4!">General</FormSectionLabel>}>
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <FormField
             control={form.control}
             name="name"
@@ -125,7 +125,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
       <FormSection
         header={
           <FormSectionLabel
-            className="lg:!col-span-4"
+            className="lg:col-span-4!"
             description={
               <p className="text-sm text-foreground-light">
                 Select which table and events will trigger your webhook
@@ -136,7 +136,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
           </FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <FormField
             control={form.control}
             name="table_id"
@@ -181,7 +181,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                 <div className="space-y-3">
                   {HOOK_EVENTS.map((event) => (
                     <div key={event.value} className="flex items-start space-x-3">
-                      <Checkbox_Shadcn_
+                      <Checkbox
                         id={`event-${event.value}`}
                         checked={field.value.includes(event.value)}
                         onCheckedChange={(checked) => {
@@ -212,10 +212,10 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
       <SidePanel.Separator />
       <FormSection
         header={
-          <FormSectionLabel className="lg:!col-span-4">Webhook configuration</FormSectionLabel>
+          <FormSectionLabel className="lg:col-span-4!">Webhook configuration</FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
+        <FormSectionContent loading={false} className="lg:col-span-8!">
           <FormField
             control={form.control}
             name="function_type"

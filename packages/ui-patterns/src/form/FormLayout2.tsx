@@ -4,12 +4,12 @@ import { useForm } from 'react-hook-form'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Form,
   FormControl,
   FormField,
-  RadioGroup_Shadcn_,
-  RadioGroupItem_Shadcn_,
+  RadioGroup,
+  RadioGroupItem,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -302,7 +302,7 @@ export const Page = () => {
                     layout="flex"
                   >
                     <FormControl>
-                      <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -343,7 +343,7 @@ export const Page = () => {
                               hideMessage
                             >
                               <FormControl>
-                                <Checkbox_Shadcn_
+                                <Checkbox
                                   checked={field.value?.includes(item.id)}
                                   onCheckedChange={(checked) => {
                                     return checked
@@ -377,7 +377,7 @@ export const Page = () => {
                     layout="horizontal"
                   >
                     <FormControl>
-                      <RadioGroup_Shadcn_
+                      <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         className="flex flex-col space-y-1"
@@ -389,7 +389,7 @@ export const Page = () => {
                           hideMessage
                         >
                           <FormControl>
-                            <RadioGroupItem_Shadcn_ value="all" />
+                            <RadioGroupItem value="all" />
                           </FormControl>
                         </FormItemLayout>
                         <FormItemLayout
@@ -399,7 +399,7 @@ export const Page = () => {
                           hideMessage
                         >
                           <FormControl>
-                            <RadioGroupItem_Shadcn_ value="mentions" />
+                            <RadioGroupItem value="mentions" />
                           </FormControl>
                         </FormItemLayout>
                         <FormItemLayout
@@ -409,10 +409,10 @@ export const Page = () => {
                           hideMessage
                         >
                           <FormControl>
-                            <RadioGroupItem_Shadcn_ value="none" />
+                            <RadioGroupItem value="none" />
                           </FormControl>
                         </FormItemLayout>
-                      </RadioGroup_Shadcn_>
+                      </RadioGroup>
                     </FormControl>
                   </FormItemLayout>
                 )}

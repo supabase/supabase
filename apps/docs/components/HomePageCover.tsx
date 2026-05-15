@@ -1,13 +1,13 @@
 'use client'
 
-import { ChevronRight, Play, Sparkles } from 'lucide-react'
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
 // End of third-party imports
-
 import { isFeatureEnabled, useBreakpoint } from 'common'
+import { ChevronRight, Play, Sparkles } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { cn, IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
+
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
 
@@ -27,7 +27,7 @@ function AiPrompt({ className }: { className?: string }) {
         'transition-colors',
         className
       )}
-      href="/guides/getting-started/ai-prompts"
+      href="/guides/ai-tools/ai-prompts"
     >
       <Sparkles size={14} />
       Start with Supabase AI prompts
@@ -41,7 +41,7 @@ const HomePageCover = (props) => {
   const iconSize = isXs ? 'sm' : 'lg'
   const { homepageHeading } = getCustomContent(['homepage:heading'])
   const { resolvedTheme } = useTheme()
-  const isLightMode = resolvedTheme !== 'dark'
+  const isLightMode = !resolvedTheme?.includes('dark')
 
   const frameworks = [
     {
@@ -161,7 +161,7 @@ const HomePageCover = (props) => {
   return (
     <div className="relative z-10 w-full bg-alternative border-b max-w-none mb-16 md:mb-12 xl:mb-0">
       <div className="max-w-7xl px-5 mx-auto py-8 sm:pb-16 sm:pt-12 xl:pt-16 flex flex-col xl:flex-row justify-between gap-12 xl:gap-12">
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl xl:max-w-[33rem]">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl xl:max-w-132">
           <DocsCoverLogo aria-hidden="true" />
           <div className="flex flex-col">
             <h1 className="m-0 mb-3 text-2xl sm:text-3xl text-foreground">

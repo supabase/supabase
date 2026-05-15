@@ -1,18 +1,24 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { sortBy } from 'lodash'
-import { ArrowRight, Database, HelpCircle, Loader2, Table, X } from 'lucide-react'
+import { ArrowRight, HelpCircle, Loader2, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  Listbox,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   SidePanel,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
+import { displayColumnType, normalizeFormatSchema } from '../ColumnEditor/ColumnEditor.utils'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
@@ -24,7 +30,6 @@ import {
   type ForeignKeyDirtyState,
 } from './ForeignKeySelector.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { DocsButton } from '@/components/ui/DocsButton'
 import InformationBox from '@/components/ui/InformationBox'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTableQuery } from '@/data/tables/table-retrieve-query'
@@ -32,7 +37,6 @@ import { useTablesQuery } from '@/data/tables/tables-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { DOCS_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 
 const EMPTY_STATE: ForeignKey = {
@@ -49,7 +53,14 @@ interface ForeignKeySelectorProps {
   table: {
     id: number
     name: string
-    columns: { id: string; name: string; format: string; isNewColumn: boolean }[]
+    columns: {
+      id: string
+      name: string
+      format: string
+      formatSchema?: string
+      isArray?: boolean
+      isNewColumn: boolean
+    }[]
   }
   column?: ColumnField // For ColumnEditor, to prefill when adding a new foreign key
   foreignKey?: ForeignKey
@@ -87,7 +98,7 @@ export const ForeignKeySelector = ({
     includeColumns: false,
   })
 
-  const { data: selectedTable, isLoading: isLoadingSelectedTable } = useTableQuery<PostgresTable>(
+  const { data: selectedTable, isLoading: isLoadingSelectedTable } = useTableQuery<PGTable>(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -142,11 +153,23 @@ export const ForeignKeySelector = ({
     const updatedRelations = fk.columns.map((x, i) => {
       if (i === idx) {
         if (key === 'target') {
-          const targetType = selectedTable?.columns?.find((col) => col.name === value)?.format
-          return { ...x, [key]: value, targetType }
+          const targetCol = selectedTable?.columns?.find((col) => col.name === value)
+          return {
+            ...x,
+            [key]: value,
+            targetType: targetCol?.format,
+            targetTypeSchema: normalizeFormatSchema(targetCol?.format_schema),
+            targetIsArray: targetCol?.data_type === 'ARRAY',
+          }
         } else {
-          const sourceType = table.columns.find((col) => col.name === value)?.format as string
-          return { ...x, [key]: value, sourceType }
+          const sourceCol = table.columns.find((col) => col.name === value)
+          return {
+            ...x,
+            [key]: value,
+            sourceType: sourceCol?.format,
+            sourceTypeSchema: normalizeFormatSchema(sourceCol?.formatSchema),
+            sourceIsArray: sourceCol?.isArray ?? false,
+          }
         }
       } else {
         return x
@@ -183,32 +206,70 @@ export const ForeignKeySelector = ({
     const typeErrors: SelectorTypeError[] = []
 
     fk.columns.forEach((column) => {
-      const { source, target, sourceType: sType, targetType: tType } = column
+      const {
+        source,
+        target,
+        sourceType: sType,
+        sourceTypeSchema: sSchema,
+        sourceIsArray: sArr,
+        targetType: tType,
+        targetTypeSchema: tSchema,
+        targetIsArray: tArr,
+      } = column
       const sourceColumn = table.columns.find((col) => col.name === source)
+      const targetColumn = selectedTable?.columns?.find((col) => col.name === target)
       const sourceType = sType ?? sourceColumn?.format ?? ''
-      const targetType =
-        tType ?? selectedTable?.columns?.find((col) => col.name === target)?.format ?? ''
+      const targetType = tType ?? targetColumn?.format ?? ''
+      const sourceTypeSchema = sSchema ?? normalizeFormatSchema(sourceColumn?.formatSchema)
+      const targetTypeSchema = tSchema ?? normalizeFormatSchema(targetColumn?.format_schema)
+      const sourceIsArray = sArr ?? sourceColumn?.isArray ?? false
+      const targetIsArray = tArr ?? targetColumn?.data_type === 'ARRAY'
 
       // [Joshen] Doing this way so that its more readable
       // If either source or target not selected yet, thats okay
       if (source === '' || target === '') return
 
-      // If source and target are in the same type of data types, thats okay
+      // pg-meta emits `_X` as the format string for arrays of X. Normalize before
+      // running family checks so that an array column is never accidentally classified
+      // as a member of a scalar family.
+      const bareSource =
+        sourceIsArray && sourceType.startsWith('_') ? sourceType.slice(1) : sourceType
+      const bareTarget =
+        targetIsArray && targetType.startsWith('_') ? targetType.slice(1) : targetType
+
+      // Same-family scalars are interchangeable; arrays must match exactly.
       if (
-        (NUMERICAL_TYPES.includes(sourceType) && NUMERICAL_TYPES.includes(targetType)) ||
-        (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
-        (sourceType === 'uuid' && targetType === 'uuid')
+        !sourceIsArray &&
+        !targetIsArray &&
+        ((NUMERICAL_TYPES.includes(sourceType) && NUMERICAL_TYPES.includes(targetType)) ||
+          (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
+          (sourceType === 'uuid' && targetType === 'uuid'))
       )
         return
 
-      // Otherwise just check if the format is equal to each other
-      if (sourceType === targetType) return
+      // Otherwise require an exact match across the full (format, format_schema, isArray) triple.
+      if (
+        bareSource === bareTarget &&
+        sourceTypeSchema === targetTypeSchema &&
+        sourceIsArray === targetIsArray
+      )
+        return
 
+      const entry: SelectorTypeError = {
+        source,
+        sourceType,
+        sourceTypeSchema,
+        sourceIsArray,
+        target,
+        targetType,
+        targetTypeSchema,
+        targetIsArray,
+      }
       if (sourceColumn?.isNewColumn && targetType !== '') {
-        return typeNotice.push({ source, sourceType, target, targetType })
+        return typeNotice.push(entry)
       }
 
-      typeErrors.push({ source, sourceType, target, targetType })
+      typeErrors.push(entry)
     })
 
     setErrors({ types: typeErrors, typeNotice })
@@ -258,61 +319,64 @@ export const ForeignKeySelector = ({
               url="https://www.postgresql.org/docs/current/tutorial-fk.html"
               urlLabel="Postgres Foreign Key Documentation"
             />
-
-            <Listbox
+            <FormItemLayout
               id="schema"
+              isReactForm={false}
+              layout="vertical"
               label="Select a schema"
-              value={fk.schema}
-              onChange={(value: string) => updateSelectedSchema(value)}
+              className="gap-[2px]"
+              size="tiny"
             >
-              {sortedSchemas.map((schema) => {
-                return (
-                  <Listbox.Option
-                    key={schema.id}
-                    value={schema.name}
-                    label={schema.name}
-                    className="min-w-96"
-                    addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
-                  >
-                    <div className="flex items-center gap-2">
-                      {/* For aria searching to target the schema name instead of schema */}
-                      <span className="hidden">{schema.name}</span>
-                      <span className="text-foreground">{schema.name}</span>
-                    </div>
-                  </Listbox.Option>
-                )
-              })}
-            </Listbox>
-
-            <Listbox
+              <Select_Shadcn_
+                value={fk.schema}
+                onValueChange={(value) => updateSelectedSchema(value)}
+              >
+                <SelectTrigger_Shadcn_ id="schema">
+                  <SelectValue_Shadcn_ />
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  {sortedSchemas.map((schema) => (
+                    <SelectItem_Shadcn_ key={schema.id} value={schema.name} className="min-w-96">
+                      {schema.name}
+                    </SelectItem_Shadcn_>
+                  ))}
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+            </FormItemLayout>
+            <FormItemLayout
               id="table"
+              isReactForm={false}
+              layout="vertical"
               label="Select a table to reference to"
-              value={selectedTable?.id ?? 1}
-              onChange={(value: string) => updateSelectedTable(Number(value))}
-              disabled={isLoadingSelectedTable}
+              className="gap-[2px]"
+              size="tiny"
             >
-              <Listbox.Option key="empty" className="min-w-96" value={1} label="---">
-                ---
-              </Listbox.Option>
-              {sortBy(tables, ['schema']).map((table) => {
-                return (
-                  <Listbox.Option
-                    key={table.id}
-                    value={table.id}
-                    label={table.name}
-                    className="min-w-96"
-                    addOnBefore={() => <Table size={16} strokeWidth={1.5} />}
-                  >
-                    <div className="flex items-center gap-2">
-                      {/* For aria searching to target the table name instead of schema */}
-                      <span className="hidden">{table.name}</span>
-                      <span className="text-foreground-lighter">{table.schema}</span>
-                      <span className="text-foreground">{table.name}</span>
-                    </div>
-                  </Listbox.Option>
-                )
-              })}
-            </Listbox>
+              <Select_Shadcn_
+                value={selectedTable?.id !== undefined ? String(selectedTable.id) : undefined}
+                onValueChange={(value) => updateSelectedTable(Number(value))}
+                disabled={isLoadingSelectedTable}
+              >
+                <SelectTrigger_Shadcn_ id="table">
+                  <SelectValue_Shadcn_ />
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  {sortBy(tables, ['schema']).map((table) => (
+                    <SelectItem_Shadcn_
+                      key={table.id}
+                      value={table.id.toString()}
+                      className="min-w-96"
+                    >
+                      <div className="flex items-center gap-2">
+                        {/* For aria searching to target the table name instead of schema */}
+                        <span className="hidden">{table.name}</span>
+                        <span className="text-foreground-lighter">{table.schema}</span>
+                        <span className="text-foreground">{table.name}</span>
+                      </div>
+                    </SelectItem_Shadcn_>
+                  ))}
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+            </FormItemLayout>
 
             {fk.schema && fk.table && (
               <>
@@ -331,10 +395,10 @@ export const ForeignKeySelector = ({
                       to reference to
                     </label>
                     <div className="grid grid-cols-10 gap-y-2">
-                      <div className="col-span-5 text-xs text-foreground-lighter">
+                      <div className="col-span-5 text-xs">
                         {selectedSchema}.{table.name.length > 0 ? table.name : '[unnamed table]'}
                       </div>
-                      <div className="col-span-4 text-xs text-foreground-lighter text-right">
+                      <div className="col-span-4 text-xs text-right">
                         {fk.schema}.{fk.table}
                       </div>
                       {fk.columns.length === 0 && (
@@ -347,73 +411,69 @@ export const ForeignKeySelector = ({
                       {fk.columns.map((_, idx) => (
                         <Fragment key={`${fk.schema}-${fk.table}-${idx}`}>
                           <div className="col-span-4">
-                            <Listbox
-                              id="column"
+                            <Select_Shadcn_
                               value={fk.columns[idx].source}
-                              onChange={(value: string) =>
-                                updateSelectedColumn(idx, 'source', value)
-                              }
+                              onValueChange={(value) => updateSelectedColumn(idx, 'source', value)}
                             >
-                              <Listbox.Option
-                                key="empty"
-                                value={''}
-                                label="---"
-                                className="!w-[170px]"
+                              <SelectTrigger_Shadcn_
+                                aria-label={`Column from ${selectedSchema}.${table.name.length > 0 ? table.name : '[unnamed table]'}`}
                               >
-                                ---
-                              </Listbox.Option>
-                              {(table?.columns ?? [])
-                                .filter((x) => x.name.length !== 0)
-                                .map((column) => (
-                                  <Listbox.Option
-                                    key={column.id}
-                                    value={column.name}
-                                    label={column.name}
-                                    className="!w-[170px]"
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-foreground">{column.name}</span>
-                                      <span className="text-foreground-lighter">
-                                        {column.format === '' ? '-' : column.format}
-                                      </span>
-                                    </div>
-                                  </Listbox.Option>
-                                ))}
-                            </Listbox>
+                                <SelectValue_Shadcn_ />
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                {(table?.columns ?? [])
+                                  .filter((x) => x.name.length !== 0)
+                                  .map((column) => (
+                                    <SelectItem_Shadcn_ key={column.id} value={column.name}>
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-foreground">{column.name}</span>
+                                        <span className="text-foreground-lighter">
+                                          {column.format === ''
+                                            ? '-'
+                                            : displayColumnType(
+                                                column.format,
+                                                column.formatSchema,
+                                                column.isArray
+                                              )}
+                                        </span>
+                                      </div>
+                                    </SelectItem_Shadcn_>
+                                  ))}
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
                           </div>
                           <div className="col-span-1 flex justify-center items-center">
                             <ArrowRight />
                           </div>
                           <div className="col-span-4">
-                            <Listbox
-                              id="column"
+                            <Select_Shadcn_
                               value={fk.columns[idx].target}
-                              onChange={(value: string) =>
-                                updateSelectedColumn(idx, 'target', value)
-                              }
+                              onValueChange={(value) => updateSelectedColumn(idx, 'target', value)}
                             >
-                              <Listbox.Option
-                                key="empty"
-                                value={''}
-                                label="---"
-                                className="!w-[170px]"
+                              <SelectTrigger_Shadcn_
+                                aria-label={`Column from ${fk.schema}.${fk.table}`}
                               >
-                                ---
-                              </Listbox.Option>
-                              {(selectedTable?.columns ?? []).map((column) => (
-                                <Listbox.Option
-                                  key={column.id}
-                                  value={column.name}
-                                  label={column.name}
-                                  className="!w-[170px]"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-foreground">{column.name}</span>
-                                    <span className="text-foreground-lighter">{column.format}</span>
-                                  </div>
-                                </Listbox.Option>
-                              ))}
-                            </Listbox>
+                                <SelectValue_Shadcn_ />
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                {(selectedTable?.columns ?? []).map((column) => (
+                                  <SelectItem_Shadcn_ key={column.id} value={column.name}>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-foreground">{column.name}</span>
+                                      <span className="text-foreground-lighter">
+                                        {column.format === ''
+                                          ? '-'
+                                          : displayColumnType(
+                                              column.format,
+                                              column.format_schema,
+                                              column.data_type === 'ARRAY'
+                                            )}
+                                      </span>
+                                    </div>
+                                  </SelectItem_Shadcn_>
+                                ))}
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
                           </div>
                           <div className="col-span-1 flex justify-end items-center">
                             <Button
@@ -445,9 +505,18 @@ export const ForeignKeySelector = ({
                               return (
                                 <li key={`type-error-${idx}`}>
                                   <code className="text-code-inline">{x.source}</code> (
-                                  {x.sourceType}) and{' '}
-                                  <code className="text-code-inline">{x.target}</code>(
-                                  {x.targetType})
+                                  {displayColumnType(
+                                    x.sourceType,
+                                    x.sourceTypeSchema,
+                                    x.sourceIsArray
+                                  )}
+                                  ) and <code className="text-code-inline">{x.target}</code>(
+                                  {displayColumnType(
+                                    x.targetType,
+                                    x.targetTypeSchema,
+                                    x.targetIsArray
+                                  )}
+                                  )
                                 </li>
                               )
                             })}
@@ -468,7 +537,12 @@ export const ForeignKeySelector = ({
                                 <li key={`type-error-${idx}`}>
                                   <div className="flex items-center gap-x-1">
                                     <code className="text-code-inline">{x.source}</code>{' '}
-                                    <ArrowRight size={14} /> {x.targetType}
+                                    <ArrowRight size={14} />{' '}
+                                    {displayColumnType(
+                                      x.targetType,
+                                      x.targetTypeSchema,
+                                      x.targetIsArray
+                                    )}
                                   </div>
                                 </li>
                               )
@@ -520,11 +594,12 @@ export const ForeignKeySelector = ({
                       urlLabel="More information"
                     />
 
-                    <Listbox
+                    <FormItemLayout
                       id="updateAction"
-                      value={fk.updateAction}
+                      isReactForm={false}
+                      layout="vertical"
                       label="Action if referenced row is updated"
-                      descriptionText={
+                      description={
                         <p>
                           {generateCascadeActionDescription(
                             'update',
@@ -533,45 +608,60 @@ export const ForeignKeySelector = ({
                           )}
                         </p>
                       }
-                      onChange={(value: string) => updateCascadeAction('updateAction', value)}
+                      className="gap-[2px]"
+                      size="tiny"
                     >
-                      {FOREIGN_KEY_CASCADE_OPTIONS.filter((option) =>
-                        ['no-action', 'cascade', 'restrict'].includes(option.key)
-                      ).map((option) => (
-                        <Listbox.Option key={option.key} value={option.value} label={option.label}>
-                          <p className="text-foreground">{option.label}</p>
-                        </Listbox.Option>
-                      ))}
-                    </Listbox>
-
-                    <Listbox
+                      <Select_Shadcn_
+                        value={fk.updateAction}
+                        onValueChange={(value) => updateCascadeAction('updateAction', value)}
+                      >
+                        <SelectTrigger_Shadcn_ id="updateAction">
+                          <SelectValue_Shadcn_ />
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          {FOREIGN_KEY_CASCADE_OPTIONS.filter((option) =>
+                            ['no-action', 'cascade', 'restrict'].includes(option.key)
+                          ).map((option) => (
+                            <SelectItem_Shadcn_ key={option.key} value={option.value}>
+                              {option.label}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                    </FormItemLayout>
+                    <FormItemLayout
                       id="deletionAction"
-                      value={fk.deletionAction}
-                      className="[&>div>label]:flex [&>div>label]:items-center"
+                      isReactForm={false}
+                      layout="vertical"
                       label="Action if referenced row is removed"
-                      // @ts-ignore
-                      labelOptional={
-                        <DocsButton href={`${DOCS_URL}/guides/database/postgres/cascade-deletes`} />
+                      description={
+                        <p>
+                          {generateCascadeActionDescription(
+                            'delete',
+                            fk.deletionAction,
+                            `${fk.schema}.${fk.table}`
+                          )}
+                        </p>
                       }
-                      descriptionText={
-                        <>
-                          <p>
-                            {generateCascadeActionDescription(
-                              'delete',
-                              fk.deletionAction,
-                              `${fk.schema}.${fk.table}`
-                            )}
-                          </p>
-                        </>
-                      }
-                      onChange={(value: string) => updateCascadeAction('deletionAction', value)}
+                      className="gap-[2px]"
+                      size="tiny"
                     >
-                      {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
-                        <Listbox.Option key={option.key} value={option.value} label={option.label}>
-                          <p className="text-foreground">{option.label}</p>
-                        </Listbox.Option>
-                      ))}
-                    </Listbox>
+                      <Select_Shadcn_
+                        value={fk.deletionAction}
+                        onValueChange={(value) => updateCascadeAction('deletionAction', value)}
+                      >
+                        <SelectTrigger_Shadcn_ id="deletionAction">
+                          <SelectValue_Shadcn_ />
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
+                            <SelectItem_Shadcn_ key={option.key} value={option.value}>
+                              {option.label}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                    </FormItemLayout>
                   </>
                 )}
               </>

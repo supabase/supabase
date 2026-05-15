@@ -194,13 +194,13 @@ export const SQLEditorTreeViewItem = ({
     const snippet = element.metadata
     let sql: string = ''
 
-    if (snippet.content && snippet.content.sql) {
-      sql = snippet.content.sql
+    if (snippet.content && snippet.content.unchecked_sql) {
+      sql = snippet.content.unchecked_sql
     } else {
       // Fetch the content first
       const { content } = await getContentById({ projectRef, id: snippet.id })
-      if ('sql' in content) {
-        sql = content.sql
+      if ('unchecked_sql' in content) {
+        sql = content.unchecked_sql
       }
     }
 

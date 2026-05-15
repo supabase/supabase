@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   Form,
   FormControl,
@@ -76,7 +76,7 @@ const defaultValues: z.infer<typeof FormSchema> = {
 }
 
 interface TriggerSheetProps {
-  selectedTrigger?: PostgresTrigger
+  selectedTrigger?: PGTrigger
   isDuplicatingTrigger?: boolean
   open: boolean
   onClose: () => void
@@ -323,7 +323,7 @@ export const TriggerSheet = ({
                                 description={event.description}
                               >
                                 <FormControl>
-                                  <Checkbox_Shadcn_
+                                  <Checkbox
                                     className="translate-y-[2px]"
                                     checked={field.value?.includes(event.value)}
                                     onCheckedChange={(checked) => {
@@ -418,8 +418,8 @@ export const TriggerSheet = ({
                               <button
                                 type="button"
                                 className={cn(
-                                  'relative w-full rounded border border-default',
-                                  'bg-surface-200 px-5 py-1 shadow-sm transition-all',
+                                  'relative w-full rounded-sm border border-default',
+                                  'bg-surface-200 px-5 py-1 shadow-xs transition-all',
                                   'hover:border-strong hover:bg-overlay-hover'
                                 )}
                                 onClick={() => setShowFunctionSelector(true)}
@@ -434,11 +434,11 @@ export const TriggerSheet = ({
                                 className={cn(
                                   'relative w-full flex items-center justify-between',
                                   'space-x-3 px-5 py-4 border border-default',
-                                  'rounded shadow-sm transition-shadow'
+                                  'rounded-sm shadow-xs transition-shadow'
                                 )}
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-foreground text-background focus-within:bg-foreground/10">
                                     <Terminal size="18" strokeWidth={2} width={14} />
                                   </div>
                                   <p>

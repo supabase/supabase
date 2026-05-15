@@ -207,6 +207,28 @@ Contains your application's Site URL. This can be configured in your project's [
 <p>Visit <a href="{{ .SiteURL }}">here</a> to log in.</p>
 ```
 
+### `RedirectTo`
+
+Contains the redirect URL passed as the `redirectTo` option in the auth method call.
+
+**Usage**
+
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}">
+  Confirm your email
+</a>
+```
+
+### `Data`
+
+Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.
+
+**Usage**
+
+```html
+<p>Hello {{ .Data.first_name }}, please confirm your signup.</p>
+```
+
 ### `Email`
 
 Contains the user's email address.

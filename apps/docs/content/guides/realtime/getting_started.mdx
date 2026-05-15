@@ -97,7 +97,7 @@ Get your project URL and key.
 ```ts
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://<project>.supabase.co', '<anon_key or sb_publishable_key>')
+const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_key>')
 ```
 
 </TabPanel>
@@ -110,7 +110,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   await Supabase.initialize(
     url: 'https://<project>.supabase.co',
-    anonKey: '<anon_key or sb_publishable_key>',
+    publishableKey: '<sb_publishable_key>',
   );
   runApp(MyApp());
 }
@@ -128,7 +128,7 @@ import Supabase
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://<project>.supabase.co")!,
-  supabaseKey: "<anon_key or sb_publishable_key>"
+  supabaseKey: "<sb_publishable_key>"
 )
 ```
 
@@ -141,7 +141,7 @@ let supabase = SupabaseClient(
 from supabase import create_client, Client
 
 url: str = "https://<project>.supabase.co"
-key: str = "<anon_key or sb_publishable_key>"
+key: str = "<sb_publishable_key>"
 supabase: Client = create_client(url, key)
 ```
 
@@ -349,8 +349,7 @@ const response = await fetch(`https://<project>.supabase.co/rest/v1/rpc/broadcas
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    Authorization: `Bearer <your-service-role-key>`,
-    apikey: '<your-service-role-key>',
+    -H "apikey: <SECRET_KEY>"
   },
   body: JSON.stringify({
     topic: 'room:lobby:messages',
@@ -378,8 +377,7 @@ final response = await http.post(
   Uri.parse('https://<project>.supabase.co/rest/v1/rpc/broadcast'),
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer <your-service-role-key>',
-    'apikey': '<your-service-role-key>',
+    -H "apikey: <SECRET_KEY>"
   },
   body: jsonEncode({
     'topic': 'room:lobby:messages',
@@ -407,8 +405,7 @@ let url = URL(string: "https://<project>.supabase.co/rest/v1/rpc/broadcast")!
 var request = URLRequest(url: url)
 request.httpMethod = "POST"
 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-request.setValue("Bearer <your-service-role-key>", forHTTPHeaderField: "Authorization")
-request.setValue("<your-service-role-key>", forHTTPHeaderField: "apikey")
+request.setValue("<SECRET_KEY>", forHTTPHeaderField: "apikey")
 
 let payload = [
   "topic": "room:lobby:messages",
@@ -440,8 +437,7 @@ response = requests.post(
     'https://<project>.supabase.co/rest/v1/rpc/broadcast',
     headers={
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer <your-service-role-key>',
-        'apikey': '<your-service-role-key>'
+        'apikey': '<SECRET_KEY>'
     },
     json={
         'topic': 'room:lobby:messages',

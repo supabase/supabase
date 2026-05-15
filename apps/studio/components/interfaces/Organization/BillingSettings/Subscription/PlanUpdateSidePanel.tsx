@@ -16,6 +16,7 @@ import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
+import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
 import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
@@ -42,7 +43,7 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
     return {
       installationId: selectedOrganization?.partner_id,
       path: '/settings',
-      message: 'Change Plan on Vercel Marketplace',
+      message: 'Change plan on Vercel Marketplace',
     }
   }
   if (selectedOrganization.managed_by === MANAGED_BY.AWS_MARKETPLACE) {
@@ -52,6 +53,12 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
   }
 }
 
+const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
+  const currentTier = planId ?? 'free'
+  const action = currentTier === 'team' ? 'downgrade' : 'upgrade'
+  return `stripe projects ${action} supabase/${currentTier}`
+}
+
 export const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const { slug } = useParams()
@@ -59,6 +66,8 @@ export const PlanUpdateSidePanel = () => {
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
   )
+  const isStripeManagedOrganization =
+    selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
   const { mutate: sendEvent } = useSendEventMutation()
 
   const originalPlanRef = useRef<string>()
@@ -126,13 +135,7 @@ export const PlanUpdateSidePanel = () => {
     { enabled: visible }
   )
 
-  const {
-    data: subscriptionPreview,
-    error: subscriptionPreviewError,
-    isPending: subscriptionPreviewIsLoading,
-    isFetching: subscriptionPreviewIsFetching,
-    isSuccess: subscriptionPreviewInitialized,
-  } = useOrganizationBillingSubscriptionPreview({
+  const subscriptionPreviewData = useOrganizationBillingSubscriptionPreview({
     tier: selectedTier,
     organizationSlug: slug,
     address: debouncedAddress,
@@ -172,10 +175,10 @@ export const PlanUpdateSidePanel = () => {
   }, [visible])
 
   useEffect(() => {
-    if (visible && isSuccessSubscription) {
+    if (visible && isSuccessSubscription && subscription.plan.id) {
       originalPlanRef.current = subscription.plan.id
     }
-  }, [visible, isSuccessSubscription])
+  }, [visible, isSuccessSubscription, subscription?.plan.id])
 
   const onConfirmDowngrade = () => {
     setSelectedTier(undefined)
@@ -189,6 +192,17 @@ export const PlanUpdateSidePanel = () => {
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
     : null
+
+  const currentPlanMeta = {
+    ...availablePlans.find((p) => p.id === subscription?.plan?.id),
+    features:
+      subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)?.features ||
+      [],
+  }
+
+  const stripeProjectsUpgradeCommand = getStripeProjectsUpgradeCommand(
+    selectedOrganization?.plan?.id ?? subscription?.plan?.id
+  )
 
   return (
     <>
@@ -208,13 +222,30 @@ export const PlanUpdateSidePanel = () => {
           </div>
         }
       >
-        {selectedOrganization && isPartnerBilledOrganization && (
-          <PartnerManagedResource
-            managedBy={selectedOrganization.managed_by}
-            resource="Organization plans"
-            cta={getPartnerManagedResourceCta(selectedOrganization)}
-          />
-        )}
+        {selectedOrganization &&
+          (isStripeManagedOrganization ? (
+            <PartnerManagedResource
+              managedBy={MANAGED_BY.STRIPE_PROJECTS}
+              resource="Organization plans"
+              title="Organization plans are managed through Stripe."
+              details={
+                <>
+                  Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in
+                  your project directory.
+                </>
+              }
+              cta={{
+                overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
+                message: 'Stripe Projects docs',
+              }}
+            />
+          ) : isPartnerBilledOrganization ? (
+            <PartnerManagedResource
+              managedBy={selectedOrganization.managed_by}
+              resource="Organization plans"
+              cta={getPartnerManagedResourceCta(selectedOrganization)}
+            />
+          ) : null)}
         <SidePanel.Content>
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
@@ -250,11 +281,11 @@ export const PlanUpdateSidePanel = () => {
                     <div className="flex items-center space-x-2">
                       <p className="text-brand-link text-sm uppercase">{plan.name}</p>
                       {isCurrentPlan ? (
-                        <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
+                        <div className="text-xs bg-surface-300 text-foreground-light rounded-sm px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-300 dark:bg-brand-400 text-brand-600 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-300 dark:bg-brand-400 text-brand-600 rounded-sm px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : null}
@@ -276,13 +307,14 @@ export const PlanUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
-                    ) : !canUpdateSubscription ? (
+                    ) : !canUpdateSubscription && !isDowngradeOption ? (
                       <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
                     ) : (
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
+                          (!canUpdateSubscription && isDowngradeOption) ||
                           subscription?.plan?.id === 'enterprise' ||
                           subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
@@ -292,7 +324,7 @@ export const PlanUpdateSidePanel = () => {
                           hasOrioleProjects
                         }
                         onClick={() => {
-                          setSelectedTier(plan.id as any)
+                          setSelectedTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')
                           sendEvent({
                             action: 'studio_pricing_plan_cta_clicked',
                             properties: {
@@ -307,14 +339,17 @@ export const PlanUpdateSidePanel = () => {
                             side: 'bottom',
                             className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
-                              subscription?.plan?.id === 'enterprise' ||
-                              subscription?.plan?.id === 'platform'
-                                ? 'Reach out to us via support to update your plan'
-                                : hasOrioleProjects
-                                  ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
-                                  : selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
-                                    ? 'You cannot change the plan for an organization managed by AWS Marketplace'
-                                    : undefined,
+                              !canUpdateSubscription && isDowngradeOption
+                                ? "You need additional permissions to change your organization's plan"
+                                : subscription?.plan?.id === 'enterprise' ||
+                                    subscription?.plan?.id === 'platform'
+                                  ? 'Reach out to us via support to update your plan'
+                                  : hasOrioleProjects
+                                    ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
+                                    : selectedOrganization?.managed_by ===
+                                        MANAGED_BY.AWS_MARKETPLACE
+                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                      : undefined,
                           },
                         }}
                       >
@@ -374,19 +409,9 @@ export const PlanUpdateSidePanel = () => {
         selectedTier={selectedTier}
         onClose={() => setSelectedTier(undefined)}
         planMeta={planMeta}
-        subscriptionPreviewError={subscriptionPreviewError}
-        subscriptionPreviewIsLoading={subscriptionPreviewIsLoading}
-        subscriptionPreviewIsFetching={subscriptionPreviewIsFetching}
-        subscriptionPreviewInitialized={subscriptionPreviewInitialized}
-        subscriptionPreview={subscriptionPreview}
-        subscription={subscription}
+        subscriptionPreviewQueryResult={subscriptionPreviewData}
         projects={orgProjects}
-        currentPlanMeta={{
-          ...availablePlans.find((p) => p.id === subscription?.plan?.id),
-          features:
-            subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)
-              ?.features || [],
-        }}
+        currentPlanMeta={currentPlanMeta}
         onAddressChange={handleAddressChange}
         onTaxIdChange={handleTaxIdChange}
         useAsDefaultBillingAddress={useAsDefaultBillingAddress}

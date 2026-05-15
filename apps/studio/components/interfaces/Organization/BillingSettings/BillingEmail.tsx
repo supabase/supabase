@@ -133,7 +133,7 @@ const BillingEmail = () => {
                   </div>
                 }
               >
-                <FormSection className="!px-8">
+                <FormSection className="px-8!">
                   <FormSectionContent fullWidth loading={loadingBillingCustomer}>
                     <FormField
                       control={form.control}
@@ -188,7 +188,7 @@ const BillingEmail = () => {
                           {Array.isArray(additionalEmailsError) &&
                             additionalEmailsError.length > 0 && (
                               <div className="flex flex-col gap-y-1 mt-2">
-                                {additionalEmailsError.map((x, idx) => (
+                                {additionalEmailsError.map((_x, idx) => (
                                   <p
                                     key={`email-error-${idx}`}
                                     className="text-sm text-destructive"

@@ -1,8 +1,7 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Badge, Checkbox_Shadcn_, Input, SidePanel } from 'ui'
+import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -22,7 +21,7 @@ import type { ImportContent, TableField } from './TableEditor.types'
 import {
   formatImportedContentToColumnFields,
   generateTableField,
-  generateTableFieldFromPostgresTable,
+  generateTableFieldFromPGTable,
   validateFields,
 } from './TableEditor.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -39,6 +38,7 @@ import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 import { useTrack } from '@/lib/telemetry/track'
 import { type PlainObject } from '@/lib/type-helpers'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -52,7 +52,7 @@ type SaveTablePayloadFor<Action extends SaveTableParams['action']> =
   SaveTableParamsFor<Action>['payload']
 
 export interface TableEditorProps {
-  table?: PostgresTable
+  table?: SafePostgresTable
   isDuplicating: boolean
   templateData?: Partial<TableField>
   visible: boolean
@@ -164,7 +164,17 @@ export const TableEditor = ({
       relation.columns.forEach((column) => {
         const sourceColumn = tableFields.columns.find((col) => col.name === column.source)
         if (sourceColumn?.isNewColumn && column.targetType) {
-          updatedColumns.push({ ...sourceColumn, format: column.targetType })
+          const isArray = column.targetIsArray ?? false
+          const bareFormat =
+            isArray && column.targetType.startsWith('_')
+              ? column.targetType.slice(1)
+              : column.targetType
+          updatedColumns.push({
+            ...sourceColumn,
+            format: bareFormat,
+            formatSchema: column.targetTypeSchema,
+            isArray,
+          })
         }
       })
     })
@@ -280,7 +290,7 @@ export const TableEditor = ({
         }
         setFkRelations([])
       } else {
-        const tableFields = generateTableFieldFromPostgresTable(
+        const tableFields = generateTableFieldFromPGTable(
           table,
           foreignKeyMeta ?? [],
           isDuplicating,
@@ -302,7 +312,7 @@ export const TableEditor = ({
 
   useEffect(() => {
     if (!isNewRecord) {
-      const tableFields = generateTableFieldFromPostgresTable(
+      const tableFields = generateTableFieldFromPGTable(
         table,
         foreignKeyMeta ?? [],
         isDuplicating,
@@ -372,7 +382,7 @@ export const TableEditor = ({
 
       <SidePanel.Content className="space-y-10 py-6">
         <div className="items-top flex space-x-2">
-          <Checkbox_Shadcn_
+          <Checkbox
             id="enable-rls"
             checked={tableFields.isRLSEnabled}
             onCheckedChange={() => {
@@ -400,7 +410,7 @@ export const TableEditor = ({
         {tableFields.isRLSEnabled ? (
           <Admonition
             type="default"
-            className="!mt-3"
+            className="mt-3!"
             title="Policies are required to query data"
             description={
               <>
@@ -420,7 +430,7 @@ export const TableEditor = ({
         ) : (
           <Admonition
             type="warning"
-            className="!mt-3"
+            className="mt-3!"
             title="You are allowing anonymous access to your table"
             description={
               <>
@@ -439,7 +449,7 @@ export const TableEditor = ({
 
         {realtimeEnabled && (
           <div className="items-top flex space-x-2">
-            <Checkbox_Shadcn_
+            <Checkbox
               id="enable-realtime"
               checked={tableFields.isRealtimeEnabled}
               onCheckedChange={() => {
@@ -490,7 +500,7 @@ export const TableEditor = ({
         {isDuplicating && (
           <>
             <div className="items-top flex space-x-2">
-              <Checkbox_Shadcn_
+              <Checkbox
                 id="duplicate-rows"
                 checked={isDuplicateRows}
                 onCheckedChange={() => setIsDuplicateRows(!isDuplicateRows)}

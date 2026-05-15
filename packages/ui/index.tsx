@@ -5,11 +5,8 @@ export * from './src/components/Icon/IconBackground'
 
 // DISPLAYS
 
-export { Card as Card_legacy_ } from './src/components/Card'
 export * from './src/components/Tabs'
-export * from './src/components/Alert'
 export * from './src/components/Accordion'
-export * from './src/components/Collapsible'
 
 // NAV
 
@@ -36,10 +33,7 @@ export * from './src/lib/utils'
 
 // DATA ENTRY
 
-export * from './src/components/Select'
-export * from './src/components/Listbox'
 export * from './src/components/Input'
-export * from './src/components/Toggle'
 export * from './src/components/ExpandingTextArea'
 
 // layout
@@ -136,6 +130,7 @@ export {
   PopoverContent as PopoverContent_Shadcn_,
   PopoverAnchor as PopoverAnchor_Shadcn_,
   PopoverSeparator as PopoverSeparator_Shadcn_,
+  type PopoverContentProps as PopoverContentProps_Shadcn_,
 } from './src/components/shadcn/ui/popover'
 
 export {
@@ -158,11 +153,7 @@ export {
   SelectScrollDownButton as SelectScrollDownButton_Shadcn_,
 } from './src/components/shadcn/ui/select'
 
-export {
-  RadioGroup as RadioGroup_Shadcn_,
-  RadioGroupItem as RadioGroupItem_Shadcn_,
-  RadioGroupLargeItem as RadioGroupLargeItem_Shadcn_,
-} from './src/components/shadcn/ui/radio-group'
+export * from './src/components/shadcn/ui/radio-group'
 
 export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
 
@@ -190,7 +181,7 @@ export * from './src/components/shadcn/ui/input-group'
 
 export * from './src/components/shadcn/ui/switch'
 
-export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
+export * from './src/components/shadcn/ui/checkbox'
 
 export * from './src/components/shadcn/ui/scroll-area'
 

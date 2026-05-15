@@ -9,7 +9,7 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Checkbox_Shadcn_,
+  Checkbox,
   Form,
   FormControl,
   FormField,
@@ -439,7 +439,7 @@ export default function FormPatternsPageLayout() {
                                   {uploadedFiles.map((file, idx) => (
                                     <div
                                       key={`${file.name}-${idx}`}
-                                      className="flex items-center justify-between gap-2 p-2 bg rounded border"
+                                      className="flex items-center justify-between gap-2 p-2 bg rounded-sm border"
                                     >
                                       <span className="text-sm text-foreground-light truncate flex-1">
                                         {file.name}
@@ -499,7 +499,7 @@ export default function FormPatternsPageLayout() {
                         render={({ field }) => (
                           <div className="flex items-center w-full justify-start space-x-2">
                             <FormControl>
-                              <Checkbox_Shadcn_
+                              <Checkbox
                                 id="enable-rls"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -520,7 +520,7 @@ export default function FormPatternsPageLayout() {
                         render={({ field }) => (
                           <div className="flex items-center w-full justify-start space-x-2">
                             <FormControl>
-                              <Checkbox_Shadcn_
+                              <Checkbox
                                 id="enable-notifications"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
@@ -541,7 +541,7 @@ export default function FormPatternsPageLayout() {
                         render={({ field }) => (
                           <div className="flex items-center w-full justify-start space-x-2">
                             <FormControl>
-                              <Checkbox_Shadcn_
+                              <Checkbox
                                 id="enable-analytics"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}

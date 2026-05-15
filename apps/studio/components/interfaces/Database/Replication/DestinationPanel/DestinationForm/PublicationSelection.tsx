@@ -19,7 +19,6 @@ type PublicationSelectionProps = {
 export const PublicationSelection = ({
   form,
   sourceId,
-  visible,
   onSelectNewPublication,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
@@ -55,7 +54,7 @@ export const PublicationSelection = ({
           </FormControl>
           {isSelectedPublicationMissing && (
             <Admonition type="warning" className="mt-2">
-              <p className="!leading-normal">
+              <p className="leading-normal!">
                 The publication <strong className="text-foreground">{publicationName}</strong> was
                 not found, it may have been renamed or deleted, please select another one.
               </p>

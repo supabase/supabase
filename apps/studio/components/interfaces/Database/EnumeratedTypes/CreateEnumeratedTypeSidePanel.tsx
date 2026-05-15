@@ -57,7 +57,7 @@ const CreateEnumeratedTypeSidePanel = ({
   const submitRef = useRef<HTMLButtonElement>(null)
   const { data: project } = useSelectedProjectQuery()
   const { mutate: createEnumeratedType, isPending: isCreating } = useEnumeratedTypeCreateMutation({
-    onSuccess: (res, vars) => {
+    onSuccess: (_res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
       closePanel()
     },
@@ -189,7 +189,7 @@ const CreateEnumeratedTypeSidePanel = ({
                   After creation, values cannot be deleted or sorted
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  <p className="!leading-normal track">
+                  <p className="leading-normal! track">
                     You will need to delete and recreate the enumerated type with the updated values
                     instead.
                   </p>

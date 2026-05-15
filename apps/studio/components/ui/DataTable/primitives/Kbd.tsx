@@ -3,7 +3,7 @@ import { ComponentPropsWithoutRef, forwardRef } from 'react'
 import { cn } from 'ui'
 
 export const kdbClassName = cn(
-  'select-none rounded border px-1.5 py-px font-mono text-[0.7rem] font-normal font-mono shadow-sm disabled:opacity-50',
+  'select-none rounded-sm border px-1.5 py-px font-mono text-[0.7rem] font-normal font-mono shadow-xs disabled:opacity-50',
   'bg-background text-foreground'
 )
 

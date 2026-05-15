@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -249,7 +250,7 @@ describe('Policies.utils - Policy Generation', () => {
         command: 'SELECT',
         table: 'posts',
         schema: 'public',
-        definition: 'true',
+        definition: safeSql`true`,
         action: 'PERMISSIVE',
         roles: ['public'],
       },
@@ -342,7 +343,7 @@ describe('Policies.utils - Policy Generation', () => {
         command: 'SELECT',
         table: 'posts',
         schema: 'public',
-        definition: 'true',
+        definition: safeSql`true`,
         action: 'PERMISSIVE',
         roles: ['public'],
       },

@@ -27,11 +27,11 @@ To access the auth token securely for your Edge Function call, we recommend stor
 
 ### Invoke an Edge Function every minute
 
-Store `project_url` and `anon_key` in Supabase Vault:
+Store `project_url` and `publishable_key` in Supabase Vault:
 
 ```sql
 select vault.create_secret('https://project-ref.supabase.co', 'project_url');
-select vault.create_secret('YOUR_SUPABASE_ANON_KEY', 'anon_key');
+select vault.create_secret('YOUR_SUPABASE_PUBLISHABLE_KEY', 'publishable_key');
 ```
 
 Make a POST request to a Supabase Edge Function every minute:
@@ -47,7 +47,7 @@ select
           url:= (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/function-name',
           headers:=jsonb_build_object(
             'Content-type', 'application/json',
-            'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'anon_key')
+            'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'publishable_key')
           ),
           body:=concat('{"time": "', now(), '"}')::jsonb
       ) as request_id;

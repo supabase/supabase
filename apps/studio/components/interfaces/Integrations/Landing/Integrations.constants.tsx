@@ -1,4 +1,5 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
+import type { Tables } from 'common/marketplace.types'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -46,9 +47,9 @@ type IntegrationStep = {
   description?: string
 }
 
-type InstallUrlType = 'get' | 'post'
-
-type InstallIdentificationMethod = 'secret_key_prefix'
+type Listing = Tables<'listings'>
+type InstallUrlType = NonNullable<Listing['installation_url_type']>
+type InstallIdentificationMethod = NonNullable<Listing['installation_identification_method']>
 
 /**
  * [Joshen] For marketplace, we probably need to revisit this definition
@@ -59,6 +60,7 @@ export type IntegrationDefinition = {
   name: string
   status?: 'alpha' | 'beta'
   categories?: string[]
+  featured?: boolean
   icon: (props?: { className?: string; style?: Record<string, string | number> }) => ReactNode
   description: string | null
   content?: string | null
@@ -107,6 +109,7 @@ export type IntegrationDefinition = {
   installUrlType?: InstallUrlType
   installIdentificationMethod?: InstallIdentificationMethod
   secretKeyPrefix?: string
+  edgeFunctionSecretName?: string
   listingId?: string
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
@@ -584,7 +587,11 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       const startTime = Date.now()
       await installStripeSync({ projectRef, startTime, stripeSecretKey: stripe_api_key as string })
 
-      if (track) track('integration_install_submitted', { integrationName: 'stripe_sync_engine' })
+      if (track)
+        track('integration_install_submitted', {
+          integrationName: 'stripe_sync_engine',
+          method: 'template',
+        })
 
       const queryClient = getQueryClient()
       await queryClient.invalidateQueries({ queryKey: stripeSyncKeys.all })

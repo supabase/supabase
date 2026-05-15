@@ -2,7 +2,6 @@ import assert from 'node:assert'
 import { Eval } from 'braintrust'
 
 import { dataset } from './dataset'
-import { buildAssistantEvalOutput } from './output'
 import {
   completenessScorer,
   concisenessScorer,
@@ -10,6 +9,7 @@ import {
   docsFaithfulnessScorer,
   goalCompletionScorer,
   knowledgeUsageScorer,
+  safetyScorer,
   toolUsageScorer,
   urlValidityScorer,
 } from './scorer'
@@ -43,10 +43,8 @@ Eval('Assistant', {
       tools: await getMockTools(input.mockTables ? { list_tables: input.mockTables } : undefined),
     })
 
-    // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
-    const [finishReason, steps] = await Promise.all([result.finishReason, result.steps])
-
-    return buildAssistantEvalOutput(finishReason, steps)
+    const finishReason = await result.finishReason
+    return { finishReason }
   },
   scores: [
     toolUsageScorer,
@@ -58,6 +56,7 @@ Eval('Assistant', {
     completenessScorer,
     docsFaithfulnessScorer,
     correctnessScorer,
+    safetyScorer,
     urlValidityScorer,
   ],
 })

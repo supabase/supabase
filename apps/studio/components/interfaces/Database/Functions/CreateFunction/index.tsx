@@ -28,7 +28,7 @@ import {
   SheetContent,
   SheetFooter,
   SheetSection,
-  Toggle,
+  Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
@@ -164,7 +164,7 @@ export const CreateFunction = ({
       <SheetContent
         showClose={false}
         size={'default'}
-        className={'p-0 flex flex-row gap-0 !min-w-screen lg:!min-w-[600px]'}
+        className={'p-0 flex flex-row gap-0 min-w-screen! lg:min-w-[600px]!'}
       >
         <div className="flex flex-col grow w-full">
           <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
@@ -172,7 +172,7 @@ export const CreateFunction = ({
           <Form {...form}>
             <form
               id={FORM_ID}
-              className="flex-grow overflow-auto"
+              className="grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <SheetSection className={focusedEditor ? 'hidden' : ''}>
@@ -247,7 +247,7 @@ export const CreateFunction = ({
                 <FormFieldArgs readonly={isEditing} />
               </SheetSection>
               <Separator className={focusedEditor ? 'hidden' : ''} />
-              <SheetSection className={`${focusedEditor ? 'h-full' : ''} !px-0`}>
+              <SheetSection className={`${focusedEditor ? 'h-full' : ''} px-0!`}>
                 <FormField
                   control={form.control}
                   name="definition"
@@ -265,7 +265,7 @@ export const CreateFunction = ({
                       <div
                         className={cn(
                           'border border-default flex',
-                          focusedEditor ? 'flex-grow ' : 'h-72'
+                          focusedEditor ? 'grow ' : 'h-72'
                         )}
                       >
                         <FunctionEditor
@@ -287,13 +287,21 @@ export const CreateFunction = ({
               ) : (
                 <>
                   <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                    <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
-                      <Toggle
-                        onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
-                        label="Show advanced settings"
-                        checked={advancedSettingsShown}
-                        labelOptional="These are settings that might be familiar for Postgres developers"
-                      />
+                    <div className="space-y-8 rounded-sm bg-studio py-4 px-6 border border-overlay">
+                      <FormItem className="flex flex-row items-center justify-between">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Show advanced settings</FormLabel>
+                          <FormDescription>
+                            These are settings that might be familiar for Postgres developers
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={advancedSettingsShown}
+                            onCheckedChange={(checked) => setAdvancedSettingsShown(checked)}
+                          />
+                        </FormControl>
+                      </FormItem>
                     </div>
                   </SheetSection>
                   {advancedSettingsShown && (
