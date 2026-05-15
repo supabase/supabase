@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal, Textarea } from 'ui'
+import { Button, Form, FormControl, FormField, Input, Modal, Textarea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -92,7 +92,7 @@ export const UpdateCustomReportModal = ({
               render={({ field }) => (
                 <FormItemLayout name="name" layout="vertical" label="Name">
                   <FormControl>
-                    <Input_Shadcn_ {...field} id="name" />
+                    <Input {...field} id="name" />
                   </FormControl>
                 </FormItemLayout>
               )}

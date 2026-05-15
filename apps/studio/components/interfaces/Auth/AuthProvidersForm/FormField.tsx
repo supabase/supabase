@@ -8,7 +8,7 @@ import {
   Calendar,
   FormControl,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   Popover_Shadcn_,
@@ -179,7 +179,7 @@ const FormField = ({
                         readOnly={readOnly}
                       />
                     ) : (
-                      <Input_Shadcn_ {...field} id={name} readOnly={readOnly} />
+                      <Input {...field} id={name} readOnly={readOnly} />
                     )}
                   </FormControl>
                 </FormItemLayout>
@@ -263,7 +263,7 @@ const FormField = ({
                         </InputGroupAddon>
                       </InputGroup>
                     ) : (
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         id={name}
                         type="number"

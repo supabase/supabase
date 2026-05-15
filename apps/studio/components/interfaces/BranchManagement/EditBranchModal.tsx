@@ -20,7 +20,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_ as Label,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -224,7 +224,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                 render={({ field }) => (
                   <FormItemLayout label="Preview branch name">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder="e.g. staging, dev-feature-x"
                         autoComplete="off"
@@ -277,7 +277,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                       >
                         <div className="relative">
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
                               placeholder="e.g. main, feat/some-feature"
                               autoComplete="off"

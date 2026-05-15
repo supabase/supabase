@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, cn, IconYCombinator, Input_Shadcn_ } from 'ui'
+import { Badge, Button, cn, IconYCombinator, Input } from 'ui'
 
 import { ChangelogLlmMarkdownButton } from '@/components/Changelog/ChangelogLlmMarkdownButton'
 import { ChangelogTimelineList } from '@/components/Changelog/ChangelogTimelineList'
@@ -262,7 +262,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   <label htmlFor="changelog-filter-search" className="sr-only">
                     Search changelog
                   </label>
-                  <Input_Shadcn_
+                  <Input
                     id="changelog-filter-search"
                     size="small"
                     placeholder="Search changelog..."

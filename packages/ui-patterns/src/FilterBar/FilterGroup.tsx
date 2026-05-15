@@ -1,13 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  cn,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverAnchor_Shadcn_,
-  PopoverContent_Shadcn_,
-} from 'ui'
+import { cn, Input, Popover_Shadcn_, PopoverAnchor_Shadcn_, PopoverContent_Shadcn_ } from 'ui'
 
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
@@ -187,7 +181,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         >
           <PopoverAnchor_Shadcn_ asChild>
             {isRootGroup ? (
-              <Input_Shadcn_
+              <Input
                 ref={freeformInputRef}
                 type="text"
                 value={isActive ? freeformText : localFreeformValue}
@@ -208,7 +202,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
               />
             ) : (
               <div className="relative inline-block py-1">
-                <Input_Shadcn_
+                <Input
                   ref={freeformInputRef}
                   type="text"
                   value={isActive ? freeformText : localFreeformValue}

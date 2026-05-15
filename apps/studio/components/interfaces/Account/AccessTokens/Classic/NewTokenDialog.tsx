@@ -16,7 +16,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -189,7 +189,7 @@ export const NewTokenDialog = ({
                 render={({ field }) => (
                   <FormItemLayout name="tokenName" label="Name">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="tokenName"
                         {...field}
                         placeholder="Provide a name for your token"

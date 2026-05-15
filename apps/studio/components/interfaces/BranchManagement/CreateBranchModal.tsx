@@ -24,7 +24,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_ as Label,
   Switch,
   Tooltip,
@@ -316,7 +316,7 @@ export const CreateBranchModal = () => {
                 render={({ field }) => (
                   <FormItemLayout label="Preview Branch Name">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder="e.g. staging, dev-feature-x"
                         autoComplete="off"
@@ -374,7 +374,7 @@ export const CreateBranchModal = () => {
                       >
                         <div className="relative w-full">
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
                               placeholder="e.g. main, feat/some-feature"
                               autoComplete="off"

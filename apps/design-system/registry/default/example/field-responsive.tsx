@@ -1,4 +1,4 @@
-import { Button, Input_Shadcn_ as Input, Textarea } from 'ui'
+import { Button, Input, Textarea } from 'ui'
 import {
   Field,
   FieldContent,

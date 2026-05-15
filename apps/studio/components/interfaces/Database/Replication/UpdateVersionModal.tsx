@@ -1,12 +1,7 @@
 import { useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
-import {
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  DialogSectionSeparator,
-} from 'ui'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger, DialogSectionSeparator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { getStatusName } from './Pipeline.utils'
@@ -117,12 +112,12 @@ export const UpdateVersionModal = ({
       </div>
       <DialogSectionSeparator />
 
-      <Collapsible_Shadcn_ className="px-5 py-3 group">
-        <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between text-sm text-foreground-light">
+      <Collapsible className="px-5 py-3 group">
+        <CollapsibleTrigger className="w-full flex items-center justify-between text-sm text-foreground-light">
           <p>View version update details</p>
           <ChevronDown size={14} className="group-data-open:-rotate-180 transition" />
-        </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
           <div className="flex flex-col gap-y-2 mt-2 pb-2">
             <div className="text-sm text-foreground prose max-w-full">
               <p className="text-foreground-light mb-1">Current version:</p>{' '}
@@ -137,8 +132,8 @@ export const UpdateVersionModal = ({
               </code>
             </div>
           </div>
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+        </CollapsibleContent>
+      </Collapsible>
     </ConfirmationModal>
   )
 }

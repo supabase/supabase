@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Input_Shadcn_ as Input, SidePanel } from 'ui'
+import { Input, SidePanel } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'

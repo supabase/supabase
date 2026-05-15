@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -15,7 +15,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -489,12 +489,12 @@ export const MfaAuthSettingsForm = () => {
                   />
 
                   {!hasValidMFAProvider && phoneMFAIsEnabled && (
-                    <Alert_Shadcn_ variant="warning" className="mt-3">
+                    <Alert variant="warning" className="mt-3">
                       <WarningIcon />
-                      <AlertTitle_Shadcn_>
+                      <AlertTitle>
                         To use MFA with Phone you should set up a Phone provider or Send SMS Hook.
-                      </AlertTitle_Shadcn_>
-                    </Alert_Shadcn_>
+                      </AlertTitle>
+                    </Alert>
                   )}
                 </CardContent>
 
@@ -542,7 +542,7 @@ export const MfaAuthSettingsForm = () => {
                         description="To format the OTP code use `{{ .Code }}`"
                       >
                         <FormControl>
-                          <Input_Shadcn_
+                          <Input
                             type="text"
                             {...field}
                             disabled={!canUpdateConfig || !hasAccessToMFA}

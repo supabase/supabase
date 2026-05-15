@@ -1,14 +1,6 @@
 import dayjs from 'dayjs'
 import type { ReactNode } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Card,
-  CardContent,
-  CardHeader,
-  CheckIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Card, CardContent, CardHeader, CheckIcon } from 'ui'
 
 import { AuthorizeRequesterDetails } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
@@ -27,10 +19,10 @@ export function ApiAuthorizationApprovedScreen({
     <Card>
       <CardHeader>Authorize API access for {requester.name}</CardHeader>
       <CardContent className="p-0">
-        <Alert_Shadcn_ className="border-0 rounded-t-none">
+        <Alert className="border-0 rounded-t-none">
           <CheckIcon />
-          <AlertTitle_Shadcn_>This authorization request has been approved</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>This authorization request has been approved</AlertTitle>
+          <AlertDescription>
             <p>
               {requester.name} has been approved access to the organization "
               {organization?.name ?? 'Unknown'}" and all of its projects for the following scopes:
@@ -45,8 +37,8 @@ export function ApiAuthorizationApprovedScreen({
             <p className="mt-2">
               Approved on: {dayjs(requester.approved_at).format('DD MMM YYYY HH:mm:ss (ZZ)')}
             </p>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       </CardContent>
     </Card>
   )

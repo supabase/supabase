@@ -17,7 +17,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
 } from 'ui'
 
@@ -75,11 +75,11 @@ function ProfileForm({ className }: React.ComponentProps<'form'>) {
     <form className={cn('grid items-start gap-4', className)}>
       <div className="grid gap-2">
         <Label_Shadcn_ htmlFor="email">Email</Label_Shadcn_>
-        <Input_Shadcn_ type="email" id="email" defaultValue="shadcn@example.com" />
+        <Input type="email" id="email" defaultValue="shadcn@example.com" />
       </div>
       <div className="grid gap-2">
         <Label_Shadcn_ htmlFor="username">Username</Label_Shadcn_>
-        <Input_Shadcn_ id="username" defaultValue="@shadcn" />
+        <Input id="username" defaultValue="@shadcn" />
       </div>
       <Button htmlType="submit">Save changes</Button>
     </form>

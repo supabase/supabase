@@ -24,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input_Shadcn_ as Input,
+  Input,
   Table,
   TableBody,
   TableCell,

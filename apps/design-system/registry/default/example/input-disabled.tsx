@@ -1,5 +1,5 @@
-import { Input_Shadcn_ } from 'ui'
+import { Input } from 'ui'
 
 export default function InputDisabled() {
-  return <Input_Shadcn_ disabled type="email" placeholder="Email" />
+  return <Input disabled type="email" placeholder="Email" />
 }

@@ -4,9 +4,9 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   FormControl,
   FormField,
   FormItem,
@@ -33,16 +33,16 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
 
   return (
     <Panel.Content>
-      <Collapsible_Shadcn_>
-        <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
+      <Collapsible>
+        <CollapsibleTrigger className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
           Advanced Configuration
           <ChevronRight
             size={16}
             strokeWidth={1}
             className="mr-2 group-data-open/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
           />
-        </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_
+        </CollapsibleTrigger>
+        <CollapsibleContent
           className={cn(
             'pt-2 data-closed:animate-collapsible-up data-open:animate-collapsible-down'
           )}
@@ -129,8 +129,8 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
               </>
             )}
           />
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+        </CollapsibleContent>
+      </Collapsible>
     </Panel.Content>
   )
 }

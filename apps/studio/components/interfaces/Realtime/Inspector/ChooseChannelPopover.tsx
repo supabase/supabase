@@ -11,7 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  Input_Shadcn_,
+  Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -111,7 +111,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                           <label className="text-foreground text-xs">Name of channel</label>
                           <div className="flex flex-row">
                             <FormControl>
-                              <Input_Shadcn_
+                              <Input
                                 {...field}
                                 autoComplete="off"
                                 className="rounded-r-none text-xs px-2.5 py-1 h-auto"

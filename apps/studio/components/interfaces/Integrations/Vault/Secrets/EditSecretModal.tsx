@@ -16,7 +16,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -145,7 +145,7 @@ export const EditSecretModal = () => {
                     render={({ field }) => (
                       <FormItemLayout name="name" label="Name">
                         <FormControl>
-                          <Input_Shadcn_ id="name" {...field} />
+                          <Input id="name" {...field} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -161,7 +161,7 @@ export const EditSecretModal = () => {
                         labelOptional="Optional"
                       >
                         <FormControl>
-                          <Input_Shadcn_ id="description" {...field} data-lpignore="true" />
+                          <Input id="description" {...field} data-lpignore="true" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -174,7 +174,7 @@ export const EditSecretModal = () => {
                       <FormItemLayout name="secret" label="Secret value">
                         <FormControl>
                           <div className="relative">
-                            <Input_Shadcn_
+                            <Input
                               id="secret"
                               type={showSecretValue ? 'text' : 'password'}
                               {...field}
