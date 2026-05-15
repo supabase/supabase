@@ -1,18 +1,16 @@
+import { useCallback, useEffect, useRef, type ReactNode } from 'react'
 import {
-  Button,
-  cn,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 
-import { PotentialIssues } from './SQLEditor.types'
-import { DOCS_URL } from '@/lib/constants'
+import { type PotentialIssues } from './SQLEditor.types'
 
 interface RunQueryWarningModalProps {
   visible: boolean
@@ -21,6 +19,17 @@ interface RunQueryWarningModalProps {
   onConfirm: () => void
   onConfirmWithRLS?: () => void
 }
+
+type WarningMessage = {
+  id: string
+  summary: ReactNode
+  description: ReactNode
+}
+
+type MissingRLSTable = NonNullable<PotentialIssues['createTablesMissingRLS']>[number]
+
+const getMissingRLSTableName = (table: MissingRLSTable) =>
+  table.schema ? `${table.schema}.${table.tableName}` : table.tableName
 
 export const RunQueryWarningModal = ({
   visible,
@@ -38,124 +47,142 @@ export const RunQueryWarningModal = ({
 
   const missingRLSTables = createTablesMissingRLS ?? []
   const hasMissingRLS = missingRLSTables.length > 0
-  const issueCount =
-    (hasDestructiveOperations ? 1 : 0) +
-    (hasUpdateWithoutWhere ? 1 : 0) +
-    (hasAlterDatabasePreventConnection ? 1 : 0) +
-    (hasMissingRLS ? 1 : 0)
+  const isConfirmingRef = useRef(false)
+
+  useEffect(() => {
+    if (visible) {
+      isConfirmingRef.current = false
+    }
+  }, [visible])
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open) return
+
+      if (isConfirmingRef.current) {
+        isConfirmingRef.current = false
+        return
+      }
+
+      onCancel()
+    },
+    [onCancel]
+  )
+
+  const handleConfirm = useCallback(() => {
+    isConfirmingRef.current = true
+    onConfirm()
+  }, [onConfirm])
+
+  const handleConfirmWithRLS = useCallback(() => {
+    if (!onConfirmWithRLS) return
+
+    isConfirmingRef.current = true
+    onConfirmWithRLS()
+  }, [onConfirmWithRLS])
+
+  const warnings: WarningMessage[] = []
+
+  if (hasDestructiveOperations) {
+    warnings.push({
+      id: 'destructive-operations',
+      summary: 'This query includes destructive operations',
+      description: 'It may permanently change or remove data, tables, schemas, or other objects.',
+    })
+  }
+
+  if (hasUpdateWithoutWhere) {
+    warnings.push({
+      id: 'update-without-where',
+      summary: (
+        <>
+          This query runs an <code className="text-code-inline">UPDATE</code> without a{' '}
+          <code className="text-code-inline">WHERE</code> clause
+        </>
+      ),
+      description: 'It may update every row in the target table.',
+    })
+  }
+
+  if (hasAlterDatabasePreventConnection) {
+    warnings.push({
+      id: 'prevent-database-connections',
+      summary: 'This query may prevent new database connections',
+      description:
+        'The dashboard may lose access until the setting is restored from a direct database connection.',
+    })
+  }
+
+  if (hasMissingRLS) {
+    const tableName =
+      missingRLSTables.length === 1 ? getMissingRLSTableName(missingRLSTables[0]) : undefined
+
+    warnings.push({
+      id: 'missing-rls',
+      summary:
+        missingRLSTables.length === 1
+          ? 'This query creates a table without enabling Row Level Security'
+          : 'This query creates tables without enabling Row Level Security',
+      description: (
+        <>
+          Clients using anon or authenticated keys may be able to access{' '}
+          {tableName ? <code className="text-code-inline">{tableName}</code> : 'these tables'}.
+        </>
+      ),
+    })
+  }
+
+  const canEnableRLS = hasMissingRLS && onConfirmWithRLS !== undefined
+  const confirmationCopy = canEnableRLS
+    ? warnings.length > 1
+      ? 'Review each issue, then choose whether to enable Row Level Security before running this query.'
+      : 'Choose whether to enable Row Level Security before running this query.'
+    : 'Run this query only if you intend these changes and understand the risks.'
+  const title = warnings.length > 1 ? 'Potential issues detected' : 'Potential issue detected'
 
   return (
-    <Dialog
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) onCancel()
-      }}
-    >
-      <DialogContent aria-describedby={undefined} className="p-0 gap-0 pb-5 block!" size="large">
-        <DialogHeader className={cn('border-b')} padding="small">
-          <DialogTitle>
-            {`Potential issue${issueCount > 1 ? 's' : ''} detected with your query`}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            Review the warnings below before running this query.
-          </DialogDescription>
-        </DialogHeader>
-
-        <Admonition
-          type="warning"
-          label={
-            issueCount > 1
-              ? 'The following potential issues have been detected:'
-              : 'The following potential issue has been detected:'
-          }
-          description="Ensure that these are intentional before executing this query"
-          className="border-x-0 rounded-none -mt-px"
-        />
-
-        <DialogSection padding="small">
-          <div className="text-sm">
-            <ul className="border rounded-md grid bg-surface-200 divide-y">
-              {hasDestructiveOperations && (
-                <li className="grid pt-3 pb-2 px-4">
-                  <span className="font-bold">Query has destructive operations</span>
-                  <span className="text-foreground-light">
-                    Make sure you are not accidentally removing something important.
-                  </span>
-                </li>
-              )}
-              {hasUpdateWithoutWhere && (
-                <li className="grid pt-2 pb-3 px-4 gap-1">
-                  <span className="font-bold">Query uses update without a where clause</span>
-                  <span className="text-foreground-light">
-                    Without a <code className="text-code-inline">where</code> clause, this could
-                    update all rows in the table.
-                  </span>
-                </li>
-              )}
-              {hasAlterDatabasePreventConnection && (
-                <li className="grid pt-2 pb-3 px-4 gap-1">
-                  <span className="font-bold">Query will prevent connections to your database</span>
-                  <span className="text-foreground-light">
-                    The dashboard will no longer have access to your database, and you will need a
-                    direct connection to your database to reconfigure this setting
-                  </span>
-                </li>
-              )}
-              {hasMissingRLS && (
-                <li className="grid pt-2 pb-3 px-4 gap-1">
-                  <span className="font-bold">
-                    {missingRLSTables.length === 1
-                      ? 'New table will not have Row Level Security enabled'
-                      : 'New tables will not have Row Level Security enabled'}
-                  </span>
-                  <span className="text-foreground-light">
-                    Without RLS, any client using your project's anon or authenticated keys can read
-                    and write to{' '}
-                    {missingRLSTables.length === 1 ? (
-                      <code className="text-code-inline">
-                        {missingRLSTables[0].schema
-                          ? `${missingRLSTables[0].schema}.${missingRLSTables[0].tableName}`
-                          : missingRLSTables[0].tableName}
-                      </code>
-                    ) : (
-                      'these tables'
-                    )}
-                    . Enable RLS and add policies before exposing this table via the API.{' '}
-                    <a
-                      href={`${DOCS_URL}/guides/database/postgres/row-level-security`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="underline"
-                    >
-                      Learn more
-                    </a>
-                    .
-                  </span>
-                </li>
-              )}
-            </ul>
-          </div>
-          <p className="mt-4 text-sm text-foreground-light">
-            Please confirm that you would like to execute this query.
-          </p>
-        </DialogSection>
-
-        <DialogSectionSeparator />
-
-        <div className="flex flex-wrap gap-2 px-5 pt-5">
-          <Button size="medium" type="default" onClick={() => onCancel()}>
-            Cancel
-          </Button>
-          <Button size="medium" type="warning" onClick={onConfirm} className="ml-auto">
-            {hasMissingRLS ? 'Run without RLS' : 'Run this query'}
-          </Button>
-          {hasMissingRLS && onConfirmWithRLS && (
-            <Button size="medium" type="primary" onClick={onConfirmWithRLS}>
-              Run and enable RLS
-            </Button>
+    <AlertDialog open={visible} onOpenChange={handleOpenChange}>
+      <AlertDialogContent size="small">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription asChild>
+            {warnings.length === 0 ? (
+              <div>
+                <p>Are you sure you want to run this query?</p>
+              </div>
+            ) : warnings.length === 1 ? (
+              <div>
+                <p>
+                  {warnings[0].summary}. {warnings[0].description}
+                </p>
+                <p className="mt-3">{confirmationCopy}</p>
+              </div>
+            ) : (
+              <div>
+                <p>This query has multiple potential issues:</p>
+                <ul>
+                  {warnings.map((warning) => (
+                    <li key={warning.id} className="mt-3">
+                      <span className="font-medium text-foreground">{warning.summary}.</span>{' '}
+                      <span>{warning.description}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3">{confirmationCopy}</p>
+              </div>
+            )}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction variant="warning" onClick={handleConfirm}>
+            {canEnableRLS ? 'Run without RLS' : 'Run query'}
+          </AlertDialogAction>
+          {canEnableRLS && (
+            <AlertDialogAction onClick={handleConfirmWithRLS}>Run and enable RLS</AlertDialogAction>
           )}
-        </div>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

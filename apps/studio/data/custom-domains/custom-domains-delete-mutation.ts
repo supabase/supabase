@@ -8,12 +8,17 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CustomDomainDeleteVariables = {
   projectRef: string
+  removeAddon?: boolean
 }
 
-export async function deleteCustomDomain({ projectRef }: CustomDomainDeleteVariables) {
+export async function deleteCustomDomain({
+  projectRef,
+  removeAddon = false,
+}: CustomDomainDeleteVariables) {
   const { data, error } = await del(`/v1/projects/{ref}/custom-hostname`, {
     params: {
       path: { ref: projectRef },
+      query: { remove_addon: removeAddon },
     },
   })
 
@@ -36,7 +41,7 @@ export const useCustomDomainDeleteMutation = ({
   return useMutation<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>({
     mutationFn: (vars) => deleteCustomDomain(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
+      const { projectRef, removeAddon } = variables
 
       // we manually setQueriesData here instead of using
       // the standard invalidateQueries is the custom domains
@@ -48,8 +53,10 @@ export const useCustomDomainDeleteMutation = ({
         }
       })
 
-      // Invalidate addons cache since the backend removes the addon when deleting the domain
-      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
+      if (removeAddon) {
+        // Invalidate addons cache since if removing addon too when deleting the domain
+        await queryClient.invalidateQueries({ queryKey: subscriptionKeys.addons(projectRef) })
+      }
 
       await onSuccess?.(data, variables, context)
     },

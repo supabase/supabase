@@ -64,9 +64,7 @@ export * from './src/components/shadcn/ui/skeleton'
 export * from './src/components/shadcn/ui/slider'
 export * from './src/components/shadcn/ui/textarea'
 export * from './src/components/shadcn/ui/toggle-group'
-
-export { Toggle as Toggle_Shadcn_ } from './src/components/shadcn/ui/toggle'
-
+export * from './src/components/shadcn/ui/toggle'
 export * from './src/components/shadcn/ui/card'
 
 export {
@@ -106,8 +104,6 @@ export {
   AlertTitle as AlertTitle_Shadcn_,
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
-
-export * from './src/components/AlertCollapsible'
 
 export {
   Field as Field_Shadcn_,

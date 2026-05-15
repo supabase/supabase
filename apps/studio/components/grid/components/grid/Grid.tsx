@@ -1,6 +1,6 @@
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
-import type { PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, {
   CalculatedColumn,
@@ -137,7 +137,7 @@ export const Grid = memo(
           tableEditorSnap.onEditForeignKeyColumnValue({
             foreignKey,
             row,
-            column: column as unknown as PostgresColumn,
+            column: column as unknown as PGColumn,
           })
         }
       }

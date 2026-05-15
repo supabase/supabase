@@ -6,6 +6,16 @@ const DEFAULT_EXPOSED_SCHEMA = 'public'
 export const getTableKey = ({ schema, name }: { schema: string; name: string }) =>
   `${schema}.${name}`
 
+export const getTablePoliciesHref = (
+  projectRef: string | undefined,
+  schema: string | undefined,
+  name: string | undefined
+): string => {
+  return `/project/${projectRef ?? ''}/auth/policies?schema=${encodeURIComponent(
+    schema ?? ''
+  )}&search=${encodeURIComponent(name ?? '')}`
+}
+
 export const getExposedSchemas = (dbSchema: string | null | undefined) => {
   const schemas = dbSchema ? parseDbSchemaString(dbSchema) : []
   return schemas.length > 0 ? schemas : [DEFAULT_EXPOSED_SCHEMA]

@@ -3123,6 +3123,7 @@ export interface components {
             cidr: string
           }[]
         }
+        branches_only?: boolean
         expires_at?: number
         role: string
       }[]
@@ -3139,6 +3140,7 @@ export interface components {
             cidr: string
           }[]
         }
+        branches_only?: boolean
         expires_at?: number
         role: string
       }
@@ -3156,6 +3158,7 @@ export interface components {
               cidr: string
             }[]
           }
+          branches_only?: boolean
           expires_at?: number
           role: string
         }[]
@@ -4434,7 +4437,8 @@ export interface components {
      *                 "cidr": "203.0.113.0/24"
      *               }
      *             ]
-     *           }
+     *           },
+     *           "branches_only": false
      *         }
      *       ]
      *     } */
@@ -4448,6 +4452,7 @@ export interface components {
             cidr: string
           }[]
         }
+        branches_only?: boolean
         expires_at?: number
         role: string
       }[]
@@ -9376,7 +9381,10 @@ export interface operations {
   }
   'v1-Delete hostname config': {
     parameters: {
-      query?: never
+      query?: {
+        /** @description If true, also removes the custom domain add-on from the project subscription. */
+        remove_addon?: boolean
+      }
       header?: never
       path: {
         /** @description Project ref */
