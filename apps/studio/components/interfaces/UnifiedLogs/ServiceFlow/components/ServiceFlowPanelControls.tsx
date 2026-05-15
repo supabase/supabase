@@ -25,14 +25,12 @@ export const ServiceFlowPanelControls = ({
   dock = 'bottom',
   setDock,
 }: ServiceFlowPanelControlsProps) => {
-  const { table, rowSelection, isLoading } = useDataTable()
-
-  const selectedRowKey = Object.keys(rowSelection)?.[0]
+  const { table, openRowId, setOpenRowId, isLoading } = useDataTable()
 
   const selectedRowData = useMemo(() => {
-    if (isLoading && !selectedRowKey) return
-    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
-  }, [selectedRowKey, isLoading, table])
+    if (isLoading && !openRowId) return
+    return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
+  }, [openRowId, isLoading, table])
 
   const index = table.getCoreRowModel().flatRows.findIndex((row) => row.id === selectedRowData?.id)
 
@@ -49,20 +47,20 @@ export const ServiceFlowPanelControls = ({
   )
 
   const onPrev = useCallback(() => {
-    if (prevId) table.setRowSelection({ [prevId]: true })
-  }, [prevId, table])
+    if (prevId) setOpenRowId(prevId)
+  }, [prevId, setOpenRowId])
 
   const onNext = useCallback(() => {
-    if (nextId) table.setRowSelection({ [nextId]: true })
-  }, [nextId, table])
+    if (nextId) setOpenRowId(nextId)
+  }, [nextId, setOpenRowId])
 
   const onClose = useCallback(() => {
-    table.resetRowSelection()
-  }, [table])
+    setOpenRowId(undefined)
+  }, [setOpenRowId])
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (!selectedRowKey) return
+      if (!openRowId) return
 
       const activeElement = document.activeElement
       if (activeElement?.closest('[role="menu"]')) return
@@ -87,7 +85,7 @@ export const ServiceFlowPanelControls = ({
 
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
-  }, [selectedRowKey, onNext, onPrev])
+  }, [openRowId, onNext, onPrev])
 
   return (
     <div className="flex h-7 items-center gap-1">

@@ -44,7 +44,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   setColumnVisibility,
   searchParamsParser,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
-  const { table, isLoading, isFetching } = useDataTable()
+  const { table, isLoading, isFetching, openRowId, setOpenRowId } = useDataTable()
   const tableRef = useRef<HTMLTableElement>(null)
 
   const headerGroups = table.getHeaderGroups()
@@ -126,7 +126,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
               row={row}
               table={table}
               searchParamsParser={searchParamsParser}
-              selected={row.getIsSelected()}
+              selected={row.id === openRowId}
+              onSelect={() => setOpenRowId(row.id === openRowId ? undefined : row.id)}
             />
           ))
         ) : isLoading ? (
@@ -210,11 +211,13 @@ function DataTableRow<TData>({
   table,
   selected,
   searchParamsParser,
+  onSelect,
 }: {
   row: Row<TData>
   table: TTable<TData>
   selected?: boolean
   searchParamsParser: any
+  onSelect: () => void
 }) {
   useQueryState('live', searchParamsParser.live)
   const rowClassName = (table.options.meta as any)?.getRowClassName?.(row)
@@ -225,11 +228,11 @@ function DataTableRow<TData>({
       id={row.id}
       tabIndex={0}
       data-state={selected && 'selected'}
-      onClick={() => row.toggleSelected()}
+      onClick={onSelect}
       onKeyDown={(event) => {
         if (event.key === 'Enter') {
           event.preventDefault()
-          row.toggleSelected()
+          onSelect()
         }
       }}
       className={cn(rowClassName)}

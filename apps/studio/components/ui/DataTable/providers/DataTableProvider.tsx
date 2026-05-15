@@ -24,6 +24,8 @@ interface DataTableStateContextType {
   pagination: PaginationState
   enableColumnOrdering: boolean
   searchParameters: QuerySearchParamsType
+  openRowId: string | undefined
+  setOpenRowId: (id: string | undefined) => void
 }
 
 interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
@@ -60,6 +62,8 @@ export function DataTableProvider<TData, TValue>({
       pagination: props.pagination ?? { pageIndex: 0, pageSize: 10 },
       enableColumnOrdering: props.enableColumnOrdering ?? false,
       searchParameters: props.searchParameters ?? ({} as any),
+      openRowId: props.openRowId,
+      setOpenRowId: props.setOpenRowId ?? (() => {}),
     }),
     [props]
   )
