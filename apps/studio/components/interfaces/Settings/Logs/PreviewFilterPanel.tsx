@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type RefObject } from 'react'
 import {
   Button,
   cn,
@@ -26,8 +26,11 @@ import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string
@@ -52,6 +55,7 @@ interface PreviewFilterPanelProps {
   className?: string
   selectedDatePickerValue: DatePickerValue
   setSelectedDatePickerValue: (value: DatePickerValue) => void
+  searchInputRef?: RefObject<HTMLInputElement>
 }
 
 /**
@@ -76,10 +80,16 @@ const PreviewFilterPanel = ({
   className,
   selectedDatePickerValue,
   setSelectedDatePickerValue,
+  searchInputRef,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const [search, setSearch] = useState('')
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_DATE_PICKER, () =>
+    setIsDatePickerOpen((prev) => !prev)
+  )
 
   const logName = router.pathname.split('/').pop()
 
@@ -118,16 +128,23 @@ const PreviewFilterPanel = ({
           }}
         >
           <InputGroup className="w-60">
-            <InputGroupInput
-              size="tiny"
-              placeholder="Search events"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-                setSearch(e.target.value)
-                handleInputSearch(e.target.value)
-              }}
-            />
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH}
+              label="Search logs"
+              side="bottom"
+            >
+              <InputGroupInput
+                ref={searchInputRef}
+                size="tiny"
+                placeholder="Search events"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                  setSearch(e.target.value)
+                  handleInputSearch(e.target.value)
+                }}
+              />
+            </ShortcutTooltip>
             <InputGroupAddon>
               <Search />
             </InputGroupAddon>
@@ -165,34 +182,29 @@ const PreviewFilterPanel = ({
           </InputGroup>
         </form>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              title="refresh"
-              type="default"
-              className="px-1.5"
-              icon={
-                <div className="relative">
-                  {newCount > 0 && (
-                    <div className="absolute -top-3 -right-3 flex items-center justify-center">
-                      <div className="absolute h-4 w-4 animate-ping rounded-full bg-brand opacity-60"></div>
-                      <div className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-medium leading-none text-white">
-                        {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                      </div>
+        <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_REFRESH} side="bottom">
+          <Button
+            title="refresh"
+            type="default"
+            className="px-1.5"
+            icon={
+              <div className="relative">
+                {newCount > 0 && (
+                  <div className="absolute -top-3 -right-3 flex items-center justify-center">
+                    <div className="absolute h-4 w-4 animate-ping rounded-full bg-brand opacity-60"></div>
+                    <div className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-medium leading-none text-white">
+                      {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                     </div>
-                  )}
-                  <RefreshCw />
-                </div>
-              }
-              loading={isLoading}
-              disabled={isLoading}
-              onClick={onRefresh}
-            />
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="text-xs">
-            Refresh logs
-          </TooltipContent>
-        </Tooltip>
+                  </div>
+                )}
+                <RefreshCw />
+              </div>
+            }
+            loading={isLoading}
+            disabled={isLoading}
+            onClick={onRefresh}
+          />
+        </ShortcutTooltip>
 
         <LogsDatePicker
           helpers={PREVIEWER_DATEPICKER_HELPERS}
@@ -201,6 +213,8 @@ const PreviewFilterPanel = ({
             setSelectedDatePickerValue(vals)
           }}
           value={selectedDatePickerValue}
+          open={isDatePickerOpen}
+          onOpenChange={setIsDatePickerOpen}
         />
 
         {FILTER_OPTIONS[table] !== undefined && (
@@ -236,13 +250,15 @@ const PreviewFilterPanel = ({
           </div>
         )}
         <div className="flex items-center space-x-2">
-          <Button
-            type="default"
-            onClick={() => onToggleEventChart()}
-            icon={isShowingEventChart ? <Eye /> : <EyeOff />}
-          >
-            Chart
-          </Button>
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_CHART} side="bottom">
+            <Button
+              type="default"
+              onClick={() => onToggleEventChart()}
+              icon={isShowingEventChart ? <Eye /> : <EyeOff />}
+            >
+              Chart
+            </Button>
+          </ShortcutTooltip>
         </div>
         {Boolean(csvData) && (
           <DownloadResultsButton

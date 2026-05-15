@@ -96,6 +96,8 @@ interface LogsDatePickerProps {
   popoverContentProps?: typeof PopoverContent_Shadcn_
   hideWarnings?: boolean
   align?: 'start' | 'end' | 'center'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export const LogsDatePicker = ({
@@ -106,8 +108,16 @@ export const LogsDatePicker = ({
   popoverContentProps,
   hideWarnings,
   align = 'end',
+  open: openProp,
+  onOpenChange,
 }: PropsWithChildren<LogsDatePickerProps>) => {
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = openProp !== undefined
+  const open = isControlled ? openProp : internalOpen
+  const setOpen = (next: boolean) => {
+    if (!isControlled) setInternalOpen(next)
+    onOpenChange?.(next)
+  }
   const [customValue, setCustomValue] = useState('')
 
   const displayedHelpers = useMemo(() => {

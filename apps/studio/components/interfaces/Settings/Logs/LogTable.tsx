@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { IS_PLATFORM, useParams } from 'common'
-import { isEqual } from 'lodash'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
@@ -37,6 +36,8 @@ import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { ResponseError } from '@/types'
 
 interface Props {
@@ -313,28 +314,86 @@ export const LogTable = ({
         : String(value)
   }
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+  // Arrow-key navigation. Unlike mouse-click (`onRowClick`), keyboard nav must
+  // preserve any existing multi-select checkmarks — clearing `selectedRows`
+  // here would wipe the user's checked rows the moment they press an arrow.
+  const navigate = (direction: 'down' | 'up') => {
+    if (logDataRows.length === 0) return
+    const focusRow = (row: LogData) => {
+      setSelectedRow(row)
+      onSelectedLogChange?.(row)
+    }
+    if (!selectedRow) {
+      focusRow(logDataRows[0])
+      return
+    }
+    const selectedKey = getRowKey(selectedRow)
+    const currentIdx = logDataRows.findIndex((row) => getRowKey(row) === selectedKey)
+    if (currentIdx === -1) {
+      focusRow(logDataRows[0])
+      return
+    }
+    if (direction === 'down' && currentIdx < logDataRows.length - 1) {
+      focusRow(logDataRows[currentIdx + 1])
+    } else if (direction === 'up' && currentIdx > 0) {
+      focusRow(logDataRows[currentIdx - 1])
+    }
+  }
+
+  useShortcut(SHORTCUT_IDS.LOGS_PREVIEW_START_NAV_DOWN, () => navigate('down'), {
+    enabled: logDataRows.length > 0,
+  })
+
+  useShortcut(SHORTCUT_IDS.LOGS_PREVIEW_START_NAV_UP, () => navigate('up'), {
+    enabled: logDataRows.length > 0,
+  })
+
+  useShortcut(
+    SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_ALL_SELECTION,
+    () => {
+      if (selectedRows.size === logDataRows.length) {
         setSelectedRows(new Set())
-        return
-      }
-
-      // Arrow navigation only in single-select mode
-      if (!logDataRows.length || !selectedRow || selectedRows.size > 0) return
-
-      const currentIndex = logDataRows.findIndex((row) => isEqual(row, selectedRow))
-      if (currentIndex === -1) return
-
-      if (event.key === 'ArrowUp' && currentIndex > 0) {
-        const prevRow = logDataRows[currentIndex - 1]
-        onRowClick(prevRow)
-      } else if (event.key === 'ArrowDown' && currentIndex < logDataRows.length - 1) {
-        const nextRow = logDataRows[currentIndex + 1]
-        onRowClick(nextRow)
+      } else {
+        setSelectedRows(new Set(logDataRows.map((row) => getRowKey(row))))
+        setSelectedRow(null)
+        onSelectedLogChange?.(null)
       }
     },
-    [logDataRows, selectedRow, selectedRows, onRowClick]
+    { enabled: logDataRows.length > 0 }
+  )
+
+  useShortcut(
+    SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_ROW_SELECTION,
+    () => {
+      if (!selectedRow) return
+      const key = getRowKey(selectedRow)
+      const next = new Set(selectedRows)
+      if (next.has(key)) {
+        next.delete(key)
+      } else {
+        next.add(key)
+      }
+      setSelectedRows(next)
+    },
+    { enabled: selectedRow !== null }
+  )
+
+  useShortcut(
+    SHORTCUT_IDS.LOGS_PREVIEW_CLOSE_PANEL,
+    () => {
+      onSelectedLogChange?.(null)
+      setSelectedRow(null)
+    },
+    { enabled: selectionOpen }
+  )
+
+  useShortcut(
+    SHORTCUT_IDS.LOGS_PREVIEW_EXIT_SELECTION,
+    () => {
+      setSelectedRows(new Set())
+      ;(document.activeElement as HTMLElement | null)?.blur()
+    },
+    { enabled: !selectionOpen && selectedRows.size > 0 }
   )
 
   useEffect(() => {
@@ -342,13 +401,6 @@ export const LogTable = ({
       setSelectedRow(null)
     }
   }, [selectedLog, isSelectedLogLoading])
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [handleKeyDown])
 
   useEffect(() => {
     if (!isLoading && !selectedRow) {
@@ -536,7 +588,7 @@ export const LogTable = ({
               rowClass={(row: LogData) => {
                 const key = getRowKey(row)
                 const isMultiSelected = selectedRows.has(key)
-                const isSingleSelected = isEqual(row, selectedRow)
+                const isSingleSelected = selectedRow !== null && getRowKey(selectedRow) === key
                 return cn(
                   'font-mono tracking-tight bg-studio! hover:bg-surface-100! cursor-pointer',
                   {
