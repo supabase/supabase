@@ -1,23 +1,41 @@
+import { useParams } from 'common'
 import { AnalyticsBucket as AnalyticsBucketIcon, VectorBucket as VectorBucketIcon } from 'icons'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BUCKET_TYPES } from './Storage.constants'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) => {
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { data: project } = useSelectedProjectQuery()
+  const { ref: projectRef } = useParams()
+  const { isLoading: isLoadingStorageConfig } = useProjectStorageConfigQuery({ projectRef })
+  const { data: organization, isLoading: isLoadingOrganization } = useSelectedOrganizationQuery()
+  const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
 
-  const isFreePlan = organization?.plan?.id === 'free'
-  const isNanoCompute = project?.infra_compute_size === 'nano'
-  // On a paid plan with the smallest compute, the feature is gated by compute
-  // size rather than plan tier, so we surface the compute upgrade path instead.
-  const requiresComputeUpgrade = !!organization && !isFreePlan && isNanoCompute
+  const isLoading =
+    isLoadingStorageConfig || isLoadingOrganization || isLoadingProject || !organization || !project
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent className="flex flex-col gap-y-8">
+            <GenericSkeletonLoader />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    )
+  }
+
+  const isFreePlan = organization.plan?.id === 'free'
+  const isNanoCompute = project.infra_compute_size === 'nano'
+  const requiresComputeUpgrade = !isFreePlan && isNanoCompute
 
   return (
     <PageContainer>
