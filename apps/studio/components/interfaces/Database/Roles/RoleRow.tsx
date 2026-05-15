@@ -7,6 +7,8 @@ import {
   Button,
   cn,
   Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,7 +47,6 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
   const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: role,
@@ -109,7 +110,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
       )}
     >
       <div className={cn('flex items-center relative', !disabled && 'pr-(--card-padding-x)')}>
-        <Collapsible.Trigger asChild>
+        <CollapsibleTrigger asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
@@ -150,7 +151,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               </p>
             </div>
           </button>
-        </Collapsible.Trigger>
+        </CollapsibleTrigger>
         {!disabled && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -176,7 +177,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           </DropdownMenu>
         )}
       </div>
-      <Collapsible.Content>
+      <CollapsibleContent>
         <Form {...form}>
           <form
             id={formId}
@@ -228,7 +229,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             )}
           </form>
         </Form>
-      </Collapsible.Content>
+      </CollapsibleContent>
     </Collapsible>
   )
 }

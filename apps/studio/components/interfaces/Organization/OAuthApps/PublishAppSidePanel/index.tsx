@@ -16,7 +16,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
@@ -234,7 +234,7 @@ export const PublishAppSidePanel = ({
                           description={selectedApp?.id && `ID: ${selectedApp.id}`}
                         >
                           <FormControl className="col-span-6">
-                            <Input_Shadcn_ {...field} />
+                            <Input {...field} />
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -245,7 +245,7 @@ export const PublishAppSidePanel = ({
                       render={({ field }) => (
                         <FormItemLayout layout="vertical" label="Website URL">
                           <FormControl className="col-span-6">
-                            <Input_Shadcn_ {...field} placeholder="https://my-website.com" />
+                            <Input {...field} placeholder="https://my-website.com" />
                           </FormControl>
                         </FormItemLayout>
                       )}

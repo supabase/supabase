@@ -1,8 +1,8 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
-import { Alert, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
@@ -95,22 +95,20 @@ const Subscription = () => {
                         </Button>
                       </ProjectUpdateDisabledTooltip>
                     ) : projectUpdateDisabled ? (
-                      <Alert
-                        className="mt-2"
-                        withIcon
-                        variant="info"
+                      <Admonition
+                        type="default"
+                        layout="horizontal"
                         title={`Unable to update plan from ${planName}`}
-                      >
-                        We have temporarily disabled project and subscription changes - our
-                        engineers are working on a fix.
-                      </Alert>
+                        description="We have temporarily disabled project and subscription changes - our
+                          engineers are working on a fix."
+                      />
                     ) : (
-                      <Alert
-                        withIcon
-                        className="mt-2"
-                        variant="info"
+                      <Admonition
+                        type="default"
+                        layout="horizontal"
                         title={`Unable to update plan from ${planName}`}
-                        actions={[
+                        description="Please contact us if you'd like to change your plan."
+                        actions={
                           <Button asChild key="contact-support" type="default">
                             <SupportLink
                               queryParams={{
@@ -120,11 +118,9 @@ const Subscription = () => {
                             >
                               Contact support
                             </SupportLink>
-                          </Button>,
-                        ]}
-                      >
-                        Please contact us if you'd like to change your plan.
-                      </Alert>
+                          </Button>
+                        }
+                      />
                     )}
                   </div>
 

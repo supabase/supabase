@@ -6,9 +6,7 @@ export * from './src/components/Icon/IconBackground'
 // DISPLAYS
 
 export * from './src/components/Tabs'
-export * from './src/components/Alert'
 export * from './src/components/Accordion'
-export * from './src/components/Collapsible'
 
 // NAV
 
@@ -34,8 +32,6 @@ export * from './src/components/AnimatedCounter'
 export * from './src/lib/utils'
 
 // DATA ENTRY
-
-export * from './src/components/Input'
 export * from './src/components/ExpandingTextArea'
 
 // layout
@@ -66,9 +62,7 @@ export * from './src/components/shadcn/ui/skeleton'
 export * from './src/components/shadcn/ui/slider'
 export * from './src/components/shadcn/ui/textarea'
 export * from './src/components/shadcn/ui/toggle-group'
-
-export { Toggle as Toggle_Shadcn_ } from './src/components/shadcn/ui/toggle'
-
+export * from './src/components/shadcn/ui/toggle'
 export * from './src/components/shadcn/ui/card'
 
 export {
@@ -83,46 +77,13 @@ export {
   CommandSeparator as CommandSeparator_Shadcn_,
 } from './src/components/shadcn/ui/command'
 
-export {
-  ContextMenu as ContextMenu_Shadcn_,
-  ContextMenuTrigger as ContextMenuTrigger_Shadcn_,
-  ContextMenuContent as ContextMenuContent_Shadcn_,
-  ContextMenuItem as ContextMenuItem_Shadcn_,
-  ContextMenuSeparator as ContextMenuSeparator_Shadcn_,
-  ContextMenuLabel as ContextMenuLabel_Shadcn_,
-  ContextMenuRadioGroup as ContextMenuRadioGroup_Shadcn_,
-  ContextMenuRadioItem as ContextMenuRadioItem_Shadcn_,
-  ContextMenuShortcut as ContextMenuShortcut_Shadcn_,
-  ContextMenuSub as ContextMenuSub_Shadcn_,
-  ContextMenuSubContent as ContextMenuSubContent_Shadcn_,
-  ContextMenuSubTrigger as ContextMenuSubTrigger_Shadcn_,
-  ContextMenuCheckboxItem as ContextMenuCheckboxItem_Shadcn_,
-  ContextMenuGroup as ContextMenuGroup_Shadcn_,
-  ContextMenuPortal as ContextMenuPortal_Shadcn_,
-} from './src/components/shadcn/ui/context-menu'
+export * from './src/components/shadcn/ui/context-menu'
 
 export * from './src/components/shadcn/ui/dialog'
 
-export {
-  Alert as Alert_Shadcn_,
-  AlertTitle as AlertTitle_Shadcn_,
-  AlertDescription as AlertDescription_Shadcn_,
-} from './src/components/shadcn/ui/alert'
+export * from './src/components/shadcn/ui/alert'
 
-export * from './src/components/AlertCollapsible'
-
-export {
-  Field as Field_Shadcn_,
-  FieldContent as FieldContent_Shadcn_,
-  FieldDescription as FieldDescription_Shadcn_,
-  FieldError as FieldError_Shadcn_,
-  FieldGroup as FieldGroup_Shadcn_,
-  FieldLabel as FieldLabel_Shadcn_,
-  FieldLegend as FieldLegend_Shadcn_,
-  FieldSeparator as FieldSeparator_Shadcn_,
-  FieldSet as FieldSet_Shadcn_,
-  FieldTitle as FieldTitle_Shadcn_,
-} from './src/components/shadcn/ui/field'
+export * from './src/components/shadcn/ui/field'
 
 export * from './src/components/shadcn/ui/form'
 
@@ -159,7 +120,7 @@ export * from './src/components/shadcn/ui/radio-group'
 
 export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
 
-export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+export * from './src/components/shadcn/ui/input'
 
 export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
@@ -175,7 +136,7 @@ export {
   BreadcrumbSeparator as BreadcrumbSeparator_Shadcn_,
 } from './src/components/shadcn/ui/breadcrumb'
 
-export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
+export * from './src/components/shadcn/ui/text-area'
 
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
 
@@ -194,11 +155,7 @@ export * from './src/components/shadcn/ui/aspect-ratio'
 export * from './src/components/shadcn/ui/table'
 export * from './src/components/ShadowScrollArea'
 
-export {
-  Collapsible as Collapsible_Shadcn_,
-  CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
-  CollapsibleContent as CollapsibleContent_Shadcn_,
-} from './src/components/shadcn/ui/collapsible'
+export * from './src/components/shadcn/ui/collapsible'
 
 export {
   Tabs as Tabs_Shadcn_,

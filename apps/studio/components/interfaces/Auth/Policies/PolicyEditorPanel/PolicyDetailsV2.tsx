@@ -22,7 +22,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -131,7 +131,7 @@ export const PolicyDetailsV2 = ({
               <FormItem className="col-span-6 flex flex-col gap-y-1">
                 <FormLabel>Policy Name</FormLabel>
                 <FormControl>
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     disabled={!canUpdatePolicies}
                     className="bg-control border-control"
@@ -217,7 +217,7 @@ export const PolicyDetailsV2 = ({
                 )}
                 {authContext === 'realtime' && (
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       disabled
                       value="messages.realtime"
                       className="bg-control border-control"

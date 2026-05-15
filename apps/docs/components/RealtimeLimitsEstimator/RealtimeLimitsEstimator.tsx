@@ -4,6 +4,8 @@ import { useState } from 'react'
 import {
   Button,
   Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Label_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -152,7 +154,7 @@ export default function RealtimeLimitsEstimater({}) {
       )}
 
       <Collapsible open={expandPreview} onOpenChange={setExpandPreview}>
-        <Collapsible.Trigger asChild>
+        <CollapsibleTrigger asChild>
           <div className="py-1 flex items-center">
             <p className="text-sm">View raw throughput table</p>
             <Button
@@ -168,8 +170,8 @@ export default function RealtimeLimitsEstimater({}) {
               onClick={() => setExpandPreview(!expandPreview)}
             />
           </div>
-        </Collapsible.Trigger>
-        <Collapsible.Content>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
           <div>
             {throughputTable
               .map((l) => l.computeAddOn)
@@ -218,7 +220,7 @@ export default function RealtimeLimitsEstimater({}) {
                 </div>
               ))}
           </div>
-        </Collapsible.Content>
+        </CollapsibleContent>
       </Collapsible>
     </div>
   )

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Input_Shadcn_ as Input, Modal } from 'ui'
+import { Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'

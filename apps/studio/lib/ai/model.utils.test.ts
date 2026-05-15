@@ -73,11 +73,11 @@ describe('model.utils', () => {
       })
     })
 
-    it('should have bedrock model with promptProviderOptions', () => {
+    it('should have bedrock model with systemProviderOptions', () => {
       const sonnetModel = PROVIDERS.bedrock.models['anthropic.claude-3-7-sonnet-20250219-v1:0']
-      expect(sonnetModel.promptProviderOptions).toBeDefined()
-      expect(sonnetModel.promptProviderOptions?.bedrock).toBeDefined()
-      expect(sonnetModel.promptProviderOptions?.bedrock?.cachePoint).toEqual({
+      expect(sonnetModel.systemProviderOptions).toBeDefined()
+      expect(sonnetModel.systemProviderOptions?.bedrock).toBeDefined()
+      expect(sonnetModel.systemProviderOptions?.bedrock?.cachePoint).toEqual({
         type: 'default',
       })
     })

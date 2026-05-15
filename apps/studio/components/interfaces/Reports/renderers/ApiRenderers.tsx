@@ -5,14 +5,13 @@ import { useTheme } from 'next-themes'
 import { Fragment, useRef, useState, type ReactNode } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Collapsible,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  CollapsibleContent,
+  CollapsibleTrigger,
   WarningIcon,
 } from 'ui'
 import * as z from 'zod'
@@ -73,11 +72,11 @@ export const NetworkTrafficRenderer = (
     return <AlertError subject="Failed to retrieve network traffic" error={error} />
   } else if (isError) {
     return (
-      <Alert_Shadcn_ variant="warning">
+      <Alert variant="warning">
         <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve network traffic</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        <AlertTitle>Failed to retrieve network traffic</AlertTitle>
+        <AlertDescription>{error?.message ?? 'Unknown error'}</AlertDescription>
+      </Alert>
     )
   }
 
@@ -137,11 +136,11 @@ export const TotalRequestsChartRenderer = (
     return <AlertError subject="Failed to retrieve total requests" error={error} />
   } else if (isError) {
     return (
-      <Alert_Shadcn_ variant="warning">
+      <Alert variant="warning">
         <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve total requests</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        <AlertTitle>Failed to retrieve total requests</AlertTitle>
+        <AlertDescription>{error?.message ?? 'Unknown error'}</AlertDescription>
+      </Alert>
     )
   }
 
@@ -179,9 +178,10 @@ export const TopApiRoutesRenderer = (
   if (props.data.length === 0) return null
 
   return (
-    <Collapsible>
+    <>
       <Table
         className="rounded-t-none"
+        containerClassName="overflow-x-auto"
         head={
           <>
             <Table.th className={headerClasses}>Request</Table.th>
@@ -207,11 +207,11 @@ export const TopApiRoutesRenderer = (
                       <Table.td className={[cellClasses].join(' ')}>
                         <RouteTdContent {...datum} />
                       </Table.td>
-                      <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                      <Table.td className={[cellClasses, 'text-right'].join(' ')}>
                         {datum.count}
                       </Table.td>
                       {props.data[0].avg !== undefined && (
-                        <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                        <Table.td className={[cellClasses, 'text-right'].join(' ')}>
                           {Number(datum.avg).toFixed(2)}ms
                         </Table.td>
                       )}
@@ -223,22 +223,20 @@ export const TopApiRoutesRenderer = (
           </>
         }
       />
-      <Collapsible.Trigger asChild>
-        <div className="flex flex-row justify-end w-full gap-2 p-1">
-          <Button
-            type="text"
-            onClick={() => setShowMore(!showMore)}
-            className={[
-              'transition',
-              showMore ? 'text-foreground' : 'text-foreground-lighter',
-              props.data.length <= 3 ? 'hidden' : '',
-            ].join(' ')}
-          >
-            {!showMore ? 'Show more' : 'Show less'}
-          </Button>
-        </div>
-      </Collapsible.Trigger>
-    </Collapsible>
+      <div className="flex flex-row justify-end w-full gap-2 p-1">
+        <Button
+          type="text"
+          onClick={() => setShowMore(!showMore)}
+          className={[
+            'transition',
+            showMore ? 'text-foreground' : 'text-foreground-lighter',
+            props.data.length <= 3 ? 'hidden' : '',
+          ].join(' ')}
+        >
+          {!showMore ? 'Show more' : 'Show less'}
+        </Button>
+      </div>
+    </>
   )
 }
 
@@ -268,11 +266,11 @@ export const ErrorCountsChartRenderer = (
     return <AlertError subject="Failed to retrieve request errors" error={error} />
   } else if (isError) {
     return (
-      <Alert_Shadcn_ variant="warning">
+      <Alert variant="warning">
         <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve request errors</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        <AlertTitle>Failed to retrieve request errors</AlertTitle>
+        <AlertDescription>{error?.message ?? 'Unknown error'}</AlertDescription>
+      </Alert>
     )
   }
 
@@ -319,11 +317,11 @@ export const ResponseSpeedChartRenderer = (
     return <AlertError subject="Failed to retrieve response speeds" error={error} />
   } else if (isError) {
     return (
-      <Alert_Shadcn_ variant="warning">
+      <Alert variant="warning">
         <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve response speeds</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        <AlertTitle>Failed to retrieve response speeds</AlertTitle>
+        <AlertDescription>{error?.message ?? 'Unknown error'}</AlertDescription>
+      </Alert>
     )
   }
 
@@ -349,8 +347,8 @@ interface RouteTdContentProps {
   search: string
 }
 const RouteTdContent = (datum: RouteTdContentProps) => (
-  <Collapsible_Shadcn_>
-    <CollapsibleTrigger_Shadcn_ asChild>
+  <Collapsible>
+    <CollapsibleTrigger asChild>
       <div className="flex gap-2 items-center">
         <Button asChild type="text" className=" py-0! p-1!" title="Show more route details">
           <span>
@@ -378,8 +376,8 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           />
         </div>
       </div>
-    </CollapsibleTrigger_Shadcn_>
-    <CollapsibleContent_Shadcn_ className="pt-2">
+    </CollapsibleTrigger>
+    <CollapsibleContent className="pt-2">
       {datum.search ? (
         <pre className="syntax-highlight overflow-auto whitespace-pre-wrap wrap-break-word rounded-sm bg-surface-100 p-2 text-xs! [&_span]:whitespace-pre-wrap!">
           <div
@@ -392,8 +390,8 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
       ) : (
         <p className="text-xs text-foreground-lighter">No query parameters in this request</p>
       )}
-    </CollapsibleContent_Shadcn_>
-  </Collapsible_Shadcn_>
+    </CollapsibleContent>
+  </Collapsible>
 )
 export const RequestsByCountryMapRenderer = (
   props: ReportWidgetProps<{

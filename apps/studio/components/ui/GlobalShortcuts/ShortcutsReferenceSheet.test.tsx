@@ -37,6 +37,14 @@ const ACTIVE_AUTH_SHORTCUT_IDS = [
   SHORTCUT_IDS.NAV_AUTH_USERS,
 ] satisfies ShortcutId[]
 
+const ACTIVE_SURFACE_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.AUTH_USERS_REFRESH,
+  SHORTCUT_IDS.SQL_EDITOR_FORMAT,
+  SHORTCUT_IDS.STORAGE_BUCKETS_REFRESH,
+  SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
+] satisfies ShortcutId[]
+
 let sequenceIdCounter = 0
 
 const buildSequenceRegistration = (id: ShortcutId): SequenceRegistrationView => {
@@ -140,6 +148,19 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Auth Navigation')).toBeInTheDocument()
     expect(screen.queryByText(/^Navigation$/)).not.toBeInTheDocument()
     expect(screen.getByText('Go to Users')).toBeInTheDocument()
+  })
+
+  it('uses human labels for active surface shortcut groups', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_SURFACE_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Auth Users')).toBeInTheDocument()
+    expect(screen.getByText('SQL Editor')).toBeInTheDocument()
+    expect(screen.getByText('Storage Buckets')).toBeInTheDocument()
+    expect(screen.getByText('Storage File Explorer')).toBeInTheDocument()
+    expect(screen.queryByText('auth-users')).not.toBeInTheDocument()
+    expect(screen.queryByText('sql-editor')).not.toBeInTheDocument()
+    expect(screen.queryByText('storage-buckets')).not.toBeInTheDocument()
+    expect(screen.queryByText('storage-explorer')).not.toBeInTheDocument()
   })
 
   it('does not show inactive database shortcuts in search results', async () => {

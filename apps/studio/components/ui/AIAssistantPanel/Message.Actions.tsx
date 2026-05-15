@@ -11,7 +11,7 @@ import {
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  TextArea_Shadcn_,
+  TextArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -187,7 +187,7 @@ function MessageActionsThumbsDown({
                 render={({ field }) => (
                   <FormItemLayout label="What went wrong?" labelOptional="optional">
                     <FormControl>
-                      <TextArea_Shadcn_
+                      <TextArea
                         placeholder="Describe why the response was not helpful..."
                         autoComplete="off"
                         rows={4}

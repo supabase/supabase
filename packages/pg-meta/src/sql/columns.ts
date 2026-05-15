@@ -29,6 +29,7 @@ SELECT
     END
   END AS data_type,
   COALESCE(bt.typname, t.typname) AS format,
+  COALESCE(nbt.nspname, nt.nspname) AS format_schema,
   a.attidentity IN ('a', 'd') AS is_identity,
   CASE
     a.attidentity

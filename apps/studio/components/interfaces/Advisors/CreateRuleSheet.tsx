@@ -22,7 +22,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  TextArea_Shadcn_ as TextArea,
+  TextArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,

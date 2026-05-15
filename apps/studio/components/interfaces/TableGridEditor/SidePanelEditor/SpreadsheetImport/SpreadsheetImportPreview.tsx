@@ -1,13 +1,15 @@
 import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
   cn,
   Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   SidePanel,
   WarningIcon,
 } from 'ui'
@@ -69,7 +71,7 @@ export const SpreadsheetImportPreview = ({
 
   return (
     <Collapsible open={expandPreview} onOpenChange={setExpandPreview} className={''}>
-      <Collapsible.Trigger asChild>
+      <CollapsibleTrigger asChild>
         <SidePanel.Content>
           <div className="py-1 flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -95,8 +97,8 @@ export const SpreadsheetImportPreview = ({
             />
           </div>
         </SidePanel.Content>
-      </Collapsible.Trigger>
-      <Collapsible.Content>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
         <SidePanel.Content>
           <div className="mb-4">
             <p className="text-sm text-foreground-light">
@@ -134,10 +136,10 @@ export const SpreadsheetImportPreview = ({
             )}
           </div>
           {(!isCompatible || dedupedErrors.length > 0) && (
-            <Alert_Shadcn_ variant="warning" className="my-4">
+            <Alert variant="warning" className="my-4">
               <WarningIcon />
-              <AlertTitle_Shadcn_>Issues found in spreadsheet</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Issues found in spreadsheet</AlertTitle>
+              <AlertDescription>
                 <div className="space-y-2">
                   {isCompatible ? (
                     <p className="text-sm">
@@ -233,11 +235,11 @@ export const SpreadsheetImportPreview = ({
                     })}
                   </ul>
                 </div>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
         </SidePanel.Content>
-      </Collapsible.Content>
+      </CollapsibleContent>
     </Collapsible>
   )
 }

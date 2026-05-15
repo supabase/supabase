@@ -16,7 +16,7 @@ import {
   FormControl,
   FormField,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -217,7 +217,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     labelOptional="Cannot be changed after creation"
                   >
                     <FormControl>
-                      <Input_Shadcn_ id="name" {...field} disabled />
+                      <Input id="name" {...field} disabled />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -323,7 +323,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                         <div className="grid grid-cols-12 gap-x-2">
                           <div className="col-span-8">
                             <FormControl>
-                              <Input_Shadcn_
+                              <Input
                                 id="formatted_size_limit"
                                 aria-label="File size limit"
                                 type="number"
@@ -413,7 +413,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       description="Wildcards are allowed, e.g. image/*."
                     >
                       <FormControl>
-                        <Input_Shadcn_
+                        <Input
                           id="allowed_mime_types"
                           {...field}
                           placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"

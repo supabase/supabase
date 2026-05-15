@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -11,7 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -76,7 +76,7 @@ const defaultValues: z.infer<typeof FormSchema> = {
 }
 
 interface TriggerSheetProps {
-  selectedTrigger?: PostgresTrigger
+  selectedTrigger?: PGTrigger
   isDuplicatingTrigger?: boolean
   open: boolean
   onClose: () => void
@@ -218,7 +218,7 @@ export const TriggerSheet = ({
                     description="Do not use spaces/whitespace."
                   >
                     <FormControl>
-                      <Input_Shadcn_ {...field} placeholder="Name of trigger" />
+                      <Input {...field} placeholder="Name of trigger" />
                     </FormControl>
                   </FormItemLayout>
                 )}

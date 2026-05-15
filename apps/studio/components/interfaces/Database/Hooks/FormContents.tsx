@@ -1,4 +1,4 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Image from 'next/legacy/image'
@@ -8,7 +8,7 @@ import {
   Checkbox,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Label_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -42,7 +42,7 @@ import { uuidv4 } from '@/lib/helpers'
 
 export interface FormContentsProps {
   form: UseFormReturn<WebhookFormValues>
-  selectedHook?: PostgresTrigger
+  selectedHook?: PGTrigger
 }
 
 export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
@@ -111,7 +111,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
             render={({ field }) => (
               <FormItemLayout label="Name" layout="vertical" className="gap-1">
                 <FormControl>
-                  <Input_Shadcn_ {...field} placeholder="my_webhook" />
+                  <Input {...field} placeholder="my_webhook" />
                 </FormControl>
                 <p className="mt-2 text-xs text-foreground-lighter">
                   Do not use spaces/whitespaces

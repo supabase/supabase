@@ -13,7 +13,7 @@ import {
   FormControl,
   FormField,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -356,7 +356,7 @@ export const StorageSettings = () => {
                               >
                                 <FormControl>
                                   <div className="flex items-center justify-end">
-                                    <Input_Shadcn_
+                                    <Input
                                       type="number"
                                       {...field}
                                       onChange={(e) => {
