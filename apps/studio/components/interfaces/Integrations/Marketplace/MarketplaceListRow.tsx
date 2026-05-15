@@ -16,11 +16,8 @@ interface MarketplaceListRowProps {
   isInstalled: boolean
 }
 
-// Drop columns on narrow viewports. The surrounding `PageContainer` exposes a
-// `@container` context (see how the grid uses `@lg:grid-cols-2`), so these
-// `@…:` prefixes track its width rather than the document viewport.
-const HIDE_BELOW_MD = 'hidden @md:table-cell'
-const HIDE_BELOW_LG = 'hidden @lg:table-cell'
+const HIDE_BELOW_XL = 'hidden @3xl:table-cell'
+const HIDE_BELOW_4XL = 'hidden @4xl:table-cell'
 
 export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceListRowProps) => {
   const router = useRouter()
@@ -41,7 +38,7 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
       <TableCell>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-            <span className="text-[13px] font-medium @lg:text-[13.5px]">{integration.name}</span>
+            <span className="text-sm font-medium @lg:text-sm">{integration.name}</span>
             {integration.status && (
               <Badge variant="warning" className="capitalize">
                 {integration.status}
@@ -63,12 +60,16 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
         </div>
       </TableCell>
 
-      <TableCell className={`w-28 text-xs text-foreground-lighter ${HIDE_BELOW_MD}`}>
+      <TableCell className={`w-28 text-xs text-foreground-lighter ${HIDE_BELOW_XL}`}>
         {formatCategoryLabel(integration.categories?.[0]) || '—'}
       </TableCell>
 
-      <TableCell className={`w-32 font-mono text-xs text-foreground-lighter ${HIDE_BELOW_LG}`}>
+      <TableCell className={`w-32 font-mono text-xs text-foreground-lighter ${HIDE_BELOW_4XL}`}>
         {installMechanism}
+      </TableCell>
+
+      <TableCell className={`w-40 text-foreground-lighter ${HIDE_BELOW_4XL}`}>
+        {integration.author?.name || '—'}
       </TableCell>
 
       <TableCell className="w-24">
@@ -88,8 +89,9 @@ export const MarketplaceListHeader = ({
   <TableRow>
     <TableHead className="w-10 pr-0 @lg:w-12" />
     <TableHead>{integrationsLabel}</TableHead>
-    <TableHead className={`w-28 ${HIDE_BELOW_MD}`}>Category</TableHead>
-    <TableHead className={`w-40 ${HIDE_BELOW_LG}`}>Type</TableHead>
+    <TableHead className={`w-28 ${HIDE_BELOW_XL}`}>Category</TableHead>
+    <TableHead className={`w-40 ${HIDE_BELOW_4XL}`}>Type</TableHead>
+    <TableHead className={`w-40 ${HIDE_BELOW_4XL}`}>Built by</TableHead>
     <TableHead className="w-32"></TableHead>
   </TableRow>
 )

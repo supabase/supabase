@@ -143,14 +143,12 @@ export const MarketplaceIndex = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Integrations Marketplace</PageHeaderTitle>
             <PageHeaderDescription>
-              Explore native and third-party integrations to add functionality, sync your data, and
-              monitor your project.
+              Explore native and third-party integrations to add functionality to your Supabase
+              project.
             </PageHeaderDescription>
           </PageHeaderSummary>
           <div className="flex shrink-0 items-center gap-2">
-            <DocsButton
-              href={`${DOCS_URL}/guides/integrations/build-a-supabase-oauth-integration`}
-            />
+            <DocsButton href={`${DOCS_URL}/guides/integrations/supabase-marketplace`} />
           </div>
         </PageHeaderMeta>
       </PageHeader>
