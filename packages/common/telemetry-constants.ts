@@ -708,7 +708,13 @@ export interface AssistantSuggestionRunQueryClickedEvent {
      * The type of suggestion that was run by the user. Mutate or Select query types only.
      */
     queryType: string
-    category?: string
+    /**
+     * For mutation queries only: the DDL subtype detected from the SQL.
+     * 'functions' for CREATE FUNCTION / CREATE OR REPLACE FUNCTION,
+     * 'rls-policies' for CREATE POLICY / ALTER POLICY,
+     * 'unknown' for any other mutation. Omitted for non-mutation queries.
+     */
+    mutationType?: 'functions' | 'rls-policies' | 'unknown'
   }
   groups: TelemetryGroups
 }

@@ -13,8 +13,10 @@ import { tableKeys } from '@/data/tables/keys'
 import { tryParseJson } from '@/lib/helpers'
 import { ResponseError } from '@/types'
 
+export type MutationCategory = 'functions' | 'rls-policies'
+
 // [Joshen] This is just very basic identification, but possible can extend perhaps
-export const identifyQueryType = (query: string) => {
+export const identifyQueryType = (query: string): MutationCategory | undefined => {
   const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')
   if (
     formattedQuery.includes('create function') ||
@@ -24,6 +26,7 @@ export const identifyQueryType = (query: string) => {
   } else if (formattedQuery.includes('create policy') || formattedQuery.includes('alter policy')) {
     return 'rls-policies'
   }
+  return undefined
 }
 
 // Check for function calls that aren't in the safe list
