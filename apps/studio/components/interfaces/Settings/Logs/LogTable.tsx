@@ -25,12 +25,17 @@ import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewCol
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
-import { formatLogsAsJson, formatLogsAsMarkdown, isDefaultLogPreviewFormat } from './Logs.utils'
+import {
+  formatLogsAsCsv,
+  formatLogsAsJson,
+  formatLogsAsMarkdown,
+  isDefaultLogPreviewFormat,
+} from './Logs.utils'
 import LogSelection from './LogSelection'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
-import { MultiSelectActionBar } from './MultiSelectActionBar'
+import { MultiSelectActionBar, type LogCopyFormat } from './MultiSelectActionBar'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
@@ -97,7 +102,7 @@ export const LogTable = ({
   const [selectedLogId] = useSelectedLog()
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
-  const [copiedFormat, setCopiedFormat] = useState<'json' | 'markdown' | null>(null)
+  const [copiedFormat, setCopiedFormat] = useState<LogCopyFormat | null>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
   const [activeRow, setActiveRow] = useState<LogData | null>(null)
   const [contextMenuKey, setContextMenuKey] = useState(0)
@@ -423,11 +428,12 @@ export const LogTable = ({
     return () => clearTimeout(timer)
   }, [copiedFormat])
 
-  function handleCopySelectedRows(format: 'json' | 'markdown') {
-    const text =
-      format === 'json'
-        ? formatLogsAsJson(selectedRowsData)
-        : formatLogsAsMarkdown(selectedRowsData)
+  function handleCopySelectedRows(format: LogCopyFormat) {
+    let text = ''
+    if (format === 'json') text = formatLogsAsJson(selectedRowsData)
+    if (format === 'markdown') text = formatLogsAsMarkdown(selectedRowsData)
+    if (format === 'csv') text = formatLogsAsCsv(selectedRowsData)
+
     copyToClipboard(text, () => {
       setCopiedFormat(format)
       toast.success(
