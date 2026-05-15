@@ -1,7 +1,7 @@
 'use client'
 
-import { AlertDialog as AlertDialogPrimitive } from 'radix-ui'
 import { cva, VariantProps } from 'class-variance-authority'
+import { AlertDialog as AlertDialogPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
@@ -181,14 +181,22 @@ const AlertDialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDiv
 AlertDialogHeader.displayName = 'AlertDialogHeader'
 
 const AlertDialogBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('px-5 pb-5', className)} {...props} />
+  <div
+    data-slot="alert-dialog-body"
+    className={cn(
+      '[&>[role=alert]]:mb-0 [&>[role=alert]]:rounded-none [&>[role=alert]]:border-x-0',
+      className
+    )}
+    {...props}
+  />
 )
 AlertDialogBody.displayName = 'AlertDialogBody'
 
 const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
+    data-slot="alert-dialog-footer"
     className={cn(
-      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 border-t py-3 px-5',
+      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 border-t py-3 px-5 [[data-slot=alert-dialog-body]:has(>[role=alert])+&]:border-t-0',
       className
     )}
     {...props}
