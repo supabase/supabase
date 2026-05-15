@@ -105,18 +105,7 @@ export {
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
 
-export {
-  Field as Field_Shadcn_,
-  FieldContent as FieldContent_Shadcn_,
-  FieldDescription as FieldDescription_Shadcn_,
-  FieldError as FieldError_Shadcn_,
-  FieldGroup as FieldGroup_Shadcn_,
-  FieldLabel as FieldLabel_Shadcn_,
-  FieldLegend as FieldLegend_Shadcn_,
-  FieldSeparator as FieldSeparator_Shadcn_,
-  FieldSet as FieldSet_Shadcn_,
-  FieldTitle as FieldTitle_Shadcn_,
-} from './src/components/shadcn/ui/field'
+export * from './src/components/shadcn/ui/field'
 
 export * from './src/components/shadcn/ui/form'
 
