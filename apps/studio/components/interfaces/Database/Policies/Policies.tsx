@@ -9,8 +9,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PolicyTableRow,
   PolicyTableRowProps,
-} from '@/components/interfaces/Auth/Policies/PolicyTableRow'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+} from '@/components/interfaces/Database/Policies/PolicyTableRow'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'

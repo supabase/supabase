@@ -3031,7 +3031,7 @@ export interface IntegrationUninstallCompletedEvent {
  *
  * @group Events
  * @source studio
- * @page /project/{ref}/auth/policies
+ * @page /project/{ref}/database/policies
  */
 export interface RlsEventTriggerBannerCreateButtonClickedEvent {
   action: 'rls_event_trigger_banner_create_button_clicked'

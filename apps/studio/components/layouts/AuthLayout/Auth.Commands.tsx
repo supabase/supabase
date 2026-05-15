@@ -41,8 +41,8 @@ export function useAuthGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-auth-policies',
         name: 'Policies',
-        value: 'Auth: Policies (RLS)',
-        route: `/project/${ref}/auth/policies`,
+        value: 'Database: Policies (RLS)',
+        route: `/project/${ref}/database/policies`,
         defaultHidden: true,
       },
       ...(authenticationSignInProviders

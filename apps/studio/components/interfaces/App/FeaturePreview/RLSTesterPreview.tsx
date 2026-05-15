@@ -27,7 +27,7 @@ export const RLSTesterPreview = () => {
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
             Show the "Test" button on the{' '}
-            <InlineLink href={`/project/${ref}/auth/policies`}>
+            <InlineLink href={`/project/${ref}/database/policies`}>
               Authentication Policies page
             </InlineLink>
           </li>

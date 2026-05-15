@@ -39,7 +39,7 @@ import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Pre
 import {
   acceptGeneratedPolicy,
   type GeneratedPolicy,
-} from '@/components/interfaces/Auth/Policies/Policies.utils'
+} from '@/components/interfaces/Database/Policies/Policies.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from '@/data/database-publications/database-publications-create-mutation'

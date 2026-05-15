@@ -21,7 +21,7 @@ import {
 
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { type Bucket } from '@/data/storage/buckets-query'

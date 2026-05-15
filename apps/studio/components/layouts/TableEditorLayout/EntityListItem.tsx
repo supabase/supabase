@@ -318,7 +318,7 @@ export const EntityListItem = ({
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                     <Link
                       key="view-policies"
-                      href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
+                      href={`/project/${projectRef}/database/policies?schema=${selectedSchema}&search=${entity.id}`}
                     >
                       <Lock size={12} />
                       <span>View policies</span>

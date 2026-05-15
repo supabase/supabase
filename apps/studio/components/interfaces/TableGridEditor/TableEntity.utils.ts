@@ -29,7 +29,7 @@ export const getTablePoliciesUrl = (
   schema: string | undefined,
   name: string | undefined
 ): string => {
-  return `/project/${projectRef ?? ''}/auth/policies?search=${encodeURIComponent(
+  return `/project/${projectRef ?? ''}/database/policies?search=${encodeURIComponent(
     name ?? ''
   )}&schema=${encodeURIComponent(schema ?? '')}`
 }

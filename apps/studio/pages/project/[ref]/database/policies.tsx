@@ -22,16 +22,16 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useIsRLSTesterEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Policies } from '@/components/interfaces/Auth/Policies/Policies'
-import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/PoliciesDataContext'
-import { getGeneralPolicyTemplates } from '@/components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
-import { PolicyEditorPanel } from '@/components/interfaces/Auth/Policies/PolicyEditorPanel'
+import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTesterSheet'
+import { Policies } from '@/components/interfaces/Database/Policies/Policies'
+import { PoliciesDataProvider } from '@/components/interfaces/Database/Policies/PoliciesDataContext'
+import { getGeneralPolicyTemplates } from '@/components/interfaces/Database/Policies/PolicyEditorModal/PolicyEditorModal.constants'
+import { PolicyEditorPanel } from '@/components/interfaces/Database/Policies/PolicyEditorPanel'
 import {
   generatePolicyUpdateSQL,
   type Policy,
-} from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
-import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTesterSheet'
-import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+} from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AlertError } from '@/components/ui/AlertError'
@@ -96,7 +96,7 @@ const getTableFilterState = (tables: PGTable[], policies: Array<Policy>, searchS
   return { tables: sortedTables, visibleTableIds }
 }
 
-const AuthPoliciesPage: NextPageWithLayout = () => {
+const DatabasePoliciesPage: NextPageWithLayout = () => {
   const [schema, setSchema] = useQueryState(
     'schema',
     parseAsString.withDefault('public').withOptions({ history: 'replace' })
@@ -402,10 +402,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   )
 }
 
-AuthPoliciesPage.getLayout = (page) => (
+DatabasePoliciesPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout title="Policies">{page}</AuthLayout>
+    <DatabaseLayout title="Policies">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 
-export default AuthPoliciesPage
+export default DatabasePoliciesPage

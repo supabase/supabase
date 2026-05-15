@@ -130,7 +130,7 @@ export function useCreateCommands(options?: CommandOptions) {
             {
               id: 'create-rls-policy',
               name: 'Create RLS Policy',
-              route: `/project/${ref}/auth/policies?new=true`,
+              route: `/project/${ref}/database/policies?new=true`,
               icon: () => <ShieldPlus />,
             },
             ...(IS_PLATFORM

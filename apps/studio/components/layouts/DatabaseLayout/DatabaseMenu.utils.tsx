@@ -94,8 +94,13 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
       ],
     },
     {
-      title: 'Configuration',
+      title: 'Access Control',
       items: [
+        {
+          name: 'Policies',
+          key: 'policies',
+          url: getDatabaseURL('policies'),
+        },
         showRoles && {
           name: 'Roles',
           key: 'roles',
@@ -108,12 +113,11 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
           url: getDatabaseURL('column-privileges'),
           shortcutId: SHORTCUT_IDS.NAV_DATABASE_COLUMN_PRIVILEGES,
         },
-        {
-          name: 'Policies',
-          key: 'policies',
-          url: `/project/${ref}/auth/policies`,
-          rightIcon: ExternalLinkIcon,
-        },
+      ].filter(Boolean) as ProductMenuGroupItem[],
+    },
+    {
+      title: 'Configuration',
+      items: [
         {
           name: 'Settings',
           key: 'settings',
