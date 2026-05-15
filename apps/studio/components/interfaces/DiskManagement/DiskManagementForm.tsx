@@ -229,13 +229,13 @@ export function DiskManagementForm() {
   const { mutateAsync: updateDiskConfiguration, isPending: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({
       // this is to suppress to toast message
-      onError: () => { },
+      onError: () => {},
       onSuccess: () => setRefetchInterval(2000),
     })
   const { mutateAsync: updateSubscriptionAddon, isPending: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
       // this is to suppress to toast message
-      onError: () => { },
+      onError: () => {},
       onSuccess: () => {
         //Manually set project status to RESIZING, Project status should be RESIZING on next project status request.
         if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
@@ -244,7 +244,7 @@ export function DiskManagementForm() {
   const { mutateAsync: updateDiskAutoscaleConfig, isPending: isUpdatingDiskAutoscaleConfig } =
     useUpdateDiskAutoscaleConfigMutation({
       // this is to suppress to toast message
-      onError: () => { },
+      onError: () => {},
     })
 
   const isUpdatingConfig = isUpdatingDisk || isUpdatingCompute || isUpdatingDiskAutoscaleConfig
@@ -390,26 +390,26 @@ export function DiskManagementForm() {
         {(isProjectResizing ||
           isProjectRequestingDiskChanges ||
           (isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions)) && (
-            <div className="relative flex flex-col gap-10">
-              <DiskMangementRestartRequiredSection
-                visible={isProjectResizing}
-                title="Your project will now automatically restart."
-                description="Your project will be unavailable for up to 2 mins."
-              />
-              <NoticeBar
-                type="default"
-                visible={isProjectRequestingDiskChanges}
-                title="Disk configuration changes have been requested"
-                description="The requested changes will be applied to your disk shortly"
-              />
-              <NoticeBar
-                type="default"
-                visible={isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions}
-                title="You do not have permission to update disk configuration"
-                description="Please contact your organization administrator to update your disk configuration"
-              />
-            </div>
-          )}
+          <div className="relative flex flex-col gap-10">
+            <DiskMangementRestartRequiredSection
+              visible={isProjectResizing}
+              title="Your project will now automatically restart."
+              description="Your project will be unavailable for up to 2 mins."
+            />
+            <NoticeBar
+              type="default"
+              visible={isProjectRequestingDiskChanges}
+              title="Disk configuration changes have been requested"
+              description="The requested changes will be applied to your disk shortly"
+            />
+            <NoticeBar
+              type="default"
+              visible={isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions}
+              title="You do not have permission to update disk configuration"
+              description="Please contact your organization administrator to update your disk configuration"
+            />
+          </div>
+        )}
 
         <Separator />
       </ScaffoldContainer>
