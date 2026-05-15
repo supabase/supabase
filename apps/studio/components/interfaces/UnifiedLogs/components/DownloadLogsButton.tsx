@@ -19,11 +19,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 
 import { QuerySearchParamsType } from '../UnifiedLogs.types'
@@ -137,30 +137,30 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
           <DialogSection className="flex flex-col gap-y-2">
             <div className="flex justify-between gap-x-2">
               <p className="text-sm mb-2">Result limit for export</p>
-              <Select_Shadcn_ value={numRows} onValueChange={setNumRows}>
-                <SelectTrigger_Shadcn_ className="w-24">
-                  <SelectValue_Shadcn_ />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="100">100</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="500">500</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="1000">1000</SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+              <Select value={numRows} onValueChange={setNumRows}>
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="100">100</SelectItem>
+                  <SelectItem value="500">500</SelectItem>
+                  <SelectItem value="1000">1000</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             {!('date' in searchParameters) && (
               <div className="flex justify-between gap-x-2">
                 <p className="text-sm mb-2">Duration to retrieve</p>
-                <Select_Shadcn_ value={numHours} onValueChange={setNumHours}>
-                  <SelectTrigger_Shadcn_ className="w-36">
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectItem_Shadcn_ value="1">1 hour ago</SelectItem_Shadcn_>
-                    <SelectItem_Shadcn_ value="12">12 hours ago</SelectItem_Shadcn_>
-                    <SelectItem_Shadcn_ value="24">24 hours ago</SelectItem_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                <Select value={numHours} onValueChange={setNumHours}>
+                  <SelectTrigger className="w-36">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 hour ago</SelectItem>
+                    <SelectItem value="12">12 hours ago</SelectItem>
+                    <SelectItem value="24">24 hours ago</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             )}
           </DialogSection>

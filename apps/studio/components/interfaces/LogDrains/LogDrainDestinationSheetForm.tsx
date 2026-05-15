@@ -15,13 +15,13 @@ import {
   Input,
   RadioGroupCard,
   RadioGroupCardItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectLabel_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -470,15 +470,15 @@ export function LogDrainDestinationSheetForm({
                     label="Type"
                     description={LOG_DRAIN_TYPES.find((t) => t.value === type)?.description || ''}
                   >
-                    <Select_Shadcn_
+                    <Select
                       defaultValue={defaultType}
                       value={form.getValues('type')}
                       onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                     >
-                      <SelectTrigger_Shadcn_>
+                      <SelectTrigger>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
+                      </SelectTrigger>
+                      <SelectContent>
                         {LOG_DRAIN_TYPES.filter((t) => {
                           if (t.value === 'sentry') return sentryEnabled
                           if (t.value === 's3') return s3Enabled
@@ -488,17 +488,17 @@ export function LogDrainDestinationSheetForm({
                           if (t.value === 'syslog') return syslogEnabled
                           return true
                         }).map((type) => (
-                          <SelectItem_Shadcn_
+                          <SelectItem
                             value={type.value}
                             key={type.value}
                             id={type.value}
                             className="text-left"
                           >
                             {type.name}
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                      </SelectContent>
+                    </Select>
                   </FormItemLayout>
                 )}
               </div>
@@ -604,21 +604,21 @@ export function LogDrainDestinationSheetForm({
                           }
                         >
                           <FormControl>
-                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                              <SelectTrigger_Shadcn_ className="col-span-3">
-                                <SelectValue_Shadcn_ placeholder="Select a region" />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select a region" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Region</SelectLabel>
                                   {DATADOG_REGIONS.map((reg) => (
-                                    <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
+                                    <SelectItem key={reg.value} value={reg.value}>
                                       {reg.label}
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   ))}
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -759,21 +759,21 @@ export function LogDrainDestinationSheetForm({
                             description="Only HTTP with Protocol Buffers is currently supported"
                           >
                             <FormControl>
-                              <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                                <SelectTrigger_Shadcn_ className="col-span-3">
-                                  <SelectValue_Shadcn_ placeholder="Select protocol" />
-                                </SelectTrigger_Shadcn_>
-                                <SelectContent_Shadcn_>
-                                  <SelectGroup_Shadcn_>
-                                    <SelectLabel_Shadcn_>Protocol</SelectLabel_Shadcn_>
+                              <Select value={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger className="col-span-3">
+                                  <SelectValue placeholder="Select protocol" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Protocol</SelectLabel>
                                     {OTLP_PROTOCOLS.map((proto) => (
-                                      <SelectItem_Shadcn_ key={proto.value} value={proto.value}>
+                                      <SelectItem key={proto.value} value={proto.value}>
                                         {proto.label}
-                                      </SelectItem_Shadcn_>
+                                      </SelectItem>
                                     ))}
-                                  </SelectGroup_Shadcn_>
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                           </FormItemLayout>
                         )}
@@ -816,21 +816,21 @@ export function LogDrainDestinationSheetForm({
                           }
                         >
                           <FormControl>
-                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                              <SelectTrigger_Shadcn_ className="col-span-3">
-                                <SelectValue_Shadcn_ placeholder="Select a region" />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select a region" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Region</SelectLabel>
                                   {LAST9_REGIONS.map((reg) => (
-                                    <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
+                                    <SelectItem key={reg.value} value={reg.value}>
                                       {reg.label}
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   ))}
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
                         </FormItemLayout>
                       )}

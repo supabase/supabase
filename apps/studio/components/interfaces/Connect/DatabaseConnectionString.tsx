@@ -10,11 +10,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
   DIALOG_PADDING_X,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -289,18 +289,18 @@ export const DatabaseConnectionString = () => {
             <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
               Type
             </span>
-            <Select_Shadcn_ value={selectedTab} onValueChange={handleTabChange}>
-              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
+            <Select value={selectedTab} onValueChange={handleTabChange}>
+              <SelectTrigger size="small" className="w-full md:w-auto rounded-l-none">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {DATABASE_CONNECTION_TYPES.map((type) => (
-                  <SelectItem_Shadcn_ key={type.id} value={type.id}>
+                  <SelectItem key={type.id} value={type.id}>
                     {type.label}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </div>
           <DatabaseSelector
             align="start"
@@ -315,13 +315,13 @@ export const DatabaseConnectionString = () => {
             <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
               Method
             </span>
-            <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
-              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
-                <SelectValue_Shadcn_ size="tiny">
+            <Select value={selectedMethod} onValueChange={handleMethodChange}>
+              <SelectTrigger size="small" className="w-full md:w-auto rounded-l-none">
+                <SelectValue size="tiny">
                   {connectionStringMethodOptions[selectedMethod].label}
-                </SelectValue_Shadcn_>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_ className="max-w-sm">
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="max-w-sm">
                 {Object.keys(connectionStringMethodOptions).map((method) => (
                   <ConnectionStringMethodSelectItem
                     key={method}
@@ -329,8 +329,8 @@ export const DatabaseConnectionString = () => {
                     poolerBadge={method === 'transaction' ? poolerBadge : undefined}
                   />
                 ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <p className="text-xs inline-flex items-center gap-1 text-foreground-lighter">
@@ -661,7 +661,7 @@ const ConnectionStringMethodSelectItem = ({
   }
 
   return (
-    <SelectItem_Shadcn_ value={method} className="[&>span:first-child]:top-3.5">
+    <SelectItem value={method} className="[&>span:first-child]:top-3.5">
       <div className="flex flex-col w-full py-1">
         <div className="flex gap-x-2 items-center">
           {connectionStringMethodOptions[method].label}
@@ -673,6 +673,6 @@ const ConnectionStringMethodSelectItem = ({
           {badges.map((badge) => badge)}
         </div>
       </div>
-    </SelectItem_Shadcn_>
+    </SelectItem>
   )
 }

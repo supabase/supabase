@@ -14,12 +14,12 @@ import {
   Input,
   InputGroup,
   InputGroupAddon,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -157,31 +157,31 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                       label="Select a namespace to create your table in"
                     >
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
                             field.onChange(value)
                             form.resetField('newNamespace')
                           }}
                         >
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select a namespace" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a namespace" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {namespaces.map((x) => (
-                              <SelectItem_Shadcn_ key={x} value={x}>
+                              <SelectItem key={x} value={x}>
                                 {x}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                            {namespaces.length > 0 && <SelectSeparator_Shadcn_ />}
-                            <SelectItem_Shadcn_ value={NEW_NAMESPACE_MARKER}>
+                            {namespaces.length > 0 && <SelectSeparator />}
+                            <SelectItem value={NEW_NAMESPACE_MARKER}>
                               <div className="flex items-center gap-x-2">
                                 <Plus size={14} />
                                 <p>Create a new namespace</p>
                               </div>
-                            </SelectItem_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -267,21 +267,18 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                   name={`columns.${idx}.type`}
                                   render={({ field }) => (
                                     <FormControl>
-                                      <Select_Shadcn_
-                                        value={field.value}
-                                        onValueChange={field.onChange}
-                                      >
-                                        <SelectTrigger_Shadcn_ className="h-auto">
-                                          <SelectValue_Shadcn_ placeholder="Select a type" />
-                                        </SelectTrigger_Shadcn_>
-                                        <SelectContent_Shadcn_>
+                                      <Select value={field.value} onValueChange={field.onChange}>
+                                        <SelectTrigger className="h-auto">
+                                          <SelectValue placeholder="Select a type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
                                           {COLUMN_TYPES.map((x) => (
-                                            <SelectItem_Shadcn_ key={x} value={x}>
+                                            <SelectItem key={x} value={x}>
                                               {x}
-                                            </SelectItem_Shadcn_>
+                                            </SelectItem>
                                           ))}
-                                        </SelectContent_Shadcn_>
-                                      </Select_Shadcn_>
+                                        </SelectContent>
+                                      </Select>
                                     </FormControl>
                                   )}
                                 />

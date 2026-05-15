@@ -8,11 +8,11 @@ import {
   FormField,
   Input,
   Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -120,17 +120,17 @@ export const CustomExpiryModal = () => {
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Units">
                     <FormControl>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ aria-label="Units" placeholder="Select an option" />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectItem_Shadcn_ value="days">days</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="weeks">weeks</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="months">months</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="years">years</SelectItem_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue aria-label="Units" placeholder="Select an option" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="days">days</SelectItem>
+                          <SelectItem value="weeks">weeks</SelectItem>
+                          <SelectItem value="months">months</SelectItem>
+                          <SelectItem value="years">years</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItemLayout>
                 )}

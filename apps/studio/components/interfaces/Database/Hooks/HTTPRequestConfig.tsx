@@ -6,11 +6,11 @@ import {
   FormControl,
   FormField,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   useWatch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -55,17 +55,17 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
           name="http_method"
           render={({ field }) => (
             <FormItemLayout label="Method" layout="vertical" className="gap-1">
-              <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+              <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                 </FormControl>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                <SelectContent>
+                  <SelectItem value="GET">GET</SelectItem>
+                  <SelectItem value="POST">POST</SelectItem>
+                </SelectContent>
+              </Select>
             </FormItemLayout>
           )}
         />
@@ -107,26 +107,26 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
                 layout="vertical"
                 className="gap-1"
               >
-                <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="Select an edge function" />
-                    </SelectTrigger_Shadcn_>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an edge function" />
+                    </SelectTrigger>
                   </FormControl>
-                  <SelectContent_Shadcn_>
+                  <SelectContent>
                     {edgeFunctions.map((fn) => {
                       const restUrl = selectedProject?.restUrl
                       const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
                       const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
 
                       return (
-                        <SelectItem_Shadcn_ key={fn.id} value={functionUrl}>
+                        <SelectItem key={fn.id} value={functionUrl}>
                           {fn.name}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       )
                     })}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
             )}
           />

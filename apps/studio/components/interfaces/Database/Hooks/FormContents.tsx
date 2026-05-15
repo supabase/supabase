@@ -12,11 +12,11 @@ import {
   Label,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SidePanel,
   useWatch,
 } from 'ui'
@@ -147,23 +147,23 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                 className="gap-1"
                 description="This is the table the trigger will watch for changes. You can only select 1 table for a trigger."
               >
-                <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="Select a table" />
-                    </SelectTrigger_Shadcn_>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a table" />
+                    </SelectTrigger>
                   </FormControl>
-                  <SelectContent_Shadcn_>
+                  <SelectContent>
                     {tables.map((table) => (
-                      <SelectItem_Shadcn_ key={table.id} value={table.id.toString()}>
+                      <SelectItem key={table.id} value={table.id.toString()}>
                         <div className="flex items-center space-x-2">
                           <span className="text-foreground-light">{table.schema}</span>
                           <span className="text-foreground">{table.name}</span>
                         </div>
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
             )}
           />

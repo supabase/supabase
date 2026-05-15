@@ -12,12 +12,12 @@ import {
   InputGroupButton,
   InputGroupInput,
   InputGroupTextarea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   TextArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -91,25 +91,25 @@ export const InputField = ({
           description={field.comment}
           className="[&>div:first-child>span]:text-foreground-lighter"
         >
-          <Select_Shadcn_
+          <Select
             value={field.value ?? ''}
             onValueChange={(value: string) => onUpdateField({ [field.name]: value })}
             disabled={!isEditable}
           >
-            <SelectTrigger_Shadcn_>
-              <SelectValue_Shadcn_ placeholder="---" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
-                <SelectItem_Shadcn_ value={null as any}>---</SelectItem_Shadcn_>
+            <SelectTrigger>
+              <SelectValue placeholder="---" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value={null as any}>---</SelectItem>
                 {field.enums.map((value) => (
-                  <SelectItem_Shadcn_ key={value} value={value}>
+                  <SelectItem key={value} value={value}>
                     {value}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       )
     }
@@ -325,24 +325,24 @@ export const InputField = ({
         labelOptional={field.format}
         description={field.comment}
       >
-        <Select_Shadcn_
+        <Select
           value={defaultValue === null ? 'null' : defaultValue}
           onValueChange={(value) => onUpdateField({ [field.name]: value })}
           disabled={!isEditable}
         >
-          <SelectTrigger_Shadcn_>
-            <SelectValue_Shadcn_ placeholder="Select a value" />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
-            <SelectGroup_Shadcn_>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a value" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
               {options.map((option) => (
-                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                <SelectItem key={option.value} value={option.value}>
                   {option.label}
-                </SelectItem_Shadcn_>
+                </SelectItem>
               ))}
-            </SelectGroup_Shadcn_>
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </FormItemLayout>
     )
   }

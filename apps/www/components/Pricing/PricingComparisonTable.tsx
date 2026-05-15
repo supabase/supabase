@@ -11,12 +11,12 @@ import { pricing } from 'shared-data/pricing'
 import {
   Button,
   cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 
 import UpgradePlan from './UpgradePlan'
@@ -127,23 +127,23 @@ const PricingComparisonTable = ({
         <div className="bg-background p-2 sticky top-14 z-10 pt-4">
           <div className="bg-surface-100 rounded-lg border py-2 px-4 flex justify-between items-center">
             <label className="text-foreground-lighter grow">Change plan</label>
-            <Select_Shadcn_
+            <Select
               name="Change plan"
               value={activeMobilePlan}
               onValueChange={(value) => setActiveMobilePlan(value)}
             >
-              <SelectTrigger_Shadcn_ id="change-plan" className="w-auto min-w-[120px]">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
-                  <SelectItem_Shadcn_ value="Free">Free</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="Pro">Pro</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="Team">Team</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="Enterprise">Enterprise</SelectItem_Shadcn_>
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              <SelectTrigger id="change-plan" className="w-auto min-w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Free">Free</SelectItem>
+                  <SelectItem value="Pro">Pro</SelectItem>
+                  <SelectItem value="Team">Team</SelectItem>
+                  <SelectItem value="Enterprise">Enterprise</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         {activeMobilePlan === 'Free' && (

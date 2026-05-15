@@ -10,11 +10,11 @@ import {
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -34,17 +34,17 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Method</FormLabel>
-            <Select_Shadcn_ onValueChange={field.onChange} value={field.value}>
+            <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
-                <SelectTrigger_Shadcn_>
-                  <SelectValue_Shadcn_ placeholder="Select a method for the HTTP request" />
-                </SelectTrigger_Shadcn_>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a method for the HTTP request" />
+                </SelectTrigger>
               </FormControl>
-              <SelectContent_Shadcn_>
-                <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              <SelectContent>
+                <SelectItem value="GET">GET</SelectItem>
+                <SelectItem value="POST">POST</SelectItem>
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}

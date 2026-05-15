@@ -16,12 +16,12 @@ import {
   FormControl,
   FormField,
   Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -242,32 +242,29 @@ export const ProjectUpgradeAlert = () => {
                   render={({ field }) => (
                     <FormItemLayout label="Select the version of Postgres to upgrade to">
                       <FormControl>
-                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select a Postgres version" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            <SelectGroup_Shadcn_>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a Postgres version" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
                               {(data?.target_upgrade_versions || [])?.map((value) => {
                                 const postgresVersion =
                                   value.app_version.split('supabase-postgres-')[1]
                                 return (
-                                  <SelectItem_Shadcn_
-                                    key={formatValue(value)}
-                                    value={formatValue(value)}
-                                  >
+                                  <SelectItem key={formatValue(value)} value={formatValue(value)}>
                                     <div className="flex items-center gap-3">
                                       <span className="text-foreground">{postgresVersion}</span>
                                       {value.release_channel !== 'ga' && (
                                         <Badge variant="warning">{value.release_channel}</Badge>
                                       )}
                                     </div>
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 )
                               })}
-                            </SelectGroup_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}

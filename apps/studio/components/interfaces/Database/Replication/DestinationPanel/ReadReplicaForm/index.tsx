@@ -5,11 +5,11 @@ import { toast } from 'sonner'
 import {
   Button,
   InfoIcon,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SheetFooter,
   SheetSection,
 } from 'ui'
@@ -82,17 +82,17 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
           label="Region"
           labelOptional="Select a region to deploy your replica in"
         >
-          <Select_Shadcn_
+          <Select
             value={selectedRegion}
             onValueChange={setSelectedRegion}
             disabled={!canDeployReplica}
           >
-            <SelectTrigger_Shadcn_>
-              <SelectValue_Shadcn_ placeholder="Select a region" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a region" />
+            </SelectTrigger>
+            <SelectContent>
               {availableRegions.map((region) => (
-                <SelectItem_Shadcn_ key={region.key} value={region.key}>
+                <SelectItem key={region.key} value={region.key}>
                   <div className="flex gap-x-3 items-center">
                     <img
                       alt="region icon"
@@ -106,10 +106,10 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
                       </span>
                     </p>
                   </div>
-                </SelectItem_Shadcn_>
+                </SelectItem>
               ))}
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       </SheetSection>
       <SheetFooter className="justify-between!">

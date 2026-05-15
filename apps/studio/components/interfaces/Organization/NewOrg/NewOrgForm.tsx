@@ -18,11 +18,11 @@ import {
   FormControl,
   FormField,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -457,19 +457,19 @@ export const NewOrgForm = ({
                     description="What best describes your organization?"
                   >
                     <FormControl>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_ className="w-full">
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
 
-                        <SelectContent_Shadcn_>
+                        <SelectContent>
                           {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
-                            <SelectItem_Shadcn_ key={k} value={k}>
+                            <SelectItem key={k} value={k}>
                               {v}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -488,19 +488,19 @@ export const NewOrgForm = ({
                       description="How many people are in your company?"
                     >
                       <FormControl>
-                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_ className="w-full">
-                            <SelectValue_Shadcn_ />
-                          </SelectTrigger_Shadcn_>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
 
-                          <SelectContent_Shadcn_>
+                          <SelectContent>
                             {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                              <SelectItem_Shadcn_ key={k} value={k}>
+                              <SelectItem key={k} value={k}>
                                 {v}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -525,25 +525,25 @@ export const NewOrgForm = ({
                       }
                     >
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
                             field.onChange(value)
                             onPlanSelected(value)
                           }}
                         >
-                          <SelectTrigger_Shadcn_ className="w-full">
-                            <SelectValue_Shadcn_ />
-                          </SelectTrigger_Shadcn_>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
 
-                          <SelectContent_Shadcn_>
+                          <SelectContent>
                             {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
-                              <SelectItem_Shadcn_ key={k} value={k} translate="no">
+                              <SelectItem key={k} value={k} translate="no">
                                 {v}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}

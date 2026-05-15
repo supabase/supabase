@@ -19,11 +19,11 @@ import {
   FormField,
   FormLabel,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetClose,
@@ -492,19 +492,19 @@ export const CreateOrUpdateOAuthAppSheet = ({
                         className="px-5"
                       >
                         <FormControl>
-                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_ className="text-sm">
-                              <SelectValue_Shadcn_ />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectItem_Shadcn_ value="client_secret_basic" className="text-sm">
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="client_secret_basic" className="text-sm">
                                 HTTP Basic Auth header (client_secret_basic)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="client_secret_post" className="text-sm">
+                              </SelectItem>
+                              <SelectItem value="client_secret_post" className="text-sm">
                                 Request body (client_secret_post)
-                              </SelectItem_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}

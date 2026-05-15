@@ -8,11 +8,11 @@ import {
   AlertDescription,
   AlertTitle,
   Button,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SidePanel,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -327,21 +327,21 @@ export const ForeignKeySelector = ({
               className="gap-[2px]"
               size="tiny"
             >
-              <Select_Shadcn_
+              <Select
                 value={fk.schema}
                 onValueChange={(value) => updateSelectedSchema(value)}
               >
-                <SelectTrigger_Shadcn_ id="schema">
-                  <SelectValue_Shadcn_ />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
+                <SelectTrigger id="schema">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
                   {sortedSchemas.map((schema) => (
-                    <SelectItem_Shadcn_ key={schema.id} value={schema.name} className="min-w-96">
+                    <SelectItem key={schema.id} value={schema.name} className="min-w-96">
                       {schema.name}
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                </SelectContent>
+              </Select>
             </FormItemLayout>
             <FormItemLayout
               id="table"
@@ -351,17 +351,17 @@ export const ForeignKeySelector = ({
               className="gap-[2px]"
               size="tiny"
             >
-              <Select_Shadcn_
+              <Select
                 value={selectedTable?.id !== undefined ? String(selectedTable.id) : undefined}
                 onValueChange={(value) => updateSelectedTable(Number(value))}
                 disabled={isLoadingSelectedTable}
               >
-                <SelectTrigger_Shadcn_ id="table">
-                  <SelectValue_Shadcn_ />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
+                <SelectTrigger id="table">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
                   {sortBy(tables, ['schema']).map((table) => (
-                    <SelectItem_Shadcn_
+                    <SelectItem
                       key={table.id}
                       value={table.id.toString()}
                       className="min-w-96"
@@ -372,10 +372,10 @@ export const ForeignKeySelector = ({
                         <span className="text-foreground-lighter">{table.schema}</span>
                         <span className="text-foreground">{table.name}</span>
                       </div>
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                </SelectContent>
+              </Select>
             </FormItemLayout>
 
             {fk.schema && fk.table && (
@@ -411,20 +411,20 @@ export const ForeignKeySelector = ({
                       {fk.columns.map((_, idx) => (
                         <Fragment key={`${fk.schema}-${fk.table}-${idx}`}>
                           <div className="col-span-4">
-                            <Select_Shadcn_
+                            <Select
                               value={fk.columns[idx].source}
                               onValueChange={(value) => updateSelectedColumn(idx, 'source', value)}
                             >
-                              <SelectTrigger_Shadcn_
+                              <SelectTrigger
                                 aria-label={`Column from ${selectedSchema}.${table.name.length > 0 ? table.name : '[unnamed table]'}`}
                               >
-                                <SelectValue_Shadcn_ />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
                                 {(table?.columns ?? [])
                                   .filter((x) => x.name.length !== 0)
                                   .map((column) => (
-                                    <SelectItem_Shadcn_ key={column.id} value={column.name}>
+                                    <SelectItem key={column.id} value={column.name}>
                                       <div className="flex items-center gap-2">
                                         <span className="text-foreground">{column.name}</span>
                                         <span className="text-foreground-lighter">
@@ -437,27 +437,27 @@ export const ForeignKeySelector = ({
                                               )}
                                         </span>
                                       </div>
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   ))}
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                              </SelectContent>
+                            </Select>
                           </div>
                           <div className="col-span-1 flex justify-center items-center">
                             <ArrowRight />
                           </div>
                           <div className="col-span-4">
-                            <Select_Shadcn_
+                            <Select
                               value={fk.columns[idx].target}
                               onValueChange={(value) => updateSelectedColumn(idx, 'target', value)}
                             >
-                              <SelectTrigger_Shadcn_
+                              <SelectTrigger
                                 aria-label={`Column from ${fk.schema}.${fk.table}`}
                               >
-                                <SelectValue_Shadcn_ />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
                                 {(selectedTable?.columns ?? []).map((column) => (
-                                  <SelectItem_Shadcn_ key={column.id} value={column.name}>
+                                  <SelectItem key={column.id} value={column.name}>
                                     <div className="flex items-center gap-2">
                                       <span className="text-foreground">{column.name}</span>
                                       <span className="text-foreground-lighter">
@@ -470,10 +470,10 @@ export const ForeignKeySelector = ({
                                             )}
                                       </span>
                                     </div>
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 ))}
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                              </SelectContent>
+                            </Select>
                           </div>
                           <div className="col-span-1 flex justify-end items-center">
                             <Button
@@ -611,23 +611,23 @@ export const ForeignKeySelector = ({
                       className="gap-[2px]"
                       size="tiny"
                     >
-                      <Select_Shadcn_
+                      <Select
                         value={fk.updateAction}
                         onValueChange={(value) => updateCascadeAction('updateAction', value)}
                       >
-                        <SelectTrigger_Shadcn_ id="updateAction">
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
+                        <SelectTrigger id="updateAction">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
                           {FOREIGN_KEY_CASCADE_OPTIONS.filter((option) =>
                             ['no-action', 'cascade', 'restrict'].includes(option.key)
                           ).map((option) => (
-                            <SelectItem_Shadcn_ key={option.key} value={option.value}>
+                            <SelectItem key={option.key} value={option.value}>
                               {option.label}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                        </SelectContent>
+                      </Select>
                     </FormItemLayout>
                     <FormItemLayout
                       id="deletionAction"
@@ -646,21 +646,21 @@ export const ForeignKeySelector = ({
                       className="gap-[2px]"
                       size="tiny"
                     >
-                      <Select_Shadcn_
+                      <Select
                         value={fk.deletionAction}
                         onValueChange={(value) => updateCascadeAction('deletionAction', value)}
                       >
-                        <SelectTrigger_Shadcn_ id="deletionAction">
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
+                        <SelectTrigger id="deletionAction">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
                           {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
-                            <SelectItem_Shadcn_ key={option.key} value={option.value}>
+                            <SelectItem key={option.key} value={option.value}>
                               {option.label}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                        </SelectContent>
+                      </Select>
                     </FormItemLayout>
                   </>
                 )}

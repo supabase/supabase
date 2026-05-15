@@ -8,12 +8,12 @@ import {
   FormControl,
   FormField,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
   TextArea,
   WarningIcon,
 } from 'ui'
@@ -279,13 +279,13 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Choose `path` for MinIO/Supabase-style endpoints or `vhost` for AWS-style virtual host addressing"
             >
               <FormControl>
-                <Select_Shadcn_ value={field.value ?? 'path'} onValueChange={field.onChange}>
-                  <SelectTrigger_Shadcn_>{field.value ?? 'path'}</SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectItem_Shadcn_ value="path">path</SelectItem_Shadcn_>
-                    <SelectItem_Shadcn_ value="vhost">vhost</SelectItem_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                <Select value={field.value ?? 'path'} onValueChange={field.onChange}>
+                  <SelectTrigger>{field.value ?? 'path'}</SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="path">path</SelectItem>
+                    <SelectItem value="vhost">vhost</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItemLayout>
           )}
@@ -301,18 +301,16 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="Whether to use SSL when connecting to the S3-compatible endpoint"
             >
               <FormControl>
-                <Select_Shadcn_
+                <Select
                   value={field.value === false ? 'false' : 'true'}
                   onValueChange={(value) => field.onChange(value === 'true')}
                 >
-                  <SelectTrigger_Shadcn_>
-                    {field.value === false ? 'false' : 'true'}
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectItem_Shadcn_ value="true">true</SelectItem_Shadcn_>
-                    <SelectItem_Shadcn_ value="false">false</SelectItem_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  <SelectTrigger>{field.value === false ? 'false' : 'true'}</SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">true</SelectItem>
+                    <SelectItem value="false">false</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormItemLayout>
           )}
@@ -460,7 +458,7 @@ export const AnalyticsBucketFields = ({
                 </Button>
               ) : (
                 <FormControl>
-                  <Select_Shadcn_
+                  <Select
                     value={field.value}
                     onValueChange={(value) => {
                       if (value === 'new-bucket') {
@@ -473,29 +471,25 @@ export const AnalyticsBucketFields = ({
                       }
                     }}
                   >
-                    <SelectTrigger_Shadcn_>
-                      {field.value || 'Select a bucket'}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
+                    <SelectTrigger>{field.value || 'Select a bucket'}</SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
                         {analyticsBuckets.length === 0 ? (
-                          <SelectItem_Shadcn_ value="__no_buckets__" disabled>
+                          <SelectItem value="__no_buckets__" disabled>
                             No buckets available
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ) : (
                           analyticsBuckets.map((bucket) => (
-                            <SelectItem_Shadcn_ key={bucket.name} value={bucket.name}>
+                            <SelectItem key={bucket.name} value={bucket.name}>
                               {bucket.name}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))
                         )}
-                        <SelectSeparator_Shadcn_ />
-                        <SelectItem_Shadcn_ value="new-bucket">
-                          Create a new bucket
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        <SelectSeparator />
+                        <SelectItem value="new-bucket">Create a new bucket</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               )}
             </FormItemLayout>
@@ -533,7 +527,7 @@ export const AnalyticsBucketFields = ({
                 </Button>
               ) : (
                 <FormControl>
-                  <Select_Shadcn_
+                  <Select
                     value={field.value}
                     onValueChange={(value) => {
                       setIsFormInteracting(true)
@@ -541,33 +535,33 @@ export const AnalyticsBucketFields = ({
                     }}
                     disabled={!canSelectNamespace}
                   >
-                    <SelectTrigger_Shadcn_>
+                    <SelectTrigger>
                       {!canSelectNamespace
                         ? 'Select a warehouse first'
                         : field.value === CREATE_NEW_NAMESPACE
                           ? 'Create a new namespace'
                           : field.value || 'Select a namespace'}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
                         {namespaces.length === 0 ? (
-                          <SelectItem_Shadcn_ value="__no_namespaces__" disabled>
+                          <SelectItem value="__no_namespaces__" disabled>
                             No namespaces available
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ) : (
                           namespaces.map((namespace) => (
-                            <SelectItem_Shadcn_ key={namespace} value={namespace}>
+                            <SelectItem key={namespace} value={namespace}>
                               {namespace}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))
                         )}
-                        <SelectSeparator_Shadcn_ />
-                        <SelectItem_Shadcn_ key={CREATE_NEW_NAMESPACE} value={CREATE_NEW_NAMESPACE}>
+                        <SelectSeparator />
+                        <SelectItem key={CREATE_NEW_NAMESPACE} value={CREATE_NEW_NAMESPACE}>
                           Create a new namespace
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               )}
             </FormItemLayout>
@@ -687,29 +681,29 @@ export const AnalyticsBucketFields = ({
                 </Button>
               ) : (
                 <FormControl>
-                  <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger_Shadcn_>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
                       {field.value === CREATE_NEW_KEY
                         ? 'Create a new key'
                         : (field.value ?? '').length === 0
                           ? 'Select an access key ID'
                           : field.value}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
                         {s3Keys.map((key) => (
-                          <SelectItem_Shadcn_ key={key.id} value={key.access_key}>
+                          <SelectItem key={key.id} value={key.access_key}>
                             {key.access_key}
                             <p className="text-foreground-lighter">{key.description}</p>
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ))}
-                        <SelectSeparator_Shadcn_ />
-                        <SelectItem_Shadcn_ key={CREATE_NEW_KEY} value={CREATE_NEW_KEY}>
+                        <SelectSeparator />
+                        <SelectItem key={CREATE_NEW_KEY} value={CREATE_NEW_KEY}>
                           Create a new key
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
               )}
             </FormItemLayout>

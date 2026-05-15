@@ -2,12 +2,12 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 
 import { componentPages, frameworkTitles } from '@/config/docs'
@@ -69,19 +69,19 @@ export function FrameworkSelector() {
     })) || []
 
   return (
-    <Select_Shadcn_ value={selectedFramework} onValueChange={onSelect}>
-      <SelectTrigger_Shadcn_ className="w-[180px] mt-4 lg:mt-0">
-        <SelectValue_Shadcn_ />
-      </SelectTrigger_Shadcn_>
-      <SelectContent_Shadcn_>
-        <SelectGroup_Shadcn_>
+    <Select value={selectedFramework} onValueChange={onSelect}>
+      <SelectTrigger className="w-[180px] mt-4 lg:mt-0">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
           {options.map((f) => (
-            <SelectItem_Shadcn_ key={f.value} value={f.value}>
+            <SelectItem key={f.value} value={f.value}>
               {f.label}
-            </SelectItem_Shadcn_>
+            </SelectItem>
           ))}
-        </SelectGroup_Shadcn_>
-      </SelectContent_Shadcn_>
-    </Select_Shadcn_>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   )
 }

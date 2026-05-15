@@ -5,11 +5,11 @@ import {
   Form,
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -53,15 +53,15 @@ export default function ConfirmationModalDemo() {
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Postgres version">
                     <FormControl>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectItem_Shadcn_ value="17.6.1.054">17.6.1.054</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="17.6.1.055">17.6.1.055</SelectItem_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="17.6.1.054">17.6.1.054</SelectItem>
+                          <SelectItem value="17.6.1.055">17.6.1.055</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItemLayout>
                 )}

@@ -1,11 +1,11 @@
 import {
   Button,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 
 import SchemaSelector from '@/components/ui/SchemaSelector'
@@ -87,20 +87,20 @@ const RolesSelect = ({
   onChangeRole: (role: string) => void
 }) => {
   return (
-    <Select_Shadcn_ value={selectedRole} onValueChange={onChangeRole}>
-      <SelectTrigger_Shadcn_ size="tiny" className="w-40">
-        <SelectValue_Shadcn_ placeholder="Select a role" />
-      </SelectTrigger_Shadcn_>
-      <SelectContent_Shadcn_>
-        <SelectGroup_Shadcn_>
+    <Select value={selectedRole} onValueChange={onChangeRole}>
+      <SelectTrigger size="tiny" className="w-40">
+        <SelectValue placeholder="Select a role" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
           {roles.map((role) => (
-            <SelectItem_Shadcn_ key={role} value={role} className="text-xs">
+            <SelectItem key={role} value={role} className="text-xs">
               <span className="text-foreground-light mr-1">role</span> {role}
-            </SelectItem_Shadcn_>
+            </SelectItem>
           ))}
-        </SelectGroup_Shadcn_>
-      </SelectContent_Shadcn_>
-    </Select_Shadcn_>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   )
 }
 
@@ -116,25 +116,25 @@ const TablesSelect = ({
   onChangeTable: (table: string) => void
 }) => {
   return (
-    <Select_Shadcn_ value={selectedTable?.name} onValueChange={onChangeTable}>
-      <SelectTrigger_Shadcn_ size="tiny" className="w-44">
-        <SelectValue_Shadcn_ placeholder="Select a table" />
-      </SelectTrigger_Shadcn_>
-      <SelectContent_Shadcn_>
-        <SelectGroup_Shadcn_>
+    <Select value={selectedTable?.name} onValueChange={onChangeTable}>
+      <SelectTrigger size="tiny" className="w-44">
+        <SelectValue placeholder="Select a table" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
           {tables.length === 0 ? (
             <div className="text-xs text-foreground-light p-2">
               No tables available in this schema
             </div>
           ) : null}
           {tables.map((table) => (
-            <SelectItem_Shadcn_ key={table} value={table} className="text-xs">
+            <SelectItem key={table} value={table} className="text-xs">
               <span className="text-foreground-light mr-1">table</span> {table}
-            </SelectItem_Shadcn_>
+            </SelectItem>
           ))}
-        </SelectGroup_Shadcn_>
-      </SelectContent_Shadcn_>
-    </Select_Shadcn_>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   )
 }
 

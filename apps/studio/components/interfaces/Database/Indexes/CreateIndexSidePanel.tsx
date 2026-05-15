@@ -14,12 +14,12 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   SidePanel,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -356,21 +356,19 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 name="selected-index-type"
                 isReactForm={false}
               >
-                <Select_Shadcn_
+                <Select
                   disabled={isOrioleDb}
                   value={selectedIndexType}
                   onValueChange={setSelectedIndexType}
                   name="selected-index-type"
                 >
-                  <SelectTrigger_Shadcn_ size={'small'}>
-                    <SelectValue_Shadcn_ className="font-mono">
-                      {selectedIndexType}
-                    </SelectValue_Shadcn_>
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
+                  <SelectTrigger size={'small'}>
+                    <SelectValue className="font-mono">{selectedIndexType}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
                     {INDEX_TYPES.map((index, i) => (
                       <Fragment key={index.name}>
-                        <SelectItem_Shadcn_ value={index.value}>
+                        <SelectItem value={index.value}>
                           <div className="flex flex-col gap-0.5">
                             <span>{index.name}</span>
                             {index.description.split('\n').map((x, idx) => (
@@ -382,12 +380,12 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                               </span>
                             ))}
                           </div>
-                        </SelectItem_Shadcn_>
-                        {i < INDEX_TYPES.length - 1 && <SelectSeparator_Shadcn_ />}
+                        </SelectItem>
+                        {i < INDEX_TYPES.length - 1 && <SelectSeparator />}
                       </Fragment>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
               {isOrioleDb && (
                 <Admonition

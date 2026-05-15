@@ -9,12 +9,12 @@ import {
   cn,
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -42,20 +42,20 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
         render={({ field }) => (
           <FormItemLayout layout="vertical" label="Which library are you having issues with">
             <FormControl>
-              <Select_Shadcn_ {...field} defaultValue={field.value} onValueChange={field.onChange}>
-                <SelectTrigger_Shadcn_ className="w-full" aria-label="Select a library">
-                  <SelectValue_Shadcn_ placeholder="Select a library" />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+              <Select {...field} defaultValue={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full" aria-label="Select a library">
+                  <SelectValue placeholder="Select a library" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
                     {CLIENT_LIBRARIES.map((option) => (
-                      <SelectItem_Shadcn_ key={option.language} value={option.language}>
+                      <SelectItem key={option.language} value={option.language}>
                         {option.language}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </FormControl>
           </FormItemLayout>
         )}

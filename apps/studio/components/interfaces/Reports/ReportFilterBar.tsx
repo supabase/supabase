@@ -13,12 +13,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -304,25 +304,25 @@ const ReportFilterBar = ({
                 className="gap-[2px]"
                 size="tiny"
               >
-                <Select_Shadcn_
+                <Select
                   value={addFilterValues.key}
                   onValueChange={(value: string) =>
                     setAddFilterValues((prev) => ({ ...prev, key: value }))
                   }
                 >
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="---" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectGroup_Shadcn_>
+                  <SelectTrigger>
+                    <SelectValue placeholder="---" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
                       {filterKeys.map((key) => (
-                        <SelectItem_Shadcn_ key={key} value={key}>
+                        <SelectItem key={key} value={key}>
                           {key}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ))}
-                    </SelectGroup_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
               <FormItemLayout
                 isReactForm={false}
@@ -331,7 +331,7 @@ const ReportFilterBar = ({
                 className="gap-[2px]"
                 size="tiny"
               >
-                <Select_Shadcn_
+                <Select
                   value={addFilterValues.compare}
                   onValueChange={(value: string) =>
                     setAddFilterValues((prev) => ({
@@ -340,19 +340,19 @@ const ReportFilterBar = ({
                     }))
                   }
                 >
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="---" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectGroup_Shadcn_>
+                  <SelectTrigger>
+                    <SelectValue placeholder="---" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
                       {['is', 'matches'].map((value) => (
-                        <SelectItem_Shadcn_ key={value} value={value}>
+                        <SelectItem key={value} value={value}>
                           {value}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ))}
-                    </SelectGroup_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
               <FormItemLayout
                 isReactForm={false}

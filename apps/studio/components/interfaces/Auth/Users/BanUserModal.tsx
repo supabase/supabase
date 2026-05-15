@@ -12,10 +12,10 @@ import {
   FormField,
   Input,
   Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -112,19 +112,19 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
                 render={({ field }) => (
                   <FormItemLayout className="[&>div>div]:mt-0 mt-[33px]">
                     <FormControl>
-                      <Select_Shadcn_
+                      <Select
                         {...field}
                         value={field.value}
                         onValueChange={(value) => form.setValue('unit', value as 'hours' | 'days')}
                       >
-                        <SelectTrigger_Shadcn_ className="capitalize w-24">
+                        <SelectTrigger className="capitalize w-24">
                           {field.value}
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectItem_Shadcn_ value="hours">Hours</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="days">Days</SelectItem_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="hours">Hours</SelectItem>
+                          <SelectItem value="days">Days</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItemLayout>
                 )}

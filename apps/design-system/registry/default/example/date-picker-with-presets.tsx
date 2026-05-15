@@ -9,11 +9,11 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 
 import { cn } from '@/lib/utils'
@@ -36,17 +36,17 @@ export default function DatePickerWithPresets() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
-        <Select_Shadcn_ onValueChange={(value) => setDate(addDays(new Date(), parseInt(value)))}>
-          <SelectTrigger_Shadcn_>
-            <SelectValue_Shadcn_ placeholder="Select" />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_ position="popper">
-            <SelectItem_Shadcn_ value="0">Today</SelectItem_Shadcn_>
-            <SelectItem_Shadcn_ value="1">Tomorrow</SelectItem_Shadcn_>
-            <SelectItem_Shadcn_ value="3">In 3 days</SelectItem_Shadcn_>
-            <SelectItem_Shadcn_ value="7">In a week</SelectItem_Shadcn_>
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+        <Select onValueChange={(value) => setDate(addDays(new Date(), parseInt(value)))}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select" />
+          </SelectTrigger>
+          <SelectContent position="popper">
+            <SelectItem value="0">Today</SelectItem>
+            <SelectItem value="1">Tomorrow</SelectItem>
+            <SelectItem value="3">In 3 days</SelectItem>
+            <SelectItem value="7">In a week</SelectItem>
+          </SelectContent>
+        </Select>
         <div className="rounded-md border">
           <Calendar mode="single" selected={date} onSelect={setDate} />
         </div>

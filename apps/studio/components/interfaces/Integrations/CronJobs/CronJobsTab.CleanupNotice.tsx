@@ -10,11 +10,11 @@ import {
   DialogTitle,
   DialogTrigger,
   Progress,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -139,22 +139,22 @@ const CronJobRunDetailsOverflowDialog = ({
             ) : (
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <div className="sm:w-64">
-                  <Select_Shadcn_
+                  <Select
                     disabled={isBusy}
                     value={cleanupInterval}
                     onValueChange={setCleanupInterval}
                   >
-                    <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Select an interval" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select an interval" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {CLEANUP_INTERVALS.map((option) => (
-                        <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                        <SelectItem key={option.value} value={option.value}>
                           {option.label}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ))}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <Button
                   type="default"

@@ -11,11 +11,11 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   Label,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Textarea,
 } from 'ui'
 
@@ -165,25 +165,25 @@ export const CreateKeyDialog = ({
       <DialogSection className="flex flex-col gap-4">
         <div className="flex flex-col gap-4">
           <Label htmlFor="algorithm">Choose signing algorithm:</Label>
-          <Select_Shadcn_
+          <Select
             name="algorithm"
             value={newKeyAlgorithm}
             onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
           >
-            <SelectTrigger_Shadcn_ id="algorithm">
-              <SelectValue_Shadcn_ placeholder="Select algorithm" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectItem_Shadcn_ value="ES256">
+            <SelectTrigger id="algorithm">
+              <SelectValue placeholder="Select algorithm" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ES256">
                 <span>ES256 (ECC)</span>
                 <Badge variant="success" className="ml-2">
                   Recommended
                 </Badge>
-              </SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="HS256">HS256 (Shared Secret)</SelectItem_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectItem>
+              <SelectItem value="RS256">RS256 (RSA)</SelectItem>
+              <SelectItem value="HS256">HS256 (Shared Secret)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex flex-col gap-4">
           <Label htmlFor="byok" className="flex items-center gap-x-2">

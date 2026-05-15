@@ -6,11 +6,11 @@ import {
   Button,
   Checkbox,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
@@ -309,15 +309,15 @@ const CreateProject = () => {
             className="gap-[2px]"
             size="tiny"
           >
-            <Select_Shadcn_ value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
-              <SelectTrigger_Shadcn_ id="region">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
+            <Select value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
+              <SelectTrigger id="region">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {Object.keys(AWS_REGIONS).map((option: string, i) => {
                   const label = Object.values(AWS_REGIONS)[i].displayName
                   return (
-                    <SelectItem_Shadcn_ key={option} value={label}>
+                    <SelectItem key={option} value={label}>
                       <div className="flex gap-2">
                         <img
                           alt="region icon"
@@ -326,11 +326,11 @@ const CreateProject = () => {
                         />
                         <span>{label}</span>
                       </div>
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   )
                 })}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </FormItemLayout>
         </div>
       </div>

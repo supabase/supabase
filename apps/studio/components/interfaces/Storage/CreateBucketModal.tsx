@@ -17,11 +17,11 @@ import {
   FormField,
   FormMessage,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -312,18 +312,18 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                             </FormControl>
                           </div>
                           <div className="col-span-4">
-                            <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
-                              <SelectTrigger_Shadcn_ aria-label="File size limit unit" size="small">
-                                <SelectValue_Shadcn_>{selectedUnit}</SelectValue_Shadcn_>
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
+                            <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+                              <SelectTrigger aria-label="File size limit unit" size="small">
+                                <SelectValue>{selectedUnit}</SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
                                 {Object.values(StorageSizeUnits).map((unit: string) => (
-                                  <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
+                                  <SelectItem key={unit} value={unit} className="text-xs">
                                     {unit}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 ))}
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
                       </FormItemLayout>

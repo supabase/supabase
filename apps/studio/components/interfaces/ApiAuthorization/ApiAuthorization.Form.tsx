@@ -15,11 +15,11 @@ import {
   FormControl,
   FormField,
   FormItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
@@ -240,26 +240,26 @@ function OrganizationSelector({
               isReactForm
             >
               <FormControl>
-                <Select_Shadcn_
+                <Select
                   value={field.value || undefined}
                   disabled={disabled}
                   onValueChange={field.onChange}
                 >
-                  <SelectTrigger_Shadcn_ size="small">
-                    <SelectValue_Shadcn_ placeholder="Select an organization" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
+                  <SelectTrigger size="small">
+                    <SelectValue placeholder="Select an organization" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {organizations.map((organization) => (
-                      <SelectItem_Shadcn_
+                      <SelectItem
                         key={organization.slug}
                         value={organization.slug}
                         className="text-xs"
                       >
                         {organization.name}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormLayout>
           </FormItem>

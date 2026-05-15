@@ -5,11 +5,11 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
@@ -69,43 +69,43 @@ export const BlockViewConfiguration = ({
 
           {isChart && chartConfig && (
             <>
-              <Select_Shadcn_
+              <Select
                 disabled={lockColumns}
                 value={chartConfig?.xKey}
                 onValueChange={(value) => updateChartConfig({ ...chartConfig, xKey: value })}
               >
-                <SelectTrigger_Shadcn_ className="text-left">
+                <SelectTrigger className="text-left">
                   X Axis {chartConfig?.xKey && `- ${chartConfig.xKey}`}
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
                     {columns.map((key) => (
-                      <SelectItem_Shadcn_ value={key} key={key}>
+                      <SelectItem value={key} key={key}>
                         {key}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
 
-              <Select_Shadcn_
+              <Select
                 disabled={lockColumns}
                 value={chartConfig?.yKey}
                 onValueChange={(value) => updateChartConfig({ ...chartConfig, yKey: value })}
               >
-                <SelectTrigger_Shadcn_ className="text-left">
+                <SelectTrigger className="text-left">
                   Y Axis {chartConfig?.yKey && `- ${chartConfig.yKey}`}
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
                     {columns.map((key) => (
-                      <SelectItem_Shadcn_ value={key} key={key}>
+                      <SelectItem value={key} key={key}>
                         {key}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
 
               <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
                 <Label htmlFor="cumulative">

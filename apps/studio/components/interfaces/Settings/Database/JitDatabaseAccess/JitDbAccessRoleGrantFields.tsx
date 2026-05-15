@@ -3,11 +3,11 @@ import type { Control } from 'react-hook-form'
 import {
   Checkbox,
   cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
@@ -141,7 +141,7 @@ export function JitDbAccessRoleGrantFields({
               <p className="text-sm text-foreground">Expires in</p>
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <Select_Shadcn_
+                  <Select
                     value={grant.expiryMode}
                     onValueChange={(value) => {
                       const nextMode = value as JitRoleGrantDraft['expiryMode']
@@ -172,17 +172,17 @@ export function JitDbAccessRoleGrantFields({
                       })
                     }}
                   >
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="Expires in" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Expires in" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {EXPIRY_MODE_OPTIONS.map((option) => (
-                        <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                        <SelectItem key={option.value} value={option.value}>
                           {option.label}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ))}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {grant.expiryMode === 'custom' && (

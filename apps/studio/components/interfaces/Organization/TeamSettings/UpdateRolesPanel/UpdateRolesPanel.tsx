@@ -11,11 +11,11 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -263,20 +263,20 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                             </TooltipContent>
                           </Tooltip>
                         ) : (
-                          <Select_Shadcn_
+                          <Select
                             value={(project?.baseRoleId ?? project.roleId).toString()}
                             onValueChange={(value) => onSelectRole(value, project)}
                           >
-                            <SelectTrigger_Shadcn_
+                            <SelectTrigger
                               className={cn(
                                 ' w-40',
                                 role?.name === undefined && 'text-foreground-light'
                               )}
                             >
                               {role?.name ?? 'Please select a role'}
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_ align="end">
-                              <SelectGroup_Shadcn_>
+                            </SelectTrigger>
+                            <SelectContent align="end">
+                              <SelectGroup>
                                 {(orgScopedRoles ?? []).map((role) => {
                                   const canAssignRole = rolesAddable.includes(role.id)
                                   const isOwnerRole = role.name === 'Owner'
@@ -289,7 +289,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                       : undefined
 
                                   return (
-                                    <SelectItem_Shadcn_
+                                    <SelectItem
                                       key={role.id}
                                       value={role.id.toString()}
                                       className="text-sm hover:bg-selection cursor-pointer"
@@ -303,12 +303,12 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                           </span>
                                         )}
                                       </div>
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   )
                                 })}
-                              </SelectGroup_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
                         )}
 
                         {!isApplyingRoleToAllProjects && (

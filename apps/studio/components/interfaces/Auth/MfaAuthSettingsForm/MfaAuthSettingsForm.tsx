@@ -19,11 +19,11 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -365,22 +365,22 @@ export const MfaAuthSettingsForm = () => {
                         description="Control use of TOTP (App Authenticator) factors"
                       >
                         <FormControl>
-                          <Select_Shadcn_
+                          <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={!canUpdateConfig}
                           >
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select status" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
                               {MFAFactorSelectionOptions.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -467,22 +467,22 @@ export const MfaAuthSettingsForm = () => {
                         description="Control use of phone factors"
                       >
                         <FormControl>
-                          <Select_Shadcn_
+                          <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                           >
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select status" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
                               {MFAFactorSelectionOptions.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}

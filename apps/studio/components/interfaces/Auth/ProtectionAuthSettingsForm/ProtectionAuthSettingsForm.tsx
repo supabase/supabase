@@ -14,11 +14,11 @@ import {
   Form,
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -288,22 +288,22 @@ export const ProtectionAuthSettingsForm = () => {
                         return (
                           <FormItemLayout layout="flex-row-reverse" label="Choose Captcha Provider">
                             <FormControl>
-                              <Select_Shadcn_
+                              <Select
                                 value={field.value}
                                 onValueChange={field.onChange}
                                 disabled={!canUpdateConfig}
                               >
-                                <SelectTrigger_Shadcn_>
-                                  <SelectValue_Shadcn_ placeholder="Select provider" />
-                                </SelectTrigger_Shadcn_>
-                                <SelectContent_Shadcn_ align="end">
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select provider" />
+                                </SelectTrigger>
+                                <SelectContent align="end">
                                   {CAPTCHA_PROVIDERS.map((x) => (
-                                    <SelectItem_Shadcn_ key={x.key} value={x.key}>
+                                    <SelectItem key={x.key} value={x.key}>
                                       {x.label}
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   ))}
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             <InlineLink
                               href={

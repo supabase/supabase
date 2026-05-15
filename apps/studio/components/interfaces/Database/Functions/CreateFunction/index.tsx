@@ -18,11 +18,11 @@ import {
   RadioGroupStacked,
   RadioGroupStackedItem,
   ScrollArea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetContent,
@@ -221,22 +221,22 @@ export const CreateFunction = ({
                     render={({ field }) => (
                       <FormItemLayout label="Return type" layout="horizontal">
                         {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                        <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger_Shadcn_ className="col-span-8">
-                            <SelectValue_Shadcn_ />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <SelectTrigger className="col-span-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
                             <ScrollArea className="h-52">
                               {['void', 'record', 'trigger', 'integer', ...POSTGRES_DATA_TYPES].map(
                                 (option) => (
-                                  <SelectItem_Shadcn_ value={option} key={option}>
+                                  <SelectItem value={option} key={option}>
                                     {option}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 )
                               )}
                             </ScrollArea>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormItemLayout>
                     )}
                   />
@@ -314,25 +314,22 @@ export const CreateFunction = ({
                           render={({ field }) => (
                             <FormItemLayout label="Behavior" layout="horizontal">
                               {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                              <Select_Shadcn_
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <SelectTrigger_Shadcn_ className="col-span-8">
-                                  <SelectValue_Shadcn_ />
-                                </SelectTrigger_Shadcn_>
-                                <SelectContent_Shadcn_>
-                                  <SelectItem_Shadcn_ value="IMMUTABLE" key="IMMUTABLE">
+                              <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger className="col-span-8">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="IMMUTABLE" key="IMMUTABLE">
                                     immutable
-                                  </SelectItem_Shadcn_>
-                                  <SelectItem_Shadcn_ value="STABLE" key="STABLE">
+                                  </SelectItem>
+                                  <SelectItem value="STABLE" key="STABLE">
                                     stable
-                                  </SelectItem_Shadcn_>
-                                  <SelectItem_Shadcn_ value="VOLATILE" key="VOLATILE">
+                                  </SelectItem>
+                                  <SelectItem value="VOLATILE" key="VOLATILE">
                                     volatile
-                                  </SelectItem_Shadcn_>
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </FormItemLayout>
                           )}
                         />
@@ -455,24 +452,24 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                         <Input value={field.value} disabled readOnly className="h-auto" />
                       ) : (
                         <>
-                          <Select_Shadcn_
+                          <Select
                             disabled={readonly}
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <SelectTrigger_Shadcn_ className="h-[38px]">
-                              <SelectValue_Shadcn_ />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger className="h-[38px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
                               <ScrollArea className="h-52">
                                 {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
-                                  <SelectItem_Shadcn_ value={option} key={option}>
+                                  <SelectItem value={option} key={option}>
                                     {option}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 ))}
                               </ScrollArea>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </>
                       )}
                     </FormControl>
@@ -541,18 +538,18 @@ const FormFieldLanguage = () => {
       render={({ field }) => (
         <FormItemLayout label="Language" layout="horizontal">
           {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-          <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-            <SelectTrigger_Shadcn_ className="col-span-8">
-              <SelectValue_Shadcn_ />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <SelectTrigger className="col-span-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
               {allowedLanguages.map((option) => (
-                <SelectItem_Shadcn_ value={option} key={option}>
+                <SelectItem value={option} key={option}>
                   {option}
-                </SelectItem_Shadcn_>
+                </SelectItem>
               ))}
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       )}
     />

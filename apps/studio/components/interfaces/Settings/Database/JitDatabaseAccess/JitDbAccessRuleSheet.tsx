@@ -10,11 +10,11 @@ import {
   FormControl,
   FormField,
   ScrollArea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -243,19 +243,19 @@ export function JitDbAccessRuleSheet({
                   render={({ field }) => (
                     <FormItemLayout layout="vertical" label="Member">
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           disabled={
                             mode === 'edit' || (mode === 'add' && availableMembersForAddCount === 0)
                           }
                           onValueChange={field.onChange}
                         >
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select a member" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a member" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {memberOptions.map((member) => (
-                              <SelectItem_Shadcn_ key={member.id} value={member.id}>
+                              <SelectItem key={member.id} value={member.id}>
                                 {member.name ? (
                                   <>
                                     {member.name}{' '}
@@ -266,10 +266,10 @@ export function JitDbAccessRuleSheet({
                                 ) : (
                                   member.email
                                 )}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
 
                       {mode === 'add' && availableMembersForAddCount === 0 && (

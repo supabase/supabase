@@ -11,11 +11,11 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -228,44 +228,44 @@ export const ChartConfig = ({
 
         <div>
           <Label className="text-xs text-foreground-light">X Axis</Label>
-          <Select_Shadcn_
+          <Select
             value={config.xKey}
             onValueChange={(value) => {
               onConfigChange({ ...config, xKey: value })
             }}
           >
-            <SelectTrigger_Shadcn_>{config.xKey || 'Select X Axis'}</SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
+            <SelectTrigger>{config.xKey || 'Select X Axis'}</SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
                 {resultKeys.map((key) => (
-                  <SelectItem_Shadcn_ value={key} key={key}>
+                  <SelectItem value={key} key={key}>
                     {key}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
           <Label className="text-xs text-foreground-light">Y Axis</Label>
-          <Select_Shadcn_
+          <Select
             value={config.yKey}
             onValueChange={(value) => {
               onConfigChange({ ...config, yKey: value })
             }}
           >
-            <SelectTrigger_Shadcn_>{config.yKey || 'Select Y Axis'}</SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
+            <SelectTrigger>{config.yKey || 'Select Y Axis'}</SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
                 {yAxisKeys.map((key) => (
-                  <SelectItem_Shadcn_ value={key} key={key}>
+                  <SelectItem value={key} key={key}>
                     {key}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
         <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
           <Label className="" htmlFor="cumulative">

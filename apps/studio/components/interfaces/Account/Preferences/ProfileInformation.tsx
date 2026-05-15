@@ -11,11 +11,11 @@ import {
   FormControl,
   FormField,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -141,23 +141,23 @@ export const ProfileInformation = () => {
                     >
                       <FormControl className="col-span-8">
                         <div className="flex flex-col gap-1">
-                          <Select_Shadcn_
+                          <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={profile?.is_sso_user}
                           >
-                            <SelectTrigger_Shadcn_ className="col-span-8 w-full">
-                              <SelectValue_Shadcn_ placeholder="Select primary email" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_ className="col-span-8">
+                            <SelectTrigger className="col-span-8 w-full">
+                              <SelectValue placeholder="Select primary email" />
+                            </SelectTrigger>
+                            <SelectContent className="col-span-8">
                               {isIdentitiesSuccess &&
                                 dedupedIdentityEmails.map((email) => (
-                                  <SelectItem_Shadcn_ key={email} value={email}>
+                                  <SelectItem key={email} value={email}>
                                     {email}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </FormControl>
                     </FormItemLayout>

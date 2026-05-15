@@ -24,11 +24,11 @@ import {
   PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
   Textarea,
 } from 'ui'
@@ -572,22 +572,22 @@ export default function FormPatternsPageLayout() {
                         description="Single selection from a list of options"
                       >
                         <FormControl>
-                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select an option" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectItem_Shadcn_ value="us-east-1">
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an option" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="us-east-1">
                                 US East (N. Virginia)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="us-west-2">
+                              </SelectItem>
+                              <SelectItem value="us-west-2">
                                 US West (Oregon)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="eu-west-1">
+                              </SelectItem>
+                              <SelectItem value="eu-west-1">
                                 EU West (Ireland)
-                              </SelectItem_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}

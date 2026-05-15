@@ -29,11 +29,11 @@ import {
   RadioGroup,
   RadioGroupLargeItem,
   ScrollArea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
 } from 'ui'
 import {
   MultiSelector,
@@ -239,31 +239,31 @@ export const PolicyDetailsV2 = ({
                   Policy Behavior <code className="text-code-inline">as</code> clause
                 </FormLabel>
                 <FormControl>
-                  <Select_Shadcn_
+                  <Select
                     disabled={isEditing}
                     value={field.value}
                     onValueChange={(value) => form.setValue('behavior', value)}
                   >
-                    <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
+                    <SelectTrigger className="text-sm h-10 capitalize">
                       {field.value}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_ value="permissive" className="text-sm">
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="permissive" className="text-sm">
                           <p>Permissive</p>
                           <p className="text-foreground-light text-xs">
                             Policies are combined using the "OR" Boolean operator
                           </p>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="restrictive" className="text-sm">
+                        </SelectItem>
+                        <SelectItem value="restrictive" className="text-sm">
                           <p>Restrictive</p>
                           <p className="text-foreground-light text-xs">
                             Policies are combined using the "AND" Boolean operator
                           </p>
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>

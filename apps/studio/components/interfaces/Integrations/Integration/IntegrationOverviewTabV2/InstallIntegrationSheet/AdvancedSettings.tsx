@@ -5,12 +5,12 @@ import {
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
   Badge,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   SheetSection,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -94,7 +94,7 @@ export const AdvancedSettings = ({
                     ) : undefined
                   }
                 >
-                  <Select_Shadcn_
+                  <Select
                     disabled={!!defaultSchema || !!ext?.installed_version}
                     value={schema}
                     onValueChange={(schema) =>
@@ -107,15 +107,15 @@ export const AdvancedSettings = ({
                       }))
                     }
                   >
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="Select a schema" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectItem_Shadcn_ value="custom">Create a new schema</SelectItem_Shadcn_>
-                      <SelectSeparator_Shadcn_ />
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a schema" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="custom">Create a new schema</SelectItem>
+                      <SelectSeparator />
                       {availableSchemas.map((schema) => {
                         return (
-                          <SelectItem_Shadcn_ key={schema.id} value={schema.name}>
+                          <SelectItem key={schema.id} value={schema.name}>
                             {schema.name}
                             {schema.name === recommendedSchema ? (
                               <Badge className="ml-2" variant="success">
@@ -124,18 +124,18 @@ export const AdvancedSettings = ({
                             ) : schema.name === 'extensions' ? (
                               <Badge className="ml-2">Default</Badge>
                             ) : null}
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         )
                       })}
                       {defaultSchema &&
                       !availableSchemas.some((schema) => schema.name === defaultSchema) ? (
-                        <SelectItem_Shadcn_ key={defaultSchema} value={defaultSchema}>
+                        <SelectItem key={defaultSchema} value={defaultSchema}>
                           {defaultSchema}
                           <Badge className="ml-2">Default</Badge>
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ) : null}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    </SelectContent>
+                  </Select>
 
                   {schema === 'custom' && (
                     <FormItemLayout

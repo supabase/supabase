@@ -27,12 +27,12 @@ import {
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -623,7 +623,7 @@ export const UsersV2 = () => {
 
                 {showUserTypeFilter &&
                   (specificFilterColumn === 'freeform' || improvedSearchEnabled) && (
-                    <Select_Shadcn_
+                    <Select
                       value={filterUserType}
                       onValueChange={(val) => {
                         setFilterUserType(val as Filter)
@@ -638,32 +638,32 @@ export const UsersV2 = () => {
                         })
                       }}
                     >
-                      <SelectTrigger_Shadcn_
+                      <SelectTrigger
                         size="tiny"
                         className={cn(
                           'w-[140px] bg-transparent!',
                           filterUserType === 'all' && 'border-dashed'
                         )}
                       >
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectGroup_Shadcn_>
-                          <SelectItem_Shadcn_ value="all" className="text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="all" className="text-xs">
                             All users
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="verified" className="text-xs">
+                          </SelectItem>
+                          <SelectItem value="verified" className="text-xs">
                             Verified users
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                          </SelectItem>
+                          <SelectItem value="unverified" className="text-xs">
                             Unverified users
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                          </SelectItem>
+                          <SelectItem value="anonymous" className="text-xs">
                             Anonymous users
-                          </SelectItem_Shadcn_>
-                        </SelectGroup_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   )}
 
                 {showProviderFilter &&
