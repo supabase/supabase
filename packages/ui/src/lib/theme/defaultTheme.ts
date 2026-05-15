@@ -532,67 +532,6 @@ export default {
   },
 
   /*
-   *  Popover
-   */
-
-  popover: {
-    trigger: `
-      flex
-      border-none
-      rounded-sm
-      bg-transparent
-      p-0
-      outline-hidden
-      outline-offset-1
-      transition-all
-      focus:outline-4
-      focus:outline-border-control
-    `,
-    content: `
-      z-40
-      bg-overlay
-      border border-overlay
-      rounded-sm
-      shadow-lg
-      data-open:animate-dropdown-content-show
-      data-closed:animate-dropdown-content-hide
-      min-w-fit
-
-      origin-popover
-      data-open:animate-dropdown-content-show
-      data-closed:animate-dropdown-content-hide
-    `,
-    size: {
-      tiny: `w-40`,
-      small: `w-48`,
-      medium: `w-64`,
-      large: `w-80`,
-      xlarge: `w-96`,
-      content: `w-auto`,
-    },
-    header: `
-      bg-surface-200
-      space-y-1 py-1.5 px-3
-      border-b border-overlay
-    `,
-    footer: `
-      bg-surface-200
-      py-1.5 px-3
-      border-t border-overlay
-    `,
-    close: `
-      transition
-      text-foreground-lighter
-    `,
-    separator: `
-      w-full
-      h-px
-      my-2
-      bg-border-overlay
-    `,
-  },
-
-  /*
    * Menu
    */
 

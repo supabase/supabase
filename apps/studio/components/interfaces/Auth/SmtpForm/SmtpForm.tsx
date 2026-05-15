@@ -14,14 +14,14 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
   Switch,
 } from 'ui'
 import { Admonition, PageSection, PageSectionContent } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -284,7 +284,7 @@ export const SmtpForm = () => {
                               description="The email address the emails are sent from."
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   placeholder="noreply@yourdomain.com"
                                   disabled={!canUpdateConfig}
@@ -303,7 +303,7 @@ export const SmtpForm = () => {
                               description="Name displayed in the recipient's inbox."
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   placeholder="Your Name"
                                   disabled={!canUpdateConfig}
@@ -334,7 +334,7 @@ export const SmtpForm = () => {
                               description="Hostname or IP address of your SMTP server."
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   placeholder="your.smtp.host.com"
                                   disabled={!canUpdateConfig}
@@ -372,7 +372,7 @@ export const SmtpForm = () => {
                               }
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   type="number"
                                   value={field.value}
                                   onChange={(e) => field.onChange(e.target.value)}
@@ -418,7 +418,7 @@ export const SmtpForm = () => {
                               description="Username for your SMTP server."
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   placeholder="SMTP Username"
                                   disabled={!canUpdateConfig}
@@ -437,7 +437,7 @@ export const SmtpForm = () => {
                               description="Password for your SMTP server. For security reasons, this password cannot be viewed once saved."
                             >
                               <FormControl>
-                                <Input {...field} reveal copy disabled={!canUpdateConfig} />
+                                <PasswordInput {...field} reveal copy disabled={!canUpdateConfig} />
                               </FormControl>
                             </FormItemLayout>
                           )}

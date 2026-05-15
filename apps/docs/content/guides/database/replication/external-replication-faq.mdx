@@ -1,0 +1,210 @@
+---
+id: 'external-replication-faq'
+title: 'External replication FAQ'
+description: 'Frequently asked questions about external replication.'
+subtitle: 'Common questions and answers about external replication.'
+sidebar_label: 'FAQ'
+---
+
+<Admonition type="caution" label="Private Alpha">
+
+External replication is currently in private alpha. Access is limited and features may change.
+
+</Admonition>
+
+## What destinations are supported?
+
+External replication currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
+
+We are working on new destinations. Availability may continue to vary based on the planned roll-out strategy.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## What happened to Analytics Buckets replication?
+
+We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
+
+As a result, managed replication to Analytics Buckets is no longer available. Right now, **BigQuery** is the only supported managed destination, and we are actively working on expanding capabilities.
+
+## What does external replication install in the database?
+
+When you enable external replication, Supabase installs database objects that help track replication state and support schema changes:
+
+- An event trigger that runs on every `ALTER TABLE` statement. External replication uses this to support schema change handling.
+- A set of tables in the `etl` schema. These tables track replication state for your pipelines.
+
+The replication state tables are not updated very often, especially after the initial copy phase is complete.
+
+## What schema changes are supported?
+
+Schema change support is currently in beta and limited to the BigQuery destination.
+
+Supported schema changes:
+
+- Adding a column
+- Removing a column
+- Renaming a column
+
+External replication does not currently support changing column data types or replicating column default values. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+
+## What happens when you disable external replication?
+
+Disabling external replication removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
+
+You must delete all external replication pipelines before the disable action is available. For the Dashboard steps, see [Disabling external replication](/docs/guides/database/replication/external-replication-setup#disabling-external-replication).
+
+Disabling external replication stops Supabase from managing external replication for the project. It does not delete tables or data that were already written to your destination.
+
+## Why is a table not being replicated?
+
+Common reasons:
+
+- **Missing primary key**: Tables must have a primary key to be replicated (Postgres logical replication requirement)
+- **Not in publication**: Ensure the table is included in your Postgres publication
+- **Unsupported data types**: Tables with custom data types are not supported
+
+Check your publication settings and verify your table meets the requirements.
+
+## How does replica identity affect updates and deletes?
+
+If inserts replicate but updates or deletes fail, check the table's `REPLICA IDENTITY` setting.
+
+Postgres logical replication uses `REPLICA IDENTITY` to decide what old-row data to include in WAL for `UPDATE` and `DELETE` events. This is based on logical WAL being enabled, not whether a replication consumer is connected at that moment. Replica identity does not affect the row data Postgres logs for `INSERT` events.
+
+Downstream destinations use old-row data to find the row that changed, handle primary-key changes, and apply deletes.
+
+Postgres supports these replica identity modes:
+
+- `DEFAULT`: uses the table's primary key. Updates and deletes require a primary key when those operations are published.
+- `FULL`: logs the full old row for updates and deletes. Postgres flattens toasted old values when needed.
+- `USING INDEX`: uses a selected unique index as the replica identity.
+- `NOTHING`: logs no old-row identity. If the table is in a publication that publishes updates or deletes, Postgres rejects those statements because there is no row identity to publish.
+
+With `DEFAULT` or `USING INDEX`, Postgres logs only the replica-identity columns. For updates, Postgres includes that old identity when it needs it, such as when an identity column changes or an identity column contains external toasted data. For deletes, Postgres includes the old identity so consumers can identify the deleted row.
+
+Large values such as `text`, `jsonb`, and `bytea` can be stored out-of-line by Postgres using TOAST. During an update, if a toasted value did not change, Postgres may send a marker that means "the value is unchanged" instead of sending the value again. The replication pipeline can only reconstruct that value when the logical replication event includes enough old-row data. If the pipeline cannot reconstruct an unchanged toasted value, the update is treated as partial.
+
+You can check a table's current setting with:
+
+```sql
+select
+  n.nspname as schema_name,
+  c.relname as table_name,
+  c.relreplident as replica_identity
+from
+  pg_class as c
+  join pg_namespace as n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relname = 'your_table';
+```
+
+The `replica_identity` value is `d` for default, `f` for full, `i` for index, and `n` for nothing.
+
+For tables with toasted columns that need reliable updates, or for destinations that need complete old-row images, set `REPLICA IDENTITY FULL`:
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+`REPLICA IDENTITY FULL` increases WAL volume because Postgres logs the full old row for updates and deletes. Use it when correctness for updates and deletes is more important than the extra replication overhead.
+
+Changing replica identity only affects WAL records generated after the change. If a retained update was written while the table used `DEFAULT`, restarting replication does not decode that older record as `FULL`. Postgres logical decoding uses historic catalog snapshots, and the old tuple or key data must already be present in the WAL record.
+
+Destination-specific requirements can be stricter than Postgres itself. For BigQuery, see [BigQuery source table requirements](/docs/guides/database/replication/bigquery#source-table-requirements).
+
+After changing replica identity, restart each pipeline that includes the affected tables so the pipeline refreshes relation metadata and applies the new setting to future changes. If the pipeline is already failed, change the replica identity and then restart the pipeline.
+
+## Why aren't publication changes reflected after adding or removing tables?
+
+After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/external-replication-setup#adding-or-removing-tables) for instructions.
+
+## Why is a pipeline in failed state?
+
+Pipeline failures occur during the streaming phase when an error happens while replicating live data. This prevents data loss. To recover:
+
+1. Check the error message by hovering over the **Failed** status
+2. Click **View status** for detailed information
+3. Fix the underlying issue (e.g., schema mismatches, destination connectivity)
+4. Restart the pipeline
+
+See [Handling errors](/docs/guides/database/replication/external-replication-monitoring#handling-errors) for more details.
+
+## Why is a table in error state?
+
+Table errors occur during the copy phase. To recover, click **View status**, find the affected table, and reset the table state. This will restart the table copy from the beginning.
+
+## How to verify replication is working
+
+Check the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard:
+
+1. Verify your pipeline shows **Running** status
+2. Click **View status** to check table states
+3. Ensure all tables show **Live** state (actively replicating)
+4. Monitor replication lag metrics
+
+See the [external replication monitoring guide](/docs/guides/database/replication/external-replication-monitoring) for comprehensive monitoring instructions.
+
+## How to stop or pause replication
+
+You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/external-replication-setup#managing-your-pipeline) for details on available actions.
+
+<Admonition type="note">
+
+Stopping replication causes changes to queue up in the WAL.
+
+</Admonition>
+
+## What happens if a table is deleted at the destination?
+
+If a table is deleted downstream at the destination, the behavior depends on the destination. In general, the replication pipeline will try to recreate the missing table so that all tables in your publication can continue replicating.
+
+**To permanently remove a table from your destination you have two options:**
+
+**Option 1: Pause the pipeline first**
+
+1. Pause or delete your replication pipeline
+2. Delete the table at your destination
+3. The table will not be recreated since the pipeline is not running
+
+**Option 2: Remove from publication first**
+
+1. Remove the table from your Postgres publication using `ALTER PUBLICATION ... DROP TABLE`
+2. Restart your replication pipeline to apply the change (the table at the destination will remain but stop receiving new changes)
+3. Delete the table at your destination
+
+<Admonition type="note">
+
+Removing a table from the publication and restarting the pipeline does not delete the table downstream, it only stops replicating new changes to it.
+
+</Admonition>
+
+## Can data duplicates occur during pipeline operations?
+
+Yes, data duplicates can occur in certain scenarios when stopping a pipeline.
+
+When you stop a pipeline (for restarts or updates), the replication process tries to finish processing any transactions that are currently being sent to your destination. The pipeline waits up to a few minutes to allow these in-progress transactions to complete cleanly before stopping.
+
+However, if a transaction in your database takes longer than this waiting period to complete, the pipeline will stop before that entire transaction has been fully processed. When the pipeline starts again, it must restart the incomplete transaction from the beginning to maintain transaction boundaries, which results in some data being sent twice to your destination.
+
+### Understanding transaction boundaries
+
+A transaction is a group of database changes that happen together (for example, all changes within a `BEGIN...COMMIT` block). Postgres logical replication must process entire transactions - it cannot process part of a transaction, stop, and then continue from the middle. This means if a transaction is interrupted, the whole transaction must be replayed when the pipeline resumes.
+
+**Example scenario**: Suppose you have a large operation that updates 10,000 rows within a single transaction. If this operation takes 10 minutes to complete and you stop the pipeline after 5 minutes (when 5,000 rows have been processed), the pipeline cannot resume from row 5,001. Instead, when it restarts, it must reprocess all 10,000 rows from the beginning, resulting in the first 5,000 rows being sent to your destination twice.
+
+<Admonition type="caution">
+
+There are currently no plans to implement automatic deduplication. If your use case requires guaranteed exactly-once delivery, you should implement deduplication logic in your downstream systems based on primary keys or other unique identifiers.
+
+</Admonition>
+
+## Where to find replication logs
+
+Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/explorer) section of the Dashboard to see all pipeline logs. Logs contain diagnostic information. If you're experiencing issues, contact support with your error details.
+
+## How to get help
+
+If you need assistance:
+
+1. Check the [external replication setup guide](/docs/guides/database/replication/external-replication-setup) and [external replication monitoring guide](/docs/guides/database/replication/external-replication-monitoring)
+2. Review this FAQ for common issues
+3. Contact support with your error details and logs
