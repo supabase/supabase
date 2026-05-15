@@ -26,6 +26,9 @@ import {
   CommandSeparator_Shadcn_,
   CriticalIcon,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -35,6 +38,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import {
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -134,17 +138,19 @@ const ColumnType = ({
     return (
       <Tooltip>
         <TooltipTrigger>
-          <Input
-            readOnly
-            disabled
-            label={showLabel ? 'Type' : ''}
+          <FormItemLayout
             layout={showLabel ? layout : undefined}
-            className="md:gap-x-0 [&>div>div]:text-left"
-            size="small"
-            icon={inferIcon(getOptionType(value))}
-            value={displayValue}
-            descriptionText={showLabel ? unsupportedDataTypeText : undefined}
-          />
+            label={showLabel ? 'Type' : ''}
+            description={showLabel ? unsupportedDataTypeText : undefined}
+            isReactForm={false}
+          >
+            <InputGroup>
+              <InputGroupInput readOnly disabled size="small" value={displayValue} />
+              <InputGroupAddon align="inline-start">
+                {inferIcon(getOptionType(value))}
+              </InputGroupAddon>
+            </InputGroup>
+          </FormItemLayout>
         </TooltipTrigger>
         {!showLabel && (
           <TooltipContent side="bottom" className="w-80">
@@ -159,15 +165,14 @@ const ColumnType = ({
     return (
       <Tooltip>
         <TooltipTrigger>
-          <Input
-            readOnly
-            disabled
+          <FormItemLayout
+            layout={showLabel ? layout : undefined}
             label={showLabel ? 'Type' : ''}
-            layout={showLabel ? 'horizontal' : undefined}
-            className="md:gap-x-0"
-            size="small"
-            value={displayValue}
-          />
+            description={showLabel ? unsupportedDataTypeText : undefined}
+            isReactForm={false}
+          >
+            <Input readOnly disabled size="small" value={displayValue} />
+          </FormItemLayout>
         </TooltipTrigger>
         {!showLabel && description && (
           <TooltipContent side="bottom">
