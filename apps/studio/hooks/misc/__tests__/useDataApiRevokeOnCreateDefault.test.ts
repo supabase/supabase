@@ -102,31 +102,49 @@ describe('useTrackDefaultPrivilegesExposure', () => {
     vi.mocked(usePHFlag).mockReturnValue(true)
     renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: true }))
     expect(track).toHaveBeenCalledTimes(1)
-    expect(track).toHaveBeenCalledWith('project_creation_default_privileges_exposed', {
-      surface: 'main',
-      dataApiEnabled: true,
-      dataApiRevokeOnCreateDefaultEnabled: true,
-    })
+    expect(track).toHaveBeenCalledWith(
+      'project_creation_default_privileges_exposed',
+      {
+        surface: 'main',
+        dataApiEnabled: true,
+        dataApiRevokeOnCreateDefaultEnabled: true,
+      },
+      undefined
+    )
   })
 
   it('fires once when the flag resolves to false on the main surface', () => {
     vi.mocked(usePHFlag).mockReturnValue(false)
     renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: false }))
     expect(track).toHaveBeenCalledTimes(1)
-    expect(track).toHaveBeenCalledWith('project_creation_default_privileges_exposed', {
-      surface: 'main',
-      dataApiEnabled: false,
-      dataApiRevokeOnCreateDefaultEnabled: false,
-    })
+    expect(track).toHaveBeenCalledWith(
+      'project_creation_default_privileges_exposed',
+      {
+        surface: 'main',
+        dataApiEnabled: false,
+        dataApiRevokeOnCreateDefaultEnabled: false,
+      },
+      undefined
+    )
   })
 
   it('omits dataApiEnabled on the vercel surface', () => {
     vi.mocked(usePHFlag).mockReturnValue(true)
-    renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'vercel' }))
-    expect(track).toHaveBeenCalledWith('project_creation_default_privileges_exposed', {
-      surface: 'vercel',
-      dataApiRevokeOnCreateDefaultEnabled: true,
-    })
+    renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'vercel', orgSlug: 'acme-org' }))
+    expect(track).toHaveBeenCalledWith(
+      'project_creation_default_privileges_exposed',
+      {
+        surface: 'vercel',
+        dataApiRevokeOnCreateDefaultEnabled: true,
+      },
+      { organization: 'acme-org' }
+    )
+  })
+
+  it('skips emission on vercel surface when orgSlug is missing', () => {
+    vi.mocked(usePHFlag).mockReturnValue(true)
+    renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'vercel', orgSlug: undefined }))
+    expect(track).not.toHaveBeenCalled()
   })
 
   it('deduplicates across re-renders', () => {
@@ -149,7 +167,8 @@ describe('useTrackDefaultPrivilegesExposure', () => {
     expect(track).toHaveBeenCalledTimes(1)
     expect(track).toHaveBeenCalledWith(
       'project_creation_default_privileges_exposed',
-      expect.objectContaining({ dataApiRevokeOnCreateDefaultEnabled: false })
+      expect.objectContaining({ dataApiRevokeOnCreateDefaultEnabled: false }),
+      undefined
     )
   })
 })
