@@ -1,17 +1,17 @@
 import { Lightbulb } from 'lucide-react'
-import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Button, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 import { EnableIndexAdvisorButton } from '../QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 
 export const IndexAdvisorPopover = () => {
   return (
-    <Popover_Shadcn_ modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover modal={false}>
+      <PopoverTrigger asChild>
         <Button type="default" icon={<Lightbulb strokeWidth={1.5} />}>
           Index Advisor
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
+      </PopoverTrigger>
+      <PopoverContent className="w-80 text-sm" align="end">
         <h4 className="flex items-center gap-2">
           <Lightbulb size={16} /> Index Advisor
         </h4>
@@ -22,7 +22,7 @@ export const IndexAdvisorPopover = () => {
             <EnableIndexAdvisorButton />
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

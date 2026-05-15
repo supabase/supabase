@@ -6,9 +6,9 @@ import {
   AlertTitle,
   Button,
   cn,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { navigateToSection } from './Content/Content.utils'
@@ -113,8 +113,8 @@ const ResourcePicker = ({ category, resource, renderResourceList }: ResourcePick
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <Button
           type="default"
           size="small"
@@ -123,15 +123,15 @@ const ResourcePicker = ({ category, resource, renderResourceList }: ResourcePick
         >
           <span className="truncate">{resource ?? 'Select a resource'}</span>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="center">
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-64" side="bottom" align="center">
         {renderResourceList({
           selectedResource: resource,
           onSelect: handleSelect,
           closePopover: () => setOpen(false),
         })}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 

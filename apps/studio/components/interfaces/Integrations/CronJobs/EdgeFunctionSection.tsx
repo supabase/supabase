@@ -21,9 +21,9 @@ import {
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -125,8 +125,8 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
             return (
               <FormItem>
                 <FormLabel>Edge Function</FormLabel>
-                <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger_Shadcn_ asChild>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         type="default"
@@ -150,8 +150,8 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                           : 'Select which edge function to trigger'}
                       </Button>
                     </FormControl>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ id={listboxId} className="p-0" sameWidthAsTrigger>
+                  </PopoverTrigger>
+                  <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
                     <Command_Shadcn_>
                       <CommandInput_Shadcn_ placeholder="Search edge functions..." />
                       <CommandList_Shadcn_>
@@ -182,8 +182,8 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                         </CommandGroup_Shadcn_>
                       </CommandList_Shadcn_>
                     </Command_Shadcn_>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )

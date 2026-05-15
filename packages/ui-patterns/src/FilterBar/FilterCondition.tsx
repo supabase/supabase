@@ -2,14 +2,7 @@
 
 import { X } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Button,
-  cn,
-  Input,
-  Popover_Shadcn_,
-  PopoverAnchor_Shadcn_,
-  PopoverContent_Shadcn_,
-} from 'ui'
+import { Button, cn, Input, Popover, PopoverAnchor, PopoverContent } from 'ui'
 
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
@@ -272,8 +265,8 @@ export function FilterCondition({
       data-testid={`filter-condition-${property.name}`}
       data-highlighted={isHighlighted}
     >
-      <Popover_Shadcn_ open={isPropertyActive && !isLoading && propertyItems.length > 0}>
-        <PopoverAnchor_Shadcn_ asChild>
+      <Popover open={isPropertyActive && !isLoading && propertyItems.length > 0}>
+        <PopoverAnchor asChild>
           <div ref={propertyLabelRef} className="relative inline-flex items-center shrink-0">
             {isPropertyActive ? (
               <Input
@@ -304,8 +297,8 @@ export function FilterCondition({
               {property.label}
             </span>
           </div>
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] p-0"
           align="start"
           side="bottom"
@@ -324,10 +317,10 @@ export function FilterCondition({
             onSelect={(item) => handlePropertyChange(path, item.value)}
             includeIcon={false}
           />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-      <Popover_Shadcn_ open={isOperatorActive && !isLoading && operatorItems.length > 0}>
-        <PopoverAnchor_Shadcn_ asChild>
+        </PopoverContent>
+      </Popover>
+      <Popover open={isOperatorActive && !isLoading && operatorItems.length > 0}>
+        <PopoverAnchor asChild>
           <div className="relative inline-block">
             <Input
               ref={operatorRef}
@@ -354,8 +347,8 @@ export function FilterCondition({
               {(isOperatorActive ? localOperator : conditionOperator) || ' '}
             </span>
           </div>
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] p-0"
           align="start"
           side="bottom"
@@ -375,10 +368,10 @@ export function FilterCondition({
             includeIcon={false}
             grouped
           />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-      <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
-        <PopoverAnchor_Shadcn_ asChild>
+        </PopoverContent>
+      </Popover>
+      <Popover open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
+        <PopoverAnchor asChild>
           <div className="relative inline-block max-w-[180px]">
             <Input
               ref={valueRef}
@@ -400,8 +393,8 @@ export function FilterCondition({
             />
             <span className="invisible whitespace-pre text-xs block px-1">{localValue || ' '}</span>
           </div>
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] w-fit p-0"
           align="start"
           side="bottom"
@@ -439,8 +432,8 @@ export function FilterCondition({
               includeIcon
             />
           )}
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
       <Button
         type="text"
         size="tiny"

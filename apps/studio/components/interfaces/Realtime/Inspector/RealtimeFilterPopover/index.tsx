@@ -10,9 +10,9 @@ import {
   IconDatabaseChanges,
   IconPresence,
   Input,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Switch,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -69,8 +69,8 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
 
   return (
     <>
-      <Popover_Shadcn_ open={open} onOpenChange={onOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={onOpen}>
+        <PopoverTrigger asChild>
           <Button
             icon={<PlusCircle size="16" />}
             type={isFiltered ? 'primary' : 'dashed'}
@@ -86,8 +86,8 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               <span className="mr-1">Filter messages</span>
             )}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-[365px]" align="start">
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-[365px]" align="start">
           <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
             Listen to event types
           </div>
@@ -229,8 +229,8 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             </Button>
             <Button onClick={() => setApplyConfigOpen(true)}>Apply</Button>
           </div>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
       <ConfirmationModal
         title="Previously found messages will be lost"
         variant="destructive"

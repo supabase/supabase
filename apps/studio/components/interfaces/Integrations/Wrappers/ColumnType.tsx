@@ -30,9 +30,9 @@ import {
   FormItem,
   FormLabel,
   Input,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -134,8 +134,8 @@ export const ColumnType = ({
             <FormLabel className="text-foreground flex gap-2 items-center wrap-break-word">
               Type
             </FormLabel>
-            <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover modal open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
                 <Button
                   role="combobox"
                   size={'small'}
@@ -157,13 +157,8 @@ export const ColumnType = ({
                     'Choose a column type...'
                   )}
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                id={listboxId}
-                className="w-[460px] p-0"
-                side="bottom"
-                align="center"
-              >
+              </PopoverTrigger>
+              <PopoverContent id={listboxId} className="w-[460px] p-0" side="bottom" align="center">
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_
                     placeholder="Search types..."
@@ -259,8 +254,8 @@ export const ColumnType = ({
                     </ScrollArea>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
             {showRecommendation && recommendation !== undefined && (
               <Alert variant="warning" className="mt-2">
                 <CriticalIcon />

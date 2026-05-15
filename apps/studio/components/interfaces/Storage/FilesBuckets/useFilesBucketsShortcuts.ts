@@ -1,6 +1,8 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Dispatch, RefObject, SetStateAction } from 'react'
 
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -21,6 +23,8 @@ export function useFilesBucketsShortcuts({
   setCreateVisible,
   onRefresh,
 }: UseFilesBucketsShortcutsParams) {
+  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
     () => {
@@ -32,6 +36,7 @@ export function useFilesBucketsShortcuts({
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setCreateVisible(true), {
     label: 'Create new bucket',
+    enabled: canCreateBuckets,
   })
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {

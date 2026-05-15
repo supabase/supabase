@@ -19,9 +19,9 @@ import {
   HoverCardTrigger,
   NavMenu,
   NavMenuItem,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Separator,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
@@ -330,13 +330,13 @@ const EdgeFunctionDetailsLayout = ({
             <PageHeaderAside>
               <div className="flex items-center space-x-2">
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Popover_Shadcn_>
-                  <PopoverTrigger_Shadcn_ asChild>
+                <Popover>
+                  <PopoverTrigger asChild>
                     <Button type="default" icon={<Download />}>
                       Download
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ align="end" className="p-0">
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="p-0">
                     {IS_PLATFORM && (
                       <>
                         <div className="p-3 flex flex-col gap-y-2">
@@ -363,8 +363,8 @@ const EdgeFunctionDetailsLayout = ({
                         Download as ZIP
                       </Button>
                     </div>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  </PopoverContent>
+                </Popover>
                 {!!functionSlug && (
                   <Button
                     type="default"

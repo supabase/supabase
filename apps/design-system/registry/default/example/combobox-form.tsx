@@ -19,9 +19,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { z } from 'zod'
 
@@ -69,8 +69,8 @@ export default function ComboboxForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Language</FormLabel>
-              <Popover_Shadcn_>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover>
+                <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       type="default"
@@ -92,8 +92,8 @@ export default function ComboboxForm() {
                         : 'Select language'}
                     </Button>
                   </FormControl>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="w-[200px] p-0">
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search language..." />
                     <CommandList_Shadcn_>
@@ -119,8 +119,8 @@ export default function ComboboxForm() {
                       </CommandGroup_Shadcn_>
                     </CommandList_Shadcn_>
                   </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
               <FormDescription>
                 This is the language that will be used in the dashboard.
               </FormDescription>

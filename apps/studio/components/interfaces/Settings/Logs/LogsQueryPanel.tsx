@@ -19,9 +19,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SidePanel,
   Switch,
   Tooltip,
@@ -266,8 +266,8 @@ const LogsQueryPanel = ({
             <SidePanel.Separator />
 
             <div className="px-4 pb-4 flex flex-col gap-4">
-              <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
                   <Button
                     type="default"
                     role="combobox"
@@ -278,8 +278,8 @@ const LogsQueryPanel = ({
                   >
                     {value ? selectedSchema?.name : 'Select source...'}
                   </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" sameWidthAsTrigger>
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search source..." />
                     <CommandList_Shadcn_>
@@ -306,8 +306,8 @@ const LogsQueryPanel = ({
                       </CommandGroup_Shadcn_>
                     </CommandList_Shadcn_>
                   </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
               <Table
                 head={[
                   <Table.th className="text-xs p-2!" key="path">

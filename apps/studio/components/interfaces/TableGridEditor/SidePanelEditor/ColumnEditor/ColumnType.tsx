@@ -30,9 +30,9 @@ import {
   InputGroupAddon,
   InputGroupInput,
   Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -186,8 +186,8 @@ const ColumnType = ({
   return (
     <div className={cn('flex flex-col gap-y-2', className)}>
       {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
-      <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover modal open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             type={error ? 'danger' : 'default'}
             role="combobox"
@@ -207,13 +207,8 @@ const ColumnType = ({
               'Choose a column type...'
             )}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          id={listboxId}
-          className="w-[460px] p-0"
-          side="bottom"
-          align="center"
-        >
+        </PopoverTrigger>
+        <PopoverContent id={listboxId} className="w-[460px] p-0" side="bottom" align="center">
           <Command_Shadcn_>
             <CommandInput_Shadcn_
               placeholder="Search types..."
@@ -301,8 +296,8 @@ const ColumnType = ({
               </ScrollArea>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
 
       {showRecommendation && recommendation !== undefined && (
         <Alert variant="warning" className="mt-2">

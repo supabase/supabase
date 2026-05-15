@@ -18,9 +18,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { cn } from '@/lib/utils'
@@ -66,8 +66,8 @@ export default function ComboboxPopover() {
   return (
     <div className="flex items-center gap-4">
       <p className="text-sm text-muted-foreground">Status</p>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             type="default"
             size="small"
@@ -82,8 +82,8 @@ export default function ComboboxPopover() {
           >
             {selectedStatus ? <>{selectedStatus.label}</> : <>Set status</>}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0" side="right" align="start">
+        </PopoverTrigger>
+        <PopoverContent className="p-0" side="right" align="start">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Change status..." />
             <CommandList_Shadcn_>
@@ -112,8 +112,8 @@ export default function ComboboxPopover() {
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

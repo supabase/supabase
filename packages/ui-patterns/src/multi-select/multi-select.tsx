@@ -8,18 +8,16 @@ import React, { isValidElement, ReactElement, useEffect } from 'react'
 import {
   Badge,
   cn,
-  Popover_Shadcn_ as Popover,
-  PopoverAnchor_Shadcn_ as PopoverAnchor,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverContentProps_Shadcn_ as PopoverContentProps,
+  Command_Shadcn_ as Command,
+  CommandEmpty_Shadcn_ as CommandEmpty,
+  CommandInput_Shadcn_ as CommandInput,
+  CommandItem_Shadcn_ as CommandItem,
+  CommandList_Shadcn_ as CommandList,
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverContentProps,
 } from 'ui'
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from 'ui/src/components/shadcn/ui/command'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {

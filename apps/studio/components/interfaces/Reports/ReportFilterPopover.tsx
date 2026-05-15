@@ -11,10 +11,10 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Input,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverSeparator,
+  PopoverTrigger,
 } from 'ui'
 import { sizes } from 'ui/src/lib/commonCva'
 import defaultTheme from 'ui/src/lib/theme/defaultTheme'
@@ -331,8 +331,8 @@ export const ReportFilterPopover = ({
   const hasChanges = !isEqual(localFilters, filters)
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <Button
           type={filters.length > 0 ? 'link' : 'text'}
           icon={<FilterIcon />}
@@ -340,8 +340,8 @@ export const ReportFilterPopover = ({
         >
           {displayButtonText}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[500px]" side="bottom" align="start">
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-[500px]" side="bottom" align="start">
         <div className="space-y-2 py-2">
           <div>
             {localFilters.map((filter, index) => (
@@ -364,7 +364,7 @@ export const ReportFilterPopover = ({
               </div>
             )}
           </div>
-          <PopoverSeparator_Shadcn_ />
+          <PopoverSeparator />
           <div className="px-3 flex flex-row justify-between">
             <div className="flex gap-2">
               <Button icon={<Plus />} type="text" onClick={onAddFilter}>
@@ -381,7 +381,7 @@ export const ReportFilterPopover = ({
             </Button>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

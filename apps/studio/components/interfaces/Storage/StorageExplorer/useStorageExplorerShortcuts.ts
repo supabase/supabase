@@ -32,13 +32,9 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  useShortcut(
-    SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
-    () => {
-      refreshAll()
-    },
-    { enabled: selectedItems.length === 0 }
-  )
+  useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH, () => {
+    refreshAll()
+  })
 
   useShortcut(
     SHORTCUT_IDS.STORAGE_EXPLORER_DOWNLOAD_SELECTED,
@@ -61,7 +57,7 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
   useShortcut(
     SHORTCUT_IDS.STORAGE_EXPLORER_DELETE_SELECTED,
     () => setSelectedItemsToDelete(selectedItems),
-    { enabled: selectedItems.length > 0 }
+    { enabled: selectedItems.length > 0 && canUpdateFiles }
   )
 
   useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_EXIT_SELECTION, () => clearSelectedItems(), {

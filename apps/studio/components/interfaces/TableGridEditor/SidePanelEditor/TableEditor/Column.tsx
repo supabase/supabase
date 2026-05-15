@@ -13,9 +13,9 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Input,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -153,13 +153,13 @@ export const Column = ({
               <Link size={12} />
             </Button>
           ) : (
-            <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
+              <PopoverTrigger asChild>
                 <Button type="default" className="rounded-l-none h-[30px] py-0 px-2">
                   <Link size={12} />
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
                 side="bottom"
                 align="center"
@@ -233,8 +233,8 @@ export const Column = ({
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       </div>
@@ -298,8 +298,8 @@ export const Column = ({
       <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
       <div className="flex w-[5%] justify-end">
         {(!column.isPrimaryKey || column.format.includes('int')) && (
-          <Popover_Shadcn_>
-            <PopoverTrigger_Shadcn_
+          <Popover>
+            <PopoverTrigger
               data-testid={`${column.name}-extra-options`}
               className="group flex items-center -space-x-1"
             >
@@ -311,8 +311,8 @@ export const Column = ({
               <div className="text-foreground-light transition-colors group-hover:text-foreground">
                 <Settings size={16} strokeWidth={1} />
               </div>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ align="end" className="w-80 p-0">
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
               <div className="flex items-center justify-center bg-surface-200 gap-y-1 py-1.5 px-3 border-b border-overlay">
                 <h5 className="text-foreground">Extra options</h5>
               </div>
@@ -387,8 +387,8 @@ export const Column = ({
                   </FormItemLayout>
                 )}
               </div>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
         )}
       </div>
       {!hasImportContent && (

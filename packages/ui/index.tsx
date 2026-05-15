@@ -17,7 +17,6 @@ export * from './src/components/NavMenu'
 
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
-export * from './src/components/Popover'
 
 // HTML
 
@@ -87,14 +86,7 @@ export * from './src/components/shadcn/ui/field'
 
 export * from './src/components/shadcn/ui/form'
 
-export {
-  Popover as Popover_Shadcn_,
-  PopoverTrigger as PopoverTrigger_Shadcn_,
-  PopoverContent as PopoverContent_Shadcn_,
-  PopoverAnchor as PopoverAnchor_Shadcn_,
-  PopoverSeparator as PopoverSeparator_Shadcn_,
-  type PopoverContentProps as PopoverContentProps_Shadcn_,
-} from './src/components/shadcn/ui/popover'
+export * from './src/components/shadcn/ui/popover'
 
 export {
   Accordion as Accordion_Shadcn_,

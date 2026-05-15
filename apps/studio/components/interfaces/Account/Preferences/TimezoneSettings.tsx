@@ -12,9 +12,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -85,8 +85,8 @@ export const TimezoneSettings = () => {
                   : 'Pick "Auto detect" to follow your browser timezone again.'
               }
             >
-              <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
                   <Button
                     role="combobox"
                     aria-expanded={open}
@@ -101,11 +101,8 @@ export const TimezoneSettings = () => {
                       {isAutoDetected ? `Auto detect (${timezone})` : triggerLabel}
                     </span>
                   </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_
-                  id={listboxId}
-                  className="w-[--radix-popover-trigger-width] p-0"
-                >
+                </PopoverTrigger>
+                <PopoverContent id={listboxId} className="w-[--radix-popover-trigger-width] p-0">
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
                     <CommandList_Shadcn_>
@@ -155,8 +152,8 @@ export const TimezoneSettings = () => {
                       </CommandGroup_Shadcn_>
                     </CommandList_Shadcn_>
                   </Command_Shadcn_>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
             </FormItemLayout>
           </CardContent>
         </Card>
