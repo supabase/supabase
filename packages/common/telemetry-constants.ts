@@ -1106,14 +1106,14 @@ export interface ImportDataButtonClickedEvent {
 }
 
 /**
- * User dropped a file into the import data dropzone on an empty table.
+ * User added a file to the import data dropzone on an empty table.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface ImportDataFileDroppedEvent {
-  action: 'import_data_dropzone_file_dropped'
+export interface ImportDataFileAddedEvent {
+  action: 'import_data_dropzone_file_added'
   groups: TelemetryGroups
 }
 
@@ -2437,17 +2437,17 @@ export interface LogDrainSaveButtonClickedEvent {
 }
 
 /**
- * User confirmed deletion of a log drain destination in the delete-confirm modal.
+ * User confirmed removal of a log drain destination in the delete-confirm modal.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/settings/log-drains
  */
-export interface LogDrainDeletedEvent {
-  action: 'log_drain_deleted'
+export interface LogDrainRemovedEvent {
+  action: 'log_drain_removed'
   properties: {
     /**
-     * Type of the destination deleted
+     * Type of the destination removed
      */
     destination:
       | 'postgres'
@@ -3349,7 +3349,7 @@ export type TelemetryEvent =
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
   | ImportDataButtonClickedEvent
-  | ImportDataFileDroppedEvent
+  | ImportDataFileAddedEvent
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
@@ -3422,7 +3422,7 @@ export type TelemetryEvent =
   | QueueOperationsSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
-  | LogDrainDeletedEvent
+  | LogDrainRemovedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent

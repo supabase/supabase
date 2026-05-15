@@ -210,7 +210,7 @@ export function LogDrains({
             onConfirm={() => {
               if (selectedLogDrain && ref) {
                 deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
-                track('log_drain_deleted', {
+                track('log_drain_removed', {
                   destination: selectedLogDrain.type,
                 })
               }
