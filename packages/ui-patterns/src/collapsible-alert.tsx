@@ -3,19 +3,21 @@
 import { type VariantProps } from 'class-variance-authority'
 import { ChevronDown } from 'lucide-react'
 import * as React from 'react'
+import { Button, cn } from 'ui'
+import { alertVariants } from 'ui/src/components/shadcn/ui/alert'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from 'ui/src/components/shadcn/ui/collapsible'
 
-import { cn } from '../../lib/utils/cn'
-import { Button } from '../Button'
-import { alertVariants } from '../shadcn/ui/alert'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../shadcn/ui/collapsible'
-
-export interface AlertCollapsibleProps
+export interface CollapsibleAlertProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof alertVariants> {
   trigger: React.ReactNode
   defaultOpen?: boolean
 }
 
-const AlertCollapsible = React.forwardRef<HTMLDivElement, AlertCollapsibleProps>(
+const CollapsibleAlert = React.forwardRef<HTMLDivElement, CollapsibleAlertProps>(
   ({ className, variant = 'default', trigger, defaultOpen, children, ...props }, ref) => (
     <div
       ref={ref}
@@ -45,6 +47,6 @@ const AlertCollapsible = React.forwardRef<HTMLDivElement, AlertCollapsibleProps>
     </div>
   )
 )
-AlertCollapsible.displayName = 'AlertCollapsible'
+CollapsibleAlert.displayName = 'CollapsibleAlert'
 
-export { AlertCollapsible }
+export { CollapsibleAlert }
