@@ -7,17 +7,27 @@ const Globe = () => {
   const { resolvedTheme } = useTheme()
   const canvasRef = useRef<any | null>(null)
 
-  let rotation: number = 0
-  let width: number = 0
-  const onResize = useCallback(
-    () => canvasRef.current && (width = canvasRef.current.offsetWidth),
-    [resolvedTheme]
-  )
-
   useEffect(() => {
-    const debouncedResize = debounce(onResize, 10)
-    window.addEventListener('resize', debouncedResize)
+    let rotation = 0
+    let width = 0
+
+    const onResize = () => {
+      if (canvasRef.current) {
+        width = canvasRef.current.offsetWidth
+      }
+    }
+
+    // Use ResizeObserver to catch container size changes reliably in local dev
+    const resizeObserver = new ResizeObserver(() => {
+      onResize()
+    })
+    
+    if (canvasRef.current) {
+      resizeObserver.observe(canvasRef.current)
+    }
+
     onResize()
+
     const cobe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
       width: width * 2,
@@ -56,7 +66,7 @@ const Globe = () => {
         state.height = width * 2
       },
     })
-    
+
     const timeoutId = setTimeout(() => {
       if (canvasRef.current) {
         canvasRef.current.style.opacity = '0.8'
@@ -64,7 +74,7 @@ const Globe = () => {
     }, 10)
 
     return () => {
-      window.removeEventListener('resize', debouncedResize)
+      resizeObserver.disconnect()
       clearTimeout(timeoutId)
       cobe.destroy()
     }
