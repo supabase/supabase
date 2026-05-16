@@ -1,7 +1,6 @@
 import createGlobe from 'cobe'
-import { debounce } from 'lib/helpers'
 import { useTheme } from 'next-themes'
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 const Globe = () => {
   const { resolvedTheme } = useTheme()
@@ -21,7 +20,7 @@ const Globe = () => {
     const resizeObserver = new ResizeObserver(() => {
       onResize()
     })
-    
+
     if (canvasRef.current) {
       resizeObserver.observe(canvasRef.current)
     }
