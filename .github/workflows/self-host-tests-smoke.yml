@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: [default, envoy]
+        config: [default, envoy, s3]
 
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -35,6 +35,16 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
+
+      - name: Install AWS CLI v2
+        if: matrix.config == 's3'
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip -q awscliv2.zip
+          sudo ./aws/install --update
+          rm -rf aws awscliv2.zip
+          aws --version
 
       - name: Generate keys
         shell: bash
@@ -54,6 +64,8 @@ jobs:
           yq -i '.services.supavisor.environment.RLIMIT_NOFILE=1024' docker-compose.yml
           if [ "${{ matrix.config }}" = "envoy" ]; then
             docker compose -f docker-compose.yml -f docker-compose.envoy.yml up --quiet-pull --wait --wait-timeout 180
+          elif [ "${{ matrix.config }}" = "s3" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.s3.yml -f tests/docker-compose.s3.test.yml up --quiet-pull --wait --wait-timeout 180
           else
             docker compose up --quiet-pull --wait --wait-timeout 180
           fi
@@ -78,3 +90,19 @@ jobs:
           set -euo pipefail
           cd docker
           sh tests/test-auth-keys.sh
+
+      - name: Run S3 protocol tests
+        if: matrix.config == 's3'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-s3.sh
+
+      - name: Run S3 backend tests
+        if: matrix.config == 's3'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-s3-backend.sh
