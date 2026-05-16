@@ -9,6 +9,14 @@ database_id = "273b79ad-b8ff-4669-8544-b99920e2d3c8"
 
 The `auth-helpers` packages are deprecated and replaced with the `@supabase/ssr` package. We recommend migrating to the `@supabase/ssr` package as future bug fixes and feature releases are focused on the `@supabase/ssr` package.
 
+## Which migration do I need?
+
+If you're looking for database or project migration guidance, choose the guide that matches your use case:
+
+- [**Database Migrations**](/docs/guides/deployment/database-migrations) — Manage versioned schema changes for your Supabase project using the CLI
+- [**Migrating to Supabase**](/docs/guides/platform/migrating-to-supabase) — Migrate data from another database service to Supabase
+- [**Migrating within Supabase**](/docs/guides/platform/migrating-within-supabase) — Migrate data between two Supabase projects
+
 Here are the steps for you to migrate your application from the `auth-helpers` package to `@supabase/ssr` package.
 
 Depending on your implementation, you may ignore some parts of this documentation and use your own implementation (i.e. using API routes vs. Server Actions). What's important is you replace the clients provided by `auth-helpers` with the utility functions created using clients provided by `@supabase/ssr`.
