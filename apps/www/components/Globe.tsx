@@ -52,11 +52,20 @@ const Globe = () => {
       onRender: (state) => {
         state.phi = rotation
         rotation += 0.0025
+        state.width = width * 2
+        state.height = width * 2
       },
     })
-    setTimeout(() => (canvasRef.current.style.opacity = '0.8'), 10)
+    
+    const timeoutId = setTimeout(() => {
+      if (canvasRef.current) {
+        canvasRef.current.style.opacity = '0.8'
+      }
+    }, 10)
+
     return () => {
-      window.removeEventListener('resize', onResize)
+      window.removeEventListener('resize', debouncedResize)
+      clearTimeout(timeoutId)
       cobe.destroy()
     }
   }, [resolvedTheme])
