@@ -489,7 +489,14 @@ test.describe('Filter Bar', () => {
 
         const lastNameValue = page.getByTestId('filter-value-last_name')
         await lastNameValue.click()
-        await page.keyboard.press('Home')
+        // Drive the cursor to position 0 directly rather than via `Home`.
+        // macOS Chromium doesn't honor the Home key inside text inputs (the
+        // OS-level binding is Cmd+ArrowLeft / Fn+ArrowLeft instead) so the
+        // press is a no-op locally and the ArrowLeft handler then sees
+        // `selectionStart === lastNameValue.length` and never triggers the
+        // condition-migration branch. Linux CI happens to honor Home, which
+        // is why this only fails on Mac.
+        await lastNameValue.evaluate((el) => (el as HTMLInputElement).setSelectionRange(0, 0))
 
         await page.keyboard.press('ArrowLeft')
 
@@ -543,10 +550,9 @@ test.describe('Filter Bar', () => {
         const valueInput = page.getByTestId(`filter-value-${columnName}`)
         await valueInput.fill('HelloWorld')
 
-        await page.keyboard.press('Home')
-        for (let i = 0; i < 5; i++) {
-          await page.keyboard.press('ArrowRight')
-        }
+        // See "ArrowLeft at position 0" — macOS Chromium ignores the Home
+        // key inside text inputs, so set the cursor programmatically.
+        await valueInput.evaluate((el) => (el as HTMLInputElement).setSelectionRange(5, 5))
         await page.keyboard.type('_Middle_')
 
         await expect(valueInput).toHaveValue('Hello_Middle_World')
