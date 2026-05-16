@@ -70,9 +70,9 @@ language="typescript"
 
 You can use Drizzle together with [Postgres.js](https://github.com/porsager/postgres). Both can be loaded directly from npm:
 
-**Set up dependencies in `import_map.json`**:
+**Set up dependencies in `deno.json`**:
 
-```json supabase/functions/import_map.json
+```json supabase/functions/drizzle/deno.json
 {
   "imports": {
     "drizzle-orm": "npm:drizzle-orm@0.29.1",
@@ -80,6 +80,25 @@ You can use Drizzle together with [Postgres.js](https://github.com/porsager/post
     "postgres": "npm:postgres@3.4.3"
   }
 }
+```
+
+**Define your shared schema**:
+
+```ts supabase/functions/_shared/schema.ts
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
+
+export const user = pgTable('user', {
+  id: serial('id').primaryKey(),
+  email: text('email').notNull(),
+  role: text('role').notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const countries = pgTable('countries', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+})
 ```
 
 **Use in your function**:
@@ -101,7 +120,7 @@ Deno.serve(async (_req) => {
 })
 ```
 
-You can find the full example on [GitHub](https://github.com/thorwebdev/edgy-drizzle).
+You can find the full example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/drizzle).
 
 ---
 
