@@ -111,14 +111,13 @@ function create({
   action = 'PERMISSIVE',
   command = 'ALL',
   roles = ['public'],
-}: PolicyCreateParams): { sql: string } {
-  const sql = `
-create policy ${ident(name)} on ${ident(schema)}.${ident(table)}
+}: PolicyCreateParams): { sql: SafeSqlFragment } {
+  const sql = `create policy ${ident(name)} on ${ident(schema)}.${ident(table)}
   as ${action}
   for ${command}
-  to ${roles.map(ident).join(',')}
+  to ${roles.map(ident).join(', ')}
   ${definition ? `using (${definition})` : ''}
-  ${check ? `with check (${check})` : ''};`
+  ${check ? `with check (${check})` : ''}` as SafeSqlFragment
   return { sql }
 }
 
@@ -132,17 +131,16 @@ type PolicyUpdateParams = {
 function update(
   identifier: Pick<PGPolicy, 'name' | 'schema' | 'table'>,
   params: PolicyUpdateParams
-): { sql: string } {
+): { sql: SafeSqlFragment } {
   const { name, definition, check, roles } = params
 
   const alter = `ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
-  const nameSql = name === undefined ? '' : `${alter} RENAME TO ${ident(name)};`
-  const definitionSql = definition === undefined ? '' : `${alter} USING (${definition});`
-  const checkSql = check === undefined ? '' : `${alter} WITH CHECK (${check});`
-  const rolesSql = roles === undefined ? '' : `${alter} TO ${roles.map(ident).join(',')};`
+  const nameSql = name === undefined ? '' : `${alter} RENAME TO ${ident(name)}`
+  const definitionSql = definition === undefined ? '' : `${alter} USING (${definition})`
+  const checkSql = check === undefined ? '' : `${alter} WITH CHECK (${check})`
+  const rolesSql = roles === undefined ? '' : `${alter} TO ${roles.map(ident).join(', ')}`
 
-  // nameSql must be last
-  const sql = `BEGIN; ${definitionSql} ${checkSql} ${rolesSql} ${nameSql} COMMIT;`
+  const sql = `${definitionSql} ${checkSql} ${rolesSql} ${nameSql}` as SafeSqlFragment
 
   return { sql }
 }
