@@ -2,14 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import {
-  ident,
-  joinSqlFragments,
-  keyword,
-  literal,
-  safeSql,
-  type SafeSqlFragment,
-} from './pg-format'
+import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { POLICIES_SQL } from './sql/policies'
 
 const pgPolicyZod = z.object({
@@ -102,8 +95,8 @@ type PolicyCreateParams = {
   name: string
   schema?: string
   table: string
-  definition?: SafeSqlFragment
-  check?: SafeSqlFragment
+  definition?: string
+  check?: string
   action?: 'PERMISSIVE' | 'RESTRICTIVE'
   command?: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE'
   roles?: string[]
@@ -119,23 +112,19 @@ function create({
   command = 'ALL',
   roles = ['public'],
 }: PolicyCreateParams): { sql: SafeSqlFragment } {
-  const rolesFragment = joinSqlFragments(roles.map(ident), ', ')
-  const definitionSql = definition ? safeSql`using (${definition})` : safeSql``
-  const checkSql = check ? safeSql`with check (${check})` : safeSql``
-  const sql = safeSql`
-create policy ${ident(name)} on ${ident(schema)}.${ident(table)}
-  as ${keyword(action)}
-  for ${keyword(command)}
-  to ${rolesFragment}
-  ${definitionSql}
-  ${checkSql};`
+  const sql = `create policy ${ident(name)} on ${ident(schema)}.${ident(table)}
+  as ${action}
+  for ${command}
+  to ${roles.map(ident).join(', ')}
+  ${definition ? `using (${definition})` : ''}
+  ${check ? `with check (${check})` : ''}` as SafeSqlFragment
   return { sql }
 }
 
 type PolicyUpdateParams = {
   name?: string
-  definition?: SafeSqlFragment
-  check?: SafeSqlFragment
+  definition?: string
+  check?: string
   roles?: string[]
 }
 
@@ -145,20 +134,13 @@ function update(
 ): { sql: SafeSqlFragment } {
   const { name, definition, check, roles } = params
 
-  const alter = safeSql`ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
-  const nameSql: SafeSqlFragment =
-    name === undefined ? safeSql`` : safeSql`${alter} RENAME TO ${ident(name)};`
-  const definitionSql: SafeSqlFragment =
-    definition === undefined ? safeSql`` : safeSql`${alter} USING (${definition});`
-  const checkSql: SafeSqlFragment =
-    check === undefined ? safeSql`` : safeSql`${alter} WITH CHECK (${check});`
-  const rolesSql: SafeSqlFragment =
-    roles === undefined
-      ? safeSql``
-      : safeSql`${alter} TO ${joinSqlFragments(roles.map(ident), ', ')};`
+  const alter = `ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
+  const nameSql = name === undefined ? '' : `${alter} RENAME TO ${ident(name)}`
+  const definitionSql = definition === undefined ? '' : `${alter} USING (${definition})`
+  const checkSql = check === undefined ? '' : `${alter} WITH CHECK (${check})`
+  const rolesSql = roles === undefined ? '' : `${alter} TO ${roles.map(ident).join(', ')}`
 
-  // nameSql must be last
-  const sql = safeSql`BEGIN; ${definitionSql} ${checkSql} ${rolesSql} ${nameSql} COMMIT;`
+  const sql = `${definitionSql} ${checkSql} ${rolesSql} ${nameSql}` as SafeSqlFragment
 
   return { sql }
 }
