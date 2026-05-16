@@ -71,7 +71,7 @@ Here's a visual representation of the complete authorization code flow:
        │                              │                                 │
        │                              │  6. approveAuthorization()      │
        │                              ├────────────────────────────────>│
-       │                              │  Return redirect_to with code   │
+       │                              │  Return redirect_url with code  │
        │                              │<────────────────────────────────┤
        │                              │                                 │
        │  7. Redirect to client callback with code                      │
@@ -189,7 +189,7 @@ Your frontend application at the authorization path should:
 5. **Handle user decision** - When the user approves or denies:
    - Call `supabase.auth.oauth.approveAuthorization(authorization_id)` to approve
    - Call `supabase.auth.oauth.denyAuthorization(authorization_id)` to deny
-   - Redirect user to the returned `redirect_to` URL
+   - Redirect user to the returned `redirect_url`
 
 This is a **frontend implementation** using `supabase-js`. Supabase Auth handles all the backend OAuth logic (generating authorization codes, validating requests, etc.) after you call the approve/deny methods.
 
