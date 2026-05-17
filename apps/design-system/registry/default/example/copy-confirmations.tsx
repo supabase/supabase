@@ -5,8 +5,8 @@ import { Button } from 'ui'
 
 export default function CopyConfirmations() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-4 w-[400px]">
+    <div className="flex flex-col gap-8 w-full max-w-[400px]">
+      <div className="flex flex-col gap-4 w-full">
         <span className="text-xs text-foreground-muted">Bad Example</span>
         <div className="flex flex-col gap-5 border border-border rounded-md p-4 bg-surface-100">
           <div className="flex flex-row items-start gap-4">
@@ -27,7 +27,7 @@ export default function CopyConfirmations() {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4 w-[400px]">
+      <div className="flex flex-col gap-4 w-full">
         <span className="text-xs text-foreground-muted">Good Example</span>
         <div className="flex flex-col gap-5 border border-border rounded-md p-4 bg-surface-100">
           <div className="flex flex-row items-start gap-4">
