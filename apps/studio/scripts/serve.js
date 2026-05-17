@@ -129,7 +129,18 @@ function toWebRequest(req) {
     else if (v !== undefined) headers.set(k, v)
   }
   const init = { method: req.method, headers }
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
+  // Only attach a body for methods that can carry one AND that actually
+  // have body bytes coming. Wrapping `req` in `Readable.toWeb(req)` for
+  // requests where Node has nothing to deliver leaves undici's
+  // `extractBody` looking at an already-consumed stream and throwing
+  // `TypeError: Response body object should not be disturbed or locked`
+  // at the `new Request(...)` call below.
+  const contentLength = Number(req.headers['content-length'] ?? '0')
+  const hasBody =
+    req.method !== 'GET' &&
+    req.method !== 'HEAD' &&
+    (contentLength > 0 || req.headers['transfer-encoding'] === 'chunked')
+  if (hasBody) {
     init.body = Readable.toWeb(req)
     init.duplex = 'half'
   }
