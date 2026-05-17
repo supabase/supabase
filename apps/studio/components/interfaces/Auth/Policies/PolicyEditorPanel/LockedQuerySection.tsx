@@ -1,9 +1,9 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PGPolicy } from '@supabase/pg-meta'
 import { Lock } from 'lucide-react'
 
 interface LockedCreateQuerySection {
   schema: string
-  selectedPolicy?: PostgresPolicy
+  selectedPolicy?: PGPolicy
   isRenamingPolicy: boolean
   formFields: { name: string; table: string; behavior: string; command: string; roles: string }
 }

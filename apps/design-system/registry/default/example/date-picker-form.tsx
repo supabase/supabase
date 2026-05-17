@@ -15,9 +15,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 import { z } from 'zod'
 
@@ -53,8 +53,8 @@ export default function DatePickerForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
-              <Popover_Shadcn_>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover>
+                <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       type={'outline'}
@@ -67,8 +67,8 @@ export default function DatePickerForm() {
                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
                     </Button>
                   </FormControl>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -76,8 +76,8 @@ export default function DatePickerForm() {
                     disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
                     initialFocus
                   />
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
               <FormDescription>Your date of birth is used to calculate your age.</FormDescription>
               <FormMessage />
             </FormItem>

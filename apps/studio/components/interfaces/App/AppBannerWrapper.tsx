@@ -3,6 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
+import { FlyDeprecationBanner } from '@/components/layouts/AppLayout/FlyDeprecationBanner'
 import { NoticeBanner, NoticeBanner2 } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 
@@ -17,6 +18,7 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
         <StatusPageBanner />
         {showNoticeBanner && <NoticeBanner />}
         {showNoticeBanner2 && <NoticeBanner2 />}
+        <FlyDeprecationBanner />
         <OrganizationResourceBanner />
         {/* Disabled until reintroduced or removed altogether. */}
         {/* <TaxIdBanner /> */}

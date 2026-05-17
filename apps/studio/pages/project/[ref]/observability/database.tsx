@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, Button } from 'ui'
 
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -22,12 +22,10 @@ import DefaultLayout from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import ChartHandler from '@/components/ui/Charts/ChartHandler'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
-import Panel from '@/components/ui/Panel'
 import { analyticsKeys } from '@/data/analytics/keys'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
@@ -134,13 +132,16 @@ const DatabaseUsage = () => {
     !org?.usage_billing_enabled &&
     project?.cloud_provider !== 'FLY'
 
+  const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
+
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
     project!,
     diskConfig,
     maxConnections,
     defaultMaxClientConn,
-    isSpendCapEnabled
+    isSpendCapEnabled,
+    showDiskIOBurstBalanceChart
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -290,21 +291,32 @@ const DatabaseUsage = () => {
             )
           })}
         {selectedDateRange && isReplicaSelected && (
-          <Panel title="Replica Information">
-            <Panel.Content>
-              <div id="replication-lag">
-                <ChartHandler
-                  startDate={selectedDateRange?.period_start?.date}
-                  endDate={selectedDateRange?.period_end?.date}
-                  attribute="physical_replication_lag_physical_replication_lag_seconds"
-                  label="Replication lag"
-                  interval={selectedDateRange.interval}
-                  provider="infra-monitoring"
-                  syncId="database-charts"
-                />
-              </div>
-            </Panel.Content>
-          </Panel>
+          <LazyComposedChartHandler
+            id="replication-lag"
+            label="Replication lag"
+            format="s"
+            valuePrecision={2}
+            showTooltip
+            YAxisProps={{
+              width: 50,
+              tickFormatter: (value: number) => `${value}s`,
+            }}
+            attributes={[
+              {
+                attribute: 'physical_replication_lag_physical_replication_lag_seconds',
+                provider: 'infra-monitoring',
+                label: 'Replication lag',
+                tooltip:
+                  'Seconds the read replica is behind its primary. Sustained or growing lag may indicate the replica cannot keep up with write throughput',
+              },
+            ]}
+            interval={selectedDateRange.interval}
+            startDate={selectedDateRange?.period_start?.date}
+            endDate={selectedDateRange?.period_end?.date}
+            updateDateRange={updateDateRange}
+            defaultChartStyle="line"
+            syncId="database-charts"
+          />
         )}
       </ReportStickyNav>
       <section id="database-size-report">
@@ -392,8 +404,8 @@ const DatabaseUsage = () => {
           }}
           append={() => (
             <div className="px-6 pb-6">
-              <Alert_Shadcn_ variant="default" className="mt-4">
-                <AlertDescription_Shadcn_>
+              <Alert variant="default" className="mt-4">
+                <AlertDescription>
                   <div className="space-y-2">
                     <p>
                       New Supabase projects have a database size of ~40-60mb. This space includes
@@ -412,8 +424,8 @@ const DatabaseUsage = () => {
                       </Link>
                     </Button>
                   </div>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             </div>
           )}
         />

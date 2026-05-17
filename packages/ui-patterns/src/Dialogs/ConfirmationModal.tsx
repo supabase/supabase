@@ -5,7 +5,7 @@
 import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, MouseEventHandler, useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
   cn,
   Dialog,
@@ -30,9 +30,9 @@ export interface ConfirmationModalProps {
   onConfirm: () => void
   onCancel: () => void
   disabled?: boolean
-  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
-    base?: React.ComponentProps<typeof Alert_Shadcn_>
+    base?: React.ComponentProps<typeof Alert>
     title?: string
     description?: string | React.ReactNode
   }

@@ -13,7 +13,7 @@ export const ActionCard = (card: {
   return (
     <Card
       className={cn(
-        'grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer',
+        'grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border hover:border-default cursor-pointer',
         card.className
       )}
       onClick={card.onClick}

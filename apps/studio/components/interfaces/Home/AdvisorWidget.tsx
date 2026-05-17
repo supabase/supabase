@@ -252,7 +252,10 @@ export const AdvisorWidget = () => {
                   },
                 }}
               >
-                <Link href={`/project/${projectRef}/advisors/${selectedTab}`} />
+                <Link
+                  href={`/project/${projectRef}/advisors/${selectedTab}`}
+                  aria-label={`Open ${selectedTab} advisor`}
+                />
               </ButtonTooltip>
             </CardHeader>
             <CardContent className="p-0! mt-0 flex-1 overflow-y-auto">
@@ -293,7 +296,10 @@ export const AdvisorWidget = () => {
                 },
               }}
             >
-              <Link href={`/project/${projectRef}/reports/query-performance`} />
+              <Link
+                href={`/project/${projectRef}/reports/query-performance`}
+                aria-label="Open Query Performance Advisor"
+              />
             </ButtonTooltip>
           </CardHeader>
           <CardContent className="p-0! flex-1 overflow-y-auto">

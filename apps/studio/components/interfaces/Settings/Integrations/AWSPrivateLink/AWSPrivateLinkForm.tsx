@@ -8,7 +8,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -181,7 +181,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                     description="The ID of the AWS account you want to connect to."
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         readOnly={!isNew}
                         autoFocus={isNew}
@@ -204,7 +204,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                     description="A name for this account connection."
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         readOnly={!isNew}
                         onFocus={(e) => {

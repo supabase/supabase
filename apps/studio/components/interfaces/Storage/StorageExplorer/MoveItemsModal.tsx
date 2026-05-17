@@ -1,6 +1,6 @@
 import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Button, Input_Shadcn_ as Input, Modal } from 'ui'
+import { Button, Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { StorageItemWithColumn } from '../Storage.types'

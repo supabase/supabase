@@ -187,11 +187,11 @@ export const QueryPerformanceGrid = ({
               </div>
               <CodeBlock
                 language="pgsql"
-                className="bg-transparent! p-0! m-0! border-none! whitespace-nowrap! [&>code]:whitespace-nowrap! [&>code]:wrap-break-word overflow-visible! truncate! w-full! pr-20! pointer-events-none"
-                wrapperClassName="max-w-full! flex-1"
+                className="bg-transparent! p-0! m-0! border-none! truncate! whitespace-nowrap! w-full! pr-20! pointer-events-none"
+                wrapperClassName="flex-1 min-w-0 max-w-full overflow-hidden!"
                 hideLineNumbers
                 hideCopy
-                value={value.replace(/\s+/g, ' ').trim() as string}
+                value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
                 wrapLines={false}
               />
               {onCurrentSelectQuery && (

@@ -233,7 +233,11 @@ export function ComposedChart({
       return '<1'
     }
 
-    return numberFormatter(value, valuePrecision)
+    const formatted = numberFormatter(value, valuePrecision)
+    if (typeof format === 'string' && format) {
+      return `${formatted}${format}`
+    }
+    return formatted
   }
 
   function computeHighlightedValue() {

@@ -9,9 +9,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Form,
   FormField,
   Skeleton,
@@ -236,12 +236,12 @@ export const AwsMarketplaceLinkExistingOrg = ({
             </Form>
 
             {orgsNotLinkable.length > 0 && !isLoadingOnboardingInfo && (
-              <Collapsible_Shadcn_
+              <Collapsible
                 className="-space-y-px"
                 open={isNotLinkableOrgListOpen || orgsLinkable.length === 0}
                 onOpenChange={() => setIsNotLinkableOrgListOpen((prev) => !prev)}
               >
-                <CollapsibleTrigger_Shadcn_ className="py-2 w-full flex items-center group justify-between">
+                <CollapsibleTrigger className="py-2 w-full flex items-center group justify-between">
                   <p className="text-xs font-bold text-foreground-light">
                     Organizations that can't be linked
                   </p>
@@ -250,8 +250,8 @@ export const AwsMarketplaceLinkExistingOrg = ({
                     className="text-foreground-lighter transition-all group-data-open:rotate-90"
                     strokeWidth={1}
                   />
-                </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_
+                </CollapsibleTrigger>
+                <CollapsibleContent
                   className={cn(
                     'flex flex-col gap-4 transition-all',
                     'data-closed:animate-collapsible-up data-open:animate-collapsible-down'
@@ -274,8 +274,8 @@ export const AwsMarketplaceLinkExistingOrg = ({
                       />
                     ))}
                   </div>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
+                </CollapsibleContent>
+              </Collapsible>
             )}
 
             <div className={cn('flex gap-3 justify-end')}>

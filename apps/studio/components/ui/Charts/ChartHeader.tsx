@@ -8,8 +8,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Badge, cn } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
@@ -187,9 +186,30 @@ export const ChartHeader = ({
         <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
           {title}
         </h3>
-        {titleTooltip && <InfoTooltip>{titleTooltip}</InfoTooltip>}
+        {titleTooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InfoIcon className="w-4 h-4 text-foreground-lighter" />
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              {titleTooltip}
+              {docsUrl && (
+                <>
+                  {' '}
+                  <Link
+                    href={docsUrl}
+                    target="_blank"
+                    className="underline text-foreground hover:text-foreground-light"
+                  >
+                    Read docs
+                  </Link>
+                </>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
-      {docsUrl && (
+      {!titleTooltip && docsUrl && (
         <ButtonTooltip
           type="text"
           className="px-1"

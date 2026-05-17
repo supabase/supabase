@@ -1,0 +1,163 @@
+---
+id: 'bigquery-destination'
+title: 'BigQuery destination'
+description: 'Configure BigQuery as an external replication destination.'
+subtitle: 'Replicate Supabase Postgres tables to BigQuery.'
+sidebar_label: 'BigQuery'
+---
+
+<Admonition type="caution" label="Private Alpha">
+
+External replication is currently in private alpha. Access is limited and features may change.
+
+</Admonition>
+
+[BigQuery](https://cloud.google.com/bigquery) is Google's fully managed data warehouse. You can replicate your database tables to BigQuery for analytics and reporting.
+
+## Prepare GCP resources
+
+Before configuring BigQuery as a destination, set up the following in Google Cloud Platform:
+
+1. **Google Cloud Platform (GCP) account**: [Sign up for GCP](https://cloud.google.com/gcp) if you don't have one
+
+2. **BigQuery dataset**: Create a [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
+   - Open the BigQuery console in GCP
+   - Select your project
+   - Click **Create Dataset**
+   - Provide a dataset ID, for example `supabase_replication`
+
+3. **GCP service account key**: Create a [service account](https://cloud.google.com/iam/docs/keys-create-delete) with appropriate permissions
+   - Go to **IAM & Admin > Service Accounts**
+   - Click **Create Service Account**
+   - Grant the "BigQuery Data Editor" role
+   - Create and download the JSON key file
+
+Required permissions:
+
+- `bigquery.datasets.get`
+- `bigquery.tables.create`
+- `bigquery.tables.get`
+- `bigquery.tables.getData`
+- `bigquery.tables.update`
+- `bigquery.tables.updateData`
+
+## Configure BigQuery as a destination
+
+1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
+2. Click **Add destination**
+
+3. Configure the general settings:
+   - **Destination name**: A name to identify this destination, for example "BigQuery Warehouse"
+   - **Publication**: The publication to replicate data from
+   - **Destination type**: Select **BigQuery**
+
+4. Configure BigQuery-specific settings:
+   - **Project ID**: Your BigQuery project identifier, found in the GCP Console
+   - **Dataset ID**: The name of your BigQuery dataset, without the project ID
+
+     <Admonition type="note">
+
+     In the GCP Console, the dataset is shown as `project-id.dataset-id`. Enter only the part after the dot. For example, if you see `my-project.my_dataset`, enter `my_dataset`.
+
+     </Admonition>
+
+   - **Service Account Key**: Your GCP service account key in JSON format
+
+5. Optionally expand **Advanced settings** for BigQuery-specific performance tuning:
+
+   | Setting                  | Default            | Description                                                                                                                                                                |
+   | ------------------------ | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | **Connection pool size** | `4` connections    | Size of the BigQuery Storage Write API connection pool. More connections allow more parallel writes, but consume more resources.                                           |
+   | **Maximum staleness**    | No staleness limit | Maximum allowed age, in minutes, for BigQuery cached metadata before reading base tables. Lower values improve freshness. Higher values can reduce query cost and latency. |
+
+6. Click **Create and start** to begin replication
+
+Your replication pipeline now starts copying data from your database to BigQuery.
+
+## How it works
+
+Once configured, replication to BigQuery:
+
+1. Captures changes from your Postgres database (INSERT, UPDATE, DELETE, TRUNCATE operations)
+2. Optimizes delivery automatically
+3. Creates BigQuery tables automatically to match your Postgres schema
+4. Streams data to BigQuery
+
+## Source table requirements
+
+BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. External replication declares those columns as the BigQuery destination primary key so BigQuery CDC can apply `UPSERT` and `DELETE` rows.
+
+BigQuery primary keys are `NOT ENFORCED`, and BigQuery CDC supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
+
+Source tables must also use a BigQuery-compatible Postgres `REPLICA IDENTITY` setting:
+
+- `DEFAULT` with a primary key is supported and works for most tables.
+- `FULL` is supported and is recommended for tables with large `text`, `jsonb`, `bytea`, or other values that Postgres may store out-of-line using TOAST.
+- `USING INDEX`, `NOTHING`, or `DEFAULT` without a primary key are not supported for BigQuery replication.
+
+For a general explanation of how replica identity affects update and delete events, see [How does replica identity affect updates and deletes?](/docs/guides/database/replication/external-replication-faq#how-does-replica-identity-affect-updates-and-deletes).
+
+For updates, Postgres does not always send a complete old row through logical replication. It can also mark unchanged toasted values as `unchanged toast` instead of resending the value. The replication pipeline can reconstruct a complete update when the old row image contains the missing value, which is reliable with `REPLICA IDENTITY FULL`. BigQuery CDC upserts require a complete new row, so updates can fail for tables with toasted columns if the pipeline receives only a partial update row.
+
+Check a table's current replica identity:
+
+```sql
+select
+  n.nspname as schema_name,
+  c.relname as table_name,
+  c.relreplident as replica_identity
+from
+  pg_class as c
+  join pg_namespace as n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relname = 'your_table';
+```
+
+The `replica_identity` value is `d` for default, `f` for full, `i` for index, and `n` for nothing.
+
+Set full replica identity when a table has toasted columns and update replication must be reliable:
+
+```sql
+alter table public.your_table replica identity full;
+```
+
+`REPLICA IDENTITY FULL` increases WAL volume because Postgres logs the full old row for updates and deletes. Use it on tables where update correctness is more important than the extra replication overhead.
+
+## How tables are structured
+
+Due to BigQuery limitations, replicated tables use a versioned structure:
+
+- The table you query is a **view**, for example `users`
+- The actual data is stored in versioned tables with a `_version` suffix, for example `users_version`
+- When a table is truncated in your database, a new version is created and the view automatically points to the latest version
+
+This structure handles table truncations while maintaining query compatibility.
+
+## Schema change support
+
+Schema change support for BigQuery is currently in beta. External replication supports a limited set of schema changes while the feature is developed further.
+
+Supported schema changes:
+
+- Adding a column
+- Removing a column
+- Renaming a column
+
+Unsupported schema changes:
+
+- Changing a column's data type
+- Replicating column default values
+
+We plan to expand schema change support over time as the feature evolves.
+
+## Limitations
+
+- **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
+- **Primary keys**: Source tables must have a primary key, the replicated primary key can contain at most 16 columns, and BigQuery does not enforce key uniqueness
+- **Replica identity**: Source tables must use primary-key replica identity or `REPLICA IDENTITY FULL`
+- **Table names**: Source table names cannot start or end with `_` when replicating to BigQuery
+- **Schema changes**: Limited to the supported schema changes listed above
+
+## Additional resources
+
+- [BigQuery documentation](https://cloud.google.com/bigquery/docs) - Official Google BigQuery documentation
+- [BigQuery change data capture](https://cloud.google.com/bigquery/docs/change-data-capture) - BigQuery CDC requirements and limitations

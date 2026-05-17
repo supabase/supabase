@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert, AlertTitle } from 'ui'
 import {
   PageSection,
   PageSectionAside,
@@ -93,10 +93,10 @@ export const DataApiProjectUrlCard = () => {
             <ShimmeringLoader className="w-3/4" delayIndex={1} />
           </div>
         ) : isError ? (
-          <Alert_Shadcn_ variant="destructive">
+          <Alert variant="destructive">
             <AlertCircle size={16} />
-            <AlertTitle_Shadcn_>Failed to retrieve project URL</AlertTitle_Shadcn_>
-          </Alert_Shadcn_>
+            <AlertTitle>Failed to retrieve project URL</AlertTitle>
+          </Alert>
         ) : (
           <Input copy readOnly className="font-mono" value={endpoint} />
         )}

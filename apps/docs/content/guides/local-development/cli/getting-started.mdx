@@ -97,6 +97,64 @@ Global installation using `npm install -g supabase` is not supported. For global
 </TabPanel>
 </Tabs>
 
+## Beta channel
+
+Pre-release CLI builds ship from the development branch (`X.Y.Z-beta.N` versions). Use the npm `beta` dist-tag, or install `supabase-beta` via Homebrew / Scoop (separate packages from stable).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="npm"
+  queryGroup="platform"
+>
+<TabPanel id="macos" label="macOS">
+
+```sh
+brew install supabase/tap/supabase-beta
+brew link --overwrite supabase-beta
+```
+
+</TabPanel>
+<TabPanel id="windows" label="Windows">
+
+```powershell
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase-beta
+```
+
+</TabPanel>
+<TabPanel id="linux" label="Linux">
+
+#### Homebrew
+
+```sh
+brew install supabase/tap/supabase-beta
+brew link --overwrite supabase-beta
+```
+
+#### Linux packages
+
+Beta builds are attached to [GitHub pre-releases](https://github.com/supabase/cli/releases). Download the `.apk`, `.deb`, or `.rpm` for your platform and install with the same commands as [Linux packages](#linux-packages) above.
+
+</TabPanel>
+<TabPanel id="npm" label="nodejs">
+
+Install as a dev dependency:
+
+```sh
+npm install supabase@beta --save-dev
+```
+
+Or run without installing:
+
+```sh
+npx supabase@beta --help
+```
+
+</TabPanel>
+</Tabs>
+
 ## Updating the Supabase CLI
 
 When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same methods.
@@ -114,11 +172,23 @@ When a new [version](https://github.com/supabase/cli/releases) is released, you 
 brew upgrade supabase
 ```
 
+Beta channel:
+
+```sh
+brew upgrade supabase-beta
+```
+
 </TabPanel>
 <TabPanel id="windows" label="Windows">
 
 ```powershell
 scoop update supabase
+```
+
+Beta channel:
+
+```powershell
+scoop update supabase-beta
 ```
 
 </TabPanel>
@@ -128,6 +198,12 @@ scoop update supabase
 
 ```sh
 brew upgrade supabase
+```
+
+Beta channel:
+
+```sh
+brew upgrade supabase-beta
 ```
 
 #### Linux package manager
@@ -145,6 +221,12 @@ If you have installed the CLI as dev dependency via [npm](https://www.npmjs.com/
 
 ```sh
 npm update supabase --save-dev
+```
+
+Beta channel (`supabase@beta`):
+
+```sh
+npm update supabase@beta --save-dev
 ```
 
 </TabPanel>

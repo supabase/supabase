@@ -19,7 +19,7 @@ export interface ConnectingStateProps {
 
 const ConnectingState = ({ project }: ConnectingStateProps) => {
   const { ref } = useParams()
-  const checkProjectConnectionIntervalRef = useRef<number>()
+  const checkProjectConnectionIntervalRef = useRef<number>(null)
 
   const { setProjectPostgrestStatus } = useSetProjectPostgrestStatus()
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
@@ -31,14 +31,18 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
     // pingPostgrest timeouts in 2s, wait for another 2s before checking again
     checkProjectConnectionIntervalRef.current = window.setInterval(testProjectConnection, 4000)
     return () => {
-      clearInterval(checkProjectConnectionIntervalRef.current)
+      if (checkProjectConnectionIntervalRef.current) {
+        clearInterval(checkProjectConnectionIntervalRef.current)
+      }
     }
   }, [project])
 
   const testProjectConnection = async () => {
     const result = await pingPostgrest(project.ref)
     if (result) {
-      clearInterval(checkProjectConnectionIntervalRef.current)
+      if (checkProjectConnectionIntervalRef.current) {
+        clearInterval(checkProjectConnectionIntervalRef.current)
+      }
       setProjectPostgrestStatus(project.ref, 'ONLINE')
       await invalidateProjectDetailsQuery(project.ref)
     }
