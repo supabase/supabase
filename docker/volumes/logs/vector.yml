@@ -53,8 +53,14 @@ transforms:
           url, split_err = split(req.request, " ")
           if split_err == null {
               .metadata.request.method = url[0]
-              .metadata.request.path = url[1]
               .metadata.request.protocol = url[2]
+              parts, parts_err = split(url[1], "?", limit: 2)
+              if parts_err == null && length(parts) > 1 {
+                  .metadata.request.path = parts[0]
+                  .metadata.request.search = parts[1]
+              } else {
+                  .metadata.request.path = url[1]
+              }
           }
       }
       if err != null {
@@ -149,27 +155,81 @@ transforms:
           .metadata.context[0].host = parsed.hostname
           .metadata.context[0].pid = parsed.pid
       }
-  # Postgres logs some messages to stderr which we map to warning severity level
+  # Postgres logs - improved parsing to extract structured metadata.
+  # Expects log_line_prefix=%h %m [%p] %q%u@%d [%a] and log_error_verbosity=verbose
+  # (both set in docker-compose.yml's db service command).
+  #
+  # Non-session format: " 2026-03-24 14:48:52.707 UTC [33] WARNING:  message"
+  # Session format:     "[local] 2026-03-24 15:00:17.143 UTC [364823] postgres@postgres [psql] ERROR:  42P01: message"
+  #
+  # Drop LOCATION continuation lines (noisy C-source pointers from verbose mode).
+  db_logs_filtered:
+    type: filter
+    inputs:
+      - router.db
+    condition: '!match(string!(.event_message), r''\] \S+@\S+ \[.*?\] LOCATION:'')'
   db_logs:
     type: remap
     inputs:
-      - router.db
+      - db_logs_filtered
     source: |-
       .metadata.host = "db-default"
       .metadata.parsed.timestamp = .timestamp
 
-      parsed, err = parse_regex(.event_message, r'.*(?P<level>INFO|NOTICE|WARNING|ERROR|LOG|FATAL|PANIC?):.*', numeric_groups: true)
+      # Try session format: host timestamp [pid] user@db [app] LEVEL: [sqlstate:] message
+      parsed, err = parse_regex(
+        .event_message,
+        r'^(?P<host>\S+)\s+(?P<ts>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+\s+\w+)\s+\[(?P<pid>\d+)\]\s+(?P<user>[^@]+)@(?P<db>\S+)\s+\[(?P<app>.*?)\]\s+(?P<level>\w+):\s+(?:(?P<sqlstate>\w{5}):\s+)?(?P<msg>.*)'
+      )
 
-      if err != null || parsed == null {
-        .metadata.parsed.error_severity = "info"
+      if err == null {
+        level = upcase!(parsed.level)
+        .metadata.parsed.error_severity = level
+        .metadata.parsed.user_name = parsed.user
+        .metadata.parsed.database_name = parsed.db
+        .metadata.parsed.host = parsed.host
+        .metadata.parsed.pid = parsed.pid
+        .metadata.parsed.application_name = parsed.app
+
+        if parsed.sqlstate != null {
+          .metadata.parsed.sql_state_code = parsed.sqlstate
+        }
+
+        if level == "DETAIL" {
+          .metadata.parsed.detail = parsed.msg
+        } else if level == "HINT" {
+          .metadata.parsed.hint = parsed.msg
+        } else if level == "CONTEXT" {
+          .metadata.parsed.context = parsed.msg
+        } else if level == "STATEMENT" {
+          .metadata.parsed.query = parsed.msg
+        }
+
+        # %a in log_line_prefix is [unknown] at connect time; recover the real
+        # application_name from the connection-authorized message body.
+        if contains(string!(.event_message), "connection authorized") {
+          conn, conn_err = parse_regex(
+            parsed.msg,
+            r'application_name=(?P<app>.+)$'
+          )
+          if conn_err == null {
+            .metadata.parsed.application_name = conn.app
+          }
+        }
+      } else {
+        # Non-session format: " timestamp [pid] LEVEL: message"
+        parsed, err = parse_regex(
+          .event_message,
+          r'^\s*(?P<ts>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+\s+\w+)\s+\[(?P<pid>\d+)\]\s+(?P<level>\w+):\s+(?P<msg>.*)'
+        )
+
+        if err == null {
+          .metadata.parsed.error_severity = upcase!(parsed.level)
+          .metadata.parsed.pid = parsed.pid
+        } else {
+          .metadata.parsed.error_severity = "LOG"
+        }
       }
-      if parsed.level != null {
-       .metadata.parsed.error_severity = parsed.level
-      }
-      if .metadata.parsed.error_severity == "info" {
-          .metadata.parsed.error_severity = "log"
-      }
-      .metadata.parsed.error_severity = upcase!(.metadata.parsed.error_severity)
 
 sinks:
   logflare_auth:

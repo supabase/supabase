@@ -563,7 +563,11 @@ services:
         "-c",
         "config_file=/etc/postgresql/postgresql.conf",
         "-c",
-        "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
+        "log_min_messages=${POSTGRES_LOG_MIN_MESSAGES:-warning}",
+        "-c",
+        "log_error_verbosity=verbose",
+        "-c",
+        "log_line_prefix=%h %m [%p] %q%u@%d [%a] "
       ]
 
   vector:
