@@ -15,13 +15,12 @@
 //     right MIME types and cache headers.
 //   - Forward everything else to the TanStack Start handler exported
 //     from `dist/server/server.js`.
-
-import { createServer } from 'node:http'
 import { createReadStream } from 'node:fs'
 import { readFile, stat } from 'node:fs/promises'
+import { createServer } from 'node:http'
+import path from 'node:path'
 import { Readable } from 'node:stream'
 import { fileURLToPath } from 'node:url'
-import path from 'node:path'
 
 const studioRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const clientDir = path.join(studioRoot, 'dist/client')
@@ -41,10 +40,7 @@ for (const file of envFiles) {
     const m = dotenvLine.exec(raw)
     if (!m) continue
     let v = m[2]
-    if (
-      (v.startsWith('"') && v.endsWith('"')) ||
-      (v.startsWith("'") && v.endsWith("'"))
-    ) {
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
       v = v.slice(1, -1)
     }
     parsed[m[1]] = v
@@ -105,7 +101,10 @@ async function serveStatic(req, res) {
   if (!st.isFile()) return false
 
   res.statusCode = 200
-  res.setHeader('content-type', mimeByExt.get(path.extname(filePath).toLowerCase()) ?? 'application/octet-stream')
+  res.setHeader(
+    'content-type',
+    mimeByExt.get(path.extname(filePath).toLowerCase()) ?? 'application/octet-stream'
+  )
   res.setHeader('content-length', String(st.size))
   res.setHeader(
     'cache-control',
@@ -140,10 +139,24 @@ function toWebRequest(req) {
 async function pipeWebResponse(response, res) {
   res.statusCode = response.status
   for (const [k, v] of response.headers) res.setHeader(k, v)
-  if (response.body) {
-    for await (const chunk of response.body) res.write(chunk)
+  if (!response.body) {
+    res.end()
+    return
   }
-  res.end()
+  // Pipe via Readable.fromWeb so the underlying stream gets proper backpressure
+  // and gets released cleanly. `for await (chunk of response.body)` works in
+  // simple cases but can leave the body in a "disturbed / locked" state when
+  // the handler internally peeks at it — surfacing as
+  // `TypeError: Response body object should not be disturbed or locked` on a
+  // subsequent request.
+  await new Promise((resolve, reject) => {
+    const readable = Readable.fromWeb(response.body)
+    readable.on('error', reject)
+    res.on('error', reject)
+    res.on('close', resolve)
+    res.on('finish', resolve)
+    readable.pipe(res)
+  })
 }
 
 const port = Number(process.env.PORT || 8082)
