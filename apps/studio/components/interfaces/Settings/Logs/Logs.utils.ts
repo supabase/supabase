@@ -675,6 +675,8 @@ function getWarningCondition(table: LogsTableName): string {
       return 'response.status_code >= 400 AND response.status_code < 500'
     case 'function_logs':
       return "metadata.level IN ('warning')"
+    case 'pg_cron_logs':
+      return "parsed.error_severity IN ('WARNING')"
     default:
       return 'false'
   }
