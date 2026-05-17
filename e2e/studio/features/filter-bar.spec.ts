@@ -643,6 +643,8 @@ test.describe('Filter Bar', () => {
     test('filtering by Today shows only today rows', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_date_today`
       const todayValue = getDateValue(0)
+      const yesterdayValue = getDateValue(1)
+      const lastWeekValue = getDateValue(7)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -650,11 +652,18 @@ test.describe('Filter Bar', () => {
           created_at date
         )`
       )
+      // Insert exact date strings computed from the test's `getDateValue`
+      // (JS local TZ) rather than `CURRENT_DATE` (postgres session TZ ≈ UTC).
+      // The studio's "Today" dropdown is built from JS local time too, so
+      // aligning the inserted rows with the filter's expected value keeps
+      // these tests deterministic across timezones — otherwise on non-UTC
+      // hosts the local "today" can land on a different day than postgres'
+      // CURRENT_DATE and the filter matches zero rows.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (CURRENT_DATE),
-          (CURRENT_DATE - INTERVAL '1 day'),
-          (CURRENT_DATE - INTERVAL '7 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue}'),
+          ('${yesterdayValue}'),
+          ('${lastWeekValue}')`
       )
 
       try {
@@ -672,7 +681,9 @@ test.describe('Filter Bar', () => {
 
     test('filtering by Yesterday shows only yesterday rows', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_date_yest`
+      const todayValue = getDateValue(0)
       const yesterdayValue = getDateValue(1)
+      const lastWeekValue = getDateValue(7)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -680,11 +691,12 @@ test.describe('Filter Bar', () => {
           created_at date
         )`
       )
+      // See "filtering by Today" — align inserts with JS-local getDateValue.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (CURRENT_DATE),
-          (CURRENT_DATE - INTERVAL '1 day'),
-          (CURRENT_DATE - INTERVAL '7 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue}'),
+          ('${yesterdayValue}'),
+          ('${lastWeekValue}')`
       )
 
       try {
@@ -702,7 +714,10 @@ test.describe('Filter Bar', () => {
 
     test('filtering by Last 7 days with greater or equal operator', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_date_7d`
+      const todayValue = getDateValue(0)
+      const threeDaysAgoValue = getDateValue(3)
       const last7DaysValue = getDateValue(7)
+      const lastMonthValue = getDateValue(30)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -710,12 +725,13 @@ test.describe('Filter Bar', () => {
           created_at date
         )`
       )
+      // See "filtering by Today" — align inserts with JS-local getDateValue.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (CURRENT_DATE),
-          (CURRENT_DATE - INTERVAL '3 days'),
-          (CURRENT_DATE - INTERVAL '7 days'),
-          (CURRENT_DATE - INTERVAL '30 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue}'),
+          ('${threeDaysAgoValue}'),
+          ('${last7DaysValue}'),
+          ('${lastMonthValue}')`
       )
 
       try {
@@ -734,6 +750,8 @@ test.describe('Filter Bar', () => {
     test('date less than operator filters correctly', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_date_lt`
       const todayValue = getDateValue(0)
+      const yesterdayValue = getDateValue(1)
+      const lastWeekValue = getDateValue(7)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -741,11 +759,12 @@ test.describe('Filter Bar', () => {
           created_at date
         )`
       )
+      // See "filtering by Today" — align inserts with JS-local getDateValue.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (CURRENT_DATE),
-          (CURRENT_DATE - INTERVAL '1 day'),
-          (CURRENT_DATE - INTERVAL '7 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue}'),
+          ('${yesterdayValue}'),
+          ('${lastWeekValue}')`
       )
 
       try {
@@ -766,6 +785,8 @@ test.describe('Filter Bar', () => {
     test('timestamp column shows date preset dropdown options', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_ts_today`
       const todayValue = getDateValue(0)
+      const yesterdayValue = getDateValue(1)
+      const lastWeekValue = getDateValue(7)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -773,11 +794,14 @@ test.describe('Filter Bar', () => {
           created_at timestamp
         )`
       )
+      // See "filtering by Today" — pin timestamps to mid-day of each
+      // JS-local date so the row falls on the correct calendar day from
+      // postgres's perspective regardless of the host timezone.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (NOW()),
-          (NOW() - INTERVAL '1 day'),
-          (NOW() - INTERVAL '7 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue} 12:00:00'),
+          ('${yesterdayValue} 12:00:00'),
+          ('${lastWeekValue} 12:00:00')`
       )
 
       try {
