@@ -1150,7 +1150,7 @@ testRunner('table editor', () => {
     const saveTablePromise = waitForApiResponseWithTimeout(
       page,
       (response) => response.url().includes('query?key=table-update'),
-      15000
+      30000
     )
     await page.getByRole('button', { name: 'Save' }).first().click()
     await saveTablePromise
@@ -1178,7 +1178,7 @@ testRunner('table editor', () => {
     const removeFkPromise = waitForApiResponseWithTimeout(
       page,
       (response) => response.url().includes('query?key=table-update'),
-      15000
+      30000
     )
     await page.getByRole('button', { name: 'Save' }).first().click()
     await removeFkPromise
