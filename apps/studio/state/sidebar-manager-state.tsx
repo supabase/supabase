@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useRef } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
 import useLatest from '@/hooks/misc/useLatest'
@@ -169,10 +169,29 @@ export const useRegisterSidebar = (
 ) => {
   const componentRef = useLatest(component)
   const handlersRef = useLatest(handlers)
+  const prevEnabledRef = useRef(enabled)
+  const shouldRestoreRef = useRef(false)
+
+  // Track mid-render when transitioning from enabled to disabled while the sidebar is open.
+  // Must happen during render (not in an effect) so we capture activeSidebar before
+  // unregisterSidebar runs and clears it. Note: in React Strict Mode (dev only) the
+  // double-effect invocation will consume the restore flag on the first mount, so the
+  // second cleanup/remount cycle won't re-open — this is dev-only and acceptable.
+  if (prevEnabledRef.current && !enabled) {
+    if (sidebarManagerState.activeSidebar?.id === id) {
+      shouldRestoreRef.current = true
+    }
+  }
+  prevEnabledRef.current = enabled
 
   useEffect(() => {
     if (enabled) {
       sidebarManagerState.registerSidebar(id, () => componentRef.current(), handlersRef.current)
+      // Restore sidebar if it was open before enabled briefly became false
+      if (shouldRestoreRef.current) {
+        sidebarManagerState.openSidebar(id)
+        shouldRestoreRef.current = false
+      }
     }
 
     return () => {
