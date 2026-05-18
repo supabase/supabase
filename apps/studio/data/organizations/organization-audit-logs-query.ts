@@ -42,16 +42,27 @@ export type OrganizationAuditLogsVariables = {
   slug?: string
   iso_timestamp_start: string
   iso_timestamp_end: string
+  /**
+   * Optional project ref. When provided, the backend scopes the audit log query to that single
+   * project instead of iterating over every project in the organization. Required for orgs with
+   * a large number of projects, where the unscoped query would otherwise blow up.
+   */
+  project_ref?: string
 }
 
 export async function getOrganizationAuditLogs(
-  { slug, iso_timestamp_start, iso_timestamp_end }: OrganizationAuditLogsVariables,
+  { slug, iso_timestamp_start, iso_timestamp_end, project_ref }: OrganizationAuditLogsVariables,
   signal?: AbortSignal
 ) {
   if (!slug) throw new Error('slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/audit', {
-    params: { path: { slug }, query: { iso_timestamp_start, iso_timestamp_end } },
+    params: {
+      path: { slug },
+      // [Jordi] project_ref is not yet typed in api-types. Cast until the schema regenerates
+      // after the corresponding platform API change ships.
+      query: { iso_timestamp_start, iso_timestamp_end, project_ref } as any,
+    },
     signal,
   })
 
@@ -70,12 +81,13 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
     ...options
   }: UseCustomQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
 ) => {
-  const { slug, iso_timestamp_start, iso_timestamp_end } = vars
+  const { slug, iso_timestamp_start, iso_timestamp_end, project_ref } = vars
 
   return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>({
     queryKey: organizationKeys.auditLogs(slug, {
       date_start: iso_timestamp_start,
       date_end: iso_timestamp_end,
+      project_ref,
     }),
     queryFn: ({ signal }) => getOrganizationAuditLogs(vars, signal),
     enabled: enabled && typeof slug !== 'undefined',

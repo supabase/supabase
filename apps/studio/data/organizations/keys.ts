@@ -12,8 +12,16 @@ export const organizationKeys = {
     ['organizations', slug, 'customer-profile'] as const,
   auditLogs: (
     slug: string | undefined,
-    { date_start, date_end }: { date_start: string | undefined; date_end: string | undefined }
-  ) => ['organizations', slug, 'audit-logs', { date_start, date_end }] as const,
+    {
+      date_start,
+      date_end,
+      project_ref,
+    }: {
+      date_start: string | undefined
+      date_end: string | undefined
+      project_ref?: string
+    }
+  ) => ['organizations', slug, 'audit-logs', { date_start, date_end, project_ref }] as const,
   subscriptionPreview: (
     slug: string | undefined,
     tier: string | undefined,

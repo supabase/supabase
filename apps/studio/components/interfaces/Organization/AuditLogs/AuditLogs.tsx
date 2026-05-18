@@ -18,6 +18,7 @@ import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import NoPermission from '@/components/ui/NoPermission'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import {
@@ -32,6 +33,12 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
+
+// For orgs with more projects than this threshold, the audit logs API would have to fan out
+// across every project to assemble a response, which blows up. Require the user to pick a
+// single project up front so we can pass `project_ref` to the API and scope the query
+// server-side. Smaller orgs keep the existing multi-select dropdown with client-side filtering.
+const LARGE_ORG_PROJECT_THRESHOLD = 10
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -56,6 +63,9 @@ export const AuditLogs = () => {
 
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
+  // When the org has more than LARGE_ORG_PROJECT_THRESHOLD projects, the user must pick a
+  // single project before we fetch audit logs (so the API call stays scoped to one project).
+  const [selectedProjectRef, setSelectedProjectRef] = useState<string | null>(null)
 
   const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -64,6 +74,23 @@ export const AuditLogs = () => {
 
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('security.audit_logs_days')
+
+  // Fetch projects first so we know the org size before deciding whether to fetch audit logs.
+  const canFetchOrgData = canReadAuditLogs && hasAccessToAuditLogs
+  const {
+    data: projectsData,
+    isLoading: isLoadingProjects,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useOrgProjectsInfiniteQuery(
+    { slug, search: search.length === 0 ? search : debouncedSearch },
+    { placeholderData: keepPreviousData, enabled: canFetchOrgData }
+  )
+
+  const totalProjectCount = projectsData?.pages[0]?.pagination.count ?? 0
+  const requiresProjectSelection = totalProjectCount > LARGE_ORG_PROJECT_THRESHOLD
 
   const {
     data,
@@ -79,9 +106,13 @@ export const AuditLogs = () => {
       slug,
       iso_timestamp_start: dateRange.from,
       iso_timestamp_end: dateRange.to,
+      // For large orgs, scope the API call to the selected project so the backend doesn't
+      // fan out across every project in the org. Smaller orgs leave this undefined and the
+      // backend returns all projects' logs.
+      project_ref: requiresProjectSelection && selectedProjectRef ? selectedProjectRef : undefined,
     },
     {
-      enabled: canReadAuditLogs,
+      enabled: canReadAuditLogs && (!requiresProjectSelection || selectedProjectRef !== null),
       retry: false,
       refetchOnWindowFocus: (query) => {
         return !query.state.error?.message.endsWith(logsUpgradeError)
@@ -91,24 +122,17 @@ export const AuditLogs = () => {
 
   const isLogsNotAvailableBasedOnPlan = isError && !hasAccessToAuditLogs
   const isRangeExceededError = isError && error.message.includes('range exceeded')
-  const showFilters = !isLoading && !isLogsNotAvailableBasedOnPlan
+  const showFilters =
+    !isLogsNotAvailableBasedOnPlan &&
+    !isLoadingPermissions &&
+    !isLoadingEntitlements &&
+    canReadAuditLogs
 
-  const {
-    data: projectsData,
-    isLoading: isLoadingProjects,
-    isFetching,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useOrgProjectsInfiniteQuery(
-    { slug, search: search.length === 0 ? search : debouncedSearch },
-    { placeholderData: keepPreviousData, enabled: showFilters }
-  )
   const { data: organizations } = useOrganizationsQuery({
-    enabled: showFilters,
+    enabled: canFetchOrgData,
   })
-  const { data: members } = useOrganizationMembersQuery({ slug }, { enabled: showFilters })
-  const { data: rolesData } = useOrganizationRolesV2Query({ slug }, { enabled: showFilters })
+  const { data: members } = useOrganizationMembersQuery({ slug }, { enabled: canFetchOrgData })
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug }, { enabled: canFetchOrgData })
 
   const activeMembers = (members ?? []).filter((x) => !x.invited_at)
   const roles = [...(rolesData?.org_scoped_roles ?? []), ...(rolesData?.project_scoped_roles ?? [])]
@@ -116,13 +140,18 @@ export const AuditLogs = () => {
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const logs = data?.result ?? []
+  // When requiresProjectSelection is true, the API already returned only the chosen project's
+  // logs, so the client-side project filter is a no-op. Keep it for the small-org path.
   const sortedLogs = filterByProjects(
     filterByUsers(sortAuditLogs(logs, dateSortDesc), filters.users),
     filters.projects
   )
 
+  const isWaitingForProjectSelection = requiresProjectSelection && selectedProjectRef === null
   const shouldShowLoadingState =
-    (isLoading && fetchStatus !== 'idle') || isLoadingPermissions || isLoadingEntitlements
+    (!isWaitingForProjectSelection && isLoading && fetchStatus !== 'idle') ||
+    isLoadingPermissions ||
+    isLoadingEntitlements
 
   // This feature depends on the subscription tier of the user.
   // The API limits the logs to maximum of 62 days and 5 minutes so when the page is
@@ -174,21 +203,30 @@ export const AuditLogs = () => {
                     activeOptions={filters.users}
                     onSaveFilters={(values) => setFilters({ ...filters, users: values })}
                   />
-                  <FilterPopover
-                    name="Projects"
-                    options={projects}
-                    labelKey="name"
-                    valueKey="ref"
-                    activeOptions={filters.projects}
-                    onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
-                    search={search}
-                    setSearch={setSearch}
-                    hasNextPage={hasNextPage}
-                    isLoading={isLoadingProjects}
-                    isFetching={isFetching}
-                    isFetchingNextPage={isFetchingNextPage}
-                    fetchNextPage={fetchNextPage}
-                  />
+                  {requiresProjectSelection ? (
+                    <OrganizationProjectSelector
+                      slug={slug}
+                      selectedRef={selectedProjectRef}
+                      searchPlaceholder="Find project..."
+                      onSelect={(project) => setSelectedProjectRef(project.ref)}
+                    />
+                  ) : (
+                    <FilterPopover
+                      name="Projects"
+                      options={projects}
+                      labelKey="name"
+                      valueKey="ref"
+                      activeOptions={filters.projects}
+                      onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+                      search={search}
+                      setSearch={setSearch}
+                      hasNextPage={hasNextPage}
+                      isLoading={isLoadingProjects}
+                      isFetching={isFetching}
+                      isFetchingNextPage={isFetchingNextPage}
+                      fetchNextPage={fetchNextPage}
+                    />
+                  )}
                   <LogsDatePicker
                     hideWarnings
                     value={dateRange}
@@ -248,6 +286,13 @@ export const AuditLogs = () => {
               </div>
             ) : !canReadAuditLogs ? (
               <NoPermission resourceText="view organization audit logs" />
+            ) : isWaitingForProjectSelection ? (
+              <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
+                <p className="prose text-sm">
+                  This organization has more than {LARGE_ORG_PROJECT_THRESHOLD} projects. Select a
+                  project above to view its audit logs.
+                </p>
+              </div>
             ) : null}
 
             {isError &&
