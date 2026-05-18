@@ -69,8 +69,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
-  // [Joshen] Error state is handled in the parent
-
   const { mutate: validateSpam } = useValidateSpamMutation()
 
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation({
@@ -335,8 +333,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                             {variable.name === 'Token' &&
                               template.variables.some((x) => x.name === 'ConfirmationURL') && (
                                 <>
-                                  {' '}
-                                  which can be used instead of{' '}
+                                  , which can be used instead of{' '}
                                   <code className="text-code-inline">ConfirmationURL</code>
                                 </>
                               )}

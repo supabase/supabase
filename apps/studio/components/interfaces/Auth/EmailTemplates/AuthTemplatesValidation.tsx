@@ -63,17 +63,18 @@ const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
     value: '{{ .Data }}',
     description: (
       <>
-        User's <code className="text-code-inline">user_metadata</code>
+        User's <code className="text-code-inline">user_metadata</code>, use this to personalize the
+        message
       </>
     ),
   },
-  // [Joshen] To check if this is deprecated - no longer in the docs
   RedirectTo: {
     name: 'RedirectTo',
     value: '{{ .RedirectTo }}',
     description: (
       <>
-        URL of <code className="text-code-inline">emailRedirectTo</code> passed in options
+        Redirect URL passed as the <code className="text-code-inline">redirectTo</code> option in
+        the auth method call
       </>
     ),
   },
