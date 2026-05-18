@@ -34,6 +34,7 @@ import {
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
 import { metricColor } from './InstanceNode.utils'
+import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
 import SparkBar from '@/components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
@@ -90,7 +91,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) =>
 
 export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
-  const { region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+  const { region, computeSize, numReplicas, numRegions, hasLoadBalancer, showPlanUsage } = data
   const { ref } = useParams()
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
@@ -211,6 +212,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
           </TooltipTrigger>
           <TooltipContent side="bottom">Go to Database Report</TooltipContent>
         </Tooltip>
+        {showPlanUsage && <PlanUsageCard />}
       </div>
       <Handle
         type="source"

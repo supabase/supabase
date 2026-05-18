@@ -25,6 +25,11 @@ export type PrimaryNodeData = NodeData & {
   numReplicas: number
   numRegions: number
   hasLoadBalancer: boolean
+  /**
+   * When true, the PrimaryNode renders an additional plan-usage section inside
+   * the same card div (used by the upgrade CTA placement experiment).
+   */
+  showPlanUsage?: boolean
 }
 
 export type LoadBalancerData = NodeData & {

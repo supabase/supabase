@@ -6,7 +6,6 @@ import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import { OrgMetricsUsage, useOrgUsageQuery } from '@/data/usage/org-usage-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
 import { useTrack } from '@/lib/telemetry/track'
 
 type MetricUnit = 'gigabytes' | 'count'
@@ -128,15 +127,18 @@ const MetricRow = ({ usageItem, config }: { usageItem: OrgMetricsUsage; config: 
   )
 }
 
+/**
+ * Renders the upgrade CTA's plan-usage sections as a fragment of `border-t`-separated
+ * blocks. Designed to be embedded inside another card container (the Primary Database
+ * React Flow node in `PrimaryNode`). The parent is responsible for gating on the
+ * experiment variant + free plan — this component only renders the visual sections
+ * once usage data is available.
+ */
 export const PlanUsageCard = () => {
   const track = useTrack()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { variant } = useUpgradeCtaExperiment()
-  const enabled = variant === 'home_usage_card'
+  const { data: usage, isSuccess } = useOrgUsageQuery({ orgSlug: organization?.slug })
 
-  const { data: usage, isSuccess } = useOrgUsageQuery({ orgSlug: organization?.slug }, { enabled })
-
-  if (!enabled) return null
   if (!isSuccess) return null
 
   const visibleRows = METRICS.map((config) => {
@@ -149,35 +151,32 @@ export const PlanUsageCard = () => {
 
   if (visibleRows.length === 0) return null
 
-  // Width matches the Primary Database React Flow node (NODE_WIDTH / 2 - 10 = 320px).
   return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10" style={{ width: 320 }}>
-      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
-        <div className="px-3 py-2 border-b">
-          <span className="text-[11px] uppercase tracking-wider text-foreground-lighter">
-            Free plan &middot; Current billing cycle
-          </span>
-        </div>
-        <div className="flex flex-col divide-y">
-          {visibleRows.map(({ config, usageItem }) => (
-            <MetricRow key={config.key} usageItem={usageItem} config={config} />
-          ))}
-        </div>
-        <div className="flex items-center justify-between gap-2 px-3 py-2 border-t">
-          <Link
-            href={`/org/${organization?.slug ?? '_'}/usage`}
-            className="text-xs text-foreground-light hover:text-foreground inline-flex items-center gap-1"
-          >
-            View all usage
-            <ArrowRight size={11} strokeWidth={1.5} />
-          </Link>
-          <UpgradePlanButton
-            source="home_usage_card"
-            plan="Pro"
-            onClick={() => track('upgrade_cta_clicked', { placement: 'home_usage_card' })}
-          />
-        </div>
+    <>
+      <div className="px-3 py-2 border-t">
+        <span className="text-[11px] uppercase tracking-wider text-foreground-lighter">
+          Free plan &middot; Current billing cycle
+        </span>
       </div>
-    </div>
+      <div className="flex flex-col divide-y">
+        {visibleRows.map(({ config, usageItem }) => (
+          <MetricRow key={config.key} usageItem={usageItem} config={config} />
+        ))}
+      </div>
+      <div className="flex items-center justify-between gap-2 px-3 py-2 border-t">
+        <Link
+          href={`/org/${organization?.slug ?? '_'}/usage`}
+          className="text-xs text-foreground-light hover:text-foreground inline-flex items-center gap-1"
+        >
+          View all usage
+          <ArrowRight size={11} strokeWidth={1.5} />
+        </Link>
+        <UpgradePlanButton
+          source="home_usage_card"
+          plan="Pro"
+          onClick={() => track('upgrade_cta_clicked', { placement: 'home_usage_card' })}
+        />
+      </div>
+    </>
   )
 }

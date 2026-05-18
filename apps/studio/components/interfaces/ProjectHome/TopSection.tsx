@@ -4,7 +4,6 @@ import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { ActivityStats } from '@/components/interfaces/ProjectHome/ActivityStats'
-import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
 import { ProjectConnectionPopover } from '@/components/interfaces/ProjectHome/ProjectConnectionPopover'
 import { ProjectPausedState } from '@/components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -93,13 +92,12 @@ export const TopSection = () => {
             <div
               className={cn(
                 'w-full border border-muted rounded-md overflow-hidden flex flex-col relative',
-                showUsageCard ? 'h-[600px] md:h-[660px]' : 'h-[400px] md:h-[500px]'
+                showUsageCard ? 'h-[600px] md:h-[680px]' : 'h-[400px] md:h-[500px]'
               )}
             >
               <ReactFlowProvider>
-                <InstanceConfiguration diagramOnly />
+                <InstanceConfiguration diagramOnly showPlanUsage={showUsageCard} />
               </ReactFlowProvider>
-              <PlanUsageCard />
             </div>
           </div>
         )}
