@@ -1,7 +1,7 @@
 import { useFlag, useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button, cn, Modal, TextArea_Shadcn_ as TextArea } from 'ui'
+import { Button, cn, Modal, TextArea } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'

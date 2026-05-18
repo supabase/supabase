@@ -15,11 +15,11 @@ import {
   DialogTrigger,
   Form,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -131,21 +131,18 @@ export const UpdateForeignSchemaDialog = ({
                       layout="vertical"
                       label="Select which Postgres schema to update"
                     >
-                      <Select_Shadcn_
-                        value={field.value}
-                        onValueChange={(val) => field.onChange(val)}
-                      >
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
+                      <Select value={field.value} onValueChange={(val) => field.onChange(val)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
                           {schemasAssociatedWithNamespace.map((x) => (
-                            <SelectItem_Shadcn_ key={x} value={x}>
+                            <SelectItem key={x} value={x}>
                               {x}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                        </SelectContent>
+                      </Select>
                     </FormItemLayout>
                   )}
                 />

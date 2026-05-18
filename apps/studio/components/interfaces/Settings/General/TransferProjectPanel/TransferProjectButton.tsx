@@ -9,11 +9,11 @@ import {
   InfoIcon,
   Loading,
   Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -205,21 +205,18 @@ export const TransferProjectButton = () => {
                   className="gap-[2px]"
                   size="tiny"
                 >
-                  <Select_Shadcn_
-                    onValueChange={(slug) => setSelectedOrg(slug)}
-                    value={selectedOrg}
-                  >
-                    <SelectTrigger_Shadcn_ id="organization">
-                      <SelectValue_Shadcn_ placeholder="Select Organization" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
+                  <Select onValueChange={(slug) => setSelectedOrg(slug)} value={selectedOrg}>
+                    <SelectTrigger id="organization">
+                      <SelectValue placeholder="Select Organization" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {organizations.map((x) => (
-                        <SelectItem_Shadcn_ key={x.id} value={x.slug}>
+                        <SelectItem key={x.id} value={x.slug}>
                           {x.name}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ))}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    </SelectContent>
+                  </Select>
                 </FormItemLayout>
               )}
             </div>

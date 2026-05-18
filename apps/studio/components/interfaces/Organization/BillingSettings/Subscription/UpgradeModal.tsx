@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { includes, without } from 'lodash'
 import { useReducer, useState } from 'react'
 import { toast } from 'sonner'
-import { Modal, TextArea_Shadcn_ as TextArea } from 'ui'
+import { Modal, TextArea } from 'ui'
 
 import { generateUpgradeReasons } from '../helpers'
 import { useSendUpgradeFeedbackMutation } from '@/data/feedback/upgrade-survey-send'

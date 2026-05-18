@@ -10,9 +10,9 @@ vi.mock('ui', async () => {
   const actual = await vi.importActual<typeof import('ui')>('ui')
   return {
     ...actual,
-    ContextMenu_Shadcn_: (props: any) => {
+    ContextMenu: (props: any) => {
       contextMenuMountCount++
-      return <actual.ContextMenu_Shadcn_ {...props} />
+      return <actual.ContextMenu {...props} />
     },
   }
 })
