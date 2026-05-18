@@ -230,7 +230,7 @@ export const UnifiedLogs = () => {
     state: {
       columnFilters,
       sorting,
-      columnVisibility: { ...columnVisibility, ...dynamicColumnVisibility },
+      columnVisibility: { ...dynamicColumnVisibility, ...columnVisibility },
       rowSelection,
       columnOrder,
     },
@@ -435,9 +435,10 @@ export const UnifiedLogs = () => {
                 chartConfig={filteredChartConfig}
               />
             </div>
+
             <ResizablePanelGroup
               key="main-logs"
-              className="flex-1"
+              className="flex-1 border-t"
               orientation={dock === 'bottom' ? 'vertical' : 'horizontal'}
             >
               <ResizablePanel
