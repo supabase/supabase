@@ -85,7 +85,11 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
     }
   }, [])
 
-  return <div ref={ref}>{React.cloneElement(children as React.ReactElement, { isVisible })}</div>
+  return (
+    <div ref={ref}>
+      {React.cloneElement(children as React.ReactElement<{ isVisible: boolean }>, { isVisible })}
+    </div>
+  )
 }
 
 /**
@@ -122,7 +126,7 @@ const ComposedChartHandler = ({
   id,
   syncId,
   ...otherProps
-}: PropsWithChildren) => {
+}: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
 
