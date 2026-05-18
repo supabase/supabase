@@ -179,10 +179,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         <NuqsAdapter>
           <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
-              <FeatureFlagProviderWithOrgContext
-                API_URL={API_URL}
-                enabled={IS_PLATFORM}
-              >
+              <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
                 <ProfileProvider>
                   <TimezoneProvider>
                     <TimestampInfoTimezoneBridge>
