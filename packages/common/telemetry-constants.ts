@@ -315,9 +315,8 @@ export interface ProjectCreationDefaultPrivilegesExposedEvent {
      * field the experiment actually controls.
      * true = default privileges granted (legacy behaviour)
      * false = revoke SQL runs on create (new behaviour, treatment default)
-     * Main flow only; the Vercel surface omits this property.
      */
-    dataApiDefaultPrivileges?: boolean
+    dataApiDefaultPrivileges: boolean
     /**
      * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
      * true = revoke cohort (checkbox defaulted to unchecked)

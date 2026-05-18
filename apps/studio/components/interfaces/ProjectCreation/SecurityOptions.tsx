@@ -32,10 +32,12 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
     control: form.control,
     name: 'dataApiDefaultPrivileges',
   })
+  const hasUserModified = form.getFieldState('dataApiDefaultPrivileges', form.formState).isDirty
 
   useTrackDefaultPrivilegesExposure({
     surface: 'main',
     dataApiDefaultPrivileges: dataApiDefaultPrivileges ?? true,
+    hasUserModified,
   })
 
   return (

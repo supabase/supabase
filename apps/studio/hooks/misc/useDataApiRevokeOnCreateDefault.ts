@@ -24,39 +24,51 @@ export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
 }
 
 type DefaultPrivilegesExposureOptions =
-  | { surface: 'main'; dataApiDefaultPrivileges: boolean }
-  | { surface: 'vercel'; orgSlug: string | undefined }
+  | {
+      surface: 'main'
+      dataApiDefaultPrivileges: boolean
+      hasUserModified: boolean
+    }
+  | {
+      surface: 'vercel'
+      orgSlug: string | undefined
+      dataApiDefaultPrivileges: boolean
+      hasUserModified: boolean
+    }
 
 /**
- * Fires `project_creation_default_privileges_exposed` once per mount, once
- * the flag has resolved. On the main surface, the event payload includes
- * `dataApiDefaultPrivileges` — the actual form-field value the experiment
- * controls (true = legacy grants kept, false = revoked on create).
- * Deduplicated via ref so re-renders and mid-session flag flips don't re-fire.
+ * Fires `project_creation_default_privileges_exposed` once per mount, once the
+ * flag has resolved AND the form value is consistent with the flag's expected
+ * default. The convergence gate avoids a render-ordering race: caller-side
+ * sync effects (in /new/[slug] and the Vercel deploy flow) update the form
+ * value when the flag resolves late, but child effects fire before parent
+ * effects in the same commit, so without the gate the exposure would capture
+ * the stale pre-sync value. If the user has dirtied the field, fire
+ * immediately with their explicit value. Deduplicated via ref.
  */
 export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExposureOptions) => {
   const track = useTrack()
   const flag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
   const hasTracked = useRef(false)
 
-  const { surface } = options
-  const dataApiDefaultPrivileges =
-    options.surface === 'main' ? options.dataApiDefaultPrivileges : null
+  const { surface, dataApiDefaultPrivileges, hasUserModified } = options
   const orgSlug = options.surface === 'vercel' ? options.orgSlug : undefined
 
   useEffect(() => {
     if (hasTracked.current) return
     if (flag === undefined) return
     if (surface === 'vercel' && !orgSlug) return
+    // Gate on form-flag convergence unless the user explicitly dirtied the field.
+    if (!hasUserModified && dataApiDefaultPrivileges !== !flag) return
     hasTracked.current = true
     track(
       'project_creation_default_privileges_exposed',
       {
         surface,
-        ...(dataApiDefaultPrivileges !== null && { dataApiDefaultPrivileges }),
+        dataApiDefaultPrivileges,
         dataApiRevokeOnCreateDefaultEnabled: flag,
       },
       surface === 'vercel' ? { organization: orgSlug } : undefined
     )
-  }, [flag, track, surface, dataApiDefaultPrivileges, orgSlug])
+  }, [flag, track, surface, dataApiDefaultPrivileges, hasUserModified, orgSlug])
 }
