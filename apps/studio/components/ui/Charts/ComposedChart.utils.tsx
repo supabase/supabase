@@ -36,7 +36,6 @@ export interface ReportAttributes {
   }
   normalizeVisibleStackToPercent?: boolean
   hideHighlightedValue?: boolean
-  useYAxisLimitAsDomainMin?: boolean
 }
 
 export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
@@ -65,7 +64,6 @@ export type MultiAttribute = {
   omitFromTotal?: boolean
   tooltip?: string
   customValue?: number
-  useYAxisLimitAsValue?: boolean
   [key: string]: any
   /**
    * Manipulate the value of the attribute before it is displayed on the chart.

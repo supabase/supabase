@@ -119,7 +119,7 @@ export const getReportAttributesV2: (
         width: 75,
         tickFormatter: (value: number) => formatBytesMinMB(value, 2),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        domain: [0, (dataMax: number) => Math.max(dataMax, 512 * 1024 * 1024)] as any,
+        domain: [0, (dataMax: number) => Math.max(dataMax, 1024 * 1024 * 1024)] as any,
       },
       attributes: [
         {
@@ -130,14 +130,14 @@ export const getReportAttributesV2: (
             'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
         },
         {
-          attribute: 'swap_scale_minimum',
+          attribute: 'swap_limit',
           provider: 'reference-line',
           isMaxValue: true,
           omitFromTotal: true,
-          label: '512 MB',
+          label: '1 GB',
           tooltip:
-            'Minimum chart scale — the y-axis shows at least 512 MB so low swap usage is not visually exaggerated',
-          customValue: 512 * 1024 * 1024,
+            'Total swap available. Every Supabase compute instance is provisioned with 1 GB of swap, regardless of size',
+          value: 1024 * 1024 * 1024,
         },
       ],
     },
