@@ -1,9 +1,19 @@
-import { LayoutGrid, List, Search } from 'lucide-react'
-import { cn, Select, SelectContent, SelectItem, SelectTrigger } from 'ui'
+import { ChevronDown, LayoutGrid, List, Search } from 'lucide-react'
+import {
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import {
   formatCategoryLabel,
+  getCategoryIcon,
   INTEGRATION_TYPES,
   MARKETPLACE_SOURCES,
   type MarketplaceIntegrationType,
@@ -19,10 +29,13 @@ interface MarketplaceFilterBarProps {
   category: string | null
   onCategoryChange: (value: string | null) => void
   categoryOptions: Array<{ slug: string; name: string }>
+  categoryCounts?: Record<string, number>
   type: MarketplaceIntegrationType | null
   onTypeChange: (value: MarketplaceIntegrationType | null) => void
+  typeCounts?: Record<MarketplaceIntegrationType, number>
   source: MarketplaceSource | null
   onSourceChange: (value: MarketplaceSource | null) => void
+  sourceCounts?: Record<MarketplaceSource, number>
   viewMode: ViewMode
   onViewModeChange: (value: ViewMode) => void
   hasActiveFilter: boolean
@@ -31,7 +44,7 @@ interface MarketplaceFilterBarProps {
 
 const ALL = '__all__'
 
-const triggerCls = 'w-[170px]'
+const triggerCls = 'inline-flex flex-row gap-2'
 
 export const MarketplaceFilterBar = ({
   resultCount,
@@ -40,10 +53,13 @@ export const MarketplaceFilterBar = ({
   category,
   onCategoryChange,
   categoryOptions,
+  categoryCounts,
   type,
   onTypeChange,
+  typeCounts,
   source,
   onSourceChange,
+  sourceCounts,
   viewMode,
   onViewModeChange,
   hasActiveFilter,
@@ -68,58 +84,113 @@ export const MarketplaceFilterBar = ({
         value={search}
         size="tiny"
         onChange={(e) => onSearchChange(e.target.value)}
-        placeholder={`Search ${resultCount} integration${resultCount === 1 ? '' : 's'}…`}
+        placeholder={`Search integration${resultCount === 1 ? '' : 's'}…`}
         icon={<Search size={14} />}
-        className="w-60"
+        className="max-w-60 grow flex-1"
       />
 
-      <Select value={category ?? ALL} onValueChange={(v) => onCategoryChange(v === ALL ? null : v)}>
-        <SelectTrigger size="tiny" className={triggerCls}>
-          <span className="truncate">Category: {categoryLabel}</span>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>All</SelectItem>
-          {categoryOptions.map((c) => (
-            <SelectItem key={c.slug} value={c.slug}>
-              {c.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+            <span className="truncate">Category: {categoryLabel}</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuRadioGroup
+            value={category ?? ALL}
+            onValueChange={(v) => onCategoryChange(v === ALL ? null : v)}
+          >
+            <DropdownMenuItem onClick={() => onCategoryChange(null)}>
+              All categories
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {categoryOptions.map((c) => {
+              const Icon = getCategoryIcon(c.slug)
+              return (
+                <DropdownMenuItem
+                  key={c.slug}
+                  onClick={() => onCategoryChange(c.slug)}
+                  className="flex items-center gap-2"
+                >
+                  <Icon size={13} className="text-foreground-lighter" />
+                  <span className="flex-1">{c.name}</span>
+                  {categoryCounts?.[c.slug] !== undefined && (
+                    <span className="font-mono text-xs text-foreground-lighter">
+                      {categoryCounts[c.slug]}
+                    </span>
+                  )}
+                </DropdownMenuItem>
+              )
+            })}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-      <Select
-        value={type ?? ALL}
-        onValueChange={(v) => onTypeChange(v === ALL ? null : (v as MarketplaceIntegrationType))}
-      >
-        <SelectTrigger size="tiny" className={triggerCls}>
-          <span className="truncate">Type: {typeLabel}</span>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>All</SelectItem>
-          {INTEGRATION_TYPES.map((t) => (
-            <SelectItem key={t.key} value={t.key}>
-              {t.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+            <span className="truncate">Type: {typeLabel}</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuRadioGroup
+            value={type ?? ALL}
+            onValueChange={(v) =>
+              onTypeChange(v === ALL ? null : (v as MarketplaceIntegrationType))
+            }
+          >
+            <DropdownMenuItem onClick={() => onTypeChange(null)}>All Types</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {INTEGRATION_TYPES.map(({ key, label, icon: Icon }) => (
+              <DropdownMenuItem
+                key={key}
+                onClick={() => onTypeChange(key)}
+                className="flex items-center gap-2"
+              >
+                <Icon size={13} className="text-foreground-lighter" />
+                <span className="flex-1">{label}</span>
+                {typeCounts?.[key] !== undefined && (
+                  <span className="font-mono text-xs text-foreground-lighter">
+                    {typeCounts[key]}
+                  </span>
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-      <Select
-        value={source ?? ALL}
-        onValueChange={(v) => onSourceChange(v === ALL ? null : (v as MarketplaceSource))}
-      >
-        <SelectTrigger size="tiny" className={triggerCls}>
-          <span className="truncate">Source: {sourceLabel}</span>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>All</SelectItem>
-          {MARKETPLACE_SOURCES.map((s) => (
-            <SelectItem key={s.key} value={s.key}>
-              {s.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+            <span className="truncate">Source: {sourceLabel}</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuRadioGroup
+            value={source ?? ALL}
+            onValueChange={(v) => onSourceChange(v === ALL ? null : (v as MarketplaceSource))}
+          >
+            <DropdownMenuItem onClick={() => onSourceChange(null)}>All sources</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {MARKETPLACE_SOURCES.map(({ key, label, icon: Icon }) => (
+              <DropdownMenuItem
+                key={key}
+                onClick={() => onSourceChange(key)}
+                className="flex items-center gap-2"
+              >
+                <Icon size={13} className="text-foreground-lighter" />
+                <span className="flex-1">{label}</span>
+                {sourceCounts?.[key] !== undefined && (
+                  <span className="font-mono text-xs text-foreground-lighter">
+                    {sourceCounts[key]}
+                  </span>
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {showClear && (
         <button

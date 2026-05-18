@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
-import { Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
+import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
 import {
+  EmptyStatePresentational,
   PageContainer,
   PageHeader,
   PageHeaderDescription,
@@ -12,9 +13,12 @@ import {
 } from 'ui-patterns'
 
 import {
+  EXCLUDED_CATEGORY_SLUGS,
   FEATURED_INTEGRATION_IDS,
   getMarketplaceSource,
   getMarketplaceType,
+  INTEGRATION_TYPES,
+  MARKETPLACE_SOURCES,
   type MarketplaceIntegrationType,
   type MarketplaceSource,
 } from './Marketplace.constants'
@@ -87,10 +91,42 @@ export const MarketplaceIndex = () => {
   const categoryOptions = useMemo(
     () =>
       marketplaceCategories
-        .filter((c): c is { slug: string; name: string } & typeof c => !!c.slug && !!c.name)
+        .filter(
+          (c): c is { slug: string; name: string } & typeof c =>
+            !!c.slug && !!c.name && !EXCLUDED_CATEGORY_SLUGS.has(c.slug)
+        )
         .map((c) => ({ slug: c.slug, name: c.name })),
     [marketplaceCategories]
   )
+
+  const typeCounts = useMemo(() => {
+    const all = availableIntegrations ?? []
+    return Object.fromEntries(
+      INTEGRATION_TYPES.map(({ key }) => [
+        key,
+        all.filter((i) => getMarketplaceType(i) === key).length,
+      ])
+    ) as Record<MarketplaceIntegrationType, number>
+  }, [availableIntegrations])
+
+  const sourceCounts = useMemo(() => {
+    const all = availableIntegrations ?? []
+    return Object.fromEntries(
+      MARKETPLACE_SOURCES.map(({ key }) => [
+        key,
+        all.filter((i) => getMarketplaceSource(i) === key).length,
+      ])
+    ) as Record<MarketplaceSource, number>
+  }, [availableIntegrations])
+
+  const categoryCounts = useMemo(() => {
+    const all = availableIntegrations ?? []
+    const counts: Record<string, number> = {}
+    for (const { slug } of categoryOptions) {
+      counts[slug] = all.filter((i) => i.categories?.includes(slug)).length
+    }
+    return counts
+  }, [availableIntegrations, categoryOptions])
 
   const hasActiveFilter = !!(category || type || source)
   const hasSearchOrFilter = hasActiveFilter || search.length > 0
@@ -183,18 +219,25 @@ export const MarketplaceIndex = () => {
               category={category}
               onCategoryChange={(v) => setCategory(v)}
               categoryOptions={categoryOptions}
+              categoryCounts={categoryCounts}
               type={type}
               onTypeChange={(v) => setType(v)}
+              typeCounts={typeCounts}
               source={source}
               onSourceChange={(v) => setSource(v)}
+              sourceCounts={sourceCounts}
               viewMode={viewMode}
               onViewModeChange={(v) => setViewMode(v)}
               hasActiveFilter={hasActiveFilter}
               onClearFilters={clearAll}
             />
 
-            {search.length > 0 && filtered.length === 0 && (
-              <NoSearchResults searchString={search} onResetFilter={() => setSearch('')} />
+            {filtered.length === 0 && (
+              <EmptyStatePresentational title="No results found">
+                <Button type="default" onClick={clearAll}>
+                  Clear filters
+                </Button>
+              </EmptyStatePresentational>
             )}
 
             {filtered.length > 0 &&

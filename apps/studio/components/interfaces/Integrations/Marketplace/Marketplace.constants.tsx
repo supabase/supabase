@@ -6,13 +6,19 @@ import {
   Cpu,
   CreditCard,
   Database,
+  Fingerprint,
   KeyRound,
   Mail,
+  MessageSquare,
+  MousePointerClick,
   Package2,
   Plug,
+  Server,
   ShieldCheck,
   Users,
+  Webhook,
   Wrench,
+  Zap,
   type LucideIcon,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -66,6 +72,12 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   postgres_extension: Database,
   wrapper: Cable,
   devtools: Wrench,
+  auth: Fingerprint,
+  'low-code': MousePointerClick,
+  'data-platform': Server,
+  api: Webhook,
+  'caching-offline-first': Zap,
+  messaging: MessageSquare,
 }
 
 export const FEATURED_CATEGORIES: Array<{ slug: string; name: string }> = [
@@ -76,6 +88,14 @@ export const FEATURED_CATEGORIES: Array<{ slug: string; name: string }> = [
   { slug: 'ai_vectors', name: 'AI & Vectors' },
   { slug: 'storage', name: 'Storage' },
 ]
+
+// Categories excluded from the filter dropdown — they either overlap with
+// dedicated filter groups (type/source) or are unused in the current catalogue.
+export const EXCLUDED_CATEGORY_SLUGS = new Set([
+  'agencies',
+  'foreign-data-wrapper',
+  'app-templates',
+])
 
 export const getCategoryIcon = (slug: string | null | undefined): LucideIcon => {
   if (!slug) return Boxes
