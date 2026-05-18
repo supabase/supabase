@@ -40,6 +40,7 @@ interface DisplayBlockRendererProps {
   onDeny?: () => void
   /** AI SDK tool state used to show approval UI for pending tool calls. */
   toolState?: ToolUIPart['state']
+  toolApprovalRespondedApproved?: boolean
   isLastPart?: boolean
   isLastMessage?: boolean
   showConfirmFooter?: boolean
@@ -57,6 +58,7 @@ export const DisplayBlockRenderer = ({
   onApprove,
   onDeny,
   toolState,
+  toolApprovalRespondedApproved,
   isLastPart = false,
   isLastMessage = false,
   showConfirmFooter = true,
@@ -223,13 +225,16 @@ export const DisplayBlockRenderer = ({
     )
   }
 
+  const isApprovalRequested = toolState === 'approval-requested'
+  const isApprovalResponded = toolState === 'approval-responded'
+  const isApprovalDenied = isApprovalResponded && toolApprovalRespondedApproved === false
   const shouldShowConfirmFooter =
     showConfirmFooter &&
-    toolState === 'approval-requested' &&
+    (isApprovalRequested || (isApprovalResponded && !isApprovalDenied)) &&
     isLastPart &&
     isLastMessage &&
-    !!onApprove &&
-    !!onDeny
+    (isApprovalResponded || (!!onApprove && !!onDeny))
+  const isRunningApprovedTool = (isApprovalResponded && !isApprovalDenied) || executeSqlLoading
 
   return (
     <div className="display-block w-auto overflow-x-hidden">
@@ -246,7 +251,7 @@ export const DisplayBlockRenderer = ({
           draggable={isDraggableToReports}
           onDragStart={handleDragStart}
           disabled={shouldShowConfirmFooter}
-          isExecuting={executeSqlLoading}
+          isExecuting={isRunningApprovedTool}
         />
       </div>
       {shouldShowConfirmFooter && (
@@ -254,10 +259,11 @@ export const DisplayBlockRenderer = ({
           <ConfirmFooter
             message="Assistant wants to run this query"
             cancelLabel="Skip"
-            confirmLabel={executeSqlLoading ? 'Running...' : 'Run Query'}
-            isLoading={executeSqlLoading}
-            onCancel={onDeny}
-            onConfirm={onApprove}
+            confirmLabel="Run Query"
+            confirmLabelLoading="Running..."
+            isLoading={isApprovalResponded || executeSqlLoading}
+            onCancel={isApprovalRequested ? onDeny : undefined}
+            onConfirm={isApprovalRequested ? onApprove : undefined}
           />
         </div>
       )}

@@ -1,3 +1,4 @@
+import { isToolUIPart, type UIMessage } from 'ai'
 import { toast } from 'sonner'
 
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
@@ -70,6 +71,36 @@ export const isReadOnlySelect = (query: string): boolean => {
   if (hasUnknownFunction) return false
 
   return true
+}
+
+export const hasPendingToolApproval = (messages: Pick<UIMessage, 'role' | 'parts'>[]) => {
+  return messages.some((message) => {
+    if (message.role !== 'assistant') return false
+
+    return message.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-requested')
+  })
+}
+
+export const resolvePendingToolApprovalsAsDenied = (messages: UIMessage[]): UIMessage[] => {
+  return messages.map((message) => {
+    if (message.role !== 'assistant') return message
+
+    const parts = message.parts?.map((part) => {
+      if (!isToolUIPart(part) || part.state !== 'approval-requested') return part
+
+      return {
+        ...part,
+        state: 'output-denied',
+        approval: {
+          id: part.approval.id,
+          approved: false,
+          reason: 'Skipped because the user sent a follow-up message.',
+        },
+      } as UIMessage['parts'][number]
+    })
+
+    return { ...message, parts } as UIMessage
+  })
 }
 
 const getContextKey = (pathname: string) => {

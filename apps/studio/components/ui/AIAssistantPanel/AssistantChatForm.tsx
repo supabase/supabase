@@ -79,7 +79,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
 
     const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
       if (event) event.preventDefault()
-      if (!value || (loading && !isEditing)) return
+      if (disabled || !value || (loading && !isEditing)) return
 
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
@@ -99,7 +99,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       }
     }
 
-    const canSubmit = !loading && !!value
+    const canSubmit = !disabled && !loading && !!value
 
     return (
       <div className="w-full">
