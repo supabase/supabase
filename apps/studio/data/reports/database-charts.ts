@@ -7,7 +7,7 @@ import { DiskAttributesData } from '@/data/config/disk-attributes-query'
 import { MaxConnectionsData } from '@/data/database/max-connections-query'
 import { Project } from '@/data/projects/project-detail-query'
 import { DOCS_URL } from '@/lib/constants'
-import { formatBytes } from '@/lib/helpers'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 // Compute variants below 4XL run on EBS instances that draw on a burst
 // credit pool for disk IO, so the burst balance chart only makes sense for
@@ -68,7 +68,7 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: number) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
       },
       attributes: [
         {
@@ -92,6 +92,14 @@ export const getReportAttributesV2: (
           tooltip:
             'Unallocated memory available for use. A small portion is always reserved by the operating system',
         },
+        {
+          attribute: 'ram_usage_total',
+          provider: 'infra-monitoring',
+          label: 'Total RAM',
+          isMaxValue: true,
+          omitFromTotal: true,
+          tooltip: 'Total RAM available on this instance',
+        },
       ],
     },
     {
@@ -109,7 +117,9 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        tickFormatter: (value: number) => formatBytes(value, 2),
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        domain: [0, (dataMax: number) => Math.max(dataMax, 1024 * 1024 * 1024)] as any,
       },
       attributes: [
         {
