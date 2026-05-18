@@ -129,16 +129,6 @@ export const getReportAttributesV2: (
           tooltip:
             'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
         },
-        {
-          attribute: 'swap_limit',
-          provider: 'reference-line',
-          isMaxValue: true,
-          omitFromTotal: true,
-          label: '1 GB',
-          tooltip:
-            'Total swap available. Every Supabase compute instance is provisioned with 1 GB of swap, regardless of size',
-          value: 1024 * 1024 * 1024,
-        },
       ],
     },
     {
