@@ -15,6 +15,7 @@ import {
 import {
   EXCLUDED_CATEGORY_SLUGS,
   FEATURED_INTEGRATION_IDS,
+  formatCategoryLabel,
   getMarketplaceSource,
   getMarketplaceType,
   INTEGRATION_TYPES,
@@ -31,7 +32,6 @@ import { useAvailableIntegrations } from '@/components/interfaces/Integrations/L
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'
@@ -172,12 +172,24 @@ export const MarketplaceIndex = () => {
     setSearch('')
   }
 
+  const activeFilters = [category, type, source].filter(Boolean)
+  const pageTitle = useMemo(() => {
+    if (activeFilters.length !== 1) return 'Integrations Marketplace'
+    if (category)
+      return `Integrations Marketplace: ${formatCategoryLabel(category, categoryOptions)}`
+    if (type)
+      return `Integrations Marketplace: ${INTEGRATION_TYPES.find((t) => t.key === type)?.label ?? type}s`
+    if (source)
+      return `Integrations Marketplace: ${MARKETPLACE_SOURCES.find((s) => s.key === source)?.label ?? source}`
+    return 'Integrations Marketplace'
+  }, [activeFilters.length, category, type, source, categoryOptions])
+
   return (
     <>
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Integrations Marketplace</PageHeaderTitle>
+            <PageHeaderTitle>{pageTitle}</PageHeaderTitle>
             <PageHeaderDescription>
               Explore native and third-party integrations to add functionality to your Supabase
               project.
