@@ -35,10 +35,10 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
-      name: 'New Logs interface',
+      name: 'Updated Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
       enabled: isUnifiedLogsPreviewAvailable || isEnterpriseOrSupabaseOrg,
-      isNew: false,
+      isNew: true,
       isPlatformOnly: true,
       isDefaultOptIn: false,
     },
