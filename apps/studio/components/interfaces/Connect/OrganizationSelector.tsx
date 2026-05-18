@@ -1,41 +1,60 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
-import Link from 'next/link'
 import { useMemo, useState, type ReactNode } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
-import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
+import {
+  CreateOrganizationCard,
+  OrganizationCard,
+} from '@/components/interfaces/Organization/OrganizationCard'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import type { Organization } from '@/types'
 
 const VISIBLE_ORGANIZATIONS_LIMIT = 3
-const CREATE_ORGANIZATION_CARD_CLASSNAME =
-  'pointer-events-none border-dashed shadow-none transition-colors group-hover:border-default group-hover:bg-surface-200'
 const CONNECT_DISCLOSURE_TRIGGER_CLASSNAME =
   'mx-auto flex h-7 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground'
 
-export const ConnectOrganizationSelector = ({
+export const OrganizationSelector = ({
   organizations,
   selectedSlug,
-  onSelect,
   disabled = false,
   description,
-  getOrganizationDescription,
   createLabel,
-  createHref,
+  createHrefParams,
+  onSelect,
+  getOrganizationDescription,
 }: {
   organizations: Organization[]
   selectedSlug?: string | null
-  onSelect: (slug: string) => void
   disabled?: boolean
   description?: ReactNode
-  getOrganizationDescription?: (organization: Organization) => ReactNode
   createLabel?: string
-  createHref?: string
+  createHrefParams?: { [key: string]: string }
+  onSelect: (slug: string) => void
+  getOrganizationDescription?: (organization: Organization) => ReactNode
 }) => {
   const [showMore, setShowMore] = useState(false)
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const { visibleOrganizations, overflowOrganizations } = useMemo(() => {
+    const lastVisitedOrg = organizations.find(({ slug }) => slug === lastVisitedOrganization)
     const selectedIndex = organizations.findIndex(({ slug }) => slug === selectedSlug)
     const selectedInOverflow = selectedIndex >= VISIBLE_ORGANIZATIONS_LIMIT
+
+    if (!!lastVisitedOrg) {
+      return {
+        visibleOrganizations: [
+          lastVisitedOrg,
+          ...organizations.slice(0, VISIBLE_ORGANIZATIONS_LIMIT - 1),
+        ],
+        overflowOrganizations: organizations
+          .filter(({ slug }) => slug !== lastVisitedOrganization)
+          .slice(VISIBLE_ORGANIZATIONS_LIMIT),
+      }
+    }
 
     if (!selectedInOverflow || !selectedSlug) {
       return {
@@ -54,7 +73,7 @@ export const ConnectOrganizationSelector = ({
       ],
       overflowOrganizations: withoutSelected.slice(VISIBLE_ORGANIZATIONS_LIMIT - 1),
     }
-  }, [organizations, selectedSlug])
+  }, [lastVisitedOrganization, organizations, selectedSlug])
 
   const hasOverflow = overflowOrganizations.length > 0
 
@@ -80,22 +99,8 @@ export const ConnectOrganizationSelector = ({
           />
         ))}
 
-        {createLabel && createHref && (
-          <Link
-            href={createHref}
-            className={cn(
-              'group block w-full cursor-pointer text-left',
-              disabled && 'pointer-events-none opacity-50'
-            )}
-            aria-disabled={disabled}
-          >
-            <OrganizationCard
-              isLink={false}
-              organization={createOrganizationCardModel(createLabel)}
-              description={null}
-              className={CREATE_ORGANIZATION_CARD_CLASSNAME}
-            />
-          </Link>
+        {!!createLabel && !!createHrefParams && (
+          <CreateOrganizationCard params={createHrefParams} label={createLabel} />
         )}
 
         {hasOverflow && (
@@ -172,24 +177,3 @@ const ConnectOrganizationButton = ({
     )}
   </button>
 )
-
-const createOrganizationCardModel = (name: string): Organization => ({
-  id: -1,
-  name,
-  slug: 'create-new-organization',
-  plan: { id: 'free', name: 'Free' },
-  managed_by: 'supabase',
-  is_owner: true,
-  billing_email: null,
-  billing_partner: null,
-  integration_source: null,
-  usage_billing_enabled: true,
-  stripe_customer_id: null,
-  subscription_id: null,
-  organization_requires_mfa: false,
-  opt_in_tags: [],
-  restriction_status: null,
-  restriction_data: null,
-  organization_missing_address: false,
-  organization_missing_tax_id: false,
-})
