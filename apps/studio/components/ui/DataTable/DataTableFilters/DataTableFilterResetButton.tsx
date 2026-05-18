@@ -29,7 +29,7 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
         }
       }}
     >
-      {filters.length}
+      {column?.id === 'date' ? 1 : filters.length}
     </Button>
   )
 }
