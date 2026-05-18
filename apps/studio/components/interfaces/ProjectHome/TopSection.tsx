@@ -89,12 +89,14 @@ export const TopSection = () => {
           <div>
             <div
               className={cn(
-                'w-full h-[400px] md:h-[500px] border border-muted rounded-md overflow-hidden flex flex-col relative'
+                'w-full border border-muted rounded-md overflow-hidden flex flex-col relative'
               )}
             >
-              <ReactFlowProvider>
-                <InstanceConfiguration diagramOnly />
-              </ReactFlowProvider>
+              <div className="h-[400px] md:h-[500px] relative">
+                <ReactFlowProvider>
+                  <InstanceConfiguration diagramOnly />
+                </ReactFlowProvider>
+              </div>
               <PlanUsageCard />
             </div>
           </div>

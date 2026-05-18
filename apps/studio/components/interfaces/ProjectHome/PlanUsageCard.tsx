@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, cn } from 'ui'
+import { cn } from 'ui'
 
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -113,8 +113,8 @@ const MetricRow = ({ usageItem, config }: { usageItem: OrgMetricsUsage; config: 
   const isApproaching = limit > 0 && ratio >= 0.8 && !isOver
 
   return (
-    <div className="flex items-center justify-between gap-3 px-3 py-2">
-      <div className="flex items-center gap-2 min-w-0">
+    <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+      <div className="flex items-center gap-2.5 min-w-0">
         <ProgressRing ratio={ratio} isOver={isOver} isApproaching={isApproaching} />
         <span className="text-xs text-foreground truncate">{config.label}</span>
       </div>
@@ -150,34 +150,31 @@ export const PlanUsageCard = () => {
   if (visibleRows.length === 0) return null
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 z-10">
-      <Card className="bg-surface-100/95 backdrop-blur-sm shadow-md">
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border-overlay">
-          <div className="flex flex-col">
-            <span className="text-xs text-foreground">Free plan usage</span>
-            <span className="text-[11px] text-foreground-lighter">Current billing cycle</span>
-          </div>
-          <UpgradePlanButton
-            source="home_usage_card"
-            plan="Pro"
-            onClick={() => track('upgrade_cta_clicked', { placement: 'home_usage_card' })}
-          />
-        </div>
-        <CardContent className="p-0 divide-y divide-border-overlay">
-          {visibleRows.map(({ config, usageItem }) => (
-            <MetricRow key={config.key} usageItem={usageItem} config={config} />
-          ))}
-        </CardContent>
-        <div className="px-4 py-2 border-t border-border-overlay flex justify-end">
-          <Link
-            href={`/org/${organization?.slug ?? '_'}/usage`}
-            className="text-[11px] text-foreground-light hover:text-foreground inline-flex items-center gap-1"
-          >
-            View all usage
-            <ArrowRight size={11} strokeWidth={1.5} />
-          </Link>
-        </div>
-      </Card>
+    <div className="flex flex-col border-t border-muted bg-surface-100">
+      <div className="px-4 py-2 border-b border-muted">
+        <span className="text-[11px] uppercase tracking-wider text-foreground-lighter">
+          Free plan &middot; Current billing cycle
+        </span>
+      </div>
+      <div className="flex flex-col divide-y divide-muted">
+        {visibleRows.map(({ config, usageItem }) => (
+          <MetricRow key={config.key} usageItem={usageItem} config={config} />
+        ))}
+      </div>
+      <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-t border-muted">
+        <Link
+          href={`/org/${organization?.slug ?? '_'}/usage`}
+          className="text-[11px] text-foreground-light hover:text-foreground inline-flex items-center gap-1"
+        >
+          View all usage
+          <ArrowRight size={11} strokeWidth={1.5} />
+        </Link>
+        <UpgradePlanButton
+          source="home_usage_card"
+          plan="Pro"
+          onClick={() => track('upgrade_cta_clicked', { placement: 'home_usage_card' })}
+        />
+      </div>
     </div>
   )
 }
