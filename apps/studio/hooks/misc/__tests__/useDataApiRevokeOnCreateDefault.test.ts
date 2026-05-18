@@ -1,5 +1,4 @@
 import { renderHook } from '@testing-library/react'
-import { posthogClient } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -25,17 +24,6 @@ vi.mock('@/lib/constants', async () => {
 vi.mock('@/lib/telemetry/track', () => ({
   useTrack: vi.fn(),
 }))
-
-vi.mock('common', async () => {
-  const actual = await vi.importActual<typeof import('common')>('common')
-  return {
-    ...actual,
-    posthogClient: {
-      getPersonProperty: vi.fn(),
-      onFeatureFlags: vi.fn(() => () => {}),
-    },
-  }
-})
 
 describe('useDataApiRevokeOnCreateDefaultEnabled', () => {
   afterEach(() => {
@@ -74,11 +62,6 @@ describe('useTrackDefaultPrivilegesExposure', () => {
 
   beforeEach(() => {
     vi.mocked(useTrack).mockReturnValue(track)
-    // Default: org_count is set on the person — most tests want to exercise
-    // the post-targeting-resolution behavior. The gate-blocked case has its
-    // own test below.
-    vi.mocked(posthogClient.getPersonProperty).mockReturnValue(1)
-    vi.mocked(posthogClient.onFeatureFlags).mockReturnValue(() => {})
   })
 
   afterEach(() => {
@@ -87,26 +70,23 @@ describe('useTrackDefaultPrivilegesExposure', () => {
 
   it('does not fire while the flag is undefined', () => {
     vi.mocked(usePHFlag).mockReturnValue(undefined)
-    renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: true }))
-    expect(track).not.toHaveBeenCalled()
-  })
-
-  it('does not fire while org_count is missing from the SDK person', () => {
-    vi.mocked(usePHFlag).mockReturnValue(true)
-    vi.mocked(posthogClient.getPersonProperty).mockReturnValue(undefined)
-    renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: true }))
+    renderHook(() =>
+      useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiDefaultPrivileges: true })
+    )
     expect(track).not.toHaveBeenCalled()
   })
 
   it('fires once when the flag resolves to true on the main surface', () => {
     vi.mocked(usePHFlag).mockReturnValue(true)
-    renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: true }))
+    renderHook(() =>
+      useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiDefaultPrivileges: false })
+    )
     expect(track).toHaveBeenCalledTimes(1)
     expect(track).toHaveBeenCalledWith(
       'project_creation_default_privileges_exposed',
       {
         surface: 'main',
-        dataApiEnabled: true,
+        dataApiDefaultPrivileges: false,
         dataApiRevokeOnCreateDefaultEnabled: true,
       },
       undefined
@@ -115,20 +95,22 @@ describe('useTrackDefaultPrivilegesExposure', () => {
 
   it('fires once when the flag resolves to false on the main surface', () => {
     vi.mocked(usePHFlag).mockReturnValue(false)
-    renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: false }))
+    renderHook(() =>
+      useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiDefaultPrivileges: true })
+    )
     expect(track).toHaveBeenCalledTimes(1)
     expect(track).toHaveBeenCalledWith(
       'project_creation_default_privileges_exposed',
       {
         surface: 'main',
-        dataApiEnabled: false,
+        dataApiDefaultPrivileges: true,
         dataApiRevokeOnCreateDefaultEnabled: false,
       },
       undefined
     )
   })
 
-  it('omits dataApiEnabled on the vercel surface', () => {
+  it('omits dataApiDefaultPrivileges on the vercel surface', () => {
     vi.mocked(usePHFlag).mockReturnValue(true)
     renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'vercel', orgSlug: 'acme-org' }))
     expect(track).toHaveBeenCalledWith(
@@ -150,7 +132,7 @@ describe('useTrackDefaultPrivilegesExposure', () => {
   it('deduplicates across re-renders', () => {
     vi.mocked(usePHFlag).mockReturnValue(true)
     const { rerender } = renderHook(() =>
-      useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: true })
+      useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiDefaultPrivileges: true })
     )
     rerender()
     rerender()
@@ -160,7 +142,7 @@ describe('useTrackDefaultPrivilegesExposure', () => {
   it('does not re-fire if the flag flips after initial exposure', () => {
     vi.mocked(usePHFlag).mockReturnValue(false)
     const { rerender } = renderHook(() =>
-      useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: true })
+      useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiDefaultPrivileges: true })
     )
     vi.mocked(usePHFlag).mockReturnValue(true)
     rerender()

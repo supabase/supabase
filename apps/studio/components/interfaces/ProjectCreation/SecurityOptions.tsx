@@ -28,8 +28,15 @@ interface SecurityOptionsProps {
 
 export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptionsProps) => {
   const dataApi = useWatch({ control: form.control, name: 'dataApi' })
+  const dataApiDefaultPrivileges = useWatch({
+    control: form.control,
+    name: 'dataApiDefaultPrivileges',
+  })
 
-  useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: dataApi ?? true })
+  useTrackDefaultPrivilegesExposure({
+    surface: 'main',
+    dataApiDefaultPrivileges: dataApiDefaultPrivileges ?? true,
+  })
 
   return (
     <Panel.Content className="pb-8">

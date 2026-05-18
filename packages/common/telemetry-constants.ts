@@ -310,10 +310,14 @@ export interface ProjectCreationDefaultPrivilegesExposedEvent {
     /** Where the checkbox was shown. */
     surface: 'main' | 'vercel'
     /**
-     * State of the "Enable Data API" toggle at exposure time. Main flow only —
-     * the Vercel surface has no such toggle, so this is omitted there.
+     * Current state of the "Automatically expose new tables" checkbox
+     * (`dataApiDefaultPrivileges` form field) at exposure time. This is the
+     * field the experiment actually controls.
+     * true = default privileges granted (legacy behaviour)
+     * false = revoke SQL runs on create (new behaviour, treatment default)
+     * Main flow only; the Vercel surface omits this property.
      */
-    dataApiEnabled?: boolean
+    dataApiDefaultPrivileges?: boolean
     /**
      * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
      * true = revoke cohort (checkbox defaulted to unchecked)
