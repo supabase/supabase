@@ -15,7 +15,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -134,7 +134,7 @@ export const CreateFirebaseAuthIntegrationDialog = ({
                 render={({ field }) => (
                   <FormItemLayout label="Firebase Auth Project ID">
                     <FormControl>
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}

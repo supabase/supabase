@@ -34,13 +34,18 @@ export type Database = {
           content: string | null
           description: string | null
           documentation_url: string | null
+          edge_function_secret_name: string | null
           featured: boolean | null
           id: string | null
           images: string[] | null
-          installation_identification_method: 'secret_key_prefix' | null
+          installation_identification_method:
+            | 'secret_key_prefix'
+            | 'edge_function_secret_name'
+            | null
           installation_url: string | null
           installation_url_type: 'get' | 'post' | null
           listing_logo: string | null
+          listing_tsv: unknown
           marketplace_url: string | null
           partner_logo: string | null
           partner_name: string | null

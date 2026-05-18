@@ -2867,7 +2867,7 @@ Replication provides the real-time data pipeline required for modern analytics a
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/replication/replication-setup',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/external-replication-setup',
     slug: 'replication',
     status: {
       stage: PRODUCT_STAGES.PRIVATE_ALPHA,

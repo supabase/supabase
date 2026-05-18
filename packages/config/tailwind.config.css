@@ -1,18 +1,14 @@
 @import 'tailwindcss';
 
 /* JS plugins. Tailwind v4 supports `@plugin` for both v3-style JS plugins and
- * v4-native packages. The two local plugins use theme('spacing') /
- * theme('transitionDuration') which resolve from v4's @theme tokens. */
+ * v4-native packages. */
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
-@plugin "tailwindcss-animate";
-@plugin "./tailwind-plugins/hit-area";
-@plugin "./tailwind-plugins/motion-safe-transition";
+@import 'tw-animate-css';
 
-/* Raw color values + per-theme overrides. Must come before colors.css so the
- * --colors-* references resolve to a value. */
-@import './css/radix-vars.css';
-@import './css/brand-vars.css';
+/* Per-theme overrides for semantic --background-/--foreground-/--brand-*
+ * tokens. Radix/scale/brand --color-* values are inlined directly in
+ * colors.css below. */
 @import '../ui/build/css/source/global.css';
 @import '../ui/build/css/themes/dark.css';
 @import '../ui/build/css/themes/light.css';
@@ -23,12 +19,13 @@
 @import './unset-tw-colors.css';
 
 /* Theme tokens + utilities + variants + base layer. colors.css declares the
- * Radix/scale CSS variables in :root; theme.css consumes them from
- * @theme inline so Tailwind generates the utilities. */
+ * Radix/scale/brand --color-* CSS variables with per-theme values; theme.css
+ * consumes them from @theme inline so Tailwind generates the utilities. */
 @import './css/colors.css';
 @import './css/theme.css';
 @import './css/animations.css';
 @import './css/utilities.css';
+@import './tailwind-plugins/hit-area.css';
 @import './css/variants.css';
 @import './css/base.css';
 

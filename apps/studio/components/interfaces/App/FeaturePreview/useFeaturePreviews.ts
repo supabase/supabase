@@ -37,7 +37,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
       name: 'New Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-      enabled: isUnifiedLogsPreviewAvailable && isEnterpriseOrSupabaseOrg,
+      enabled: isUnifiedLogsPreviewAvailable || isEnterpriseOrSupabaseOrg,
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
@@ -72,7 +72,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
-      name: 'JIT database access',
+      name: 'Temporary access',
       discussionsUrl: undefined,
       isNew: true,
       isPlatformOnly: true,

@@ -19,7 +19,7 @@ import {
   DialogTrigger,
   Form,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
@@ -276,7 +276,7 @@ export const CreditCodeRedemption = ({
                           className="gap-1"
                           layout="horizontal"
                         >
-                          <Input_Shadcn_
+                          <Input
                             {...field}
                             className="uppercase w-56 ml-auto"
                             placeholder="ABCD-1234-EFGH-5678"

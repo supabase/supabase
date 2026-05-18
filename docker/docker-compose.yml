@@ -480,9 +480,8 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "curl",
-          "http://localhost:4000/health"
+          "CMD-SHELL",
+          "curl -sSfL -o /dev/null http://localhost:4000/health"
         ]
       timeout: 5s
       interval: 5s
@@ -628,6 +627,7 @@ services:
     environment:
       PORT: 4000
       POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_URL: ecto://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase

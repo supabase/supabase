@@ -1,4 +1,3 @@
-import type { PGColumn } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -48,6 +47,7 @@ import {
   getUniqueIndexColumnNames,
 } from './ColumnList.utils'
 import { ConstraintToken } from './ConstraintToken'
+import { displayColumnType } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -57,8 +57,9 @@ import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
 
-const getColumnTypeAffordancePresentation = (column: PGColumn) => {
+const getColumnTypeAffordancePresentation = (column: SafePostgresColumn) => {
   const { kind, label } = getColumnTypeAffordance(column.format)
   const iconClassName = 'text-foreground-muted'
 
@@ -98,8 +99,8 @@ const getColumnTypeAffordancePresentation = (column: PGColumn) => {
 
 interface ColumnListProps {
   onAddColumn: () => void
-  onEditColumn: (column: PGColumn) => void
-  onDeleteColumn: (column: PGColumn) => void
+  onEditColumn: (column: SafePostgresColumn) => void
+  onDeleteColumn: (column: SafePostgresColumn) => void
 }
 
 export const ColumnList = ({
@@ -322,7 +323,11 @@ export const ColumnList = ({
                               <span>{column.data_type}</span>
                               {column.format !== column.data_type && (
                                 <span className="text-xs text-foreground-light">
-                                  {column.format}
+                                  {displayColumnType(
+                                    column.format,
+                                    column.format_schema,
+                                    column.data_type === 'ARRAY'
+                                  )}
                                 </span>
                               )}
                             </div>
@@ -343,7 +348,13 @@ export const ColumnList = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <p className="text-foreground-lighter">{column.format}</p>
+                        <p className="text-foreground-lighter">
+                          {displayColumnType(
+                            column.format,
+                            column.format_schema,
+                            column.data_type === 'ARRAY'
+                          )}
+                        </p>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1.5">{constraintTokens}</div>

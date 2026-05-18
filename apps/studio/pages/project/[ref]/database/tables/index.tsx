@@ -1,4 +1,3 @@
-import type { PGTable } from '@supabase/pg-meta'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useState } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -71,7 +70,14 @@ const DatabaseTables: NextPageWithLayout = () => {
           </TableEditorTableStateContextProvider>
         )}
 
-      <SidePanelEditor includeColumns selectedTable={selectedTableToEdit as PGTable} />
+      <SidePanelEditor
+        includeColumns
+        selectedTable={
+          selectedTableToEdit !== undefined && isTableLike(selectedTableToEdit)
+            ? selectedTableToEdit
+            : undefined
+        }
+      />
     </>
   )
 }
