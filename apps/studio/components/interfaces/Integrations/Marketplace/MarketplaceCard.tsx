@@ -2,8 +2,8 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { Badge, Card } from 'ui'
 
+import { IntegrationLogo } from '../Integration/IntegrationLogo'
 import { getMarketplaceSource, MarketplaceSourceBadge } from './Marketplace.constants'
-import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
 interface MarketplaceCardProps {
@@ -22,7 +22,7 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
     >
       <Card className="flex min-h-[168px] h-full flex-col gap-2.5 hover:border-stronger p-4">
         <div className="flex items-start justify-between">
-          <MarketplaceLogo integration={integration} size="h-9 w-9" />
+          <IntegrationLogo integration={integration} size="h-9 w-9" />
           {isInstalled && <Badge variant="success">Installed</Badge>}
         </div>
         <div>

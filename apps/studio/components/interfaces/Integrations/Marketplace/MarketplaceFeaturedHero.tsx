@@ -1,14 +1,14 @@
-import { Pause, Play } from 'lucide-react'
+import { ArrowRight, Pause, Play } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Badge, Button, cn } from 'ui'
 
+import { IntegrationLogo } from '../Integration/IntegrationLogo'
 import {
   formatCategoryLabel,
   getMarketplaceSource,
   MarketplaceSourceBadge,
 } from './Marketplace.constants'
-import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -90,7 +90,10 @@ export const MarketplaceFeaturedHero = ({
         />
       </div>
       <div ref={cardRef} className="overflow-hidden rounded-lg border bg-surface-100">
-        <div className="grid gap-0 @3xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
+        <Link
+          href={`/project/${project?.ref}/integrations/${active.id}/overview`}
+          className="grid gap-0 @3xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)] hover:bg-selection/20 transition-colors"
+        >
           <div className="relative hidden @3xl:block">
             <FeaturedCover integration={active} categoryLabel={activeCategoryName} />
           </div>
@@ -100,7 +103,7 @@ export const MarketplaceFeaturedHero = ({
               <div className="flex items-center gap-2">
                 <div className="flex flex-wrap flex-col @lg:flex-row @lg:items-center gap-2">
                   <div className="flex items-center gap-2">
-                    <MarketplaceLogo integration={active} size="h-7 w-7" />
+                    <IntegrationLogo integration={active} size="h-7 w-7" />
                     <span className="text-lg font-medium text-foreground">{active.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -125,14 +128,20 @@ export const MarketplaceFeaturedHero = ({
             </div>
 
             <div className="mt-1 flex items-center gap-4">
-              <Button asChild type="default" size="tiny">
+              <Button
+                asChild
+                type="text"
+                className="p-0 pointer-events-none"
+                iconRight={<ArrowRight size={12} />}
+                size="tiny"
+              >
                 <Link href={`/project/${project?.ref}/integrations/${active.id}/overview`}>
                   {isActiveInstalled ? 'Manage integration' : 'View integration'}
                 </Link>
               </Button>
             </div>
           </div>
-        </div>
+        </Link>
 
         <div className="grid grid-cols-2 border-t @md:grid-cols-3">
           {integrations.map((integration, idx) => {
@@ -150,7 +159,7 @@ export const MarketplaceFeaturedHero = ({
                 )}
                 aria-pressed={isActive}
               >
-                <MarketplaceLogo integration={integration} size="h-7 w-7" />
+                <IntegrationLogo integration={integration} size="h-7 w-7" />
                 <div className="min-w-0 flex-1">
                   <div
                     className={cn(

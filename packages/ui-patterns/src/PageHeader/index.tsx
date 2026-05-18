@@ -245,8 +245,8 @@ export type PageHeaderNavigationTabsProps = React.ComponentProps<'div'>
  * Should be placed as the last child of PageHeader.
  */
 const PageHeaderNavigationTabs = ({ className, ...props }: PageHeaderNavigationTabsProps) => {
-  const { size, fullWidthNav } = usePageHeaderContext()
-  const outerIsFull = size === 'full' || fullWidthNav
+  const { size } = usePageHeaderContext()
+  const outerIsFull = size === 'full'
 
   return (
     <div data-slot="page-header-nav-row" className={cn('w-full', outerIsFull && 'border-b')}>

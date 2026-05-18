@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Badge, TableCell, TableHead, TableRow } from 'ui'
 
+import { IntegrationLogo } from '../Integration/IntegrationLogo'
 import {
   formatCategoryLabel,
   getMarketplaceSource,
@@ -8,7 +9,6 @@ import {
   getMarketplaceTypeLabel,
   MarketplaceSourceBadge,
 } from './Marketplace.constants'
-import { MarketplaceLogo } from './MarketplaceLogo'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -29,7 +29,7 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
   return (
     <TableRow className="group relative transition-colors hover:bg-surface-100 [&>td]:py-2 @lg:[&>td]:py-2.5">
       <TableCell className="w-10 pr-0 @lg:w-12">
-        <MarketplaceLogo integration={integration} size="h-7 w-7 @lg:h-8 @lg:w-8" />
+        <IntegrationLogo integration={integration} size="h-7 w-7 @lg:h-8 @lg:w-8" />
       </TableCell>
 
       <TableCell>

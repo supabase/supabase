@@ -9,7 +9,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from 'ui'
-import { PageHeaderBreadcrumb } from 'ui-patterns'
 
 interface MarketplaceDetailTopBarProps {
   title: string
@@ -25,7 +24,7 @@ export const MarketplaceDetailTopBar = ({
   const { ref } = useParams()
 
   return (
-    <div className="sticky h-(--header-height) top-0 z-20 flex justify-between items-center border-b bg-dash-sidebar px-6 py-2.5 xl:px-10">
+    <div className="sticky min-h-(--header-height) top-0 z-20 flex justify-between items-center border-b bg-dash-sidebar px-6 py-2.5 xl:px-10">
       <div className="flex min-w-0 flex-1 items-center gap-4 [&_li]:text-xs">
         <BreadcrumbList className="min-w-0 flex-nowrap">
           <BreadcrumbItem>
