@@ -18,22 +18,18 @@ jobs:
           script: |
             const sender = context.payload.pull_request.user.login;
 
-            const query = `query($owner:String!, $name:String!, $contributor:String!) {
-              repository(owner:$owner, name:$name) {
-                pullRequests(first: 2, createdBy:$contributor) {
-                  totalCount
-                }
+            const query = `query($q:String!) {
+              search(query:$q, type: ISSUE, first: 2) {
+                issueCount
               }
             }`;
             
             const variables = {
-              owner: context.repo.owner,
-              name: context.repo.repo,
-              contributor: sender
+              q: `repo:${context.repo.owner}/${context.repo.repo} is:pr author:${sender}`
             };
 
             const result = await github.graphql(query, variables);
-            const totalCount = result.repository.pullRequests.totalCount;
+            const totalCount = result.search.issueCount;
 
             let greeting = "Thanks for contributing to Supabase! ❤️ Our team will review your PR.";
             if (totalCount === 1) {
