@@ -1,5 +1,5 @@
 ---
-title = "546 - WORKER_RESOURCE_LIMIT Exceeded"
+title = "546 - WORKER_RESOURCE_LIMIT Exceeded / WORKER_LIMIT Exceeded"
 topics = [ "functions" ]
 keywords = [ "546", "error", "resource", "memory", "cpu", "event loop", "edge function" ]
 database_id = "4e6ff2e4-2abb-4fba-8233-5883b3d56fb0"
@@ -7,9 +7,13 @@ database_id = "4e6ff2e4-2abb-4fba-8233-5883b3d56fb0"
 [[errors]]
 http_status_code = 546
 message = "WORKER_RESOURCE_LIMIT"
+
+[[errors]]
+http_status_code = 546
+message = "WORKER_LIMIT"
 ---
 
-A 546 error indicates that an edge function used more resources (CPU or Memory) than it was allocated.
+A 546 error indicates that an edge function used more resources (CPU or Memory) than it was allocated. Previously it was `WORKER_LIMIT`.
 
 ## Context for the error
 
