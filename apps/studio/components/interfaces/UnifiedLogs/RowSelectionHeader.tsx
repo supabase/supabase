@@ -1,14 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, Copy, X } from 'lucide-react'
+import { Copy, X } from 'lucide-react'
 import { toast } from 'sonner'
-import {
-  Button,
-  copyToClipboard,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { copyToClipboard } from 'ui'
 
 import { type LogData } from '../Settings/Logs/Logs.types'
 import {
@@ -69,34 +62,23 @@ export const RowSelectionHeader = () => {
           </p>
 
           <div className="flex items-center justify-center gap-x-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="default"
-                  size="tiny"
-                  icon={<Copy size={12} />}
-                  iconRight={<ChevronDown size={11} />}
-                >
-                  Copy
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                <DropdownMenuItem onClick={() => onCopy('json')} className="gap-2 text-xs">
-                  <Copy size={13} />
-                  Copy as JSON
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onCopy('markdown')} className="gap-2 text-xs">
-                  <Copy size={13} />
-                  Copy as Markdown
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             <AiAssistantDropdown
               label="Explain with AI"
               buildPrompt={() => buildLogsPrompt(selectedRows)}
               onOpenAssistant={handleOpenAiAssistant}
               telemetrySource="log_explorer"
+              additionalDropdownItems={[
+                {
+                  label: 'Copy as JSON',
+                  icon: <Copy size={14} />,
+                  onClick: () => onCopy('json'),
+                },
+                {
+                  label: 'Copy as Markdown',
+                  icon: <Copy size={14} />,
+                  onClick: () => onCopy('markdown'),
+                },
+              ]}
             />
 
             <ButtonTooltip

@@ -13,6 +13,7 @@ export const DataTableColumnStatusCode = ({
   className?: string
 }) => {
   const colors = getStatusColor(level)
+
   if (!value) {
     return <Minus className="h-4 w-4 text-muted-foreground/50" />
   }
@@ -23,8 +24,7 @@ export const DataTableColumnStatusCode = ({
         className={cn(
           'flex items-center justify-center relative font-mono',
           colors.text,
-          colors.bg,
-          colors.border
+          colors.bg
         )}
       >
         {value}
