@@ -376,9 +376,10 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
             <SpamValidation spamRules={spamRules} />
 
             <CardFooter className="flex flex-row justify-between gap-2">
-              {hasCustomTemplate && !hasChanges && (
+              {hasCustomTemplate && (
                 <ResetTemplateDialog
                   template={template}
+                  hasUnsavedChanges={hasChanges}
                   onResetSuccess={(config: AuthConfigResponse) => {
                     form.reset(getFormValuesFromConfig(config))
                     setBodyValue((config && config[messageSlug]) ?? '')

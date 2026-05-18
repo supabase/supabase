@@ -160,14 +160,29 @@ describe('TemplateEditor reset to default', () => {
     expect(screen.getByRole('button', { name: 'Reset template' })).toBeInTheDocument()
   })
 
-  it('hides reset while there are unsaved editor changes', async () => {
+  it('keeps reset visible while there are unsaved editor changes', async () => {
     const user = userEvent.setup()
     renderTemplateEditor({ hasCustomBody: true })
 
     await user.clear(screen.getByLabelText('Body source'))
     await user.type(screen.getByLabelText('Body source'), '<p>Unsaved body</p>')
 
-    expect(screen.queryByRole('button', { name: 'Reset template' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Reset template' })).toBeInTheDocument()
+  })
+
+  it('warns that reset discards unsaved changes', async () => {
+    const user = userEvent.setup()
+    renderTemplateEditor({ hasCustomBody: true })
+
+    await user.clear(screen.getByLabelText('Body source'))
+    await user.type(screen.getByLabelText('Body source'), '<p>Unsaved body</p>')
+    await user.click(screen.getByRole('button', { name: 'Reset template' }))
+
+    expect(
+      await screen.findByText(
+        'This will discard your unsaved changes and use the default subject line and email body content.'
+      )
+    ).toBeInTheDocument()
   })
 
   it('resets the template through the dedicated reset endpoint after confirmation', async () => {
