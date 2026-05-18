@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 import { Badge, cn, NavMenu, NavMenuItem } from 'ui'
 
 import { getMarketplaceSource, MarketplaceSourceBadge } from './Marketplace.constants'
-import { centeredContentClass } from './MarketplaceDetail'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
 interface MarketplaceDetailHeroProps {
@@ -38,11 +37,11 @@ export const MarketplaceDetailHero = ({
 
   return (
     <div className={cn('@container border-b bg-surface-75 pt-10')}>
-      <div className={cn(centeredContentClass, 'flex flex-col gap-4')}>
+      <div className="mx-auto w-full px-6 xl:px-10 flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <div
             className={cn(
-              'relative flex h-[72px] w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-xl border bg-white'
+              'relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border bg-white'
             )}
           >
             {integration.icon()}
@@ -58,14 +57,12 @@ export const MarketplaceDetailHero = ({
                 integration={integration}
               />
             </div>
-            <div className="text-[13.5px] text-foreground-light">{subtitle}</div>
+            <div className="text-sm text-foreground-light">{subtitle}</div>
           </div>
         </div>
         <BadgesComponent className="flex @xl:hidden" source={source} integration={integration} />
         {description && (
-          <p className="m-0 max-w-[760px] text-lg leading-snug tracking-tight text-foreground">
-            {description}
-          </p>
+          <p className="heading-subSection text-foreground-light truncate">{description}</p>
         )}
 
         {tabs.length > 0 && (
