@@ -16,24 +16,33 @@ const CONNECT_DISCLOSURE_TRIGGER_CLASSNAME =
 
 export const OrganizationSelector = ({
   organizations,
+  unavailableOrganizations = [],
   selectedSlug,
   disabled = false,
   description,
   createLabel,
   createHrefParams,
+  onCreate,
   onSelect,
   getOrganizationDescription,
+  getUnavailableOrganizationDescription,
+  unavailableReason,
 }: {
   organizations: Organization[]
+  unavailableOrganizations?: Organization[]
   selectedSlug?: string | null
   disabled?: boolean
   description?: ReactNode
   createLabel?: string
   createHrefParams?: { [key: string]: string }
+  onCreate?: () => void
   onSelect: (slug: string) => void
   getOrganizationDescription?: (organization: Organization) => ReactNode
+  getUnavailableOrganizationDescription?: (organization: Organization) => ReactNode
+  unavailableReason?: ReactNode
 }) => {
   const [showMore, setShowMore] = useState(false)
+  const [showUnavailable, setShowUnavailable] = useState(false)
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
@@ -77,6 +86,7 @@ export const OrganizationSelector = ({
   }, [lastVisitedOrganization, organizations, selectedSlug])
 
   const hasOverflow = overflowOrganizations.length > 0
+  const hasUnavailableOrganizations = unavailableOrganizations.length > 0
 
   return (
     <section className="space-y-2" aria-label="Organizations">
@@ -100,8 +110,13 @@ export const OrganizationSelector = ({
           />
         ))}
 
-        {!!createLabel && !!createHrefParams && (
-          <CreateOrganizationCard params={createHrefParams} label={createLabel} />
+        {!!createLabel && (!!createHrefParams || !!onCreate) && (
+          <CreateOrganizationCard
+            params={createHrefParams}
+            label={createLabel}
+            disabled={disabled}
+            onClick={onCreate}
+          />
         )}
 
         {hasOverflow && (
@@ -126,6 +141,37 @@ export const OrganizationSelector = ({
                     }
                   />
                 ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+
+        {hasUnavailableOrganizations && (
+          <Collapsible open={showUnavailable} onOpenChange={setShowUnavailable}>
+            <CollapsibleTrigger className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
+              <span>Organizations that can't be linked</span>
+              <ChevronDown
+                className={cn('size-3.5 transition-transform', showUnavailable && 'rotate-180')}
+              />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
+              <div className="space-y-2 pt-1">
+                {unavailableOrganizations.map((organization) => (
+                  <ConnectOrganizationButton
+                    key={organization.slug}
+                    organization={organization}
+                    disabled
+                    description={
+                      getUnavailableOrganizationDescription?.(organization) ??
+                      getPlanDescription(organization)
+                    }
+                  />
+                ))}
+                {unavailableReason && (
+                  <p className="mx-auto max-w-xs text-center text-xs text-foreground-lighter text-balance">
+                    {unavailableReason}
+                  </p>
+                )}
               </div>
             </CollapsibleContent>
           </Collapsible>
