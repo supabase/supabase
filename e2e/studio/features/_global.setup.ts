@@ -30,11 +30,8 @@ setup('Global Setup', async ({ page }) => {
     - Is Platform: ${IS_PLATFORM}
     `)
 
-  // Cleanup once-per-file locks before anything else. Every branch below
-  // returns early, so leaving this at the end of the function made it dead
-  // code — and tests using `withFileOnceSetup` (cron-jobs, etc.) would skip
-  // their setup whenever a stale `setup.done.json` was left over from a
-  // previous run, even though the database had been wiped in between.
+  // Cleanup once-per-file locks before any of the early returns below —
+  // tests using `withFileOnceSetup` rely on this running unconditionally.
   const locksDirPath = path.join(os.tmpdir(), 'playwright-locks')
   try {
     await fs.access(locksDirPath)

@@ -9,7 +9,7 @@ import { useSnapshot } from 'valtio'
 import { ConsentToast } from './ConsentToast'
 
 export const useConsentToast = () => {
-  const consentToastId = useRef<string | number>()
+  const consentToastId = useRef<string | number | undefined>(undefined)
   const snap = useSnapshot(consentState)
 
   const acceptAll = useCallback(() => {

@@ -18,7 +18,7 @@ import {
   DialogTrigger,
   Form,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
@@ -160,7 +160,7 @@ export const InitializeForeignSchemaDialog = () => {
                 name="schema"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Schema name">
-                    <Input_Shadcn_ {...field} placeholder="Provide a name for your schema" />
+                    <Input {...field} placeholder="Provide a name for your schema" />
                   </FormItemLayout>
                 )}
               />

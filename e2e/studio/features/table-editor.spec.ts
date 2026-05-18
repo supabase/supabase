@@ -502,19 +502,17 @@ testRunner('table editor', () => {
     await expect(page.locator('.view-lines')).toContainText(`security_invoker = true`)
 
     const openInSqlEditorLink = page.getByRole('link', { name: 'Open in SQL Editor' })
-    // Accept either percent-encoded spaces (`%20%3D%20`) or form-encoded
-    // (`+%3D+`). Next's Link forwards the raw href; the TanStack-router
-    // shim round-trips the search params through URLSearchParams, which
-    // emits `+` for spaces. Both decode to the same SQL once the SQL
-    // editor consumes the `content` param.
+    // Accept either percent-encoded (`%20`) or form-encoded (`+`) spaces —
+    // some routers serialize search params via URLSearchParams which emits
+    // `+` for spaces. Both decode to the same SQL.
     await expect(openInSqlEditorLink).toHaveAttribute(
       'href',
       /security_invoker(%20|\+)%3D(%20|\+)true/
     )
-    // Verifying the link href is the meaningful assertion for *this* test
-    // (view definition preserves security_invoker). The actual click-and-
-    // load-in-SQL-editor flow exercises a separate code path (SQL editor
-    // hydrating from `?content=`) that's covered elsewhere.
+    await openInSqlEditorLink.click()
+    await page.waitForURL(/\/sql\/new/)
+    await expect(page.locator('.view-lines')).toContainText(`create view public.${viewName}`)
+    await expect(page.locator('.view-lines')).toContainText(`security_invoker = true`)
   })
 
   test('sorting rows works as expected', async ({ page, ref }) => {

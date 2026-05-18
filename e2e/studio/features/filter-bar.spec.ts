@@ -19,7 +19,8 @@ import { createApiResponseWaiter, waitForTableToLoad } from '../utils/wait-for-r
 const tableNamePrefix = 'pw_filter_bar'
 
 function getDateValue(daysAgo: number): string {
-  const date = new Date(Date.now() - daysAgo * 86400000)
+  const date = new Date()
+  date.setDate(date.getDate() - daysAgo)
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
@@ -489,13 +490,9 @@ test.describe('Filter Bar', () => {
 
         const lastNameValue = page.getByTestId('filter-value-last_name')
         await lastNameValue.click()
-        // Drive the cursor to position 0 directly rather than via `Home`.
+        // Drive the cursor to position 0 directly rather than via `Home` —
         // macOS Chromium doesn't honor the Home key inside text inputs (the
-        // OS-level binding is Cmd+ArrowLeft / Fn+ArrowLeft instead) so the
-        // press is a no-op locally and the ArrowLeft handler then sees
-        // `selectionStart === lastNameValue.length` and never triggers the
-        // condition-migration branch. Linux CI happens to honor Home, which
-        // is why this only fails on Mac.
+        // OS-level binding is Cmd+ArrowLeft / Fn+ArrowLeft).
         await lastNameValue.evaluate((el) => (el as HTMLInputElement).setSelectionRange(0, 0))
 
         await page.keyboard.press('ArrowLeft')

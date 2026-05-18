@@ -4,16 +4,7 @@ import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -126,7 +117,7 @@ const SiteUrl = () => {
                       description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
                     >
                       <FormControl>
-                        <Input_Shadcn_ {...field} disabled={!canUpdateConfig} />
+                        <Input {...field} disabled={!canUpdateConfig} />
                       </FormControl>
                     </FormItemLayout>
                   )}

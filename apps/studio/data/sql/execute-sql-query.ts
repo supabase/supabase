@@ -1,4 +1,8 @@
-import { ROLE_IMPERSONATION_NO_RESULTS, ROLE_IMPERSONATION_SQL_LINE_COUNT } from '@supabase/pg-meta'
+import {
+  ROLE_IMPERSONATION_NO_RESULTS,
+  ROLE_IMPERSONATION_SQL_LINE_COUNT,
+  SafeSqlFragment,
+} from '@supabase/pg-meta'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { QueryKey, useQuery } from '@tanstack/react-query'
 
@@ -24,7 +28,7 @@ export const COST_THRESHOLD_ERROR = 'Query cost exceeds threshold'
 export type ExecuteSqlVariables = {
   projectRef?: string
   connectionString?: string | null
-  sql: string
+  sql: SafeSqlFragment
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
