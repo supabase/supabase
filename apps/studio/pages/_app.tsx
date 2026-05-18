@@ -86,10 +86,7 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
   : []
 
-const FeatureFlagProviderWithOrgContext = ({
-  children,
-  ...props
-}: ComponentProps<typeof FeatureFlagProvider>) => {
+const FeatureFlagProviderWithOrgContext = ({ children, ...props }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
   const cloudProvider = useDefaultProvider()
 
