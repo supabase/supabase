@@ -15,7 +15,7 @@ import {
   Badge,
   Button,
   cn,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,

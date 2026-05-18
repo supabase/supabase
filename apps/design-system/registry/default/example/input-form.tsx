@@ -12,7 +12,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_ as Input,
+  Input,
 } from 'ui'
 import { z } from 'zod'
 

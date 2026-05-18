@@ -1,13 +1,13 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 import { test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
-import path from 'node:path'
-import os from 'node:os'
-import fs from 'node:fs/promises'
 
 import { env } from '../env.config.js'
-import { setupProjectForTests } from '../scripts/setup-platform-tests.js'
 import { loginWithEmail } from '../scripts/login/email.js'
 import { loginWithGithubWithRetry } from '../scripts/login/github.js'
+import { setupProjectForTests } from '../scripts/setup-platform-tests.js'
 
 /**
  * Run any setup tasks for the tests.
@@ -29,6 +29,16 @@ setup('Global Setup', async ({ page }) => {
     - Auth: ${doAuthentication ? 'enabled' : 'disabled'}
     - Is Platform: ${IS_PLATFORM}
     `)
+
+  // Cleanup once-per-file locks before any of the early returns below —
+  // tests using `withFileOnceSetup` rely on this running unconditionally.
+  const locksDirPath = path.join(os.tmpdir(), 'playwright-locks')
+  try {
+    await fs.access(locksDirPath)
+    await fs.rm(locksDirPath, { recursive: true, force: true })
+  } catch {
+    // Silently catch, no directory
+  }
 
   /**
    * Studio Check
@@ -120,14 +130,5 @@ To start API locally, run:
       console.error(`\n 🚨 Authentication failed with GitHub`)
       throw err
     }
-  }
-
-  // Cleanup locks as they may persist between runs especially locally
-  const locksDirPath = path.join(os.tmpdir(), 'playwright-locks')
-  try {
-    await fs.access(locksDirPath);
-    await fs.rm(locksDirPath, { recursive: true, force: true })
-  } catch {
-    // Silently catch, no directory
   }
 })

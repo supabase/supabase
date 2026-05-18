@@ -10,7 +10,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   SheetFooter,
   SheetSection,
 } from 'ui'
@@ -209,7 +209,7 @@ export const CreateAnalyticsBucketForm = ({
                   description="Must be between 3 – 63 characters. Only lowercase letters, numbers, and hyphens are allowed."
                 >
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       id="name"
                       data-1p-ignore
                       data-lpignore="true"

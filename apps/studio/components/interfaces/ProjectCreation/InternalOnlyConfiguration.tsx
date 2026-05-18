@@ -3,12 +3,12 @@ import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import {
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -28,16 +28,16 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
 
   return (
     <Panel.Content>
-      <Collapsible_Shadcn_>
-        <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
+      <Collapsible>
+        <CollapsibleTrigger className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
           Internal-only Configuration
           <ChevronRight
             size={16}
             strokeWidth={1}
             className="mr-2 group-data-open/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
           />
-        </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_ className="pt-2 data-closed:animate-collapsible-up data-open:animate-collapsible-down flex flex-col gap-y-6">
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-2 data-closed:animate-collapsible-up data-open:animate-collapsible-down flex flex-col gap-y-6">
           <div>
             <p className="text-xs text-foreground-lighter mb-6">
               These settings are only visible to internal staff
@@ -79,7 +79,7 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                       description="Specify a custom version of Postgres (defaults to the latest)."
                     >
                       <FormControl>
-                        <Input_Shadcn_ placeholder="e.g 17.6.1.104" {...field} autoComplete="off" />
+                        <Input placeholder="e.g 17.6.1.104" {...field} autoComplete="off" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -95,7 +95,7 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                       description="Specify a custom instance type."
                     >
                       <FormControl>
-                        <Input_Shadcn_ placeholder="e.g t3.nano" {...field} autoComplete="off" />
+                        <Input placeholder="e.g t3.nano" {...field} autoComplete="off" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -103,8 +103,8 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
               </div>
             </div>
           )}
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+        </CollapsibleContent>
+      </Collapsible>
     </Panel.Content>
   )
 }

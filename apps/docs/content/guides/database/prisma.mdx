@@ -19,7 +19,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
     <StepHikeCompact.Details title="Create a custom user for Prisma">
       - In the [SQL Editor](/dashboard/project/_/sql/new), create a Prisma DB user with full privileges on the public schema.
       - This gives you better control over Prisma's access and makes it easier to monitor using Supabase tools like the [Query Performance Dashboard](/dashboard/project/_/advisors/query-performance) and [Log Explorer](/dashboard/project/_/logs/explorer).
-      <Admonition type="note" label="password manager">
+      <Admonition type="note" title="password manager">
 
         For security, consider using a [password generator](https://bitwarden.com/password-generator/) for the Prisma role.
 
@@ -283,7 +283,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
-            <Admonition type="tip" label="conflict management">
+            <Admonition type="tip" title="conflict management">
 
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
 
@@ -311,7 +311,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
-            <Admonition type="note" label="conflict management">
+            <Admonition type="note" title="conflict management">
 
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
 
@@ -339,7 +339,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
-            <Admonition type="note" label="conflict management">
+            <Admonition type="note" title="conflict management">
 
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
 
@@ -367,7 +367,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
-            <Admonition type="note" label="conflict management">
+            <Admonition type="note" title="conflict management">
 
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma-troubleshooting) for more details
 
