@@ -1,17 +1,10 @@
 import { FeatureFlagContext } from 'common'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
 import { OrganizationSelector } from '../Connect/OrganizationSelector'
-import {
-  EMPTY_ORGANIZATIONS,
-  MOCK_ORGANIZATIONS,
-  MOCK_SELECTED_ORG_SLUG,
-  RedeemCreditsMockState,
-} from './MockState'
 import { CreditCodeRedemption } from '@/components/interfaces/Organization/BillingSettings/CreditCodeRedemption'
 import {
   InterstitialAccountRow,
@@ -20,6 +13,7 @@ import {
 } from '@/components/layouts/InterstitialLayout'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProfile } from '@/lib/profile'
+import { EMPTY_ARR } from '@/lib/void'
 
 const RETURN_TO_SELECTED_ORG_PARAM = 'selected_org'
 
@@ -37,34 +31,21 @@ const RedeemCreditsInterstitial = ({
   </InterstitialLayout>
 )
 
-export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState }) => {
+export const RedeemCreditsScreen = () => {
   const router = useRouter()
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const isMockMode = !!mock
 
-  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string | null>(
-    mock === 'redeeming' ? MOCK_SELECTED_ORG_SLUG : null
-  )
+  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string | null>(null)
   const [redemptionModalOrgSlug, setRedemptionModalOrgSlug] = useState<string | null>(null)
   const appliedReturnSelectedOrgRef = useRef<string | null>(null)
 
-  useEffect(() => {
-    setSelectedOrgSlug(mock === 'redeeming' ? MOCK_SELECTED_ORG_SLUG : null)
-    setRedemptionModalOrgSlug(null)
-  }, [mock])
-
   const {
-    data: organizations,
+    data: organizationOptions = EMPTY_ARR,
     error: organizationsError,
     isLoading: isLoadingOrganizations,
     isError: isOrganizationsError,
-  } = useOrganizationsQuery({ enabled: !isMockMode })
-
-  const organizationOptions = useMemo(
-    () => (isMockMode ? MOCK_ORGANIZATIONS : (organizations ?? EMPTY_ORGANIZATIONS)),
-    [isMockMode, organizations]
-  )
+  } = useOrganizationsQuery()
 
   const returnSelectedOrgSlug =
     router.isReady && typeof router.query[RETURN_TO_SELECTED_ORG_PARAM] === 'string'
@@ -73,15 +54,13 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
 
   const displayName = profile?.primary_email ?? profile?.username
 
-  const isLoading =
-    mock === 'loading' ||
-    (!isMockMode && (isLoadingProfile || isLoadingOrganizations || !hasLoaded))
+  const isLoading = isLoadingProfile || isLoadingOrganizations || !hasLoaded
 
   useEffect(() => {
-    if (isMockMode || !returnSelectedOrgSlug) return
+    if (!returnSelectedOrgSlug) return
     if (appliedReturnSelectedOrgRef.current === returnSelectedOrgSlug) return
 
-    const hasReturnedOrganization = organizationOptions.some(
+    const hasReturnedOrganization = (organizationOptions ?? []).some(
       (organization) => organization.slug === returnSelectedOrgSlug
     )
 
@@ -89,7 +68,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
       setSelectedOrgSlug(returnSelectedOrgSlug)
       appliedReturnSelectedOrgRef.current = returnSelectedOrgSlug
     }
-  }, [isMockMode, organizationOptions, returnSelectedOrgSlug])
+  }, [organizationOptions, returnSelectedOrgSlug])
 
   if (isLoading) {
     return (
@@ -102,58 +81,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
     )
   }
 
-  if (mock === 'redeemed') {
-    return (
-      <RedeemCreditsInterstitial
-        title="Credits redeemed"
-        description="Your credits were applied to the selected organization"
-      >
-        <div className="flex flex-col gap-3">
-          <Admonition
-            type="success"
-            title="$500 credits applied"
-            description="Credits are automatically used toward future invoices for Acme Production."
-          />
-          <Button type="primary" block asChild>
-            <Link href={`/org/${MOCK_SELECTED_ORG_SLUG}`}>Go to organization</Link>
-          </Button>
-        </div>
-      </RedeemCreditsInterstitial>
-    )
-  }
-
-  if (mock === 'already-redeemed' || mock === 'invalid' || mock === 'wrong-account') {
-    const notice =
-      mock === 'already-redeemed'
-        ? {
-            title: 'Code already redeemed',
-            description:
-              'This credit code has already been used. Check the billing page for the organization that redeemed it.',
-          }
-        : mock === 'wrong-account'
-          ? {
-              title: 'Wrong account',
-              description:
-                'Sign in with the Supabase account that owns the organization this credit code was issued for.',
-            }
-          : {
-              title: 'Invalid code',
-              description: 'Check the code and try again. Codes are case sensitive.',
-            }
-
-    return (
-      <RedeemCreditsInterstitial
-        title={notice.title}
-        description="The credit code could not be redeemed"
-      >
-        <div className="flex flex-col gap-3">
-          <Admonition type="warning" description={notice.description} />
-        </div>
-      </RedeemCreditsInterstitial>
-    )
-  }
-
-  if (mock === 'error' || isOrganizationsError) {
+  if (isOrganizationsError) {
     return (
       <RedeemCreditsInterstitial
         title="Unable to load credit redemption"
@@ -178,16 +106,13 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
     )
   }
 
-  const isRedeeming = mock === 'redeeming'
-
   const createOrganizationParams = {
     returnTo: router.asPath || '/redeem',
     returnToOrgParam: RETURN_TO_SELECTED_ORG_PARAM,
   }
 
   const openRedemption = () => {
-    if (!selectedOrgSlug || isRedeeming) return
-    if (isMockMode) return
+    if (!selectedOrgSlug) return
     setRedemptionModalOrgSlug(selectedOrgSlug)
   }
 
@@ -203,7 +128,6 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
           <OrganizationSelector
             organizations={organizationOptions}
             selectedSlug={selectedOrgSlug}
-            disabled={isRedeeming}
             onSelect={setSelectedOrgSlug}
             getOrganizationDescription={(organization) => `${organization.plan.name} Plan`}
             createLabel={
@@ -223,10 +147,9 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
 
           <div className="flex flex-col gap-2">
             <Button
-              type="primary"
               block
-              loading={isRedeeming}
-              disabled={!selectedOrgSlug || organizationOptions.length === 0 || isRedeeming}
+              type="primary"
+              disabled={!selectedOrgSlug || organizationOptions.length === 0}
               onClick={openRedemption}
             >
               Redeem credits

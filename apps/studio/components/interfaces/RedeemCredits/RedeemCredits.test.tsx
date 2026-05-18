@@ -4,7 +4,6 @@ import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { RedeemCreditsMockState } from './MockState'
 import { RedeemCreditsScreen } from './RedeemCredits'
 import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganization } from '@/tests/helpers'
@@ -60,10 +59,10 @@ const ORGANIZATION = createMockOrganization({
   plan: { id: 'pro', name: 'Pro' },
 })
 
-function renderScreen(props: Partial<Parameters<typeof RedeemCreditsScreen>[0]> = {}) {
+function renderScreen() {
   return customRender(
     <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: true }}>
-      <RedeemCreditsScreen {...props} />
+      <RedeemCreditsScreen />
     </FeatureFlagContext.Provider>,
     { profileContext: DEFAULT_PROFILE_CONTEXT }
   )
@@ -75,28 +74,6 @@ describe('RedeemCreditsScreen', () => {
     creditRedemptionQueryCode.current = undefined
     routerMock.setCurrentUrl('/redeem')
   })
-
-  test.each([
-    ['loading', 'shimmering-loader'],
-    ['ready', 'Acme Production'],
-    ['redeemed', '$500 credits applied'],
-    ['already-redeemed', 'Code already redeemed'],
-    ['invalid', 'Invalid code'],
-    ['wrong-account', 'Wrong account'],
-    ['error', 'Unable to load credit redemption'],
-  ] satisfies Array<[RedeemCreditsMockState, string]>)(
-    'renders %s mock state',
-    (mock, expected) => {
-      const { container } = renderScreen({ mock })
-
-      if (expected === 'shimmering-loader') {
-        expect(container.querySelectorAll('.shimmering-loader').length).toBeGreaterThan(0)
-        return
-      }
-
-      expect(screen.getAllByText(expected).length).toBeGreaterThan(0)
-    }
-  )
 
   test('renders ready state from organizations query and opens redemption for selected organization', async () => {
     const user = userEvent.setup()
