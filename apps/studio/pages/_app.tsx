@@ -86,10 +86,7 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
   : []
 
-const FeatureFlagProviderWithOrgContext = ({
-  children,
-  ...props
-}: ComponentProps<typeof FeatureFlagProvider>) => {
+const FeatureFlagProviderWithOrgContext = ({ children, ...props }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
 
   return (
@@ -150,13 +147,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
 
   const cloudProvider = useDefaultProvider()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
 
   const getConfigCatFlags = useCallback(
     (userEmail?: string) => {
-      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
+      const customAttributes: Record<string, string> = {}
+      if (cloudProvider) customAttributes.cloud_provider = cloudProvider
+      if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
       return getFlags(userEmail, customAttributes)
     },
-    [cloudProvider]
+    [cloudProvider, selectedOrganization?.plan?.id]
   )
 
   const checkCliEnvironment = async () => {
