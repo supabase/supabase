@@ -71,3 +71,56 @@ jobs:
             echo "Applying flagged label for new issue suspected of spam"
             gh issue edit "$NUMBER" --add-label "$LABEL"
           fi
+
+  welcome-first-time:
+    if: github.event.action == 'opened' && !contains(fromJson('["dependabot[bot]", "github-actions[bot]", "renovate[bot]"]'), github.actor)
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      WELCOME_MSG: |
+        Welcome to the Supabase community! 🎉 Thank you for reporting your first issue.
+
+        A few tips to help us help you faster:
+        - Search existing issues to avoid duplicates.
+        - Include steps to reproduce, expected vs. actual behavior, and your environment (OS, browser, Supabase version).
+        - Check out our [contributing guidelines](https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md) for more details.
+
+        Our team and the community will look into this shortly!
+    steps:
+      - name: Post welcome comment for first-time issue reporters
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const sender = context.payload.issue.user.login;
+            const number = context.payload.issue.number;
+
+            const query = `query($owner:String!, $name:String!, $contributor:String!) {
+              repository(owner:$owner, name:$name) {
+                issues(first: 2, filterBy: {createdBy:$contributor}) {
+                  totalCount
+                }
+              }
+            }`;
+            
+            const variables = {
+              owner: context.repo.owner,
+              name: context.repo.repo,
+              contributor: sender
+            };
+
+            const result = await github.graphql(query, variables);
+            const totalCount = result.repository.issues.totalCount;
+
+            if (totalCount > 1) {
+              console.log(`Not ${sender}'s first issue (total: ${totalCount}). Skipping.`);
+              return;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: number,
+              body: process.env.WELCOME_MSG
+            });

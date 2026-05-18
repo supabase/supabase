@@ -10,14 +10,38 @@ permissions:
 jobs:
   comment-on-external-pr:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name != github.repository
+    if: github.event.pull_request.head.repo.full_name != github.repository && !contains(fromJson('["dependabot[bot]", "github-actions[bot]", "renovate[bot]"]'), github.actor)
     steps:
       - name: Comment on PR
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
+            const sender = context.payload.pull_request.user.login;
+
+            const query = `query($owner:String!, $name:String!, $contributor:String!) {
+              repository(owner:$owner, name:$name) {
+                pullRequests(first: 2, createdBy:$contributor) {
+                  totalCount
+                }
+              }
+            }`;
+            
+            const variables = {
+              owner: context.repo.owner,
+              name: context.repo.repo,
+              contributor: sender
+            };
+
+            const result = await github.graphql(query, variables);
+            const totalCount = result.repository.pullRequests.totalCount;
+
+            let greeting = "Thanks for contributing to Supabase! ❤️ Our team will review your PR.";
+            if (totalCount === 1) {
+              greeting = "Welcome to the Supabase community! 🎉 Thank you for creating your very first pull request. ❤️ Our team will review your PR shortly.";
+            }
+
             const commentBody = `
-            Thanks for contributing to Supabase! ❤️ Our team will review your PR.
+            ${greeting}
 
             A few tips for a smoother review process:
             - If you have a local version of the repo, run \`pnpm run format\` to make sure formatting checks pass.
