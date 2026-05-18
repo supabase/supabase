@@ -39,6 +39,20 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
     registerInCommandMenu: true,
   })
 
+  const copyButton = (
+    <CopyButton
+      text={selectionText}
+      type="default"
+      title="Copy log to clipboard"
+      onClick={() => {
+        sendEvent({
+          action: 'realtime_inspector_copy_message_clicked',
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
+      }}
+    />
+  )
+
   return (
     <div className={cn('relative flex h-full grow flex-col border-l overflow-y-scroll bg-200')}>
       <div
@@ -84,23 +98,13 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
         <div className="pt-4 flex flex-col gap-4">
           <div className="px-4 flex flex-row justify-between items-center">
             <div className="transition">
-              <ShortcutTooltip
-                shortcutId={SHORTCUT_IDS.INSPECTOR_COPY_MESSAGE}
-                side="bottom"
-                open={!log ? false : undefined}
-              >
-                <CopyButton
-                  text={selectionText}
-                  type="default"
-                  title="Copy log to clipboard"
-                  onClick={() => {
-                    sendEvent({
-                      action: 'realtime_inspector_copy_message_clicked',
-                      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                    })
-                  }}
-                />
-              </ShortcutTooltip>
+              {log ? (
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_COPY_MESSAGE} side="bottom">
+                  {copyButton}
+                </ShortcutTooltip>
+              ) : (
+                copyButton
+              )}
             </div>
             <Button
               type="text"

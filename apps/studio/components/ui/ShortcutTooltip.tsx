@@ -1,5 +1,5 @@
 import { TooltipContentProps } from '@ui/components/shadcn/ui/tooltip'
-import { Fragment, type ReactNode, useState } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { KeyboardShortcut, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
@@ -18,9 +18,9 @@ interface ShortcutTooltipProps {
    */
   label?: string
   /**
-   * Open state override for the tooltip. Pass `false` to force the tooltip
+   * Controlled open state for the tooltip. Pass `false` to force the tooltip
    * closed (e.g. while a popover or dialog opened by the wrapped element is
-   * visible). Leave `undefined` for default hover/focus behavior.
+   * visible). Leave `undefined` for default uncontrolled behavior.
    */
   open?: boolean
 }
@@ -49,15 +49,9 @@ export const ShortcutTooltip = ({
 }: ShortcutTooltipProps) => {
   const def = SHORTCUT_DEFINITIONS[shortcutId]
   const label = labelOverride ?? def.label
-  const [defaultOpen, setDefaultOpen] = useState(false)
-  const isOpenOverridden = open !== undefined
 
   return (
-    <Tooltip
-      delayDuration={delayDuration}
-      open={isOpenOverridden ? open : defaultOpen}
-      onOpenChange={isOpenOverridden ? undefined : setDefaultOpen}
-    >
+    <Tooltip delayDuration={delayDuration} open={open}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent
         side={side}

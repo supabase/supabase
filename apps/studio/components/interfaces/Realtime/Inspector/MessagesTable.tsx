@@ -42,6 +42,12 @@ const NoResultAlert = ({
     'service_api_keys'
   )
 
+  const broadcastButton = (
+    <Button type="default" onClick={showSendMessage}>
+      Broadcast a message
+    </Button>
+  )
+
   return (
     <div className="w-full max-w-md flex items-center flex-col">
       {isLoadingPermissions ? (
@@ -65,15 +71,13 @@ const NoResultAlert = ({
                 <p className="text-foreground">Create a Broadcast message</p>
                 <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
               </div>
-              <ShortcutTooltip
-                shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST}
-                side="bottom"
-                open={!enabled ? false : undefined}
-              >
-                <Button type="default" onClick={showSendMessage}>
-                  Broadcast a message
-                </Button>
-              </ShortcutTooltip>
+              {enabled ? (
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
+                  {broadcastButton}
+                </ShortcutTooltip>
+              ) : (
+                broadcastButton
+              )}
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
               <IconPresence

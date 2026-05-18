@@ -85,33 +85,36 @@ export const RealtimeFilterPopover = ({
   // [Joshen] Restricting the schemas to only public as any other schema won’t work out of the box due to missing permissions
   // Consequently, SchemaSelector here will also be disabled
   const isFiltered = config.table !== '*'
+  const filterPopoverTrigger = (
+    <PopoverTrigger asChild>
+      <Button
+        icon={<PlusCircle size="16" />}
+        type={isFiltered ? 'primary' : 'dashed'}
+        className={cn('rounded-full px-1 text-xs h-[26px]')}
+        size="small"
+      >
+        {isFiltered ? (
+          <>
+            <span className="mr-1">Filtered by </span>
+            <Badge variant="success">table: {config.table}</Badge>
+          </>
+        ) : (
+          <span className="mr-1">Filter messages</span>
+        )}
+      </Button>
+    </PopoverTrigger>
+  )
 
   return (
     <>
       <Popover open={open} onOpenChange={onOpen}>
-        <ShortcutTooltip
-          shortcutId={SHORTCUT_IDS.INSPECTOR_TOGGLE_FILTERS}
-          side="bottom"
-          open={open || config.channelName.length === 0 ? false : undefined}
-        >
-          <PopoverTrigger asChild>
-            <Button
-              icon={<PlusCircle size="16" />}
-              type={isFiltered ? 'primary' : 'dashed'}
-              className={cn('rounded-full px-1 text-xs h-[26px]')}
-              size="small"
-            >
-              {isFiltered ? (
-                <>
-                  <span className="mr-1">Filtered by </span>
-                  <Badge variant="success">table: {config.table}</Badge>
-                </>
-              ) : (
-                <span className="mr-1">Filter messages</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-        </ShortcutTooltip>
+        {!open && config.channelName.length > 0 ? (
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_TOGGLE_FILTERS} side="bottom">
+            {filterPopoverTrigger}
+          </ShortcutTooltip>
+        ) : (
+          filterPopoverTrigger
+        )}
         <PopoverContent className="p-0 w-[365px]" align="start">
           <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
             Listen to event types

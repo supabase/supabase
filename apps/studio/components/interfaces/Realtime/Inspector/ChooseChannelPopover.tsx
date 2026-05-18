@@ -99,24 +99,28 @@ export const ChooseChannelPopover = ({
     })
   }
 
+  const channelPopoverTrigger = (
+    <PopoverTrigger asChild>
+      <Button className="rounded-r-none" type="default" size="tiny" iconRight={<ChevronDown />}>
+        <p
+          className="max-w-[120px] truncate"
+          title={config.channelName.length > 0 ? config.channelName : ''}
+        >
+          {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Join a channel'}
+        </p>
+      </Button>
+    </PopoverTrigger>
+  )
+
   return (
     <Popover open={open} onOpenChange={onOpen}>
-      <ShortcutTooltip
-        shortcutId={SHORTCUT_IDS.INSPECTOR_JOIN_CHANNEL}
-        side="bottom"
-        open={open || config.channelName.length > 0 ? false : undefined}
-      >
-        <PopoverTrigger asChild>
-          <Button className="rounded-r-none" type="default" size="tiny" iconRight={<ChevronDown />}>
-            <p
-              className="max-w-[120px] truncate"
-              title={config.channelName.length > 0 ? config.channelName : ''}
-            >
-              {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Join a channel'}
-            </p>
-          </Button>
-        </PopoverTrigger>
-      </ShortcutTooltip>
+      {!open && config.channelName.length === 0 ? (
+        <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_JOIN_CHANNEL} side="bottom">
+          {channelPopoverTrigger}
+        </ShortcutTooltip>
+      ) : (
+        channelPopoverTrigger
+      )}
       <PopoverContent className="p-0 w-[320px]" align="start">
         <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
