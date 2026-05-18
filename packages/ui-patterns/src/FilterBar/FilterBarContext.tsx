@@ -139,6 +139,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   const handleInputChange = useCallback(
     (path: number[], value: string) => {
+      console.log('handleInputChange')
       const updatedFilters = updateNestedValue(filters, path, value)
       onFilterChange(updatedFilters)
 
