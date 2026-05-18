@@ -2,18 +2,19 @@
 #
 # Manage the self-hosted Supabase docker compose stack.
 #
-# Reads CONFIG from .env (space-separated list of override names) to decide
-# which docker-compose.<name>.yml override files to layer on top of the base
-# docker-compose.yml.
+# Override files are layered via docker compose's native COMPOSE_FILE env
+# var in .env. Format: colon-separated list with docker-compose.yml first.
 #
 # Examples in .env:
-#   CONFIG=                  (no overrides, default)
-#   CONFIG=pg17              (one override)
-#   CONFIG="pg17 envoy"      (multiple, quote when there are spaces)
+#   COMPOSE_FILE=docker-compose.yml
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.pg17.yml
+#
+# Manage with: ./run.sh config add <name> | config remove <name>
+# (accepts either a short name like 'pg17' or 'docker-compose.pg17.yml')
 #
 # Usage:
-#   ./run.sh start                  # docker compose -f ... up -d --wait
-#   ./run.sh stop                   # docker compose -f ... down
+#   ./run.sh start                  # docker compose up -d --wait
+#   ./run.sh stop                   # docker compose down
 #   ./run.sh restart [service]      # restart the stack (or named services)
 #   ./run.sh restart --except <svc>...  # restart all services except the named ones
 #   ./run.sh recreate [service]     # stop then start (or force-recreate one service)
@@ -23,9 +24,9 @@
 #   ./run.sh inspect <service>      # docker inspect on a service's container
 #   ./run.sh printenv <service>     # print a service's environment variables
 #   ./run.sh pull                   # pull images
-#   ./run.sh config                 # print CONFIG list of the compose files
-#   ./run.sh config add <name>      # add overrides to CONFIG in .env
-#   ./run.sh config remove <name>   # remove overrides from CONFIG in .env
+#   ./run.sh config                 # show the active COMPOSE_FILE list
+#   ./run.sh config add <name>      # add an override to COMPOSE_FILE in .env
+#   ./run.sh config remove <name>   # remove an override from COMPOSE_FILE in .env
 #   ./run.sh compose-config         # dump fully-resolved docker compose config
 #   ./run.sh secrets                # print key passwords and API keys from .env
 #
@@ -39,37 +40,79 @@ if [ ! -f docker-compose.yml ]; then
     exit 1
 fi
 
-CONFIG=""
-if [ -f .env ]; then
-    CONFIG=$(grep '^CONFIG=' .env | head -n1 | cut -d= -f2- | tr -d "\r\"'")
-fi
+# Normalize an override argument:
+#   pg17                       -> docker-compose.pg17.yml
+#   docker-compose.pg17.yml    -> docker-compose.pg17.yml
+#   ./docker-compose.pg17.yml  -> docker-compose.pg17.yml
+#   docker-compose.yml         -> error (base file, always implicit)
+normalize_override() {
+    arg="${1#./}"
+    case "$arg" in
+        docker-compose.yml)
+            echo "ERROR: docker-compose.yml is the base file, always included" >&2
+            return 1
+            ;;
+        docker-compose.*.yml)
+            echo "$arg"
+            ;;
+        *)
+            echo "docker-compose.${arg}.yml"
+            ;;
+    esac
+}
 
-COMPOSE_FILES="-f docker-compose.yml"
-for name in $CONFIG; do
-    file="docker-compose.${name}.yml"
-    if [ ! -f "$file" ]; then
-        echo "ERROR: $file (from CONFIG=$CONFIG) not found in $(pwd)" >&2
+# Read COMPOSE_FILE from .env (stripping quotes and CR).
+read_compose_file() {
+    [ -f .env ] || return 0
+    grep '^COMPOSE_FILE=' .env | head -n1 | cut -d= -f2- | tr -d "\r\"'"
+}
+
+# Pretty-print the effective compose file list.
+print_config() {
+    val="$1"
+    [ -z "$val" ] && val="docker-compose.yml"
+    echo "COMPOSE_FILE=$val"
+    echo "compose files:"
+    OLD_IFS=$IFS
+    IFS=:
+    for f in $val; do
+        echo "  $f"
+    done
+    IFS=$OLD_IFS
+    echo ""
+}
+
+# Update or append COMPOSE_FILE in .env.
+write_compose_file() {
+    new_value="$1"
+    if [ ! -f .env ]; then
+        echo "ERROR: .env not found in $(pwd)" >&2
         exit 1
     fi
-    COMPOSE_FILES="$COMPOSE_FILES -f $file"
-done
+    new_line="COMPOSE_FILE=$new_value"
+    if grep -q '^COMPOSE_FILE=' .env; then
+        sed -i.old -e "s|^COMPOSE_FILE=.*$|$new_line|" .env
+        rm -f .env.old
+    else
+        cat >> .env <<EOF
 
-print_config() {
-    cfg="$1"
-    files="-f docker-compose.yml"
-    for n in $cfg; do
-        files="$files -f docker-compose.${n}.yml"
-    done
-    echo "CONFIG=$cfg"
-    echo "compose files: $files"
-    echo ""
+############
+# Docker compose override files to layer on top of docker-compose.yml.
+# Colon-separated list. Manage with ./run.sh config add|remove <name>.
+#
+# Examples:
+#   COMPOSE_FILE=docker-compose.yml
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.pg17.yml
+############
+$new_line
+EOF
+    fi
 }
 
 # Echoes the list of services (one per line) minus those passed as args.
 # Warns on unknown names; returns 1 if no services remain.
 services_except() {
-    # shellcheck disable=SC2086
-    all_services=$(docker compose $COMPOSE_FILES config --services)
+    all_services=$(docker compose config --services)
     filtered="$all_services"
     for ex in "$@"; do
         echo "$all_services" | grep -qFx "$ex" \
@@ -83,49 +126,15 @@ services_except() {
     printf '%s\n' "$filtered"
 }
 
-write_env_config() {
-    new_value="$1"
-    if [ ! -f .env ]; then
-        echo "ERROR: .env not found in $(pwd)" >&2
-        exit 1
-    fi
-    if [ -n "$new_value" ]; then
-        new_line="CONFIG=\"$new_value\""
-    else
-        new_line="CONFIG="
-    fi
-    if grep -q '^CONFIG=' .env; then
-        sed -i.old -e "s|^CONFIG=.*$|$new_line|" .env
-        rm -f .env.old
-    else
-        cat >> .env <<EOF
-
-############
-# List of docker-compose override files to layer on top of docker-compose.yml.
-# Each name should match a docker-compose.<name>.yml file. Used by ./run.sh
-#
-# Examples:
-#   CONFIG=                 (no overrides, default)
-#   CONFIG="pg17 envoy"     (quote when there are spaces)
-#
-############
-$new_line
-EOF
-    fi
-}
-
 CMD="${1:-help}"
 [ "$#" -gt 0 ] && shift
 
-# COMPOSE_FILES is intentionally word-split; each token is a separate -f / path.
 case "$CMD" in
     start|up)
-        # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES up -d --wait "$@"
+        exec docker compose up -d --wait "$@"
         ;;
     stop|down)
-        # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES down "$@"
+        exec docker compose down "$@"
         ;;
     restart)
         if [ "${1:-}" = "--except" ]; then
@@ -133,10 +142,9 @@ case "$CMD" in
             [ $# -eq 0 ] && { echo "Usage: $(basename "$0") restart --except <svc>..." >&2; exit 1; }
             services=$(services_except "$@") || exit 1
             # shellcheck disable=SC2086
-            exec docker compose $COMPOSE_FILES restart $services
+            exec docker compose restart $services
         fi
-        # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES restart "$@"
+        exec docker compose restart "$@"
         ;;
     recreate)
         if [ "${1:-}" = "--except" ]; then
@@ -144,93 +152,92 @@ case "$CMD" in
             [ $# -eq 0 ] && { echo "Usage: $(basename "$0") recreate --except <svc>..." >&2; exit 1; }
             services=$(services_except "$@") || exit 1
             # shellcheck disable=SC2086
-            exec docker compose $COMPOSE_FILES up -d --wait --force-recreate --no-deps $services
+            exec docker compose up -d --wait --force-recreate --no-deps $services
         fi
         if [ $# -eq 0 ]; then
-            # shellcheck disable=SC2086
-            docker compose $COMPOSE_FILES down
-            # shellcheck disable=SC2086
-            exec docker compose $COMPOSE_FILES up -d --wait
+            docker compose down
+            exec docker compose up -d --wait
         fi
         # Single-service recreate: force-recreate the named services only,
         # leave their dependencies running.
-        # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES up -d --wait --force-recreate --no-deps "$@"
+        exec docker compose up -d --wait --force-recreate --no-deps "$@"
         ;;
     status|ps)
-        # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES ps "$@"
+        exec docker compose ps "$@"
         ;;
     logs)
-        # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES logs -f "$@"
+        exec docker compose logs -f "$@"
         ;;
     inspect)
         [ $# -eq 0 ] && { echo "Usage: $(basename "$0") inspect <service> [docker-inspect-args]" >&2; exit 1; }
         svc="$1"; shift
-        # shellcheck disable=SC2086
-        cid=$(docker compose $COMPOSE_FILES ps -q "$svc")
+        cid=$(docker compose ps -q "$svc")
         [ -z "$cid" ] && { echo "Service '$svc' is not running" >&2; exit 1; }
         exec docker inspect "$cid" "$@"
         ;;
     printenv)
         [ $# -eq 0 ] && { echo "Usage: $(basename "$0") printenv <service>" >&2; exit 1; }
         svc="$1"
-        # shellcheck disable=SC2086
-        cid=$(docker compose $COMPOSE_FILES ps -q "$svc")
+        cid=$(docker compose ps -q "$svc")
         [ -z "$cid" ] && { echo "Service '$svc' is not running" >&2; exit 1; }
         exec docker inspect --format='{{range .Config.Env}}{{println .}}{{end}}' "$cid"
         ;;
     pull)
-        # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES pull "$@"
+        exec docker compose pull "$@"
         ;;
     compose-config)
-        # shellcheck disable=SC2086
-        exec docker compose $COMPOSE_FILES config "$@"
+        exec docker compose config "$@"
         ;;
     config)
         sub="${1:-show}"
         [ "$#" -gt 0 ] && shift
+        current=$(read_compose_file)
         case "$sub" in
             show)
-                print_config "$CONFIG"
+                print_config "$current"
                 ;;
             add)
                 [ $# -eq 0 ] && { echo "Usage: $(basename "$0") config add <name>..." >&2; exit 1; }
-                new_config="$CONFIG"
-                for n in "$@"; do
-                    if [ ! -f "docker-compose.${n}.yml" ]; then
-                        echo "ERROR: docker-compose.${n}.yml not found" >&2
+                new_value="${current:-docker-compose.yml}"
+                changed=false
+                for arg in "$@"; do
+                    file=$(normalize_override "$arg") || exit 1
+                    if [ ! -f "$file" ]; then
+                        echo "ERROR: $file not found" >&2
                         exit 1
                     fi
-                    # Pad with spaces so " $n " matches whole words only (not substrings of other names)
-                    case " $new_config " in
-                        *" $n "*) echo "Already present: $n" ;;
-                        *)        new_config="${new_config:+$new_config }$n" ;;
+                    case ":$new_value:" in
+                        *":$file:"*) echo "Already present: $file" ;;
+                        *) new_value="$new_value:$file"; changed=true ;;
                     esac
                 done
-                write_env_config "$new_config"
-                print_config "$new_config"
+                [ "$changed" = true ] && write_compose_file "$new_value"
+                print_config "$new_value"
                 ;;
             remove|rm)
                 [ $# -eq 0 ] && { echo "Usage: $(basename "$0") config remove <name>..." >&2; exit 1; }
-                new_config="$CONFIG"
-                for n in "$@"; do
-                    case " $new_config " in
-                        *" $n "*)
-                            # Drop $n by rebuilding the list
+                new_value="${current:-docker-compose.yml}"
+                changed=false
+                for arg in "$@"; do
+                    file=$(normalize_override "$arg") || exit 1
+                    case ":$new_value:" in
+                        *":$file:"*)
+                            # Drop $file by rebuilding the colon list
                             tmp=""
-                            for tok in $new_config; do
-                                [ "$tok" = "$n" ] || tmp="${tmp:+$tmp }$tok"
+                            OLD_IFS=$IFS
+                            IFS=:
+                            for tok in $new_value; do
+                                [ "$tok" = "$file" ] || tmp="${tmp:+$tmp:}$tok"
                             done
-                            new_config="$tmp"
+                            IFS=$OLD_IFS
+                            new_value="$tmp"
+                            changed=true
                             ;;
-                        *)  echo "Not present: $n" ;;
+                        *)  echo "Not present: $file" ;;
                     esac
                 done
-                write_env_config "$new_config"
-                print_config "$new_config"
+                [ "$changed" = true ] && write_compose_file "$new_value"
+                print_config "$new_value"
                 ;;
             *)
                 echo "Unknown config subcommand: $sub" >&2
@@ -274,9 +281,9 @@ Commands:
   inspect <service>     Inspect a service's container (forwards extra args to docker inspect)
   printenv <service>    Print a service's environment variables (one per line)
   pull                  Pull all images
-  config                Show CONFIG list of the compose files
-  config add <name>     Add overrides to CONFIG in .env (validates the file exists)
-  config remove <name>  Remove overrides from CONFIG in .env
+  config                Show the active COMPOSE_FILE list
+  config add <name>     Add an override to COMPOSE_FILE in .env (short name or full filename)
+  config remove <name>  Remove an override from COMPOSE_FILE in .env
   compose-config        Dump the fully-resolved docker compose config
   secrets               Show key passwords and API keys from .env
 
