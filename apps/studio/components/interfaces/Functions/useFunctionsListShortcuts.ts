@@ -11,6 +11,7 @@ interface UseFunctionsListShortcutsParams {
   setSearch: Dispatch<SetStateAction<string>> | ((value: string) => void)
   sort: EdgeFunctionsSort
   setSort: (value: EdgeFunctionsSort) => void
+  canCreateNew: boolean
   onCreateNew: () => void
   onRefresh: () => void
 }
@@ -20,6 +21,7 @@ export function useFunctionsListShortcuts({
   setSearch,
   sort,
   setSort,
+  canCreateNew,
   onCreateNew,
   onRefresh,
 }: UseFunctionsListShortcutsParams) {
@@ -33,6 +35,7 @@ export function useFunctionsListShortcuts({
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, onCreateNew, {
+    enabled: canCreateNew,
     label: 'Deploy a new function',
   })
 
