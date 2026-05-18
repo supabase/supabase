@@ -172,7 +172,7 @@ Choose the appropriate `type` for your admonition:
 - `note` for anything else
 
 ```
-<Admonition type="note" title="Optional label displays as title">
+<Admonition type="note" title="Optional title">
 
 Your content here
 
