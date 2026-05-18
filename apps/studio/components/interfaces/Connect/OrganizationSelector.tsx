@@ -45,14 +45,15 @@ export const OrganizationSelector = ({
     const selectedInOverflow = selectedIndex >= VISIBLE_ORGANIZATIONS_LIMIT
 
     if (!!lastVisitedOrg) {
+      const withoutLastVisited = organizations.filter(
+        ({ slug }) => slug !== lastVisitedOrganization
+      )
       return {
         visibleOrganizations: [
           lastVisitedOrg,
-          ...organizations.slice(0, VISIBLE_ORGANIZATIONS_LIMIT - 1),
+          ...withoutLastVisited.slice(0, VISIBLE_ORGANIZATIONS_LIMIT - 1),
         ],
-        overflowOrganizations: organizations
-          .filter(({ slug }) => slug !== lastVisitedOrganization)
-          .slice(VISIBLE_ORGANIZATIONS_LIMIT),
+        overflowOrganizations: withoutLastVisited.slice(VISIBLE_ORGANIZATIONS_LIMIT - 1),
       }
     }
 
