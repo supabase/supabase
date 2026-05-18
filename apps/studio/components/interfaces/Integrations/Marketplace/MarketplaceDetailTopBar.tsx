@@ -1,8 +1,15 @@
 import { useParams } from 'common'
-import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { Badge } from 'ui'
+import {
+  Badge,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from 'ui'
+import { PageHeaderBreadcrumb } from 'ui-patterns'
 
 interface MarketplaceDetailTopBarProps {
   title: string
@@ -18,20 +25,23 @@ export const MarketplaceDetailTopBar = ({
   const { ref } = useParams()
 
   return (
-    <div className="sticky h-(--header-height) top-0 z-20 flex shrink-0 items-center border-b bg-dash-sidebar px-6 py-2.5 xl:px-10">
-      <div className="flex items-center gap-2 text-xs justify-between">
-        <Link
-          href={`/project/${ref}/integrations`}
-          className="inline-flex items-center gap-1 text-foreground-light hover:text-foreground"
-        >
-          <ChevronLeft size={13} />
-          Integrations
-        </Link>
-        <span className="text-foreground-muted">/</span>
-        <div>{title}</div>
-        {isInstalled && <Badge variant="success">Installed</Badge>}
+    <div className="sticky h-(--header-height) top-0 z-20 flex justify-between items-center border-b bg-dash-sidebar px-6 py-2.5 xl:px-10">
+      <div className="flex min-w-0 flex-1 items-center gap-4 [&_li]:text-xs">
+        <BreadcrumbList className="min-w-0 flex-nowrap">
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href={`/project/${ref}/integrations`}>Integrations</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem className="min-w-0">
+            <BreadcrumbPage className="block min-w-0 truncate">{title}</BreadcrumbPage>
+            {isInstalled && <Badge variant="success">Installed</Badge>}
+          </BreadcrumbItem>
+        </BreadcrumbList>
       </div>
-      <div className="ml-auto flex items-center gap-2">{actions}</div>
+
+      <div className="flex shrink-0 items-center gap-2">{actions}</div>
     </div>
   )
 }

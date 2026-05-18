@@ -6,7 +6,6 @@ import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 
-import { formatCategoryLabel } from './Marketplace.constants'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
 import { MarketplaceDetailTopBar } from './MarketplaceDetailTopBar'
 import { OverviewTab } from './OverviewTab'
@@ -110,16 +109,8 @@ export const MarketplaceDetail = () => {
     )
   }
 
-  const categoryLabel = formatCategoryLabel(integration.categories?.[0])
-  const subtitle = (
-    <>
-      {integration.author?.name && <>By {integration.author.name}</>}
-      {integration.author?.name && categoryLabel && (
-        <span className="text-foreground-muted"> · </span>
-      )}
-      {categoryLabel}
-    </>
-  )
+  const pageSubTitle =
+    integration?.description || 'If you think this is an error, please contact support'
 
   const renderInstallAction = () => {
     if (integration.type === 'oauth') {
@@ -166,12 +157,7 @@ export const MarketplaceDetail = () => {
         }
       />
 
-      <MarketplaceDetailHero
-        integration={integration}
-        subtitle={subtitle}
-        description={integration.description}
-        tabs={tabs}
-      />
+      <MarketplaceDetailHero integration={integration} subtitle={pageSubTitle} tabs={tabs} />
 
       {activeRoute === 'overview' ? (
         <div className={centeredContentClass}>

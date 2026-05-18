@@ -1,13 +1,21 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { Badge, cn, NavMenu, NavMenuItem } from 'ui'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderIcon,
+  PageHeaderMeta,
+  PageHeaderNavigationTabs,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns'
 
 import { getMarketplaceSource, MarketplaceSourceBadge } from './Marketplace.constants'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
 interface MarketplaceDetailHeroProps {
   integration: IntegrationDefinition
-  description?: ReactNode
   subtitle?: ReactNode
   tabs: Array<{ label: string; href: string; active: boolean }>
 }
@@ -29,54 +37,50 @@ const BadgesComponent = ({ className, source, integration }: BadgesComponentProp
 
 export const MarketplaceDetailHero = ({
   integration,
-  description,
   subtitle,
   tabs,
 }: MarketplaceDetailHeroProps) => {
   const source = getMarketplaceSource(integration)
 
+  // Determine page title, icon, and subtitle based on state
+  const pageTitle = integration?.name || 'Integration not found'
+  const pageIcon = integration ? (
+    <div className="shrink-0 w-10 h-10 @lg:w-14 @lg:h-14 relative bg-white border rounded-md flex items-center justify-center">
+      {integration.icon()}
+    </div>
+  ) : null
+
   return (
-    <div className={cn('@container border-b bg-surface-75 pt-10')}>
-      <div className="mx-auto w-full px-6 xl:px-10 flex flex-col gap-4">
-        <div className="flex items-center gap-4">
-          <div
-            className={cn(
-              'relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border bg-white'
-            )}
-          >
-            {integration.icon()}
-          </div>
-          <div>
+    <PageHeader size="full" className={cn('@container')}>
+      <PageHeaderMeta className="mx-auto w-full flex @xl:flex-col @xl:justify-start @xl:items-start gap-4">
+        <div className="mx-auto w-full flex items-center gap-2 @lg:gap-4">
+          {pageIcon && <PageHeaderIcon>{pageIcon}</PageHeaderIcon>}
+          <PageHeaderSummary className="gap-y-0.5">
             <div className="mb-1 flex flex-col flex-wrap @lg:flex-row @lg:items-center gap-2">
-              <h1 className="m-0 text-3xl font-normal leading-tight tracking-tight">
-                {integration.name}
-              </h1>
+              <PageHeaderTitle className="heading-title truncate">{pageTitle}</PageHeaderTitle>
               <BadgesComponent
                 className="hidden @xl:flex"
                 source={source}
                 integration={integration}
               />
             </div>
-            <div className="text-sm text-foreground-light">{subtitle}</div>
-          </div>
+            <PageHeaderDescription className="hidden @lg:block">{subtitle}</PageHeaderDescription>
+          </PageHeaderSummary>
         </div>
+        <PageHeaderDescription className="@lg:hidden">{subtitle}</PageHeaderDescription>
         <BadgesComponent className="flex @xl:hidden" source={source} integration={integration} />
-        {description && (
-          <p className="heading-subSection text-foreground-light truncate">{description}</p>
-        )}
-
-        {tabs.length > 0 && (
-          <div className="mt-6 -mb-px">
-            <NavMenu>
-              {tabs.map((tab) => (
-                <NavMenuItem key={tab.href} active={tab.active}>
-                  <Link href={tab.href}>{tab.label}</Link>
-                </NavMenuItem>
-              ))}
-            </NavMenu>
-          </div>
-        )}
-      </div>
-    </div>
+      </PageHeaderMeta>
+      {tabs.length > 0 && (
+        <PageHeaderNavigationTabs className="mx-auto w-full">
+          <NavMenu>
+            {tabs.map((tab) => (
+              <NavMenuItem key={tab.href} active={tab.active}>
+                <Link href={tab.href}>{tab.label}</Link>
+              </NavMenuItem>
+            ))}
+          </NavMenu>
+        </PageHeaderNavigationTabs>
+      )}
+    </PageHeader>
   )
 }
