@@ -1,9 +1,14 @@
-import pgMeta, { getEntityDefinitionsSql, type PGPolicy } from '@supabase/pg-meta'
+import pgMeta, {
+  getEntityDefinitionsSql,
+  joinSqlFragments,
+  literal,
+  safeSql,
+  type PGPolicy,
+} from '@supabase/pg-meta'
 import { z } from 'zod'
 
 import { executeSql } from '@/data/sql/execute-sql-query'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
-import { quoteLiteral } from '@/lib/pg-format'
 
 export interface RlsTableStatus {
   schema: string
@@ -59,12 +64,8 @@ const SYSTEM_ROLES = new Set([
   'pgbouncer',
 ])
 
-function toSqlList(schemas: string[]) {
-  return schemas.map(quoteLiteral).join(', ')
-}
-
 function getTypeDefinitionsSql(schemas: string[]) {
-  return `
+  return safeSql`
     SELECT
       CASE t.typtype
         WHEN 'e' THEN
@@ -87,7 +88,7 @@ function getTypeDefinitionsSql(schemas: string[]) {
     JOIN pg_namespace n ON n.oid = t.typnamespace
     LEFT JOIN pg_class c ON c.oid = t.typrelid
     LEFT JOIN pg_depend d ON d.objid = t.oid AND d.deptype = 'e'
-    WHERE n.nspname IN (${toSqlList(schemas)})
+    WHERE n.nspname IN (${joinSqlFragments(schemas.map(literal), ', ')})
       AND t.typtype IN ('e', 'c', 'd')
       AND d.objid IS NULL
       AND (t.typtype != 'c' OR c.relkind = 'c')
