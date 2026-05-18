@@ -70,12 +70,12 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
-      size: 130,
-      minSize: 130,
-      maxSize: 130,
+      size: 140,
+      minSize: 140,
+      maxSize: 140,
       meta: {
-        cellClassName: 'font-mono tracking-tight w-[130px]',
-        headerClassName: 'w-[130px]',
+        cellClassName: 'font-mono tracking-tight w-[140px]',
+        headerClassName: 'w-[140px]',
       },
     },
     // Log type column - always visible
