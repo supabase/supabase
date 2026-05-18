@@ -7,7 +7,14 @@ const stringDescriptionProps = {
   description: 'Description-only copy.',
 } satisfies AdmonitionProps
 
+const invalidLabelProps = {
+  // @ts-expect-error label was removed; use title instead.
+  label: 'Legacy heading',
+  description: 'Body copy.',
+} satisfies AdmonitionProps
+
 void stringDescriptionProps
+void invalidLabelProps
 
 describe('Admonition', () => {
   it('renders description-only content', () => {
@@ -95,17 +102,4 @@ describe('Admonition', () => {
     expect(alert.querySelector('svg')).not.toBeInTheDocument()
   })
 
-  it('prefers title over legacy label when both are provided', () => {
-    render(
-      <Admonition
-        type="note"
-        label="Legacy heading"
-        title="Preferred heading"
-        description="Body copy."
-      />
-    )
-
-    expect(screen.getByText('Preferred heading')).toBeVisible()
-    expect(screen.queryByText('Legacy heading')).not.toBeInTheDocument()
-  })
 })
