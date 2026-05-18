@@ -246,18 +246,15 @@ export type PageHeaderNavigationTabsProps = React.ComponentProps<'div'>
  */
 const PageHeaderNavigationTabs = ({ className, ...props }: PageHeaderNavigationTabsProps) => {
   const { size } = usePageHeaderContext()
-  const outerIsFull = size === 'full'
 
   return (
-    <div data-slot="page-header-nav-row" className={cn('w-full', outerIsFull && 'border-b')}>
-      <PageContainer size={size}>
-        <div
-          data-slot="page-header-footer"
-          className={cn('w-full [&>nav]:border-b-0', !outerIsFull && 'border-b', className)}
-          {...props}
-        />
-      </PageContainer>
-    </div>
+    <PageContainer size={size} className={cn(size === 'full' && 'border-b')}>
+      <div
+        data-slot="page-header-footer"
+        className={cn('w-full [&>nav]:border-b-0', size !== 'full' && 'border-b', className)}
+        {...props}
+      />
+    </PageContainer>
   )
 }
 PageHeaderNavigationTabs.displayName = 'PageHeaderNavigationTabs'
