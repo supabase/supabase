@@ -2,12 +2,14 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction, useCallback } from 'react'
+import { Button } from 'ui'
 
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
 import { RealtimeTokensPopover } from './RealtimeTokensPopover'
 import { RealtimeConfig } from './useRealtimeMessages'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -69,6 +71,19 @@ export const Header = ({
     enabled: canToggleListening,
   })
 
+  const listeningButton = (
+    <Button
+      size="tiny"
+      type={config.enabled ? 'warning' : 'primary'}
+      className="rounded-l-none border-l-0"
+      disabled={!canToggleListening}
+      icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
+      onClick={handleToggleListening}
+    >
+      {config.enabled ? `Stop listening` : `Start listening`}
+    </Button>
+  )
+
   return (
     <div className="flex flex-row min-h-14 md:min-h-(--header-height) gap-2.5 items-center px-4 border-b ">
       <div className="flex flex-row">
@@ -79,26 +94,32 @@ export const Header = ({
           onOpenChange={onChannelPopoverChange}
         />
         <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />
-        <ButtonTooltip
-          size="tiny"
-          type={config.enabled ? 'warning' : 'primary'}
-          className="rounded-l-none border-l-0"
-          disabled={!canToggleListening}
-          icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
-          onClick={handleToggleListening}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canReadAPIKeys
-                ? 'You need additional permissions to use the realtime inspector'
-                : config.channelName.length === 0
-                  ? 'You need to join a channel first'
-                  : undefined,
-            },
-          }}
-        >
-          {config.enabled ? `Stop listening` : `Start listening`}
-        </ButtonTooltip>
+        {canToggleListening ? (
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_TOGGLE_LISTENING} side="bottom">
+            {listeningButton}
+          </ShortcutTooltip>
+        ) : (
+          <ButtonTooltip
+            size="tiny"
+            type={config.enabled ? 'warning' : 'primary'}
+            className="rounded-l-none border-l-0"
+            disabled
+            icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
+            onClick={handleToggleListening}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canReadAPIKeys
+                  ? 'You need additional permissions to use the realtime inspector'
+                  : config.channelName.length === 0
+                    ? 'You need to join a channel first'
+                    : undefined,
+              },
+            }}
+          >
+            {config.enabled ? `Stop listening` : `Start listening`}
+          </ButtonTooltip>
+        )}
       </div>
       <RealtimeFilterPopover
         config={config}

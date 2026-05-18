@@ -21,10 +21,12 @@ import * as z from 'zod'
 
 import { RealtimeConfig } from './useRealtimeMessages'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig
@@ -99,16 +101,22 @@ export const ChooseChannelPopover = ({
 
   return (
     <Popover open={open} onOpenChange={onOpen}>
-      <PopoverTrigger asChild>
-        <Button className="rounded-r-none" type="default" size="tiny" iconRight={<ChevronDown />}>
-          <p
-            className="max-w-[120px] truncate"
-            title={config.channelName.length > 0 ? config.channelName : ''}
-          >
-            {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Join a channel'}
-          </p>
-        </Button>
-      </PopoverTrigger>
+      <ShortcutTooltip
+        shortcutId={SHORTCUT_IDS.INSPECTOR_JOIN_CHANNEL}
+        side="bottom"
+        open={open || config.channelName.length > 0 ? false : undefined}
+      >
+        <PopoverTrigger asChild>
+          <Button className="rounded-r-none" type="default" size="tiny" iconRight={<ChevronDown />}>
+            <p
+              className="max-w-[120px] truncate"
+              title={config.channelName.length > 0 ? config.channelName : ''}
+            >
+              {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Join a channel'}
+            </p>
+          </Button>
+        </PopoverTrigger>
+      </ShortcutTooltip>
       <PopoverContent className="p-0 w-[320px]" align="start">
         <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (

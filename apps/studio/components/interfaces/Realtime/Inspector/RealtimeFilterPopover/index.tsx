@@ -21,11 +21,13 @@ import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig
@@ -87,23 +89,29 @@ export const RealtimeFilterPopover = ({
   return (
     <>
       <Popover open={open} onOpenChange={onOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            icon={<PlusCircle size="16" />}
-            type={isFiltered ? 'primary' : 'dashed'}
-            className={cn('rounded-full px-1 text-xs h-[26px]')}
-            size="small"
-          >
-            {isFiltered ? (
-              <>
-                <span className="mr-1">Filtered by </span>
-                <Badge variant="success">table: {config.table}</Badge>
-              </>
-            ) : (
-              <span className="mr-1">Filter messages</span>
-            )}
-          </Button>
-        </PopoverTrigger>
+        <ShortcutTooltip
+          shortcutId={SHORTCUT_IDS.INSPECTOR_TOGGLE_FILTERS}
+          side="bottom"
+          open={open || config.channelName.length === 0 ? false : undefined}
+        >
+          <PopoverTrigger asChild>
+            <Button
+              icon={<PlusCircle size="16" />}
+              type={isFiltered ? 'primary' : 'dashed'}
+              className={cn('rounded-full px-1 text-xs h-[26px]')}
+              size="small"
+            >
+              {isFiltered ? (
+                <>
+                  <span className="mr-1">Filtered by </span>
+                  <Badge variant="success">table: {config.table}</Badge>
+                </>
+              ) : (
+                <span className="mr-1">Filter messages</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+        </ShortcutTooltip>
         <PopoverContent className="p-0 w-[365px]" align="start">
           <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
             Listen to event types

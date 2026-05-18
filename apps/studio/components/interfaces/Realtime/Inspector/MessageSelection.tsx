@@ -7,6 +7,7 @@ import { Button, cn, copyToClipboard } from 'ui'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
 import CopyButton from '@/components/ui/CopyButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -83,17 +84,23 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
         <div className="pt-4 flex flex-col gap-4">
           <div className="px-4 flex flex-row justify-between items-center">
             <div className="transition">
-              <CopyButton
-                text={selectionText}
-                type="default"
-                title="Copy log to clipboard"
-                onClick={() => {
-                  sendEvent({
-                    action: 'realtime_inspector_copy_message_clicked',
-                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                  })
-                }}
-              />
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.INSPECTOR_COPY_MESSAGE}
+                side="bottom"
+                open={!log ? false : undefined}
+              >
+                <CopyButton
+                  text={selectionText}
+                  type="default"
+                  title="Copy log to clipboard"
+                  onClick={() => {
+                    sendEvent({
+                      action: 'realtime_inspector_copy_message_clicked',
+                      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                    })
+                  }}
+                />
+              </ShortcutTooltip>
             </div>
             <Button
               type="text"
