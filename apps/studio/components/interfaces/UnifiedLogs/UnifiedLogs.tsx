@@ -224,8 +224,6 @@ export const UnifiedLogs = () => {
     return generateDynamicColumns(flatData)
   }, [flatData])
 
-  console.log({ columnVisibility, dynamicColumnVisibility })
-
   const table: Table<ColumnSchema> = useReactTable({
     data: flatData,
     columns: dynamicColumns,
