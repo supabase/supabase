@@ -87,15 +87,15 @@ const CreateProject = () => {
     !isDataApiRevokeOnCreateDefault
   )
 
-  useTrackDefaultPrivilegesExposure({ surface: 'vercel' })
+  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
+
+  useTrackDefaultPrivilegesExposure({ surface: 'vercel', orgSlug: slug })
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
     setPasswordStrengthMessage(message)
   }
-
-  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
   const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
 
