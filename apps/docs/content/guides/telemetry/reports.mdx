@@ -84,6 +84,7 @@ The following charts are available for Free and Pro plans:
 | Chart                        | Available Plans | Description                                  | Key Insights                                                   |
 | ---------------------------- | --------------- | -------------------------------------------- | -------------------------------------------------------------- |
 | Memory usage                 | Free, Pro       | RAM usage percentage by the database         | Memory pressure and resource utilization                       |
+| Swap usage                   | Free, Pro       | Swap space in use by the operating system    | Memory pressure detection when RAM is exhausted                |
 | CPU usage                    | Free, Pro       | Average CPU usage percentage                 | CPU-intensive query identification                             |
 | Disk IOPS                    | Free, Pro       | Read/write operations per second with limits | IO bottleneck detection and workload analysis                  |
 | Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                                     |
@@ -136,6 +137,29 @@ Actions you can take:
 | [Optimize queries](/docs/content/guides/database/query-optimization)        | Reduce memory consumption of expensive queries |
 | [Tune Postgres configuration](https://pgtune.leopard.in.ua)                 | Improve memory management settings             |
 | Implement application caching                                               | Add query result caching to reduce memory load |
+
+### Swap usage
+
+This chart shows swap space currently in use by the operating system. Every Supabase compute instance is provisioned with 1 GB of swap regardless of compute size. The y-axis always spans at least 0 to 1 GB so that low swap usage appears correctly at the bottom of the chart.
+
+| Component | Description                                                                                          |
+| --------- | ---------------------------------------------------------------------------------------------------- |
+| **Swap**  | Disk space used as overflow when RAM is exhausted. Sustained usage slows the database significantly. |
+
+How it helps debug issues:
+
+| Issue                     | Description                                                            |
+| ------------------------- | ---------------------------------------------------------------------- |
+| Memory pressure detection | Identify when the database is spilling to disk due to insufficient RAM |
+| Performance degradation   | Correlate swap usage spikes with query slowdowns                       |
+
+Actions you can take:
+
+| Action                                                                      | Description                                              |
+| --------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size) | Increase available RAM to eliminate swap usage           |
+| [Optimize queries](/docs/content/guides/database/query-optimization)        | Reduce memory consumption of expensive queries           |
+| [Tune Postgres configuration](https://pgtune.leopard.in.ua)                 | Lower `work_mem` or `shared_buffers` to reduce RAM usage |
 
 ### CPU usage
 
