@@ -46,7 +46,6 @@ import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.util
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
-import { DataTableFilterCommand } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
 import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
 import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideBarLayout'
@@ -405,16 +404,15 @@ export const UnifiedLogs = () => {
                     </p>
                   </TooltipContent>
                 </Tooltip>
+
                 <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1">
                   <LogsFilterBar />
-                  <DataTableFilterCommand
-                    placeholder="Search logs..."
-                    searchParamsParser={SEARCH_PARAMS_PARSER}
-                  />
                 </div>
+
                 <div className="block sm:hidden">
                   <DataTableFilterControlsDrawer />
                 </div>
+
                 <div className="ml-auto flex items-center gap-x-2">
                   <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
                   <DataTableViewOptions />
@@ -427,6 +425,7 @@ export const UnifiedLogs = () => {
                   ) : null}
                 </div>
               </div>
+
               <TimelineChart
                 data={unifiedLogsChart}
                 className={cn(

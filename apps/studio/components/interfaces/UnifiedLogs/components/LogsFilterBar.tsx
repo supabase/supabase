@@ -8,10 +8,6 @@ export const LogsFilterBar = () => {
   const { table, filterFields } = useDataTable()
 
   const [freeformText, setFreeformText] = useState('')
-  const [filters, setFilters] = useState<FilterGroup>({
-    logicalOperator: 'AND',
-    conditions: [],
-  })
 
   const filterProperties: FilterProperty[] = filterFields
     .filter((x) => x.type !== 'timerange')
@@ -22,6 +18,25 @@ export const LogsFilterBar = () => {
       options: filter.options ?? [],
       operators: ['='],
     }))
+
+  // Seed from the table's columnFilters (already hydrated from the URL by the parent) so
+  // chips re-appear after a page reload or a deep-link.
+  const [filters, setFilters] = useState<FilterGroup>(() => {
+    const filterableNames = new Set(filterProperties.map((p) => p.name))
+    const conditions: FilterCondition[] = []
+    for (const { id, value } of table.getState().columnFilters) {
+      if (!filterableNames.has(id) || value === null || value === undefined) continue
+      const values = Array.isArray(value) ? value : [value]
+      for (const v of values) {
+        conditions.push({
+          propertyName: id,
+          value: v as FilterCondition['value'],
+          operator: '=',
+        })
+      }
+    }
+    return { logicalOperator: 'AND', conditions }
+  })
 
   // No nested conditions in unified logs — type-cast to FilterCondition on read.
   const onApply = (next: FilterGroup) => {
