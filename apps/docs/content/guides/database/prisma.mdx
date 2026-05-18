@@ -78,7 +78,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="npm_initiate" label="npm">
               ```bash
               npm init -y
-              npm install prisma typescript ts-node @types/node --save-dev
+              npm install prisma tsx @types/pg --save-dev
+              npm install @prisma/client @prisma/adapter-pg dotenv pg
 
               npx tsc --init
 
@@ -87,8 +88,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </TabPanel>
             <TabPanel id="pnpm_initiate" label="pnpm">
               ```bash
-              pnpm init -y
-              pnpm install prisma typescript ts-node @types/node --save-dev
+              pnpm init
+              pnpm install prisma tsx @types/pg --save-dev
+              pnpm install @prisma/client @prisma/adapter-pg dotenv pg
 
               pnpx tsc --init
 
@@ -98,7 +100,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="yarn_initiate" label="yarn">
               ```bash
               yarn init -y
-              yarn add prisma typescript ts-node @types/node --save-dev
+              yarn add prisma tsx @types/pg --save-dev
+              yarn add @prisma/client @prisma/adapter-pg dotenv pg
 
               npx tsc --init
 
@@ -108,7 +111,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="bun_initiate" label="bun">
               ```bash
               bun init -y
-              bun install prisma typescript ts-node @types/node --save-dev
+              bun install prisma tsx @types/pg --save-dev
+              bun install @prisma/client @prisma/adapter-pg dotenv pg
 
               bunx tsc --init
 
@@ -168,15 +172,6 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
                     postgres://prisma.[PROJECT-REF]...
                     ```
 
-                    In your schema.prisma file, edit your `datasource db` configs to reference your DIRECT_URL
-                    ```text schema.prisma
-                    datasource db {
-                      provider  = "postgresql"
-                      url       = env("DATABASE_URL")
-                      directUrl = env("DIRECT_URL")
-                    }
-                    ```
-
 
                 </TabPanel>
 
@@ -190,6 +185,33 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Configure prisma.config.ts">
+
+    Add `import "dotenv/config"` to the generated `prisma.config.ts` and change the datasource url to `DIRECT_URL`
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```ts prisma.config.ts
+      import "dotenv/config";
+      import { defineConfig, env } from "prisma/config";
+
+      export default defineConfig({
+        schema: "prisma/schema",
+        migrations: {
+          path: "prisma/migrations",
+        },
+        datasource: {
+          url: env("DIRECT_URL"),
+        },
+      });
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+
+  <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Create your migrations">
 
     If you have already modified your Supabase database, synchronize it with your migration file. Otherwise create new tables for your database
@@ -386,60 +408,20 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Install the prisma client">
-    Install the Prisma client and generate its model
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-              <Tabs
-            scrollable
-            size="small"
-            type="underlined"
-            defaultActiveId="npm_client"
-            queryGroup="client"
-          >
-      <TabPanel id="npm_client" label="npm">
-          ```sh
-          npm install @prisma/client
-          npx prisma generate
-          ```
-      </TabPanel>
-      <TabPanel id="pnpm_client" label="pnpm">
-          ```sh
-          pnpm install @prisma/client
-          pnpx prisma generate
-          ```
-      </TabPanel>
-      <TabPanel id="yarn_client" label="yarn">
-          ```sh
-          yarn add @prisma/client
-          npx prisma generate
-          ```
-      </TabPanel>
-      <TabPanel id="bun_client" label="bun">
-          ```sh
-          bun install @prisma/client
-          bunx prisma generate
-          ```
-      </TabPanel>
-      </Tabs>
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
     <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Test your API">
       Create a index.ts file and run it to test your connection
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
       ```ts index.ts
-      const { PrismaClient } = require('@prisma/client');
+      import { PrismaClient } from "./generated/prisma/client";
+      import { PrismaPg } from "@prisma/adapter-pg";
 
-      const prisma = new PrismaClient();
+      const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+      export const prisma = new PrismaClient({ adapter });
 
       async function main() {
-        //change to reference a table in your schema
-        const val = await prisma.<SOME_TABLE_NAME>.findMany({
+        const val = await prisma.user.findMany({
           take: 10,
         });
         console.log(val);
@@ -452,10 +434,10 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
         .catch(async (e) => {
           console.error(e);
           await prisma.$disconnect();
-        process.exit(1);
+          process.exit(1);
       });
-
       ```
+
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
