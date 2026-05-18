@@ -26,9 +26,9 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -372,16 +372,16 @@ export const JWTSettings = () => {
                 </Admonition>
               )}
 
-              <Collapsible_Shadcn_ className="bg border rounded-md mt-4">
-                <CollapsibleTrigger_Shadcn_ className="p-4 w-full flex items-center justify-between [&[data-state=open]>svg]:-rotate-180!">
+              <Collapsible className="bg border rounded-md mt-4">
+                <CollapsibleTrigger className="p-4 w-full flex items-center justify-between [&[data-state=open]>svg]:-rotate-180!">
                   <p className="text-sm">
                     {disableLegacyJwtSecretRotation
                       ? 'How to migrate to the new API keys?'
                       : 'How to change your JWT secret?'}
                   </p>
                   <ChevronDown size={14} className="transition-transform duration-200" />
-                </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="border-t p-4">
+                </CollapsibleTrigger>
+                <CollapsibleContent className="border-t p-4">
                   <p className="text-sm text-foreground-light text-balance mb-2">
                     {disableLegacyJwtSecretRotation
                       ? 'Migrate to the new publishable and secret API keys to enable rotation with zero downtime and without signing users out. The change is reversible until you revoke the legacy secret.'
@@ -521,8 +521,8 @@ export const JWTSettings = () => {
                       </DropdownMenu>
                     )}
                   </div>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
+                </CollapsibleContent>
+              </Collapsible>
             </>
           )}
         </Panel.Content>

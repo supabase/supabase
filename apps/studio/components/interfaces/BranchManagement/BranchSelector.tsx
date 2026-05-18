@@ -7,9 +7,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -45,8 +45,8 @@ export const BranchSelector = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <ButtonTooltip
           icon={<GitMerge size={14} strokeWidth={1.5} />}
           type={type}
@@ -66,8 +66,8 @@ export const BranchSelector = ({
         >
           {isUpdating ? 'Creating...' : 'New merge request'}
         </ButtonTooltip>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="end">
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-80" side="bottom" align="end">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Find branch to review..." />
           <CommandList_Shadcn_>
@@ -99,7 +99,7 @@ export const BranchSelector = ({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

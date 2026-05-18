@@ -1,7 +1,7 @@
 ---
 id: 'replication'
-title: 'Database Replication'
-description: 'Replicate your database to external destinations using Supabase replication or manual replication.'
+title: 'Database replication'
+description: 'Compare read replicas, external replication, and manual replication.'
 subtitle: 'An introduction to database replication and change data capture.'
 sidebar_label: 'Overview'
 ---
@@ -12,52 +12,51 @@ Replication is the process of copying changes from your database to another loca
 
 You might use database replication for:
 
-- **Analytics and Data Warehousing**: Replicate your operational database to analytics platforms for complex analysis without impacting your application's performance.
-- **Data Integration**: Keep your data synchronized across different systems and services in your tech stack.
-- **Backup and Disaster Recovery**: Maintain up-to-date copies of your data in different locations.
+- **Analytics and data warehousing**: Replicate your operational database to analytics platforms for complex analysis without impacting your application's performance.
+- **Data integration**: Keep your data synchronized across different systems and services in your tech stack.
+- **Backup and disaster recovery**: Maintain up-to-date copies of your data in different locations.
 
 ## Replication methods
 
-Supabase supports three methods for replicating your database to external destinations:
+Supabase supports three replication methods. Choose based on whether you need another Supabase Postgres database, a managed pipeline to an external system, or full control over your own logical replication setup.
 
-### Read Replicas
+### Read replicas
 
-Additional databases that are kept in sync with your Primary database. These read-only databases can be deployed across multiple regions, for lower latency and better resource management.
+Read replicas are additional Supabase Postgres databases kept in sync with your primary database. Use them when you want read-only query capacity, lower latency in another region, or to isolate analytical reads from application writes while staying inside Supabase Postgres.
 
-- [Set up Read Replicas](/docs/guides/platform/read-replicas)
+- [Set up read replicas](/docs/guides/platform/read-replicas)
 
-### Replication
+### External replication
 
 <Admonition type="caution" label="Private Alpha">
 
-Replication is currently in private alpha. Access is limited and features may change.
+External replication is currently in private alpha. Access is limited and features may change.
 
 </Admonition>
 
-Replication powered by [Supabase ETL](https://github.com/supabase/etl) automatically replicates data to supported systems. Right now, **BigQuery** is the only supported managed destination.
+External replication is powered by [Supabase ETL](https://github.com/supabase/etl). It uses Postgres logical replication under the hood and provides a managed Dashboard workflow for replicating data from Supabase Postgres to external data systems.
 
-<Admonition type="note" title="Why Analytics Buckets are no longer listed">
+- [Set up external replication](/docs/guides/database/replication/external-replication-setup)
 
-We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
+#### Supported destinations
 
-At the moment, BigQuery is the only supported destination, but we are actively working on expanding capabilities.
+External replication currently supports BigQuery as the managed destination. We are working on new destinations, and this table will be updated as support expands.
 
-</Admonition>
-
-- [Set up replication](/docs/guides/database/replication/replication-setup)
+| Destination                                            | Insert       | Update       | Delete       | Truncate     | Schema change | Description                                                         |
+| ------------------------------------------------------ | ------------ | ------------ | ------------ | ------------ | ------------- | ------------------------------------------------------------------- |
+| [BigQuery](/docs/guides/database/replication/bigquery) | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported | ✅ Supported  | Managed replication to Google BigQuery for analytics and reporting. |
 
 ### Manual replication
 
-Configure your own replication using external tools and Postgres's native logical replication. This gives you full control over the replication process and allows you to use any tool that supports Postgres logical replication.
+Manual replication uses the same underlying Postgres logical replication features as external replication, but you configure and operate the pieces yourself. Use this path when you want to connect tools such as Airbyte, Estuary, Fivetran, Materialize, Stitch, AWS DMS, or another system that supports Postgres logical replication.
 
-- [Set up Manual Replication](/docs/guides/database/replication/manual-replication-setup)
+- [Set up manual replication](/docs/guides/database/replication/manual-replication-setup)
 
 ## Related features
 
-Choose the data syncing method based on your use case:
+For realtime features and syncing data to clients (browsers, mobile apps), see [Realtime](/docs/guides/realtime).
 
-- For realtime features and syncing data to clients (browsers, mobile apps), see [Realtime](/docs/guides/realtime)
-- For deploying read-only databases across multiple regions, see [Read Replicas](/docs/guides/platform/read-replicas)
+Realtime also uses Postgres changes, but it is intended for broadcasting database updates to clients rather than maintaining a copy of your database in another system.
 
 ## Concepts and terms
 
@@ -67,11 +66,11 @@ Postgres uses a system called the Write-Ahead Log (WAL) to manage changes to the
 
 ### Logical replication and WAL
 
-Logical replication is a method of replication where Postgres uses the WAL files and transmit those changes to another Postgres database, or a system that supports reading WAL files.
+Logical replication is a method of replication where Postgres uses WAL files to transmit changes to another Postgres database, or to a system that supports reading WAL files.
 
 ### LSN
 
-LSN is a Log Sequence Number that is used to identify the position of a WAL file in the WAL directory. It is often used to determine the progress of replication in subscribers and calculate the lag of a replication slot.
+LSN is a Log Sequence Number that identifies a position in the WAL. It is often used to determine the progress of replication in subscribers and calculate the lag of a replication slot.
 
 ## Logical replication architecture
 
@@ -83,11 +82,11 @@ When setting up logical replication, three key components are involved:
 
 ## Logical replication output format
 
-Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgres sends changes to any active replication slot.
+Logical replication is typically output in two forms, `pgoutput` and `wal2json`. The output method is how Postgres sends changes to any active replication slot.
 
 ## Logical replication configuration
 
-When using logical replication, Postgres is then configured to keep WAL files around for longer than it needs them. If the files are removed too quickly, then your `replication slot` will become inactive and, if the database receives a large number of changes in a short time, then the `replication slot` can become lost as it was not able to keep up.
+When using logical replication, Postgres keeps WAL files around for longer than it otherwise needs them. If the files are removed too quickly, then your `replication slot` can become inactive or lost if the database receives a large number of changes in a short time.
 
 In order to mitigate this, Postgres has many options and settings that can be [tweaked](/docs/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
 

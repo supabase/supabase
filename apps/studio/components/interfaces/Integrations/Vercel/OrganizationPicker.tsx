@@ -10,9 +10,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
@@ -58,8 +58,8 @@ const OrganizationPicker = ({
 
   return (
     <>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             ref={ref}
             type="default"
@@ -83,13 +83,8 @@ const OrganizationPicker = ({
               )}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          className="p-0 w-full"
-          side="bottom"
-          align="center"
-          sameWidthAsTrigger
-        >
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-full" side="bottom" align="center" sameWidthAsTrigger>
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Search organizations..." />
             <CommandList_Shadcn_>
@@ -123,8 +118,8 @@ const OrganizationPicker = ({
               </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </>
   )
 }

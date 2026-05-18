@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
   Button,
@@ -12,8 +13,8 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_,
+  Input,
+  Label,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -57,7 +58,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   )
 
   const { id, properties } = template
-  const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as EmailTemplateContentKey
 
   const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
@@ -241,9 +242,27 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   control={form.control}
                   name={x}
                   render={({ field }) => (
-                    <FormItemLayout className="gap-y-3" layout="vertical" label={property.title}>
+                    <FormItemLayout
+                      className="gap-y-3"
+                      layout="vertical"
+                      label={property.title}
+                      description={
+                        property.description ? (
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {property.description}
+                          </ReactMarkdown>
+                        ) : null
+                      }
+                      labelOptional={
+                        property.descriptionOptional ? (
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {property.descriptionOptional}
+                          </ReactMarkdown>
+                        ) : null
+                      }
+                    >
                       <FormControl>
-                        <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
+                        <Input id={x} {...field} disabled={!canUpdateConfig} />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -258,7 +277,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
           <>
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center justify-between gap-2">
-                <Label_Shadcn_>Body</Label_Shadcn_>
+                <Label>Body</Label>
                 <TwoOptionToggle
                   width={60}
                   options={['preview', 'source']}

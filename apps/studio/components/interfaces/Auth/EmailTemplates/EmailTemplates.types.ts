@@ -54,6 +54,8 @@ export interface AuthTemplate {
     [x: string]: {
       title: string
       type: 'boolean' | 'string' | 'select' | 'number' | 'code'
+      description?: string
+      descriptionOptional?: string
     }
   }
   variables: TemplateVariable[]

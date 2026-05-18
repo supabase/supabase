@@ -118,6 +118,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Collapsible Alert',
+          href: '/docs/fragments/collapsible-alert',
+          items: [],
+        },
+        {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
           items: [],

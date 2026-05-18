@@ -1,4 +1,11 @@
-import { ident, literal } from '@supabase/pg-meta/src/pg-format'
+import {
+  ident,
+  joinSqlFragments,
+  keyword,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
@@ -54,36 +61,47 @@ export function generateQueryPerformanceSql({
     (orderBy.order === 'asc' || orderBy.order === 'desc')
 
   const orderBySql = isValidOrderBy
-    ? `ORDER BY ${ident(orderBy!.column)} ${orderBy!.order}`
+    ? safeSql`ORDER BY ${ident(orderBy!.column)} ${keyword(orderBy!.order)}`
     : undefined
 
-  const whereConditions = []
+  const whereConditions: SafeSqlFragment[] = []
   if (roles.length > 0) {
-    whereConditions.push(`auth.rolname in (${roles.map((r) => `${literal(r)}`).join(', ')})`)
+    whereConditions.push(
+      safeSql`auth.rolname in (${joinSqlFragments(
+        roles.map((r) => literal(r)),
+        ', '
+      )})`
+    )
   }
   if (searchQuery.length > 0) {
-    whereConditions.push(`statements.query ~* ${literal(searchQuery)}`)
+    whereConditions.push(safeSql`statements.query ~* ${literal(searchQuery)}`)
   }
   if (sources.includes('dashboard') && !sources.includes('non-dashboard')) {
-    whereConditions.push(`statements.query ~* 'source: dashboard'`)
+    whereConditions.push(safeSql`statements.query ~* 'source: dashboard'`)
   }
   if (sources.includes('non-dashboard') && !sources.includes('dashboard')) {
-    whereConditions.push(`statements.query !~* 'source: dashboard'`)
+    whereConditions.push(safeSql`statements.query !~* 'source: dashboard'`)
   }
   if (Number.isFinite(minCalls) && minCalls > 0) {
-    whereConditions.push(`statements.calls >= ${minCalls}`)
+    whereConditions.push(safeSql`statements.calls >= ${literal(minCalls)}`)
   }
   if (Number.isFinite(minTotalTime) && minTotalTime > 0) {
     whereConditions.push(
-      `(statements.total_exec_time + statements.total_plan_time) >= ${minTotalTime}`
+      safeSql`(statements.total_exec_time + statements.total_plan_time) >= ${literal(minTotalTime)}`
     )
   }
 
-  const whereSql = whereConditions.join(' AND ')
+  const whereSql = joinSqlFragments(whereConditions, ' AND ')
 
-  const sql = baseSQL.sql(
+  if (baseSQL.queryType !== 'db') {
+    throw new Error(
+      `Query performance presets must be db queries; got ${baseSQL.queryType} for preset ${preset}`
+    )
+  }
+
+  const sql = baseSQL.safeSql(
     [],
-    whereSql.length > 0 ? `WHERE ${whereSql}` : undefined,
+    whereSql.length > 0 ? safeSql`WHERE ${whereSql}` : undefined,
     orderBySql,
     runIndexAdvisor,
     filterIndexAdvisor,
