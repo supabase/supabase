@@ -307,7 +307,7 @@ export const UnifiedLogs = () => {
     setSearch(search)
   }
 
-  const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 1000)
+  const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)
 
   useEffect(() => {
     debouncedApplyFilterSearch()
