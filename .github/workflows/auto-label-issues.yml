@@ -98,7 +98,7 @@ jobs:
 
             const query = `query($owner:String!, $name:String!, $contributor:String!) {
               repository(owner:$owner, name:$name) {
-                issues(first: 2, filterBy: {createdBy:$contributor}) {
+                issues(first: 2, filterBy: {createdBy:$contributor, states:[OPEN, CLOSED]}) {
                   totalCount
                 }
               }
@@ -113,7 +113,7 @@ jobs:
             const result = await github.graphql(query, variables);
             const totalCount = result.repository.issues.totalCount;
 
-            if (totalCount > 1) {
+            if (totalCount !== 1) {
               console.log(`Not ${sender}'s first issue (total: ${totalCount}). Skipping.`);
               return;
             }
