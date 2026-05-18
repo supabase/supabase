@@ -72,7 +72,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
-      name: 'JIT database access',
+      name: 'Temporary access',
       discussionsUrl: undefined,
       isNew: true,
       isPlatformOnly: true,

@@ -291,7 +291,11 @@ test.describe('SQL Editor', () => {
   })
 
   test('warns on CREATE TABLE without RLS and "Run and enable RLS" enables it', async ({ ref }) => {
-    const tableName = 'pw_rls_smoke_test'
+    // Suffix with parallel worker index so parallel workers don't collide
+    // on the same table name — when they do, one worker's `dropTable`
+    // races another's "Run and enable RLS" and the post-action query
+    // sometimes finds the table missing.
+    const tableName = `pw_rls_smoke_test_${test.info().parallelIndex}`
 
     // Drop any leftover table from a previous failed run, and ensure cleanup
     // after the test regardless of pass/fail.

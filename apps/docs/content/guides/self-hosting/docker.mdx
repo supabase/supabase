@@ -172,7 +172,7 @@ Review and change URL configuration variables:
 - `API_EXTERNAL_URL`: used by the Auth service to configure callback URLs, e.g., `http://example.com:8000`
 - `SITE_URL`: default [redirect URL](/docs/guides/auth/redirect-urls) for Auth, e.g., `http://example.com:3000`
 
-<Admonition type="note" label="What your-domain means in the docs">
+<Admonition type="note" title="What your-domain means in the docs">
 
   Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
 
@@ -236,7 +236,7 @@ To stop Supabase, use:
 docker compose down
 ```
 
-<Admonition type="caution" label="Windows: CRLF line endings">
+<Admonition type="caution" title="Windows: CRLF line endings">
 
   If the API gateway (Kong) fails to start with an entrypoint error, your local files may have been checked out with CRLF line endings instead of LF. Re-clone the repository, or normalize everything in the `docker/` directory to LF, then restart Supabase. Fresh clones should already use LF because of `.gitattributes`.
 
