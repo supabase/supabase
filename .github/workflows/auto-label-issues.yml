@@ -89,7 +89,7 @@ jobs:
         Our team and the community will look into this shortly!
     steps:
       - name: Post welcome comment for first-time issue reporters
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           github-token: ${{ github.token }}
           script: |
