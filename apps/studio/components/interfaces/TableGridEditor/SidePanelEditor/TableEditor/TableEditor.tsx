@@ -1,5 +1,5 @@
 import { isEmpty, noop } from 'lodash'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -89,6 +89,10 @@ export const TableEditor = ({
   const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  // Tracks whether tableFields has been initialized with fully-loaded server data
+  // for the current panel session. Prevents background refetches from resetting
+  // local edits (e.g. unsaved newly-added columns) while the panel is open.
+  const hasInitializedRef = useRef(false)
 
   const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
   const [importContent, setImportContent] = useState<ImportContent>()
@@ -290,6 +294,7 @@ export const TableEditor = ({
           setTableFields(tableFields)
         }
         setFkRelations([])
+        hasInitializedRef.current = true
       } else {
         const tableFields = generateTableFieldFromPGTable(
           table,
@@ -298,7 +303,12 @@ export const TableEditor = ({
           isRealtimeEnabled
         )
         setTableFields(tableFields)
+        // Only mark fully initialized once FK meta has loaded — otherwise we'll
+        // re-init below when it arrives.
+        hasInitializedRef.current = isSuccessForeignKeyMeta
       }
+    } else if (visibleChanged && !visible) {
+      hasInitializedRef.current = false
     }
   }, [
     visible,
@@ -309,10 +319,14 @@ export const TableEditor = ({
     isDuplicating,
     table,
     visibleChanged,
+    isSuccessForeignKeyMeta,
   ])
 
   useEffect(() => {
-    if (!isNewRecord) {
+    // Re-init tableFields once if foreignKeyMeta arrives after the panel opened.
+    // After this fires (or after the panel-open effect above sets it true),
+    // subsequent background refetches must not clobber the user's local edits.
+    if (!isNewRecord && visible && isSuccessForeignKeyMeta && !hasInitializedRef.current) {
       const tableFields = generateTableFieldFromPGTable(
         table,
         foreignKeyMeta ?? [],
@@ -320,8 +334,17 @@ export const TableEditor = ({
         isRealtimeEnabled
       )
       setTableFields(tableFields)
+      hasInitializedRef.current = true
     }
-  }, [isNewRecord, table, foreignKeyMeta, isDuplicating, isRealtimeEnabled])
+  }, [
+    isNewRecord,
+    visible,
+    isSuccessForeignKeyMeta,
+    table,
+    foreignKeyMeta,
+    isDuplicating,
+    isRealtimeEnabled,
+  ])
 
   useEffect(() => {
     if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
