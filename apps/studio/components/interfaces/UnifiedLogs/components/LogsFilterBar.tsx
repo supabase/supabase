@@ -1,4 +1,5 @@
 import { groupBy } from 'lodash'
+import { LoaderCircle, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { FilterBar, FilterCondition, type FilterGroup, type FilterProperty } from 'ui-patterns'
 
@@ -25,7 +26,7 @@ const buildFilterGroup = (
 }
 
 export const LogsFilterBar = () => {
-  const { table, filterFields, columnFilters } = useDataTable()
+  const { table, filterFields, columnFilters, isFetching } = useDataTable()
 
   const [freeformText, setFreeformText] = useState('')
 
@@ -87,6 +88,14 @@ export const LogsFilterBar = () => {
       onFilterChange={setFilters}
       onApply={onApply}
       onFreeformTextChange={setFreeformText}
+      isLoading={isFetching}
+      icon={
+        isFetching ? (
+          <LoaderCircle className="h-4 w-4 animate-spin text-foreground-muted opacity-50" />
+        ) : (
+          <Search className="text-foreground-muted w-4 h-4 sticky" />
+        )
+      }
     />
   )
 }
