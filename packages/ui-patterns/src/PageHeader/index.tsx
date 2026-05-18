@@ -246,7 +246,6 @@ export type PageHeaderNavigationTabsProps = React.ComponentProps<'div'>
  */
 const PageHeaderNavigationTabs = ({ className, ...props }: PageHeaderNavigationTabsProps) => {
   const { size } = usePageHeaderContext()
-
   return (
     <PageContainer size={size} className={cn(size === 'full' && 'border-b')}>
       <div
