@@ -87,37 +87,22 @@ export function getLevelColor(
   }
 }
 
-export function getStatusColor(value?: number | string): Record<'text' | 'bg', string> {
+export function getStatusColor(value?: number | string): string {
   switch (value) {
     case '1':
     case 'info':
-      return {
-        text: 'text-blue-500',
-        bg: '',
-      }
+      return 'text-blue-500'
     case '2':
     case 'success':
-      return {
-        text: 'text-foreground',
-        bg: '',
-      }
+      return 'text-foreground'
     case '4':
     case 'warning':
     case 'redirect':
-      return {
-        text: 'text-warning',
-        bg: 'bg-warning-300 dark:bg-warning-200',
-      }
+      return 'text-warning'
     case '5':
     case 'error':
-      return {
-        text: 'text-destructive',
-        bg: 'bg-destructive-300 dark:bg-destructive-300/50',
-      }
+      return 'text-destructive'
     default:
-      return {
-        text: 'text-foreground',
-        bg: '',
-      }
+      return 'text-foreground'
   }
 }

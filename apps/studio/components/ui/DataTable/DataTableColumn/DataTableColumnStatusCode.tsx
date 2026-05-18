@@ -12,7 +12,7 @@ export const DataTableColumnStatusCode = ({
   level?: string
   className?: string
 }) => {
-  const colors = getStatusColor(level)
+  const colorClassName = getStatusColor(level)
 
   if (!value) {
     return <Minus className="h-4 w-4 text-muted-foreground/50" />
@@ -20,13 +20,7 @@ export const DataTableColumnStatusCode = ({
 
   return (
     <div className={cn('flex items-center relative', className)}>
-      <div
-        className={cn(
-          'flex items-center justify-center relative font-mono',
-          colors.text,
-          colors.bg
-        )}
-      >
+      <div className={cn('flex items-center justify-center relative font-mono', colorClassName)}>
         {value}
       </div>
     </div>
