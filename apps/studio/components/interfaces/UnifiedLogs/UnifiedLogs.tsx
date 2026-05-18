@@ -33,6 +33,7 @@ import {
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
+import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
@@ -404,7 +405,8 @@ export const UnifiedLogs = () => {
                     </p>
                   </TooltipContent>
                 </Tooltip>
-                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 **:[[cmdk-input-wrapper]]:px-3! [&_button]:px-3! [&_button>span]:h-[26px]! [&_button>span]:py-0! [&_input]:h-[26px]! [&_input]:py-0!">
+                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1">
+                  <LogsFilterBar />
                   <DataTableFilterCommand
                     placeholder="Search logs..."
                     searchParamsParser={SEARCH_PARAMS_PARSER}
