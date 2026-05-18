@@ -98,7 +98,7 @@ export const SlotLagMetricsList = ({
                     <button
                       type="button"
                       aria-label={`What is ${label}`}
-                      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                      className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
                     >
                       <Info size={12} />
                     </button>

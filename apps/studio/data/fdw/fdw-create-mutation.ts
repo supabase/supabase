@@ -1,4 +1,4 @@
-import { getCreateFDWSql } from '@supabase/pg-meta'
+import { getCreateFDWSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -23,7 +23,7 @@ export type FDWCreateVariables = {
   tables: any[]
   sourceSchema: string
   targetSchema: string
-  schemaOptions?: string[]
+  schemaOptions?: SafeSqlFragment[]
 }
 
 export async function createFDW({ projectRef, connectionString, ...rest }: FDWCreateVariables) {

@@ -13,13 +13,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormField,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -94,7 +94,7 @@ export const UpdateForeignSchemaDialog = ({
         <Button type="default">Update schema tables</Button>
       </DialogTrigger>
       <DialogContent size="medium" aria-describedby={undefined}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>Update schema to expose foreign tables</DialogTitle>
@@ -123,7 +123,7 @@ export const UpdateForeignSchemaDialog = ({
               </p>
 
               {schemasAssociatedWithNamespace.length > 1 ? (
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="schema"
                   render={({ field }) => (
@@ -131,21 +131,18 @@ export const UpdateForeignSchemaDialog = ({
                       layout="vertical"
                       label="Select which Postgres schema to update"
                     >
-                      <Select_Shadcn_
-                        value={field.value}
-                        onValueChange={(val) => field.onChange(val)}
-                      >
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
+                      <Select value={field.value} onValueChange={(val) => field.onChange(val)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
                           {schemasAssociatedWithNamespace.map((x) => (
-                            <SelectItem_Shadcn_ key={x} value={x}>
+                            <SelectItem key={x} value={x}>
                               {x}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                        </SelectContent>
+                      </Select>
                     </FormItemLayout>
                   )}
                 />
@@ -155,7 +152,7 @@ export const UpdateForeignSchemaDialog = ({
                 </p>
               )}
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <DocsButton href={`${DOCS_URL}/guides/storage/analytics/query-with-postgres`} />
               <div className="flex items-center gap-x-2">
                 <Button type="default" disabled={isUpdating} onClick={() => setIsOpen(false)}>
@@ -167,7 +164,7 @@ export const UpdateForeignSchemaDialog = ({
               </div>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

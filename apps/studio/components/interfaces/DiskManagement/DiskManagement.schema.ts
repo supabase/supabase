@@ -51,9 +51,11 @@ const baseSchema = z.object({
 export const CreateDiskStorageSchema = ({
   defaultTotalSize,
   cloudProvider,
+  isSpendCapEnabled,
 }: {
   defaultTotalSize: number
   cloudProvider: CloudProvider
+  isSpendCapEnabled: boolean
 }) => {
   const isFlyProject = cloudProvider === 'FLY'
   const isAwsNimbusProject = cloudProvider === 'AWS_NIMBUS'
@@ -69,10 +71,23 @@ export const CreateDiskStorageSchema = ({
       return COMPUTE_MAX_IOPS[parsedCompute.data] ?? Number.POSITIVE_INFINITY
     })()
 
-    if (validateDiskConfiguration && totalSize < 8) {
+    if (validateDiskConfiguration && totalSize < 8 && totalSize !== defaultTotalSize) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Allocated disk size must be at least 8 GB.',
+        message: 'New disk size must be at least 8 GB.',
+        path: ['totalSize'],
+      })
+    }
+
+    if (
+      validateDiskConfiguration &&
+      isSpendCapEnabled &&
+      totalSize > 8 &&
+      totalSize !== defaultTotalSize
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Disable spend cap to increase disk above 8 GB.',
         path: ['totalSize'],
       })
     }

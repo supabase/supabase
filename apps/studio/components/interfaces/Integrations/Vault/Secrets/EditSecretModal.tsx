@@ -13,10 +13,10 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -131,26 +131,26 @@ export const EditSecretModal = () => {
         ) : (
           <>
             <DialogSection>
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form
                   id={formId}
                   className="flex flex-col gap-4"
                   autoComplete="off"
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
-                  <FormField_Shadcn_
+                  <FormField
                     key="name"
                     name="name"
                     control={form.control}
                     render={({ field }) => (
                       <FormItemLayout name="name" label="Name">
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_ id="name" {...field} />
-                        </FormControl_Shadcn_>
+                        <FormControl>
+                          <Input id="name" {...field} />
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     key="description"
                     name="description"
                     control={form.control}
@@ -160,21 +160,21 @@ export const EditSecretModal = () => {
                         label="Description"
                         labelOptional="Optional"
                       >
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_ id="description" {...field} data-lpignore="true" />
-                        </FormControl_Shadcn_>
+                        <FormControl>
+                          <Input id="description" {...field} data-lpignore="true" />
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     key="secret"
                     name="secret"
                     control={form.control}
                     render={({ field }) => (
                       <FormItemLayout name="secret" label="Secret value">
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <div className="relative">
-                            <Input_Shadcn_
+                            <Input
                               id="secret"
                               type={showSecretValue ? 'text' : 'password'}
                               {...field}
@@ -191,12 +191,12 @@ export const EditSecretModal = () => {
                               onClick={() => setShowSecretValue(!showSecretValue)}
                             />
                           </div>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </form>
-              </Form_Shadcn_>
+              </Form>
             </DialogSection>
             <DialogFooter>
               <Button

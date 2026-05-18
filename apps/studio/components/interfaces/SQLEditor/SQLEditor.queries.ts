@@ -92,7 +92,7 @@ for each row execute
     id: 9,
     type: 'template',
     title: 'Increment field value',
-    description: 'Update a field with incrementing value using stored procedure.',
+    description: 'Update a field with incrementing value using a function.',
     sql: `
 create function increment(row_id int)
 returns void as

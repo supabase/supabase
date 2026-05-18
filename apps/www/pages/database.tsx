@@ -4,6 +4,7 @@ import 'swiper/css'
 import { ArrowUpRight, X } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -23,6 +24,8 @@ import ExtensionsExamplesData from '@/data/products/database/extensions-examples
 import HighlightsCards from '@/data/products/database/highlight-cards'
 import SqlViewCarouselData from '@/data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from '@/data/products/database/table-view-carousel.json'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -72,6 +75,27 @@ function Database() {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              softwareApplicationSchema({
+                name: 'Supabase Database',
+                description: meta_description,
+                url: 'https://supabase.com/database',
+                image: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+              })
+            ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.database)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.DATABASE} />
         <ProductHeader
@@ -281,7 +305,7 @@ function Database() {
 
               <div className="mt-4 flex gap-2">
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/docs/guides/database/etl">Read the docs</Link>
+                  <Link href="/docs/guides/database/replication">Read the docs</Link>
                 </Button>
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/supabase-etl">Read the blog post</Link>

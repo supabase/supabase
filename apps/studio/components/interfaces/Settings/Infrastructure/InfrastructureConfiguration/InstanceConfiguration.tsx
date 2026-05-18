@@ -169,7 +169,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                     target: primary.identifier,
                     type: 'smoothstep',
                     animated: true,
-                    className: '!cursor-default',
+                    className: 'cursor-default!',
                   },
                 ]
               : []),
@@ -180,7 +180,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                 target: database.identifier,
                 type: 'smoothstep',
                 animated: true,
-                className: '!cursor-default',
+                className: 'cursor-default!',
                 data: {
                   status: database.status,
                   identifier: database.identifier,

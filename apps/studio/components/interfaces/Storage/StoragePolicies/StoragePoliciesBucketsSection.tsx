@@ -1,14 +1,7 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { ChevronUp, Search, X } from 'lucide-react'
 import { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
-import {
-  Button,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
@@ -22,6 +15,7 @@ import {
 
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { type Bucket } from '@/data/storage/buckets-query'
@@ -29,12 +23,12 @@ import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 export type SelectBucketPolicyForAction = {
   addPolicy: (bucketName?: string, table?: string) => void
-  editPolicy: (policy: PostgresPolicy, bucketName?: string, table?: string) => void
-  deletePolicy: (policy: PostgresPolicy) => void
+  editPolicy: (policy: Policy, bucketName?: string, table?: string) => void
+  deletePolicy: (policy: Policy) => void
 }
 
 type BucketsPoliciesProps = {
-  buckets: { bucket: Bucket; policies: PostgresPolicy[] }[]
+  buckets: { bucket: Bucket; policies: Policy[] }[]
   search?: string
   debouncedSearch?: string
   setSearch: (search: string) => void
@@ -60,7 +54,7 @@ export const BucketsPolicies = ({
 
   return (
     <PageSection>
-      <Collapsible_Shadcn_ open={expanded} onOpenChange={setExpanded}>
+      <Collapsible open={expanded} onOpenChange={setExpanded}>
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Buckets</PageSectionTitle>
@@ -68,7 +62,7 @@ export const BucketsPolicies = ({
               Write policies for each bucket to control access to the bucket and its contents
             </PageSectionDescription>
           </PageSectionSummary>
-          <CollapsibleTrigger_Shadcn_ asChild>
+          <CollapsibleTrigger asChild>
             <button>
               <span className="sr-only">Toggle bucket list</span>
               <ChevronUp
@@ -80,9 +74,9 @@ export const BucketsPolicies = ({
                 )}
               />
             </button>
-          </CollapsibleTrigger_Shadcn_>
+          </CollapsibleTrigger>
         </PageSectionMeta>
-        <CollapsibleContent_Shadcn_>
+        <CollapsibleContent>
           <PageSectionContent className="mt-6">
             {showEmptyState && <StoragePoliciesPlaceholder />}
 
@@ -124,14 +118,14 @@ export const BucketsPolicies = ({
               pagination={pagination}
             />
           </PageSectionContent>
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+        </CollapsibleContent>
+      </Collapsible>
     </PageSection>
   )
 }
 
 type BucketsPoliciesVirtualizedListProps = {
-  items: { bucket: Bucket; policies: PostgresPolicy[] }[]
+  items: { bucket: Bucket; policies: Policy[] }[]
   actions: SelectBucketPolicyForAction
   pagination: BucketsPoliciesProps['pagination']
 }

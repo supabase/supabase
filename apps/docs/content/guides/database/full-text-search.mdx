@@ -665,7 +665,7 @@ select title from books where to_tsvector(title) @@ to_tsquery('Lit:*');
 
 ### Extending functionality with RPC
 
-To make the partial search functionality accessible through the API, you can wrap the search logic in a stored procedure.
+To make the partial search functionality accessible through the API, you can wrap the search logic in a database function.
 
 After creating this function, you can invoke it from your application using the SDK for your platform. Here's an example:
 

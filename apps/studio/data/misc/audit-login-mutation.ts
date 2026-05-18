@@ -22,7 +22,7 @@ export const useAddLoginEvent = ({
   'mutationFn'
 > = {}) => {
   return useMutation<AddLoginEventData, ResponseError, AddLoginEventVariables>({
-    mutationFn: (vars) => addLoginEvent(),
+    mutationFn: () => addLoginEvent(),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

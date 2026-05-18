@@ -8,7 +8,7 @@ const Hero = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
-    <div className="relative -mt-[65px]">
+    <div className="relative mt-[-65px]">
       <SectionContainer className="pt-8 pb-10 md:pt-16 overflow-hidden">
         <div className="relative">
           <div className="mx-auto">

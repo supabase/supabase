@@ -1,13 +1,7 @@
 import { isEqual } from 'lodash'
 import { Filter as FilterIcon, Plus } from 'lucide-react'
 import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
-import {
-  Button,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
+import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
 
 import FilterRow from './FilterRow'
 import type { Filter } from '@/components/grid/types'
@@ -86,13 +80,13 @@ export const FilterPopoverPrimitive = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <Button type={filters.length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
           {displayButtonText}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-96" side="bottom" align="start">
         <div className="space-y-2 py-2">
           <div className="space-y-2">
             {localFilters.map((filter, index) => (
@@ -114,7 +108,7 @@ export const FilterPopoverPrimitive = ({
               </div>
             )}
           </div>
-          <PopoverSeparator_Shadcn_ />
+          <PopoverSeparator />
           <div className="px-3 flex flex-row justify-between">
             <Button icon={<Plus />} type="dashed" onClick={onAddFilter}>
               Add filter
@@ -128,7 +122,7 @@ export const FilterPopoverPrimitive = ({
             </Button>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

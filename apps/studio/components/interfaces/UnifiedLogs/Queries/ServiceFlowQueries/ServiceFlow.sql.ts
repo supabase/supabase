@@ -29,8 +29,6 @@ type EdgeServiceType = keyof typeof SERVICE_CONFIGS
  * to eliminate 500+ lines of SQL duplication
  */
 const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType): string => {
-  const config = SERVICE_CONFIGS[serviceType]
-
   return `
   select 
       id,

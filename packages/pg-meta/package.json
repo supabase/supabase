@@ -8,11 +8,8 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
-    "test": "run-s db:clean db:run test:run db:clean",
-    "db:clean": "cd test/db && docker compose down",
-    "db:run": "cd test/db && docker compose up --detach --wait",
-    "test:run": "vitest run --coverage",
-    "test:update": "vitest run --update",
+    "test": "test/run-tests.sh vitest run --coverage",
+    "test:update": "test/run-tests.sh vitest run --update",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit"
   },

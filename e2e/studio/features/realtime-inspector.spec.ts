@@ -118,9 +118,7 @@ test.describe('Realtime Inspector', () => {
 
       await openBroadcastModal(page)
 
-      const codeEditor = page.getByRole('textbox', { name: /Editor content/i })
-      await expect(codeEditor).toBeInViewport({ timeout: 5000 })
-      await codeEditor.click({ force: true })
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.press('ControlOrMeta+KeyA')
       await page.keyboard.type('{ invalid json }')
 

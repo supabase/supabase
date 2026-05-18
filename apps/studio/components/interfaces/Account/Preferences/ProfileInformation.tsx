@@ -7,15 +7,15 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -30,7 +30,6 @@ import z from 'zod'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useProfileUpdateMutation } from '@/data/profile/profile-update-mutation'
 import { useProfile } from '@/lib/profile'
-import type { FormSchema } from '@/types'
 
 const FormSchema = z.object({
   first_name: z.string().optional(),
@@ -96,37 +95,37 @@ export const ProfileInformation = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
             <Card>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="first_name"
                   render={({ field }) => (
                     <FormItemLayout label="First name" layout="flex-row-reverse">
-                      <FormControl_Shadcn_ className="col-span-8">
-                        <Input_Shadcn_ {...field} placeholder="First name" className="w-full" />
-                      </FormControl_Shadcn_>
+                      <FormControl className="col-span-8">
+                        <Input {...field} placeholder="First name" className="w-full" />
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="last_name"
                   render={({ field }) => (
                     <FormItemLayout label="Last name" layout="flex-row-reverse">
-                      <FormControl_Shadcn_ className="col-span-8">
-                        <Input_Shadcn_ {...field} placeholder="Last name" className="w-full" />
-                      </FormControl_Shadcn_>
+                      <FormControl className="col-span-8">
+                        <Input {...field} placeholder="Last name" className="w-full" />
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="primary_email"
                   render={({ field }) => (
@@ -139,33 +138,33 @@ export const ProfileInformation = () => {
                       }
                       layout="flex-row-reverse"
                     >
-                      <FormControl_Shadcn_ className="col-span-8">
+                      <FormControl className="col-span-8">
                         <div className="flex flex-col gap-1">
-                          <Select_Shadcn_
+                          <Select
                             value={field.value}
                             onValueChange={field.onChange}
                             disabled={profile?.is_sso_user}
                           >
-                            <SelectTrigger_Shadcn_ className="col-span-8 w-full">
-                              <SelectValue_Shadcn_ placeholder="Select primary email" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_ className="col-span-8">
+                            <SelectTrigger className="col-span-8 w-full">
+                              <SelectValue placeholder="Select primary email" />
+                            </SelectTrigger>
+                            <SelectContent className="col-span-8">
                               {isIdentitiesSuccess &&
                                 dedupedIdentityEmails.map((email) => (
-                                  <SelectItem_Shadcn_ key={email} value={email}>
+                                  <SelectItem key={email} value={email}>
                                     {email}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </div>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="username"
                   render={({ field }) => (
@@ -178,16 +177,16 @@ export const ProfileInformation = () => {
                       }
                       layout="flex-row-reverse"
                     >
-                      <FormControl_Shadcn_ className="col-span-8">
+                      <FormControl className="col-span-8">
                         <div className="flex flex-col gap-1">
-                          <Input_Shadcn_
+                          <Input
                             {...field}
                             className="w-full"
                             placeholder="Username"
                             disabled={profile?.is_sso_user}
                           />
                         </div>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -209,7 +208,7 @@ export const ProfileInformation = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

@@ -28,7 +28,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
     <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
       <div className="flex flex-col md:flex-row md:items-center gap-3">
         <div className="flex flex-row items-center gap-3">
-          <div className="flex h-6 w-6 items-center justify-center rounded border border-brand-600 bg-brand-300 text-brand">
+          <div className="flex h-6 w-6 items-center justify-center rounded-sm border border-brand-600 bg-brand-300 text-brand">
             <List size={14} strokeWidth={3} />
           </div>
 
@@ -81,7 +81,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                   unnesting joins
                   <ExternalLink
                     size={14}
-                    className="ml-1 inline -translate-y-[2px]"
+                    className="ml-1 inline translate-y-[-2px]"
                     strokeWidth={1.5}
                   />
                 </Link>
@@ -105,10 +105,10 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
               >
                 <Table
                   head={[
-                    <Table.th className="text-xs !p-2" key="path">
+                    <Table.th className="text-xs p-2!" key="path">
                       Path
                     </Table.th>,
-                    <Table.th key="type" className="text-xs !p-2">
+                    <Table.th key="type" className="text-xs p-2!">
                       Type
                     </Table.th>,
                   ]}
@@ -142,7 +142,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
+        className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -171,7 +171,7 @@ const Field = ({
           </Tooltip>
         )}
       </Table.td>
-      <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
+      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
     </Table.tr>
   )
 }

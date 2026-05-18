@@ -13,7 +13,6 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'

@@ -7,7 +7,7 @@ hideToc: true
 
 ## Get started
 
-The fastest and recommended way to self-host Supabase is using Docker.
+The fastest and recommended way to self-host Supabase is to use Docker.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   <div className="md:col-span-6 xl:col-span-4 relative" key="/guides/self-hosting/docker">
@@ -55,7 +55,7 @@ There are several other options to deploy Supabase. If you're interested in help
 
 ## About self-hosting
 
-Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent using managed services, or want to run Supabase in an isolated environment.
+Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent you from using managed services, or want to run Supabase in an isolated environment.
 
 ### How self-hosted Supabase differs
 
@@ -64,11 +64,7 @@ Self-hosted Supabase is different from:
 - **Supabase CLI** (local development), which is intended for development and testing only.
 - **Managed Supabase** platform, which is fully hosted and operated by Supabase.
 
-### Telemetry
-
-Self-hosted Supabase (Docker) does not phone home or collect any telemetry.
-
-The **Supabase CLI** is a [separate tool](/docs/guides/local-development/cli/getting-started) from self-hosted Supabase and collects usage telemetry to help improve the developer experience. You can opt out by running `supabase telemetry disable` or setting `SUPABASE_TELEMETRY_DISABLED=1`. See [CLI telemetry](/docs/guides/local-development/cli/getting-started#telemetry) for other opt-out methods.
+Self-hosted Supabase mimics a single project. Studio doesn't support multiple organizations or projects. Platform-only [features](/features) such as branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable** in self-hosted configuration. Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
 
 ### Your responsibilities when self-hosting
 
@@ -76,9 +72,17 @@ When you self-host, **you are responsible for**:
 
 - Server provisioning and maintenance
 - Security hardening and keeping OS and services updated
-- Maintaining the Postgres database
+- Service configuration and management
+- Postgres database maintenance
+- High availability and scalability
 - Backups and disaster recovery
 - Monitoring and uptime
+
+### Telemetry
+
+Self-hosted Supabase (run via Docker Compose) **does not phone home or collect any telemetry**.
+
+The **Supabase CLI** is a [separate tool](/docs/guides/local-development/cli/getting-started) and collects usage telemetry to help improve the developer experience. See [CLI telemetry](/docs/guides/local-development/cli/getting-started#telemetry) for opt-out methods.
 
 ## Support and community
 

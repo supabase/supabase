@@ -478,12 +478,12 @@ export function SurveyChart({
             !dataLoading &&
             !dataError &&
             chartData.length > 3 && (
-              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-gradient-to-b from-transparent to-background">
+              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-linear-to-b from-transparent to-background">
                 <Button
                   type="default"
                   size="tiny"
                   onClick={() => setIsExpanded(true)}
-                  className="shadow-sm"
+                  className="shadow-xs"
                 >
                   Show more
                 </Button>

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useFormContext } from 'react-hook-form'
-import { FormLabel_Shadcn_, SheetSection } from 'ui'
+import { FormLabel, SheetSection } from 'ui'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
@@ -36,7 +36,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
 
   return (
     <SheetSection>
-      <FormLabel_Shadcn_>HTTP Headers</FormLabel_Shadcn_>
+      <FormLabel>HTTP Headers</FormLabel>
       <KeyValueFieldArray
         control={form.control}
         name="values.httpHeaders"

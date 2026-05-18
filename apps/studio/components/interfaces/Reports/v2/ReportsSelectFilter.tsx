@@ -99,7 +99,7 @@ export const ReportsSelectFilter = ({
                   <Label
                     key={option.value}
                     className={
-                      'flex items-center overflow-hidden p-1 rounded-sm gap-x-3 w-full h-full'
+                      'flex items-center overflow-hidden p-1 rounded-xs gap-x-3 w-full h-full'
                     }
                   >
                     <Checkbox

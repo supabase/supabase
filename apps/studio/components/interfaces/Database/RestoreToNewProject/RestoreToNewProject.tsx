@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -92,7 +92,6 @@ export const RestoreToNewProject = () => {
       enabled: PHYSICAL_BACKUPS_ENABLED || PITR_ENABLED,
     }
   )
-  const IS_CLONED_PROJECT = cloneStatus?.cloned_from?.source_project?.ref ? true : false
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
 
   useEffect(() => {
@@ -186,22 +185,6 @@ export const RestoreToNewProject = () => {
     return <GenericSkeletonLoader />
   }
 
-  if (IS_CLONED_PROJECT) {
-    return (
-      <Admonition type="default" title="This project cannot be restored to a new project">
-        <Markdown
-          className="max-w-full [&>p]:!leading-normal"
-          content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project.`}
-        />
-        <Button asChild type="default">
-          <Link href={`/project/${cloneStatus?.cloned_from?.source_project?.ref || ''}`}>
-            Go to original project
-          </Link>
-        </Button>
-      </Admonition>
-    )
-  }
-
   if (isError) {
     return <AlertError error={error} subject="Failed to retrieve backups" />
   }
@@ -274,10 +257,10 @@ export const RestoreToNewProject = () => {
         }}
       />
       {isRestoring ? (
-        <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light mb-6">
+        <Alert className="[&>svg]:bg-none! [&>svg]:text-foreground-light mb-6">
           <Loader2 className="animate-spin" />
-          <AlertTitle_Shadcn_>Restoration in progress</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Restoration in progress</AlertTitle>
+          <AlertDescription>
             <p>
               The new project {(restoringClone?.target_project as any)?.name || ''} is currently
               being created. You'll be able to restore again once the project is ready.
@@ -287,8 +270,8 @@ export const RestoreToNewProject = () => {
                 Go to new project
               </Link>
             </Button>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       ) : null}
       {previousClones?.length ? (
         <div className="flex flex-col gap-2">

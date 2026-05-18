@@ -1,13 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  cn,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverAnchor_Shadcn_,
-  PopoverContent_Shadcn_,
-} from 'ui'
+import { cn, Input, Popover, PopoverAnchor, PopoverContent } from 'ui'
 
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
@@ -182,12 +176,10 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
             </React.Fragment>
           )
         })}
-        <Popover_Shadcn_
-          open={isActive && !isLoading && items.length > 0 && !highlightedConditionPath}
-        >
-          <PopoverAnchor_Shadcn_ asChild>
+        <Popover open={isActive && !isLoading && items.length > 0 && !highlightedConditionPath}>
+          <PopoverAnchor asChild>
             {isRootGroup ? (
-              <Input_Shadcn_
+              <Input
                 ref={freeformInputRef}
                 type="text"
                 value={isActive ? freeformText : localFreeformValue}
@@ -195,7 +187,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onFocus={() => handleGroupFreeformFocus(path)}
                 onBlur={handleFreeformBlur}
                 onKeyDown={handleFreeformKeyDown}
-                className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-1"
+                className="border-none bg-transparent text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-1"
                 placeholder={
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
@@ -208,7 +200,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
               />
             ) : (
               <div className="relative inline-block py-1">
-                <Input_Shadcn_
+                <Input
                   ref={freeformInputRef}
                   type="text"
                   value={isActive ? freeformText : localFreeformValue}
@@ -216,7 +208,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   onFocus={() => handleGroupFreeformFocus(path)}
                   onBlur={handleFreeformBlur}
                   onKeyDown={handleFreeformKeyDown}
-                  className="h-full border-none bg-transparent py-0 text-xs md:text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
+                  className="h-full border-none bg-transparent py-0 text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
                   placeholder="+ Add filter"
                   disabled={isLoading}
                   autoComplete="off"
@@ -229,8 +221,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 </span>
               </div>
             )}
-          </PopoverAnchor_Shadcn_>
-          <PopoverContent_Shadcn_
+          </PopoverAnchor>
+          <PopoverContent
             className="min-w-[220px] p-0"
             align="start"
             side="bottom"
@@ -249,8 +241,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
               onSelect={handleSelectMenuItem}
               includeIcon
             />
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   )

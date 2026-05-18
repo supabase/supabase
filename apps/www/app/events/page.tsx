@@ -1,6 +1,8 @@
-import type { Metadata } from 'next'
-import { getNotionEvents } from '~/lib/events'
 import { EventClientRenderer } from '~/components/Events/new/EventClientRenderer'
+import { breadcrumbs } from '~/lib/breadcrumbs'
+import { getMdxEvents, getNotionEvents } from '~/lib/events'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'View all Supabase events and meetups.',
@@ -9,7 +11,20 @@ export const metadata: Metadata = {
 }
 
 export default async function EventsPage() {
-  const notionEvents = await getNotionEvents()
+  const [notionEvents, mdxEvents] = await Promise.all([
+    getNotionEvents(),
+    Promise.resolve(getMdxEvents()),
+  ])
 
-  return <EventClientRenderer notionEvents={notionEvents} />
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.eventsIndex)),
+        }}
+      />
+      <EventClientRenderer notionEvents={notionEvents} mdxEvents={mdxEvents} />
+    </>
+  )
 }

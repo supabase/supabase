@@ -1,22 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetContent,
@@ -76,7 +76,7 @@ const defaultValues: z.infer<typeof FormSchema> = {
 }
 
 interface TriggerSheetProps {
-  selectedTrigger?: PostgresTrigger
+  selectedTrigger?: PGTrigger
   isDuplicatingTrigger?: boolean
   open: boolean
   onClose: () => void
@@ -201,13 +201,13 @@ export const TriggerSheet = ({
             </SheetTitle>
           </SheetHeader>
 
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               className="flex-1 flex flex-col gap-y-6 overflow-auto py-6"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 name="name"
                 control={form.control}
                 render={({ field }) => (
@@ -217,15 +217,15 @@ export const TriggerSheet = ({
                     label="Name of trigger"
                     description="Do not use spaces/whitespace."
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="Name of trigger" />
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Input {...field} placeholder="Name of trigger" />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
 
               {isEditing ? (
-                <FormField_Shadcn_
+                <FormField
                   name="enabled_mode"
                   control={form.control}
                   render={({ field }) => (
@@ -235,24 +235,24 @@ export const TriggerSheet = ({
                       label="Enabled mode"
                       description="Determines if a trigger should or should not fire. Can also be used to disable a trigger, but not delete it."
                     >
-                      <FormControl_Shadcn_>
-                        <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_ className="col-span-8">
+                      <FormControl>
+                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className="col-span-8">
                             {
                               TRIGGER_ENABLED_MODES.find((option) => option.value === field.value)
                                 ?.label
                             }
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                          </SelectTrigger>
+                          <SelectContent>
                             {TRIGGER_ENABLED_MODES.map((option) => (
-                              <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                              <SelectItem key={option.value} value={option.value}>
                                 <p className="text-foreground">{option.label}</p>
                                 <p className="text-foreground-lighter">{option.description}</p>
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -260,7 +260,7 @@ export const TriggerSheet = ({
                 <>
                   <Separator />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="tableId"
                     control={form.control}
                     render={({ field }) => (
@@ -270,8 +270,8 @@ export const TriggerSheet = ({
                         label="Table"
                         description="Trigger will watch for changes on this table"
                       >
-                        <FormControl_Shadcn_>
-                          <Select_Shadcn_
+                        <FormControl>
+                          <Select
                             defaultValue={field.value}
                             onValueChange={(val) => {
                               // mark table ID as dirty to trigger validation
@@ -283,24 +283,24 @@ export const TriggerSheet = ({
                               }
                             }}
                           >
-                            <SelectTrigger_Shadcn_ className="col-span-8">
-                              <SelectValue_Shadcn_ />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger className="col-span-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
                               {tables.map((table) => (
-                                <SelectItem_Shadcn_ key={table.id} value={table.id.toString()}>
+                                <SelectItem key={table.id} value={table.id.toString()}>
                                   <span className="text-foreground-light">{table.schema}.</span>
                                   <span className="text-foreground">{table.name}</span>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="events"
                     control={form.control}
                     render={() => (
@@ -311,7 +311,7 @@ export const TriggerSheet = ({
                         description="These are the events that are watched by the trigger, only the events selected above will fire the trigger on the table you've selected."
                       >
                         {TRIGGER_EVENTS.map((event) => (
-                          <FormField_Shadcn_
+                          <FormField
                             key={event.value}
                             control={form.control}
                             name="events"
@@ -322,8 +322,8 @@ export const TriggerSheet = ({
                                 label={event.label}
                                 description={event.description}
                               >
-                                <FormControl_Shadcn_>
-                                  <Checkbox_Shadcn_
+                                <FormControl>
+                                  <Checkbox
                                     className="translate-y-[2px]"
                                     checked={field.value?.includes(event.value)}
                                     onCheckedChange={(checked) => {
@@ -334,7 +334,7 @@ export const TriggerSheet = ({
                                           )
                                     }}
                                   />
-                                </FormControl_Shadcn_>
+                                </FormControl>
                               </FormItemLayout>
                             )}
                           />
@@ -343,7 +343,7 @@ export const TriggerSheet = ({
                     )}
                   />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="activation"
                     control={form.control}
                     render={({ field }) => (
@@ -353,26 +353,26 @@ export const TriggerSheet = ({
                         label="Trigger type"
                         description="Determines when your trigger fires"
                       >
-                        <FormControl_Shadcn_>
-                          <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_ className="col-span-8">
+                        <FormControl>
+                          <Select defaultValue={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="col-span-8">
                               {TRIGGER_TYPES.find((option) => option.value === field.value)?.label}
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            </SelectTrigger>
+                            <SelectContent>
                               {TRIGGER_TYPES.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   <p className="text-foreground">{option.label}</p>
                                   <p className="text-foreground-lighter">{option.description}</p>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="orientation"
                     control={form.control}
                     render={({ field }) => (
@@ -382,44 +382,44 @@ export const TriggerSheet = ({
                         label="Orientation"
                         description="Identifies whether the trigger fires once for each processed row or once for each statement"
                       >
-                        <FormControl_Shadcn_>
-                          <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_ className="col-span-8">
+                        <FormControl>
+                          <Select defaultValue={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="col-span-8">
                               {
                                 TRIGGER_ORIENTATIONS.find((option) => option.value === field.value)
                                   ?.label
                               }
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            </SelectTrigger>
+                            <SelectContent>
                               {TRIGGER_ORIENTATIONS.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   <p className="text-foreground">{option.label}</p>
                                   <p className="text-foreground-lighter">{option.description}</p>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
 
                   <Separator />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="function_name"
                     control={form.control}
                     render={() => (
                       <FormItemLayout layout="vertical" className="px-5">
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <div className="flex flex-col gap-y-2">
                             <p className="text-sm">Function to trigger</p>
                             {function_name.length === 0 ? (
                               <button
                                 type="button"
                                 className={cn(
-                                  'relative w-full rounded border border-default',
-                                  'bg-surface-200 px-5 py-1 shadow-sm transition-all',
+                                  'relative w-full rounded-sm border border-default',
+                                  'bg-surface-200 px-5 py-1 shadow-xs transition-all',
                                   'hover:border-strong hover:bg-overlay-hover'
                                 )}
                                 onClick={() => setShowFunctionSelector(true)}
@@ -434,11 +434,11 @@ export const TriggerSheet = ({
                                 className={cn(
                                   'relative w-full flex items-center justify-between',
                                   'space-x-3 px-5 py-4 border border-default',
-                                  'rounded shadow-sm transition-shadow'
+                                  'rounded-sm shadow-xs transition-shadow'
                                 )}
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-foreground text-background focus-within:bg-foreground/10">
                                     <Terminal size="18" strokeWidth={2} width={14} />
                                   </div>
                                   <p>
@@ -458,14 +458,14 @@ export const TriggerSheet = ({
                               </div>
                             )}
                           </div>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
 
           <SheetFooter className="shrink-0">
             <Button

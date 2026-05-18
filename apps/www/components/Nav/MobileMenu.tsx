@@ -87,11 +87,11 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
               rounded-lg border
               bg-alternative-200 text-foreground-light
               hover:text-foreground hover:border-foreground-muted
-              focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none
-              focus-visible:rounded focus-visible:ring-foreground-lighter
+              focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-hidden
+              focus-visible:rounded-sm focus-visible:ring-foreground-lighter
             "
           >
-            <div className="flex flex-col gap-1 !leading-3">
+            <div className="flex flex-col gap-1 leading-3!">
               <span>Features</span>
               <span className="text-foreground-lighter text-xs leading-4">
                 Explore everything you can do with Supabase.
@@ -119,7 +119,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                   url={link.url}
                   label={link.text}
                   counter={link.text === 'Careers' && jobsCount > 0 ? jobsCount : undefined}
-                  className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay !mt-0"
+                  className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay mt-0!"
                 />
               ))}
             </div>
@@ -158,7 +158,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                   key={link.text}
                   url={link.url}
                   label={link.text}
-                  className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay !mt-0"
+                  className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay mt-0!"
                 />
               ))}
             </div>
@@ -178,7 +178,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
       chevronAlign="right"
     >
       {menu.primaryNav.map((menuItem: any) => (
-        <m.div variants={listItem} className="border-b [&>div]:!rounded-none" key={menuItem.title}>
+        <m.div variants={listItem} className="border-b [&>div]:rounded-none!" key={menuItem.title}>
           {menuItem.hasDropdown ? (
             <Accordion.Item
               header={menuItem.title}
@@ -190,7 +190,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
           ) : (
             <Link
               href={menuItem.url}
-              className="block py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded"
+              className="block py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:rounded-sm"
             >
               {menuItem.title}
             </Link>
@@ -209,20 +209,20 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
             initial="hidden"
             animate="show"
             exit="exit"
-            className="bg-overlay fixed overflow-hidden inset-0 z-50 h-screen max-h-screen w-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] transform"
+            className="bg-overlay fixed overflow-hidden inset-0 z-50 h-screen max-h-screen w-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-svh transform"
           >
-            <div className="absolute h-16 px-6 flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay before:content[''] before:absolute before:w-full before:h-3 before:inset-0 before:top-full before:bg-gradient-to-b before:from-background-overlay before:to-transparent">
+            <div className="absolute h-16 px-6 flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay before:content[''] before:absolute before:w-full before:h-3 before:inset-0 before:top-full before:bg-linear-to-b before:from-background-overlay before:to-transparent">
               <Link
                 href="/"
                 as="/"
-                className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+                className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs"
               >
                 <SupabaseWordmark />
               </Link>
               <button
                 onClick={() => setOpen(false)}
                 type="button"
-                className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter focus:ring-brand hover:text-foreground-light transition-colors focus:outline-none focus:ring-2 focus:ring-inset"
+                className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter focus:ring-brand hover:text-foreground-light transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset"
               >
                 <span className="sr-only">Close menu</span>
                 <svg
@@ -242,7 +242,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                 </svg>
               </button>
             </div>
-            <div className="max-h-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] overflow-y-auto pt-20 pb-32 px-4">
+            <div className="max-h-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-svh overflow-y-auto pt-20 pb-32 px-4">
               <Menu />
             </div>
             <div className="absolute bottom-0 left-0 right-0 top-auto w-full bg-alternative flex items-stretch p-4 gap-4">

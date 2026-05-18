@@ -11,12 +11,12 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -81,48 +81,48 @@ export const AddNewSecretModal = () => {
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="space-y-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               noValidate
               onSubmit={form.handleSubmit(onAddNewSecret)}
               className="space-y-4"
             >
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Name">
-                    <FormControl_Shadcn_ className="col-span-6">
-                      <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    <FormControl className="col-span-6">
+                      <Input {...field} />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Description" labelOptional="Optional">
-                    <FormControl_Shadcn_ className="col-span-6">
-                      <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    <FormControl className="col-span-6">
+                      <Input {...field} />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="secret"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Secret value">
-                    <FormControl_Shadcn_ className="col-span-6">
-                      <Input reveal copy {...field} />
-                    </FormControl_Shadcn_>
+                    <FormControl className="col-span-6">
+                      <PasswordInput reveal copy {...field} />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           <Button type="default" disabled={isSubmitting} onClick={handleClose}>

@@ -118,7 +118,7 @@ export const LogsBarChart = ({
                   active={props.active}
                   payload={filteredPayload}
                   label={props.label}
-                  className="text-foreground-light -mt-5 !transition-none"
+                  className="text-foreground-light -mt-5 transition-none!"
                   labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
                 />
               )

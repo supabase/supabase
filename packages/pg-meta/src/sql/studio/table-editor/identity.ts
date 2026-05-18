@@ -9,7 +9,15 @@ export const getUpdateIdentitySequenceSQL = ({
   table: string
   column: string
 }): SafeSqlFragment => {
-  return safeSql`SELECT setval(${literal(`${ident(schema)}.${ident(`${table}_${column}_seq`)}`)}::regclass, (SELECT COALESCE(MAX(${ident(column)}), 1) FROM ${ident(schema)}.${ident(table)}))`
+  return safeSql`WITH sequence_reference AS (
+  SELECT pg_get_serial_sequence(${literal(`${schema}.${table}`)}, ${literal(column)}) AS sequence_name
+)
+SELECT setval(
+  sequence_reference.sequence_name,
+  COALESCE((SELECT MAX(${ident(column)}) FROM ${ident(schema)}.${ident(table)}), 1)
+)
+FROM sequence_reference
+WHERE sequence_reference.sequence_name IS NOT NULL`
 }
 
 export const getDuplicateIdentitySequenceSQL = ({

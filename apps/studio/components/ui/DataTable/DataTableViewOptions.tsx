@@ -1,16 +1,16 @@
 import { GripVertical, Settings2 } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
   CommandGroup_Shadcn_ as CommandGroup,
   CommandInput_Shadcn_ as CommandInput,
   CommandItem_Shadcn_ as CommandItem,
   CommandList_Shadcn_ as CommandList,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
@@ -50,7 +50,12 @@ export function DataTableViewOptions() {
       </PopoverTrigger>
       <PopoverContent id={listboxId} side="bottom" align="end" className="w-[200px] p-0">
         <Command>
-          <CommandInput value={search} onValueChange={setSearch} placeholder="Search columns..." />
+          <CommandInput
+            value={search}
+            onValueChange={setSearch}
+            placeholder="Search columns..."
+            className="text-xs"
+          />
           <CommandList>
             <CommandEmpty>No option found.</CommandEmpty>
             <CommandGroup>
@@ -74,7 +79,7 @@ export function DataTableViewOptions() {
                         className="capitalize p-1"
                         disabled={drag}
                       >
-                        <Checkbox_Shadcn_ checked={column.getIsVisible()} className="mr-2" />
+                        <Checkbox checked={column.getIsVisible()} className="mr-2" />
                         <span>{(column.columnDef.meta as any)?.label || column.id}</span>
                         {enableColumnOrdering && !search ? (
                           <SortableDragHandle

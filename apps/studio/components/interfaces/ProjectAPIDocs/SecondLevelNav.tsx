@@ -40,13 +40,13 @@ const StoredProceduresSecondLevelNav = () => {
   return (
     <SecondLevelNavLayout
       category={API_DOCS_CATEGORIES.STORED_PROCEDURES}
-      title="Stored Procedures"
+      title="Database Functions"
       docsUrl={`${DOCS_URL}/reference/javascript/rpc`}
       renderResourceList={(props) => (
         <ResourcePickerList
           {...props}
           items={functions}
-          emptyMessage="No stored procedures available"
+          emptyMessage="No database functions available"
         />
       )}
     />

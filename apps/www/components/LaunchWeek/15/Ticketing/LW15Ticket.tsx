@@ -42,7 +42,7 @@ const LW15Ticket = ({
     <div
       ref={tilt}
       className={cn(
-        'min-h-[400px] transition-colors border duration-300 [&_*]:transition-colors [&_*]:duration-300 max-h-[500px] h-[70%] w-auto aspect-[278/443] flex flex-col shadow-2xl rounded-md overflow-hidden',
+        'min-h-[400px] transition-colors border duration-300 **:transition-colors **:duration-300 max-h-[500px] h-[70%] w-auto aspect-278/443 flex flex-col shadow-2xl rounded-md overflow-hidden',
         className
       )}
       style={{ background: bg, color: fg }}

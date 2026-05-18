@@ -126,6 +126,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-description-only": {
+      name: "admonition-description-only",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-description-only")),
+      source: "",
+      files: ["registry/default/example/admonition-description-only.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "admonition-warning": {
       name: "admonition-warning",
       type: "components:example",
@@ -133,6 +144,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/admonition-warning")),
       source: "",
       files: ["registry/default/example/admonition-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "admonition-success": {
+      name: "admonition-success",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-success")),
+      source: "",
+      files: ["registry/default/example/admonition-success.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -170,13 +192,13 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "alert-collapsible-demo": {
-      name: "alert-collapsible-demo",
+    "collapsible-alert-demo": {
+      name: "collapsible-alert-demo",
       type: "components:example",
-      registryDependencies: ["alert","collapsible","button"],
-      component: React.lazy(() => import("@/registry/default/example/alert-collapsible-demo")),
+      registryDependencies: ["collapsible-alert"],
+      component: React.lazy(() => import("@/registry/default/example/collapsible-alert-demo")),
       source: "",
-      files: ["registry/default/example/alert-collapsible-demo.tsx"],
+      files: ["registry/default/example/collapsible-alert-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2564,6 +2586,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/multi-select-inline-search-input")),
       source: "",
       files: ["registry/default/example/multi-select-inline-search-input.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-in-dialog": {
+      name: "multi-select-in-dialog",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-in-dialog")),
+      source: "",
+      files: ["registry/default/example/multi-select-in-dialog.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

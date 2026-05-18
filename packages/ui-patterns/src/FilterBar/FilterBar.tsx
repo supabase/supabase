@@ -2,18 +2,21 @@
 
 import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
-import React from 'react'
+import React, { forwardRef } from 'react'
 import { cn } from 'ui'
 
-import { FilterBarRoot, useFilterBar, type FilterBarVariant } from './FilterBarContext'
+import {
+  FilterBarHandle,
+  FilterBarRoot,
+  useFilterBar,
+  type FilterBarVariant,
+} from './FilterBarContext'
 import { FilterGroup } from './FilterGroup'
 import { FilterBarAction, FilterGroup as FilterGroupType, FilterProperty } from './types'
 
 export type FilterBarProps = {
   filterProperties: FilterProperty[]
-  onFilterChange: (filters: FilterGroupType) => void
   freeformText: string
-  onFreeformTextChange: (freeformText: string) => void
   filters: FilterGroupType
   actions?: FilterBarAction[]
   isLoading?: boolean
@@ -21,10 +24,20 @@ export type FilterBarProps = {
   supportsOperators?: boolean
   variant?: FilterBarVariant
   icon?: React.ReactNode
+  onFilterChange: (filters: FilterGroupType) => void
+  onFreeformTextChange: (freeformText: string) => void
 }
 
 function FilterBarContent({ className }: { className?: string }) {
-  const { filters, error, optionsError, isLoading, variant, icon: loadingIcon } = useFilterBar()
+  const {
+    filters,
+    error,
+    optionsError,
+    isLoading,
+    variant,
+    icon: loadingIcon,
+    handleGroupFreeformFocus,
+  } = useFilterBar()
 
   return (
     <div className="w-full space-y-2 relative">
@@ -37,8 +50,10 @@ function FilterBarContent({ className }: { className?: string }) {
         <div
           className={cn(
             'relative flex items-center justify-center shrink-0 px-2 bg-surface-200',
-            variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r'
+            variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r',
+            !isLoading && 'cursor-pointer'
           )}
+          onClick={() => !isLoading && handleGroupFreeformFocus([])}
         >
           <div
             className={cn(
@@ -99,21 +114,25 @@ function FilterBarContent({ className }: { className?: string }) {
  * </FilterBar.Root>
  * ```
  */
-export function FilterBar({
-  filterProperties,
-  filters,
-  onFilterChange,
-  freeformText,
-  onFreeformTextChange,
-  actions,
-  isLoading,
-  className,
-  supportsOperators = false,
-  variant = 'default',
-  icon,
-}: FilterBarProps) {
+export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function FilterBar(
+  {
+    filterProperties,
+    filters,
+    onFilterChange,
+    freeformText,
+    onFreeformTextChange,
+    actions,
+    isLoading,
+    className,
+    supportsOperators = false,
+    variant = 'default',
+    icon,
+  },
+  ref
+) {
   return (
     <FilterBarRoot
+      ref={ref}
       filterProperties={filterProperties}
       filters={filters}
       onFilterChange={onFilterChange}
@@ -128,9 +147,11 @@ export function FilterBar({
       <FilterBarContent className={className} />
     </FilterBarRoot>
   )
-}
+})
 
 // Composable API exports
-FilterBar.Root = FilterBarRoot
-FilterBar.Content = FilterBarContent
-FilterBar.Group = FilterGroup
+Object.assign(FilterBar, {
+  Root: FilterBarRoot,
+  Content: FilterBarContent,
+  Group: FilterGroup,
+})

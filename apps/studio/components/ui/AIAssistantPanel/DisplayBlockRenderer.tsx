@@ -1,5 +1,7 @@
+import { acceptUntrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import type { ToolUIPart } from 'ai'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
@@ -12,17 +14,16 @@ import { entityTypeKeys } from '@/data/entity-types/keys'
 import { lintKeys } from '@/data/lint/keys'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useChangedSync } from '@/hooks/misc/useChanged'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface DisplayBlockRendererProps {
   messageId: string
   toolCallId: string
   initialArgs: {
-    sql: string
+    sql: UntrustedSqlFragment
     label?: string
     isWriteQuery?: boolean
     view?: 'table' | 'chart'
@@ -30,13 +31,19 @@ interface DisplayBlockRendererProps {
     yAxis?: string
   }
   initialResults?: unknown
-  onResults?: (args: { messageId: string; results: unknown }) => void
+  /** Called when locally running SQL fails before or during client-side execution. */
   onError?: (args: { messageId: string; errorText: string }) => void
-  toolState?: 'input-streaming' | 'input-available' | 'output-available' | 'output-error'
+  /** Responds affirmatively to an AI SDK tool approval request; does not run SQL directly. */
+  onApprove?: () => void
+  /** Responds negatively to an AI SDK tool approval request; does not run SQL directly. */
+  onDeny?: () => void
+  /** AI SDK tool state used to show approval UI for pending tool calls. */
+  toolState?: ToolUIPart['state']
   isLastPart?: boolean
   isLastMessage?: boolean
   showConfirmFooter?: boolean
   onChartConfigChange?: (chartConfig: ChartConfig) => void
+  /** Called when the user clicks the query block play button to run SQL locally. */
   onQueryRun?: (queryType: 'select' | 'mutation') => void
 }
 
@@ -45,8 +52,9 @@ export const DisplayBlockRenderer = ({
   toolCallId,
   initialArgs,
   initialResults,
-  onResults,
   onError,
+  onApprove,
+  onDeny,
   toolState,
   isLastPart = false,
   isLastMessage = false,
@@ -68,9 +76,8 @@ export const DisplayBlockRenderer = ({
   const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
-  const { data: org } = useSelectedOrganizationQuery()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
@@ -132,16 +139,11 @@ export const DisplayBlockRenderer = ({
 
     onQueryRun?.(queryType)
 
-    sendEvent({
-      action: 'assistant_suggestion_run_query_clicked',
-      properties: {
-        queryType,
-        ...(queryType === 'mutation' ? { category: identifyQueryType(sqlQuery) ?? 'unknown' } : {}),
-      },
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
+    track('assistant_suggestion_run_query_clicked', {
+      queryType,
+      ...(queryType === 'mutation'
+        ? { mutationType: identifyQueryType(sqlQuery) ?? 'unknown' }
+        : {}),
     })
   }
 
@@ -163,15 +165,11 @@ export const DisplayBlockRenderer = ({
       setIsWriteQuery(true)
     }
     executeSql(
-      { projectRef: ref, connectionString, sql: sqlQuery },
+      { projectRef: ref, connectionString, sql: acceptUntrustedSql(sqlQuery) },
       {
         onSuccess: (data) => {
           setRows(Array.isArray(data.result) ? data.result : undefined)
           setIsWriteQuery(queryType === 'mutation' || initialArgs.isWriteQuery || false)
-          onResults?.({
-            messageId,
-            results: Array.isArray(data.result) ? data.result : undefined,
-          })
           if (queryType === 'mutation') {
             queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
             queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(ref) })
@@ -218,13 +216,13 @@ export const DisplayBlockRenderer = ({
     )
   }
 
-  const resolvedHasDecision = initialResults !== undefined || rows !== undefined
   const shouldShowConfirmFooter =
     showConfirmFooter &&
-    !resolvedHasDecision &&
-    toolState === 'input-available' &&
+    toolState === 'approval-requested' &&
     isLastPart &&
-    isLastMessage
+    isLastMessage &&
+    !!onApprove &&
+    !!onDeny
 
   return (
     <div className="display-block w-auto overflow-x-hidden">
@@ -251,12 +249,8 @@ export const DisplayBlockRenderer = ({
             cancelLabel="Skip"
             confirmLabel={executeSqlLoading ? 'Running...' : 'Run Query'}
             isLoading={executeSqlLoading}
-            onCancel={async () => {
-              onResults?.({ messageId, results: 'User skipped running the query' })
-            }}
-            onConfirm={() => {
-              handleExecute(isWriteQuery ? 'mutation' : 'select')
-            }}
+            onCancel={onDeny}
+            onConfirm={onApprove}
           />
         </div>
       )}

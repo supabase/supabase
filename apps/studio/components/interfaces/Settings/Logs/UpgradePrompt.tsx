@@ -39,7 +39,7 @@ const UpgradePrompt: React.FC<Props> = ({
       <Modal.Content>
         <div className="space-y-4">
           <p className="text-sm">{description}</p>
-          <div className="border-control bg-surface-300 rounded border">
+          <div className="border-control bg-surface-300 rounded-sm border">
             <div className="flex items-center px-4 pt-2 pb-1">
               <p className="text-foreground-light w-[40%] text-sm">Plan</p>
               <p className="text-foreground-light w-[60%] text-sm">Retention duration</p>

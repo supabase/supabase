@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -119,16 +119,16 @@ export const SignInForm = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField_Shadcn_
+        <FormField
           key="email"
           name="email"
           control={form.control}
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
-              <FormControl_Shadcn_>
-                <Input_Shadcn_
+              <FormControl>
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
@@ -136,21 +136,21 @@ export const SignInForm = () => {
                   placeholder="you@example.com"
                   disabled={isSubmitting}
                 />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
 
         <div className="relative">
-          <FormField_Shadcn_
+          <FormField
             key="password"
             name="password"
             control={form.control}
             render={({ field }) => (
               <FormItemLayout name="password" label="Password">
-                <FormControl_Shadcn_>
+                <FormControl>
                   <div className="relative">
-                    <Input_Shadcn_
+                    <Input
                       id="password"
                       type={passwordHidden ? 'password' : 'text'}
                       autoComplete="current-password"
@@ -169,7 +169,7 @@ export const SignInForm = () => {
                       onClick={() => setPasswordHidden((prev) => !prev)}
                     />
                   </div>
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
@@ -203,6 +203,6 @@ export const SignInForm = () => {
           </Button>
         </LastSignInWrapper>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

@@ -84,10 +84,10 @@ export default function App() {
                 key={user.user_id} 
                 className="flex flex-col items-center gap-3"
               >
-                <div className="relative w-16 h-16 rounded-full bg-gradient-to-b from-neutral-700 to-neutral-800 shadow-neutral-900/75 shadow-[inset_0_0_20px_rgba(0,0,0,0.3)]">
+                <div className="relative w-16 h-16 rounded-full bg-linear-to-b from-neutral-700 to-neutral-800 shadow-neutral-900/75 shadow-[inset_0_0_20px_rgba(0,0,0,0.3)]">
                   <div className="absolute bottom-0 right-0 w-2 h-2 bg-green-400 rounded-full"></div>
                 </div>
-                <span className="text-sm text-neutral-400 text-center break-words">
+                <span className="text-sm text-neutral-400 text-center wrap-break-word">
                   {user.username}
                 </span>
               </div>

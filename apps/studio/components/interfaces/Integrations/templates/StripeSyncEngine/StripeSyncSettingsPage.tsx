@@ -108,7 +108,7 @@ export const StripeSyncSettingsPage = () => {
                   <h5 className="text-sm">View Stripe data in Table Editor</h5>
                   <p className="text-sm text-foreground-light text-balance">
                     The Stripe Sync Engine stores all synced data in the{' '}
-                    <code className="text-code-inline !break-keep">stripe</code> schema. You can
+                    <code className="text-code-inline break-keep!">stripe</code> schema. You can
                     view and query this data directly in the Table Editor.
                   </p>
                 </div>

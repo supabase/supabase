@@ -1,7 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react'
-import { SupabaseEvent, SUPABASE_HOST } from '~/lib/eventsTypes'
+import { SUPABASE_HOST, SupabaseEvent } from '~/lib/eventsTypes'
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 
 interface EventsContextValue {
   allEvents: SupabaseEvent[]
@@ -20,9 +20,10 @@ const EventsContext = createContext<EventsContextValue | undefined>(undefined)
 interface EventsProviderProps {
   children: ReactNode
   notionEvents: SupabaseEvent[]
+  mdxEvents: SupabaseEvent[]
 }
 
-export function EventsProvider({ children, notionEvents }: EventsProviderProps) {
+export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProviderProps) {
   const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -42,9 +43,12 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
 
         if (data.success) {
           const transformedEvents: SupabaseEvent[] = data.events.map((event: any) => {
-            let categories: string[] = []
-            const isMeetup = event.name.toLowerCase().includes('meetup')
-            if (isMeetup) categories.push('meetup')
+            // Categorize by the originating Luma calendar: events from the
+            // Supabase Hackathons calendar → `hackathon`; everything from the
+            // Supabase Community Events calendar → `community`.
+            const categories: string[] = [
+              event?.calendar === 'hackathon' ? 'hackathon' : 'community',
+            ]
 
             const rawUrl = event?.url || ''
             let safeUrl: string | undefined
@@ -73,7 +77,8 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
               location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
                 [event?.city, event?.country].filter(Boolean)
               ),
-              hosts: isMeetup || event?.hosts?.length === 0 ? [SUPABASE_HOST] : event?.hosts || [],
+              // All Luma events are Supabase-hosted regardless of which calendar they're from.
+              hosts: [SUPABASE_HOST],
               source: 'luma' as const,
               disable_page_build: true,
               link: safeUrl ? { href: safeUrl, target: '_blank' as const } : undefined,
@@ -91,10 +96,17 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
     fetchLumaEvents()
   }, [])
 
-  // Merge Notion (server) + Luma (client) events
+  // Merge Notion (server) + mdx (server) + Luma (client) events, showing only today and future.
   const allEvents = useMemo(() => {
-    return [...notionEvents, ...lumaEvents]
-  }, [notionEvents, lumaEvents])
+    const now = new Date()
+    const startOfToday = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    )
+    return [...notionEvents, ...mdxEvents, ...lumaEvents].filter((event) => {
+      const eventDate = new Date(event.end_date || event.date)
+      return eventDate >= startOfToday
+    })
+  }, [notionEvents, mdxEvents, lumaEvents])
 
   const categories = useMemo(() => {
     const counts: { [key: string]: number } = { all: 0 }
@@ -151,36 +163,14 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
     return [...filtered].sort((a, b) => {
       const dateA = new Date(a.date).getTime()
       const dateB = new Date(b.date).getTime()
-      return dateB - dateA
+      return dateA - dateB
     })
   }, [allEvents, selectedCategories, searchQuery])
 
   const featuredEvent = useMemo(() => {
     if (allEvents.length === 0) return undefined
 
-    const now = new Date()
-
-    const upcomingEvents = allEvents.filter((event) => {
-      const eventDate = new Date(event.end_date || event.date)
-      return eventDate >= now
-    })
-
-    const pastEvents = allEvents.filter((event) => {
-      const eventDate = new Date(event.end_date || event.date)
-      return eventDate < now
-    })
-
-    if (upcomingEvents.length > 0) {
-      return upcomingEvents.sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      )[0]
-    }
-
-    if (pastEvents.length > 0) {
-      return pastEvents.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
-    }
-
-    return undefined
+    return [...allEvents].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0]
   }, [allEvents])
 
   const value: EventsContextValue = {

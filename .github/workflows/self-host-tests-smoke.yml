@@ -31,4 +31,4 @@ jobs:
           cd docker
           cp .env.example .env
           yq -i '.services.supavisor.environment.RLIMIT_NOFILE=1024' docker-compose.yml
-          docker compose up --wait --wait-timeout 180
+          docker compose up --quiet-pull --wait --wait-timeout 180

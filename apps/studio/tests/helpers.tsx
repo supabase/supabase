@@ -3,6 +3,7 @@ import { fireEvent, getByText, render as originalRender, screen } from '@testing
 import type React from 'react'
 import { useState } from 'react'
 import { TooltipProvider } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
 
 import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
 import type { Organization } from '@/types'
@@ -54,6 +55,7 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     is_owner: true,
     billing_email: 'billing@example.com',
     billing_partner: null,
+    integration_source: null,
     usage_billing_enabled: false,
     stripe_customer_id: 'stripe-1',
     subscription_id: 'subscription-1',
@@ -106,7 +108,9 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
 
   return (
     <TooltipProvider>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <CommandProvider openKey="">{children}</CommandProvider>
+      </QueryClientProvider>
     </TooltipProvider>
   )
 }

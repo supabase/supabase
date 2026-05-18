@@ -1,9 +1,9 @@
 'use client'
 
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { useBreakpoint } from 'common'
 import useDragToClose from 'common/hooks/useDragToClose'
 import { AlertTriangle, ArrowLeft, Search } from 'lucide-react'
+import { VisuallyHidden } from 'radix-ui'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -58,7 +58,7 @@ const CommandWrapper = forwardRef<
       ref={ref}
       className={cn(
         'h-full w-full flex flex-col overflow-hidden',
-        '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+        '**:[[cmdk-group]]:px-2 **:[[cmdk-group]]:bg-transparent! **:[[cmdk-group-heading]]:bg-transparent! **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger **:[[cmdk-input]]:h-12',
         '[&_[cmdk-item]_svg]:h-5',
         '[&_[cmdk-item]_svg]:w-5',
         '[&_[cmdk-item]_svg]:stroke-1',
@@ -160,7 +160,7 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
       'rounded-md border border-input bg-background',
       'text-sm',
       'hover:bg-accent hover:text-accent-foreground',
-      'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      'ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'disabled:pointer-events-none disabled:opacity-50',
       'transition-colors',
       childFromProps.props.className
@@ -184,12 +184,12 @@ function CommandMenuTriggerInput({
         type="button"
         className={cn(
           'group',
-          'flex-grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
+          'grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
           'pl-1.5 md:pl-2 pr-1',
           'flex items-center justify-between',
           'bg-surface-100/75 text-foreground-lighter border',
-          'hover:bg-opacity-100 hover:border-stronger',
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-border-strong focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+          'hover:bg-surface-100/100  hover:border-stronger',
+          'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-border-strong focus-visible:ring-offset-1 focus-visible:ring-offset-background',
           'transition',
           className
         )}
@@ -264,9 +264,9 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         }}
         size={size}
         className={cn(
-          'relative flex flex-col my-0 mx-auto rounded-t-lg overflow-hidden',
+          'relative flex flex-col my-0 mx-auto rounded-t-lg',
           'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
-          '!animate-in !slide-in-from-bottom-[85%] !duration-300',
+          '!animate-in !slide-in-from-bottom-[85%] duration-300!',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
           // Remove defaults set from primitive component
           '!slide-in-from-left-[0%] :!slide-in-from-top-[0%]',
@@ -279,10 +279,10 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
           className: cn('overflow-hidden flex data-closed:delay-100'),
         }}
       >
-        <VisuallyHidden>
+        <VisuallyHidden.VisuallyHidden>
           <DialogTitle>Command menu</DialogTitle>
           <DialogDescription>Type a command or search</DialogDescription>
-        </VisuallyHidden>
+        </VisuallyHidden.VisuallyHidden>
         <ErrorBoundary FallbackComponent={CommandError}>
           <PageSwitch>{children}</PageSwitch>
         </ErrorBoundary>

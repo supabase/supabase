@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
@@ -16,8 +15,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -155,10 +154,10 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
               </DialogDescription>
             </DialogHeader>
             <DialogSectionSeparator />
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogSection>
-                  <FormField_Shadcn_
+                  <FormField
                     name="description"
                     render={({ field }) => (
                       <FormItemLayout label="Description">
@@ -178,7 +177,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
                   </Button>
                 </DialogFooter>
               </form>
-            </Form_Shadcn_>
+            </Form>
           </>
         )}
       </DialogContent>

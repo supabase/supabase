@@ -21,3 +21,5 @@ export interface components {
   headers: apiComponents['headers'] & platformComponents['headers']
   pathItems: apiComponents['pathItems'] & platformComponents['pathItems']
 }
+
+export type { platformComponents, apiComponents }

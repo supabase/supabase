@@ -34,7 +34,7 @@ export const QueryInsightsTableRow = ({
       {item.issueType && IssueIcon && (
         <div
           className={cn(
-            'h-6 w-6 rounded-full flex-shrink-0 border flex items-center justify-center',
+            'h-6 w-6 rounded-full shrink-0 border flex items-center justify-center',
             ISSUE_DOT_COLORS[item.issueType]?.border,
             ISSUE_DOT_COLORS[item.issueType]?.background
           )}
@@ -70,7 +70,7 @@ export const QueryInsightsTableRow = ({
         </p>
       </div>
 
-      <div className="flex items-stretch divide-x divide-border flex-shrink-0 tabular-nums">
+      <div className="flex items-stretch divide-x divide-border shrink-0 tabular-nums">
         <Tooltip>
           <TooltipTrigger asChild>
             <div className="flex flex-col items-end pr-4 cursor-default">
@@ -125,7 +125,7 @@ export const QueryInsightsTableRow = ({
         </Tooltip>
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0 justify-end w-[260px]">
+      <div className="flex items-center gap-2 shrink-0 justify-end w-[260px]">
         <Button
           type="default"
           size="tiny"

@@ -84,7 +84,7 @@ export function RegisterContent() {
             <div className="flex-1 hidden md:block" />
 
             {/* Bottom content — two columns, bottom-aligned */}
-            <div className="max-w-[65rem] mx-auto w-full px-8 pb-16 md:pb-24 pt-24 md:pt-0 grid grid-cols-1 lg:grid-cols-[auto_1fr] items-end gap-12 lg:gap-20 transition-opacity [transition-duration:1200ms]">
+            <div className="max-w-260 mx-auto w-full px-8 pb-16 md:pb-24 pt-24 md:pt-0 grid grid-cols-1 lg:grid-cols-[auto_1fr] items-end gap-12 lg:gap-20 transition-opacity [transition-duration:1200ms]">
               <div className="flex flex-col">
                 <h1 className="text-6xl md:text-8xl font-light text-foreground leading-[0.92] tracking-tight">
                   The State <br /> of Startups
@@ -119,7 +119,7 @@ export function RegisterContent() {
       {/* About section */}
       <SurveySectionBreak />
       <section className="w-full">
-        <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
+        <div className="grid grid-cols-1 md:grid-cols-3 max-w-240 mx-auto md:border-x border-muted">
           {/* Left: description text */}
           <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
             <p>
@@ -134,6 +134,12 @@ export function RegisterContent() {
         <SurveySectionBreak />
       </section>
 
+      <section className="px-4 py-16 md:px-8 md:py-32">
+        <div className="max-w-240 mx-auto">
+          <PreviousResultsCta />
+        </div>
+      </section>
+
       <Footer />
     </main>
   )
@@ -143,7 +149,7 @@ function ShirtImage() {
   const [hasAppeared, setHasAppeared] = useState(false)
 
   return (
-    <div className="flex items-center justify-center relative overflow-hidden aspect-[1/1]">
+    <div className="flex items-center justify-center relative overflow-hidden aspect-square">
       <motion.div
         className="relative w-full h-full"
         initial={{ scale: 0.6, opacity: 0 }}
@@ -171,5 +177,40 @@ function ShirtImage() {
         </motion.div>
       </motion.div>
     </div>
+  )
+}
+
+function PreviousResultsCta() {
+  return (
+    <Link
+      href="/state-of-startups-2025"
+      className="group grid gap-8 transition-colors md:grid-cols-[auto_1fr_auto] md:items-end md:gap-12"
+    >
+      <div className="flex w-fit flex-col gap-2" aria-hidden="true">
+        <div className="w-fit bg-brand-300 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand md:text-[2.25rem] md:leading-10">
+          State
+        </div>
+        <div className="w-fit bg-brand-300 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand md:text-[2.25rem] md:leading-10">
+          of
+        </div>
+        <div className="w-fit bg-brand px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-background dark:text-brand-200 md:text-[2.25rem] md:leading-10">
+          Startups
+        </div>
+        <div className="w-fit bg-brand-500 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand-300 md:text-[2.25rem] md:leading-10">
+          2025
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 self-end">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-foreground-light">
+          Previous Report
+        </p>
+        <p className="text-2xl tracking-tight text-foreground">See last year&apos;s report.</p>
+      </div>
+
+      <div className="flex items-center self-end text-foreground-light transition-transform duration-200 group-hover:translate-x-1 group-hover:text-foreground md:justify-self-end">
+        <ArrowRight size={18} />
+      </div>
+    </Link>
   )
 }

@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { UIMessage } from 'ai'
 import { expect, test, vi } from 'vitest'
 
@@ -24,7 +25,7 @@ test('generateV4 calls the tool sanitizer', async () => {
               type: 'tool-execute_sql',
               state: 'output-available',
               toolCallId: 'test-tool-call-id',
-              input: { sql: 'SELECT * FROM users' },
+              input: { sql: safeSql`SELECT * FROM users` },
               output: [{ id: 1, name: 'test-output' }],
             },
           ],
@@ -47,7 +48,6 @@ test('generateV4 calls the tool sanitizer', async () => {
     getOrgAIDetails: vi.fn().mockResolvedValue({
       aiOptInLevel: 'schema_and_log_and_data',
       hasAccessToAdvanceModel: true,
-      isDpaSigned: false,
     }),
     getProjectAIDetails: vi.fn().mockResolvedValue({
       region: 'us-east-1',
@@ -58,7 +58,7 @@ test('generateV4 calls the tool sanitizer', async () => {
   vi.mock('@/lib/ai/model', () => ({
     getModel: vi.fn().mockResolvedValue({
       modelParams: { model: {} },
-      promptProviderOptions: {},
+      systemProviderOptions: {},
     }),
   }))
 

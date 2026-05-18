@@ -34,6 +34,26 @@ export const storageKeys = {
   archive: (projectRef: string | undefined) => ['projects', projectRef, 'archive'] as const,
   publicBucketsWithSelectPolicies: (projectRef: string | undefined, bucketId: string | undefined) =>
     ['projects', projectRef, 'public-buckets-with-select-policies', bucketId] as const,
+  objects: (
+    projectRef: string | undefined,
+    bucketId: string | undefined,
+    path: string,
+    params: {
+      limit?: number
+      search?: string
+      sortColumn?: string
+      sortOrder?: string
+    } = {}
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'buckets',
+      bucketId,
+      'objects',
+      ...(path ? [path] : []),
+      ...(params ? [params] : []),
+    ] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({

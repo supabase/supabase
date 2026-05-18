@@ -1,7 +1,6 @@
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
 
+import { MD_CONTENT } from '@/app/api-v2/md/content.generated'
 import { generatePricingContent } from '@/lib/llms'
 
 export const dynamic = 'force-dynamic'
@@ -33,25 +32,10 @@ function getSources(): Source[] {
   ]
 }
 
-// Order matters: homepage first, products alphabetical in between.
-// pricing.txt is generated dynamically via generatePricingContent().
-const PRODUCT_LLM_FILES = [
-  'homepage.txt',
-  'auth.txt',
-  'database.txt',
-  'edge-functions.txt',
-  'realtime.txt',
-  'storage.txt',
-  'vector.txt',
-]
-
+// Order is set by scripts/generateMdContent.mjs (homepage first, rest
+// alphabetical). pricing is appended here since it's dynamic.
 async function readProductOverviews(): Promise<string> {
-  const staticContents = await Promise.all(
-    PRODUCT_LLM_FILES.map((file) => {
-      const filePath = join(process.cwd(), 'data/llms', file)
-      return readFile(filePath, 'utf-8')
-    })
-  )
+  const staticContents = [...MD_CONTENT.values()]
   const pricingContent = generatePricingContent()
 
   return [...staticContents, pricingContent].join('\n\n---\n\n')

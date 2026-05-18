@@ -48,7 +48,7 @@ export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) =>
       <Modal.Content>
         <ul className="space-y-5">
           <li className="flex gap-3 text-sm">
-            <Lock size={14} className="flex-shrink-0" />
+            <Lock size={14} className="shrink-0" />
             <div>
               <strong>Before you remove this app, consider:</strong>
               <ul className="space-y-2 mt-2">

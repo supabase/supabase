@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseQueuesKeys } from './keys'
@@ -16,7 +17,7 @@ export type PostgresQueue = {
   created_at: string
 }
 
-const queueSqlQuery = `select * from pgmq.list_queues();`
+const queueSqlQuery = safeSql`select * from pgmq.list_queues();`
 
 export async function getDatabaseQueues({ projectRef, connectionString }: DatabaseQueuesVariables) {
   if (!projectRef) throw new Error('Project ref is required')

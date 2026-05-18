@@ -3,16 +3,16 @@ import dayjs from 'dayjs'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -81,7 +81,7 @@ export const CustomExpiryModal = () => {
       confirmText="Get URL"
       onCancel={handleClose}
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <Modal.Content>
           <p className="text-sm text-foreground-light mb-4">
             Enter the duration for which the URL will be valid for:
@@ -92,14 +92,14 @@ export const CustomExpiryModal = () => {
             noValidate
             className="flex items-start space-x-2"
           >
-            <div className="flex-grow">
-              <FormField_Shadcn_
+            <div className="grow">
+              <FormField
                 control={form.control}
                 name="expiresIn"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Duration">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         {...field}
                         type="number"
                         onChange={(e) => {
@@ -108,30 +108,30 @@ export const CustomExpiryModal = () => {
                           )
                         }}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </div>
             <div>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="units"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Units">
-                    <FormControl_Shadcn_>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ aria-label="Units" placeholder="Select an option" />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectItem_Shadcn_ value="days">days</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="weeks">weeks</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="months">months</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="years">years</SelectItem_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue aria-label="Units" placeholder="Select an option" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="days">days</SelectItem>
+                          <SelectItem value="weeks">weeks</SelectItem>
+                          <SelectItem value="months">months</SelectItem>
+                          <SelectItem value="years">years</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -158,7 +158,7 @@ export const CustomExpiryModal = () => {
             Get signed URL
           </Button>
         </Modal.Content>
-      </Form_Shadcn_>
+      </Form>
     </Modal>
   )
 }

@@ -11,7 +11,7 @@ export type OAuthAppsVariables = {
 
 export type OAuthApp = components['schemas']['OAuthAppResponse']
 
-export async function getOAuthApps({ slug }: OAuthAppsVariables, signal?: AbortSignal) {
+export async function getOAuthApps({ slug }: OAuthAppsVariables) {
   if (!slug) throw new Error('Organization slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/oauth/apps', {
@@ -31,7 +31,7 @@ export const useOAuthAppsQuery = <TData = OAuthAppsData>(
 ) =>
   useQuery<OAuthAppsData, OAuthAppsError, TData>({
     queryKey: oauthAppKeys.oauthApps(slug),
-    queryFn: ({ signal }) => getOAuthApps({ slug }, signal),
+    queryFn: () => getOAuthApps({ slug }),
     enabled: enabled && typeof slug !== 'undefined',
     ...options,
   })

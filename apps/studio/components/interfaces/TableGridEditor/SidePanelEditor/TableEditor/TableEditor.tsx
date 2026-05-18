@@ -1,10 +1,10 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
@@ -22,7 +22,7 @@ import type { ImportContent, TableField } from './TableEditor.types'
 import {
   formatImportedContentToColumnFields,
   generateTableField,
-  generateTableFieldFromPostgresTable,
+  generateTableFieldFromPGTable,
   validateFields,
 } from './TableEditor.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -32,7 +32,6 @@ import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-const
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useChanged } from '@/hooks/misc/useChanged'
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -40,6 +39,7 @@ import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 import { useTrack } from '@/lib/telemetry/track'
 import { type PlainObject } from '@/lib/type-helpers'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -53,7 +53,7 @@ type SaveTablePayloadFor<Action extends SaveTableParams['action']> =
   SaveTableParamsFor<Action>['payload']
 
 export interface TableEditorProps {
-  table?: PostgresTable
+  table?: SafePostgresTable
   isDuplicating: boolean
   templateData?: Partial<TableField>
   visible: boolean
@@ -78,8 +78,6 @@ export const TableEditor = ({
   const tableEditorApi = useContext(TableEditorStateContext)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
-
-  const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
 
   const [params, setParams] = useUrlState()
   const { data: project } = useSelectedProjectQuery()
@@ -167,7 +165,17 @@ export const TableEditor = ({
       relation.columns.forEach((column) => {
         const sourceColumn = tableFields.columns.find((col) => col.name === column.source)
         if (sourceColumn?.isNewColumn && column.targetType) {
-          updatedColumns.push({ ...sourceColumn, format: column.targetType })
+          const isArray = column.targetIsArray ?? false
+          const bareFormat =
+            isArray && column.targetType.startsWith('_')
+              ? column.targetType.slice(1)
+              : column.targetType
+          updatedColumns.push({
+            ...sourceColumn,
+            format: bareFormat,
+            formatSchema: column.targetTypeSchema,
+            isArray,
+          })
         }
       })
     })
@@ -283,7 +291,7 @@ export const TableEditor = ({
         }
         setFkRelations([])
       } else {
-        const tableFields = generateTableFieldFromPostgresTable(
+        const tableFields = generateTableFieldFromPGTable(
           table,
           foreignKeyMeta ?? [],
           isDuplicating,
@@ -305,7 +313,7 @@ export const TableEditor = ({
 
   useEffect(() => {
     if (!isNewRecord) {
-      const tableFields = generateTableFieldFromPostgresTable(
+      const tableFields = generateTableFieldFromPGTable(
         table,
         foreignKeyMeta ?? [],
         isDuplicating,
@@ -350,55 +358,70 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        <Input
-          data-testid="table-name-input"
-          label="Name"
+        <FormItemLayout
           id="name"
+          isReactForm={false}
           layout="horizontal"
-          type="text"
+          label="Name"
           error={errors.name ? String(errors.name) : undefined}
-          value={tableFields?.name}
-          onChange={(event) => onUpdateField({ name: event.target.value })}
-        />
-        <Input
-          label="Description"
+        >
+          <Input
+            data-testid="table-name-input"
+            id="name"
+            type="text"
+            value={tableFields?.name}
+            onChange={(event) => onUpdateField({ name: event.target.value })}
+          />
+        </FormItemLayout>
+        <FormItemLayout
           id="description"
-          placeholder="Optional"
+          isReactForm={false}
           layout="horizontal"
-          type="text"
-          value={tableFields?.comment ?? ''}
-          onChange={(event) => onUpdateField({ comment: event.target.value })}
-        />
+          label="Description"
+        >
+          <Input
+            id="description"
+            placeholder="Optional"
+            type="text"
+            value={tableFields?.comment ?? ''}
+            onChange={(event) => onUpdateField({ comment: event.target.value })}
+          />
+        </FormItemLayout>
       </SidePanel.Content>
 
       <SidePanel.Separator />
 
       <SidePanel.Content className="space-y-10 py-6">
-        <Checkbox
-          id="enable-rls"
-          // @ts-ignore
-          label={
-            <div className="flex items-center space-x-2">
+        <div className="items-top flex space-x-2">
+          <Checkbox
+            id="enable-rls"
+            checked={tableFields.isRLSEnabled}
+            onCheckedChange={() => {
+              // if isEnabled, show confirm modal to turn off
+              // if not enabled, allow turning on without modal confirmation
+              tableFields.isRLSEnabled
+                ? setRlsConfirmVisible(true)
+                : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+            }}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="enable-rls"
+              className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
               <span>Enable Row Level Security (RLS)</span>
               <Badge>Recommended</Badge>
-            </div>
-          }
-          description="Restrict access to your table by enabling RLS and writing Postgres policies."
-          checked={tableFields.isRLSEnabled}
-          onChange={() => {
-            // if isEnabled, show confirm modal to turn off
-            // if not enabled, allow turning on without modal confirmation
-            tableFields.isRLSEnabled
-              ? setRlsConfirmVisible(true)
-              : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-          }}
-          size="medium"
-        />
+            </label>
+            <p className="text-sm text-foreground-muted">
+              Restrict access to your table by enabling RLS and writing Postgres policies.
+            </p>
+          </div>
+        </div>
 
         {tableFields.isRLSEnabled ? (
           <Admonition
             type="default"
-            className="!mt-3"
+            className="mt-3!"
             title="Policies are required to query data"
             description={
               <>
@@ -418,7 +441,7 @@ export const TableEditor = ({
         ) : (
           <Admonition
             type="warning"
-            className="!mt-3"
+            className="mt-3!"
             title="You are allowing anonymous access to your table"
             description={
               <>
@@ -436,22 +459,32 @@ export const TableEditor = ({
         )}
 
         {realtimeEnabled && (
-          <Checkbox
-            id="enable-realtime"
-            label="Enable Realtime"
-            description="Broadcast changes on this table to authorized subscribers"
-            checked={tableFields.isRealtimeEnabled}
-            onChange={() => {
-              track('realtime_toggle_table_clicked', {
-                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                origin: 'tableSidePanel',
-              })
-              onUpdateField({
-                isRealtimeEnabled: !tableFields.isRealtimeEnabled,
-              })
-            }}
-            size="medium"
-          />
+          <div className="items-top flex space-x-2">
+            <Checkbox
+              id="enable-realtime"
+              checked={tableFields.isRealtimeEnabled}
+              onCheckedChange={() => {
+                track('realtime_toggle_table_clicked', {
+                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                  origin: 'tableSidePanel',
+                })
+                onUpdateField({
+                  isRealtimeEnabled: !tableFields.isRealtimeEnabled,
+                })
+              }}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <label
+                htmlFor="enable-realtime"
+                className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Enable Realtime
+              </label>
+              <p className="text-sm text-foreground-muted">
+                Broadcast changes on this table to authorized subscribers.
+              </p>
+            </div>
+          </div>
         )}
       </SidePanel.Content>
 
@@ -477,14 +510,24 @@ export const TableEditor = ({
         )}
         {isDuplicating && (
           <>
-            <Checkbox
-              id="duplicate-rows"
-              label="Duplicate table entries"
-              description="This will copy all the data in the table into the new table"
-              checked={isDuplicateRows}
-              onChange={() => setIsDuplicateRows(!isDuplicateRows)}
-              size="medium"
-            />
+            <div className="items-top flex space-x-2">
+              <Checkbox
+                id="duplicate-rows"
+                checked={isDuplicateRows}
+                onCheckedChange={() => setIsDuplicateRows(!isDuplicateRows)}
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="duplicate-rows"
+                  className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Duplicate table entries
+                </label>
+                <p className="text-sm text-foreground-muted">
+                  This will copy all the data in the table into the new table
+                </p>
+              </div>
+            </div>
           </>
         )}
 
@@ -528,22 +571,18 @@ export const TableEditor = ({
         </>
       )}
 
-      {isApiGrantTogglesEnabled && (
-        <>
-          <SidePanel.Separator />
-          <SidePanel.Content className="py-6 space-y-6">
-            <ApiAccessToggle
-              projectRef={project?.ref}
-              schemaName={isNewRecord ? selectedSchema : table?.schema}
-              tableName={
-                isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
-              }
-              isNewRecord={isNewRecord || isDuplicating}
-              handler={apiAccessToggleHandler}
-            />
-          </SidePanel.Content>
-        </>
-      )}
+      <SidePanel.Separator />
+      <SidePanel.Content className="py-6 space-y-6">
+        <ApiAccessToggle
+          projectRef={project?.ref}
+          schemaName={isNewRecord ? selectedSchema : table?.schema}
+          tableName={
+            isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
+          }
+          isNewRecord={isNewRecord || isDuplicating}
+          handler={apiAccessToggleHandler}
+        />
+      </SidePanel.Content>
     </SidePanel>
   )
 }

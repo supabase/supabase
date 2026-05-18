@@ -71,14 +71,14 @@ const BucketPage: NextPageWithLayout = () => {
       <PageLayout
         size="full"
         isCompact
-        className="[&>div:first-child]:!border-b-0" // Override the border-b from ScaffoldContainer
+        className="[&>div:first-child]:border-b-0!" // Override the border-b from ScaffoldContainer
         title={
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <span className="truncate">{bucketId}</span>
             {bucket?.public && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Badge variant="warning" className="flex flex-shrink-0">
+                  <Badge variant="warning" className="flex shrink-0">
                     Public
                   </Badge>
                 </TooltipTrigger>

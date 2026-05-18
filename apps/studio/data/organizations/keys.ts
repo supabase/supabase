@@ -32,4 +32,8 @@ export const organizationKeys = {
   ) => ['organizations', 'creation-preview', tier, params] as const,
   previewCreditCode: (slug: string | undefined, code: string) =>
     ['organizations', slug, 'preview-credit-code', code] as const,
+  creditTopUpPreview: (
+    slug: string | undefined,
+    params?: { amount?: number; address?: Record<string, unknown>; taxId?: Record<string, unknown> }
+  ) => ['organizations', slug, 'credits', 'preview', params] as const,
 }

@@ -293,7 +293,7 @@ export const FileExplorerRow = ({
       <div
         className={cn(
           'storage-row group flex h-full items-center px-2.5',
-          'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
+          'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-selection' : ''}`,
           `${isSelected ? 'bg-selection' : ''}`,
           `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
@@ -333,15 +333,15 @@ export const FileExplorerRow = ({
               </div>
             )}
             <Checkbox
-              label={''}
-              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
+              className={`${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
                 isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}
               checked={isSelected}
-              onChange={(event) => {
-                event.stopPropagation()
-                onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
+              // use onClick instead of onCheckedChange to handle shift-key selection
+              onClick={(event) => {
+                onCheckItem(event.nativeEvent.shiftKey)
               }}
+              aria-label="Check to select this item"
             />
           </div>
           <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
@@ -370,7 +370,7 @@ export const FileExplorerRow = ({
 
         <div
           className={`flex items-center justify-end ${
-            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
+            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
           }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select

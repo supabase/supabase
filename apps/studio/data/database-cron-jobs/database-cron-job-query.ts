@@ -1,3 +1,4 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { CronJob } from './database-cron-jobs-infinite-query'
@@ -24,8 +25,8 @@ export async function getDatabaseCronJob({
     projectRef,
     connectionString,
     sql: !!id
-      ? `SELECT * FROM cron.job where jobid = ${id};`
-      : `SELECT * FROM cron.job where jobname = '${name}';`,
+      ? safeSql`SELECT * FROM cron.job where jobid = ${literal(id)};`
+      : safeSql`SELECT * FROM cron.job where jobname = ${literal(name)};`,
     queryKey: ['cron-job', id],
   })
 

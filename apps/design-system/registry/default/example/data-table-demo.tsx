@@ -17,7 +17,7 @@ import * as React from 'react'
 import {
   Button,
   Card,
-  Checkbox_Shadcn_,
+  Checkbox,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -78,7 +78,7 @@ export const columns: ColumnDef<Payment>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <Checkbox_Shadcn_
+      <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)
@@ -88,7 +88,7 @@ export const columns: ColumnDef<Payment>[] = [
       />
     ),
     cell: ({ row }) => (
-      <Checkbox_Shadcn_
+      <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
@@ -196,7 +196,7 @@ export default function DataTableDemo() {
           placeholder="Filter by email"
           value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
           onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
-          className="max-w-sm"
+          className="max-w-xs"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

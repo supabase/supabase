@@ -19,19 +19,19 @@ import { useEffect, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
   SidePanel,
 } from 'ui'
 import * as z from 'zod'
@@ -126,7 +126,7 @@ const EditEnumeratedTypeSidePanel = ({
           isNew: x.isNew,
         })),
       ...(data.description !== selectedEnumeratedType.comment
-        ? { description: data.description?.replaceAll("'", "''") }
+        ? { description: data.description }
         : {}),
     }
 
@@ -179,32 +179,32 @@ const EditEnumeratedTypeSidePanel = ({
       }}
     >
       <SidePanel.Content className="py-4">
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_>Description</FormLabel_Shadcn_>
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
-                  </FormControl_Shadcn_>
-                  <FormDescription_Shadcn_>Optional</FormDescription_Shadcn_>
-                </FormItem_Shadcn_>
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormDescription>Optional</FormDescription>
+                </FormItem>
               )}
             />
 
@@ -218,11 +218,11 @@ const EditEnumeratedTypeSidePanel = ({
               >
                 Values
               </span>
-              <Alert_Shadcn_>
+              <Alert>
                 <AlertCircle strokeWidth={1.5} />
-                <AlertTitle_Shadcn_>Existing values cannot be deleted or sorted</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p className="!leading-normal track">
+                <AlertTitle>Existing values cannot be deleted or sorted</AlertTitle>
+                <AlertDescription>
+                  <p className="leading-normal! track">
                     You will need to delete and recreate the enumerated type with the updated values
                     instead.
                   </p>
@@ -240,8 +240,8 @@ const EditEnumeratedTypeSidePanel = ({
                       Learn more
                     </Link>
                   </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -275,7 +275,7 @@ const EditEnumeratedTypeSidePanel = ({
               Update
             </Button>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </SidePanel.Content>
     </SidePanel>
   )

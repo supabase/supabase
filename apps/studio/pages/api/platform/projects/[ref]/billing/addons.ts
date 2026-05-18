@@ -20,7 +20,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type ResponseData =
   paths['/platform/projects/{ref}/billing/addons']['get']['responses']['200']['content']['application/json']
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   const response: ResponseData = {
     ref: '',
     selected_addons: [],

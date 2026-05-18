@@ -2,7 +2,6 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { cn } from 'ui'
 import {
   MetricCard,
   MetricCardContent,
@@ -31,8 +30,8 @@ type DatabaseInfrastructureSectionProps = {
 export const DatabaseInfrastructureSection = ({
   interval,
   refreshKey,
-  dbErrorRate,
-  isLoading: dbLoading,
+  dbErrorRate: _dbErrorRate,
+  isLoading: _dbLoading,
   slowQueriesCount = 0,
   slowQueriesLoading = false,
 }: DatabaseInfrastructureSectionProps) => {
@@ -176,7 +175,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : connections.max > 0 ? (
                 <MetricCardValue>
                   {connections.current}/{connections.max}
@@ -197,7 +196,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -216,7 +215,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.diskIo.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -235,7 +234,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -254,7 +253,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
               ) : (

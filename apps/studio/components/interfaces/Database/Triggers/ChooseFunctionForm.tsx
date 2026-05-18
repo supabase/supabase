@@ -123,7 +123,7 @@ export interface SchemaFunctionGroupProps {
 const SchemaFunctionGroup = ({ schema, functions, selectFunction }: SchemaFunctionGroupProps) => {
   return (
     <div className="space-y-4">
-      <div className="sticky top-0 flex items-center space-x-1 px-6 backdrop-blur backdrop-filter">
+      <div className="sticky top-0 flex items-center space-x-1 px-6 backdrop-blur-sm backdrop-filter">
         <h5 className="text-foreground-light">schema</h5>
         <h5>{schema}</h5>
       </div>
@@ -151,12 +151,12 @@ export interface FunctionProps {
 
 const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
   return (
-    <div className="cursor-pointer rounded p-3 px-6 hover:bg-studio" onClick={() => onClick(id)}>
+    <div className="cursor-pointer rounded-sm p-3 px-6 hover:bg-studio" onClick={() => onClick(id)}>
       <Accordion_Shadcn_ type="single" collapsible>
         <AccordionItem_Shadcn_ value="definition" className="border-none">
           <div className="flex items-center justify-between space-x-3">
             <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
+              <div className="flex items-center justify-center rounded-sm bg-foreground p-1 text-background">
                 <Terminal strokeWidth={2} size={14} />
               </div>
               <p className="mb-0 text-sm">{name}</p>

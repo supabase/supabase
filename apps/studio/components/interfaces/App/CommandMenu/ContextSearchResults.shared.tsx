@@ -18,10 +18,10 @@ export function SkeletonResults() {
     <div className="p-2 space-y-1">
       {[0, 1, 2, 3].map((i) => (
         <div key={i} className="flex items-center gap-3 px-2 py-2">
-          <ShimmeringLoader className="!w-4 !h-4 !py-0 rounded" delayIndex={i} />
+          <ShimmeringLoader className="w-4! h-4! py-0! rounded-sm" delayIndex={i} />
           <div className="flex-1 space-y-1">
-            <ShimmeringLoader className="!w-32 !py-1.5" delayIndex={i} />
-            <ShimmeringLoader className="!w-48 !py-1" delayIndex={i + 1} />
+            <ShimmeringLoader className="w-32! py-1.5!" delayIndex={i} />
+            <ShimmeringLoader className="w-48! py-1!" delayIndex={i + 1} />
           </div>
         </div>
       ))}
@@ -88,7 +88,7 @@ export function ResultsList({
   return (
     <CommandList_Shadcn_
       className={cn(
-        '!max-h-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-transparent',
+        'max-h-full! flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-transparent',
         className
       )}
     >

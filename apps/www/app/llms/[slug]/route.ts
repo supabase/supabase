@@ -1,6 +1,3 @@
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
-
 import { generatePricingContent } from '@/lib/llms'
 
 export const dynamic = 'force-dynamic'
@@ -14,6 +11,10 @@ function textResponse(content: string) {
   })
 }
 
+// Product overview slugs and pricing.txt are 301-redirected to /<slug>.md in
+// apps/www/lib/redirects.js, so this handler typically only sees per-SDK
+// reference files. The pricing branch stays as a fallback in case the redirect
+// is bypassed.
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
@@ -21,21 +22,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
     return new Response('Not Found', { status: 404 })
   }
 
-  // 1. Check for dynamically generated content (e.g. pricing)
   if (slug === 'pricing.txt') {
     return textResponse(generatePricingContent())
   }
 
-  // 2. Check for a local static file in public/llms/
-  try {
-    const filePath = join(process.cwd(), 'data/llms', slug)
-    const content = await readFile(filePath, 'utf-8')
-    return textResponse(content)
-  } catch {
-    // File doesn't exist locally, fall through
-  }
-
-  // 3. Try fetching from the docs app
   const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL
   if (docsUrl) {
     const response = await fetch(`${docsUrl}/llms/${slug}`)

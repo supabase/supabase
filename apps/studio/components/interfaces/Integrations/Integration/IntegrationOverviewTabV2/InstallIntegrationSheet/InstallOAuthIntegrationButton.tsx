@@ -6,6 +6,8 @@ import { Button } from 'ui'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useInstallOAuthIntegrationMutation } from '@/data/marketplace/install-oauth-integration-mutation'
+import { useSecretsQuery } from '@/data/secrets/secrets-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface InstallOAuthIntegrationButtonProps {
   integration: IntegrationDefinition
@@ -13,10 +15,23 @@ interface InstallOAuthIntegrationButtonProps {
 
 export function InstallOAuthIntegrationButton({ integration }: InstallOAuthIntegrationButtonProps) {
   const { ref: projectRef } = useParams()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+
+  const requiresApiKeysCheck =
+    integration.installIdentificationMethod === 'secret_key_prefix' && !!integration.secretKeyPrefix
+
+  const requiresEdgeFunctionSecretsCheck =
+    integration.installIdentificationMethod === 'edge_function_secret_name' &&
+    !!integration.edgeFunctionSecretName
 
   const { data: apiKeys, isLoading: isApiKeysLoading } = useAPIKeysQuery(
     { projectRef, reveal: false },
-    { enabled: !!projectRef }
+    { enabled: requiresApiKeysCheck }
+  )
+
+  const { data: edgeFunctionSecrets, isPending: isEdgeFunctionSecretsLoading } = useSecretsQuery(
+    { projectRef },
+    { enabled: requiresEdgeFunctionSecretsCheck }
   )
 
   const { mutate: installOAuthIntegration, isPending: isInstalling } =
@@ -27,7 +42,7 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
             toast.error('Failed to redirect because redirect URL is invalid')
             return
           }
-          window.location.href = data.redirectUrl
+          window.open(data.redirectUrl, '_blank', 'noreferrer')
         } else {
           toast.error('Failed to start integration installation')
         }
@@ -35,18 +50,26 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
     })
 
   const isLoading =
-    integration.installIdentificationMethod === 'secret_key_prefix' && isApiKeysLoading
+    (requiresApiKeysCheck && isApiKeysLoading) ||
+    (requiresEdgeFunctionSecretsCheck && isEdgeFunctionSecretsLoading)
 
   const isIntegrationInstalled = useMemo(() => {
     if (!integration) return false
 
-    const prefix = integration.secretKeyPrefix
+    if (integration.installIdentificationMethod === 'secret_key_prefix') {
+      const prefix = integration.secretKeyPrefix
+      if (!prefix || isApiKeysLoading || !apiKeys) return false
+      return apiKeys.some((k) => k.type === 'secret' && k.name.startsWith(prefix))
+    }
 
-    if (integration.installIdentificationMethod !== 'secret_key_prefix' || !prefix) return false
-    if (isApiKeysLoading || !apiKeys) return false
+    if (integration.installIdentificationMethod === 'edge_function_secret_name') {
+      const secretName = integration.edgeFunctionSecretName
+      if (!secretName || isEdgeFunctionSecretsLoading || !edgeFunctionSecrets) return false
+      return edgeFunctionSecrets.some((secret) => secret.name === secretName)
+    }
 
-    return apiKeys.some((k) => k.type === 'secret' && k.name.startsWith(prefix))
-  }, [apiKeys, integration, isApiKeysLoading])
+    return false
+  }, [apiKeys, edgeFunctionSecrets, integration, isApiKeysLoading, isEdgeFunctionSecretsLoading])
 
   const handleInstallClick = async () => {
     if (!integration || !projectRef) return
@@ -55,7 +78,16 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
       if (!integration.listingId) return toast.error('Listing ID is required')
       installOAuthIntegration({ projectRef, id: integration.listingId })
     } else {
-      window.location.href = integration.installUrl ?? '/'
+      let redirectUrl = '/'
+
+      if (integration.installUrl) {
+        const url = new URL(integration.installUrl)
+        url.searchParams.append('organization_slug', selectedOrg?.slug ?? '')
+        url.searchParams.append('project_id', projectRef)
+        redirectUrl = url.href
+      }
+
+      window.open(redirectUrl, '_blank', 'noreferrer')
     }
   }
 

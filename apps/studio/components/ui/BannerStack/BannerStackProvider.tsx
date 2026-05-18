@@ -5,6 +5,7 @@ export const BANNER_ID = {
   INDEX_ADVISOR: 'index-advisor-banner',
   TABLE_EDITOR_QUEUE_OPERATIONS: 'table-editor-queue-operations-banner',
   RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
+  RLS_TESTER: 'rls-tester-banner',
   FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
 } as const
 

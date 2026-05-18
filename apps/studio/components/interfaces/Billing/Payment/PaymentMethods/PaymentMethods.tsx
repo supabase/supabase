@@ -1,6 +1,6 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CreditCardIcon, Plus } from 'lucide-react'
+import { CreditCardIcon, ExternalLink, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -22,6 +22,7 @@ import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
 import NoPermission from '@/components/ui/NoPermission'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -53,7 +54,11 @@ const PaymentMethods = () => {
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
   )
-
+  const isPartnerBilledOrganization = isPartnerBillingOrganization(
+    selectedOrganization?.billing_partner
+  )
+  const isStripeManagedOrganization =
+    selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
   return (
     <>
       <ScaffoldSection>
@@ -61,13 +66,14 @@ const PaymentMethods = () => {
           <div className="sticky space-y-2 top-12">
             <p className="text-foreground text-base m-0">Payment Methods</p>
             <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
-              Payments for your subscription are made using the default card.
+              {isStripeManagedOrganization
+                ? 'Billing for this organisation is handled through Stripe Projects.'
+                : 'Payments for your subscription are made using the default card.'}
             </p>
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {selectedOrganization?.managed_by !== undefined &&
-          selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE ? (
+          {selectedOrganization && isPartnerBilledOrganization ? (
             <PartnerManagedResource
               managedBy={selectedOrganization?.managed_by}
               resource="Payment Methods"
@@ -98,41 +104,63 @@ const PaymentMethods = () => {
                       type="note"
                       layout="horizontal"
                       title="Payment is currently by invoice"
-                      description="You get a monthly invoice and payment link via email. To change your payment
-                      method, please contact us via our support form."
+                      description={
+                        isStripeManagedOrganization
+                          ? 'You get a monthly invoice and payment link via email. Manage payment methods through Stripe Projects.'
+                          : 'You get a monthly invoice and payment link via email. To change your payment method, please contact us via our support form.'
+                      }
                       actions={
-                        <Button asChild key="payment-method-support" type="default">
-                          <SupportLink
-                            queryParams={{
-                              category: SupportCategories.BILLING,
-                              subject: 'Request to change payment method',
-                            }}
+                        isStripeManagedOrganization ? (
+                          <Button
+                            asChild
+                            key="stripe-projects-billing-docs"
+                            type="default"
+                            iconRight={<ExternalLink size={14} />}
                           >
-                            Contact support
-                          </SupportLink>
-                        </Button>
+                            <a
+                              href="https://docs.stripe.com/projects#manage-billing"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              View Stripe Projects docs
+                            </a>
+                          </Button>
+                        ) : (
+                          <Button asChild key="payment-method-support" type="default">
+                            <SupportLink
+                              queryParams={{
+                                category: SupportCategories.BILLING,
+                                subject: 'Request to change payment method',
+                              }}
+                            >
+                              Contact support
+                            </SupportLink>
+                          </Button>
+                        )
                       }
                     />
                   )}
                   <FormPanel
                     footer={
-                      <div className="flex items-center justify-between py-4 px-8">
-                        {!canUpdatePaymentMethods ? (
-                          <p className="text-sm text-foreground-light">
-                            You need additional permissions to manage payment methods
-                          </p>
-                        ) : (
-                          <div />
-                        )}
-                        <Button
-                          type="default"
-                          icon={<Plus />}
-                          disabled={!canUpdatePaymentMethods}
-                          onClick={() => setShowAddPaymentMethodModal(true)}
-                        >
-                          Add new card
-                        </Button>
-                      </div>
+                      !isStripeManagedOrganization ? (
+                        <div className="flex items-center justify-between py-4 px-8">
+                          {!canUpdatePaymentMethods ? (
+                            <p className="text-sm text-foreground-light">
+                              You need additional permissions to manage payment methods
+                            </p>
+                          ) : (
+                            <div />
+                          )}
+                          <Button
+                            type="default"
+                            icon={<Plus />}
+                            disabled={!canUpdatePaymentMethods}
+                            onClick={() => setShowAddPaymentMethodModal(true)}
+                          >
+                            Add new card
+                          </Button>
+                        </div>
+                      ) : undefined
                     }
                   >
                     <FormSection>

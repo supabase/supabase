@@ -42,7 +42,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
       )}
       {recent.length === 0 && (
         <>
-          <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
+          <div className="my-auto flex h-full grow flex-col items-center justify-center gap-1">
             <Clock className="animate-bounce" />
             <h3 className="text-lg text-foreground">No Recent Queries Yet</h3>
             <p className="text-sm text-foreground-lighter">

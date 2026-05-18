@@ -1,6 +1,7 @@
+import { untrustedSql } from '@supabase/pg-meta'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import {
+import React, {
   isValidElement,
   memo,
   ReactNode,
@@ -84,7 +85,7 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children?: R
       <DialogTrigger asChild>
         <span
           className={cn(
-            '!m-0 text-foreground cursor-pointer transition',
+            'm-0! text-foreground cursor-pointer transition',
             'underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground-lighter'
           )}
         >
@@ -134,8 +135,8 @@ const baseMarkdownComponents = {
   h3: Heading3,
   code: InlineCode,
   a: Hyperlink,
-  img: ({ src }: JSX.IntrinsicElements['img']) => (
-    <span className="text-foreground-light font-mono">[Image: {src}]</span>
+  img: ({ src }: React.JSX.IntrinsicElements['img']) => (
+    <span className="text-foreground-light font-mono">[Image: {src?.toString()}]</span>
   ),
 }
 
@@ -168,7 +169,7 @@ export function MessageMarkdown({
     () => ({
       ...markdownComponents,
       ...baseMarkdownComponents,
-      pre: (props: JSX.IntrinsicElements['pre']) => (
+      pre: (props: React.JSX.IntrinsicElements['pre']) => (
         <MarkdownPre id={id} isLoading={isLoading} readOnly={readOnly}>
           {props.children}
         </MarkdownPre>
@@ -187,7 +188,7 @@ export function MessageMarkdown({
 export const MarkdownPre = ({
   children,
   id,
-  isLoading,
+  isLoading: _isLoading,
   readOnly,
 }: {
   children: any
@@ -205,8 +206,11 @@ export const MarkdownPre = ({
   })
 
   const childArray = Array.isArray(children) ? children : [children]
-  const codeElement = childArray.find((child): child is ReactElement => isValidElement(child))
-  const codeProps = codeElement?.props || {}
+  const codeElement = childArray.find(
+    (child): child is ReactElement<{ className?: string; children: ReactNode }> =>
+      isValidElement<{ className?: string; children: ReactNode }>(child)
+  )
+  const codeProps = codeElement?.props || ({} as { className?: string; children: ReactNode })
   const language = codeProps.className?.replace('language-', '') || 'sql'
   const codeChildren = codeProps.children
   const rawContent = Array.isArray(codeChildren)
@@ -265,7 +269,7 @@ export const MarkdownPre = ({
             messageId={id}
             toolCallId={toolCallId}
             initialArgs={{
-              sql: cleanContent,
+              sql: untrustedSql(cleanContent),
               label: title,
               isWriteQuery: false,
               view: isChart ? 'chart' : 'table',
@@ -285,7 +289,7 @@ export const MarkdownPre = ({
           value={cleanContent}
           language={language as CodeBlockLang}
           className={cn(
-            'my-4 max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
+            'my-4 max-h-96 max-w-none block border rounded-sm bg-transparent! py-3! px-3.5! prose dark:prose-dark text-foreground',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
         />

@@ -1,5 +1,7 @@
+import Image from 'next/image'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
+import antigravityAuthenticateScreenshot from './assets/antigravity-authenticate-screenshot.png'
 import type {
   AntigravityMcpConfig,
   ClaudeCodeMcpConfig,
@@ -65,22 +67,6 @@ export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group
 /** Only set hasDistinctDarkIcon: true when the client has a separate -icon-dark.svg that looks different. Otherwise the same -icon.svg is used for both themes. */
 export const MCP_CLIENTS: McpClient[] = [
   {
-    key: 'cursor',
-    label: 'Cursor',
-    icon: 'cursor',
-    configFile: '.cursor/mcp.json',
-    externalDocsUrl: 'https://docs.cursor.com/context/mcp',
-    generateDeepLink: (config) => {
-      const name = 'supabase'
-      const mcpUrl = getMcpUrl(config)
-      const serverConfig = {
-        url: mcpUrl,
-      }
-      const base64Config = Buffer.from(JSON.stringify(serverConfig)).toString('base64')
-      return `cursor://anysphere.cursor-deeplink/mcp/install?name=${name}&config=${encodeURIComponent(base64Config)}`
-    },
-  },
-  {
     key: 'claude-code',
     label: 'Claude Code',
     icon: 'claude',
@@ -136,6 +122,22 @@ export const MCP_CLIENTS: McpClient[] = [
     ),
   },
   {
+    key: 'cursor',
+    label: 'Cursor',
+    icon: 'cursor',
+    configFile: '.cursor/mcp.json',
+    externalDocsUrl: 'https://docs.cursor.com/context/mcp',
+    generateDeepLink: (config) => {
+      const name = 'supabase'
+      const mcpUrl = getMcpUrl(config)
+      const serverConfig = {
+        url: mcpUrl,
+      }
+      const base64Config = Buffer.from(JSON.stringify(serverConfig)).toString('base64')
+      return `cursor://anysphere.cursor-deeplink/mcp/install?name=${name}&config=${encodeURIComponent(base64Config)}`
+    },
+  },
+  {
     key: 'vscode',
     label: 'VS Code',
     icon: 'vscode',
@@ -176,7 +178,7 @@ export const MCP_CLIENTS: McpClient[] = [
     },
     primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
-      const command = `codex mcp add supabase --url ${mcpUrl}`
+      const command = `codex mcp add supabase --url "${mcpUrl}"`
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">Add the Supabase MCP server to Codex:</p>
@@ -190,7 +192,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           After adding the server, enable remote MCP client support by adding this to your{' '}
@@ -289,7 +291,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => {
+    alternateInstructions: (_config, onCopy) => {
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
@@ -336,10 +338,18 @@ export const MCP_CLIENTS: McpClient[] = [
           servers.
         </p>
         <p className="text-xs text-foreground-light">
-          If you run into authentication issues, open the command palette and run{' '}
-          <strong>Authentication: Remove Dynamic Authentication Providers</strong> to clear cached
-          OAuth credentials and re-authenticate.
+          If you run into authentication issues, open Agent Settings with <strong>Cmd+,</strong>{' '}
+          (Mac) or <strong>Ctrl+,</strong> (Windows/Linux), navigate to the{' '}
+          <strong>Customizations</strong> tab, and click the <strong>Authenticate</strong> button
+          next to the Supabase server.
         </p>
+        <Image
+          src={antigravityAuthenticateScreenshot}
+          alt="Antigravity MCP server settings showing the Authenticate button next to the Supabase server"
+          width={1316}
+          height={258}
+          className="rounded border border-muted w-full"
+        />
       </div>
     ),
   },
@@ -360,12 +370,12 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    primaryInstructions: (config, onCopy) => (
+    primaryInstructions: (_config, _onCopy) => (
       <p className="text-xs text-warning">
         Ensure you are running Windsurf version <code>0.1.37</code> or higher.
       </p>
     ),
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, _onCopy) => (
       <p className="text-xs text-foreground-light">
         Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
         the mcp-remote package as a proxy.
@@ -422,7 +432,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, _onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           For more details, see{' '}
@@ -472,7 +482,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, _onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           Restart Factory or type <code>/mcp</code> within droid to complete OAuth authentication
@@ -501,7 +511,7 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           After adding the configuration, run the following command to authenticate:
@@ -544,7 +554,39 @@ export const MCP_CLIENTS: McpClient[] = [
       </>
     ),
   },
+  {
+    key: 'claude-ai',
+    label: 'Claude.ai',
+    icon: 'claude',
+    externalDocsUrl: 'https://claude.com/docs/connectors/overview',
+    generateDeepLink: () =>
+      'https://claude.ai/directory/connectors/11ca66fc-1e98-49d5-ab9b-7cb4672a8f10',
+  },
+  {
+    key: 'chatgpt',
+    label: 'ChatGPT',
+    icon: 'openai',
+    hasDistinctDarkIcon: true,
+    externalDocsUrl: 'https://chatgpt.com/features/apps/',
+    generateDeepLink: () =>
+      'https://chatgpt.com/apps/supabase/asdk_app_69d3e5ee6a708191baa733f7b8931995',
+  },
 ]
+
+export const MCP_CLIENT_GROUPS = [
+  {
+    heading: 'AI Agent CLI',
+    keys: ['claude-code', 'codex', 'gemini-cli', 'opencode', 'factory'],
+  },
+  {
+    heading: 'Web Clients',
+    keys: ['claude-ai', 'chatgpt', 'goose'],
+  },
+  {
+    heading: 'IDE',
+    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf'],
+  },
+] as const
 
 export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
 export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'

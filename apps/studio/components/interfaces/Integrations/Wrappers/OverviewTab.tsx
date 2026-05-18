@@ -105,7 +105,7 @@ const AddNewWrapperCTA = () => {
   if (!!wrapperMeta && isWrappersExtensionInstalled && !hasRequiredVersion) {
     return (
       <Admonition type="warning" title="Your extension version is outdated for this wrapper">
-        <div className="flex flex-col gap-y-2 [&>p]:!mb-0">
+        <div className="flex flex-col gap-y-2 [&>p]:mb-0!">
           <p>
             The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}

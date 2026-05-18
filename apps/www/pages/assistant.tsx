@@ -676,7 +676,7 @@ function Assistant() {
               {/* Main content */}
               <div className="mb-6 flex flex-col gap-4 max-w-lg">
                 <h1 className="text-4xl sm:text-5xl sm:leading-none">Chat with Postgres</h1>
-                <p className="p text-lg !m-0">
+                <p className="p text-lg m-0!">
                   Generate, run and debug queries, chart your data, create functions, policies and
                   more. The Assistant is here to help.
                 </p>
@@ -765,7 +765,7 @@ function Assistant() {
                     ease: 'easeInOut',
                     delay: 0.5,
                   }}
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-background-muted/40 to-transparent transform -skew-x-12 z-10"
+                  className="absolute inset-0 bg-linear-to-r from-transparent via-background-muted/40 to-transparent transform -skew-x-12 z-10"
                 />
                 <AIDemoPanel incomingMessages={incomingMessages} />
               </motion.div>

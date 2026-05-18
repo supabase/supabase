@@ -10,10 +10,10 @@ import {
   Calendar,
   cn,
   copyToClipboard,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
@@ -93,7 +93,7 @@ interface LogsDatePickerProps {
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
-  popoverContentProps?: typeof PopoverContent_Shadcn_
+  popoverContentProps?: typeof PopoverContent
   hideWarnings?: boolean
   align?: 'start' | 'end' | 'center'
 }
@@ -317,27 +317,27 @@ export const LogsDatePicker = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
           {value.isHelper
             ? value.text
             : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         className="flex w-full p-0"
         side="bottom"
         align={align}
         {...popoverContentProps}
       >
         <div className="border-r p-2 flex flex-col gap-px">
-          <Input_Shadcn_
+          <Input
             type="text"
             placeholder="e.g. 2h, 30m, 7d"
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
-            className="mb-2 text-xs h-7 rounded-sm"
+            className="mb-2 text-xs h-7 rounded-xs"
           />
           <RadioGroup
             onValueChange={handleHelperChange}
@@ -348,7 +348,7 @@ export const LogsDatePicker = ({
               <Label
                 key={helper.text}
                 className={cn(
-                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
+                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-xs text-xs w-full',
                   {
                     'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
                   }
@@ -372,7 +372,7 @@ export const LogsDatePicker = ({
 
         <div>
           <div className="flex p-2 gap-2 items-center">
-            <div className="flex flex-grow *:flex-grow gap-2 font-mono">
+            <div className="flex grow *:grow gap-2 font-mono">
               <TimeSplitInput
                 type="start"
                 startTime={startTime}
@@ -396,7 +396,7 @@ export const LogsDatePicker = ({
                 endDate={endDate}
               />
             </div>
-            <div className="flex-shrink">
+            <div className="shrink">
               <ButtonTooltip
                 tooltip={{
                   content: {
@@ -458,7 +458,7 @@ export const LogsDatePicker = ({
             <Button onClick={handleApply}>Apply</Button>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

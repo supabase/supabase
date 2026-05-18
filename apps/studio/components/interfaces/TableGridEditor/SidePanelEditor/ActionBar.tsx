@@ -2,7 +2,8 @@ import { noop } from 'lodash'
 import { PropsWithChildren, useCallback, useState } from 'react'
 import { Button, KeyboardShortcut } from 'ui'
 
-import { useHotKey } from '@/hooks/ui/useHotKey'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface ActionBarProps {
   loading?: boolean
@@ -37,36 +38,20 @@ export const ActionBar = ({
     setIsRunning(false)
   }, [applyFunction])
 
-  const handleSave = useCallback(
-    (event: KeyboardEvent) => {
-      // Don't trigger if already running/loading, or if apply is disabled/hidden
-      if (isRunning || loading || disableApply || hideApply) return
+  const handleSave = useCallback(() => {
+    if (isRunning || loading || disableApply || hideApply) return
 
-      // Don't trigger if the user is in a textarea (allow multi-line entry)
-      // unless they explicitly press CMD+Enter
-      const activeElement = document.activeElement
-      const isTextarea = activeElement?.tagName === 'TEXTAREA'
-
-      // If in a textarea and this is just an Enter key (not CMD+Enter), don't submit
-      if (isTextarea && !event.metaKey && !event.ctrlKey) return
-
-      event.preventDefault()
-      event.stopPropagation()
-
-      if (formId) {
-        // Form-based submission - programmatically submit the form
-        const form = document.getElementById(formId) as HTMLFormElement | null
-        if (form) {
-          form.requestSubmit()
-        }
-      } else if (applyFunction) {
-        onSelectApply()
+    if (formId) {
+      const form = document.getElementById(formId) as HTMLFormElement | null
+      if (form) {
+        form.requestSubmit()
       }
-    },
-    [isRunning, loading, disableApply, hideApply, formId, applyFunction, onSelectApply]
-  )
+    } else if (applyFunction) {
+      onSelectApply()
+    }
+  }, [isRunning, loading, disableApply, hideApply, formId, applyFunction, onSelectApply])
 
-  useHotKey(handleSave, 'Enter', { enabled: visible })
+  useShortcut(SHORTCUT_IDS.ACTION_BAR_SAVE, handleSave, { enabled: visible })
 
   return (
     <div className="flex w-full items-center gap-3 border-t border-default px-3 py-4">

@@ -1,5 +1,7 @@
-export const enrichLintsQuery = (query: string, exposedSchemas?: string) => {
-  return `
+import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+
+export const enrichLintsQuery = (query: SafeSqlFragment, exposedSchemas?: string) => {
+  return safeSql`
 do $$
 begin
   set pg_stat_statements.track = none;
@@ -7,10 +9,10 @@ exception when others then
   -- not a superuser or extension not installed, skip silently
 end
 $$;
-${!!exposedSchemas ? `set local pgrst.db_schemas = '${exposedSchemas}';` : ''}
+${!!exposedSchemas ? safeSql`set local pgrst.db_schemas = ${literal(exposedSchemas)};` : safeSql``}
 -- source: dashboard
--- user: ${'self host'}
--- date: ${new Date().toISOString()}
+-- user: self host
+-- date: ${new Date().toISOString() as SafeSqlFragment}
 
 ${query}
 `
@@ -22,8 +24,8 @@ ${query}
  * - Replace all "\`%s\`" with backquotes to escape the tick character ("\`%s\`")
  * - Replace docs url with docsUrl (${docsUrl})
  */
-export const getLintsSQL = ({ docsUrl }: { docsUrl: string }) =>
-  /* SQL */ `set local search_path = '';
+export const getLintsSQL = ({ docsUrl }: { docsUrl: string }): SafeSqlFragment =>
+  safeSql`set local search_path = '';
 
 (
 with foreign_keys as (
@@ -70,7 +72,7 @@ select
         fk.table_name,
         fk.fkey_name
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0001_unindexed_foreign_keys' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0001_unindexed_foreign_keys`)} as remediation,
     jsonb_build_object(
         'schema', fk.schema_name,
         'name', fk.table_name,
@@ -110,7 +112,7 @@ select
         'View/Materialized View "%s" in the public schema may expose \`auth.users\` data to anon or authenticated roles.',
         c.relname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0002_auth_users_exposed' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0002_auth_users_exposed`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -224,12 +226,12 @@ select
     array['PERFORMANCE'] as categories,
     'Detects if calls to \`current_setting()\` and \`auth.<function>()\` in RLS policies are being unnecessarily re-evaluated for each row' as description,
     format(
-        'Table \`%s.%s\` has a row level security policy \`%s\` that re-evaluates current_setting() or auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing \`auth.<function>()\` with \`(select auth.<function>())\`. See [docs](${docsUrl}/guides/database/postgres/row-level-security#call-functions-with-select) for more info.',
+        ${literal(`Table \`%s.%s\` has a row level security policy \`%s\` that re-evaluates current_setting() or auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing \`auth.<function>()\` with \`(select auth.<function>())\`. See [docs](${docsUrl}/guides/database/postgres/row-level-security#call-functions-with-select) for more info.`)},
         schema_name,
         table_name,
         policy_name
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0003_auth_rls_initplan' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0003_auth_rls_initplan`)} as remediation,
     jsonb_build_object(
         'schema', schema_name,
         'name', table_name,
@@ -301,7 +303,7 @@ select
         pgns.nspname,
         pgc.relname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0004_no_primary_key' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0004_no_primary_key`)} as remediation,
      jsonb_build_object(
         'schema', pgns.nspname,
         'name', pgc.relname,
@@ -348,7 +350,7 @@ select
         psui.schemaname,
         psui.relname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0005_unused_index' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0005_unused_index`)} as remediation,
     jsonb_build_object(
         'schema', psui.schemaname,
         'name', psui.relname,
@@ -393,7 +395,7 @@ select
         act.cmd,
         array_agg(p.polname order by p.polname)
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0006_multiple_permissive_policies' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0006_multiple_permissive_policies`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -464,7 +466,7 @@ select
         c.relname,
         array_agg(p.polname order by p.polname)
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0007_policy_exists_rls_disabled' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0007_policy_exists_rls_disabled`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -509,7 +511,7 @@ select
         n.nspname,
         c.relname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0008_rls_enabled_no_policy' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0008_rls_enabled_no_policy`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -556,7 +558,7 @@ select
         c.relname,
         array_agg(pi.indexname order by pi.indexname)
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0009_duplicate_index' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0009_duplicate_index`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -610,7 +612,7 @@ select
         n.nspname,
         c.relname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0010_security_definer_view' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0010_security_definer_view`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -663,7 +665,7 @@ select
         n.nspname,
         p.proname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0011_function_search_path_mutable' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0011_function_search_path_mutable`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', p.proname,
@@ -707,7 +709,7 @@ select
         n.nspname,
         c.relname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0013_rls_disabled_in_public' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0013_rls_disabled_in_public`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -747,7 +749,7 @@ select
         'Extension \`%s\` is installed in the public schema. Move it to another schema.',
         pe.extname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0014_extension_in_public' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0014_extension_in_public`)} as remediation,
     jsonb_build_object(
         'schema', pe.extnamespace::regnamespace,
         'name', pe.extname,
@@ -801,7 +803,7 @@ select
         table_name,
         policy_name
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0015_rls_references_user_metadata' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0015_rls_references_user_metadata`)} as remediation,
     jsonb_build_object(
         'schema', schema_name,
         'name', table_name,
@@ -837,7 +839,7 @@ select
         n.nspname,
         c.relname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0016_materialized_view_in_api' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0016_materialized_view_in_api`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -880,7 +882,7 @@ select
         n.nspname,
         c.relname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0017_foreign_table_in_api' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0017_foreign_table_in_api`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -925,7 +927,7 @@ select
         a.attname,
         t.typname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=unsupported_reg_types' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=unsupported_reg_types`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -966,7 +968,7 @@ select
         n.nspname,
         c.relname
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0019_insecure_queue_exposed_in_api' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0019_insecure_queue_exposed_in_api`)} as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -1149,7 +1151,7 @@ select
         ext.installed_version,
         ext.default_version
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0022_extension_versions_outdated' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0022_extension_versions_outdated`)} as remediation,
     jsonb_build_object(
         'extension_name', ext.name,
         'installed_version', ext.installed_version,
@@ -1260,7 +1262,7 @@ select
         table_name,
         string_agg(distinct column_name, ', ' order by column_name)
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0023_sensitive_columns_exposed' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0023_sensitive_columns_exposed`)} as remediation,
     jsonb_build_object(
         'schema', schema_name,
         'name', table_name,
@@ -1382,7 +1384,7 @@ select
         end,
         array_to_string(roles, ', ')
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0024_permissive_rls_policy' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0024_permissive_rls_policy`)} as remediation,
     jsonb_build_object(
         'schema', schema_name,
         'name', table_name,
@@ -1491,7 +1493,7 @@ select
         end,
         array_to_string(policy_names, ', ')
     ) as detail,
-    '${docsUrl}/guides/database/database-linter?lint=0025_public_bucket_allows_listing' as remediation,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0025_public_bucket_allows_listing`)} as remediation,
     jsonb_build_object(
         'schema', 'storage',
         'name', bucket_name,
@@ -1505,4 +1507,248 @@ select
 from
     affected_buckets
 order by
-    bucket_id)`.trim()
+    bucket_id)
+union all
+(
+with graphql_installed as (
+    select 1 as installed
+    from pg_catalog.pg_extension
+    where extname = 'pg_graphql'
+),
+exposed_objects as (
+    select
+        n.nspname as schema_name,
+        c.relname as object_name,
+        c.relkind as object_relkind,
+        case c.relkind
+            when 'r' then 'table'
+            when 'v' then 'view'
+            when 'm' then 'materialized view'
+            when 'f' then 'foreign table'
+        end as object_type
+    from
+        pg_catalog.pg_class c
+        join pg_catalog.pg_namespace n
+            on c.relnamespace = n.oid
+    where
+        c.relkind in ('r', 'v', 'm', 'f') -- tables, views, materialized views, foreign tables; matches pg_graphql
+        and exists (
+            -- Any selectable column (table-level or column-level grant)
+            select 1
+            from pg_catalog.pg_attribute a
+            where a.attrelid = c.oid
+                and a.attnum > 0
+                and not a.attisdropped
+                and pg_catalog.has_column_privilege('anon', c.oid, a.attnum, 'SELECT')
+        )
+        and exists (select 1 from graphql_installed)
+        and n.nspname not in (
+            '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        )
+)
+select
+    'pg_graphql_anon_table_exposed' as name,
+    'Public Can See Object in GraphQL Schema' as title,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects tables, views, materialized views, and foreign tables that are visible in the GraphQL schema to anyone using your public anon key. Revoke \`SELECT\` from \`anon\` for objects that should not be discoverable before sign-in, and check lint 0027 for the matching signed-in-user exposure.' as description,
+    format(
+        '%s \`%s.%s\` is visible in the GraphQL schema because the \`anon\` role can \`SELECT\` it. Revoke \`SELECT\` from \`anon\` if it should not be discoverable without signing in.',
+        object_type,
+        schema_name,
+        object_name
+    ) as detail,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0026_pg_graphql_anon_table_exposed`)} as remediation,
+    jsonb_build_object(
+        'schema', schema_name,
+        'name', object_name,
+        'type', object_type
+    ) as metadata,
+    format(
+        'pg_graphql_anon_table_exposed_%s_%s',
+        schema_name,
+        object_name
+    ) as cache_key
+from
+    exposed_objects
+order by
+    schema_name,
+    object_name)
+union all
+(
+with graphql_installed as (
+    select 1 as installed
+    from pg_catalog.pg_extension
+    where extname = 'pg_graphql'
+),
+exposed_objects as (
+    select
+        n.nspname as schema_name,
+        c.relname as object_name,
+        c.relkind as object_relkind,
+        case c.relkind
+            when 'r' then 'table'
+            when 'v' then 'view'
+            when 'm' then 'materialized view'
+            when 'f' then 'foreign table'
+        end as object_type
+    from
+        pg_catalog.pg_class c
+        join pg_catalog.pg_namespace n
+            on c.relnamespace = n.oid
+    where
+        c.relkind in ('r', 'v', 'm', 'f') -- tables, views, materialized views, foreign tables; matches pg_graphql
+        and exists (
+            -- Any selectable column (table-level or column-level grant)
+            select 1
+            from pg_catalog.pg_attribute a
+            where a.attrelid = c.oid
+                and a.attnum > 0
+                and not a.attisdropped
+                and pg_catalog.has_column_privilege('authenticated', c.oid, a.attnum, 'SELECT')
+        )
+        and exists (select 1 from graphql_installed)
+        and n.nspname not in (
+            '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        )
+)
+select
+    'pg_graphql_authenticated_table_exposed' as name,
+    'Signed-In Users Can See Object in GraphQL Schema' as title,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects tables, views, materialized views, and foreign tables that are visible in the GraphQL schema to signed-in users. Revoke \`SELECT\` from \`authenticated\` for objects that signed-in users should not discover, and check lint 0026 for the matching public exposure.' as description,
+    format(
+        '%s \`%s.%s\` is visible in the GraphQL schema to signed-in users because the \`authenticated\` role can \`SELECT\` it. Revoke \`SELECT\` from \`authenticated\` if it should not be discoverable to every account.',
+        object_type,
+        schema_name,
+        object_name
+    ) as detail,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0027_pg_graphql_authenticated_table_exposed`)} as remediation,
+    jsonb_build_object(
+        'schema', schema_name,
+        'name', object_name,
+        'type', object_type
+    ) as metadata,
+    format(
+        'pg_graphql_authenticated_table_exposed_%s_%s',
+        schema_name,
+        object_name
+    ) as cache_key
+from
+    exposed_objects
+order by
+    schema_name,
+    object_name)
+union all
+(
+select
+    'anon_security_definer_function_executable' as name,
+    'Public Can Execute SECURITY DEFINER Function' as title,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects \`SECURITY DEFINER\` functions that are callable without signing in. Revoke \`EXECUTE\`, switch the function to \`SECURITY INVOKER\`, or move it out of your exposed API schema if it is not meant to be public.' as description,
+    format(
+        'Function \`%s.%s(%s)\` can be executed by the \`anon\` role as a \`SECURITY DEFINER\` function via \`/rest/v1/rpc/%s\`. Revoke \`EXECUTE\` or switch it to \`SECURITY INVOKER\` if that is not intentional.',
+        schema_name,
+        function_name,
+        function_args,
+        function_name
+    ) as detail,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0028_anon_security_definer_function_executable`)} as remediation,
+    jsonb_build_object(
+        'schema', schema_name,
+        'name', function_name,
+        'arguments', function_args,
+        'language', function_language,
+        'security_definer', true
+    ) as metadata,
+    format(
+        'anon_security_definer_function_executable_%s_%s_%s',
+        schema_name,
+        function_name,
+        function_args
+    ) as cache_key
+from
+    (
+        select
+            n.nspname as schema_name,
+            p.proname as function_name,
+            pg_catalog.pg_get_function_identity_arguments(p.oid) as function_args,
+            l.lanname as function_language
+        from
+            pg_catalog.pg_proc p
+            join pg_catalog.pg_namespace n
+                on p.pronamespace = n.oid
+            join pg_catalog.pg_language l
+                on p.prolang = l.oid
+        where
+            p.prosecdef = true
+            and pg_catalog.has_function_privilege('anon', p.oid, 'EXECUTE')
+            and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
+            and n.nspname not in (
+                '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+            )
+    ) exposed_functions
+order by
+    schema_name,
+    function_name,
+    function_args)
+union all
+(
+select
+    'authenticated_security_definer_function_executable' as name,
+    'Signed-In Users Can Execute SECURITY DEFINER Function' as title,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects \`SECURITY DEFINER\` functions that are callable by signed-in users. Revoke \`EXECUTE\`, switch the function to \`SECURITY INVOKER\`, or move it out of your exposed API schema if signed-in users should not call it.' as description,
+    format(
+        'Function \`%s.%s(%s)\` can be executed by the \`authenticated\` role as a \`SECURITY DEFINER\` function via \`/rest/v1/rpc/%s\`. Revoke \`EXECUTE\` or switch it to \`SECURITY INVOKER\` if that is not intentional.',
+        schema_name,
+        function_name,
+        function_args,
+        function_name
+    ) as detail,
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable`)} as remediation,
+    jsonb_build_object(
+        'schema', schema_name,
+        'name', function_name,
+        'arguments', function_args,
+        'language', function_language,
+        'security_definer', true
+    ) as metadata,
+    format(
+        'authenticated_security_definer_function_executable_%s_%s_%s',
+        schema_name,
+        function_name,
+        function_args
+    ) as cache_key
+from
+    (
+        select
+            n.nspname as schema_name,
+            p.proname as function_name,
+            pg_catalog.pg_get_function_identity_arguments(p.oid) as function_args,
+            l.lanname as function_language
+        from
+            pg_catalog.pg_proc p
+            join pg_catalog.pg_namespace n
+                on p.pronamespace = n.oid
+            join pg_catalog.pg_language l
+                on p.prolang = l.oid
+        where
+            p.prosecdef = true
+            and pg_catalog.has_function_privilege('authenticated', p.oid, 'EXECUTE')
+            and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
+            and n.nspname not in (
+                '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgmq', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+            )
+    ) exposed_functions
+order by
+    schema_name,
+    function_name,
+    function_args)`

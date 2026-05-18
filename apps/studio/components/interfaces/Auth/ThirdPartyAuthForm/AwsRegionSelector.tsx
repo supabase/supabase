@@ -9,10 +9,10 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  FormControl_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  FormControl,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -59,9 +59,9 @@ export const AwsRegionSelector = ({
   const listboxId = useId()
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <FormControl_Shadcn_>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <FormControl>
           <Button
             type="default"
             role="combobox"
@@ -75,9 +75,9 @@ export const AwsRegionSelector = ({
           >
             {value ?? 'Select a region'}
           </Button>
-        </FormControl_Shadcn_>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ id={listboxId} className="p-0" sameWidthAsTrigger>
+        </FormControl>
+      </PopoverTrigger>
+      <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search AWS regions..." />
           <CommandList_Shadcn_>
@@ -103,7 +103,7 @@ export const AwsRegionSelector = ({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

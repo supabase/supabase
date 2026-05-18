@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { SUPABASE_TARGET_SCHEMA_OPTION, WRAPPER_HANDLERS, WRAPPERS } from './Wrappers.constants'
+import { SUPABASE_TARGET_SCHEMA_OPTION, WRAPPER_HANDLERS } from './Wrappers.constants'
 import { Table } from './Wrappers.types'
 import {
   getEditionFormSchema,

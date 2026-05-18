@@ -98,7 +98,7 @@ export function BranchDropdownCommandContent({
         {isBranchingEnabled && (
           <CommandInput_Shadcn_ placeholder="Find branch..." wrapperClassName="shrink-0 border-b" />
         )}
-        <CommandList_Shadcn_ className="flex flex-col flex-1 p-1 min-h-0 overflow-y-auto !max-h-none">
+        <CommandList_Shadcn_ className="flex flex-col flex-1 p-1 min-h-0 overflow-y-auto max-h-none!">
           {isBranchingEnabled && <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>}
           <CommandGroup_Shadcn_ className="min-h-0">
             {branchList.map((branch) => (

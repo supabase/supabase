@@ -3,11 +3,12 @@ import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
-import { useHotKey } from '@/hooks/ui/useHotKey'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export function DataTableResetButton() {
   const { table } = useDataTable()
-  useHotKey(() => table.resetColumnFilters(), 'Escape')
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS, () => table.resetColumnFilters())
 
   return (
     <Tooltip>

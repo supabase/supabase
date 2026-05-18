@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { databasePublicationsKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabasePublicationsVariables = {
@@ -53,3 +54,17 @@ export const useDatabasePublicationsQuery = <TData = DatabasePublicationsData>(
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
+
+export const useIsTableRealtimeEnabled = ({ id }: { id: number }) => {
+  const { data: project } = useSelectedProjectQuery()
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
+  const realtimeEnabledTables = realtimePublication?.tables ?? []
+  const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === id)
+  return isRealtimeEnabled
+}

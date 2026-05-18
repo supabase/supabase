@@ -10,7 +10,7 @@ description: 'Learn how to use Supabase in your Vue 3 App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/vue3-user-management).
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/vue3-user-management).
 
 </Admonition>
 
@@ -61,7 +61,10 @@ lines={[[1, -1]]}
 meta="name=src/supabase.js"
 />
 
-Optionally, update [src/style.css](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/vue3-user-management/src/style.css) to style the app.
+### App styling (optional)
+
+An optional step is to update the CSS file `src/style.css` to make the app look better.
+You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/vue3-user-management/src/style.css).
 
 ### Set up a login component
 
@@ -77,6 +80,30 @@ meta="name=src/components/Auth.vue"
 
 After a user signs in, allow them to edit their profile details and manage their account.
 Create a new `src/components/Account.vue` component to handle this.
+
+<$CodeSample
+path="/user-management/vue3-user-management/src/components/Account.vue"
+lines={[[1, 3], [5, 76], [78, -1]]}
+meta="name=src/components/Account.vue"
+/>
+
+## Profile photos
+
+Next, add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+
+### Create an upload widget
+
+Create a new `src/components/Avatar.vue` component that allows users to upload profile photos:
+
+<$CodeSample
+path="/user-management/vue3-user-management/src/components/Avatar.vue"
+lines={[[1, -1]]}
+meta="name=src/components/Avatar.vue"
+/>
+
+### Update the Account component
+
+With the Avatar component created, update `src/components/Account.vue` to include it:
 
 <$CodeSample
 path="/user-management/vue3-user-management/src/components/Account.vue"
@@ -103,25 +130,5 @@ npm run dev
 And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
 ![Supabase Vue 3](/docs/img/supabase-vue-3-demo.png)
-
-## Bonus: Profile photos
-
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
-
-### Create an upload widget
-
-Create a new `src/components/Avatar.vue` component that allows users to upload profile photos:
-
-<$CodeSample
-path="/user-management/vue3-user-management/src/components/Avatar.vue"
-lines={[[1, -1]]}
-meta="name=src/components/Avatar.vue"
-/>
-
-### Add the new widget
-
-Finally, add the widget to the Account page.
-
-The `Account.vue` component [shown earlier](#account-page) already includes the `Avatar` component.
 
 At this stage you have a fully functional application!

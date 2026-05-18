@@ -12,9 +12,9 @@ import Link from 'next/link'
 import { ReactNode, useId, useState } from 'react'
 import { Control } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   Command_Shadcn_,
@@ -25,14 +25,14 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   CriticalIcon,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -107,7 +107,7 @@ export const ColumnType = ({
   }
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={control}
       name={name}
       render={({ field }) => {
@@ -123,19 +123,19 @@ export const ColumnType = ({
               description={unsupportedDataTypeText}
               className={className}
             >
-              <FormControl_Shadcn_>
-                <Input_Shadcn_ {...field} id={name} disabled readOnly />
-              </FormControl_Shadcn_>
+              <FormControl>
+                <Input {...field} id={name} disabled readOnly />
+              </FormControl>
             </FormItemLayout>
           )
         }
         return (
-          <FormItem_Shadcn_ className={cn('flex flex-col space-y-2', className)}>
-            <FormLabel_Shadcn_ className="text-foreground flex gap-2 items-center break-words">
+          <FormItem className={cn('flex flex-col space-y-2', className)}>
+            <FormLabel className="text-foreground flex gap-2 items-center wrap-break-word">
               Type
-            </FormLabel_Shadcn_>
-            <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            </FormLabel>
+            <Popover modal open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
                 <Button
                   role="combobox"
                   size={'small'}
@@ -157,19 +157,14 @@ export const ColumnType = ({
                     'Choose a column type...'
                   )}
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                id={listboxId}
-                className="w-[460px] p-0"
-                side="bottom"
-                align="center"
-              >
+              </PopoverTrigger>
+              <PopoverContent id={listboxId} className="w-[460px] p-0" side="bottom" align="center">
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_
                     placeholder="Search types..."
                     // [Joshen] Addresses style issues when this component is being used in the old Form component
                     // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
-                    className="!bg-transparent focus:!shadow-none focus:!ring-0 text-xs"
+                    className="bg-transparent! focus:shadow-none! focus:ring-0! text-xs"
                   />
                   <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
 
@@ -259,17 +254,17 @@ export const ColumnType = ({
                     </ScrollArea>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
             {showRecommendation && recommendation !== undefined && (
-              <Alert_Shadcn_ variant="warning" className="mt-2">
+              <Alert variant="warning" className="mt-2">
                 <CriticalIcon />
-                <AlertTitle_Shadcn_>
+                <AlertTitle>
                   {' '}
                   It is recommended to use{' '}
                   <code className="text-code-inline">{recommendation.alternative}</code> instead
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
+                </AlertTitle>
+                <AlertDescription>
                   <p>
                     Postgres recommends against using the data type{' '}
                     <code className="text-code-inline">{field.value}</code> unless you have a very
@@ -288,10 +283,10 @@ export const ColumnType = ({
                       Use {recommendation.alternative}
                     </Button>
                   </div>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
-          </FormItem_Shadcn_>
+          </FormItem>
         )
       }}
     />

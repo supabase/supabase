@@ -22,17 +22,17 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import * as z from 'zod'
@@ -140,7 +140,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           let snippetContent = (snippet as SnippetWithContent)?.content
           if (snippetContent === undefined) {
             const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-            if ('sql' in content) {
+            if ('unchecked_sql' in content) {
               snippetContent = content
             }
           }
@@ -213,7 +213,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
   return (
     <Dialog open={visible} onOpenChange={() => onClose()}>
       <DialogContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove)}>
             <DialogHeader>
               <DialogTitle>
@@ -229,9 +229,9 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
             <DialogSection className="py-5 flex flex-col gap-y-4">
               <div className="flex flex-col gap-y-2">
-                <Label_Shadcn_ className="text-foreground-light">Select a folder</Label_Shadcn_>
-                <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                  <PopoverTrigger_Shadcn_ asChild>
+                <Label className="text-foreground-light">Select a folder</Label>
+                <Popover open={open} onOpenChange={setOpen} modal={false}>
+                  <PopoverTrigger asChild>
                     <Button
                       block
                       size="small"
@@ -250,13 +250,8 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                         {isCurrentFolder && ` (Current)`}
                       </div>
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_
-                    className="p-0"
-                    side="bottom"
-                    align="start"
-                    sameWidthAsTrigger
-                  >
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
                     <Command_Shadcn_>
                       <CommandInput_Shadcn_ placeholder="Find folder..." />
                       <CommandList_Shadcn_>
@@ -313,7 +308,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                         <CommandGroup_Shadcn_>
                           <CommandItem_Shadcn_
                             className="cursor-pointer w-full justify-start gap-x-2"
-                            onSelect={(e) => {
+                            onSelect={(_e) => {
                               setOpen(false)
                               setSelectedId('new-folder')
                             }}
@@ -328,28 +323,28 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                         </CommandGroup_Shadcn_>
                       </CommandList_Shadcn_>
                     </Command_Shadcn_>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {selectedId === 'new-folder' && (
                 <div className="flex flex-col gap-y-2">
-                  <FormField_Shadcn_
+                  <FormField
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                        <FormLabel_Shadcn_>Provide a name for your new folder</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
+                      <FormItem className="flex flex-col gap-y-2">
+                        <FormLabel>Provide a name for your new folder</FormLabel>
+                        <FormControl>
+                          <Input
                             autoFocus
                             {...field}
                             autoComplete="off"
                             disabled={isMovingSnippet || isCreatingFolder}
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
                 </div>
@@ -374,7 +369,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

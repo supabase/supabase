@@ -11,10 +11,10 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   Switch,
 } from 'ui'
 import { PageSection, PageSectionContent } from 'ui-patterns'
@@ -214,11 +214,11 @@ export const OAuthServerSettingsForm = () => {
     <>
       <PageSection>
         <PageSectionContent>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="OAUTH_SERVER_ENABLED"
                     render={({ field }) => (
@@ -227,13 +227,13 @@ export const OAuthServerSettingsForm = () => {
                         label="Enable the Supabase OAuth Server"
                         description="Enable OAuth server functionality for your project to create and manage OAuth applications."
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={handleOAuthServerToggle}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -258,7 +258,7 @@ export const OAuthServerSettingsForm = () => {
                           </>
                         }
                       >
-                        <Input_Shadcn_
+                        <Input
                           value={authConfig?.SITE_URL}
                           disabled
                           placeholder="https://example.com"
@@ -266,7 +266,7 @@ export const OAuthServerSettingsForm = () => {
                       </FormItemLayout>
                     </CardContent>
                     <CardContent className="space-y-4">
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="OAUTH_SERVER_AUTHORIZATION_PATH"
                         render={({ field }) => (
@@ -275,9 +275,9 @@ export const OAuthServerSettingsForm = () => {
                             layout="flex-row-reverse"
                             description="Path where you'll implement the OAuth authorization UI (consent screens)."
                           >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="/auth/authorize" />
-                            </FormControl_Shadcn_>
+                            <FormControl>
+                              <Input {...field} placeholder="/auth/authorize" />
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -315,7 +315,7 @@ export const OAuthServerSettingsForm = () => {
                       })()}
                     </CardContent>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION"
                         render={({ field }) => (
@@ -334,13 +334,13 @@ export const OAuthServerSettingsForm = () => {
                               </>
                             }
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={handleDynamicAppsToggle}
                                 disabled={!canUpdateConfig}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -363,7 +363,7 @@ export const OAuthServerSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
       {isSuccess && authConfig?.OAUTH_SERVER_ENABLED && form.watch('OAUTH_SERVER_ENABLED') && (

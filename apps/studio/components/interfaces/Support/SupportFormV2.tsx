@@ -4,7 +4,7 @@ import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
-import { DialogSectionSeparator, Form_Shadcn_ } from 'ui'
+import { DialogSectionSeparator, Form } from 'ui'
 
 import {
   AffectedServicesSelector,
@@ -197,7 +197,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form id="support-form" className="flex flex-col gap-y-6">
         <h3 className="px-6 text-xl">How can we help?</h3>
 
@@ -236,14 +236,14 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         {DASHBOARD_LOG_CATEGORIES.includes(category) && (
           <>
-            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
+            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}
 
         {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
           <>
-            <SupportAccessToggle form={form} />
+            <SupportAccessToggle form={form} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}
@@ -256,6 +256,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           />
         </div>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

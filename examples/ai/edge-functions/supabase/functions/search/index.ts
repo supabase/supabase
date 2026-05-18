@@ -3,9 +3,11 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { Database } from '../_shared/database.types.ts'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+
 const supabase = createClient<Database>(
   Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  Deno.env.get(SUPABASE_SECRET_KEYS['default'])!
 )
 
 const model = new Supabase.ai.Session('gte-small')

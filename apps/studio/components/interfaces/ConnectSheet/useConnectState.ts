@@ -254,7 +254,6 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         const libraryKey = resolveFrameworkLibraryKey({
           framework: next.framework,
           frameworkVariant: next.frameworkVariant,
-          library: next.library,
         })
         if (libraryKey) {
           next.library = libraryKey
@@ -268,7 +267,6 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         const libraryKey = resolveFrameworkLibraryKey({
           framework: prev.framework,
           frameworkVariant: String(value),
-          library: next.library,
         })
         if (libraryKey) next.library = libraryKey
       }
@@ -297,7 +295,6 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
           const libraryKey = resolveFrameworkLibraryKey({
             framework: next.framework,
             frameworkVariant: next.frameworkVariant,
-            library: next.library,
           })
           if (libraryKey) next.library = libraryKey
         }

@@ -52,7 +52,7 @@ const CustomerQuotesSection = (props: Props) => {
       <m.div
         initial={initial}
         animate={isInView ? animate : initial}
-        className="bg-background hover:border-control border-background-overlay-default rounded-2xl border p-6 drop-shadow-sm flex flex-col justify-between"
+        className="bg-background hover:border-control border-background-overlay-default rounded-2xl border p-6 drop-shadow-xs flex flex-col justify-between"
       >
         <div className="flex flex-col gap-4">
           <div className="h-24 w-full flex items-center justify-center pb-3">
@@ -92,7 +92,7 @@ const CustomerQuotesSection = (props: Props) => {
         <div className="relative h-[300px] w-[300vw] left-[-98vw] md:left-0 mx-auto md:w-full -mb-32 z-0">
           <CustomersVisual />
         </div>
-        <SectionContainer className="!py-0">
+        <SectionContainer className="py-0!">
           <div className="col-span-12 text-center relative z-10">
             <h3 className="text-3xl md:text-4xl heading-gradient">{props.title}</h3>
           </div>

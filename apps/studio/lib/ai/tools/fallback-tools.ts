@@ -37,7 +37,7 @@ export const getFallbackTools = ({
       }),
       execute: async ({ schemas }) => {
         try {
-          const result = includeSchemaMetadata
+          const { result } = includeSchemaMetadata
             ? await executeSql(
                 {
                   projectRef,

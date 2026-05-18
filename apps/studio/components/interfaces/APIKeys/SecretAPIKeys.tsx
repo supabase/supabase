@@ -141,7 +141,7 @@ export const SecretAPIKeys = () => {
         <AlertError error={error} subject="Failed to load secret API keys" />
       ) : empty ? (
         <Card>
-          <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+          <div className="rounded-b-md! overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
             <p className="text-sm text-foreground">No secret API keys found</p>
             <p className="text-sm text-foreground-light">
               Your project is not accessible via secret keys—there are no active secret keys

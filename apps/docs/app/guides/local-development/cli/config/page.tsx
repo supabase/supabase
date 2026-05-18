@@ -36,7 +36,7 @@ const Config = () => {
   const editLink = newEditLink('supabase/supabase/blob/master/apps/docs/spec/cli_v1_config.yaml')
 
   return (
-    <GuideTemplate meta={meta} editLink={editLink}>
+    <GuideTemplate meta={meta} editLink={editLink} pathname="/guides/local-development/cli/config">
       <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
       <div>{content}</div>
     </GuideTemplate>

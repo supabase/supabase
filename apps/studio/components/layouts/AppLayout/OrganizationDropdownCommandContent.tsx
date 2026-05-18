@@ -14,7 +14,6 @@ import {
 } from 'ui'
 
 import { OrgCommandItem } from './OrgCommandItem'
-import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { Organization } from '@/types'
 
 export interface OrganizationDropdownCommandContentProps {
@@ -90,7 +89,7 @@ export function OrganizationDropdownCommandContent({
           wrapperClassName="shrink-0"
           className="text-base sm:text-sm"
         />
-        <CommandList_Shadcn_ className="flex flex-col flex-1 min-h-0 overflow-y-auto p-1 !max-h-none">
+        <CommandList_Shadcn_ className="flex flex-col flex-1 min-h-0 overflow-y-auto p-1 max-h-none!">
           <CommandEmpty_Shadcn_>No organizations found</CommandEmpty_Shadcn_>
           <CommandGroup_Shadcn_ className="min-h-0">{orgList}</CommandGroup_Shadcn_>
         </CommandList_Shadcn_>

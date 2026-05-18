@@ -84,7 +84,7 @@ const ReplicationDiagramContent = () => {
           source: projectRef,
           target: x.identifier,
           type: 'smoothstep',
-          className: '!cursor-default',
+          className: 'cursor-default!',
           animated: isReplicating,
           style: {
             opacity: isReplicating ? 1 : 0.4,
@@ -119,7 +119,7 @@ const ReplicationDiagramContent = () => {
           source: projectRef,
           target: x.id.toString(),
           type: 'smoothstep',
-          className: '!cursor-default',
+          className: 'cursor-default!',
           animated: isReplicating,
           style: {
             opacity: isReplicating ? 1 : 0.4,

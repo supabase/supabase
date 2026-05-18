@@ -7,15 +7,15 @@ import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
+  Alert,
+  AlertDescription,
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   Table,
   TableBody,
@@ -149,14 +149,14 @@ export const S3Connection = () => {
               />
             )}
 
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>
                 {projectIsLoading ? (
                   <GenericSkeletonLoader />
                 ) : isProjectActive ? (
                   <Card>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         name="s3ConnectionEnabled"
                         control={form.control}
                         render={({ field }) => (
@@ -166,14 +166,14 @@ export const S3Connection = () => {
                             label="S3 protocol connection"
                             description="Allow clients to connect to Supabase Storage via the S3 protocol"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 size="large"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!isSuccessStorageConfig || field.disabled}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -243,21 +243,21 @@ export const S3Connection = () => {
                     </CardFooter>
                   </Card>
                 ) : (
-                  <Alert_Shadcn_ variant="warning">
+                  <Alert variant="warning">
                     <WarningIcon />
                     <AlertTitle>Project is paused</AlertTitle>
-                    <AlertDescription_Shadcn_>
+                    <AlertDescription>
                       To connect to your S3 bucket, you need to restore your project.
-                    </AlertDescription_Shadcn_>
+                    </AlertDescription>
                     <div className="mt-3 flex items-center space-x-2">
                       <Button asChild type="default">
                         <Link href={`/project/${projectRef}`}>Restore project</Link>
                       </Button>
                     </div>
-                  </Alert_Shadcn_>
+                  </Alert>
                 )}
               </form>
-            </Form_Shadcn_>
+            </Form>
           </PageSectionContent>
         </PageSection>
 
@@ -280,18 +280,18 @@ export const S3Connection = () => {
             ) : !canReadS3Credentials ? (
               <NoPermission resourceText="view this project's S3 access keys" />
             ) : !isProjectActive ? (
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <WarningIcon />
                 <AlertTitle>Can't fetch S3 access keys</AlertTitle>
-                <AlertDescription_Shadcn_>
+                <AlertDescription>
                   To fetch your S3 access keys, you need to restore your project.
-                </AlertDescription_Shadcn_>
-                <AlertDescription_Shadcn_>
+                </AlertDescription>
+                <AlertDescription>
                   <Button asChild type="default" className="mt-3">
                     <Link href={`/project/${projectRef}`}>Restore project</Link>
                   </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             ) : (
               <>
                 {isLoadingStorageCreds ? (
@@ -324,7 +324,7 @@ export const S3Connection = () => {
                           ))
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={4} className="!rounded-b-md overflow-hidden">
+                            <TableCell colSpan={4} className="rounded-b-md! overflow-hidden">
                               <p className="text-sm text-foreground">No access keys created</p>
                               <p className="text-sm text-foreground-light">
                                 There are no access keys associated with your project yet

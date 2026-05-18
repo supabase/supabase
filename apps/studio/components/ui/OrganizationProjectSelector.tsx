@@ -9,9 +9,9 @@ import {
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -238,7 +238,7 @@ export const OrganizationProjectSelector = ({
       <CommandList_Shadcn_
         className={
           embedded
-            ? 'flex-1 min-h-0 overflow-y-auto overflow-x-hidden !max-h-none'
+            ? 'flex-1 min-h-0 overflow-y-auto overflow-x-hidden max-h-none!'
             : 'max-h-none md:max-h-[300px] overflow-y-auto overflow-x-hidden'
         }
       >
@@ -260,8 +260,8 @@ export const OrganizationProjectSelector = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={modal}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={modal}>
+      <PopoverTrigger asChild>
         {renderTrigger ? (
           renderTrigger({
             isLoading: isLoadingProjects || isFetching,
@@ -287,8 +287,8 @@ export const OrganizationProjectSelector = ({
             )}
           </Button>
         )}
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         id={listboxId}
         sameWidthAsTrigger={sameWidthAsTrigger}
         className="p-0"
@@ -296,7 +296,7 @@ export const OrganizationProjectSelector = ({
         align="start"
       >
         {commandContent}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

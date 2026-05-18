@@ -7,21 +7,21 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -115,11 +115,9 @@ export const ProjectUpgradeAlert = () => {
 
   return (
     <>
-      <Alert_Shadcn_ title="Your project can be upgraded to the latest version of Postgres">
-        <AlertTitle_Shadcn_>
-          Your project can be upgraded to the latest version of Postgres
-        </AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
+      <Alert title="Your project can be upgraded to the latest version of Postgres">
+        <AlertTitle>Your project can be upgraded to the latest version of Postgres</AlertTitle>
+        <AlertDescription>
           <p>The latest version of Postgres ({latestPgVersion}) is available for your project.</p>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -139,8 +137,8 @@ export const ProjectUpgradeAlert = () => {
               </TooltipContent>
             )}
           </Tooltip>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        </AlertDescription>
+      </Alert>
 
       <Modal
         hideFooter
@@ -149,7 +147,7 @@ export const ProjectUpgradeAlert = () => {
         onCancel={() => setShowUpgradeModal(false)}
         header="Confirm to upgrade Postgres version"
       >
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onConfirmUpgrade)}>
             <Admonition
               type="warning"
@@ -173,10 +171,10 @@ export const ProjectUpgradeAlert = () => {
                 )}
                 {/* @ts-ignore */}
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
-                  <Alert_Shadcn_ variant="destructive" title="Breaking changes">
+                  <Alert variant="destructive" title="Breaking changes">
                     <AlertCircle className="h-4 w-4" strokeWidth={2} />
-                    <AlertTitle_Shadcn_>Breaking changes</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                    <AlertTitle>Breaking changes</AlertTitle>
+                    <AlertDescription className="flex flex-col gap-3">
                       <p>
                         Your project will be upgraded across major versions of Postgres. This may
                         involve breaking changes.
@@ -193,19 +191,19 @@ export const ProjectUpgradeAlert = () => {
                           </Link>
                         </Button>
                       </div>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                    </AlertDescription>
+                  </Alert>
                 )}
                 {legacyAuthCustomRoles.length > 0 && (
-                  <Alert_Shadcn_
+                  <Alert
                     variant="warning"
                     title="Custom Postgres roles using md5 authentication have been detected"
                   >
                     <AlertTriangle className="h-4 w-4" strokeWidth={2} />
-                    <AlertTitle_Shadcn_>
+                    <AlertTitle>
                       Custom Postgres roles will not work automatically after upgrade
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                    </AlertTitle>
+                    <AlertDescription className="flex flex-col gap-3">
                       <p>You must run a series of commands after upgrading.</p>
                       <p>
                         This is because new Postgres versions use scram-sha-256 authentication by
@@ -235,42 +233,39 @@ export const ProjectUpgradeAlert = () => {
                           </Link>
                         </Button>
                       </div>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                    </AlertDescription>
+                  </Alert>
                 )}
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="postgresVersionSelection"
                   render={({ field }) => (
                     <FormItemLayout label="Select the version of Postgres to upgrade to">
-                      <FormControl_Shadcn_>
-                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select a Postgres version" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            <SelectGroup_Shadcn_>
+                      <FormControl>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a Postgres version" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
                               {(data?.target_upgrade_versions || [])?.map((value) => {
                                 const postgresVersion =
                                   value.app_version.split('supabase-postgres-')[1]
                                 return (
-                                  <SelectItem_Shadcn_
-                                    key={formatValue(value)}
-                                    value={formatValue(value)}
-                                  >
+                                  <SelectItem key={formatValue(value)} value={formatValue(value)}>
                                     <div className="flex items-center gap-3">
                                       <span className="text-foreground">{postgresVersion}</span>
                                       {value.release_channel !== 'ga' && (
                                         <Badge variant="warning">{value.release_channel}</Badge>
                                       )}
                                     </div>
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 )
                               })}
-                            </SelectGroup_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -290,7 +285,7 @@ export const ProjectUpgradeAlert = () => {
               </Button>
             </Modal.Content>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </Modal>
     </>
   )

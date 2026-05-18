@@ -237,7 +237,7 @@ export const QueryBlock = ({
       {showSql && (
         <div
           className={cn(
-            'shrink-0 grow-1 w-full h-full overflow-y-auto overscroll-contain max-h-[min(300px, 100%)]',
+            'shrink-0 grow w-full h-full overflow-y-auto overscroll-contain max-h-[min(300px, 100%)]',
             {
               'border-b': results !== undefined,
             }
@@ -249,7 +249,7 @@ export const QueryBlock = ({
             value={sql}
             language="sql"
             className={cn(
-              'max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 text-foreground !rounded-none w-full',
+              'max-w-none block bg-transparent! py-3! px-3.5! prose dark:prose-dark border-0 text-foreground rounded-none! w-full',
               '[&>code]:m-0 [&>code>span]:text-foreground'
             )}
           />

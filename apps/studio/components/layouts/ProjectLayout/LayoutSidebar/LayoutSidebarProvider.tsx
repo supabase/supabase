@@ -10,7 +10,13 @@ import useLatest from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useRegisterSidebar, useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+import {
+  sidebarManagerState,
+  useRegisterSidebar,
+  useSidebarManagerSnapshot,
+} from '@/state/sidebar-manager-state'
 
 const AdvisorPanel = dynamic(() =>
   import('@/components/ui/AdvisorPanel/AdvisorPanel').then((m) => m.AdvisorPanel)
@@ -48,9 +54,9 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const sidebarURLParamRef = useLatest(sidebarURLParam)
   const sidebarLocalStorageRef = useLatest(sidebarLocalStorage)
 
-  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, 'i', !!project)
-  useRegisterSidebar(SIDEBAR_KEYS.EDITOR_PANEL, () => <EditorPanel />, {}, 'e', !!project)
-  useRegisterSidebar(SIDEBAR_KEYS.ADVISOR_PANEL, () => <AdvisorPanel />, {}, undefined, true)
+  useRegisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT, () => <AIAssistant />, {}, !!project)
+  useRegisterSidebar(SIDEBAR_KEYS.EDITOR_PANEL, () => <EditorPanel />, {}, !!project)
+  useRegisterSidebar(SIDEBAR_KEYS.ADVISOR_PANEL, () => <AdvisorPanel />, {}, true)
   useRegisterSidebar(
     SIDEBAR_KEYS.HELP_PANEL,
     () => (
@@ -65,8 +71,14 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
       />
     ),
     {},
-    undefined,
     true
+  )
+
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE, () =>
+    sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+  )
+  useShortcut(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE, () =>
+    sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   )
 
   useEffect(() => {

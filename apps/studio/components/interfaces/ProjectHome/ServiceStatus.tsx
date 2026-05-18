@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { cn, InfoIcon, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
 import {
   extractDbSchema,
@@ -240,8 +240,8 @@ export const ServiceStatus = () => {
   const overallStatusLabel = getOverallStatusLabel()
 
   return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_>
+    <HoverCard openDelay={200} closeDelay={100}>
+      <HoverCardTrigger>
         <SingleStat
           icon={
             // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
@@ -270,8 +270,8 @@ export const ServiceStatus = () => {
           label={<span>Status</span>}
           value={<span>{overallStatusLabel}</span>}
         />
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-60" side="bottom" align="start">
+      </HoverCardTrigger>
+      <HoverCardContent className="p-0 w-60" side="bottom" align="start">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
@@ -327,7 +327,7 @@ export const ServiceStatus = () => {
             </div>
           </div>
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </HoverCardContent>
+    </HoverCard>
   )
 }

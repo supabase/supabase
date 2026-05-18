@@ -8,11 +8,11 @@ import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuTrigger,
   copyToClipboard,
   ResizableHandle,
   ResizablePanel,
@@ -207,7 +207,7 @@ export const LogTable = ({
             toggle()
           }}
         >
-          <Checkbox_Shadcn_
+          <Checkbox
             className="group-hover:border-foreground-muted"
             checked={selectedRows.has(key)}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
@@ -502,12 +502,12 @@ export const LogTable = ({
                 }}
               />
             </div>
-            <ContextMenu_Shadcn_ modal={false}>
-              <ContextMenuTrigger_Shadcn_ asChild>
+            <ContextMenu modal={false}>
+              <ContextMenuTrigger asChild>
                 <div ref={triggerRef} className="fixed pointer-events-none w-0 h-0" />
-              </ContextMenuTrigger_Shadcn_>
+              </ContextMenuTrigger>
               <ContextMenuContent key={contextMenuKey}>
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => {
                     const eventMessage = activeRow?.event_message
@@ -520,9 +520,9 @@ export const LogTable = ({
                 >
                   <Copy size={14} />
                   <span className="text-xs">Copy event message</span>
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               </ContextMenuContent>
-            </ContextMenu_Shadcn_>
+            </ContextMenu>
             <DataGrid
               role="table"
               style={{ flex: '1 1 0%', minHeight: 0 }}
@@ -538,9 +538,9 @@ export const LogTable = ({
                 const isMultiSelected = selectedRows.has(key)
                 const isSingleSelected = isEqual(row, selectedRow)
                 return cn(
-                  'font-mono tracking-tight !bg-studio hover:!bg-surface-100 cursor-pointer',
+                  'font-mono tracking-tight bg-studio! hover:bg-surface-100! cursor-pointer',
                   {
-                    '!bg-surface-200 rdg-row--focused': isSingleSelected || isMultiSelected,
+                    'bg-surface-200! rdg-row--focused': isSingleSelected || isMultiSelected,
                   }
                 )
               }}
