@@ -7,11 +7,6 @@ interface ConstrainedIntegrationTabScaffoldProps extends PropsWithChildren {
   className?: string
 }
 
-/**
- * Handles padding for the new Marketplace and legacy integrations layouts.
- * Legacy layout uses px-6, marketplace uses px-0 as padding is handled by the container.
- * [TODO]: Remove this component when the legacy layout will be deprecated.
- */
 export const ConstrainedIntegrationTabScaffold = ({
   children,
   className,
