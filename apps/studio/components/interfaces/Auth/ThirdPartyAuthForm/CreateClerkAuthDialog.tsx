@@ -14,7 +14,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -122,7 +122,7 @@ export const CreateClerkAuthIntegrationDialog = ({
                 render={({ field }) => (
                   <FormItemLayout label="Clerk Domain">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder={
                           'https://clerk.example.com or https://example.clerk.accounts.dev'

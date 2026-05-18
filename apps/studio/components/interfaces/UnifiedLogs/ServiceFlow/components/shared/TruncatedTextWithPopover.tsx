@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 interface TruncatedTextWithPopoverProps {
   text: string
@@ -25,13 +25,13 @@ export const TruncatedTextWithPopover = ({
 
   // If truncated, render with popover
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
         <span className={`cursor-help ${className}`}>{children || truncatedText}</span>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="max-w-md p-3 wrap-break-word" side="top">
+      </PopoverTrigger>
+      <PopoverContent className="max-w-md p-3 wrap-break-word" side="top">
         <div className="text-sm font-mono whitespace-pre-wrap">{text}</div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

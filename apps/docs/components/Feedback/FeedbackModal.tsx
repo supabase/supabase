@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal, Textarea } from 'ui'
+import { Button, Form, FormControl, FormField, Input, Modal, Textarea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -55,7 +55,7 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
               render={({ field }) => (
                 <FormItemLayout layout="vertical" label="Title">
                   <FormControl className="col-span-6">
-                    <Input_Shadcn_ {...field} />
+                    <Input {...field} />
                   </FormControl>
                 </FormItemLayout>
               )}

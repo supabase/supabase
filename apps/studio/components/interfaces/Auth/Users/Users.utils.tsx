@@ -5,11 +5,11 @@ import { Column, useRowSelection } from 'react-data-grid'
 import {
   Checkbox,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   copyToClipboard,
 } from 'ui'
 
@@ -351,8 +351,8 @@ export const formatUserColumns = ({
         }
 
         return (
-          <ContextMenu_Shadcn_>
-            <ContextMenuTrigger_Shadcn_ asChild>
+          <ContextMenu>
+            <ContextMenuTrigger asChild>
               <div
                 className={cn(
                   'w-full flex items-center text-xs',
@@ -392,9 +392,9 @@ export const formatUserColumns = ({
                   </p>
                 )}
               </div>
-            </ContextMenuTrigger_Shadcn_>
-            <ContextMenuContent_Shadcn_ onClick={(e) => e.stopPropagation()}>
-              <ContextMenuItem_Shadcn_
+            </ContextMenuTrigger>
+            <ContextMenuContent onClick={(e) => e.stopPropagation()}>
+              <ContextMenuItem
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}
                 onSelect={() => {
@@ -404,11 +404,11 @@ export const formatUserColumns = ({
               >
                 <Copy size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
-              </ContextMenuItem_Shadcn_>
+              </ContextMenuItem>
 
-              <ContextMenuSeparator_Shadcn_ />
+              <ContextMenuSeparator />
 
-              <ContextMenuItem_Shadcn_
+              <ContextMenuItem
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}
                 onSelect={() => {
@@ -417,9 +417,9 @@ export const formatUserColumns = ({
               >
                 <TableEditor size={12} />
                 <span>View data as user</span>
-              </ContextMenuItem_Shadcn_>
+              </ContextMenuItem>
 
-              <ContextMenuItem_Shadcn_
+              <ContextMenuItem
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}
                 onSelect={() => {
@@ -428,11 +428,11 @@ export const formatUserColumns = ({
               >
                 <SqlEditor size={12} />
                 <span>Run SQL as user</span>
-              </ContextMenuItem_Shadcn_>
+              </ContextMenuItem>
 
-              <ContextMenuSeparator_Shadcn_ />
+              <ContextMenuSeparator />
 
-              <ContextMenuItem_Shadcn_
+              <ContextMenuItem
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}
                 onSelect={() => {
@@ -441,9 +441,9 @@ export const formatUserColumns = ({
               >
                 <Trash size={12} />
                 <span>Delete user</span>
-              </ContextMenuItem_Shadcn_>
-            </ContextMenuContent_Shadcn_>
-          </ContextMenu_Shadcn_>
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
         )
       },
     }

@@ -2,12 +2,12 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   useWatch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -42,18 +42,18 @@ export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
             )
           }
         >
-          <Select_Shadcn_
+          <Select
             onValueChange={(value) => field.onChange(value)}
             defaultValue={field.value}
             value={field.value}
           >
             <FormControl>
-              <SelectTrigger_Shadcn_>
-                <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
-              </SelectTrigger_Shadcn_>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a cloud provider" />
+              </SelectTrigger>
             </FormControl>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
+            <SelectContent>
+              <SelectGroup>
                 {Object.values(PROVIDERS)
                   .filter((provider) => validCloudProviders?.includes(provider.id) ?? true)
                   .map((providerObj) => {
@@ -61,14 +61,14 @@ export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
                     const value = providerObj['id']
                     const isDisabled = highAvailability && !HA_SUPPORTED_PROVIDERS.includes(value)
                     return (
-                      <SelectItem_Shadcn_ key={value} value={value} disabled={isDisabled}>
+                      <SelectItem key={value} value={value} disabled={isDisabled}>
                         {label}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     )
                   })}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       )}
     />

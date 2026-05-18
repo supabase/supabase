@@ -8,15 +8,15 @@ import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
@@ -127,14 +127,14 @@ export const SignUpForm = () => {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="absolute top-0 w-full"
         >
-          <Alert_Shadcn_ variant="default">
+          <Alert variant="default">
             <CheckCircle />
-            <AlertTitle_Shadcn_>Check your email to confirm</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="text-xs">
+            <AlertTitle>Check your email to confirm</AlertTitle>
+            <AlertDescription className="text-xs">
               You've successfully signed up. Please check your email to confirm your account before
               signing in to the Supabase dashboard. The confirmation link expires in 10 minutes.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         </motion.div>
       )}
       <div
@@ -152,7 +152,7 @@ export const SignUpForm = () => {
               render={({ field }) => (
                 <FormItemLayout name="email" label="Email">
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       id="email"
                       autoComplete="email"
                       disabled={isSubmitting}
@@ -172,7 +172,7 @@ export const SignUpForm = () => {
                 <FormItemLayout name="password" label="Password">
                   <FormControl>
                     <div className="relative">
-                      <Input_Shadcn_
+                      <Input
                         id="password"
                         type={passwordHidden ? 'password' : 'text'}
                         autoComplete="new-password"

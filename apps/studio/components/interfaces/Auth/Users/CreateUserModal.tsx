@@ -18,7 +18,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import * as z from 'zod'
 
@@ -87,7 +87,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}
                       />
-                      <Input_Shadcn_
+                      <Input
                         autoFocus
                         {...field}
                         autoComplete="off"
@@ -117,7 +117,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}
                       />
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         autoComplete="new-password"
                         type="password"

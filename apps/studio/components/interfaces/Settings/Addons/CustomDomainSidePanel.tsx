@@ -4,9 +4,9 @@ import { AlertCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   cn,
   RadioGroupCard,
   RadioGroupCardItem,
@@ -130,16 +130,14 @@ const CustomDomainSidePanel = () => {
           {subscriptionCDOption === undefined &&
             selectedCustomDomain !== undefined &&
             customDomainsDisabledDueToQuota && (
-              <Alert_Shadcn_ variant="default" className="mb-2">
+              <Alert variant="default" className="mb-2">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle_Shadcn_>
-                  Adding new custom domains temporarily disabled
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                <AlertTitle>Adding new custom domains temporarily disabled</AlertTitle>
+                <AlertDescription className="flex flex-col gap-3">
                   We are working with our upstream DNS provider before we are able to sign up new
                   custom domains. Please check back in a few hours.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up

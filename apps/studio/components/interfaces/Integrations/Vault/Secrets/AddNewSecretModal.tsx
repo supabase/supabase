@@ -14,9 +14,9 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -94,7 +94,7 @@ export const AddNewSecretModal = () => {
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Name">
                     <FormControl className="col-span-6">
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -105,7 +105,7 @@ export const AddNewSecretModal = () => {
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Description" labelOptional="Optional">
                     <FormControl className="col-span-6">
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -116,7 +116,7 @@ export const AddNewSecretModal = () => {
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Secret value">
                     <FormControl className="col-span-6">
-                      <Input reveal copy {...field} />
+                      <PasswordInput reveal copy {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}

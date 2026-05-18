@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -128,7 +128,7 @@ export const SignInForm = () => {
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
@@ -150,7 +150,7 @@ export const SignInForm = () => {
               <FormItemLayout name="password" label="Password">
                 <FormControl>
                   <div className="relative">
-                    <Input_Shadcn_
+                    <Input
                       id="password"
                       type={passwordHidden ? 'password' : 'text'}
                       autoComplete="current-password"

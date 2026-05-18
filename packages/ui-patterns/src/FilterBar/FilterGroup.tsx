@@ -1,13 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  cn,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverAnchor_Shadcn_,
-  PopoverContent_Shadcn_,
-} from 'ui'
+import { cn, Input, Popover, PopoverAnchor, PopoverContent } from 'ui'
 
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
@@ -182,12 +176,10 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
             </React.Fragment>
           )
         })}
-        <Popover_Shadcn_
-          open={isActive && !isLoading && items.length > 0 && !highlightedConditionPath}
-        >
-          <PopoverAnchor_Shadcn_ asChild>
+        <Popover open={isActive && !isLoading && items.length > 0 && !highlightedConditionPath}>
+          <PopoverAnchor asChild>
             {isRootGroup ? (
-              <Input_Shadcn_
+              <Input
                 ref={freeformInputRef}
                 type="text"
                 value={isActive ? freeformText : localFreeformValue}
@@ -208,7 +200,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
               />
             ) : (
               <div className="relative inline-block py-1">
-                <Input_Shadcn_
+                <Input
                   ref={freeformInputRef}
                   type="text"
                   value={isActive ? freeformText : localFreeformValue}
@@ -229,8 +221,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 </span>
               </div>
             )}
-          </PopoverAnchor_Shadcn_>
-          <PopoverContent_Shadcn_
+          </PopoverAnchor>
+          <PopoverContent
             className="min-w-[220px] p-0"
             align="start"
             side="bottom"
@@ -249,8 +241,8 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
               onSelect={handleSelectMenuItem}
               includeIcon
             />
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   )
