@@ -86,23 +86,3 @@ export function getLevelColor(
       }
   }
 }
-
-export function getStatusColor(value?: number | string): string {
-  switch (value) {
-    case '1':
-    case 'info':
-      return 'text-blue-500'
-    case '2':
-    case 'success':
-      return 'text-foreground'
-    case '4':
-    case 'warning':
-    case 'redirect':
-      return 'text-warning'
-    case '5':
-    case 'error':
-      return 'text-destructive'
-    default:
-      return 'text-foreground'
-  }
-}
