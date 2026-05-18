@@ -1,7 +1,7 @@
 import { Check, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState, type ReactNode } from 'react'
-import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
 import type { Organization } from '@/types'
@@ -129,14 +129,14 @@ export const ConnectOrganizationSelector = ({
           ) : null)}
 
         {hasOverflow && (
-          <Collapsible_Shadcn_ open={showMore} onOpenChange={setShowMore}>
-            <CollapsibleTrigger_Shadcn_ className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
+          <Collapsible open={showMore} onOpenChange={setShowMore}>
+            <CollapsibleTrigger className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
               <span>{showMore ? 'Show fewer' : `Show ${overflowOrganizations.length} more`}</span>
               <ChevronDown
                 className={cn('size-3.5 transition-transform', showMore && 'rotate-180')}
               />
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
+            </CollapsibleTrigger>
+            <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
               <div className="space-y-2 pt-1">
                 {overflowOrganizations.map((organization) => (
                   <ConnectOrganizationButton
@@ -151,19 +151,19 @@ export const ConnectOrganizationSelector = ({
                   />
                 ))}
               </div>
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
         {hasUnavailable && (
-          <Collapsible_Shadcn_ open={showUnavailable} onOpenChange={setShowUnavailable}>
-            <CollapsibleTrigger_Shadcn_ className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
+          <Collapsible open={showUnavailable} onOpenChange={setShowUnavailable}>
+            <CollapsibleTrigger className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
               <span>Organizations that can't be linked</span>
               <ChevronDown
                 className={cn('size-3.5 transition-transform', showUnavailable && 'rotate-180')}
               />
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
+            </CollapsibleTrigger>
+            <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
               <div className="space-y-3 pt-1">
                 <div className="space-y-2">
                   {unavailableOrganizations.map((organization) => (
@@ -181,8 +181,8 @@ export const ConnectOrganizationSelector = ({
                   </p>
                 )}
               </div>
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
+            </CollapsibleContent>
+          </Collapsible>
         )}
       </div>
     </section>

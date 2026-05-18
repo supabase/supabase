@@ -6,11 +6,11 @@ import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import {
   Button,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -291,53 +291,53 @@ const VercelProjectConnectionForm = ({
         label="Supabase project"
         description="Project that receives the Vercel environment variables"
       >
-        <Select_Shadcn_
+        <Select
           value={supabaseProjectRef ?? ''}
           disabled={isLoadingSupabaseProjects || isLoading}
           onValueChange={setSupabaseProjectRef}
         >
-          <SelectTrigger_Shadcn_ size="small" aria-label="Supabase project to connect">
-            <SelectValue_Shadcn_
+          <SelectTrigger size="small" aria-label="Supabase project to connect">
+            <SelectValue
               placeholder={isLoadingSupabaseProjects ? 'Loading projects' : 'Select a project'}
             />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
+          </SelectTrigger>
+          <SelectContent>
             {supabaseProjects.map((project) => (
-              <SelectItem_Shadcn_ key={project.ref} value={project.ref} className="text-xs">
+              <SelectItem key={project.ref} value={project.ref} className="text-xs">
                 {project.name}
-              </SelectItem_Shadcn_>
+              </SelectItem>
             ))}
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+          </SelectContent>
+        </Select>
       </ProjectSelectionSection>
 
       <ProjectSelectionSection
         label="Vercel project"
         description="Project that will receive the Supabase variables"
       >
-        <Select_Shadcn_
+        <Select
           value={vercelProjectId ?? ''}
           disabled={loadingForeignProjects || isLoading}
           onValueChange={setVercelProjectId}
         >
-          <SelectTrigger_Shadcn_ size="small" aria-label="Vercel project to connect">
-            <SelectValue_Shadcn_
+          <SelectTrigger size="small" aria-label="Vercel project to connect">
+            <SelectValue
               placeholder={loadingForeignProjects ? 'Loading projects' : 'Select a project'}
             />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
+          </SelectTrigger>
+          <SelectContent>
             {foreignProjects.map((project) => {
               const isConnected = connectedVercelProjectIds.has(project.id)
 
               return (
-                <SelectItem_Shadcn_ key={project.id} value={project.id} className="text-xs">
+                <SelectItem key={project.id} value={project.id} className="text-xs">
                   {project.name}
                   {isConnected ? ' (already connected)' : ''}
-                </SelectItem_Shadcn_>
+                </SelectItem>
               )
             })}
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+          </SelectContent>
+        </Select>
       </ProjectSelectionSection>
 
       {!hasSupabaseProjects && (
@@ -451,39 +451,39 @@ const MockProjectConnectionForm = ({ state }: { state: VercelProjectConnectionMo
         label="Supabase project"
         description="Project that receives the Vercel environment variables"
       >
-        <Select_Shadcn_ value={isLoading ? '' : 'abcd1234'} disabled={isLoading || isConnected}>
-          <SelectTrigger_Shadcn_ size="small" aria-label="Supabase project to connect">
-            <SelectValue_Shadcn_
+        <Select value={isLoading ? '' : 'abcd1234'} disabled={isLoading || isConnected}>
+          <SelectTrigger size="small" aria-label="Supabase project to connect">
+            <SelectValue
               placeholder={isLoading ? 'Loading projects' : 'Select a project'}
             />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
-            <SelectItem_Shadcn_ value="abcd1234" className="text-xs">
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="abcd1234" className="text-xs">
               api-service
-            </SelectItem_Shadcn_>
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </ProjectSelectionSection>
 
       <ProjectSelectionSection
         label="Vercel project"
         description="Project that will receive the Supabase variables"
       >
-        <Select_Shadcn_
+        <Select
           value={isLoading || isEmpty ? '' : 'prj_mock_vercel_project'}
           disabled={isLoading || isEmpty || isConnected}
         >
-          <SelectTrigger_Shadcn_ size="small" aria-label="Vercel project to connect">
-            <SelectValue_Shadcn_
+          <SelectTrigger size="small" aria-label="Vercel project to connect">
+            <SelectValue
               placeholder={isLoading ? 'Loading projects' : 'Select a project'}
             />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
-            <SelectItem_Shadcn_ value="prj_mock_vercel_project" className="text-xs">
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="prj_mock_vercel_project" className="text-xs">
               web-dashboard
-            </SelectItem_Shadcn_>
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </ProjectSelectionSection>
 
       {isEmpty && (

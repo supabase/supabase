@@ -10,9 +10,9 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DialogSectionSeparator,
   Form,
   Separator,
@@ -470,11 +470,11 @@ export function DiskManagementForm() {
               <>
                 <Separator />
 
-                <Collapsible_Shadcn_
+                <Collapsible
                   open={advancedSettingsOpen}
                   onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
                 >
-                  <CollapsibleTrigger_Shadcn_ className="px-card py-3 w-full border flex items-center gap-6 rounded-t data-closed:rounded-b group justify-between">
+                  <CollapsibleTrigger className="px-card py-3 w-full border flex items-center gap-6 rounded-t data-closed:rounded-b group justify-between">
                     <div className="flex flex-col items-start">
                       <span className="text-sm text-foreground">Advanced disk settings</span>
                       <span className="text-sm text-foreground-light text-left">
@@ -487,8 +487,8 @@ export function DiskManagementForm() {
                       className="text-foreground-light transition-all group-data-open:rotate-90"
                       strokeWidth={1}
                     />
-                  </CollapsibleTrigger_Shadcn_>
-                  <CollapsibleContent_Shadcn_
+                  </CollapsibleTrigger>
+                  <CollapsibleContent
                     ref={advancedSettingsRef}
                     className={cn(
                       'transition-all rounded-b',
@@ -538,8 +538,8 @@ export function DiskManagementForm() {
                         />
                       </div>
                     </div>
-                  </CollapsibleContent_Shadcn_>
-                </Collapsible_Shadcn_>
+                  </CollapsibleContent>
+                </Collapsible>
               </>
             )}
           </ScaffoldContainer>

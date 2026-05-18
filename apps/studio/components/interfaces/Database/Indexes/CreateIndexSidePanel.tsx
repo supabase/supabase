@@ -11,15 +11,15 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   SidePanel,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -179,12 +179,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
       <div className="py-6 space-y-6">
         <SidePanel.Content className="space-y-6">
           <FormItemLayout label="Select a schema" name="select-schema" isReactForm={false}>
-            <Popover_Shadcn_
-              modal={false}
-              open={schemaDropdownOpen}
-              onOpenChange={setSchemaDropdownOpen}
-            >
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover modal={false} open={schemaDropdownOpen} onOpenChange={setSchemaDropdownOpen}>
+              <PopoverTrigger asChild>
                 <Button
                   type="default"
                   size={'medium'}
@@ -197,13 +193,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                     ? selectedSchema
                     : 'Choose a schema'}
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                className="p-0"
-                side="bottom"
-                align="start"
-                sameWidthAsTrigger
-              >
+              </PopoverTrigger>
+              <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_
                     placeholder="Find schema..."
@@ -236,8 +227,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           </FormItemLayout>
 
           <FormItemLayout
@@ -250,15 +241,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             }
             isReactForm={false}
           >
-            <Popover_Shadcn_
-              modal={false}
-              open={tableDropdownOpen}
-              onOpenChange={setTableDropdownOpen}
-            >
-              <PopoverTrigger_Shadcn_
-                asChild
-                disabled={isSelectEntityDisabled || isLoadingEntities}
-              >
+            <Popover modal={false} open={tableDropdownOpen} onOpenChange={setTableDropdownOpen}>
+              <PopoverTrigger asChild disabled={isSelectEntityDisabled || isLoadingEntities}>
                 <Button
                   type="default"
                   size="medium"
@@ -276,13 +260,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                       ? 'No tables available in schema'
                       : 'Choose a table'}
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                className="p-0"
-                side="bottom"
-                align="start"
-                sameWidthAsTrigger
-              >
+              </PopoverTrigger>
+              <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
                 {/* [Terry] shouldFilter context:
                 https://github.com/pacocoursey/cmdk/issues/267#issuecomment-2252717107 */}
                 <Command_Shadcn_ shouldFilter={false}>
@@ -328,8 +307,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           </FormItemLayout>
 
           {selectedEntity && (
@@ -377,21 +356,19 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 name="selected-index-type"
                 isReactForm={false}
               >
-                <Select_Shadcn_
+                <Select
                   disabled={isOrioleDb}
                   value={selectedIndexType}
                   onValueChange={setSelectedIndexType}
                   name="selected-index-type"
                 >
-                  <SelectTrigger_Shadcn_ size={'small'}>
-                    <SelectValue_Shadcn_ className="font-mono">
-                      {selectedIndexType}
-                    </SelectValue_Shadcn_>
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
+                  <SelectTrigger size={'small'}>
+                    <SelectValue className="font-mono">{selectedIndexType}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
                     {INDEX_TYPES.map((index, i) => (
                       <Fragment key={index.name}>
-                        <SelectItem_Shadcn_ value={index.value}>
+                        <SelectItem value={index.value}>
                           <div className="flex flex-col gap-0.5">
                             <span>{index.name}</span>
                             {index.description.split('\n').map((x, idx) => (
@@ -403,12 +380,12 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                               </span>
                             ))}
                           </div>
-                        </SelectItem_Shadcn_>
-                        {i < INDEX_TYPES.length - 1 && <SelectSeparator_Shadcn_ />}
+                        </SelectItem>
+                        {i < INDEX_TYPES.length - 1 && <SelectSeparator />}
                       </Fragment>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
               {isOrioleDb && (
                 <Admonition

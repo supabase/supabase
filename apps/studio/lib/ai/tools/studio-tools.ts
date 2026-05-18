@@ -1,3 +1,4 @@
+import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
@@ -68,8 +69,11 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
       inputSchema: executeSqlInputSchema,
       needsApproval: true,
       execute: async ({ sql }) => {
+        // The `needsApproval: true` gate on this tool means the user has
+        // explicitly approved this AI-generated SQL before execute runs —
+        // that approval is the user gesture that promotes untrusted to safe.
         const { result } = await executeSql(
-          { projectRef, connectionString, sql },
+          { projectRef, connectionString, sql: acceptUntrustedSql(untrustedSql(sql)) },
           undefined,
           authHeaders
         )

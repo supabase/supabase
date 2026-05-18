@@ -13,12 +13,12 @@ import {
   FormControl,
   FormField,
   FormMessage,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -356,7 +356,7 @@ export const StorageSettings = () => {
                               >
                                 <FormControl>
                                   <div className="flex items-center justify-end">
-                                    <Input_Shadcn_
+                                    <Input
                                       type="number"
                                       {...field}
                                       onChange={(e) => {
@@ -373,7 +373,7 @@ export const StorageSettings = () => {
                                       control={form.control}
                                       name="unit"
                                       render={({ field: unitField }) => (
-                                        <Select_Shadcn_
+                                        <Select
                                           value={unitField.value}
                                           onValueChange={(val) => {
                                             unitField.onChange(val)
@@ -384,23 +384,23 @@ export const StorageSettings = () => {
                                             !canUpdateStorageSettings
                                           }
                                         >
-                                          <SelectTrigger_Shadcn_ className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
-                                            <SelectValue_Shadcn_ placeholder="Choose a prefix">
+                                          <SelectTrigger className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
+                                            <SelectValue placeholder="Choose a prefix">
                                               {storageUnit}
-                                            </SelectValue_Shadcn_>
-                                          </SelectTrigger_Shadcn_>
-                                          <SelectContent_Shadcn_>
+                                            </SelectValue>
+                                          </SelectTrigger>
+                                          <SelectContent>
                                             {Object.values(StorageSizeUnits).map((unit: string) => (
-                                              <SelectItem_Shadcn_
+                                              <SelectItem
                                                 key={unit}
                                                 disabled={!hasAccessToFileSizeConfiguration}
                                                 value={unit}
                                               >
                                                 {unit}
-                                              </SelectItem_Shadcn_>
+                                              </SelectItem>
                                             ))}
-                                          </SelectContent_Shadcn_>
-                                        </Select_Shadcn_>
+                                          </SelectContent>
+                                        </Select>
                                       )}
                                     />
                                   </div>

@@ -70,12 +70,12 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
-      size: 130,
-      minSize: 130,
-      maxSize: 130,
+      size: 140,
+      minSize: 140,
+      maxSize: 140,
       meta: {
-        cellClassName: 'font-mono w-[130px]',
-        headerClassName: 'w-[130px]',
+        cellClassName: 'font-mono tracking-tight w-[140px]',
+        headerClassName: 'w-[140px]',
       },
     },
     // Log type column - always visible
@@ -168,7 +168,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       minSize: 70,
       maxSize: 70,
       meta: {
-        cellClassName: 'w-[70px]',
+        cellClassName: 'font-mono tracking-tight w-[70px]',
         headerClassName: 'w-[70px]',
       },
     },
@@ -186,7 +186,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       minSize: 200,
       maxSize: 200,
       meta: {
-        cellClassName: 'max-w-[320px]',
+        cellClassName: 'font-mono tracking-tight max-w-[320px]',
         headerClassName: 'max-w-[320px]',
       },
     },
@@ -225,6 +225,9 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       size: 200,
       minSize: 200,
       maxSize: 400,
+      meta: {
+        cellClassName: 'font-mono tracking-tight',
+      },
     },
   ]
 

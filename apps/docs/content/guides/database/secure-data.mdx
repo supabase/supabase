@@ -32,7 +32,7 @@ Your publishable key is safe to expose with RLS enabled, because row access perm
 
 Older projects may also show an `anon` key. Treat it like a publishable key: it can identify your project, but it is not a secret and must be paired with RLS and least-privilege grants.
 
-<Admonition type="danger" label="Never expose your service role or secret keys on the frontend">
+<Admonition type="danger" title="Never expose your service role or secret keys on the frontend">
 
 Unlike your publishable key, your secret and service role keys are **never** safe to expose because they bypass RLS. Only use your secret and service role keys on the backend. Treat them as secrets (for example, import them as sensitive environment variables instead of hardcoding them).
 

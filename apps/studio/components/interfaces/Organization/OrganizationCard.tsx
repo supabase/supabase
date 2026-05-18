@@ -1,5 +1,5 @@
 import { useIsMFAEnabled } from 'common'
-import { Boxes, Lock } from 'lucide-react'
+import { Boxes, Lock, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -84,4 +84,28 @@ export const OrganizationCard = ({
   } else {
     return <Fragment>{renderContent()}</Fragment>
   }
+}
+
+export const CreateOrganizationCard = ({
+  params = {},
+  label = 'Create new organization',
+}: {
+  params?: { [key: string]: string }
+  label?: string
+}) => {
+  const createOrganizationHref = `/new${Object.keys(params).length > 0 ? `?${new URLSearchParams(params).toString()}` : ''}`
+
+  return (
+    <Link href={createOrganizationHref}>
+      <ActionCard
+        bgColor="bg border"
+        className={cn(
+          'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center max-h-min',
+          'border-dashed shadow-none transition-colors group-hover:border-default group-hover:bg-surface-200'
+        )}
+        icon={<Plus size={18} strokeWidth={1} className="text-foreground" />}
+        title={label}
+      />
+    </Link>
+  )
 }

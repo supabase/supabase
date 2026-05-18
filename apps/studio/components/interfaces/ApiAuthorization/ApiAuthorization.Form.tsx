@@ -15,11 +15,11 @@ import {
   FormField,
   FormItem,
   FormMessage,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -301,7 +301,7 @@ function OrganizationSelector({
               )}
             </div>
             <FormControl>
-              <Select_Shadcn_
+              <Select
                 value={field.value ?? ''}
                 disabled={disabled}
                 onValueChange={(value) => {
@@ -309,26 +309,26 @@ function OrganizationSelector({
                   form.trigger('selectedOrgSlug')
                 }}
               >
-                <SelectTrigger_Shadcn_
+                <SelectTrigger
                   size="small"
                   aria-label="Organization to grant API access to"
                   aria-invalid={fieldState.invalid}
                   aria-describedby={fieldState.error ? 'organization-selection-error' : undefined}
                 >
-                  <SelectValue_Shadcn_ placeholder="Select an organization" />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
+                  <SelectValue placeholder="Select an organization" />
+                </SelectTrigger>
+                <SelectContent>
                   {organizations.map((organization) => (
-                    <SelectItem_Shadcn_
+                    <SelectItem
                       key={organization.slug}
                       value={organization.slug}
                       className="text-xs"
                     >
                       {organization.name}
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                </SelectContent>
+              </Select>
             </FormControl>
             <FormMessage id="organization-selection-error" className="text-xs" />
           </FormItem>

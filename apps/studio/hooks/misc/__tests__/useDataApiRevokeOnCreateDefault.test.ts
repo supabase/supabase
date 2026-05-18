@@ -1,4 +1,5 @@
 import { renderHook } from '@testing-library/react'
+import { posthogClient } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -24,6 +25,17 @@ vi.mock('@/lib/constants', async () => {
 vi.mock('@/lib/telemetry/track', () => ({
   useTrack: vi.fn(),
 }))
+
+vi.mock('common', async () => {
+  const actual = await vi.importActual<typeof import('common')>('common')
+  return {
+    ...actual,
+    posthogClient: {
+      getPersonProperty: vi.fn(),
+      onFeatureFlags: vi.fn(() => () => {}),
+    },
+  }
+})
 
 describe('useDataApiRevokeOnCreateDefaultEnabled', () => {
   afterEach(() => {
@@ -62,6 +74,11 @@ describe('useTrackDefaultPrivilegesExposure', () => {
 
   beforeEach(() => {
     vi.mocked(useTrack).mockReturnValue(track)
+    // Default: org_count is set on the person — most tests want to exercise
+    // the post-targeting-resolution behavior. The gate-blocked case has its
+    // own test below.
+    vi.mocked(posthogClient.getPersonProperty).mockReturnValue(1)
+    vi.mocked(posthogClient.onFeatureFlags).mockReturnValue(() => {})
   })
 
   afterEach(() => {
@@ -70,6 +87,13 @@ describe('useTrackDefaultPrivilegesExposure', () => {
 
   it('does not fire while the flag is undefined', () => {
     vi.mocked(usePHFlag).mockReturnValue(undefined)
+    renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: true }))
+    expect(track).not.toHaveBeenCalled()
+  })
+
+  it('does not fire while org_count is missing from the SDK person', () => {
+    vi.mocked(usePHFlag).mockReturnValue(true)
+    vi.mocked(posthogClient.getPersonProperty).mockReturnValue(undefined)
     renderHook(() => useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: true }))
     expect(track).not.toHaveBeenCalled()
   })

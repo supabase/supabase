@@ -182,9 +182,7 @@ Custom Access Token Hooks are triggered for **all** token issuance. Use `client_
 A common use case is customizing the `audience` claim for different OAuth clients. This allows third-party services to validate that tokens were issued specifically for them:
 
 ```typescript
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-
-serve(async (req) => {
+Deno.serve(async (req) => {
   const { user, claims, client_id } = await req.json()
 
   // Customize audience based on OAuth client
@@ -230,10 +228,9 @@ The `audience` claim is especially important for:
 You can also add custom claims and metadata based on the OAuth client:
 
 ```typescript
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const { user, claims, client_id } = await req.json()
 
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SECRET_KEY')!)

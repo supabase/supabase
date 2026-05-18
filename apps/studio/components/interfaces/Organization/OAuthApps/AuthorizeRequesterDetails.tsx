@@ -6,9 +6,9 @@ import {
   Card,
   CardContent,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -226,21 +226,21 @@ export const AuthorizeRequesterDetails = ({
             </>
           )}
 
-          <Collapsible_Shadcn_
+          <Collapsible
             open={showDetails}
             onOpenChange={setShowDetails}
             className="mt-2 space-y-2"
           >
-            <CollapsibleTrigger_Shadcn_ className={PERMISSION_DETAILS_TRIGGER_CLASSNAME}>
+            <CollapsibleTrigger className={PERMISSION_DETAILS_TRIGGER_CLASSNAME}>
               <span>{showDetails ? 'Hide detailed permissions' : 'Show detailed permissions'}</span>
               <ChevronDown
                 className={cn('size-3.5 transition-transform', showDetails && 'rotate-180')}
               />
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
+            </CollapsibleTrigger>
+            <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
               <PermissionDetails requestedPermissions={requestedPermissions} />
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
+            </CollapsibleContent>
+          </Collapsible>
         </>
       )}
     </section>

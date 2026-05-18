@@ -1,8 +1,8 @@
 import { AlertTriangle } from 'lucide-react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button_Shadcn_,
   Dialog,
@@ -98,16 +98,16 @@ const ErrorExplanation = ({
 }
 
 const ErrorState = ({ refetch }: { refetch?: () => void }) => (
-  <Alert_Shadcn_ variant="warning">
+  <Alert variant="warning">
     <AlertTriangle />
-    <AlertTitle_Shadcn_>Lookup failed</AlertTitle_Shadcn_>
-    <AlertDescription_Shadcn_>
+    <AlertTitle>Lookup failed</AlertTitle>
+    <AlertDescription>
       <p>Failed to look up error code help info</p>
       {refetch && (
         <Button_Shadcn_ variant="outline" size="sm" className="mt-2" onClick={refetch}>
           Try again
         </Button_Shadcn_>
       )}
-    </AlertDescription_Shadcn_>
-  </Alert_Shadcn_>
+    </AlertDescription>
+  </Alert>
 )

@@ -8,12 +8,12 @@ import { toast } from 'sonner'
 import {
   Button,
   Checkbox,
-  Input_Shadcn_ as Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -209,12 +209,12 @@ const MockCreateProject = ({ isCreating }: { isCreating: boolean }) => (
           className="gap-[2px]"
           size="tiny"
         >
-          <Select_Shadcn_ value="US East (N. Virginia)" onValueChange={() => undefined}>
-            <SelectTrigger_Shadcn_ id="mockRegion" disabled={isCreating}>
-              <SelectValue_Shadcn_ />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectItem_Shadcn_ value="US East (N. Virginia)">
+          <Select value="US East (N. Virginia)" onValueChange={() => undefined}>
+            <SelectTrigger id="mockRegion" disabled={isCreating}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="US East (N. Virginia)">
                 <div className="flex gap-2">
                   <img
                     alt="region icon"
@@ -223,9 +223,9 @@ const MockCreateProject = ({ isCreating }: { isCreating: boolean }) => (
                   />
                   <span>US East (N. Virginia)</span>
                 </div>
-              </SelectItem_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       </div>
     </div>
@@ -509,15 +509,15 @@ const CreateProject = () => {
             className="gap-[2px]"
             size="tiny"
           >
-            <Select_Shadcn_ value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
-              <SelectTrigger_Shadcn_ id="region">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
+            <Select value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
+              <SelectTrigger id="region">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {Object.keys(AWS_REGIONS).map((option: string, i) => {
                   const label = Object.values(AWS_REGIONS)[i].displayName
                   return (
-                    <SelectItem_Shadcn_ key={option} value={label}>
+                    <SelectItem key={option} value={label}>
                       <div className="flex gap-2">
                         <img
                           alt="region icon"
@@ -526,11 +526,11 @@ const CreateProject = () => {
                         />
                         <span>{label}</span>
                       </div>
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   )
                 })}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </FormItemLayout>
         </div>
       </div>

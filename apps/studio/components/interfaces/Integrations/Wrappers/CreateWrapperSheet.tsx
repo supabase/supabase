@@ -11,7 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   SheetFooter,
@@ -251,7 +251,7 @@ export const CreateWrapperSheet = ({
                             }
                           >
                             <FormControl>
-                              <Input_Shadcn_ id="wrapper_name" {...field} />
+                              <Input id="wrapper_name" {...field} />
                             </FormControl>
                           </FormItemLayout>
                         )}
