@@ -142,6 +142,11 @@ const KNOWN_CHUNK_CYCLES: ReadonlyArray<ReadonlyArray<string>> = [
   // pin; the chunk graph still surfaces the cycle even though the
   // top-level `cva(...)` call inside TreeView is no longer broken.
   ['LoadingLine', 'TreeView', 'ui'],
+  // Same root cause as #1, extended via FormLayout/index after the
+  // master merge. The cycle stays a chunk-graph artifact (cva pinned
+  // via manualChunks); FormLayout imports from `ui` which closes the
+  // loop back through the existing LoadingLine/TreeView/ui chain.
+  ['FormLayout', 'LoadingLine', 'TreeView', 'ui', 'index'],
 ]
 
 function chunkPrefix(name: string): string {
