@@ -207,7 +207,7 @@ export const dataset: AssistantEvalCase[] = [
     metadata: {
       category: ['sql_generation'],
       description:
-        'Ensures execute_sql marks cron.schedule() calls as write queries so they run with write privileges.',
+        "Ensures execute_sql marks cron.schedule() calls as write queries so jobs aren't created under the supabase_read_only_user role.",
     },
   },
   {
