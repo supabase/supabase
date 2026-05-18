@@ -306,7 +306,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
                       onClick={() =>
                         sendTelemetryEvent({
-                          action: 'www_pricing_plan_cta_clicked',
+                          action: 'www_event_page_cta_clicked',
                           properties: { eventTitle: event.title },
                         })
                       }
