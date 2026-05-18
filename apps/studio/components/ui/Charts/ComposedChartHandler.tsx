@@ -85,11 +85,7 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
     }
   }, [])
 
-  return (
-    <div ref={ref}>
-      {React.cloneElement(children as React.ReactElement<{ isVisible: boolean }>, { isVisible })}
-    </div>
-  )
+  return <div ref={ref}>{React.cloneElement(children as React.ReactElement, { isVisible })}</div>
 }
 
 /**
@@ -126,7 +122,7 @@ const ComposedChartHandler = ({
   id,
   syncId,
   ...otherProps
-}: PropsWithChildren<ComposedChartHandlerProps>) => {
+}: PropsWithChildren) => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -176,11 +172,6 @@ const ComposedChartHandler = ({
 
         attributes.forEach((attr, index) => {
           if (!attr) return
-
-          if (attr.useYAxisLimitAsValue) {
-            point[attr.attribute] = yAxisLimitFromQuery ?? attr.customValue ?? 0
-            return
-          }
 
           if (attr.customValue !== undefined) {
             point[attr.attribute] = attr.customValue
