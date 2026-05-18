@@ -10,7 +10,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -18,7 +18,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -98,7 +98,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                 render={({ field }) => (
                   <FormItemLayout label="Name" layout="horizontal">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         readOnly
                         className="text-foreground-light! cursor-not-allowed"
@@ -117,7 +117,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                     description="Secrets can’t be retrieved once saved. Enter a new value to overwrite the existing value."
                   >
                     <FormControl>
-                      <Input
+                      <PasswordInput
                         {...field}
                         type={showSecretValue ? 'text' : 'password'}
                         placeholder="my-secret-value"

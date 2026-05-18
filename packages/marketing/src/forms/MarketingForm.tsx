@@ -5,13 +5,13 @@ import ReactMarkdown from 'react-markdown'
 import {
   Button,
   Checkbox,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  TextArea_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  TextArea,
 } from 'ui'
 import type { z } from 'zod'
 
@@ -83,7 +83,7 @@ function FieldInput({
     case 'email':
     case 'url':
       return (
-        <Input_Shadcn_
+        <Input
           type={field.type}
           placeholder={field.placeholder}
           required={field.required}
@@ -93,7 +93,7 @@ function FieldInput({
       )
     case 'textarea':
       return (
-        <TextArea_Shadcn_
+        <TextArea
           placeholder={field.placeholder}
           required={field.required}
           rows={field.rows}
@@ -103,18 +103,18 @@ function FieldInput({
       )
     case 'select':
       return (
-        <Select_Shadcn_ value={value} onValueChange={onChange} required={field.required}>
-          <SelectTrigger_Shadcn_>
-            <SelectValue_Shadcn_ placeholder={field.placeholder} />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
+        <Select value={value} onValueChange={onChange} required={field.required}>
+          <SelectTrigger>
+            <SelectValue placeholder={field.placeholder} />
+          </SelectTrigger>
+          <SelectContent>
             {field.options.map((opt) => (
-              <SelectItem_Shadcn_ key={opt.value} value={opt.value}>
+              <SelectItem key={opt.value} value={opt.value}>
                 {opt.label}
-              </SelectItem_Shadcn_>
+              </SelectItem>
             ))}
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+          </SelectContent>
+        </Select>
       )
     case 'checkbox':
       return null

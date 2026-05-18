@@ -1,6 +1,7 @@
-import type { PGForeignTable, PGMaterializedView, PGTable, PGView } from '@supabase/pg-meta'
+import { PGForeignTable, PGMaterializedView, PGView } from '@supabase/pg-meta'
 
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 
 // [Joshen] We just need name, schema, description, rows, size, and the number of columns
 // Just missing partitioned tables as missing pg-meta support
@@ -10,7 +11,7 @@ export const formatAllEntities = ({
   materializedViews = [],
   foreignTables = [],
 }: {
-  tables?: PGTable[]
+  tables?: SafePostgresTable[]
   views?: PGView[]
   materializedViews?: PGMaterializedView[]
   foreignTables?: PGForeignTable[]

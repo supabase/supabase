@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta/src/pg-format'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -14,15 +15,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   ScrollArea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetContent,
@@ -42,7 +43,7 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import SchemaSelector from '@/components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from '@/data/database-functions/database-functions-create-mutation'
-import { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from '@/data/database-functions/database-functions-update-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -52,7 +53,7 @@ import type { FormSchema } from '@/types'
 const FORM_ID = 'create-function-sidepanel'
 
 interface CreateFunctionProps {
-  func?: DatabaseFunction
+  func?: SavedDatabaseFunction
   isDuplicating?: boolean
   visible: boolean
   onClose: () => void
@@ -101,10 +102,15 @@ export const CreateFunction = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!project) return console.error('Project is required')
+    // Submit click is the explicit user gesture that promotes form-entered SQL fragments
+    // (`args` items, `return_type`, and each `config_params` value) to executable.
     const payload = {
       ...data,
-      args: data.args.map((x) => `${x.name} ${x.type}`),
-      config_params: mapValues(keyBy(data.config_params, 'name'), 'value') as Record<string, never>,
+      args: data.args.map((x) => acceptUntrustedSql(untrustedSql(`${x.name} ${x.type}`))),
+      return_type: acceptUntrustedSql(untrustedSql(data.return_type)),
+      config_params: mapValues(keyBy(data.config_params, 'name'), (item) =>
+        acceptUntrustedSql(untrustedSql(item.value))
+      ),
     }
 
     if (isEditing) {
@@ -186,7 +192,7 @@ export const CreateFunction = ({
                       layout="horizontal"
                     >
                       <FormControl>
-                        <Input_Shadcn_ {...field} placeholder="Name of function" />
+                        <Input {...field} placeholder="Name of function" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -221,22 +227,22 @@ export const CreateFunction = ({
                     render={({ field }) => (
                       <FormItemLayout label="Return type" layout="horizontal">
                         {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                        <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger_Shadcn_ className="col-span-8">
-                            <SelectValue_Shadcn_ />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <SelectTrigger className="col-span-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
                             <ScrollArea className="h-52">
                               {['void', 'record', 'trigger', 'integer', ...POSTGRES_DATA_TYPES].map(
                                 (option) => (
-                                  <SelectItem_Shadcn_ value={option} key={option}>
+                                  <SelectItem value={option} key={option}>
                                     {option}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 )
                               )}
                             </ScrollArea>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormItemLayout>
                     )}
                   />
@@ -314,25 +320,22 @@ export const CreateFunction = ({
                           render={({ field }) => (
                             <FormItemLayout label="Behavior" layout="horizontal">
                               {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                              <Select_Shadcn_
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <SelectTrigger_Shadcn_ className="col-span-8">
-                                  <SelectValue_Shadcn_ />
-                                </SelectTrigger_Shadcn_>
-                                <SelectContent_Shadcn_>
-                                  <SelectItem_Shadcn_ value="IMMUTABLE" key="IMMUTABLE">
+                              <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger className="col-span-8">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="IMMUTABLE" key="IMMUTABLE">
                                     immutable
-                                  </SelectItem_Shadcn_>
-                                  <SelectItem_Shadcn_ value="STABLE" key="STABLE">
+                                  </SelectItem>
+                                  <SelectItem value="STABLE" key="STABLE">
                                     stable
-                                  </SelectItem_Shadcn_>
-                                  <SelectItem_Shadcn_ value="VOLATILE" key="VOLATILE">
+                                  </SelectItem>
+                                  <SelectItem value="VOLATILE" key="VOLATILE">
                                     volatile
-                                  </SelectItem_Shadcn_>
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
                             </FormItemLayout>
                           )}
                         />
@@ -440,7 +443,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
-                      <Input_Shadcn_ {...field} disabled={readonly} placeholder="argument_name" />
+                      <Input {...field} disabled={readonly} placeholder="argument_name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -452,27 +455,27 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                   <FormItem className="flex-1">
                     <FormControl>
                       {readonly ? (
-                        <Input_Shadcn_ value={field.value} disabled readOnly className="h-auto" />
+                        <Input value={field.value} disabled readOnly className="h-auto" />
                       ) : (
                         <>
-                          <Select_Shadcn_
+                          <Select
                             disabled={readonly}
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
-                            <SelectTrigger_Shadcn_ className="h-[38px]">
-                              <SelectValue_Shadcn_ />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger className="h-[38px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
                               <ScrollArea className="h-52">
                                 {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
-                                  <SelectItem_Shadcn_ value={option} key={option}>
+                                  <SelectItem value={option} key={option}>
                                     {option}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 ))}
                               </ScrollArea>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </>
                       )}
                     </FormControl>
@@ -541,18 +544,18 @@ const FormFieldLanguage = () => {
       render={({ field }) => (
         <FormItemLayout label="Language" layout="horizontal">
           {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-          <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-            <SelectTrigger_Shadcn_ className="col-span-8">
-              <SelectValue_Shadcn_ />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <SelectTrigger className="col-span-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
               {allowedLanguages.map((option) => (
-                <SelectItem_Shadcn_ value={option} key={option}>
+                <SelectItem value={option} key={option}>
                   {option}
-                </SelectItem_Shadcn_>
+                </SelectItem>
               ))}
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       )}
     />

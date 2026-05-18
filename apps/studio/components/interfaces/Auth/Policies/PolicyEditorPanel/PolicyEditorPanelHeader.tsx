@@ -3,9 +3,9 @@ import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useState } from 'react'
 import {
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   SheetClose,
   SheetHeader,
   SheetTitle,
@@ -47,12 +47,12 @@ export const PolicyEditorPanelHeader = ({
               : 'Create a new Row Level Security policy'}
           </SheetTitle>
           {selectedPolicy !== undefined && (
-            <Collapsible_Shadcn_
+            <Collapsible
               className="-mt-1.5 pb-1.5"
               open={showDetails}
               onOpenChange={setShowDetails}
             >
-              <CollapsibleTrigger_Shadcn_ className="group  font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
+              <CollapsibleTrigger className="group  font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
                 <div className="flex items-center gap-x-2 w-full">
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     View policy details
@@ -63,8 +63,8 @@ export const PolicyEditorPanelHeader = ({
                     size={14}
                   />
                 </div>
-              </CollapsibleTrigger_Shadcn_>
-              <CollapsibleContent_Shadcn_ className="grid gap-1.5">
+              </CollapsibleTrigger>
+              <CollapsibleContent className="grid gap-1.5">
                 <div className="flex my-2">
                   <div>
                     <div className="text-xs flex items-start space-x-2 border-b py-1.5">
@@ -97,8 +97,8 @@ export const PolicyEditorPanelHeader = ({
                     </div>
                   </div>
                 </div>
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </div>
       </div>

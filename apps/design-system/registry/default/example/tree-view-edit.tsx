@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import {
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   flattenTree,
   TreeView,
   TreeViewItem,
@@ -84,8 +84,8 @@ export default function TreeViewDemo() {
       aria-label="directory tree"
       nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => {
         return (
-          <ContextMenu_Shadcn_ modal={false}>
-            <ContextMenuTrigger_Shadcn_ asChild>
+          <ContextMenu modal={false}>
+            <ContextMenuTrigger asChild>
               <TreeViewItem
                 isExpanded={isExpanded}
                 isBranch={isBranch}
@@ -111,15 +111,15 @@ export default function TreeViewDemo() {
                 }}
                 {...getNodeProps()}
               />
-            </ContextMenuTrigger_Shadcn_>
-            <ContextMenuContent_Shadcn_
+            </ContextMenuTrigger>
+            <ContextMenuContent
               onCloseAutoFocus={(e) => {
                 // stop focus propagation
                 // so input in TreeViewItem gets focus
                 e.stopPropagation()
               }}
             >
-              <ContextMenuItem_Shadcn_
+              <ContextMenuItem
                 onSelect={() => {
                   handleRenameSelect(element.id as number)
                 }}
@@ -130,13 +130,13 @@ export default function TreeViewDemo() {
                 }}
               >
                 Rename
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuItem_Shadcn_ disabled>Open in new tab</ContextMenuItem_Shadcn_>
-              <ContextMenuItem_Shadcn_ disabled>Share with team</ContextMenuItem_Shadcn_>
-              <ContextMenuSeparator_Shadcn_ />
-              <ContextMenuItem_Shadcn_ disabled>Delete</ContextMenuItem_Shadcn_>
-            </ContextMenuContent_Shadcn_>
-          </ContextMenu_Shadcn_>
+              </ContextMenuItem>
+              <ContextMenuItem disabled>Open in new tab</ContextMenuItem>
+              <ContextMenuItem disabled>Share with team</ContextMenuItem>
+              <ContextMenuSeparator />
+              <ContextMenuItem disabled>Delete</ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
         )
       }}
     />

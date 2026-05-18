@@ -12,9 +12,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
@@ -67,8 +67,8 @@ export const UserSelector = () => {
 
   return (
     <FormItemLayout isReactForm={false} label="Select which user to test as">
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen} modal>
+        <PopoverTrigger asChild>
           <Button
             block
             type="default"
@@ -80,8 +80,8 @@ export const UserSelector = () => {
           >
             {impersonatingUser?.email ?? 'Select a user'}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0" side="bottom" align="start">
+        </PopoverTrigger>
+        <PopoverContent sameWidthAsTrigger className="p-0" side="bottom" align="start">
           <Command_Shadcn_ shouldFilter={false}>
             <CommandInput_Shadcn_
               showResetIcon
@@ -137,8 +137,8 @@ export const UserSelector = () => {
               )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     </FormItemLayout>
   )
 }

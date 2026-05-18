@@ -56,7 +56,7 @@ vi.mock('next/head', async () => {
         (child) => React.isValidElement(child) && child.type === 'title'
       )
 
-      if (!React.isValidElement(titleElement)) return
+      if (!React.isValidElement<{ children: ReactNode }>(titleElement)) return
 
       const titleText = React.Children.toArray(titleElement.props.children).join('')
       document.title = titleText
@@ -93,9 +93,9 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('ui', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
-  Alert_Shadcn_: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  AlertDescription_Shadcn_: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  AlertTitle_Shadcn_: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  Alert: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  AlertDescription: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  AlertTitle: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   CommandInput_Shadcn_: { displayName: 'CommandInput' },
   Command_Shadcn_: { displayName: 'Command' },
   CommandGroup_Shadcn_: { displayName: 'CommandGroup' },

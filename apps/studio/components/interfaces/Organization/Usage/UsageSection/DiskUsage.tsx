@@ -1,13 +1,7 @@
 import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  CriticalIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -100,15 +94,15 @@ export const DiskUsage = ({
             {currentBillingCycleSelected &&
               subscription?.usage_billing_enabled === false &&
               hasProjectsExceedingDiskSize && (
-                <Alert_Shadcn_ variant="warning">
+                <Alert variant="warning">
                   <CriticalIcon />
-                  <AlertTitle_Shadcn_>Projects exceeding quota</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>Projects exceeding quota</AlertTitle>
+                  <AlertDescription>
                     You have projects that are exceeding 8 GB of provisioned disk size, but do not
                     allow any overages with the Spend Cap on. Reduce the disk size or disable the
                     spend cap.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertDescription>
+                </Alert>
               )}
 
             <div>

@@ -70,7 +70,7 @@ export const PlanUpdateSidePanel = () => {
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const originalPlanRef = useRef<string>()
+  const originalPlanRef = useRef<string>(undefined)
 
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)

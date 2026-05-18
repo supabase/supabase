@@ -2,7 +2,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { TextArea_Shadcn_ as TextArea } from 'ui'
+import { TextArea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
