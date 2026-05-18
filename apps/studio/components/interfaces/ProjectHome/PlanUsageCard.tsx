@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, cn } from 'ui'
+import { cn } from 'ui'
 
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -69,8 +69,8 @@ const ProgressRing = ({
   const offset = RING_CIRCUMFERENCE * (1 - clamped)
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 18 18"
       className="shrink-0"
       aria-hidden="true"
@@ -116,9 +116,9 @@ const MetricRow = ({ usageItem, config }: { usageItem: OrgMetricsUsage; config: 
     <div className="flex items-center justify-between gap-3 px-3 py-2">
       <div className="flex items-center gap-2 min-w-0">
         <ProgressRing ratio={ratio} isOver={isOver} isApproaching={isApproaching} />
-        <span className="text-xs text-foreground truncate">{config.label}</span>
+        <span className="text-sm text-foreground truncate">{config.label}</span>
       </div>
-      <span className="text-[11px] font-mono tabular-nums whitespace-nowrap">
+      <span className="text-xs font-mono tabular-nums whitespace-nowrap">
         <span className={cn(isOver ? 'text-warning' : 'text-foreground-light')}>
           {formatValue(current, config.unit)}
         </span>
@@ -149,35 +149,35 @@ export const PlanUsageCard = () => {
 
   if (visibleRows.length === 0) return null
 
+  // Width matches the Primary Database React Flow node (NODE_WIDTH / 2 - 10 = 320px).
   return (
-    <div className="absolute bottom-4 left-4 right-4 z-10">
-      <Card className="bg-surface-100/95 backdrop-blur-sm shadow-md">
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border-overlay">
-          <div className="flex flex-col">
-            <span className="text-xs text-foreground">Free plan usage</span>
-            <span className="text-[11px] text-foreground-lighter">Current billing cycle</span>
-          </div>
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10" style={{ width: 320 }}>
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
+        <div className="px-3 py-2 border-b">
+          <span className="text-[11px] uppercase tracking-wider text-foreground-lighter">
+            Free plan &middot; Current billing cycle
+          </span>
+        </div>
+        <div className="flex flex-col divide-y">
+          {visibleRows.map(({ config, usageItem }) => (
+            <MetricRow key={config.key} usageItem={usageItem} config={config} />
+          ))}
+        </div>
+        <div className="flex items-center justify-between gap-2 px-3 py-2 border-t">
+          <Link
+            href={`/org/${organization?.slug ?? '_'}/usage`}
+            className="text-xs text-foreground-light hover:text-foreground inline-flex items-center gap-1"
+          >
+            View all usage
+            <ArrowRight size={11} strokeWidth={1.5} />
+          </Link>
           <UpgradePlanButton
             source="home_usage_card"
             plan="Pro"
             onClick={() => track('upgrade_cta_clicked', { placement: 'home_usage_card' })}
           />
         </div>
-        <CardContent className="p-0 divide-y divide-border-overlay">
-          {visibleRows.map(({ config, usageItem }) => (
-            <MetricRow key={config.key} usageItem={usageItem} config={config} />
-          ))}
-        </CardContent>
-        <div className="px-4 py-2 border-t border-border-overlay flex justify-end">
-          <Link
-            href={`/org/${organization?.slug ?? '_'}/usage`}
-            className="text-[11px] text-foreground-light hover:text-foreground inline-flex items-center gap-1"
-          >
-            View all usage
-            <ArrowRight size={11} strokeWidth={1.5} />
-          </Link>
-        </div>
-      </Card>
+      </div>
     </div>
   )
 }
