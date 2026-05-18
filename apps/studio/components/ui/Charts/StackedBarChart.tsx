@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
 
@@ -11,15 +10,10 @@ import {
   ValidStackColor,
 } from './Charts.constants'
 import type { CommonChartProps } from './Charts.types'
-import {
-  numberFormatter,
-  precisionFormatter,
-  timestampFormatter,
-  useChartSize,
-  useStacked,
-} from './Charts.utils'
+import { numberFormatter, precisionFormatter, useChartSize, useStacked } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { useChartHoverState } from './useChartHoverState'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
 
 interface Props extends CommonChartProps<any> {
   xAxisKey: string
@@ -69,12 +63,19 @@ const StackedBarChart: React.FC<Props> = ({
   })
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker.
+  const formatPickerDate = useFormatDateTime()
+  const formatChartDate = (value: number | string) =>
+    displayDateInUtc
+      ? formatDateTime(value, { tz: 'UTC', format: customDateFormat })
+      : formatPickerDate(value, customDateFormat)
+
   const resolvedHighlightedLabel =
     (focusDataIndex !== null &&
       data &&
       data[focusDataIndex] !== undefined &&
-      day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+      formatChartDate(data[focusDataIndex][xAxisKey])) ||
     highlightedLabel
 
   const resolvedHighlightedValue =
@@ -179,9 +180,7 @@ const StackedBarChart: React.FC<Props> = ({
           ))}
           <Tooltip
             labelFormatter={
-              xAxisFormatAsDate
-                ? (label) => timestampFormatter(label, customDateFormat, displayDateInUtc)
-                : undefined
+              xAxisFormatAsDate ? (label) => formatChartDate(label as number | string) : undefined
             }
             formatter={(value, name, props) => {
               const suffix = format || ''
@@ -209,19 +208,9 @@ const StackedBarChart: React.FC<Props> = ({
       </Container>
       {stackedData && stackedData[0] && (
         <div className="text-foreground-lighter -mt-5 flex items-center justify-between text-xs">
+          <span>{formatChartDate(stackedData[0][xAxisKey] as number | string)}</span>
           <span>
-            {timestampFormatter(
-              stackedData[0][xAxisKey] as string,
-              customDateFormat,
-              displayDateInUtc
-            )}
-          </span>
-          <span>
-            {timestampFormatter(
-              stackedData[stackedData?.length - 1][xAxisKey] as string,
-              customDateFormat,
-              displayDateInUtc
-            )}
+            {formatChartDate(stackedData[stackedData?.length - 1][xAxisKey] as number | string)}
           </span>
         </div>
       )}

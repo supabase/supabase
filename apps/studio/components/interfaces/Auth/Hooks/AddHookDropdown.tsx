@@ -25,6 +25,8 @@ interface AddHookDropdownProps {
   buttonText?: string
   align?: 'end' | 'center'
   type?: 'primary' | 'default'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   onSelectHook: (hook: HOOK_DEFINITION_TITLE) => void
 }
 
@@ -32,6 +34,8 @@ export const AddHookDropdown = ({
   buttonText = 'Add hook',
   align = 'end',
   type = 'primary',
+  open,
+  onOpenChange,
   onSelectHook,
 }: AddHookDropdownProps) => {
   const { ref: projectRef } = useParams()
@@ -78,7 +82,7 @@ export const AddHookDropdown = ({
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button type={type} iconRight={<ChevronDown />}>
           {buttonText}

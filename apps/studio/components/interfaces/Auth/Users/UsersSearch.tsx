@@ -1,17 +1,17 @@
 import { AuthUsersSearchSubmittedEvent } from 'common/telemetry-constants'
 import { Search, X } from 'lucide-react'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { Dispatch, forwardRef, SetStateAction } from 'react'
 import {
   Button,
   cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -24,6 +24,7 @@ import {
   UUIDV4_LEFT_PREFIX_REGEX,
 } from './Users.constants'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { onSearchInputEscape } from '@/lib/keyboard'
 
 const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
   switch (column) {
@@ -43,23 +44,30 @@ const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
 }
 
 interface UsersSearchProps {
+  search: string
+  setSearch: Dispatch<SetStateAction<string>>
   improvedSearchEnabled?: boolean
   telemetryProps: Omit<AuthUsersSearchSubmittedEvent['properties'], 'trigger'>
   telemetryGroups: AuthUsersSearchSubmittedEvent['groups']
   onSelectFilterColumn: (value: SpecificFilterColumn) => void
 }
 
-export const UsersSearch = ({
-  improvedSearchEnabled = false,
-  telemetryProps,
-  telemetryGroups,
-  onSelectFilterColumn,
-}: UsersSearchProps) => {
+export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(function UsersSearch(
+  {
+    search,
+    setSearch,
+    improvedSearchEnabled = false,
+    telemetryProps,
+    telemetryGroups,
+    onSelectFilterColumn,
+  },
+  ref
+) {
   const [, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
+  const [, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
   const [specificFilterColumn] = useQueryState<SpecificFilterColumn>(
     'filter',
     parseAsStringEnum<SpecificFilterColumn>([
@@ -71,7 +79,6 @@ export const UsersSearch = ({
     ]).withDefault('email')
   )
 
-  const [search, setSearch] = useState(filterKeywords)
   const { mutate: sendEvent } = useSendEventMutation()
 
   const searchInvalid =
@@ -105,43 +112,43 @@ export const UsersSearch = ({
         <Search size={14} />
       </div>
 
-      <Select_Shadcn_
+      <Select
         value={specificFilterColumn}
         onValueChange={(v) => onSelectFilterColumn(v as typeof specificFilterColumn)}
       >
-        <SelectTrigger_Shadcn_
+        <SelectTrigger
           size="tiny"
           className={cn(
             'w-[130px] bg-transparent! rounded-none -ml-px',
             specificFilterColumn === 'freeform' && 'text-warning'
           )}
         >
-          <SelectValue_Shadcn_ />
-        </SelectTrigger_Shadcn_>
-        <SelectContent_Shadcn_>
-          <SelectGroup_Shadcn_>
-            <SelectItem_Shadcn_ value="id" className="text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="id" className="text-xs">
               User ID
-            </SelectItem_Shadcn_>
-            <SelectItem_Shadcn_ value="email" className="text-xs">
+            </SelectItem>
+            <SelectItem value="email" className="text-xs">
               Email address
-            </SelectItem_Shadcn_>
+            </SelectItem>
             {improvedSearchEnabled && (
-              <SelectItem_Shadcn_ value="name" className="text-xs">
+              <SelectItem value="name" className="text-xs">
                 Name
-              </SelectItem_Shadcn_>
+              </SelectItem>
             )}
-            <SelectItem_Shadcn_ value="phone" className="text-xs">
+            <SelectItem value="phone" className="text-xs">
               Phone number
-            </SelectItem_Shadcn_>
+            </SelectItem>
             {!improvedSearchEnabled && (
               <>
-                <SelectSeparator_Shadcn_ />
+                <SelectSeparator />
                 <Tooltip>
                   <TooltipTrigger>
-                    <SelectItem_Shadcn_ value="freeform" className="text-xs">
+                    <SelectItem value="freeform" className="text-xs">
                       Unified search
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="w-64 text-center">
                     Search by all columns at once, including mid-string search. May impact database
@@ -150,11 +157,12 @@ export const UsersSearch = ({
                 </Tooltip>
               </>
             )}
-          </SelectGroup_Shadcn_>
-        </SelectContent_Shadcn_>
-      </Select_Shadcn_>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
 
       <Input
+        ref={ref}
         size="tiny"
         containerClassName="w-[245px] rounded-l-none -ml-px"
         className={cn(
@@ -168,7 +176,12 @@ export const UsersSearch = ({
         onKeyDown={(e) => {
           if (e.code === 'Enter' || e.code === 'NumpadEnter') {
             if (!searchInvalid) onSubmitSearch()
+            return
           }
+          onSearchInputEscape(search, () => {
+            setSearch('')
+            setFilterKeywords('')
+          })(e)
         }}
         actions={
           search ? (
@@ -187,4 +200,4 @@ export const UsersSearch = ({
       />
     </div>
   )
-}
+})

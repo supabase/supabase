@@ -1,6 +1,6 @@
 import { EventClientRenderer } from '~/components/Events/new/EventClientRenderer'
 import { breadcrumbs } from '~/lib/breadcrumbs'
-import { getNotionEvents } from '~/lib/events'
+import { getMdxEvents, getNotionEvents } from '~/lib/events'
 import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import type { Metadata } from 'next'
 
@@ -11,7 +11,10 @@ export const metadata: Metadata = {
 }
 
 export default async function EventsPage() {
-  const notionEvents = await getNotionEvents()
+  const [notionEvents, mdxEvents] = await Promise.all([
+    getNotionEvents(),
+    Promise.resolve(getMdxEvents()),
+  ])
 
   return (
     <>
@@ -21,7 +24,7 @@ export default async function EventsPage() {
           __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.eventsIndex)),
         }}
       />
-      <EventClientRenderer notionEvents={notionEvents} />
+      <EventClientRenderer notionEvents={notionEvents} mdxEvents={mdxEvents} />
     </>
   )
 }

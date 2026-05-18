@@ -8,7 +8,7 @@ import { cn } from 'ui/src/lib/utils'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
-  textAreaRef?: React.RefObject<HTMLTextAreaElement>
+  textAreaRef?: React.RefObject<HTMLTextAreaElement | null>
   /* The loading state of the form */
   loading: boolean
   /* The disabled state of the form */

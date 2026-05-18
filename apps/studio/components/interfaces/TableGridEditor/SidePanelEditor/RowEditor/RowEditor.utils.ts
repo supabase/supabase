@@ -1,5 +1,5 @@
+import type { PGColumn, PGTable, PGTableRelationship } from '@supabase/pg-meta'
 import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
-import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
 import { compact, isEqual, isString, isUndefined, omitBy } from 'lodash'
 
@@ -15,7 +15,7 @@ import type { RowField } from './RowEditor.types'
 import { minifyJSON, tryParseJson } from '@/lib/helpers'
 import type { Dictionary } from '@/types'
 
-const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary<any> }) => {
+const getRowValue = ({ column, row }: { column: PGColumn; row?: Dictionary<any> }) => {
   const isNewRow = row === undefined
 
   if (isNewRow) {
@@ -43,7 +43,7 @@ const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
-  table: PostgresTable,
+  table: PGTable,
   foreignKeys: ForeignKey[]
 ): RowField[] => {
   const { primary_keys = [] } = table
@@ -69,7 +69,7 @@ export const generateRowFields = (
               target_table_name: foreignKey.table,
               target_column_name:
                 foreignKey.columns.find((c) => c.source === column.name)?.target ?? '',
-            } as PostgresRelationship)
+            } as PGTableRelationship)
           : undefined,
       id: column.id,
       name: column.name,

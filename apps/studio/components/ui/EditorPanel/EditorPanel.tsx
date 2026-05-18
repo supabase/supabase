@@ -25,13 +25,13 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   KeyboardShortcut,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SQL_ICON,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -123,7 +123,7 @@ export const EditorPanel = () => {
   const [showResults, setShowResults] = useState(true)
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle')
-  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>(null)
   const originalSnippetRef = useRef<{ sql: string; name: string } | null>(null)
 
   const refocusEditor = () => {
@@ -145,7 +145,9 @@ export const EditorPanel = () => {
 
   const showSaveSuccess = () => {
     setSaveStatus('success')
-    clearTimeout(saveStatusTimerRef.current)
+    if (saveStatusTimerRef.current) {
+      clearTimeout(saveStatusTimerRef.current)
+    }
     saveStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000)
   }
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
@@ -310,8 +312,8 @@ export const EditorPanel = () => {
               onClick={() => editorPanelState.openAsNew()}
             />
           )}
-          <Popover_Shadcn_ open={isSnippetsOpen} onOpenChange={setIsSnippetsOpen}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover open={isSnippetsOpen} onOpenChange={setIsSnippetsOpen}>
+            <PopoverTrigger asChild>
               <ButtonTooltip
                 size="tiny"
                 type="text"
@@ -326,8 +328,8 @@ export const EditorPanel = () => {
                   },
                 }}
               ></ButtonTooltip>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-[300px] p-0">
               <Command_Shadcn_ shouldFilter={false}>
                 <CommandInput_Shadcn_
                   placeholder="Search snippets..."
@@ -360,11 +362,11 @@ export const EditorPanel = () => {
                   </CommandGroup_Shadcn_>
                 </CommandList_Shadcn_>
               </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
           {templates.length > 0 && (
-            <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
+              <PopoverTrigger asChild>
                 <Button
                   size="tiny"
                   type="default"
@@ -375,16 +377,16 @@ export const EditorPanel = () => {
                 >
                   Templates
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[300px] p-0">
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Search templates..." />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
                       {templates.map((template) => (
-                        <HoverCard_Shadcn_ key={template.name}>
-                          <HoverCardTrigger_Shadcn_ asChild>
+                        <HoverCard key={template.name}>
+                          <HoverCardTrigger asChild>
                             <CommandItem_Shadcn_
                               value={template.name}
                               onSelect={() => onSelectTemplate(template.content)}
@@ -405,22 +407,22 @@ export const EditorPanel = () => {
                                 </div>
                               </div>
                             </CommandItem_Shadcn_>
-                          </HoverCardTrigger_Shadcn_>
-                          <HoverCardContent_Shadcn_ side="left" className="w-[500px] p-0">
+                          </HoverCardTrigger>
+                          <HoverCardContent side="left" className="w-[500px] p-0">
                             <CodeBlock
                               language="sql"
                               className="language-sql border-none"
                               hideLineNumbers
                               value={template.content}
                             />
-                          </HoverCardContent_Shadcn_>
-                        </HoverCard_Shadcn_>
+                          </HoverCardContent>
+                        </HoverCard>
                       ))}
                     </CommandGroup_Shadcn_>
                   </CommandList_Shadcn_>
                 </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
           <ButtonTooltip
             type="text"

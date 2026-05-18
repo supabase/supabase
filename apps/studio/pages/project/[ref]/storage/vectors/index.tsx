@@ -9,6 +9,7 @@ import {
   PageSectionContent,
 } from 'ui-patterns'
 
+import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { BucketsUpgradePlan } from '@/components/interfaces/Storage/BucketsUpgradePlan'
 import { VectorsBuckets } from '@/components/interfaces/Storage/VectorBuckets'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -32,6 +33,9 @@ const StorageVectorsPage: NextPageWithLayout = () => {
 
   // [Joshen] We're actively looking into lifting this restriction so can remove once done
   const isAvailableInProjectRegion = AVAILABLE_REGIONS.includes(project?.region ?? '')
+  const regionLabel = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    project?.region?.includes(region.region)
+  )
 
   if (!isAvailableInProjectRegion) {
     return (
@@ -44,24 +48,32 @@ const StorageVectorsPage: NextPageWithLayout = () => {
             />
             <EmptyStatePresentational
               icon={VectorBucket}
+              className="[&>div>div>h3]:flex [&>div>div>h3]:items-center [&>div>div>h3]:gap-x-2"
               title="Coming soon to your project's region"
               description={
                 <p>
-                  Vector buckets are currently only available for projects created in{' '}
+                  Your project is in{' '}
                   <Tooltip>
-                    <TooltipTrigger className={InlineLinkClassName}>some regions</TooltipTrigger>
+                    <TooltipTrigger className={InlineLinkClassName}>
+                      {regionLabel?.name}
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">{regionLabel?.region}</TooltipContent>
+                  </Tooltip>
+                  , but Vector buckets are only available for{' '}
+                  <Tooltip>
+                    <TooltipTrigger className={InlineLinkClassName}>certain regions</TooltipTrigger>
                     <TooltipContent side="bottom">
                       <ul>
                         {AVAILABLE_REGIONS.map((x) => (
                           <li key={x}>
                             <span>{getRegionNameFromCode(x)}</span>
-                            <span className="text-foreground-lighter ml-2">{x}</span>
+                            <span className="text-foreground-light ml-2">{x}</span>
                           </li>
                         ))}
                       </ul>
                     </TooltipContent>
-                  </Tooltip>{' '}
-                  and we're actively looking to expand that soon.
+                  </Tooltip>
+                  . We're actively looking to expand that soon.
                 </p>
               }
             />

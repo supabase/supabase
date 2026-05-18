@@ -7,9 +7,9 @@ import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
   Form,
@@ -286,16 +286,16 @@ export const ConnectionPooling = () => {
                           </FormControl>
                           {!!maxConnData &&
                             (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
-                              <Alert_Shadcn_ variant="warning" className="mt-2">
-                                <AlertTitle_Shadcn_ className="text-foreground">
+                              <Alert variant="warning" className="mt-2">
+                                <AlertTitle className="text-foreground">
                                   Pool size is greater than 80% of the max connections (
                                   {maxConnData.maxConnections}) on your database
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
+                                </AlertTitle>
+                                <AlertDescription>
                                   This may result in instability and unreliability with your
                                   database connections.
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
+                                </AlertDescription>
+                              </Alert>
                             )}
                         </FormItemLayout>
                       )}

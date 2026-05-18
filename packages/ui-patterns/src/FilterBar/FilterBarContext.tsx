@@ -71,7 +71,7 @@ export type FilterBarContextValue = {
   actions?: FilterBarAction[]
   icon?: React.ReactNode
 
-  rootRef: React.RefObject<HTMLDivElement>
+  rootRef: React.RefObject<HTMLDivElement | null>
 }
 
 const FilterBarContext = createContext<FilterBarContextValue | null>(null)

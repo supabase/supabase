@@ -7,17 +7,23 @@ const sugu = authors.find((a) => a.author_id === 'sugu_sougoumarane')
 
 const page: GoPageInput = {
   template: 'lead-gen',
-  slug: 'dash-2026/exec-dinner',
+  slug: 'nyc-2026/exec-dinner',
   metadata: {
-    title: 'Executive Dinner | Supabase at DASH 2026',
+    title: 'Executive Dinner | Supabase',
     description:
-      'Join Supabase leaders for an intimate dinner. Location to be announced. Cocktails at 6:30 PM, dinner at 7:00 PM.',
+      'Join Supabase leaders for an intimate dinner at Manhatta Restaurant on June 10, 2026. Cocktails at 6:30 PM, dinner at 7:00 PM.',
   },
   hero: {
     title: 'The future of scalable databases',
     subtitle: 'An intimate executive dinner hosted by Supabase',
     description:
       'Join Supabase product and engineering leaders for a dinner conversation about where Postgres is headed -- from scaling beyond single-node limits to managing globally distributed workloads. Expect sharp perspectives, good food, and the opportunity to connect with other engineering leaders.',
+    image: {
+      src: '/images/landing-pages/dash-2026/manhatta_restaurant.jpg',
+      alt: 'Private dining room at Manhatta Restaurant',
+      width: 600,
+      height: 450,
+    },
     ctas: [
       {
         label: 'Reserve your seat',
@@ -32,8 +38,11 @@ const page: GoPageInput = {
       title: 'Details',
       children: (
         <div className="flex flex-col items-center gap-2 text-foreground-light">
-          <p className="text-lg font-medium text-foreground">Location</p>
-          <p>To be announced</p>
+          <p className="text-lg font-medium text-foreground">Date</p>
+          <p>June 10, 2026</p>
+          <p className="mt-4 text-lg font-medium text-foreground">Location</p>
+          <p>Manhatta Restaurant</p>
+          <p>28 Liberty St, 60th Floor</p>
           <p className="mt-4 text-lg font-medium text-foreground">Schedule</p>
           <p>6:30 PM — Cocktails and introductions</p>
           <p>7:00 PM — Dinner and discussion</p>
@@ -112,12 +121,26 @@ const page: GoPageInput = {
           type: 'text',
           name: 'company_name',
           label: 'Company',
-          placeholder: 'Company name',
+          placeholder: 'ACME, Inc.',
           required: true,
+        },
+        {
+          type: 'text',
+          name: 'job_title',
+          label: 'Job Title',
+          placeholder: 'VP of Engineering',
+          required: false,
+        },
+        {
+          type: 'text',
+          name: 'phone_number',
+          label: 'Phone Number',
+          placeholder: '+1 212 555 1212',
+          required: false,
         },
       ],
       submitLabel: 'Confirm RSVP',
-      successRedirect: '/go/dash-2026/exec-dinner/thank-you',
+      successRedirect: '/go/nyc-2026/exec-dinner/thank-you',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
@@ -127,10 +150,23 @@ const page: GoPageInput = {
             first_name: 'firstname',
             last_name: 'lastname',
             email_address: 'email',
-            company_name: 'company',
+            company_name: 'name',
+            job_title: 'jobtitle',
+            phone_number: 'phone',
           },
           consent:
             'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
+        },
+        notion: {
+          database_id: '35b5004b775f80eb8f1acbc26b576f86',
+          columnMap: {
+            first_name: 'First Name',
+            last_name: 'Last Name',
+            email_address: 'Email',
+            company_name: 'Company',
+            job_title: 'Job Title',
+            phone_number: 'Phone Number',
+          },
         },
       },
     },

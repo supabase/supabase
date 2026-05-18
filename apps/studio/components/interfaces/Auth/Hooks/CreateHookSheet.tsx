@@ -15,7 +15,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -462,7 +462,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                         description="Supabase Auth will send a HTTPS POST request to this URL each time the hook is triggered."
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} />
+                          <Input {...field} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -490,7 +490,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                       >
                         <FormControl>
                           <div className="flex flex-row">
-                            <Input_Shadcn_ {...field} className="rounded-r-none border-r-0" />
+                            <Input {...field} className="rounded-r-none border-r-0" />
                             <Button
                               type="default"
                               size="small"

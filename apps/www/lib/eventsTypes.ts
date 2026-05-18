@@ -45,7 +45,7 @@ export interface SupabaseEvent {
   timezone: string
   location: string
   hosts: EventHost[]
-  source: 'luma' | 'notion'
+  source: 'luma' | 'notion' | 'mdx'
   end_date?: string
   onDemand?: boolean
   disable_page_build?: boolean

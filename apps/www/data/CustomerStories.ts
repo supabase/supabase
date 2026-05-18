@@ -297,9 +297,9 @@ export const data: CustomerStoryType[] = [
   },
   {
     type: 'Customer Story',
-    title: 'Bootstrapped founder builds an AI app with Supabase and scales to $1M in 5 months.',
+    title: 'Chatbase goes upmarket on Supabase',
     description:
-      'How Yasser leveraged Supabase to build Chatbase and became one of the most successful single-founder AI products.',
+      'The consolidation play that took a single founder from zero to 10 million in ARR, and the bet that takes him to 100.',
     imgUrl: 'images/customers/logos/chatbase.png',
     logo: '/images/customers/logos/chatbase.png',
     logo_inverse: '/images/customers/logos/light/chatbase.png',
@@ -307,10 +307,10 @@ export const data: CustomerStoryType[] = [
     url: '/customers/chatbase',
     path: '/customers/chatbase',
     postMeta: {
-      name: 'Paul Copplestone',
-      avatarUrl: 'https://avatars0.githubusercontent.com/u/10214025?v=4',
-      publishDate: 'Sep 6, 2023',
-      readLength: 6,
+      name: 'Prashant Sridharan',
+      avatarUrl: 'https://avatars.githubusercontent.com/u/914007?v=4',
+      publishDate: 'May 18, 2026',
+      readLength: 12,
     },
     ctaText: 'View story',
   },

@@ -69,7 +69,7 @@ export const billingMetricUnit = (pricingMetric: PricingMetric) => {
   }
 }
 
-export const generateUpgradeReasons = (originalPlan?: string, upgradedPlan?: string) => {
+export const generateUpgradeReasons = (originalPlan?: string | null, upgradedPlan?: string) => {
   const reasons = [
     'Current plan limits are not enough for me',
     'I want better customer support from Supabase',
@@ -94,13 +94,3 @@ export const generateUpgradeReasons = (originalPlan?: string, upgradedPlan?: str
 
   return reasons
 }
-
-// For `customerBalance`, negative sign means credit.
-// Negate it first so both sources contribute as positive credit amounts before combining.
-export const getTotalCreditBalanceCents = ({
-  customerBalance = 0,
-  prepaidCreditsBalance = 0,
-}: {
-  customerBalance?: number
-  prepaidCreditsBalance?: number
-}) => -customerBalance + prepaidCreditsBalance

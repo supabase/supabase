@@ -1,3 +1,4 @@
+import { useQueries } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import {
@@ -17,6 +18,12 @@ import {
 
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { projectKeys } from '@/data/projects/keys'
+import {
+  getOrganizationProjects,
+  type OrgProject,
+} from '@/data/projects/org-projects-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 // Update this whenever the banner content below changes so old client bundles
@@ -48,6 +55,77 @@ export const NoticeBanner = () => {
       variant="note"
       title="We've updated our Terms of Service"
       description={<UpdatedTermsOfServiceDialog onDismiss={() => setBannerAcknowledged(true)} />}
+      onDismiss={() => setBannerAcknowledged(true)}
+    />
+  )
+}
+
+const MAINTENANCE_REGIONS = new Set(['ap-southeast-1', 'sa-east-1'])
+
+export const NoticeBanner2 = () => {
+  const id = 'maintenance-2026-05-13'
+  const expiry = new Date('2026-05-14T23:59:00Z')
+  const isExpired = new Date() > expiry
+
+  const router = useRouter()
+
+  const [bannerAcknowledged, setBannerAcknowledged, { isSuccess }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.MAINTENANCE_BANNER_DISMISSED(id),
+    false
+  )
+
+  const shouldEvaluate =
+    !router.pathname.includes('sign-in') && isSuccess && !bannerAcknowledged && !isExpired
+
+  const { data: organizations } = useOrganizationsQuery({ enabled: shouldEvaluate })
+  const orgProjectsQueries = useQueries({
+    queries: (organizations ?? []).map((org) => ({
+      queryKey: projectKeys.bannerProjectsByOrg(org.slug),
+      queryFn: () => getOrganizationProjects({ slug: org.slug, limit: 100 }),
+      staleTime: 30 * 60 * 1000,
+      enabled: shouldEvaluate,
+    })),
+  })
+
+  const isProjectsFetched =
+    organizations !== undefined &&
+    (organizations.length === 0 || orgProjectsQueries.every((q) => q.isFetched))
+
+  const hasMaintenanceRegionProject = orgProjectsQueries
+    .flatMap((q) => q.data?.projects ?? [])
+    .some((project: OrgProject) =>
+      project.databases.some((db) => MAINTENANCE_REGIONS.has(db.region))
+    )
+
+  if (!shouldEvaluate || !isProjectsFetched || !hasMaintenanceRegionProject) {
+    return null
+  }
+
+  return (
+    <HeaderBanner
+      variant="note"
+      title="Upcoming maintenance"
+      description={
+        <>
+          Shared pooler maintenance in{' '}
+          <a
+            target="_blank"
+            rel="noopener referrer"
+            href="https://status.supabase.com/incidents/hxf8876zl69x"
+          >
+            ap-southeast-1
+          </a>{' '}
+          and{' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://status.supabase.com/incidents/jqsj3pb3mnx7"
+          >
+            sa-east-1
+          </a>{' '}
+          on May 13-14.
+        </>
+      }
       onDismiss={() => setBannerAcknowledged(true)}
     />
   )
