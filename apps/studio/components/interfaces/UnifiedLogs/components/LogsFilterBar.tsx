@@ -23,33 +23,28 @@ export const LogsFilterBar = () => {
       operators: ['='],
     }))
 
-  const onApplyFilters = (filters: FilterGroup) => {
-    setFilters(filters)
-
-    // [Joshen] Actual server side filter applying
-    // I'm wondering whether this logic should be within the FilterBar component tbh
-    // There's no nested conditions either for unified logs, hence the type cast
-    const isValid = filters.conditions.every(
+  // No nested conditions in unified logs — type-cast to FilterCondition on read.
+  const onApply = (next: FilterGroup) => {
+    const isValid = next.conditions.every(
       (x) =>
         !!(x as FilterCondition).operator &&
         !!(x as FilterCondition).value &&
         !!(x as FilterCondition).propertyName
     )
+    if (!isValid) return
 
-    if (isValid) {
-      const filterConditions = filters.conditions as FilterCondition[]
-      const groupedFilterConditions = groupBy(filterConditions, 'propertyName')
-      Object.entries(groupedFilterConditions).forEach(([name, conditions]) => {
-        table.getColumn(name)?.setFilterValue(conditions.map((x) => x.value))
-      })
+    const filterConditions = next.conditions as FilterCondition[]
+    const groupedFilterConditions = groupBy(filterConditions, 'propertyName')
+    Object.entries(groupedFilterConditions).forEach(([name, conditions]) => {
+      table.getColumn(name)?.setFilterValue(conditions.map((x) => x.value))
+    })
 
-      const currentFilters = table.getState().columnFilters
-      const filterColumns = Object.keys(groupedFilterConditions)
-      const filtersToRemove = currentFilters.filter((x) => !filterColumns.includes(x.id))
-      filtersToRemove.forEach((x) => {
-        table.getColumn(x.id)?.setFilterValue(undefined)
-      })
-    }
+    const currentFilters = table.getState().columnFilters
+    const filterColumns = Object.keys(groupedFilterConditions)
+    const filtersToRemove = currentFilters.filter((x) => !filterColumns.includes(x.id))
+    filtersToRemove.forEach((x) => {
+      table.getColumn(x.id)?.setFilterValue(undefined)
+    })
   }
 
   return (
@@ -59,7 +54,8 @@ export const LogsFilterBar = () => {
       filterProperties={filterProperties}
       freeformText={freeformText}
       filters={filters}
-      onFilterChange={onApplyFilters}
+      onFilterChange={setFilters}
+      onApply={onApply}
       onFreeformTextChange={setFreeformText}
     />
   )

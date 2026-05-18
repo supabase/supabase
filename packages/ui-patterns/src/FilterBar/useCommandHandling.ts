@@ -14,10 +14,10 @@ export function useCommandHandling({
   setActiveInput,
   activeFilters,
   onFilterChange,
+  commitFilters,
   filterProperties,
   freeformText,
   onFreeformTextChange,
-  handleInputChange,
   handleOperatorChange,
   newPathRef,
   setIsCommandMenuVisible,
@@ -26,10 +26,10 @@ export function useCommandHandling({
   setActiveInput: (input: ActiveInputState) => void
   activeFilters: FilterGroup
   onFilterChange: (filters: FilterGroup) => void
+  commitFilters: (filters: FilterGroup) => void
   filterProperties: FilterProperty[]
   freeformText: string
   onFreeformTextChange: (text: string) => void
-  handleInputChange: (path: number[], value: string) => void
   handleOperatorChange: (path: number[], value: string) => void
   newPathRef: React.MutableRefObject<number[]>
   setIsCommandMenuVisible: (visible: boolean) => void
@@ -40,6 +40,8 @@ export function useCommandHandling({
       const group = findGroupByPath(activeFilters, currentPath)
       if (!group) return
 
+      // Group-add is structural (no value typed yet), so update draft state only — onApply will
+      // fire once a value gets committed inside the new group.
       const updatedFilters = addGroupToGroup(activeFilters, currentPath)
       onFilterChange(updatedFilters)
       newPathRef.current = [...currentPath, group.conditions.length]
@@ -55,12 +57,13 @@ export function useCommandHandling({
       if (!activeInput || activeInput.type !== 'value') return
 
       const path = activeInput.path
-      handleInputChange(path, item.value)
+      const updated = updateNestedValue(activeFilters, path, item.value)
+      commitFilters(updated)
       setTimeout(() => {
         setActiveInput({ type: 'group', path: path.slice(0, -1) })
       }, 0)
     },
-    [activeInput, handleInputChange, setActiveInput]
+    [activeInput, activeFilters, commitFilters, setActiveInput]
   )
 
   const handleOperatorCommand = useCallback(
@@ -76,6 +79,8 @@ export function useCommandHandling({
 
   const handlePropertySelection = useCallback(
     (selectedProperty: FilterProperty, currentPath: number[], group: FilterGroup) => {
+      // Adding a new condition stub (property only, no operator/value yet) is structural —
+      // draft-only. onApply fires once the user picks an operator or value.
       const updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
       onFilterChange(updatedFilters)
       const newPath = [...currentPath, group.conditions.length]
@@ -137,7 +142,7 @@ export function useCommandHandling({
         if (item.isDefaultOperator) {
           const path = activeInput.path
           const filtersWithOperator = updateNestedOperator(activeFilters, path, item.value)
-          onFilterChange(updateNestedValue(filtersWithOperator, path, item.defaultValue ?? ''))
+          commitFilters(updateNestedValue(filtersWithOperator, path, item.defaultValue ?? ''))
 
           // Added minor delay to ensure the filter is updated before navigating to the group
           setTimeout(() => {
@@ -159,7 +164,7 @@ export function useCommandHandling({
       handleValueCommand,
       handleOperatorCommand,
       handleGroupPropertyCommand,
-      onFilterChange,
+      commitFilters,
       setIsCommandMenuVisible,
     ]
   )

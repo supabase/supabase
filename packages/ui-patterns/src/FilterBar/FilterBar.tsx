@@ -25,6 +25,14 @@ export type FilterBarProps = {
   variant?: FilterBarVariant
   icon?: React.ReactNode
   onFilterChange: (filters: FilterGroupType) => void
+  /**
+   * Fires only on commit boundaries: menu item selected, operator/property/logical-operator
+   * change, condition removed, AI filter applied, Enter pressed in value input, or focus leaves
+   * the FilterBar. Use this when downstream state (URL params, table filters, queries) should
+   * only update once the user has finalized a value — `onFilterChange` fires on every keystroke
+   * and is intended for keeping the controlled `filters` prop in sync.
+   */
+  onApply?: (filters: FilterGroupType) => void
   onFreeformTextChange: (freeformText: string) => void
 }
 
@@ -119,6 +127,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
     filterProperties,
     filters,
     onFilterChange,
+    onApply,
     freeformText,
     onFreeformTextChange,
     actions,
@@ -136,6 +145,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
       filterProperties={filterProperties}
       filters={filters}
       onFilterChange={onFilterChange}
+      onApply={onApply}
       freeformText={freeformText}
       onFreeformTextChange={onFreeformTextChange}
       actions={actions}
