@@ -51,13 +51,10 @@ breadcrumb: 'Migrations'
 
 ## Things to keep in mind
 
-Here are some things that are not stored directly in your database and will require you to re-create or setup on the new project:
+<$Partial path="restore_transferred.mdx" variables={{ "extras": "" }} />
 
-    - Edge Functions
-    - Auth Settings and API keys
-    - Realtime settings
-    - Database extensions and settings
-    - Read Replicas
+<$Partial path="restore_manual_configuration.mdx" variables={{ "extras": ", compute instance size, disk attributes, SSL enforcement settings, and network restrictions" }} />
+
 
 ## Restore backup
 
@@ -118,7 +115,7 @@ Here are some things that are not stored directly in your database and will requ
   </StepHikeCompact.Details>
 </StepHikeCompact.Step>
 
-<StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Restore your backup" fullWidth>
       <StepHikeCompact.Code>
         ```sql
@@ -134,18 +131,17 @@ Here are some things that are not stored directly in your database and will requ
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Restore other settings / configurations" fullWidth>
+        - [Migrate Edge Functions](/docs/guides/platform/migrating-within-supabase/migrate-edge-functions)
+        - [Migrate Storage](/docs/guides/platform/migrating-within-supabase/migrate-storage)
+        - [Migrate Project Configurations](/docs/guides/platform/migrating-within-supabase/migrate-project-configurations)
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
 </StepHikeCompact>
 
-## Migrate storage objects to new project's S3 storage
-
-After restoring the backup, the buckets and files metadata will show up in the dashboard of the new project.
-However, the storage files stored in the S3 buckets would not be present.
-
-Use the following Google Colab script provided below to migrate your downloaded storage objects to your new project's S3 buckets.
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
-
-This method requires uploading to Google Colab and then to the S3 buckets. This could add significant upload time if there are large storage objects.
 
 ## Common errors with the backup restore process
 

@@ -1,0 +1,110 @@
+---
+title: 'Migrate Edge Functions'
+subtitle: 'Learn how to migrate edge functions between projects'
+breadcrumb: 'Migrations'
+---
+
+Edge functions can be migrated using the steps below. After restoring, do also restore any [Edge Function secrets](/dashboard/project/_/functions/secrets) as needed.
+
+## Using a downloaded copy
+
+<Admonition type="note" label="Requirements">
+- A downloaded copy of edge functions in a `supabase/functions`
+</Admonition>
+
+With the Supabase CLI [Supabase CLI](/docs/guides/local-development/cli/getting-started), run:
+
+```
+supabase functions deploy --project-ref your_target_project_ref
+```
+This deploys all functions within the `supabase/functions` to the target project. You can confirm by checking your Edge Functions on [the project dashboard](/dashboard/project/_/functions)
+
+## Using the Supabase CLI
+<Admonition type="note" label="Requirements">
+- An active source project to migrate files from
+</Admonition>
+
+<StepHikeCompact>
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Login to your Supabase Account" fullWidth>
+      With the Supabase CLI [Supabase CLI](/docs/guides/local-development/cli/getting-started), run:
+      ```bash
+      supabase login
+      ```
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="List your edge functions" fullWidth>
+      ```bash
+      supabase functions list --project-ref your_project_ref
+      ```
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Download your functions" fullWidth>
+      You can download an individual function with the following command:
+      ```bash
+      supabase functions download YOUR_FUNCTION_NAME --project-ref your_project_ref
+      ```
+      <Admonition type="note">
+
+        The command will not download [import maps](/docs/guides/functions/dependencies#using-import-maps-legacy) nor [deno.json](/docs/guides/functions/dependencies#using-denojson-recommended) files. If your edge functions rely on them for dependency management, you will have to add them back manually.
+
+      </Admonition>
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+    <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Deploy the functions" fullWidth>
+      ```bash
+      supabase functions deploy --project-ref your_target_project_ref
+      ```
+      This deploys all functions within the `supabase/functions` to the target project. You can confirm by checking your Edge Functions on [the project dashboard](/dashboard/project/_/functions)
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+## Using the Supabase Dashboard
+<Admonition type="note" label="Requirements">
+- An active source project to migrate files from
+</Admonition>
+<Admonition type="note">
+Dependencies defined through [import maps](/docs/guides/functions/dependencies#using-import-maps-legacy) and [deno.json](/docs/guides/functions/dependencies#using-denojson-recommended) files will need to be rewritten to rely on their [direct import paths](/docs/guides/functions/dependencies#importing-dependencies) when using this approach.
+</Admonition>
+<StepHikeCompact>
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details fullWidth>
+      In the source project, navigate to **Edge Functions** from the side menu
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details fullWidth>
+      Using the `Download` button, download your desired function as zip: ![Download Edge
+      Function](/docs/img/troubleshooting/download-edge-function-via-dashboard.gif)
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details fullWidth>
+      In the target project, navigate to **Edge Functions** from the side menu
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details fullWidth>
+      Click on the `Deploy a new function` button, select **Via Editor** operation
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details fullWidth>
+      Drag and drop your downloaded function (the zip function from step 2) into the editor
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details fullWidth>
+      Add your function name and click on the `Deploy function` button to deploy the function:
+      ![Upload Edge Function](/docs/img/troubleshooting/upload-edge-function-via-dashboard.gif)
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+</StepHikeCompact>
