@@ -1,4 +1,5 @@
 import { Table } from '@tanstack/react-table'
+import { Filter } from 'lucide-react'
 import { ReactNode } from 'react'
 import { cn, Skeleton } from 'ui'
 
@@ -11,7 +12,7 @@ interface DetailRowProps {
   filterId?: string
   filterValue?: string | number
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
-  filterFields?: DataTableFilterField<any>[]
+  filterFields: DataTableFilterField<any>[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
   table?: Table<any>
   isLoading?: boolean
@@ -61,58 +62,31 @@ export const DetailRow = ({
     <Skeleton className="h-4 w-24" />
   ) : isEmpty ? (
     <span className="font-mono text-xs text-foreground-muted">—</span>
-  ) : typeof value === 'string' || typeof value === 'number' ? (
-    <span
-      className={cn(
-        'font-mono text-xs text-foreground',
-        wrap ? 'break-all text-right max-w-[calc(100%-12rem)]' : 'truncate text-right',
-        isFilterable && 'group-hover:underline'
-      )}
-    >
-      {value}
-    </span>
   ) : (
     value
   )
 
   const rowClass = cn(
-    'flex items-start justify-between gap-3 px-4',
+    'flex items-start justify-between gap-x-10 px-4',
     wrap ? 'min-h-9 py-2' : 'h-9 items-center'
   )
 
-  const isStringValue = typeof value === 'string' || typeof value === 'number'
-
-  if (isFilterable && resolvedFilterValue !== undefined && isStringValue) {
-    return (
-      <DataTableSheetRowAction
-        fieldValue={filterId!}
-        filterFields={filterFields!}
-        value={resolvedFilterValue}
-        table={table!}
-        className={cn(rowClass, 'group w-full cursor-pointer hover:bg-surface-200/50')}
-      >
-        {labelEl}
-        {valueEl}
-      </DataTableSheetRowAction>
-    )
-  }
-
   return (
-    <div className={rowClass}>
-      {labelEl}
-      {isFilterable && resolvedFilterValue !== undefined && !isStringValue ? (
-        <DataTableSheetRowAction
-          fieldValue={filterId!}
-          filterFields={filterFields!}
-          value={resolvedFilterValue}
-          table={table!}
-          className="group"
-        >
-          <span className="[&_div]:group-hover:text-foreground">{valueEl}</span>
-        </DataTableSheetRowAction>
-      ) : (
-        valueEl
-      )}
-    </div>
+    <DataTableSheetRowAction
+      fieldValue={filterId}
+      filterFields={filterFields}
+      value={resolvedFilterValue ?? ''}
+      table={table!}
+      label={label}
+      className={cn(rowClass, 'rounded-none group w-full cursor-pointer hover:bg-surface-100!')}
+    >
+      <div className="flex items-center gap-x-2">
+        {labelEl}
+        {isFilterable && resolvedFilterValue !== undefined && (
+          <Filter size={12} className="text-foreground-lighter" />
+        )}
+      </div>
+      {valueEl}
+    </DataTableSheetRowAction>
   )
 }

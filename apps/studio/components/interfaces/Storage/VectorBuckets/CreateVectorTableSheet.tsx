@@ -11,7 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -248,7 +248,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                     layout="horizontal"
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="name"
                         data-1p-ignore
                         data-lpignore="true"
@@ -276,7 +276,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                     layout="horizontal"
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="dimension"
                         type="number"
                         placeholder="Enter a numeric value"
@@ -353,7 +353,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                             layout="vertical"
                           >
                             <FormControl>
-                              <Input_Shadcn_
+                              <Input
                                 {...field}
                                 value={field.value}
                                 size="small"

@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, keyword, literal, rawSql, safeSql, type SafeSqlFragment } from './pg-format'
 import { COLUMNS_SQL } from './sql/columns'
 
 const pgColumnZod = z.object({
@@ -14,6 +14,10 @@ const pgColumnZod = z.object({
   ordinal_position: z.number(),
   data_type: z.string(),
   format: z.string(),
+  // Optional at the type level for compatibility with column data sourced from the legacy
+  // `/platform/pg-meta/{ref}/tables` REST endpoint, which doesn't include this field. The pg-meta
+  // SQL itself always returns format_schema.
+  format_schema: z.string().optional(),
   is_identity: z.boolean(),
   identity_generation: z.string().nullable(),
   is_generated: z.boolean(),
@@ -106,28 +110,17 @@ function retrieve(identifier: ColumnIdentifier): {
   }
 }
 
-function create({
-  schema,
-  table,
-  name,
-  type,
-  default_value,
-  default_value_format = 'literal',
-  is_identity = false,
-  identity_generation = 'BY DEFAULT',
-  is_nullable,
-  is_primary_key = false,
-  is_unique = false,
-  comment,
-  check,
-  no_transaction = false,
-}: {
+export type ColumnTypeRef = {
+  schema?: string
+  name: string
+  isArray?: boolean
+}
+
+export interface CreateOptionsBase {
   schema: string
   table: string
   name: string
-  type: string
-  default_value?: any
-  default_value_format?: 'expression' | 'literal'
+  type: ColumnTypeRef
   is_identity?: boolean
   identity_generation?: 'BY DEFAULT' | 'ALWAYS'
   is_nullable?: boolean
@@ -136,37 +129,64 @@ function create({
   comment?: string
   check?: string
   no_transaction?: boolean
-}): { sql: string } {
-  let defaultValueClause = ''
+}
+
+type CreateOptionsDefaultExpression = {
+  default_value_format: 'expression'
+  default_value: SafeSqlFragment
+} & CreateOptionsBase
+
+type CreateOptionsNotDefaultExpression = {
+  default_value_format?: 'literal'
+  default_value?: unknown
+} & CreateOptionsBase
+
+type CreateOptions = CreateOptionsDefaultExpression | CreateOptionsNotDefaultExpression
+
+function create({
+  schema,
+  table,
+  name,
+  type,
+  is_identity = false,
+  identity_generation = 'BY DEFAULT',
+  is_nullable,
+  is_primary_key = false,
+  is_unique = false,
+  comment,
+  check,
+  no_transaction = false,
+  ...defaultOptions
+}: CreateOptions): { sql: SafeSqlFragment } {
+  let defaultValueClause: SafeSqlFragment = safeSql``
   if (is_identity) {
-    if (default_value !== undefined) {
+    if (defaultOptions.default_value !== undefined) {
       throw new Error('Columns cannot both be identity and have a default value')
     }
 
-    defaultValueClause = `GENERATED ${identity_generation} AS IDENTITY`
+    defaultValueClause = safeSql`GENERATED ${keyword(identity_generation)} AS IDENTITY`
   } else {
-    if (default_value === undefined) {
+    if (defaultOptions.default_value === undefined) {
       // skip
-    } else if (default_value_format === 'expression') {
-      defaultValueClause = `DEFAULT ${default_value}`
+    } else if (defaultOptions.default_value_format === 'expression') {
+      defaultValueClause = safeSql`DEFAULT ${defaultOptions.default_value}`
     } else {
-      defaultValueClause = `DEFAULT ${literal(default_value)}`
+      defaultValueClause = safeSql`DEFAULT ${literal(defaultOptions.default_value)}`
     }
   }
 
-  let isNullableClause = ''
-  if (is_nullable !== undefined) {
-    isNullableClause = is_nullable ? 'NULL' : 'NOT NULL'
-  }
-  const isPrimaryKeyClause = is_primary_key ? 'PRIMARY KEY' : ''
-  const isUniqueClause = is_unique ? 'UNIQUE' : ''
-  const checkSql = check === undefined ? '' : `CHECK (${check})`
-  const commentSql =
+  const isNullableClause: SafeSqlFragment =
+    is_nullable === undefined ? safeSql`` : is_nullable ? safeSql`NULL` : safeSql`NOT NULL`
+  const isPrimaryKeyClause: SafeSqlFragment = is_primary_key ? safeSql`PRIMARY KEY` : safeSql``
+  const isUniqueClause: SafeSqlFragment = is_unique ? safeSql`UNIQUE` : safeSql``
+  const checkSql: SafeSqlFragment =
+    check === undefined ? safeSql`` : safeSql`CHECK (${rawSql(check)})`
+  const commentSql: SafeSqlFragment =
     comment === undefined
-      ? ''
-      : `COMMENT ON COLUMN ${ident(schema)}.${ident(table)}.${ident(name)} IS ${literal(comment)}`
+      ? safeSql``
+      : safeSql`COMMENT ON COLUMN ${ident(schema)}.${ident(table)}.${ident(name)} IS ${literal(comment)}`
 
-  const sql = `
+  const sql = safeSql`
   ALTER TABLE ${ident(schema)}.${ident(table)} ADD COLUMN ${ident(name)} ${typeIdent(type)}
     ${defaultValueClause}
     ${isNullableClause}
@@ -180,20 +200,19 @@ function create({
   }
 
   return {
-    sql: `
+    sql: safeSql`
   BEGIN;
     ${sql};
   COMMIT;`,
   }
 }
 
-// TODO: make this more robust - use type_id or type_schema + type_name instead of just type.
-const typeIdent = (type: string) => {
-  return type.endsWith('[]')
-    ? `${ident(type.slice(0, -2))}[]`
-    : type.includes('.')
-      ? type
-      : ident(type)
+function typeIdent(type: ColumnTypeRef): SafeSqlFragment {
+  const base =
+    type.schema !== undefined
+      ? safeSql`${ident(type.schema)}.${ident(type.name)}`
+      : ident(type.name)
+  return type.isArray ? safeSql`${base}[]` : base
 }
 
 function update(
@@ -215,7 +234,7 @@ function update(
     check,
   }: {
     name?: string
-    type?: string
+    type?: ColumnTypeRef
     drop_default?: boolean
     default_value?: any
     default_value_format?: 'expression' | 'literal'
@@ -224,36 +243,28 @@ function update(
     is_nullable?: boolean
     is_unique?: boolean
     comment?: string | null
-    check?: string | null
+    check?: SafeSqlFragment | null
   }
-): { sql: string } {
-  const nameSql =
+): { sql: SafeSqlFragment } {
+  const nameSql: SafeSqlFragment =
     name === undefined || name === old.name
-      ? ''
-      : `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} RENAME COLUMN ${ident(
-          old.name
-        )} TO ${ident(name)};`
+      ? safeSql``
+      : safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} RENAME COLUMN ${ident(old.name)} TO ${ident(name)};`
   // We use USING to allow implicit conversion of incompatible types (e.g. int4 -> text).
-  const typeSql =
+  const typeSql: SafeSqlFragment =
     type === undefined
-      ? ''
-      : `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
-          old.name
-        )} SET DATA TYPE ${typeIdent(type)} USING ${ident(old.name)}::${typeIdent(type)};`
+      ? safeSql``
+      : safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(old.name)} SET DATA TYPE ${typeIdent(type)} USING ${ident(old.name)}::${typeIdent(type)};`
 
-  let defaultValueSql: string
+  let defaultValueSql: SafeSqlFragment
   if (drop_default) {
-    defaultValueSql = `ALTER TABLE ${ident(old.schema)}.${ident(
-      old.table
-    )} ALTER COLUMN ${ident(old.name)} DROP DEFAULT;`
+    defaultValueSql = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(old.name)} DROP DEFAULT;`
   } else if (default_value === undefined) {
-    defaultValueSql = ''
+    defaultValueSql = safeSql``
   } else {
-    const defaultValue =
+    const defaultValue: SafeSqlFragment =
       default_value_format === 'expression' ? default_value : literal(default_value)
-    defaultValueSql = `ALTER TABLE ${ident(old.schema)}.${ident(
-      old.table
-    )} ALTER COLUMN ${ident(old.name)} SET DEFAULT ${defaultValue};`
+    defaultValueSql = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(old.name)} SET DEFAULT ${defaultValue};`
   }
   // What identitySql does vary depending on the old and new values of
   // is_identity and identity_generation.
@@ -263,37 +274,32 @@ function update(
   // | true                   | maybe set identity | maybe set identity | drop if exists |
   // |------------------------+--------------------+--------------------+----------------|
   // | false                  | -                  | add identity       | drop if exists |
-  let identitySql = `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
-    old.name
-  )}`
+  const alterColumnPrefix = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(old.name)}`
+  let identitySql: SafeSqlFragment
   if (is_identity === false) {
-    identitySql += ' DROP IDENTITY IF EXISTS;'
+    identitySql = safeSql`${alterColumnPrefix} DROP IDENTITY IF EXISTS;`
   } else if (old.is_identity === true) {
     if (identity_generation === undefined) {
-      identitySql = ''
+      identitySql = safeSql``
     } else {
-      identitySql += ` SET GENERATED ${identity_generation};`
+      identitySql = safeSql`${alterColumnPrefix} SET GENERATED ${keyword(identity_generation)};`
     }
   } else if (is_identity === undefined) {
-    identitySql = ''
+    identitySql = safeSql``
   } else {
-    identitySql += ` ADD GENERATED ${identity_generation} AS IDENTITY;`
+    identitySql = safeSql`${alterColumnPrefix} ADD GENERATED ${keyword(identity_generation)} AS IDENTITY;`
   }
-  let isNullableSql: string
+  let isNullableSql: SafeSqlFragment
   if (is_nullable === undefined) {
-    isNullableSql = ''
+    isNullableSql = safeSql``
   } else {
     isNullableSql = is_nullable
-      ? `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
-          old.name
-        )} DROP NOT NULL;`
-      : `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
-          old.name
-        )} SET NOT NULL;`
+      ? safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(old.name)} DROP NOT NULL;`
+      : safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(old.name)} SET NOT NULL;`
   }
-  let isUniqueSql = ''
+  let isUniqueSql: SafeSqlFragment = safeSql``
   if (old.is_unique === true && is_unique === false) {
-    isUniqueSql = `
+    isUniqueSql = safeSql`
 DO $$
 DECLARE
   r record;
@@ -305,29 +311,32 @@ BEGIN
       AND conrelid = ${literal(old.table_id)}
       AND conkey[1] = ${literal(old.ordinal_position)}
   LOOP
-    EXECUTE ${literal(
-      `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} DROP CONSTRAINT `
-    )} || quote_ident(r.conname);
+    EXECUTE ${literal(`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} DROP CONSTRAINT `)} || quote_ident(r.conname);
   END LOOP;
 END
-$$;
-`
+$$;`
   } else if (old.is_unique === false && is_unique === true) {
-    isUniqueSql = `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD UNIQUE (${ident(
-      old.name
-    )});`
+    isUniqueSql = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD UNIQUE (${ident(old.name)});`
   }
-  const commentSql =
+  const commentSql: SafeSqlFragment =
     comment === undefined
-      ? ''
-      : `COMMENT ON COLUMN ${ident(old.schema)}.${ident(old.table)}.${ident(
-          old.name
-        )} IS ${literal(comment)};`
+      ? safeSql``
+      : safeSql`COMMENT ON COLUMN ${ident(old.schema)}.${ident(old.table)}.${ident(old.name)} IS ${literal(comment)};`
 
-  const checkSql =
-    check === undefined
-      ? ''
-      : `
+  let checkSql: SafeSqlFragment = safeSql``
+  if (check !== undefined) {
+    const addCheckSql: SafeSqlFragment =
+      check !== null
+        ? safeSql`
+  ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD CONSTRAINT ${ident(`${old.table}_${old.name}_check`)} CHECK (${check});
+
+  SELECT conkey into v_conkey FROM pg_constraint WHERE conname = ${literal(`${old.table}_${old.name}_check`)};
+
+  ASSERT v_conkey IS NOT NULL, 'error creating column constraint: check condition must refer to this column';
+  ASSERT cardinality(v_conkey) = 1, 'error creating column constraint: check condition cannot refer to multiple columns';
+  ASSERT v_conkey[1] = ${literal(old.ordinal_position)}, 'error creating column constraint: check condition cannot refer to other columns';`
+        : safeSql``
+    checkSql = safeSql`
 DO $$
 DECLARE
   v_conname name;
@@ -342,40 +351,19 @@ BEGIN
     LIMIT 1;
 
   IF v_conname IS NOT NULL THEN
-    EXECUTE format('ALTER TABLE ${ident(old.schema)}.${ident(
-      old.table
-    )} DROP CONSTRAINT %I', v_conname);
+    EXECUTE format('ALTER TABLE ${ident(old.schema)}.${ident(old.table)} DROP CONSTRAINT %I', v_conname);
   END IF;
-
-  ${
-    check !== null
-      ? `
-  ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD CONSTRAINT ${ident(
-    `${old.table}_${old.name}_check`
-  )} CHECK (${check});
-
-  SELECT conkey into v_conkey FROM pg_constraint WHERE conname = ${literal(
-    `${old.table}_${old.name}_check`
-  )};
-
-  ASSERT v_conkey IS NOT NULL, 'error creating column constraint: check condition must refer to this column';
-  ASSERT cardinality(v_conkey) = 1, 'error creating column constraint: check condition cannot refer to multiple columns';
-  ASSERT v_conkey[1] = ${literal(
-    old.ordinal_position
-  )}, 'error creating column constraint: check condition cannot refer to other columns';
-`
-      : ''
-  }
+  ${addCheckSql}
 END
-$$;
-`
+$$;`
+  }
 
   // TODO: Can't set default if column is previously identity even if
   // is_identity: false. Must do two separate PATCHes (once to drop identity
   // and another to set default).
   // NOTE: nameSql must be last. defaultValueSql must be after typeSql.
   // identitySql must be after isNullableSql.
-  const sql = `
+  const sql = safeSql`
 BEGIN;
   ${isNullableSql}
   ${typeSql}

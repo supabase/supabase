@@ -11,10 +11,10 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Switch,
 } from 'ui'
 import * as z from 'zod'
@@ -81,8 +81,8 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={onOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={onOpen}>
+      <PopoverTrigger asChild>
         <Button className="rounded-r-none" type="default" size="tiny" iconRight={<ChevronDown />}>
           <p
             className="max-w-[120px] truncate"
@@ -91,8 +91,8 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
             {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Join a channel'}
           </p>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[320px]" align="start">
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-[320px]" align="start">
         <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
@@ -111,7 +111,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                           <label className="text-foreground text-xs">Name of channel</label>
                           <div className="flex flex-row">
                             <FormControl>
-                              <Input_Shadcn_
+                              <Input
                                 {...field}
                                 autoComplete="off"
                                 className="rounded-r-none text-xs px-2.5 py-1 h-auto"
@@ -203,7 +203,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
             </div>
           )}
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

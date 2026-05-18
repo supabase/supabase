@@ -1,4 +1,4 @@
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, CriticalIcon } from 'ui'
+import { Alert, AlertDescription, AlertTitle, CriticalIcon } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -22,18 +22,18 @@ export const AccountDeletion = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <CriticalIcon />
-          <AlertTitle_Shadcn_>Request for account deletion</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Request for account deletion</AlertTitle>
+          <AlertDescription>
             Deleting your account is permanent and cannot be undone. Your data will be deleted
             within 30 days, but we may retain some metadata and logs for longer where required or
             permitted by law.
-          </AlertDescription_Shadcn_>
-          <AlertDescription_Shadcn_ className="mt-3">
+          </AlertDescription>
+          <AlertDescription className="mt-3">
             <DeleteAccountButton />
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       </PageSectionContent>
     </PageSection>
   )

@@ -3,6 +3,7 @@ import { Cable, Clock, Database } from 'lucide-react'
 import { memo } from 'react'
 
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
+import { getRowTimestampMs } from '../../../UnifiedLogs.utils'
 import { postgresDetailsFields, postgresPrimaryFields } from '../../config/serviceFlowFields'
 import { BlockFieldConfig } from '../../types'
 import { DetailRow } from '../shared/DetailRow'
@@ -61,11 +62,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   filterFields,
   table,
 }: PostgresFlowDetailProps) {
-  const timestampMs = data?.timestamp
-    ? data.timestamp / 1000
-    : data?.date
-      ? data.date.getTime()
-      : null
+  const timestampMs = getRowTimestampMs(data)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   const severity: string | undefined =
@@ -75,7 +72,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   return (
     <div className="[&>*:nth-child(even)]:bg-surface-100/50">
       <DetailSectionHeader
-        title="Requested started"
+        title="Request started"
         icon={Clock}
         summary={formattedTime ?? undefined}
       />

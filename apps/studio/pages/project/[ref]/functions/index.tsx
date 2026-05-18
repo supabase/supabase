@@ -1,7 +1,8 @@
 import { useFlag, useParams } from 'common'
-import { ExternalLink, Search, X } from 'lucide-react'
+import { ExternalLink, RefreshCw, Search, X } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -31,17 +32,24 @@ import {
   FunctionsInstructionsLocal,
 } from '@/components/interfaces/Functions/FunctionsEmptyState'
 import { TerminalInstructionsDialog } from '@/components/interfaces/Functions/TerminalInstructionsDialog'
+import { useFunctionsListShortcuts } from '@/components/interfaces/Functions/useFunctionsListShortcuts'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import type { NextPageWithLayout } from '@/types'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const { ref } = useParams()
   const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const [sort, setSortQueryParam] = useQueryState(
@@ -55,7 +63,20 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isPending: isLoading,
     isError,
     isSuccess,
+    isFetching,
+    refetch,
   } = useEdgeFunctionsQuery({ projectRef: ref })
+
+  useFunctionsListShortcuts({
+    searchInputRef,
+    setSearch,
+    sort,
+    setSort: setSortQueryParam,
+    onCreateNew: () => router.push(`/project/${ref}/functions/new`),
+    onRefresh: () => {
+      refetch()
+    },
+  })
 
   const filteredFunctions = useMemo(() => {
     const temp = (functions ?? []).filter((x) =>
@@ -106,31 +127,52 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
                         <div className="relative">
-                          <Input
-                            placeholder="Search function names"
-                            icon={<Search />}
-                            size="tiny"
-                            className="w-32 md:w-64"
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            actions={[
-                              search && (
-                                <Button
-                                  key="clear"
-                                  size="tiny"
-                                  type="text"
-                                  icon={<X />}
-                                  onClick={() => setSearch('')}
-                                  className="p-0 h-5 w-5"
-                                />
-                              ),
-                            ]}
-                          />
+                          <ShortcutTooltip
+                            shortcutId={SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH}
+                            label="Search functions"
+                            side="bottom"
+                          >
+                            <Input
+                              ref={searchInputRef}
+                              placeholder="Search function names"
+                              icon={<Search />}
+                              size="tiny"
+                              className="w-32 md:w-64"
+                              value={search}
+                              onChange={(event) => setSearch(event.target.value)}
+                              onKeyDown={onSearchInputEscape(search, setSearch)}
+                              actions={[
+                                search && (
+                                  <Button
+                                    key="clear"
+                                    size="tiny"
+                                    type="text"
+                                    icon={<X />}
+                                    onClick={() => setSearch('')}
+                                    className="p-0 h-5 w-5"
+                                  />
+                                ),
+                              ]}
+                            />
+                          </ShortcutTooltip>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
                       </div>
+                      <ShortcutTooltip
+                        shortcutId={SHORTCUT_IDS.FUNCTIONS_LIST_REFRESH}
+                        side="bottom"
+                      >
+                        <Button
+                          type="default"
+                          icon={<RefreshCw />}
+                          loading={isFetching}
+                          onClick={() => refetch()}
+                        >
+                          Refresh
+                        </Button>
+                      </ShortcutTooltip>
                       <span className="border-l border-default pl-2 text-xs text-foreground-light">
                         {search && filteredFunctions.length !== functions.length
                           ? `Viewing ${filteredFunctions.length} of ${functions.length} functions in total`

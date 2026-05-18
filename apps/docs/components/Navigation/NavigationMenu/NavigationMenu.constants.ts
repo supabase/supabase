@@ -1163,18 +1163,24 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'Replication',
-          url: '/guides/database/replication/replication-setup' as `/${string}`,
+          name: 'External replication',
+          url: '/guides/database/replication/external-replication-setup' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/replication-setup' as `/${string}`,
+              url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+              items: [
+                {
+                  name: 'BigQuery',
+                  url: '/guides/database/replication/bigquery' as `/${string}`,
+                },
+              ],
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/external-replication-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/external-replication-faq' },
           ],
         },
         {

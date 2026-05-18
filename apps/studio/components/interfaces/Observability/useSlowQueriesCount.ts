@@ -1,9 +1,10 @@
+import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { useMemo } from 'react'
 
 import useDbQuery from '@/hooks/analytics/useDbQuery'
 
-export function buildSlowQueriesCountSql(): string {
-  return `
+export function buildSlowQueriesCountSql(): SafeSqlFragment {
+  return safeSql`
     -- observability-slow-queries-count
     set search_path to public, extensions;
 

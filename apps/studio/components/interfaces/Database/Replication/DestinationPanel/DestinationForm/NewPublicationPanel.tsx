@@ -7,7 +7,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -102,7 +102,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                     render={({ field }) => (
                       <FormItemLayout label="Name" layout="vertical">
                         <FormControl>
-                          <Input_Shadcn_ {...field} placeholder="Name" />
+                          <Input {...field} placeholder="Name" />
                         </FormControl>
                       </FormItemLayout>
                     )}

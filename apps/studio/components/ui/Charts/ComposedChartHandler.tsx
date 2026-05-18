@@ -86,7 +86,11 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
     }
   }, [])
 
-  return <div ref={ref}>{React.cloneElement(children as React.ReactElement, { isVisible })}</div>
+  return (
+    <div ref={ref}>
+      {React.cloneElement(children as React.ReactElement<{ isVisible: boolean }>, { isVisible })}
+    </div>
+  )
 }
 
 /**

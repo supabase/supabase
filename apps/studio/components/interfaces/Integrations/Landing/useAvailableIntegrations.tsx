@@ -42,6 +42,7 @@ export const useAvailableIntegrations = () => {
           id: listingId,
           slug,
           categories,
+          featured,
           title,
           description,
           documentation_url: docsUrl,
@@ -50,6 +51,7 @@ export const useAvailableIntegrations = () => {
           installation_url_type: installUrlType,
           installation_identification_method: installMethod,
           secret_key_prefix: secretKeyPrefix,
+          edge_function_secret_name: edgeFunctionSecretName,
           images,
           content,
           partner_name: authorName,
@@ -63,6 +65,7 @@ export const useAvailableIntegrations = () => {
           id: slug ?? '',
           name: title ?? '',
           status,
+          featured: !!featured,
           type: 'oauth' as const, // Currently marketplace only supports oauth apps
           categories: Array.isArray(categories)
             ? (categories as Array<{ slug: string }>).map((x) => x.slug)
@@ -76,6 +79,7 @@ export const useAvailableIntegrations = () => {
           installUrlType: installUrlType ?? undefined,
           installIdentificationMethod: installMethod ?? undefined,
           secretKeyPrefix: secretKeyPrefix ?? undefined,
+          edgeFunctionSecretName: edgeFunctionSecretName ?? undefined,
           listingId: listingId ?? undefined,
           author,
           requiredExtensions: [],
