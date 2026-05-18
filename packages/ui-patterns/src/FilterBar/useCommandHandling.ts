@@ -5,6 +5,7 @@ import {
   addFilterToGroup,
   addGroupToGroup,
   findGroupByPath,
+  isFilterOperatorObject,
   updateNestedOperator,
   updateNestedValue,
 } from './utils'
@@ -81,12 +82,26 @@ export function useCommandHandling({
     (selectedProperty: FilterProperty, currentPath: number[], group: FilterGroup) => {
       // Adding a new condition stub (property only, no operator/value yet) is structural —
       // draft-only. onApply fires once the user picks an operator or value.
-      const updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
-      onFilterChange(updatedFilters)
+      let updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
       const newPath = [...currentPath, group.conditions.length]
 
+      // If the property only allows a single operator, pre-fill it and skip the operator step —
+      // the user otherwise has to hit Enter on a one-item dropdown before they can type a value.
+      const operators = selectedProperty.operators ?? []
+      const onlyOperator =
+        operators.length === 1
+          ? isFilterOperatorObject(operators[0])
+            ? operators[0].value
+            : operators[0]
+          : null
+
+      if (onlyOperator) {
+        updatedFilters = updateNestedOperator(updatedFilters, newPath, onlyOperator)
+      }
+      onFilterChange(updatedFilters)
+
       setTimeout(() => {
-        setActiveInput({ type: 'operator', path: newPath })
+        setActiveInput({ type: onlyOperator ? 'value' : 'operator', path: newPath })
       }, 0)
     },
     [activeFilters, onFilterChange, setActiveInput]

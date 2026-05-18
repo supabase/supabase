@@ -213,6 +213,7 @@ export const FilterPopoverNew = ({
 
   return (
     <div className="flex-1 min-w-0" onFocus={() => onInputFocus?.()} onBlur={() => onInputBlur?.()}>
+      {/* [Joshen] We should be using onApply instead to not ping network requests too aggressively */}
       <FilterBar
         ref={filterBarRef}
         filterProperties={filterProperties}

@@ -39,14 +39,14 @@ export function DataTableFilterControls({
         const value = field.value as string
         return (
           <AccordionItem key={value} value={value} className="border-none">
-            <AccordionTrigger className="w-full px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
-              <div className="flex w-full items-center justify-between gap-2 truncate py-2 pr-2">
-                <div className="flex items-center gap-2 truncate">
+            <div className="flex items-center gap-2 pr-2">
+              <AccordionTrigger className="flex-1 px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
+                <div className="flex items-center gap-2 truncate py-2">
                   <p className="text-sm">{field.label}</p>
                 </div>
-                <DataTableFilterResetButton {...field} />
-              </div>
-            </AccordionTrigger>
+              </AccordionTrigger>
+              <DataTableFilterResetButton {...field} />
+            </div>
             <AccordionContent>
               {/* REMINDER: avoid the focus state to be cut due to overflow-hidden */}
               {/* REMINDER: need to move within here because of accordion height animation */}

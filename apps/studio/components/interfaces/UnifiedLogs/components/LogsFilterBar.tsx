@@ -1,11 +1,31 @@
 import { groupBy } from 'lodash'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FilterBar, FilterCondition, type FilterGroup, type FilterProperty } from 'ui-patterns'
 
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+
+const buildFilterGroup = (
+  columnFilters: { id: string; value: unknown }[],
+  filterableNames: Set<string>
+): FilterGroup => {
+  const conditions: FilterCondition[] = []
+  for (const { id, value } of columnFilters) {
+    if (!filterableNames.has(id) || value === null || value === undefined) continue
+    const values = Array.isArray(value) ? value : [value]
+    for (const v of values) {
+      conditions.push({
+        propertyName: id,
+        value: v as FilterCondition['value'],
+        operator: '=',
+      })
+    }
+  }
+  return { logicalOperator: 'AND', conditions }
+}
 
 export const LogsFilterBar = () => {
-  const { table, filterFields } = useDataTable()
+  const { table, filterFields, columnFilters } = useDataTable()
 
   const [freeformText, setFreeformText] = useState('')
 
@@ -19,23 +39,14 @@ export const LogsFilterBar = () => {
       operators: ['='],
     }))
 
-  // Seed from the table's columnFilters (already hydrated from the URL by the parent) so
-  // chips re-appear after a page reload or a deep-link.
-  const [filters, setFilters] = useState<FilterGroup>(() => {
-    const filterableNames = new Set(filterProperties.map((p) => p.name))
-    const conditions: FilterCondition[] = []
-    for (const { id, value } of table.getState().columnFilters) {
-      if (!filterableNames.has(id) || value === null || value === undefined) continue
-      const values = Array.isArray(value) ? value : [value]
-      for (const v of values) {
-        conditions.push({
-          propertyName: id,
-          value: v as FilterCondition['value'],
-          operator: '=',
-        })
-      }
-    }
-    return { logicalOperator: 'AND', conditions }
+  // Local state because the FilterBar carries transient states
+  const [filters, setFilters] = useState<FilterGroup>(() =>
+    buildFilterGroup(columnFilters, new Set(filterProperties.map((p) => p.name)))
+  )
+
+  // Read latest filterProperties without making the effect depend on its (per-render) identity.
+  const syncFromColumnFilters = useStaticEffectEvent(() => {
+    setFilters(buildFilterGroup(columnFilters, new Set(filterProperties.map((p) => p.name))))
   })
 
   // No nested conditions in unified logs — type-cast to FilterCondition on read.
@@ -61,6 +72,10 @@ export const LogsFilterBar = () => {
       table.getColumn(x.id)?.setFilterValue(undefined)
     })
   }
+
+  useEffect(() => {
+    syncFromColumnFilters()
+  }, [columnFilters, syncFromColumnFilters])
 
   return (
     <FilterBar
