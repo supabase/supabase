@@ -90,8 +90,8 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
 
 const Menu = () => (
   <Accordion_Shadcn_ type="multiple" className="space-y-1 mt-2.5">
-    {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section) => (
-      <AccordionMenuItem section={section} />
+    {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
+      <AccordionMenuItem key={index} section={section} />
     ))}
   </Accordion_Shadcn_>
 )
