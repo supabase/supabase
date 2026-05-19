@@ -159,6 +159,11 @@ keys.json
 # Playwright MCP
 .playwright-mcp/*
 
+# Ota local runtime artifacts
+.ota/state/
+.ota/receipts/
+.ota/proof/
+
 # Application
 **/.superset/**
 
