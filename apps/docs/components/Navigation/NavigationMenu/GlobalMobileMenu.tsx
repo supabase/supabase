@@ -1,3 +1,5 @@
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { X } from 'lucide-react'
 import Image from 'next/image'
@@ -5,12 +7,16 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Dispatch, Fragment, SetStateAction, useEffect } from 'react'
 import { useKey } from 'react-use'
-
-import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { Accordion, Button, cn } from 'ui'
+import {
+  Accordion_Shadcn_,
+  AccordionContent_Shadcn_,
+  AccordionItem_Shadcn_,
+  AccordionTrigger_Shadcn_,
+  Button,
+  cn,
+} from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
-import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
@@ -35,68 +41,59 @@ const itemClassName =
 const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
 
-  return (
-    <m.div
-      variants={listItem}
-      className="border-b border-muted [&>div]:rounded-none! [&_div[data-state=open]>div]:py-1"
-      key={section[0].label}
-    >
-      {section[0].menuItems ? (
-        <Accordion.Item
-          header={section[0].label}
-          id={section[0].label}
-          className={cn(
-            'relative',
-            activeLabel === section[0].label && 'text-foreground!',
-            itemClassName
-          )}
-        >
-          {section[0].menuItems?.map((menuItem, menuItemIndex) => (
-            <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
-              {menuItem
-                .filter((item) => item.enabled !== false)
-                .map((item) =>
-                  !item.href ? (
-                    <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
-                      {item.label}
-                    </div>
-                  ) : (
-                    <MenuItem
-                      href={item.href}
-                      title={item.label}
-                      community={item.community}
-                      icon={item.icon}
-                    />
-                  )
-                )}
-            </Fragment>
-          ))}
-        </Accordion.Item>
-      ) : (
-        <Link
-          href={section[0].href || '#'}
-          className={cn(activeLabel === section[0].label && 'text-foreground!', itemClassName)}
-        >
-          {section[0].label}
-        </Link>
+  return section[0].menuItems ? (
+    <AccordionItem_Shadcn_
+      value={section[0].label}
+      className={cn(
+        'relative',
+        activeLabel === section[0].label && 'text-foreground!',
+        itemClassName
       )}
-    </m.div>
+    >
+      <AccordionTrigger_Shadcn_ className="py-1">{section[0].label}</AccordionTrigger_Shadcn_>
+      <AccordionContent_Shadcn_>
+        {section[0].menuItems?.map((menuItem, menuItemIndex) => (
+          <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
+            {menuItem
+              .filter((item) => item.enabled !== false)
+              .map((item) =>
+                !item.href ? (
+                  <div
+                    key={item.label}
+                    className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none"
+                  >
+                    {item.label}
+                  </div>
+                ) : (
+                  <MenuItem
+                    key={item.label}
+                    href={item.href}
+                    title={item.label}
+                    community={item.community}
+                    icon={item.icon}
+                  />
+                )
+              )}
+          </Fragment>
+        ))}
+      </AccordionContent_Shadcn_>
+    </AccordionItem_Shadcn_>
+  ) : (
+    <Link
+      href={section[0].href || '#'}
+      className={cn(activeLabel === section[0].label && 'text-foreground!', itemClassName)}
+    >
+      {section[0].label}
+    </Link>
   )
 }
 
 const Menu = () => (
-  <Accordion
-    type="default"
-    openBehaviour="multiple"
-    size="small"
-    className="space-y-1 mt-2.5"
-    justified
-    chevronAlign="right"
-  >
-    {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section) => (
-      <AccordionMenuItem section={section} />
+  <Accordion_Shadcn_ type="multiple" className="space-y-1 mt-2.5">
+    {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
+      <AccordionMenuItem key={index} section={section} />
     ))}
-  </Accordion>
+  </Accordion_Shadcn_>
 )
 interface Props {
   open: boolean
