@@ -1,9 +1,4 @@
-import {
-  Accordion_Shadcn_ as Accordion,
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 
 import { DateRangeDisabled } from '../DataTable.types'
 import { useDataTable } from '../providers/DataTableProvider'

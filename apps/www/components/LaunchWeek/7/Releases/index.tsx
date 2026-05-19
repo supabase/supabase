@@ -4,12 +4,7 @@ import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useEffect } from 'react'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 
 import {
   AccordionHeader,
@@ -249,21 +244,21 @@ export default function LW7Releases() {
         </div>
       </SectionContainer>
       <SectionContainer className="pt-0! w-full! px-0! max-w-none!">
-        <Accordion_Shadcn_ type="multiple" className="text-white" defaultValue={publishedSections}>
-          <AccordionItem_Shadcn_
+        <Accordion type="multiple" className="text-white" defaultValue={publishedSections}>
+          <AccordionItem
             key={preRelease.dd}
             disabled={!prereleaseShipped}
             value={preRelease.d.toString()}
           >
-            <AccordionTrigger_Shadcn_ className="py-8 font-normal hover:no-underline">
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
               <AccordionHeader
                 date={preRelease.date}
                 day={preRelease.dd}
                 title={preRelease.title}
                 shipped={prereleaseShipped}
               />
-            </AccordionTrigger_Shadcn_>
-            <AccordionContent_Shadcn_>
+            </AccordionTrigger>
+            <AccordionContent>
               {preRelease.steps.length > 0 && (
                 <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -367,18 +362,18 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_ disabled={!day1Shipped} value={day1.d.toString()}>
-            <AccordionTrigger_Shadcn_ className="py-8 font-normal hover:no-underline">
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day1Shipped} value={day1.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
               <AccordionHeader
                 date={day1.date}
                 day={day1.dd}
                 title={day1.title}
                 shipped={day1Shipped}
               />
-            </AccordionTrigger_Shadcn_>
-            <AccordionContent_Shadcn_>
+            </AccordionTrigger>
+            <AccordionContent>
               {day1.steps.length > 0 && (
                 <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -437,18 +432,18 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_ disabled={!day2Shipped} value={day2.d.toString()}>
-            <AccordionTrigger_Shadcn_ className="py-8 font-normal hover:no-underline">
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day2Shipped} value={day2.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
               <AccordionHeader
                 date={day2.date}
                 day={day2.dd}
                 title={day2.title}
                 shipped={day2Shipped}
               />
-            </AccordionTrigger_Shadcn_>
-            <AccordionContent_Shadcn_>
+            </AccordionTrigger>
+            <AccordionContent>
               {day2.steps.length > 0 && (
                 <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -507,18 +502,18 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_ disabled={!day3Shipped} value={day3.d.toString()}>
-            <AccordionTrigger_Shadcn_ className="py-8 font-normal hover:no-underline">
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day3Shipped} value={day3.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
               <AccordionHeader
                 date={day3.date}
                 day={day3.dd}
                 title={day3.title}
                 shipped={day3Shipped}
               />
-            </AccordionTrigger_Shadcn_>
-            <AccordionContent_Shadcn_>
+            </AccordionTrigger>
+            <AccordionContent>
               {day3.steps.length > 0 && (
                 <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -577,18 +572,18 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_ disabled={!day4Shipped} value={day4.d.toString()}>
-            <AccordionTrigger_Shadcn_ className="py-8 font-normal hover:no-underline">
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day4Shipped} value={day4.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
               <AccordionHeader
                 date={day4.date}
                 day={day4.dd}
                 title={day4.title}
                 shipped={day4Shipped}
               />
-            </AccordionTrigger_Shadcn_>
-            <AccordionContent_Shadcn_>
+            </AccordionTrigger>
+            <AccordionContent>
               {day4.steps.length > 0 && (
                 <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
                   <motion.div
@@ -645,22 +640,22 @@ export default function LW7Releases() {
                   </motion.div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_ disabled={!day5Shipped} value={day5.d.toString()}>
-            <AccordionTrigger_Shadcn_ className="py-8 font-normal hover:no-underline">
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem disabled={!day5Shipped} value={day5.d.toString()}>
+            <AccordionTrigger className="py-8 font-normal hover:no-underline">
               <AccordionHeader
                 date={day5.date}
                 day={day5.dd}
                 title={day5.title}
                 shipped={day5Shipped}
               />
-            </AccordionTrigger_Shadcn_>
-            <AccordionContent_Shadcn_>
+            </AccordionTrigger>
+            <AccordionContent>
               <Day5 day={day5} />
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-        </Accordion_Shadcn_>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </SectionContainer>
     </>
   )

@@ -7,14 +7,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Dispatch, Fragment, SetStateAction, useEffect } from 'react'
 import { useKey } from 'react-use'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
-  Button,
-  cn,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import type { DropdownMenuItem } from '../Navigation.types'
@@ -42,7 +35,7 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
 
   return section[0].menuItems ? (
-    <AccordionItem_Shadcn_
+    <AccordionItem
       value={section[0].label}
       className={cn(
         'relative',
@@ -50,8 +43,8 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
         itemClassName
       )}
     >
-      <AccordionTrigger_Shadcn_ className="py-1">{section[0].label}</AccordionTrigger_Shadcn_>
-      <AccordionContent_Shadcn_>
+      <AccordionTrigger className="py-1">{section[0].label}</AccordionTrigger>
+      <AccordionContent>
         {section[0].menuItems?.map((menuItem, menuItemIndex) => (
           <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
             {menuItem
@@ -76,8 +69,8 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
               )}
           </Fragment>
         ))}
-      </AccordionContent_Shadcn_>
-    </AccordionItem_Shadcn_>
+      </AccordionContent>
+    </AccordionItem>
   ) : (
     <Link
       href={section[0].href || '#'}
@@ -89,11 +82,11 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
 }
 
 const Menu = () => (
-  <Accordion_Shadcn_ type="multiple" className="space-y-1 mt-2.5">
+  <Accordion type="multiple" className="space-y-1 mt-2.5">
     {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
       <AccordionMenuItem key={index} section={section} />
     ))}
-  </Accordion_Shadcn_>
+  </Accordion>
 )
 interface Props {
   open: boolean
