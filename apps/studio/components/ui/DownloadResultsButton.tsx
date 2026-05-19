@@ -31,6 +31,7 @@ interface DownloadResultsButtonProps {
   results: any[]
   fileName: string
   onDownloadAsCSV?: () => void
+  onDownloadAsJSON?: () => void
   onCopyAsMarkdown?: () => void
   onCopyAsJSON?: () => void
   onCopyAsCSV?: () => void
@@ -44,6 +45,7 @@ export const DownloadResultsButton = ({
   results,
   fileName,
   onDownloadAsCSV,
+  onDownloadAsJSON,
   onCopyAsMarkdown,
   onCopyAsJSON,
   onCopyAsCSV,
@@ -64,6 +66,19 @@ export const DownloadResultsButton = ({
     saveAs(blob, `${fileName}.csv`)
     toast.success('Downloading results as CSV')
     onDownloadAsCSV?.()
+  }
+
+  const downloadAsJSON = () => {
+    const jsonData = convertResultsToJSON(results)
+    if (!jsonData) {
+      toast('Results are empty')
+      return
+    }
+
+    const blob = new Blob([jsonData], { type: 'application/json;charset=utf-8;' })
+    saveAs(blob, `${fileName}.json`)
+    toast.success('Downloading results as JSON')
+    onDownloadAsJSON?.()
   }
 
   const copyAsMarkdown = () => {
@@ -118,6 +133,10 @@ export const DownloadResultsButton = ({
     enabled: !isEmpty,
     registerInCommandMenu: true,
   })
+  useShortcut(SHORTCUT_IDS.RESULTS_DOWNLOAD_JSON, downloadAsJSON, {
+    enabled: !isEmpty,
+    registerInCommandMenu: true,
+  })
 
   return (
     <DropdownMenu>
@@ -167,6 +186,13 @@ export const DownloadResultsButton = ({
           <p>Download CSV</p>
           <span className="ml-auto">
             <KeyboardShortcut keys={['Shift', 'Meta', 'd']} />
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsJSON()}>
+          <Download size={14} />
+          <p>Download JSON</p>
+          <span className="ml-auto">
+            <KeyboardShortcut keys={['Shift', 'Meta', 'o']} />
           </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
