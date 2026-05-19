@@ -2,10 +2,10 @@ import { Database } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
   Button,
   NavMenu,
   NavMenuItem,

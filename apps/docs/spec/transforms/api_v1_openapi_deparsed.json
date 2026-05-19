@@ -4753,6 +4753,16 @@
               "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
+          },
+          {
+            "name": "remove_addon",
+            "required": false,
+            "in": "query",
+            "description": "If true, also removes the custom domain add-on from the project subscription.",
+            "schema": {
+              "default": "false",
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -8034,6 +8044,16 @@
                               }
                             },
                             "required": ["type", "slot_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["x86_architecture"]
+                              }
+                            },
+                            "required": ["type"]
                           }
                         ]
                       }
@@ -16444,6 +16464,9 @@
                                 }
                               }
                             }
+                          },
+                          "branches_only": {
+                            "type": "boolean"
                           }
                         },
                         "required": ["role"]
@@ -16580,6 +16603,9 @@
                               }
                             }
                           }
+                        },
+                        "branches_only": {
+                          "type": "boolean"
                         }
                       },
                       "required": ["role"]
@@ -16692,6 +16718,9 @@
                               }
                             }
                           }
+                        },
+                        "branches_only": {
+                          "type": "boolean"
                         }
                       },
                       "required": ["role"]
@@ -16711,7 +16740,8 @@
                             "cidr": "203.0.113.0/24"
                           }
                         ]
-                      }
+                      },
+                      "branches_only": false
                     }
                   ]
                 }
@@ -16771,6 +16801,9 @@
                                 }
                               }
                             }
+                          },
+                          "branches_only": {
+                            "type": "boolean"
                           }
                         },
                         "required": ["role"]
@@ -16884,6 +16917,9 @@
                                       }
                                     }
                                   }
+                                },
+                                "branches_only": {
+                                  "type": "boolean"
                                 }
                               },
                               "required": ["role"]
@@ -21693,6 +21729,7 @@
                                   "auth.advanced_auth_settings",
                                   "auth.performance_settings",
                                   "auth.password_hibp",
+                                  "auth.custom_oauth.max_providers",
                                   "backup.retention_days",
                                   "backup.restore_to_new_project",
                                   "function.max_count",
@@ -24854,6 +24891,16 @@
                     }
                   },
                   "required": ["type", "slot_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["x86_architecture"]
+                    }
+                  },
+                  "required": ["type"]
                 }
               ]
             }
@@ -28572,6 +28619,9 @@
                       }
                     }
                   }
+                },
+                "branches_only": {
+                  "type": "boolean"
                 }
               },
               "required": ["role"]
@@ -28643,6 +28693,9 @@
                     }
                   }
                 }
+              },
+              "branches_only": {
+                "type": "boolean"
               }
             },
             "required": ["role"]
@@ -28702,6 +28755,9 @@
                             }
                           }
                         }
+                      },
+                      "branches_only": {
+                        "type": "boolean"
                       }
                     },
                     "required": ["role"]
@@ -28762,6 +28818,9 @@
                       }
                     }
                   }
+                },
+                "branches_only": {
+                  "type": "boolean"
                 }
               },
               "required": ["role"]
@@ -28781,7 +28840,8 @@
                     "cidr": "203.0.113.0/24"
                   }
                 ]
-              }
+              },
+              "branches_only": false
             }
           ]
         }
@@ -30888,6 +30948,7 @@
                         "auth.advanced_auth_settings",
                         "auth.performance_settings",
                         "auth.password_hibp",
+                        "auth.custom_oauth.max_providers",
                         "backup.retention_days",
                         "backup.restore_to_new_project",
                         "function.max_count",

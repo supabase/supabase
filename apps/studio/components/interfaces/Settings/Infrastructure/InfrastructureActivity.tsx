@@ -1,9 +1,10 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { capitalize } from 'lodash'
-import { BarChart2, ExternalLink } from 'lucide-react'
+import { BarChart2, ChartLine, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useMemo, useState } from 'react'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -430,6 +431,19 @@ export const InfrastructureActivity = () => {
                         </div>
                       </Panel.Content>
                     </Panel>
+                  )}
+                  {attribute.key === 'disk_io_consumption' && !hasDedicatedIOResources && (
+                    <Admonition
+                      type="default"
+                      title="Looking for actual disk activity?"
+                      description="The chart above shows your remaining burst budget, not real disk throughput. For detailed read/write IOPS and throughput charts, head to the Database Observability page."
+                    >
+                      <Button asChild type="default" icon={<ChartLine size={14} />}>
+                        <Link href={`/project/${projectRef}/observability/database`}>
+                          View detailed IOPS and throughput
+                        </Link>
+                      </Button>
+                    </Admonition>
                   )}
                 </ScaffoldSectionContent>
               </ScaffoldSection>

@@ -4,13 +4,13 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -70,14 +70,14 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
               <FormItemLayout label="Name" layout="horizontal">
                 <FormControl>
                   <>
-                    <Input_Shadcn_ {...field} placeholder="Organization name" />
+                    <Input {...field} placeholder="Organization name" />
                     <div className="mt-1">
-                      <Label_Shadcn_
+                      <Label
                         htmlFor="name"
                         className="text-foreground-lighter leading-normal text-sm"
                       >
                         What's the name of your company or team?
-                      </Label_Shadcn_>
+                      </Label>
                     </div>
                   </>
                 </FormControl>
@@ -91,25 +91,25 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
               <FormItemLayout label="Type" layout="horizontal">
                 <FormControl>
                   <>
-                    <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger_Shadcn_>
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
                         {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
-                          <SelectItem_Shadcn_ key={k} value={k}>
+                          <SelectItem key={k} value={k}>
                             {v}
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                      </SelectContent>
+                    </Select>
                     <div className="mt-1">
-                      <Label_Shadcn_
+                      <Label
                         htmlFor="kind"
                         className="text-foreground-lighter leading-normal text-sm"
                       >
                         What would best describe your organization?
-                      </Label_Shadcn_>
+                      </Label>
                     </div>
                   </>
                 </FormControl>
@@ -124,25 +124,25 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
                 <FormItemLayout label="Company size" layout="horizontal">
                   <FormControl>
                     <>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ placeholder="How many people are in your company?" />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="How many people are in your company?" />
+                        </SelectTrigger>
+                        <SelectContent>
                           {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                            <SelectItem_Shadcn_ key={k} value={k}>
+                            <SelectItem key={k} value={k}>
                               {v}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                        </SelectContent>
+                      </Select>
                       <div className="mt-1">
-                        <Label_Shadcn_
+                        <Label
                           htmlFor="size"
                           className="text-foreground-lighter leading-normal text-sm"
                         >
                           How many people are in your company?
-                        </Label_Shadcn_>
+                        </Label>
                       </div>
                     </>
                   </FormControl>

@@ -1,4 +1,4 @@
-import { ident, literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { ident, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Loader } from 'lucide-react'
@@ -51,7 +51,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
     if (isUpdating || !canUpdateDescription) return false
 
     setIsUpdating(true)
-    let query: string | undefined
+    let query: SafeSqlFragment | undefined
     if (table && column)
       query = safeSql`comment on column ${ident('public')}.${ident(table)}.${ident(column)} is ${literal(value)};`
     if (table && !column)

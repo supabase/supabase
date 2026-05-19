@@ -113,7 +113,7 @@ export type Model = BedrockModel | OpenAIModelId
 
 export type ProviderModelConfig = {
   /** Optional providerOptions to attach to the system message for this model */
-  promptProviderOptions?: Record<string, any>
+  systemProviderOptions?: Record<string, any>
   /** The default model for this provider (used when limited or no preferred specified) */
   default: boolean
 }
@@ -133,7 +133,7 @@ export const PROVIDERS: ProviderRegistry = {
   bedrock: {
     models: {
       'anthropic.claude-3-7-sonnet-20250219-v1:0': {
-        promptProviderOptions: {
+        systemProviderOptions: {
           bedrock: {
             // Always cache the system prompt (must not contain dynamic content)
             cachePoint: { type: 'default' },

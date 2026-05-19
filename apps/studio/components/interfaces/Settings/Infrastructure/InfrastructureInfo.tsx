@@ -3,7 +3,7 @@ import Link from 'next/link'
 import {
   Badge,
   Button,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,

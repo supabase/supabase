@@ -1,11 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-import {
-  AlertDescription_Shadcn_ as AlertDescription,
-  AlertTitle_Shadcn_ as AlertTitle,
-  buttonVariants,
-  cn,
-} from 'ui'
+import { AlertDescription, AlertTitle, buttonVariants, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'

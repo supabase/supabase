@@ -32,6 +32,27 @@ const ACTIVE_DATABASE_SHORTCUT_IDS = [
   SHORTCUT_IDS.NAV_DATABASE_TABLES,
 ] satisfies ShortcutId[]
 
+const ACTIVE_AUTH_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.NAV_AUTH_USERS,
+] satisfies ShortcutId[]
+
+const ACTIVE_FUNCTION_DETAIL_NAV_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW,
+] satisfies ShortcutId[]
+
+const ACTIVE_SURFACE_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.AUTH_USERS_REFRESH,
+  SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST,
+  SHORTCUT_IDS.FUNCTION_OVERVIEW_INTERVAL_15MIN,
+  SHORTCUT_IDS.FUNCTIONS_LIST_REFRESH,
+  SHORTCUT_IDS.SQL_EDITOR_FORMAT,
+  SHORTCUT_IDS.STORAGE_BUCKETS_REFRESH,
+  SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
+] satisfies ShortcutId[]
+
 let sequenceIdCounter = 0
 
 const buildSequenceRegistration = (id: ShortcutId): SequenceRegistrationView => {
@@ -126,6 +147,43 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Database Navigation')).toBeInTheDocument()
     expect(screen.queryByText(/^Navigation$/)).not.toBeInTheDocument()
     expect(screen.getByText('Go to Tables')).toBeInTheDocument()
+  })
+
+  it('shows the auth navigation section when auth shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_AUTH_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Global Navigation')).toBeInTheDocument()
+    expect(screen.getByText('Auth Navigation')).toBeInTheDocument()
+    expect(screen.queryByText(/^Navigation$/)).not.toBeInTheDocument()
+    expect(screen.getByText('Go to Users')).toBeInTheDocument()
+  })
+
+  it('shows the edge function tabs section when function tab shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_FUNCTION_DETAIL_NAV_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Global Navigation')).toBeInTheDocument()
+    expect(screen.getByText('Edge Function Tabs')).toBeInTheDocument()
+    expect(screen.queryByText('Edge Function Page Navigation')).not.toBeInTheDocument()
+    expect(screen.getByText('Go to Overview')).toBeInTheDocument()
+  })
+
+  it('uses human labels for active surface shortcut groups', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_SURFACE_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Auth Users')).toBeInTheDocument()
+    expect(screen.getByText('Edge Function Actions')).toBeInTheDocument()
+    expect(screen.getByText('Edge Function Overview')).toBeInTheDocument()
+    expect(screen.getByText('Edge Functions')).toBeInTheDocument()
+    expect(screen.getByText('SQL Editor')).toBeInTheDocument()
+    expect(screen.getByText('Storage Buckets')).toBeInTheDocument()
+    expect(screen.getByText('Storage File Explorer')).toBeInTheDocument()
+    expect(screen.queryByText('auth-users')).not.toBeInTheDocument()
+    expect(screen.queryByText('functions-detail')).not.toBeInTheDocument()
+    expect(screen.queryByText('functions-list')).not.toBeInTheDocument()
+    expect(screen.queryByText('functions-overview')).not.toBeInTheDocument()
+    expect(screen.queryByText('sql-editor')).not.toBeInTheDocument()
+    expect(screen.queryByText('storage-buckets')).not.toBeInTheDocument()
+    expect(screen.queryByText('storage-explorer')).not.toBeInTheDocument()
   })
 
   it('does not show inactive database shortcuts in search results', async () => {

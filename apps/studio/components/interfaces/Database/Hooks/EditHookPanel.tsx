@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { keyword } from '@supabase/pg-meta'
-import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -37,7 +36,7 @@ export const isEdgeFunction = ({
 
 const FORM_ID = 'edit-hook-panel-form'
 
-const parseHeaders = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
+const parseHeaders = (selectedHook?: PGTrigger): HTTPArgument[] => {
   if (typeof selectedHook === 'undefined') {
     return [{ id: uuidv4(), name: 'Content-type', value: 'application/json' }]
   }
@@ -57,7 +56,7 @@ const parseHeaders = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
   }))
 }
 
-const parseParameters = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
+const parseParameters = (selectedHook?: PGTrigger): HTTPArgument[] => {
   if (typeof selectedHook === 'undefined') {
     return [{ id: uuidv4(), name: '', value: '' }]
   }

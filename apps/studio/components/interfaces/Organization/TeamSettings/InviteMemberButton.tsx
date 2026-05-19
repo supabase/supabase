@@ -19,12 +19,12 @@ import {
   Form,
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -302,13 +302,13 @@ export const InviteMemberButton = () => {
                 render={({ field }) => (
                   <FormItemLayout label="Role">
                     <FormControl>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_ className="text-sm capitalize">
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="text-sm capitalize">
                           {orgScopedRoles.find((role) => role.id === Number(field.value))?.name ??
                             'Unknown'}
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectGroup_Shadcn_>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
                             {orgScopedRoles.map((role) => {
                               const canAssignRole = rolesAddable.includes(role.id)
                               const isOwnerRole = role.name === 'Owner'
@@ -321,7 +321,7 @@ export const InviteMemberButton = () => {
                                   : undefined
 
                               return (
-                                <SelectItem_Shadcn_
+                                <SelectItem
                                   key={role.id}
                                   value={role.id.toString()}
                                   className="text-sm"
@@ -335,12 +335,12 @@ export const InviteMemberButton = () => {
                                       </span>
                                     )}
                                   </div>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               )
                             })}
-                          </SelectGroup_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -355,24 +355,20 @@ export const InviteMemberButton = () => {
                       description="Choose how the invitee should authenticate"
                     >
                       <FormControl>
-                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Automatic (based on your account)" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            <SelectGroup_Shadcn_>
-                              <SelectItem_Shadcn_ value="auto">
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Automatic (based on your account)" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="auto">
                                 Automatic (based on your account)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="sso">
-                                Require SSO authentication
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="non-sso">
-                                Email/password authentication
-                              </SelectItem_Shadcn_>
-                            </SelectGroup_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                              </SelectItem>
+                              <SelectItem value="sso">Require SSO authentication</SelectItem>
+                              <SelectItem value="non-sso">Email/password authentication</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}

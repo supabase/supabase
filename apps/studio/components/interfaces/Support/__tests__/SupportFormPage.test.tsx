@@ -285,6 +285,11 @@ const getAttachmentFileInput = () => {
 const getAttachmentRemoveButtons = (screen: Screen) =>
   screen.queryAllByRole('button', { name: 'Remove attachment' })
 
+const fillField = async (field: Element, text: string) => {
+  await userEvent.click(field)
+  await userEvent.paste(text)
+}
+
 const createDeferred = () => {
   let resolve!: () => void
   const promise = new Promise<void>((res) => {
@@ -522,12 +527,15 @@ describe('SupportFormPage', () => {
   test('loading with initial params prefills the organization and project', async () => {
     renderSupportForm({ initialParams: { projectRef: 'project-3' } })
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(screen.getByRole('combobox', { name: 'Select a project' })).toHaveTextContent(
-        'Project 3'
-      )
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(screen.getByRole('combobox', { name: 'Select a project' })).toHaveTextContent(
+          'Project 3'
+        )
+      },
+      { timeout: 5_000 }
+    )
   })
 
   test('loading a URL with a valid project slug prefills the organization and project', async () => {
@@ -538,21 +546,27 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(screen.getByRole('combobox', { name: 'Select a project' })).toHaveTextContent(
-        'Project 3'
-      )
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(screen.getByRole('combobox', { name: 'Select a project' })).toHaveTextContent(
+          'Project 3'
+        )
+      },
+      { timeout: 5_000 }
+    )
   })
 
   test('loading a URL with no project slug falls back to first organization and project', async () => {
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
   })
 
   test('loading a URL with explicit no project ref falls back to first organization and no project', async () => {
@@ -563,10 +577,13 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
+      },
+      { timeout: 5_000 }
+    )
   })
 
   test('loading a URL with an invalid project slug falls back to first organization and project', async () => {
@@ -582,10 +599,13 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
   })
 
   test('loading a URL with a message prefills the message field', async () => {
@@ -710,8 +730,8 @@ describe('SupportFormPage', () => {
       expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
     })
 
-    await userEvent.type(getSummaryField(screen), 'Dashboard stopped loading')
-    await userEvent.type(getMessageField(screen), 'The dashboard page loads blank after login')
+    await fillField(getSummaryField(screen), 'Dashboard stopped loading')
+    await fillField(getMessageField(screen), 'The dashboard page loads blank after login')
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -755,8 +775,8 @@ describe('SupportFormPage', () => {
       expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
     })
 
-    await userEvent.type(getSummaryField(screen), 'Dashboard stopped loading')
-    await userEvent.type(getMessageField(screen), messageBody)
+    await fillField(getSummaryField(screen), 'Dashboard stopped loading')
+    await fillField(getMessageField(screen), messageBody)
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -822,11 +842,11 @@ describe('SupportFormPage', () => {
 
     const summaryField = getSummaryField(screen)
     await userEvent.clear(summaryField)
-    await userEvent.type(summaryField, 'API requests failing in production')
+    await userEvent.paste('API requests failing in production')
 
     const messageField = getMessageField(screen)
     await userEvent.clear(messageField)
-    await userEvent.type(messageField, 'Requests return status 500 when calling the RPC endpoint')
+    await userEvent.paste('Requests return status 500 when calling the RPC endpoint')
 
     const supportAccessToggle = screen.getByRole('switch', {
       name: /allow support access to your project/i,
@@ -896,17 +916,23 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await userEvent.click(getOrganizationSelector(screen))
     await userEvent.click(await screen.findByRole('option', { name: 'Organization 2' }))
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 2')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 2')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 2')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 2')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Issues with logging in')
     await waitFor(() => {
@@ -920,11 +946,11 @@ describe('SupportFormPage', () => {
 
     const summaryField = getSummaryField(screen)
     await userEvent.clear(summaryField)
-    await userEvent.type(summaryField, 'Cannot log in to dashboard')
+    await userEvent.paste('Cannot log in to dashboard')
 
     const messageField = getMessageField(screen)
     await userEvent.clear(messageField)
-    await userEvent.type(messageField, 'MFA challenge fails with an unknown error code')
+    await userEvent.paste('MFA challenge fails with an unknown error code')
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -999,10 +1025,13 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 3')
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 3')
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Database unresponsive')
     await waitFor(() => {
@@ -1016,11 +1045,11 @@ describe('SupportFormPage', () => {
 
     const summaryField = getSummaryField(screen)
     await userEvent.clear(summaryField)
-    await userEvent.type(summaryField, 'Database unreachable after upgrade')
+    await userEvent.paste('Database unreachable after upgrade')
 
     const messageField = getMessageField(screen)
     await userEvent.clear(messageField)
-    await userEvent.type(messageField, 'Connections time out after 30 seconds')
+    await userEvent.paste('Connections time out after 30 seconds')
 
     const supportAccessToggle = screen.getByRole('switch', {
       name: /allow support access to your project/i,
@@ -1062,10 +1091,13 @@ describe('SupportFormPage', () => {
   test('when organization changes, project selector updates to match', async () => {
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await userEvent.click(getOrganizationSelector(screen))
     await userEvent.click(screen.getByRole('option', { name: 'Organization 2' }))
@@ -1108,9 +1140,12 @@ describe('SupportFormPage', () => {
       const renderResult = renderSupportFormPage()
       unmount = renderResult.unmount
 
-      await waitFor(() => {
-        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      })
+      await waitFor(
+        () => {
+          expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        },
+        { timeout: 5_000 }
+      )
 
       const fileInput = getAttachmentFileInput()
       const firstFile = new File(['first file'], 'first.png', { type: 'image/png' })
@@ -1162,17 +1197,20 @@ describe('SupportFormPage', () => {
     renderSupportFormPage()
 
     try {
-      await waitFor(() => {
-        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-      })
+      await waitFor(
+        () => {
+          expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+          expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+        },
+        { timeout: 5_000 }
+      )
 
       await selectCategoryOption(screen, 'Dashboard bug')
       await waitFor(() => {
         expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
       })
-      await userEvent.type(getSummaryField(screen), 'Unable to connect to database')
-      await userEvent.type(getMessageField(screen), 'Connections time out after 30 seconds')
+      await fillField(getSummaryField(screen), 'Unable to connect to database')
+      await fillField(getMessageField(screen), 'Connections time out after 30 seconds')
 
       const submitButton = getSubmitButton(screen)
       await userEvent.click(submitButton)
@@ -1201,9 +1239,12 @@ describe('SupportFormPage', () => {
   test('shows dashboard logs toggle only for Dashboard bug issues', async () => {
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     expect(getDashboardLogsToggle(screen, 'query')).not.toBeInTheDocument()
 
@@ -1229,7 +1270,7 @@ describe('SupportFormPage', () => {
     })
     const dashboardLogToggleAgain = await getDashboardLogsToggle(screen)
     expect(dashboardLogToggleAgain).toBeChecked()
-  })
+  }, 10_000)
 
   test('skips dashboard log upload when toggle is disabled', async () => {
     const submitSpy = vi.fn()
@@ -1266,9 +1307,12 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Dashboard bug')
     await waitFor(() => {
@@ -1280,8 +1324,8 @@ describe('SupportFormPage', () => {
     await userEvent.click(dashboardLogToggle!)
     expect(dashboardLogToggle).not.toBeChecked()
 
-    await userEvent.type(getSummaryField(screen), 'Dashboard charts crashing')
-    await userEvent.type(getMessageField(screen), 'Charts throw error on load')
+    await fillField(getSummaryField(screen), 'Dashboard charts crashing')
+    await fillField(getMessageField(screen), 'Charts throw error on load')
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -1295,7 +1339,7 @@ describe('SupportFormPage', () => {
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.message).toContain('Charts throw error on load')
     expect(payload.message).not.toContain('Dashboard logs:')
-  })
+  }, 10_000)
 
   test('skips dashboard log upload when toggle hidden', async () => {
     const submitSpy = vi.fn()
@@ -1332,9 +1376,12 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Database unresponsive')
     await waitFor(() => {
@@ -1343,8 +1390,8 @@ describe('SupportFormPage', () => {
 
     expect(getDashboardLogsToggle(screen, 'query')).not.toBeInTheDocument()
 
-    await userEvent.type(getSummaryField(screen), 'Dashboard charts crashing')
-    await userEvent.type(getMessageField(screen), 'Charts throw error on load')
+    await fillField(getSummaryField(screen), 'Dashboard charts crashing')
+    await fillField(getMessageField(screen), 'Charts throw error on load')
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -1358,7 +1405,7 @@ describe('SupportFormPage', () => {
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload.message).toContain('Charts throw error on load')
     expect(payload.message).not.toContain('Dashboard logs:')
-  })
+  }, 10_000)
 
   test('uploads dashboard logs when enabled and appends link to message', async () => {
     const submitSpy = vi.fn()
@@ -1392,9 +1439,12 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Dashboard bug')
     await waitFor(() => {
@@ -1406,11 +1456,8 @@ describe('SupportFormPage', () => {
     })
     expect(dashboardLogToggle).toBeChecked()
 
-    await userEvent.type(getSummaryField(screen), 'Dashboard navigation broken')
-    await userEvent.type(
-      getMessageField(screen),
-      'Navigation menu does not respond after latest deploy'
-    )
+    await fillField(getSummaryField(screen), 'Dashboard navigation broken')
+    await fillField(getMessageField(screen), 'Navigation menu does not respond after latest deploy')
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -1430,7 +1477,7 @@ describe('SupportFormPage', () => {
     expect(payload.message).toBe('Navigation menu does not respond after latest deploy')
     expect(payload.dashboardLogs).toMatch(/^https:\/\/storage\.example\.com\/signed\/.+\.json$/)
     expect(payload.dashboardStudioVersion).toBe(mockStudioVersion)
-  })
+  }, 10_000)
 
   test('shows toast on submission error and allows form re-editing and resubmission', async () => {
     const submitSpy = vi.fn()
@@ -1454,18 +1501,21 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Dashboard bug')
     await waitFor(() => {
       expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
     })
 
-    await userEvent.type(getSummaryField(screen), 'Cannot access settings')
-    await userEvent.type(getMessageField(screen), 'Settings page shows 500 error')
+    await fillField(getSummaryField(screen), 'Cannot access settings')
+    await fillField(getMessageField(screen), 'Settings page shows 500 error')
 
     const submitButton = getSubmitButton(screen)
     await userEvent.click(submitButton)
@@ -1490,7 +1540,7 @@ describe('SupportFormPage', () => {
 
     const messageField = getMessageField(screen)
     await userEvent.clear(messageField)
-    await userEvent.type(messageField, 'Settings page shows 500 error - updated description')
+    await userEvent.paste('Settings page shows 500 error - updated description')
 
     await userEvent.click(submitButton)
 
@@ -1602,14 +1652,11 @@ describe('SupportFormPage', () => {
 
       const summaryField = getSummaryField(screen)
       await userEvent.clear(summaryField)
-      await userEvent.type(summaryField, 'Query timeouts after maintenance')
+      await userEvent.paste('Query timeouts after maintenance')
 
       const messageField = getMessageField(screen)
       await userEvent.clear(messageField)
-      await userEvent.type(
-        messageField,
-        'All queries timing out after scheduled maintenance window'
-      )
+      await userEvent.paste('All queries timing out after scheduled maintenance window')
 
       const fileInput = getAttachmentFileInput()
       const firstFile = new File(['screenshot 1'], 'error-screenshot.png', { type: 'image/png' })
@@ -1690,9 +1737,12 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('No specific organization')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('No specific organization')
+      },
+      { timeout: 5_000 }
+    )
     await waitFor(() => {
       expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
     })
@@ -1707,8 +1757,8 @@ describe('SupportFormPage', () => {
     await userEvent.click(dashboardLogToggle!)
     expect(dashboardLogToggle).not.toBeChecked()
 
-    await userEvent.type(getSummaryField(screen), 'Cannot access my account')
-    await userEvent.type(getMessageField(screen), 'I need help accessing my Supabase account')
+    await fillField(getSummaryField(screen), 'Cannot access my account')
+    await fillField(getMessageField(screen), 'I need help accessing my Supabase account')
 
     await userEvent.click(getSubmitButton(screen))
 

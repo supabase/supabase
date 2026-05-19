@@ -44,6 +44,12 @@ export interface ComposedChartHandlerProps {
   docsUrl?: string
   hide?: boolean
   syncId?: string
+  YAxisProps?: {
+    width?: number
+    tickFormatter?: (value: number) => string
+    domain?: [number | string, number | string]
+    allowDataOverflow?: boolean
+  }
 }
 
 /**
@@ -79,7 +85,11 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
     }
   }, [])
 
-  return <div ref={ref}>{React.cloneElement(children as React.ReactElement, { isVisible })}</div>
+  return (
+    <div ref={ref}>
+      {React.cloneElement(children as React.ReactElement<{ isVisible: boolean }>, { isVisible })}
+    </div>
+  )
 }
 
 /**
@@ -347,7 +357,7 @@ const useAttributeQueries = (
   )
 
   const referenceLineQueries = referenceLines.map((line) => {
-    let value = line.value || 0
+    let value = line.value ?? line.customValue ?? 0
 
     return {
       data: {

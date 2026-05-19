@@ -17,7 +17,7 @@ import {
   Form,
   FormControl,
   FormField,
-  TextArea_Shadcn_,
+  TextArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -217,7 +217,7 @@ export const RequestUpgradeToBillingOwners = ({
                     layout="vertical"
                   >
                     <FormControl>
-                      <TextArea_Shadcn_
+                      <TextArea
                         id="note"
                         {...field}
                         rows={3}

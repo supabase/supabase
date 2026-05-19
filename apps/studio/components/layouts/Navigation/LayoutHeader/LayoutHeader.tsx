@@ -137,6 +137,7 @@ export const LayoutHeader = ({
               )}
             </AnimatePresence>
           </div>
+
           <div className="hidden md:flex items-center text-sm">
             <HomeIcon />
             <div className="flex items-center md:pl-2">
@@ -146,6 +147,7 @@ export const LayoutHeader = ({
                   <OrganizationDropdown />
                 </>
               ) : null}
+
               <AnimatePresence>
                 {projectRef && (
                   <motion.div
@@ -159,6 +161,7 @@ export const LayoutHeader = ({
                     }}
                   >
                     {IS_PLATFORM && <LayoutHeaderDivider />}
+
                     <ProjectDropdown />
 
                     {exceedingLimits && (
@@ -182,6 +185,7 @@ export const LayoutHeader = ({
                 )}
               </AnimatePresence>
             </div>
+
             <AnimatePresence>
               {headerTitle && (
                 <motion.div

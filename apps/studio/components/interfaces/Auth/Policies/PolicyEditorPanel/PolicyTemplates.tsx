@@ -1,4 +1,4 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PGPolicy } from '@supabase/pg-meta'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -26,7 +26,7 @@ import { NoSearchResults } from '@/components/ui/NoSearchResults'
 interface PolicyTemplatesProps {
   schema: string
   table: string
-  selectedPolicy?: PostgresPolicy
+  selectedPolicy?: PGPolicy
   selectedTemplate?: string
   onSelectTemplate: (template: any) => void
 }

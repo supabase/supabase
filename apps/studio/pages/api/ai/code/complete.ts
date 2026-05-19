@@ -165,7 +165,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const {
       modelParams,
       error: modelError,
-      promptProviderOptions,
+      systemProviderOptions,
     } = await getModel({
       provider: 'openai',
       modelEntry: DEFAULT_COMPLETION_MODEL,
@@ -257,7 +257,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'system',
         content: system,
-        ...(promptProviderOptions && { providerOptions: promptProviderOptions }),
+        ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
       },
       {
         role: 'user',

@@ -1,11 +1,27 @@
 import { SHORTCUT_REFERENCE_GROUPS } from './referenceGroups'
+import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
+import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
 import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
+import { FUNCTIONS_DETAIL_SHORTCUT_IDS, functionsDetailRegistry } from './registry/functions-detail'
+import {
+  FUNCTIONS_DETAIL_NAV_SHORTCUT_IDS,
+  functionsDetailNavRegistry,
+} from './registry/functions-detail-nav'
+import { FUNCTIONS_LIST_SHORTCUT_IDS, functionsListRegistry } from './registry/functions-list'
+import { FUNCTIONS_NAV_SHORTCUT_IDS, functionsNavRegistry } from './registry/functions-nav'
+import {
+  FUNCTIONS_OVERVIEW_SHORTCUT_IDS,
+  functionsOverviewRegistry,
+} from './registry/functions-overview'
 import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
 import {
   SCHEMA_VISUALIZER_SHORTCUT_IDS,
   schemaVisualizerRegistry,
 } from './registry/schema-visualizer'
 import { SQL_EDITOR_SHORTCUT_IDS, sqlEditorRegistry } from './registry/sql-editor'
+import { STORAGE_BUCKETS_SHORTCUT_IDS, storageBucketsRegistry } from './registry/storage-buckets'
+import { STORAGE_EXPLORER_SHORTCUT_IDS, storageExplorerRegistry } from './registry/storage-explorer'
+import { STORAGE_NAV_SHORTCUT_IDS, storageNavRegistry } from './registry/storage-nav'
 import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
 import { ShortcutDefinition } from './types'
 
@@ -69,6 +85,29 @@ export const SHORTCUT_IDS = {
 
   // Database sub-page navigation chords
   ...DATABASE_NAV_SHORTCUT_IDS,
+
+  // Auth users page shortcuts
+  ...AUTH_USERS_SHORTCUT_IDS,
+  // Auth sub-page navigation chords
+  ...AUTH_NAV_SHORTCUT_IDS,
+
+  // Storage sub-page navigation chords
+  ...STORAGE_NAV_SHORTCUT_IDS,
+  // Storage Files (bucket list) page shortcuts
+  ...STORAGE_BUCKETS_SHORTCUT_IDS,
+  // Storage Explorer (file browser) shortcuts
+  ...STORAGE_EXPLORER_SHORTCUT_IDS,
+
+  // Edge Functions sub-page navigation chords
+  ...FUNCTIONS_NAV_SHORTCUT_IDS,
+  // Edge Functions overview (list) page shortcuts
+  ...FUNCTIONS_LIST_SHORTCUT_IDS,
+  // Per-function detail layout shortcuts (header actions + test submit)
+  ...FUNCTIONS_DETAIL_SHORTCUT_IDS,
+  // Per-function detail tab navigation (digits)
+  ...FUNCTIONS_DETAIL_NAV_SHORTCUT_IDS,
+  // Per-function Overview tab shortcuts (intervals, refresh, open logs)
+  ...FUNCTIONS_OVERVIEW_SHORTCUT_IDS,
 } as const
 
 /**
@@ -348,4 +387,27 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Database sub-page navigation chord registration
   ...databaseNavRegistry,
+
+  // Auth users page shortcut registration
+  ...authUsersRegistry,
+  // Auth sub-page navigation chord registration
+  ...authNavRegistry,
+
+  // Storage sub-page navigation chord registration
+  ...storageNavRegistry,
+  // Storage Files (bucket list) page shortcut registration
+  ...storageBucketsRegistry,
+  // Storage Explorer (file browser) shortcut registration
+  ...storageExplorerRegistry,
+
+  // Edge Functions sub-page navigation chord registration
+  ...functionsNavRegistry,
+  // Edge Functions overview (list) page shortcut registration
+  ...functionsListRegistry,
+  // Per-function detail layout shortcut registration
+  ...functionsDetailRegistry,
+  // Per-function detail tab navigation registration
+  ...functionsDetailNavRegistry,
+  // Per-function Overview tab shortcut registration
+  ...functionsOverviewRegistry,
 }
