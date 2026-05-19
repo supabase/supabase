@@ -136,7 +136,7 @@ export const RestoreToNewProject = () => {
     return (
       <Admonition
         type="default"
-        title="Restoring to new projects is temporarily not available for AWS (Revamped) projects"
+        description="Restoring to new projects is temporarily not available for AWS (Revamped) projects."
       />
     )
   }
