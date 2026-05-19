@@ -41,7 +41,7 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 
 ## Table of contents
 
-- [Studio (Dashboard)](#studio)
+- [Studio (Dashboard)](#studio-dashboard)
 - [Auth (GoTrue)](#auth)
 - [PostgREST](#postgrest)
 - [Realtime](#realtime)
