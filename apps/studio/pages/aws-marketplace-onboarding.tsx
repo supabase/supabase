@@ -345,7 +345,12 @@ export const AwsMarketplaceOnboardingScreen = ({
           <Admonition
             type="warning"
             title="Setup unavailable"
-            description="Open the onboarding link from AWS Marketplace again. The link must include a buyer_id parameter."
+            description={
+              <p>
+                Open the onboarding link from AWS Marketplace again. The link must include a{' '}
+                <code className="text-code-inline">buyer_id</code> parameter.
+              </p>
+            }
           />
           <Button type="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
@@ -639,13 +644,13 @@ function getContractIneligibilityDescription(
 ) {
   switch (reason) {
     case 'AWS_ACTIVATE_CREDITS_DEAL':
-      return 'No further action is required for this AWS Activate credits offer.'
+      return 'No further action is required for this AWS Activate credits offer'
     case 'AGREEMENT_BASED_OFFER':
-      return 'This private offer updated an existing AWS Marketplace subscription.'
+      return 'This private offer updated an existing AWS Marketplace subscription'
     case 'NO_ACTIVE_CONTRACT_FOUND':
-      return 'AWS is still syncing this Marketplace subscription.'
+      return 'AWS is still syncing this Marketplace subscription'
     default:
-      return 'This AWS Marketplace subscription cannot be linked right now.'
+      return 'This AWS Marketplace subscription cannot be linked right now'
   }
 }
 
