@@ -90,27 +90,76 @@ jobs:
         run: |
           ota --version
 
-      - name: Validate contract and inspect workflows [bash]
+      - name: Validate contract [bash]
+        id: validate_contract_bash
         if: matrix.run_shell == 'bash'
         shell: bash
         run: |
+          ota validate --json . > ota-validate.json
           ota validate .
-          ota tasks --workflow app .
-          ota tasks --workflow docs .
-          ota tasks --workflow instant .
-          ota execution topology --json .
 
-      - name: Validate contract and inspect workflows [pwsh]
+      - name: Validate contract [pwsh]
+        id: validate_contract_pwsh
         if: matrix.run_shell == 'pwsh'
         shell: pwsh
         run: |
+          & ota validate --json . | Out-File -Encoding utf8 ota-validate.json
           ota validate .
-          ota tasks --workflow app .
-          ota tasks --workflow docs .
-          ota tasks --workflow instant .
-          ota execution topology --json .
+
+      - name: List app workflow tasks [bash]
+        id: tasks_app_bash
+        if: matrix.run_shell == 'bash'
+        shell: bash
+        run: ota tasks --workflow app .
+
+      - name: List app workflow tasks [pwsh]
+        id: tasks_app_pwsh
+        if: matrix.run_shell == 'pwsh'
+        shell: pwsh
+        run: ota tasks --workflow app .
+
+      - name: List docs workflow tasks [bash]
+        id: tasks_docs_bash
+        if: matrix.run_shell == 'bash'
+        shell: bash
+        run: ota tasks --workflow docs .
+
+      - name: List docs workflow tasks [pwsh]
+        id: tasks_docs_pwsh
+        if: matrix.run_shell == 'pwsh'
+        shell: pwsh
+        run: ota tasks --workflow docs .
+
+      - name: List instant workflow tasks [bash]
+        id: tasks_instant_bash
+        if: matrix.run_shell == 'bash'
+        shell: bash
+        run: ota tasks --workflow instant .
+
+      - name: List instant workflow tasks [pwsh]
+        id: tasks_instant_pwsh
+        if: matrix.run_shell == 'pwsh'
+        shell: pwsh
+        run: ota tasks --workflow instant .
+
+      - name: Export execution topology [bash]
+        id: topology_bash
+        if: matrix.run_shell == 'bash'
+        shell: bash
+        run: |
+          ota execution topology --json . > ota-execution-topology.json
+          cat ota-execution-topology.json
+
+      - name: Export execution topology [pwsh]
+        id: topology_pwsh
+        if: matrix.run_shell == 'pwsh'
+        shell: pwsh
+        run: |
+          & ota execution topology --json . | Out-File -Encoding utf8 ota-execution-topology.json
+          Get-Content ota-execution-topology.json
 
       - name: Validate instant workflow readiness [bash]
+        id: instant_ready_bash
         if: matrix.run_shell == 'bash'
         shell: bash
         run: |
@@ -160,6 +209,7 @@ jobs:
           fi
 
       - name: Validate instant workflow readiness [pwsh]
+        id: instant_ready_pwsh
         if: matrix.run_shell == 'pwsh'
         shell: pwsh
         run: |
@@ -203,20 +253,24 @@ jobs:
           }
 
       - name: Proof app workflow [bash]
+        id: proof_app_bash
         if: matrix.full_proof && matrix.run_shell == 'bash'
         shell: bash
         run: |
           ota clean . || true
-          ota proof runtime --workflow app --json .
+          ota proof runtime --workflow app --json . > ota-proof-app.json
+          cat ota-proof-app.json
           ota clean . || true
 
       - name: Proof app workflow [pwsh]
+        id: proof_app_pwsh
         if: matrix.full_proof && matrix.run_shell == 'pwsh'
         shell: pwsh
         run: |
           & ota clean . *> $null
           try {
-            & ota proof runtime --workflow app --json .
+            & ota proof runtime --workflow app --json . | Out-File -Encoding utf8 ota-proof-app.json
+            Get-Content ota-proof-app.json
             if ($LASTEXITCODE -ne 0) {
               exit $LASTEXITCODE
             }
@@ -225,16 +279,70 @@ jobs:
             & ota clean . *> $null
           }
 
+      - name: Ota matrix summary + annotations
+        if: ${{ always() }}
+        shell: bash
+        env:
+          MATRIX_NAME: ${{ matrix.name }}
+          VALIDATE_BASH: ${{ steps.validate_contract_bash.outcome }}
+          VALIDATE_PWSH: ${{ steps.validate_contract_pwsh.outcome }}
+          TASKS_APP_BASH: ${{ steps.tasks_app_bash.outcome }}
+          TASKS_APP_PWSH: ${{ steps.tasks_app_pwsh.outcome }}
+          TASKS_DOCS_BASH: ${{ steps.tasks_docs_bash.outcome }}
+          TASKS_DOCS_PWSH: ${{ steps.tasks_docs_pwsh.outcome }}
+          TASKS_INSTANT_BASH: ${{ steps.tasks_instant_bash.outcome }}
+          TASKS_INSTANT_PWSH: ${{ steps.tasks_instant_pwsh.outcome }}
+          TOPOLOGY_BASH: ${{ steps.topology_bash.outcome }}
+          TOPOLOGY_PWSH: ${{ steps.topology_pwsh.outcome }}
+          INSTANT_BASH: ${{ steps.instant_ready_bash.outcome }}
+          INSTANT_PWSH: ${{ steps.instant_ready_pwsh.outcome }}
+          PROOF_BASH: ${{ steps.proof_app_bash.outcome }}
+          PROOF_PWSH: ${{ steps.proof_app_pwsh.outcome }}
+        run: |
+          {
+            echo "## Ota Contract Matrix Summary (${MATRIX_NAME})"
+            echo
+            echo "| Phase | Outcome |"
+            echo "| --- | --- |"
+            echo "| Validate contract | ${VALIDATE_BASH:-$VALIDATE_PWSH} |"
+            echo "| List app tasks | ${TASKS_APP_BASH:-$TASKS_APP_PWSH} |"
+            echo "| List docs tasks | ${TASKS_DOCS_BASH:-$TASKS_DOCS_PWSH} |"
+            echo "| List instant tasks | ${TASKS_INSTANT_BASH:-$TASKS_INSTANT_PWSH} |"
+            echo "| Export topology | ${TOPOLOGY_BASH:-$TOPOLOGY_PWSH} |"
+            echo "| Instant readiness | ${INSTANT_BASH:-$INSTANT_PWSH} |"
+            echo "| Proof app workflow | ${PROOF_BASH:-$PROOF_PWSH} |"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+
+      - name: Annotate instant workflow findings (ota-run/action)
+        if: ${{ always() }}
+        uses: ota-run/action@v1
+        with:
+          command: doctor
+          path: .
+          workflow: instant
+          install: never
+          annotate: true
+          max-annotations: 20
+          comment-pr: false
+          fail-on-error: false
+          output-path: ota-doctor-instant-action.json
+
       - name: Upload failure artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: ota-contract-matrix-${{ matrix.name }}
           path: |
+            ota-validate.json
+            ota-execution-topology.json
             ota-up-instant.log
             ota-up-instant.out.log
             ota-up-instant.err.log
             ota-doctor-instant.json
+            ota-doctor-instant-action.json
             ota-doctor-instant.err
+            ota-proof-app.json
             .ota/
           retention-days: 7
