@@ -18,6 +18,7 @@ import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  Button,
   ChartConfig,
   cn,
   ResizableHandle,
@@ -39,7 +40,6 @@ import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -49,9 +49,9 @@ import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideB
 import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions'
 import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
 import { LiveButton } from '@/components/ui/DataTable/LiveButton'
-import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
@@ -380,28 +380,16 @@ export const UnifiedLogs = () => {
           >
             <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
               <div className="flex flex-wrap items-center gap-2 px-2 border-b">
-                <ButtonTooltip
-                  size="tiny"
-                  type="text"
-                  icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
-                  onClick={() => setIsFilterBarOpen((prev) => !prev)}
-                  className="hidden w-[26px] sm:flex"
-                  aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: (
-                        <p>
-                          Toggle controls with{' '}
-                          <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
-                            <span className="mr-1">⌘</span>
-                            <span>B</span>
-                          </Kbd>
-                        </p>
-                      ),
-                    },
-                  }}
-                />
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
+                  <Button
+                    size="tiny"
+                    type="text"
+                    icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                    onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                    className="hidden w-[26px] sm:flex"
+                    aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
+                  />
+                </ShortcutTooltip>
 
                 <div className="h-full border-r" />
 
