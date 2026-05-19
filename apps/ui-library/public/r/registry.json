@@ -1408,6 +1408,8 @@
       "registryDependencies": [],
       "dependencies": [
         "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
         "yjs@latest",
         "@supabase/ssr@latest",
         "@supabase/supabase-js@latest"
@@ -1449,6 +1451,8 @@
       "registryDependencies": [],
       "dependencies": [
         "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
         "yjs@latest",
         "@supabase/supabase-js@latest"
       ],
@@ -1481,6 +1485,8 @@
       "registryDependencies": [],
       "dependencies": [
         "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
         "yjs@latest",
         "@supabase/ssr@latest",
         "@supabase/supabase-js@latest"
@@ -1518,6 +1524,8 @@
       "registryDependencies": [],
       "dependencies": [
         "@xyflow/react@latest",
+        "@supabase-labs/y-supabase@latest",
+        "y-protocols@latest",
         "yjs@latest",
         "@supabase/ssr@latest",
         "@supabase/supabase-js@latest"

@@ -11,7 +11,7 @@ import {
   type EdgeTypes,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { SupabasePersistenceOptions } from '@supabase-labs/y-supabase'
+import type { SupabasePersistenceOptions } from '@supabase-labs/y-supabase'
 
 import { RealtimeFlowOverlay } from './realtime-flow-overlay'
 import { useRealtimeFlow } from '../hooks/use-realtime-flow'

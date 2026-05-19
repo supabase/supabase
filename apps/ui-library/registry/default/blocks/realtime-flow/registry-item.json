@@ -5,7 +5,12 @@
   "title": "Realtime Flow",
   "description": "Real-time flow diagram editor for collaborative applications.",
   "registryDependencies": [],
-  "dependencies": ["@xyflow/react@latest", "yjs@latest"],
+  "dependencies": [
+    "@xyflow/react@latest",
+    "@supabase-labs/y-supabase@latest",
+    "y-protocols@latest",
+    "yjs@latest"
+  ],
   "files": [
     {
       "path": "registry/default/blocks/realtime-flow/hooks/use-realtime-flow.ts",

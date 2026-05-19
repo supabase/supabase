@@ -1,6 +1,6 @@
 'use client'
 
-import { SupabasePersistenceOptions, SupabaseProvider } from '@supabase-labs/y-supabase'
+import { type SupabasePersistenceOptions, SupabaseProvider } from '@supabase-labs/y-supabase'
 import {
   type Edge,
   type Node,

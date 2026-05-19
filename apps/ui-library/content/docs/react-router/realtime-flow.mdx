@@ -88,17 +88,25 @@ export default function FlowPage() {
 You can also pass a `SupabasePersistenceOptions` object:
 
 ```tsx
-<RealtimeFlow
-  channel="realtime-flow-demo"
-  initialNodes={nodes}
-  initialEdges={edges}
-  persistence={{
-    table: 'yjs_documents',
-    roomColumn: 'room',
-    stateColumn: 'state',
-    storeTimeout: 2000,
-  }}
-/>
+import type { SupabasePersistenceOptions } from '@supabase-labs/y-supabase'
+
+const persistenceOptions = {
+  table: 'yjs_documents',
+  roomColumn: 'room',
+  stateColumn: 'state',
+  storeTimeout: 2000,
+} satisfies SupabasePersistenceOptions
+
+export default function FlowPage() {
+  return (
+    <RealtimeFlow
+      channel="realtime-flow-demo"
+      initialNodes={nodes}
+      initialEdges={edges}
+      persistence={persistenceOptions}
+    />
+  )
+}
 ```
 
 ### Using the hook for full control
