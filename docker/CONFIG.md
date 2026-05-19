@@ -844,6 +844,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ## Realtime
 
+> Realtime's upstream env-var reference is at [supabase/realtime ENVS.md](https://github.com/supabase/realtime/blob/main/ENVS.md).
+
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `API_JWT_JWKS` | JWT | Both | JWKS JSON used to verify tenant JWTs during self-host seeding. Read by `priv/repo/seeds.exs` and `priv/repo/dev_seeds.exs`. | Used only by the seed script (`SEED_SELF_HOST=true`). Commented out in the default docker-compose. |
@@ -858,9 +860,9 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `CLUSTER_SECRET_ID` | string | Self-hosted | AWS Secrets Manager secret ID holding the cluster CA cert/key. | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
 | `CLUSTER_SECRET_REGION` | string | Self-hosted | AWS region for `CLUSTER_SECRET_ID`. | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
 | `CLUSTER_STRATEGIES` | string (CSV) | Self-hosted | Comma-separated list of libcluster backends to enable. Supported: `EPMD`, `DNS`, `POSTGRES`. | Default: `EPMD` outside production, `POSTGRES` in production. |
-| `CONNECT_ERROR_BACKOFF_MS` | integer (ms) | Self-hosted | Delay (ms) before returning a WebSocket connection error to the client. | Default: `2000` (2 seconds). |
+| `CONNECT_ERROR_BACKOFF_MS` | integer (ms) | Self-hosted | Delay (ms) before returning a WebSocket connection error to the client. Slows down reconnect storms. | Default: `2000` (2 seconds). |
 | `CONNECT_PARTITION_SLOTS` | integer (count) | Self-hosted | Number of dynamic supervisor partitions for the `Connect` / `ReplicationConnect` processes. | Default: `System.schedulers_online() * 2`. |
-| `DASHBOARD_AUTH` | enum | Self-hosted | Authentication method for the admin dashboard (`/admin`). Accepted: `basic_auth`, `zta`. | Default: `basic_auth`. |
+| `DASHBOARD_AUTH` | enum | Self-hosted | Authentication method for the admin dashboard (`/admin`). Accepted: `basic_auth` (requires `DASHBOARD_USER` and `DASHBOARD_PASSWORD`) or `zta` (requires `CF_TEAM_DOMAIN`). | Default: `basic_auth`. |
 | `DASHBOARD_PASSWORD` | string | Self-hosted | Password for admin dashboard basic auth. | Default: random hex string generated at boot. |
 | `DASHBOARD_USER` | string | Self-hosted | Username for admin dashboard basic auth. | Default: random hex string generated at boot. |
 | `DB_AFTER_CONNECT_QUERY` | string | Both | SQL query executed after every Postgres connection is established. | No default. Self-host sets `SET search_path TO _realtime`. |
@@ -925,10 +927,10 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `SLOT_NAME_SUFFIX` | string | CLI | Suffix appended to the default replication slot name `supabase_realtime_replication_slot`. | Allowed: lowercase letters, numbers, underscore. Combined name must be 64 characters or fewer. |
 | `TENANT_CACHE_EXPIRATION_IN_MS` | integer (ms) | Self-hosted | TTL (ms) for the in-process tenant cache. | Default: 30 seconds. |
 | `TENANT_MAX_BYTES_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum bytes per second (used when a tenant is first created). | Default: `100000`. |
-| `TENANT_MAX_CHANNELS_PER_CLIENT` | integer (count) | Self-hosted | Default per-tenant maximum channels per client. | Default: `100`. |
-| `TENANT_MAX_CONCURRENT_USERS` | integer (count) | Self-hosted | Default per-tenant maximum concurrent users per channel. | Default: `200`. |
-| `TENANT_MAX_EVENTS_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum events per second. | Default: `100`. |
-| `TENANT_MAX_JOINS_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum channel joins per second. | Default: `100`. |
+| `TENANT_MAX_CHANNELS_PER_CLIENT` | integer (count) | Self-hosted | Default per-tenant maximum channels per client (used when a tenant is first created). | Default: `100`. |
+| `TENANT_MAX_CONCURRENT_USERS` | integer (count) | Self-hosted | Default per-tenant maximum concurrent users per channel (used when a tenant is first created). | Default: `200`. |
+| `TENANT_MAX_EVENTS_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum events per second (used when a tenant is first created). | Default: `100`. |
+| `TENANT_MAX_JOINS_PER_SECOND` | integer (count) | Self-hosted | Default per-tenant maximum channel joins per second (used when a tenant is first created). | Default: `100`. |
 | `USERS_SCOPE_SHARDS` | integer (count) | Self-hosted | Number of partitions used by the Beacon `users` scope. | Default: `5`. |
 | `WEBSOCKET_MAX_HEAP_SIZE` | integer (bytes) | Self-hosted | Maximum heap (bytes) for each WebSocket transport process; the process is killed if exceeded. | Default: `50000000` (50 MB). |
 
