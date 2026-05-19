@@ -2,13 +2,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
-  cn,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import {
   AccordionHeader,
@@ -34,13 +28,13 @@ function LW8Releases() {
   return (
     <>
       <SectionContainer className="pt-0! w-full! px-0! max-w-none!">
-        <Accordion_Shadcn_ type="multiple" className="text-white" defaultValue={publishedSections}>
-          <AccordionItem_Shadcn_
+        <Accordion type="multiple" className="text-white" defaultValue={publishedSections}>
+          <AccordionItem
             key={preRelease.dd}
             value={preRelease.d.toString()}
             className="border-[#111718]"
           >
-            <AccordionTrigger_Shadcn_ className="py-2 font-normal hover:no-underline">
+            <AccordionTrigger className="py-2 font-normal hover:no-underline">
               <AccordionHeader
                 date={preRelease.date}
                 day={preRelease.d}
@@ -50,8 +44,8 @@ function LW8Releases() {
                 shippable={false}
                 publishedAt={preRelease.publishedAt}
               />
-            </AccordionTrigger_Shadcn_>
-            <AccordionContent_Shadcn_>
+            </AccordionTrigger>
+            <AccordionContent>
               {preRelease.steps.length > 0 && (
                 <div className="flex flex-col gap-5 lg:flex-row pb-4">
                   <div
@@ -192,13 +186,9 @@ function LW8Releases() {
                   </div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_
-            key={day1.dd}
-            value={day1.d.toString()}
-            className="border-[#111718]"
-          >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem key={day1.dd} value={day1.d.toString()} className="border-[#111718]">
             <AccordionHeader
               date={day1.date}
               day={day1.d}
@@ -209,7 +199,7 @@ function LW8Releases() {
               youtube_id={day1.youtube_id}
               videoThumbnail={day1.videoThumbnail}
             />
-            <AccordionContent_Shadcn_>
+            <AccordionContent>
               {day1.steps.length > 0 && (
                 <div className="flex flex-col gap-5 lg:flex-row pb-4">
                   <div
@@ -265,13 +255,9 @@ function LW8Releases() {
                   </div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_
-            key={day2.dd}
-            value={day2.d.toString()}
-            className="border-[#111718]"
-          >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem key={day2.dd} value={day2.d.toString()} className="border-[#111718]">
             <AccordionHeader
               date={day2.date}
               day={day2.d}
@@ -282,7 +268,7 @@ function LW8Releases() {
               youtube_id={day2.youtube_id}
               videoThumbnail={day2.videoThumbnail}
             />
-            <AccordionContent_Shadcn_>
+            <AccordionContent>
               {day2.steps.length > 0 && (
                 <div className="flex flex-col gap-5 lg:flex-row pb-4">
                   <div
@@ -335,13 +321,9 @@ function LW8Releases() {
                   </div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_
-            key={day3.dd}
-            value={day3.d.toString()}
-            className="border-[#111718]"
-          >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem key={day3.dd} value={day3.d.toString()} className="border-[#111718]">
             <AccordionHeader
               date={day3.date}
               day={day3.d}
@@ -352,7 +334,7 @@ function LW8Releases() {
               youtube_id={day3.youtube_id}
               videoThumbnail={day3.videoThumbnail}
             />
-            <AccordionContent_Shadcn_>
+            <AccordionContent>
               {day3.steps.length > 0 && (
                 <div className="flex flex-col gap-5 lg:flex-row pb-4">
                   <div
@@ -417,13 +399,9 @@ function LW8Releases() {
                   </div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_
-            key={day4.dd}
-            value={day4.d.toString()}
-            className="border-[#111718]"
-          >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem key={day4.dd} value={day4.d.toString()} className="border-[#111718]">
             <AccordionHeader
               date={day4.date}
               day={day4.d}
@@ -434,7 +412,7 @@ function LW8Releases() {
               youtube_id={day4.youtube_id}
               videoThumbnail={day4.videoThumbnail}
             />
-            <AccordionContent_Shadcn_>
+            <AccordionContent>
               {day4.steps.length > 0 && (
                 <div className="flex flex-col gap-5 lg:flex-row pb-4">
                   <div
@@ -527,13 +505,9 @@ function LW8Releases() {
                   </div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-          <AccordionItem_Shadcn_
-            key={day5.dd}
-            value={day5.d.toString()}
-            className="border-[#111718]"
-          >
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem key={day5.dd} value={day5.d.toString()} className="border-[#111718]">
             <AccordionHeader
               date={day5.date}
               day={day5.d}
@@ -544,7 +518,7 @@ function LW8Releases() {
               youtube_id={day5.youtube_id}
               videoThumbnail={day5.videoThumbnail}
             />
-            <AccordionContent_Shadcn_>
+            <AccordionContent>
               {day5.steps.length > 0 && (
                 <div className="flex flex-col pb-4">
                   <div
@@ -689,9 +663,9 @@ function LW8Releases() {
                   </div>
                 </div>
               )}
-            </AccordionContent_Shadcn_>
-          </AccordionItem_Shadcn_>
-        </Accordion_Shadcn_>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </SectionContainer>
     </>
   )

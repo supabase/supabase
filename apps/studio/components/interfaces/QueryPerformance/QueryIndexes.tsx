@@ -2,9 +2,9 @@ import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
   Alert,
   AlertDescription,
   AlertTitle,
@@ -389,22 +389,22 @@ export const QueryIndexes = ({
           <QueryPanelSection className="py-6 border-t">
             <div className="flex flex-col gap-y-2">
               <h4 className="mb-2">FAQ</h4>
-              <Accordion_Shadcn_ collapsible type="single" className="border rounded-md">
-                <AccordionItem_Shadcn_ value="1">
+              <Accordion collapsible type="single" className="border rounded-md">
+                <AccordionItem value="1">
                   <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition data-open:text-foreground">
                     What units are cost in?
                   </AccordionTrigger>
-                  <AccordionContent_Shadcn_ className="px-4 text-foreground-light">
+                  <AccordionContent className="px-4 text-foreground-light">
                     Costs are in an arbitrary unit, and do not represent a unit of time. The units
                     are anchored (by default) to a single sequential page read costing 1.0 units.
                     They do, however, serve as a predictor of higher execution times.
-                  </AccordionContent_Shadcn_>
-                </AccordionItem_Shadcn_>
-                <AccordionItem_Shadcn_ value="2" className="border-b-0">
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="2" className="border-b-0">
                   <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition data-open:text-foreground">
                     How should I prioritize start up and total cost?
                   </AccordionTrigger>
-                  <AccordionContent_Shadcn_ className="px-4 text-foreground-light [&>div]:space-y-2">
+                  <AccordionContent className="px-4 text-foreground-light [&>div]:space-y-2">
                     <p>This depends on the expected size of the result set from the query.</p>
                     <p>
                       For queries that return a small number or rows, the startup cost is more
@@ -416,9 +416,9 @@ export const QueryIndexes = ({
                       important, and optimizing it will help in efficiently using resources and
                       reducing overall query execution time.
                     </p>
-                  </AccordionContent_Shadcn_>
-                </AccordionItem_Shadcn_>
-              </Accordion_Shadcn_>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </QueryPanelSection>
         </>
