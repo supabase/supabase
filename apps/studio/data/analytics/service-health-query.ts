@@ -51,7 +51,10 @@ export async function getServiceHealth(
 
   if (error) handleError(error)
 
-  return data as unknown as ProjectServiceHealthResponse
+  const result = data as unknown as ProjectServiceHealthResponse
+  if (result?.error) throw new Error(typeof result.error === 'string' ? result.error : 'Failed to fetch service health')
+
+  return result
 }
 
 export type ServiceHealthError = unknown
