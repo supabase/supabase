@@ -4,6 +4,25 @@ Last updated: 2026-05-19
 
 This document is the aggregated reference for environment variables relevant to a self-hosted Supabase deployment. It aims to be comprehensive for the self-hosted use case rather than literally exhaustive - variables that only apply on the hosted platform (billing, multi-tenant orchestration, internal tooling) are typically omitted or marked as such. For the complete set a given service can read, refer to its upstream repository linked in the [service version matrix](#service-version-matrix) below.
 
+> **A note on accuracy.** This reference is compiled from each service's source code and upstream docs as a self-hosting overview - it is not maintained by the individual product teams and shouldn't be treated as canonical. Within each row:
+>
+> - **Defaults, formats, and where the variable is read** are derived directly from code and are usually reliable.
+> - The **prose description of what the variable is *for*** is more interpretive. It captures the immediate mechanical effect well, but the underlying *intent* - why the variable exists, when you should change it, how it interacts with other variables - is partly synthesized and can be subtly off.
+>
+> When the *what* matters operationally, trust the row. When the *why* matters, defer to the upstream service's own documentation or source.
+
+## Verification status
+
+The Description column is best-effort. Descriptions for the following sections were cross-checked against upstream prose documentation:
+
+- **Auth** - against `supabase/auth` `README.md` (which documents ~50 vars; the rest are documented from code reads)
+- **PostgREST** - against postgrest.org/en/stable
+- **Realtime** - against `supabase/realtime` `ENVS.md`
+- **Analytics (Logflare)** - against [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/), with `supabase/logflare` `config/runtime.exs` and `config/config.exs` used as tiebreakers when the docs page disagreed with the code
+- **Supavisor** - against `supabase/supavisor` `docs/configuration/env.md`
+
+Other sections (Studio, Storage, Edge Functions, Postgres) appear to have no comparable upstream prose documentation and are documented from code reads alone. Corrections welcome via PR.
+
 ## How to read this document
 
 Each table has five columns:
@@ -621,8 +640,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | Variable | Description | CLI | Self-hosted | Notes |
 |---|---|---|---|---|
 | `GOTRUE_RATE_LIMIT_ANONYMOUS_USERS` | Rate limit for anonymous user creation. | Yes | No | Default: `30` per hour |
-| `GOTRUE_RATE_LIMIT_EMAIL_SENT` | Rate limit for outgoing emails. Accepts `n` or `n/duration` (burst). | Yes | No | Default: `30` per hour |
-| `GOTRUE_RATE_LIMIT_HEADER` | HTTP header used to identify the rate-limit subject (e.g. `X-Forwarded-For`). | No | No | |
+| `GOTRUE_RATE_LIMIT_EMAIL_SENT` | Rate limit for outgoing emails on `/signup`, `/invite`, `/magiclink`, `/recover`, `/otp`, `/user`. Accepts `n` or `n/duration` (burst). | Yes | No | Default: `30` per hour |
+| `GOTRUE_RATE_LIMIT_HEADER` | HTTP header used to rate-limit the `/token` endpoint (e.g. `X-Forwarded-For`). | No | No | |
 | `GOTRUE_RATE_LIMIT_O_AUTH_DYNAMIC_CLIENT_REGISTER` | Rate limit for OAuth dynamic client registration. | No | No | Default: `10` per hour |
 | `GOTRUE_RATE_LIMIT_OTP` | Rate limit for OTP endpoints. | Yes | No | Default: `30` per hour |
 | `GOTRUE_RATE_LIMIT_PASSKEY` | Rate limit for passkey endpoints. | No | No | Default: `30` per hour |
@@ -646,7 +665,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_SECURITY_REFRESH_TOKEN_REUSE_INTERVAL` | Grace period (s) during which a rotated refresh token can be reused. | Yes | No | |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED` | Rotate refresh tokens on use. | Yes | No | Default: `true` |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_UPGRADE_PERCENTAGE` | Percentage of users to upgrade to a newer refresh-token format (0-100). | No | No | |
-| `GOTRUE_SECURITY_SB_FORWARDED_FOR_ENABLED` | Trust the `X-Sb-Forwarded-For` header. | No | No | Default: `false` |
+| `GOTRUE_SECURITY_SB_FORWARDED_FOR_ENABLED` | Trust the `Sb-Forwarded-For` header. Auth parses the leftmost value as an IP address and uses it for IP tracking and rate limiting. | No | No | Default: `false` |
 | `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD` | Require the current password to change a password. | No | No | |
 | `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION` | Require reauthentication before changing a password. | Yes | No | |
 
@@ -832,7 +851,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `CLUSTER` | Cluster name added to log metadata. | No | No | No default. Read by `Realtime.Application.start/2`. |
 | `CLUSTER_SECRET_ID` | AWS Secrets Manager secret ID holding the cluster CA cert/key. | No | No | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
 | `CLUSTER_SECRET_REGION` | AWS region for `CLUSTER_SECRET_ID`. | No | No | Used by `run.sh` `generate_certs` when `GENERATE_CLUSTER_CERTS` is set. |
-| `CLUSTER_STRATEGIES` | Comma-separated list of libcluster backends to enable. Supported: `EPMD`, `DNS`, `POSTGRES`. | No | No | Default: `POSTGRES` (??), `EPMD` otherwise. |
+| `CLUSTER_STRATEGIES` | Comma-separated list of libcluster backends to enable. Supported: `EPMD`, `DNS`, `POSTGRES`. | No | No | Default: `EPMD` outside production, `POSTGRES` in production. |
 | `CONNECT_ERROR_BACKOFF_MS` | Delay (ms) before returning a WebSocket connection error to the client. | No | No | Default: `2000` (2 seconds). |
 | `CONNECT_PARTITION_SLOTS` | Number of dynamic supervisor partitions for the `Connect` / `ReplicationConnect` processes. | No | No | Default: `System.schedulers_online() * 2`. |
 | `DASHBOARD_AUTH` | Authentication method for the admin dashboard (`/admin`). Accepted: `basic_auth`, `zta`. | No | No | Default: `basic_auth`. |
@@ -871,7 +890,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `LOGFLARE_LOGGER_BACKEND_URL` | Endpoint for the Logflare logger backend. | No | No | Default: `https://api.logflare.app`. |
 | `LOGFLARE_SOURCE_ID` | Logflare source ID. | No | No | Required when `LOGS_ENGINE=logflare`. |
 | `LOGS_ENGINE` | Log backend selector. Set to `logflare` to enable the Logflare HTTP backend. | No | No | When unset, standard logger output is used. |
-| `MAX_CONNECTIONS` | Soft maximum number of WebSocket connections. | No | No | Default: `1000`. |
+| `MAX_CONNECTIONS` | Soft maximum number of WebSocket connections. | No | No | Default: `16384`. |
 | `MAX_HEADER_LENGTH` | Maximum HTTP header value length (bytes). | Yes | No | Default: `4096`. |
 | `METRICS_CLEANER_SCHEDULE_TIMER_IN_MS` | Interval (ms) between metrics cleaner runs. | No | No | Default: 30 minutes. |
 | `METRICS_JWT_SECRET` | Secret used to sign JWTs for the metrics endpoints. | Yes | Yes | Required - the app raises an exception if unset. |
@@ -1209,7 +1228,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 > The `analytics` container runs `supabase/logflare`, an Elixir/Phoenix application. Almost all runtime env reads live in `config/runtime.exs`. Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.yml`. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
 
-> **Heads-up — always-on admin UI:** Logflare's admin pages under `/admin/*` (sources, accounts, cluster view) are reachable by default. `LOGFLARE_SUPABASE_MODE=true` provisions an auto-admin user, and the `/admin/*` routes are gated by an auth pipeline rather than an env var - there is no flag to disable them. If the `analytics` container is exposed beyond your private Docker network, **block** `/admin/*` at the reverse proxy or API gateway level.
+> **Heads-up - always-on admin UI:** Logflare's admin pages under `/admin/*` (sources, accounts, cluster view) are reachable by default. `LOGFLARE_SUPABASE_MODE=true` provisions an auto-admin user, and the `/admin/*` routes are gated by an auth pipeline rather than an env var - there is no flag to disable them. If the `analytics` container is exposed beyond your private Docker network, **block** `/admin/*` at the reverse proxy or API gateway level.
 
 ### Self-host mode
 
@@ -1220,6 +1239,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `LOGFLARE_PUBLIC_ACCESS_TOKEN` | Public API token used by ingestion clients (e.g. the `vector` container) to push log events. Falls back to `LOGFLARE_API_KEY`. | No | Yes | Required in single-tenant mode |
 | `LOGFLARE_PRIVATE_ACCESS_TOKEN` | Private API token used by Studio server-side (and the management API) to query logs and run analytics endpoints. | Yes | Yes | Required in single-tenant mode |
 | `LOGFLARE_FEATURE_FLAG_OVERRIDE` | Comma-separated `key=value` pairs overriding feature flags at boot. Self-hosted sets `multibackend=true` so the Postgres backend is reachable. | Yes | Yes | E.g. `multibackend=true` |
+| `LOGFLARE_NODE_HOST` | Hostname used to form the Erlang `RELEASE_NODE` (`<name>@<host>`). The single-node default is fine for most self-hosted setups. | Yes | Yes | Default: `127.0.0.1`. |
 | `LOGFLARE_API_KEY` | Legacy fallback name for `LOGFLARE_PUBLIC_ACCESS_TOKEN`. | No | No | Deprecated; prefer `LOGFLARE_PUBLIC_ACCESS_TOKEN` |
 
 ### Internal database (metadata)
@@ -1234,7 +1254,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `DB_SCHEMA` | Postgres schema used for Logflare metadata tables (set as `search_path`). | Yes | Yes | Self-hosted: `_analytics` |
 | `DB_USERNAME` | Postgres user for Logflare's metadata connection. | Yes | Yes | Self-hosted: `supabase_admin` |
 | `DB_PASSWORD` | Postgres password for the metadata connection. | Yes | Yes | Self-hosted: from `POSTGRES_PASSWORD` |
-| `DB_POOL_SIZE` | Ecto connection pool size for the metadata Postgres. | No | No | No default |
+| `DB_POOL_SIZE` | Ecto connection pool size for the metadata Postgres. | No | No | Default: `10` (Ecto default) |
 | `DB_SSL` | Enable SSL/TLS for the metadata Postgres connection (requires cert files). | No | No | Default: `false` |
 
 ### Postgres backend (log storage)
@@ -1255,7 +1275,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOOGLE_PROJECT_ID` | Google Cloud project ID hosting the BigQuery dataset. | No | Yes | Commented out in compose |
 | `GOOGLE_PROJECT_NUMBER` | Numeric Google Cloud project number. | No | Yes | Commented out in compose |
 | `GOOGLE_DATASET_ID_APPEND` | Suffix appended to BigQuery dataset IDs. | No | No | Default: `_default` |
-| `GOOGLE_DATASET_LOCATION` | BigQuery dataset location (e.g. `US`, `EU`). | No | No | |
+| `GOOGLE_DATASET_LOCATION` | BigQuery dataset location (e.g. `US`, `EU`). | No | No | Default: `US` |
 | `GOOGLE_SERVICE_ACCOUNT` | Service-account email used for BigQuery operations. | No | No | |
 | `LOGFLARE_BIGQUERY_MANAGED_SA_POOL` | Number of managed service accounts in the BigQuery SA pool. | No | No | Default: `0` |
 | `LOGFLARE_BQ_WRITE_API_POOL_SIZE` | Connection pool size for the BigQuery Write API. | No | No | Default: `10` |
@@ -1342,7 +1362,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ### Supabase init SQL (mounted by docker-compose)
 
-> These are consumed by SQL scripts the self-hosted compose mounts into `/docker-entrypoint-initdb.d/init-scripts/`. They are *not* read by the `supabase/postgres` image itself — they are read by init SQL under `docker/volumes/db/` (the orchestration layer).
+> These are consumed by SQL scripts the self-hosted compose mounts into `/docker-entrypoint-initdb.d/init-scripts/`. They are *not* read by the `supabase/postgres` image itself - they are read by init SQL under `docker/volumes/db/` (the orchestration layer).
 
 | Variable | Description | CLI | Self-hosted | Notes |
 |---|---|---|---|---|
