@@ -161,9 +161,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                               snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
                             )}
                           />
-                          <span className="truncate flex-1 min-w-0 overflow-hidden">
-                            {chat.name}
-                          </span>
+                          <span className="truncate flex-1 w-0">{chat.name}</span>
                         </>
                       )}
                     </div>

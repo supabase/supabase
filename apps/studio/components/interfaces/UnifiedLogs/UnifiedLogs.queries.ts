@@ -128,10 +128,13 @@ const translateFilter = (key: string, value: unknown): SafeLogSqlFragment | null
       return arr
         ? safeSql`${ATTR.method} IN ${inList(arr)}`
         : safeSql`${ATTR.method} = ${lit(String(value))}`
-    case 'status':
-      return arr
-        ? safeSql`${ATTR.status} IN ${inList(arr)}`
-        : safeSql`${ATTR.status} = ${lit(String(value))}`
+    case 'status': {
+      // Match the displayed status: HTTP response code for gateway rows,
+      // Postgres SQLSTATE for postgres rows. Inline STATUS_EXPR so e.g.
+      // filtering on '00000' picks up postgres success rows.
+      const statuses = arr ?? [value]
+      return safeSql`(${STATUS_EXPR}) IN ${inList(statuses.map((v) => String(v)))}`
+    }
     case 'pathname':
       return arr
         ? safeSql`(${joinSqlFragments(
@@ -371,8 +374,8 @@ WHERE ${baseFiltersFor('level')}
   )
 
   const facetBranches = joinSqlFragments(
-    (['method', 'status', 'pathname'] as const).map((facet) =>
-      getFacetCountQuery({ search, facet })
+    (['method', 'status', 'pathname'] as const).map(
+      (facet) => safeSql`(${getFacetCountQuery({ search, facet })})`
     ),
     ' UNION ALL '
   )
