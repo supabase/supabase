@@ -9,9 +9,9 @@ import {
   CommandInput_Shadcn_ as CommandInput,
   CommandItem_Shadcn_ as CommandItem,
   CommandList_Shadcn_ as CommandList,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Popover as Popover,
+  PopoverContent as PopoverContent,
+  PopoverTrigger as PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'

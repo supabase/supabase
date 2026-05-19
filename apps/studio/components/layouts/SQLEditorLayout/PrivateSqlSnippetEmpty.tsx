@@ -8,8 +8,8 @@ export const EmptyPrivateQueriesPanel = () => (
     description="Queries will be automatically saved once you start writing in the editor"
     className="mx-4"
   >
-    <div className="top-0 left-6 flex flex-col opacity-50 cursor-not-allowed bg-dash-sidebar h-content -mb-7 pointer-events-none scale-75">
-      <div className="relative h-content">
+    <div className="top-0 left-6 flex flex-col opacity-50 cursor-not-allowed bg-dash-sidebar -mb-7 pointer-events-none scale-75">
+      <div className="relative">
         <div className="absolute inset-0 pointer-events-none z-10">
           <div className="absolute inset-0 bg-linear-to-t from-transparent from-80% to-100% to-background-surface-100 dark:to-background-surface-75" />
           <div className="absolute inset-0 bg-linear-to-r from-transparent from-50% to-100% to-background-surface-100 dark:to-background-surface-75" />

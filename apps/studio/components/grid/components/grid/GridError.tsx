@@ -143,7 +143,7 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
     <Admonition
       type="warning"
       className="pointer-events-auto"
-      title={`Sorting is not supporting on ${sorts.length > 1 ? 'one of the selected columns' : 'the selected column'}`}
+      title={`Sorting is not supported on ${sorts.length > 1 ? 'one of the selected columns' : 'the selected column'}`}
     >
       <p className="mb-0!">
         Unable to retrieve results as sorting is not supported on{' '}

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -90,12 +90,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
           render={({ field }) => (
             <FormItemLayout label="Code">
               <FormControl>
-                <Input_Shadcn_
-                  {...field}
-                  placeholder="123456"
-                  autoComplete="off"
-                  disabled={isLoading}
-                />
+                <Input {...field} placeholder="123456" autoComplete="off" disabled={isLoading} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -162,7 +157,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
           render={({ field }) => (
             <FormItemLayout label="Email">
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   {...field}
                   type="email"
                   placeholder="you@example.com"

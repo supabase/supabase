@@ -12,9 +12,9 @@ import {
 import Link from 'next/link'
 import { ReactNode, useId, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   Command_Shadcn_,
@@ -26,15 +26,19 @@ import {
   CommandSeparator_Shadcn_,
   CriticalIcon,
   Input,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import {
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -134,17 +138,19 @@ const ColumnType = ({
     return (
       <Tooltip>
         <TooltipTrigger>
-          <Input
-            readOnly
-            disabled
-            label={showLabel ? 'Type' : ''}
+          <FormItemLayout
             layout={showLabel ? layout : undefined}
-            className="md:gap-x-0 [&>div>div]:text-left"
-            size="small"
-            icon={inferIcon(getOptionType(value))}
-            value={displayValue}
-            descriptionText={showLabel ? unsupportedDataTypeText : undefined}
-          />
+            label={showLabel ? 'Type' : ''}
+            description={showLabel ? unsupportedDataTypeText : undefined}
+            isReactForm={false}
+          >
+            <InputGroup>
+              <InputGroupInput readOnly disabled size="small" value={displayValue} />
+              <InputGroupAddon align="inline-start">
+                {inferIcon(getOptionType(value))}
+              </InputGroupAddon>
+            </InputGroup>
+          </FormItemLayout>
         </TooltipTrigger>
         {!showLabel && (
           <TooltipContent side="bottom" className="w-80">
@@ -159,15 +165,14 @@ const ColumnType = ({
     return (
       <Tooltip>
         <TooltipTrigger>
-          <Input
-            readOnly
-            disabled
+          <FormItemLayout
+            layout={showLabel ? layout : undefined}
             label={showLabel ? 'Type' : ''}
-            layout={showLabel ? 'horizontal' : undefined}
-            className="md:gap-x-0"
-            size="small"
-            value={displayValue}
-          />
+            description={showLabel ? unsupportedDataTypeText : undefined}
+            isReactForm={false}
+          >
+            <Input readOnly disabled size="small" value={displayValue} />
+          </FormItemLayout>
         </TooltipTrigger>
         {!showLabel && description && (
           <TooltipContent side="bottom">
@@ -180,9 +185,9 @@ const ColumnType = ({
 
   return (
     <div className={cn('flex flex-col gap-y-2', className)}>
-      {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
-      <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      {showLabel && <Label className="text-foreground-light">Type</Label>}
+      <Popover modal open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             type={error ? 'danger' : 'default'}
             role="combobox"
@@ -202,13 +207,8 @@ const ColumnType = ({
               'Choose a column type...'
             )}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          id={listboxId}
-          className="w-[460px] p-0"
-          side="bottom"
-          align="center"
-        >
+        </PopoverTrigger>
+        <PopoverContent id={listboxId} className="w-[460px] p-0" side="bottom" align="center">
           <Command_Shadcn_>
             <CommandInput_Shadcn_
               placeholder="Search types..."
@@ -296,18 +296,18 @@ const ColumnType = ({
               </ScrollArea>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
 
       {showRecommendation && recommendation !== undefined && (
-        <Alert_Shadcn_ variant="warning" className="mt-2">
+        <Alert variant="warning" className="mt-2">
           <CriticalIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             {' '}
             It is recommended to use{' '}
             <code className="text-code-inline">{recommendation.alternative}</code> instead
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          </AlertTitle>
+          <AlertDescription>
             <p>
               Postgres recommends against using the data type{' '}
               <code className="text-code-inline">{displayValue}</code> unless you have a very
@@ -326,8 +326,8 @@ const ColumnType = ({
                 Use {recommendation.alternative}
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   )

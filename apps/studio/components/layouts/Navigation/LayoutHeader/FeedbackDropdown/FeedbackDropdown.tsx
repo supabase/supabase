@@ -2,13 +2,7 @@ import { IS_PLATFORM } from 'common'
 import { Lightbulb, TriangleAlert } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import {
-  Button,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
+import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
 
 import { FeedbackWidget } from './FeedbackWidget'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -39,7 +33,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
   )
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={isOpen}
       onOpenChange={(e) => {
@@ -48,7 +42,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
         if (!e) setStage('select')
       }}
     >
-      <PopoverTrigger_Shadcn_ asChild>
+      <PopoverTrigger asChild>
         <Button
           asChild
           onClick={() => {
@@ -60,8 +54,8 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
         >
           <span className={className}>Feedback</span>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         side="bottom"
         align="end"
         className="p-0 flex flex-col w-96"
@@ -108,7 +102,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
                 onSupportClick={() => setIsOpen(false)}
               />
             </div>
-            <PopoverSeparator_Shadcn_ />
+            <PopoverSeparator />
             <div className="px-4 pt-4 pb-4">
               <Button type="default" size="tiny" onClick={() => setStage('widget')}>
                 Leave feedback instead
@@ -122,7 +116,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             onSwitchToIssueOptions={() => setStage('issue-options')}
           />
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

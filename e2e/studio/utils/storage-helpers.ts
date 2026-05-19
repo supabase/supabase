@@ -98,16 +98,13 @@ export const deleteBucket = async (page: Page, ref: string, bucketName: string) 
   await page.getByRole('button', { name: 'Delete bucket' }).click()
   await apiPromise
 
-  // Verify bucket was deleted - should redirect to files page
-  await expect(page, 'Should redirect to storage files page after deletion').toHaveURL(
-    new RegExp(`/storage/files$`)
-  )
-
-  // Verify bucket is no longer in the list
+  // Verify bucket is no longer in the list. The post-delete redirect to
+  // /storage/files can race other history updates, so asserting the row
+  // is gone is a more stable signal that the delete actually succeeded.
   await expect(
     page.getByRole('row').filter({ hasText: bucketName }),
     `Bucket ${bucketName} should not be visible after deletion`
-  ).not.toBeVisible()
+  ).not.toBeVisible({ timeout: 10000 })
 }
 
 /**

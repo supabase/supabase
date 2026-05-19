@@ -1579,6 +1579,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/auth#understanding-authorization-headers',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/auth#the-verify_jwt-platform-check',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/examples',
     destination: '/docs/guides/functions',
   },
@@ -2679,12 +2689,27 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/replication/etl-destinations',
-    destination: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/external-replication-setup',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/analytics/replication',
-    destination: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/external-replication-setup',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/external-replication-setup',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-monitoring',
+    destination: '/docs/guides/database/replication/external-replication-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-faq',
+    destination: '/docs/guides/database/replication/external-replication-faq',
   },
   {
     permanent: true,
