@@ -98,6 +98,7 @@ const FeatureFlagProviderWithOrgContext = ({
       const customAttributes: Record<string, string> = {}
       if (cloudProvider) customAttributes.cloud_provider = cloudProvider
       if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      console.log('[ConfigCat] user attributes', { userEmail, ...customAttributes })
       return getFlags(userEmail, customAttributes)
     },
     [cloudProvider, selectedOrganization?.plan?.id]
