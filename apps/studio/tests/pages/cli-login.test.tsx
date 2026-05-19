@@ -119,4 +119,45 @@ describe('CliLoginScreen', () => {
     expect(await screen.findByText('Unable to create CLI sign-in')).toBeInTheDocument()
     expect(screen.getByText(/Session expired/)).toBeInTheDocument()
   })
+
+  test('surfaces error messages from non-Error rejection shapes (openapi-fetch)', async () => {
+    createCliLoginSessionMock.mockRejectedValue({
+      message:
+        'User can have up to 20 personal access tokens. Please remove the excess tokens to create new ones.',
+      statusCode: 403,
+    })
+    renderScreen()
+
+    expect(await screen.findByText('Unable to create CLI sign-in')).toBeInTheDocument()
+    expect(
+      screen.getByText(/User can have up to 20 personal access tokens/)
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/Unknown error/)).not.toBeInTheDocument()
+  })
+
+  test('POSTs createCliLoginSession exactly once even when parent re-renders', async () => {
+    createCliLoginSessionMock.mockResolvedValue({ nonce: 'ABCDEFGH12345678' })
+    const { rerender } = renderScreen()
+
+    await waitFor(() => {
+      expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
+    })
+
+    // Re-render with a brand-new `navigate` prop (mirrors the production
+    // bug where the parent recreated the closure on every render).
+    for (let i = 0; i < 5; i++) {
+      rerender(
+        <CliLoginScreen
+          isLoggedIn
+          routerReady
+          sessionId="session-test"
+          publicKey="public-key-test"
+          tokenName="local-dev"
+          navigate={vi.fn()}
+        />
+      )
+    }
+
+    expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
+  })
 })
