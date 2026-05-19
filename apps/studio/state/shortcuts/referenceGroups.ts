@@ -31,6 +31,7 @@ export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_FUNCTION_DETAIL,
   'functions-detail',
   'functions-overview',
+  'logs-preview',
   'nav',
   'ai-assistant',
   'inline-editor',
