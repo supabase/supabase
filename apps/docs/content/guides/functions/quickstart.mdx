@@ -215,6 +215,12 @@ curl --request POST 'https://[YOUR_PROJECT_ID].supabase.co/functions/v1/hello-wo
 
 Now that your function is deployed, you can invoke it from within an app:
 
+<Admonition type="note" label="Calling from the browser?">
+
+If you're invoking your Edge Function from a browser, you'll need to handle CORS (Cross-Origin Resource Sharing). See the [CORS guide](/docs/guides/functions/cors) for instructions on configuring CORS headers in your function.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
