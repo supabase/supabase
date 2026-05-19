@@ -58,11 +58,15 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
               .filter((item) => item.enabled !== false)
               .map((item) =>
                 !item.href ? (
-                  <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
+                  <div
+                    key={item.label}
+                    className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none"
+                  >
                     {item.label}
                   </div>
                 ) : (
                   <MenuItem
+                    key={item.label}
                     href={item.href}
                     title={item.label}
                     community={item.community}
