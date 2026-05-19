@@ -85,7 +85,7 @@ export const LogsFilterBar = () => {
   return (
     <FilterBar
       variant="pill"
-      className="[&>div>div>div>input]:!text-xs"
+      className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"
       filterProperties={filterProperties}
       freeformText={freeformText}
       filters={filters}

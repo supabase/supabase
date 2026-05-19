@@ -43,6 +43,7 @@ import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -381,31 +382,34 @@ export const UnifiedLogs = () => {
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
-            <div ref={topBarRef} className="top-0 z-10 flex flex-col gap-2 bg-background pb-3">
-              <div className="flex flex-wrap items-center gap-2 px-2 pt-2.5 pb-0.5">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="tiny"
-                      type="text"
-                      icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
-                      onClick={() => setIsFilterBarOpen((prev) => !prev)}
-                      className="hidden w-[26px] sm:flex"
-                      aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>
-                      Toggle controls with{' '}
-                      <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
-                        <span className="mr-1">⌘</span>
-                        <span>B</span>
-                      </Kbd>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
+            <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
+              <div className="flex flex-wrap items-center gap-2 px-2 border-b">
+                <ButtonTooltip
+                  size="tiny"
+                  type="text"
+                  icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                  onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                  className="hidden w-[26px] sm:flex"
+                  aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: (
+                        <p>
+                          Toggle controls with{' '}
+                          <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
+                            <span className="mr-1">⌘</span>
+                            <span>B</span>
+                          </Kbd>
+                        </p>
+                      ),
+                    },
+                  }}
+                />
 
-                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1">
+                <div className="h-full border-r" />
+
+                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
                   <LogsFilterBar />
                 </div>
 
@@ -429,7 +433,7 @@ export const UnifiedLogs = () => {
               <TimelineChart
                 data={unifiedLogsChart}
                 className={cn(
-                  '-mb-2',
+                  '-mb-1.5 mt-1.5',
                   isFetchingCharts && 'opacity-60 transition-opacity duration-150'
                 )}
                 columnId="timestamp"
