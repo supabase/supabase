@@ -3748,6 +3748,10 @@ export interface components {
             /** @enum {string} */
             type: 'active_replication_slot'
           }
+        | {
+            /** @enum {string} */
+            type: 'project_hibernating'
+          }
       )[]
       warnings: {
         /** @enum {string} */
