@@ -57,11 +57,10 @@ function FilterBarContent({ className }: { className?: string }) {
       >
         <div
           className={cn(
-            'relative flex items-center justify-center shrink-0 px-2 bg-surface-200',
-            variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r',
-            !isLoading && 'cursor-pointer'
+            'relative flex items-center justify-center shrink-0 px-2 bg-surface-200 cursor-pointer',
+            variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r'
           )}
-          onClick={() => !isLoading && handleGroupFreeformFocus([])}
+          onClick={() => handleGroupFreeformFocus([])}
         >
           <div
             className={cn(
