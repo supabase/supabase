@@ -8,21 +8,35 @@ execution:
   contexts:
     host:
       backend: native
+      requirements:
+        runtimes:
+          node: ">=22"
+        tools:
+          pnpm: "10.24.0"
     app:
       backend: container
       lifecycle: persistent
+      requirements:
+        runtimes:
+          node: ">=22"
+      attachments:
+        isolated_paths:
+          - node_modules
       container:
         image: node:22-bookworm
+        engines:
+          - docker
+          - podman
+        resources:
+          memory:
+            minimum: 3GiB
+            default: 4GiB
 toolchains:
   node:
     provider: corepack
     version: ">=22"
     package_managers:
       pnpm: "10.24.0"
-tools:
-  docker:
-    version: "*"
-    required: false
 surfaces:
   www:
     kind: http
@@ -64,8 +78,6 @@ tasks:
     requirements:
       toolchains:
         - node
-      tools:
-        pnpm: "10.24.0"
     depends_on:
       - setup:env-www
     safe_for_agent: true
@@ -81,8 +93,6 @@ tasks:
     requirements:
       toolchains:
         - node
-      tools:
-        docker: "*"
     depends_on:
       - setup:env-www
     safe_for_agent: true
@@ -96,8 +106,6 @@ tasks:
     requirements:
       toolchains:
         - node
-      tools:
-        pnpm: "10.24.0"
       checks:
         - workspace-dependencies-installed
     depends_on:
@@ -113,8 +121,6 @@ tasks:
     requirements:
       toolchains:
         - node
-      tools:
-        pnpm: "10.24.0"
       checks:
         - workspace-dependencies-installed
     depends_on:
@@ -135,8 +141,6 @@ tasks:
     requirements:
       toolchains:
         - node
-      tools:
-        pnpm: "10.24.0"
       checks:
         - workspace-dependencies-installed
     depends_on:
@@ -156,8 +160,6 @@ tasks:
     requirements:
       toolchains:
         - node
-      tools:
-        docker: "*"
       checks:
         - workspace-dependencies-installed
     depends_on:
@@ -182,8 +184,6 @@ tasks:
     requirements:
       toolchains:
         - node
-      tools:
-        docker: "*"
       checks:
         - workspace-dependencies-installed
     depends_on:
