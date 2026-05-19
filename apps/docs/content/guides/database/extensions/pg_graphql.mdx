@@ -100,7 +100,7 @@ returning the JSON
 }
 ```
 
-Note that `pg_graphql` supports schema introspection, so you can connect any GraphQL IDE or schema inspection tool to see the full set of fields and arguments available in the API. From `pg_graphql` 1.6.0 onwards, introspection is **disabled by default** and must be enabled per schema:
+Note that `pg_graphql` supports schema introspection, so you can connect any GraphQL IDE or schema inspection tool to see the full set of fields and arguments available in the API. Starting from `pg_graphql` 1.6.0, introspection is **disabled by default** and must be enabled per schema:
 
 ```sql
 comment on schema public is e'@graphql({"introspection": true})';
