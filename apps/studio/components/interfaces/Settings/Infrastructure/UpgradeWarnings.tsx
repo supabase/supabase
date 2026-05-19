@@ -67,6 +67,8 @@ const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidatio
       return `Move the ${error.obj_type} to your own schema`
     case 'active_replication_slot':
       return 'Drop the active replication slot'
+    case 'project_hibernating':
+      return 'The project is currently hibernating and will wake on next supported request'
   }
 }
 
