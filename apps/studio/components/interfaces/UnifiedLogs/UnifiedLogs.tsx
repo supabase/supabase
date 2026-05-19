@@ -18,15 +18,11 @@ import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Button,
   ChartConfig,
   cn,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   useIsMobile,
 } from 'ui'
 
