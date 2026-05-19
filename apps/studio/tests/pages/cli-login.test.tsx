@@ -129,9 +129,7 @@ describe('CliLoginScreen', () => {
     renderScreen()
 
     expect(await screen.findByText('Unable to create CLI sign-in')).toBeInTheDocument()
-    expect(
-      screen.getByText(/User can have up to 20 personal access tokens/)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/User can have up to 20 personal access tokens/)).toBeInTheDocument()
     expect(screen.queryByText(/Unknown error/)).not.toBeInTheDocument()
   })
 

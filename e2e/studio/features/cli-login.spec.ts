@@ -66,9 +66,9 @@ test.describe('CLI browser login', () => {
       )
     )
 
-    await expect(
-      page.getByText(/User can have up to 20 personal access tokens/)
-    ).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByText(/User can have up to 20 personal access tokens/)).toBeVisible({
+      timeout: 10_000,
+    })
     await expect(page.getByText(/Error: Unknown error/)).not.toBeVisible()
   })
 })
