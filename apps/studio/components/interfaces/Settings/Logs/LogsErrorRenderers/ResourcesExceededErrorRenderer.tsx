@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import {
   Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   copyToClipboard,
   InputGroup,
   InputGroupAddon,
@@ -24,36 +27,31 @@ const ResourcesExceededErrorRenderer: React.FC<ErrorRendererProps> = ({ error, i
         </p>
         {!isCustomQuery && <p>Please contact support if this error persists.</p>}
       </div>
-      <Accordion
-        className="text-sm"
-        justified={false}
-        openBehaviour="multiple"
-        type="default"
-        chevronAlign="left"
-        size="small"
-        iconPosition="left"
-      >
-        <Accordion.Item id="1" header="Full error message">
-          <InputGroup>
-            <InputGroupTextarea value={errorAsJson} className="font-mono" rows={5} />
-            <InputGroupAddon align="block-end">
-              <InputGroupButton
-                size="tiny"
-                type="default"
-                className="ml-auto"
-                onClick={() => {
-                  copyToClipboard(errorAsJson)
-                  setCopied(true)
-                  setTimeout(() => {
-                    setCopied(false)
-                  }, 3000)
-                }}
-              >
-                {copied ? 'Copied' : 'Copy'}
-              </InputGroupButton>
-            </InputGroupAddon>
-          </InputGroup>
-        </Accordion.Item>
+      <Accordion className="text-sm" type="single">
+        <AccordionItem value="1">
+          <AccordionTrigger>Full error message</AccordionTrigger>
+          <AccordionContent>
+            <InputGroup>
+              <InputGroupTextarea value={errorAsJson} className="font-mono" rows={5} />
+              <InputGroupAddon align="block-end">
+                <InputGroupButton
+                  size="tiny"
+                  type="default"
+                  className="ml-auto"
+                  onClick={() => {
+                    copyToClipboard(errorAsJson)
+                    setCopied(true)
+                    setTimeout(() => {
+                      setCopied(false)
+                    }, 3000)
+                  }}
+                >
+                  {copied ? 'Copied' : 'Copy'}
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
     </div>
   )

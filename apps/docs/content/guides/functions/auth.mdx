@@ -5,114 +5,65 @@ description: 'Authentication patterns for Supabase Edge Functions.'
 subtitle: 'Authentication patterns for Edge Functions'
 ---
 
-<Admonition type="caution">
+The `withSupabase` wrapper from [`@supabase/server`](https://github.com/supabase/server) verifies the caller's credentials against a declared `auth` mode and hands you a pre-configured Supabase client on `ctx`. The sections below show how to use it for each common auth scenario.
 
-The patterns in this guide assume your project uses the new [JWT signing keys](/docs/guides/getting-started/api-keys) and the new [API keys](https://github.com/orgs/supabase/discussions/29260). If you're still on legacy JWTs, see the [Legacy JWT Secret guide](/docs/guides/functions/auth-legacy-jwt).
+For how authorization headers and the `verify_jwt` platform check work under the hood, see [Authorization headers](/docs/guides/functions/auth-headers).
+
+| Mode            | Accepts                                    |
+| --------------- | ------------------------------------------ |
+| `'user'`        | A valid user JWT on `Authorization`        |
+| `'secret'`      | A secret key on `apikey`                   |
+| `'publishable'` | A publishable key on `apikey`              |
+| `'none'`        | Any caller, no check (for signed webhooks) |
+
+## Authenticated user calls
+
+Functions called by signed-in users — typically through `supabase.functions.invoke` from the client — send the user's session JWT on the `Authorization` header. Keep `verify_jwt = true` (the default) so the platform validates the JWT before your handler runs, then use `auth: 'user'` to get `ctx.supabase` already scoped to the caller's RLS policies.
+
+```ts
+import { withSupabase } from 'npm:@supabase/server'
+
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {
+    const { supabase, supabaseAdmin, userClaims, jwtClaims, authMode } = ctx
+    // supabase       — RLS-scoped to the authenticated user
+    // supabaseAdmin  — bypasses RLS (service role)
+    // userClaims     — user identity from JWT (id, email, role)
+    // jwtClaims      — full JWT claims
+    // authMode       — which auth mode matched
+
+    // your business logic goes here
+    return Response.json({ email: ctx.userClaims?.email })
+  }),
+}
+```
+
+## Service-to-service calls
+
+Cron jobs, workers, `pg_net`, or another Edge Function make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'` to validate the key against any secret key from your [dashboard](/dashboard/project/_/settings/api-keys). You get `ctx.supabaseAdmin` for privileged work.
+
+```ts
+import { withSupabase } from 'npm:@supabase/server'
+
+export default {
+  fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
+    // your business logic. ctx.supabaseAdmin bypasses RLS
+    return Response.json({ ok: true })
+  }),
+}
+```
+
+<Admonition type="note">
+
+To accept only one specific key, use `auth: 'secret:<name>'`. For example, `auth: 'secret:automations'` only accepts the secret key you named "automations" in the [**Settings > API keys**](/dashboard/project/_/settings/api-keys) section of the Dashboard. The same syntax works for publishable keys (`auth: 'publishable:<name>'`).
+
+![A secret key named "automations" listed under Secret keys in the Supabase dashboard.](/docs/img/guides/functions/secret-keys-automations.png)
 
 </Admonition>
 
-Every request to an Edge Function passes through two layers of auth. First, a platform-level check (`verify_jwt`) runs before your code executes. Then, once the request reaches your handler, you decide what to do with the credentials the caller sent.
+## Public functions
 
-## Understanding authorization headers
-
-Edge Functions care about two request headers. Sending the wrong credential in the wrong header is the most common source of 401 errors.
-
-| Header          | Value                                   | Used for                               |
-| --------------- | --------------------------------------- | -------------------------------------- |
-| `Authorization` | `Bearer <user-jwt>`                     | A user signed in through Supabase Auth |
-| `apikey`        | `sb_publishable_...` or `sb_secret_...` | Calls from clients or services         |
-
-A common mistake is sending a publishable or secret key as a bearer token: `Authorization: Bearer sb_publishable_...`. The new API keys are not JWTs. The platform check can't validate them, and your handler can't verify them as JWTs either. Instead, put API keys in the `apikey` header.
-
-You can send both headers together. A signed-in user calling your function through `supabase-js`, for example, sends their session JWT in `Authorization` and the project's publishable key in `apikey`.
-
-## The `verify_jwt` platform check
-
-When `verify_jwt` is enabled (the default), the platform inspects the `Authorization` header of every request before your function runs. It expects a valid user JWT. If the header is missing, malformed, or signed with a different key, the platform returns a 401 error, and your code never executes.
-
-The check validates legacy HS256 JWTs and JWTs signed with the new asymmetric [signing keys](/docs/guides/auth/signing-keys).
-
-The check does not accept an API key. Publishable and secret keys are not JWTs, so callers that send one in the `Authorization` header fail the check before their request reaches your handler.
-
-Use the `verify_jwt` flag to match how the function is called:
-
-- **Leave `verify_jwt` on** for functions that are only called with a user JWT, such as functions invoked from the client through `supabase.functions.invoke`. The platform rejects unauthenticated requests before they reach your code, and your handler can trust that a valid JWT is present.
-- **Turn `verify_jwt` off** for functions that are called without an `Authorization` header, such as webhooks from external providers, or service-to-service calls that authenticate with an API key. These patterns are covered later in the guide.
-
-Set the flag per function in `supabase/config.toml`:
-
-```toml
-[functions.stripe-webhook]
-verify_jwt = false
-```
-
-For 401 failure modes and how to diagnose them, see [Edge Function 401 error response](/docs/troubleshooting/edge-function-401-error-response).
-
-## Common auth patterns
-
-The sections below show the four patterns you'll reach for most often, written without an SDK so the auth moves are visible. Business logic is left as a placeholder. The next section shows the same four patterns using [`@supabase/server`](https://github.com/supabase/server).
-
-### Authenticated user calls
-
-Keep `verify_jwt` enabled. The platform validates the JWT before your handler runs. Forward the `Authorization` header to the Supabase client so queries run under the caller's RLS policies.
-
-```toml
-[functions.notes]
-verify_jwt = true
-```
-
-```ts
-import { createClient } from 'npm:@supabase/supabase-js@2'
-
-const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
-
-Deno.serve((req) => {
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    SUPABASE_PUBLISHABLE_KEYS['default'],
-    { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-  )
-
-  // your business logic. queries run as the caller
-  return Response.json({ ok: true })
-})
-```
-
-### Service-to-service calls
-
-Cron jobs, workers, `pg_net`, or another Edge Functions make calls with a secret key on the `apikey` header. These callers don't send a user JWT, so disable `verify_jwt` and validate the key yourself.
-
-```toml
-[functions.run-automations]
-verify_jwt = false
-```
-
-```ts
-import { createClient } from 'npm:@supabase/supabase-js@2'
-
-const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
-
-Deno.serve((req) => {
-  if (req.headers.get('apikey') !== Deno.env.get('INTERNAL_AUTOMATIONS_KEY')) {
-    return Response.json({ error: 'forbidden' }, { status: 401 })
-  }
-
-  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, SUPABASE_SECRET_KEYS['default'])
-
-  // your business logic. queries run with the service role
-  return Response.json({ ok: true })
-})
-```
-
-<Admonition type="tip">
-
-Never expose a secret key to the browser. Store it as a [function secret](/docs/guides/functions/secrets).
-
-</Admonition>
-
-### Public functions
-
-For a genuinely public function, like a health check, no credential is required. Disable `verify_jwt` so anonymous callers can reach the handler.
+For a genuinely public function, like a health check, use `auth: 'none'` with `verify_jwt = false` so anonymous callers can reach the handler.
 
 ```toml
 [functions.health]
@@ -120,103 +71,21 @@ verify_jwt = false
 ```
 
 ```ts
-Deno.serve(() => {
-  // your business logic
-  return Response.json({ ok: true })
-})
-```
-
-### External webhooks
-
-External providers like Stripe or GitHub don't send Supabase credentials. They sign the request body with their own shared secret. Disable `verify_jwt` and verify the signature before acting on the payload.
-
-```toml
-[functions.stripe-webhook]
-verify_jwt = false
-```
-
-```ts
-import Stripe from 'npm:stripe'
-
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
-
-Deno.serve(async (req) => {
-  const signature = req.headers.get('stripe-signature') ?? ''
-  const body = await req.text()
-
-  try {
-    stripe.webhooks.constructEvent(body, signature, Deno.env.get('STRIPE_WEBHOOK_SECRET')!)
-  } catch {
-    return new Response('bad signature', { status: 400 })
-  }
-
-  // your business logic. handle the event
-  return Response.json({ received: true })
-})
-```
-
-## Simplifying with `@supabase/server`
-
-The [`@supabase/server`](https://github.com/supabase/server) package wraps your handler, checks the caller's credentials against a declared `auth` mode, and hands you a pre-configured Supabase client on `ctx`. The same patterns above, written against the SDK, look like this.
-
-| Mode                   | Accepts                                    |
-| ---------------------- | ------------------------------------------ |
-| `'user'`               | A valid user JWT on `Authorization`        |
-| `'secret:<name>'`      | A named secret key on `apikey`             |
-| `'publishable:<name>'` | A named publishable key on `apikey`        |
-| `'none'`               | Any caller, no check (for signed webhooks) |
-
-<Admonition type="tip">
-
-See the [`@supabase/server` docs](https://github.com/supabase/server) for the full list of modes.
-
-</Admonition>
-
-### Authenticated user calls [#authenticated-user-calls-with-server-sdk]
-
-`auth: 'user'` pairs with `verify_jwt = true`. The platform validates the JWT, and the SDK hands you `ctx.supabase` already scoped to the caller.
-
-```ts
 import { withSupabase } from 'npm:@supabase/server'
 
 export default {
-  fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {
-    // your business logic. ctx.supabase is scoped to the caller
-    return Response.json({ email: ctx.userClaims?.email })
-  }),
-}
-```
-
-### Service-to-service calls [#service-to-service-calls-with-server-sdk]
-
-`auth: 'secret:<name>'` validates the `apikey` header against the named secret key from your [dashboard](/dashboard/project/_/settings/api-keys) and gives you `ctx.supabaseAdmin` for privileged work. The `<name>` matches the name you gave the key. Keep `verify_jwt = false`.
-
-```ts
-import { withSupabase } from 'npm:@supabase/server'
-
-export default {
-  fetch: withSupabase({ auth: 'secret:automations' }, async (_req, ctx) => {
-    // your business logic. ctx.supabaseAdmin bypasses RLS
+  fetch: withSupabase({ auth: 'none' }, async () => {
+    // your business logic
     return Response.json({ ok: true })
   }),
 }
 ```
 
-<Admonition type="tip">
+`auth: 'none'` skips every credential check — see the caution under [External webhooks](#external-webhooks) before using it on anything that reads or writes sensitive data.
 
-Create a named secret key for each caller in the [**Settings > API keys**](/dashboard/project/_/settings/api-keys) section of the Dashboard. Give it a name like "automations", and share the generated `sb_secret_...` value with the service that calls this function.
+## External webhooks
 
-![A secret key named "automations" listed under Secret keys in the Supabase dashboard.](/docs/img/guides/functions/secret-keys-automations.png)
-
-</Admonition>
-
-### Public functions [#public-functions-with-server-sdk]
-
-The SDK adds nothing to a truly public function. Use the raw pattern from the previous section. If you need a Supabase client anyway, `auth: 'none'` with `verify_jwt = false` skips every check and treats every caller as anonymous.
-
-### External webhooks [#external-webhooks-with-server-sdk]
-
-Use `auth: 'none'` to skip the SDK's credential check, then verify the provider's signature inside the handler. Keep `verify_jwt = false`.
+External providers like Stripe or GitHub don't send Supabase credentials. They sign the request body with their own shared secret. Use `auth: 'none'` to skip the SDK's credential check, then verify the provider's signature inside the handler. Keep `verify_jwt = false`.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
@@ -247,7 +116,7 @@ export default {
 
 </Admonition>
 
-### Combining modes
+## Combining modes
 
 Functions that answer both users and internal callers take an array on `auth`. Modes are tried in order. The first match wins, and `ctx.authMode` tells you which matched.
 
@@ -255,7 +124,7 @@ Functions that answer both users and internal callers take an array on `auth`. M
 import { withSupabase } from 'npm:@supabase/server'
 
 export default {
-  fetch: withSupabase({ auth: ['user', 'secret:automations'] }, async (req, ctx) => {
+  fetch: withSupabase({ auth: ['user', 'secret'] }, async (req, ctx) => {
     if (ctx.authMode === 'user') {
       // your business logic for user calls. ctx.supabase is scoped to them
       return Response.json({ ok: true })
@@ -267,7 +136,7 @@ export default {
 }
 ```
 
-### Custom error responses
+## Custom error responses
 
 To shape the 401 response yourself, use `createSupabaseContext` instead of `withSupabase`. It returns a `{ data, error }` tuple so you stay in control.
 
