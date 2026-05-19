@@ -781,20 +781,22 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ## PostgREST
 
+> PostgREST's upstream documentation at [postgrest.org](https://postgrest.org/en/stable/references/configuration.html) covers each variable with prose context - security rationale, interaction notes, examples. The rows below stay reference-style; for backstory and detailed semantics, see the upstream docs.
+
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `PGRST_ADMIN_SERVER_HOST` | string | Self-hosted | Hostname for the PostgREST admin server. | Defaults to `server-host` value |
 | `PGRST_ADMIN_SERVER_PORT` | integer | Both | Port for the PostgREST admin server. The admin server is disabled unless a port is set, and it must differ from `PGRST_SERVER_PORT`. | No default (admin server disabled when unset) |
 | `PGRST_APP_SETTINGS_*` | string | Self-hosted | Arbitrary settings exposed to PostgreSQL via `current_setting('app.settings.<name>')`. The suffix after `PGRST_APP_SETTINGS_` becomes the setting name (case-insensitive). | Used for `PGRST_APP_SETTINGS_JWT_SECRET` and `PGRST_APP_SETTINGS_JWT_EXP` in self-hosted |
 | `PGRST_CLIENT_ERROR_VERBOSITY` | enum | Self-hosted | Controls verbosity of client-facing error responses. | Default: `verbose` (other value: `minimal`) |
-| `PGRST_DB_AGGREGATES_ENABLED` | boolean | Self-hosted | Allows the use of aggregate functions (`max`, `sum`, etc.) in queries. | Default: `false` |
+| `PGRST_DB_AGGREGATES_ENABLED` | boolean | Self-hosted | Allows the use of aggregate functions (`max`, `sum`, etc.) in queries. Disabled by default due to potential performance risks. | Default: `false` |
 | `PGRST_DB_ANON_ROLE` | string | Both | Database role used for unauthenticated requests. When unset, anonymous access is blocked. | No default |
 | `PGRST_DB_CHANNEL` | string | Self-hosted | Postgres `NOTIFY` channel name used for schema cache and config reloading. | Default: `pgrst` |
-| `PGRST_DB_CHANNEL_ENABLED` | boolean | Self-hosted | Enables the Postgres `NOTIFY` listener channel. | Default: `true` |
+| `PGRST_DB_CHANNEL_ENABLED` | boolean | Self-hosted | Enables the Postgres `NOTIFY` listener channel. Disable when running behind a transaction-pooling connection pooler. | Default: `true` |
 | `PGRST_DB_CONFIG` | boolean | Self-hosted | Enables loading in-database configuration via `db-pre-config` and role settings. | Default: `true` |
 | `PGRST_DB_EXTRA_SEARCH_PATH` | string (CSV) | Both | Comma-separated list of extra schemas added to the `search_path` of every request. Schemas listed here do not get API endpoints. | Default: `public` |
 | `PGRST_DB_HOISTED_TX_SETTINGS` | string (CSV) | Self-hosted | Comma-separated list of settings allowed to be applied as transaction-scoped function settings. | Default: `statement_timeout,plan_filter.statement_cost_limit,default_transaction_isolation` |
-| `PGRST_DB_MAX_ROWS` | integer (count) | Both | Hard limit on the number of rows PostgREST returns for any table, view, or function. | No default (unlimited); alias `PGRST_MAX_ROWS` |
+| `PGRST_DB_MAX_ROWS` | integer (count) | Both | Hard limit on the number of rows PostgREST returns for any table, view, or function; bounds payload size against accidental or malicious queries. | No default (unlimited); alias `PGRST_MAX_ROWS` |
 | `PGRST_DB_PLAN_ENABLED` | boolean | Self-hosted | Allows clients to request the query execution plan with `Accept: application/vnd.pgrst.plan`. | Default: `false` |
 | `PGRST_DB_POOL` | integer (count) | Self-hosted | Maximum number of database connections kept open in PostgREST's pool. | Default: `10` |
 | `PGRST_DB_POOL_ACQUISITION_TIMEOUT` | integer (seconds) | Self-hosted | Time in seconds a request waits for a free connection from the pool. | Default: `10` |
@@ -831,7 +833,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `PGRST_ROOT_SPEC` | string | Self-hosted | Deprecated alias for `PGRST_DB_ROOT_SPEC`. | Deprecated; use `PGRST_DB_ROOT_SPEC` |
 | `PGRST_SECRET_IS_BASE64` | boolean | Self-hosted | Deprecated alias for `PGRST_JWT_SECRET_IS_BASE64`. | Deprecated; use `PGRST_JWT_SECRET_IS_BASE64` |
 | `PGRST_SERVER_CORS_ALLOWED_ORIGINS` | string (CSV) | Self-hosted | Comma-separated list of allowed CORS origins. When empty or unset, all origins are accepted. | No default |
-| `PGRST_SERVER_HOST` | string | Self-hosted | Address the PostgREST web server binds to. Special values: `*`, `*4`, `!4`, `*6`, `!6`. | Default: `!4` |
+| `PGRST_SERVER_HOST` | string | Self-hosted | Address the PostgREST web server binds to. Special values: `*` (any), `*4` (IPv4-preferred), `!4` (IPv4-only), `*6` (IPv6-preferred), `!6` (IPv6-only). | Default: `!4` |
 | `PGRST_SERVER_PORT` | integer | Self-hosted | TCP port the PostgREST web server binds to. Use `0` to auto-assign. | Default: `3000` |
 | `PGRST_SERVER_TIMING_ENABLED` | boolean | Self-hosted | Enables the `Server-Timing` HTTP response header. | Default: `false` |
 | `PGRST_SERVER_TRACE_HEADER` | string | Self-hosted | HTTP header name used to trace requests (e.g. `X-Request-Id`). | No default |
