@@ -178,7 +178,7 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     ['error', 'Unable to load setup'],
     ['linked', 'Organization linked'],
     ['create-new', 'Create new organization'],
-    ['not-eligible', 'Still syncing'],
+    ['not-eligible', 'This AWS Marketplace subscription cannot be linked right now'],
     ['already-linked', 'No action required'],
     ['wrong-account', 'Sign in with the Supabase account'],
   ] satisfies Array<[AwsMarketplaceMockState, string]>)(

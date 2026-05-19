@@ -265,7 +265,7 @@ export const AwsMarketplaceOnboardingScreen = ({
       : MOCK_ORGANIZATIONS
   const mockEligibility =
     mock === 'not-eligible'
-      ? createEligibility({ is_eligible: false, reasons: ['NO_ACTIVE_CONTRACT_FOUND'] })
+      ? createEligibility({ is_eligible: false, reasons: [] })
       : mock === 'already-linked'
         ? createEligibility({ is_eligible: false, reasons: ['AGREEMENT_BASED_OFFER'] })
         : createEligibility()
@@ -687,9 +687,8 @@ function ContractIneligibilityNotice({
     default:
       return (
         <Admonition
-          type="warning"
-          title="Unable to continue"
-          description="Supabase could not determine why this Marketplace subscription is unavailable. Contact support if this keeps happening."
+          type="default"
+          description="Contact support if this keeps happening."
         />
       )
   }
