@@ -129,6 +129,8 @@ export const ValidationErrorsWarning = ({
 }: {
   validationErrors: ProjectUpgradeEligibilityValidationError[]
 }) => {
+  if (validationErrors.length === 0) return null
+
   return (
     <Admonition type="note" showIcon={false} title="A newer version of Postgres is available">
       <div className="flex flex-col gap-3">
@@ -174,22 +176,18 @@ export const ValidationWarningsAdmonition = ({
 }) => {
   if (warnings.length === 0) return null
 
-  return (
-    <>
-      {warnings.map((warning, idx) => (
-        <Admonition
-          key={`${warning.type}-${idx}`}
-          type="default"
-          title={getWarningTitle(warning)}
-          description={getWarningDescription(warning)}
-        >
-          <Button asChild type="default" className="mt-2">
-            <Link href={getWarningLink(warning)} target="_blank" rel="noreferrer">
-              Read upgrade notes
-            </Link>
-          </Button>
-        </Admonition>
-      ))}
-    </>
-  )
+  return warnings.map((warning, idx) => (
+    <Admonition
+      key={`${warning.type}-${idx}`}
+      type="default"
+      title={getWarningTitle(warning)}
+      description={getWarningDescription(warning)}
+    >
+      <Button asChild type="default" className="mt-2">
+        <Link href={getWarningLink(warning)} target="_blank" rel="noreferrer">
+          Read upgrade notes
+        </Link>
+      </Button>
+    </Admonition>
+  ))
 }

@@ -87,8 +87,6 @@ export const InfrastructureInfo = () => {
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
 
-  const hasValidationErrors = (data?.validation_errors ?? []).length > 0
-
   return (
     <>
       <ScaffoldDivider />
@@ -231,13 +229,13 @@ export const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {showDatabaseUpgrades && data && !data.eligible && hasValidationErrors ? (
-                      <ValidationErrorsWarning validationErrors={data.validation_errors ?? []} />
-                    ) : null}
+                    {showDatabaseUpgrades && data && !data.eligible && (
+                      <ValidationErrorsWarning validationErrors={data.validation_errors} />
+                    )}
 
-                    {showDatabaseUpgrades && data && (data.warnings ?? []).length > 0 ? (
-                      <ValidationWarningsAdmonition warnings={data.warnings ?? []} />
-                    ) : null}
+                    {showDatabaseUpgrades && data && (
+                      <ValidationWarningsAdmonition warnings={data.warnings} />
+                    )}
                   </>
                 )}
               </>
