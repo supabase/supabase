@@ -24,15 +24,13 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   useIsMobile,
 } from 'ui'
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
+import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
@@ -45,16 +43,15 @@ import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.util
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
-import { DataTableFilterCommand } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
 import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
 import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideBarLayout'
 import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions'
 import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
 import { LiveButton } from '@/components/ui/DataTable/LiveButton'
-import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
@@ -387,38 +384,29 @@ export const UnifiedLogs = () => {
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
-            <div ref={topBarRef} className="top-0 z-10 flex flex-col gap-2 bg-background pb-3">
-              <div className="flex flex-wrap items-center gap-2 px-2 pt-2.5 pb-0.5">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="tiny"
-                      type="text"
-                      icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
-                      onClick={() => setIsFilterBarOpen((prev) => !prev)}
-                      className="hidden w-[26px] sm:flex"
-                      aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>
-                      Toggle controls with{' '}
-                      <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
-                        <span className="mr-1">⌘</span>
-                        <span>B</span>
-                      </Kbd>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 **:[[cmdk-input-wrapper]]:px-3! [&_button]:px-3! [&_button>span]:h-[26px]! [&_button>span]:py-0! [&_input]:h-[26px]! [&_input]:py-0!">
-                  <DataTableFilterCommand
-                    placeholder="Search logs..."
-                    searchParamsParser={SEARCH_PARAMS_PARSER}
+            <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
+              <div className="flex flex-wrap items-center gap-2 px-2 border-b">
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
+                  <Button
+                    size="tiny"
+                    type="text"
+                    icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                    onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                    className="hidden w-[26px] sm:flex"
+                    aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
                   />
+                </ShortcutTooltip>
+
+                <div className="h-full border-r" />
+
+                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
+                  <LogsFilterBar />
                 </div>
+
                 <div className="block sm:hidden">
                   <DataTableFilterControlsDrawer />
                 </div>
+
                 <div className="ml-auto flex items-center gap-x-2">
                   <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
                   <DataTableViewOptions />
@@ -431,10 +419,11 @@ export const UnifiedLogs = () => {
                   ) : null}
                 </div>
               </div>
+
               <TimelineChart
                 data={unifiedLogsChart}
                 className={cn(
-                  '-mb-2',
+                  '-mb-1.5 mt-1.5',
                   isFetchingCharts && 'opacity-60 transition-opacity duration-150'
                 )}
                 columnId="timestamp"
@@ -458,11 +447,10 @@ export const UnifiedLogs = () => {
                 <div
                   className={cn(
                     'h-full [&>div]:h-full',
-                    '[&_thead_tr]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]!',
                     '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
                     '[&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]!',
-                    '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0! [&_thead_tr:hover]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]!',
-                    '[&_thead_th]:text-foreground-lighter!'
+                    '[&_thead_th]:text-foreground-lighter! [&_thead_tr:hover]:bg-surface-75',
+                    '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
                   )}
                 >
                   <DataTableInfinite
