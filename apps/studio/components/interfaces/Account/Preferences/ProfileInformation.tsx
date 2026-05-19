@@ -30,7 +30,6 @@ import z from 'zod'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useProfileUpdateMutation } from '@/data/profile/profile-update-mutation'
 import { useProfile } from '@/lib/profile'
-import type { FormSchema } from '@/types'
 
 const FormSchema = z.object({
   first_name: z.string().optional(),

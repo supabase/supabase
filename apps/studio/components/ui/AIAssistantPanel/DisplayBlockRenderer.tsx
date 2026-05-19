@@ -14,11 +14,10 @@ import { entityTypeKeys } from '@/data/entity-types/keys'
 import { lintKeys } from '@/data/lint/keys'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useChangedSync } from '@/hooks/misc/useChanged'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface DisplayBlockRendererProps {
   messageId: string
@@ -77,9 +76,8 @@ export const DisplayBlockRenderer = ({
   const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
-  const { data: org } = useSelectedOrganizationQuery()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
@@ -141,16 +139,11 @@ export const DisplayBlockRenderer = ({
 
     onQueryRun?.(queryType)
 
-    sendEvent({
-      action: 'assistant_suggestion_run_query_clicked',
-      properties: {
-        queryType,
-        ...(queryType === 'mutation' ? { category: identifyQueryType(sqlQuery) ?? 'unknown' } : {}),
-      },
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
+    track('assistant_suggestion_run_query_clicked', {
+      queryType,
+      ...(queryType === 'mutation'
+        ? { mutationType: identifyQueryType(sqlQuery) ?? 'unknown' }
+        : {}),
     })
   }
 
