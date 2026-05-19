@@ -15,13 +15,13 @@ This document is the aggregated reference for environment variables relevant to 
 
 The Description column is best-effort. Descriptions for the following sections were cross-checked against upstream prose documentation:
 
-- **Auth** - against `supabase/auth` `README.md` (which documents ~50 vars; the rest are documented from code reads)
-- **PostgREST** - against postgrest.org/en/stable
-- **Realtime** - against `supabase/realtime` `ENVS.md`
-- **Analytics (Logflare)** - against [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/), with `supabase/logflare` `config/runtime.exs` and `config/config.exs` used as tiebreakers when the docs page disagreed with the code
-- **Supavisor** - against `supabase/supavisor` `docs/configuration/env.md`
+- **Auth** - against [supabase/auth](https://github.com/supabase/auth) `README.md` (which documents ~50 vars; the rest are documented from code reads)
+- **PostgREST** - against [postgrest.org/en/stable](postgrest.org/en/stable)
+- **Realtime** - against [supabase/realtime](https://github.com/supabase/realtime) `ENVS.md`
+- **Analytics (Logflare)** - against [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/), with [logflare/logflare](https://github.com/logflare/logflare) `config/runtime.exs` and `config/config.exs` used as tiebreakers when the docs page disagreed with the code
+- **Supavisor** - against [supabase/supavisor](https://github.com/supabase/supavisor) `docs/configuration/env.md`
 
-Other sections (Studio, Storage, Edge Functions, Postgres) appear to have no comparable upstream prose documentation and are documented from code reads alone. Corrections welcome via PR.
+Other sections (Studio, Storage, Edge Functions, Postgres) appeared to have no comparable upstream prose documentation and were documented from code reads alone. Corrections welcome via PR.
 
 ## How to read this document
 
