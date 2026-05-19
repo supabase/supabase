@@ -42,6 +42,19 @@ const ACTIVE_FUNCTION_DETAIL_NAV_SHORTCUT_IDS = [
   SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW,
 ] satisfies ShortcutId[]
 
+const ACTIVE_REALTIME_NAV_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.NAV_REALTIME_INSPECTOR,
+] satisfies ShortcutId[]
+
+const ACTIVE_REALTIME_INSPECTOR_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.INSPECTOR_JOIN_CHANNEL,
+  SHORTCUT_IDS.INSPECTOR_TOGGLE_LISTENING,
+  SHORTCUT_IDS.INSPECTOR_BROADCAST,
+  SHORTCUT_IDS.INSPECTOR_COPY_MESSAGE,
+] satisfies ShortcutId[]
+
 const ACTIVE_SURFACE_SHORTCUT_IDS = [
   ...ACTIVE_SHORTCUT_IDS,
   SHORTCUT_IDS.AUTH_USERS_REFRESH,
@@ -166,6 +179,25 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Edge Function Tabs')).toBeInTheDocument()
     expect(screen.queryByText('Edge Function Page Navigation')).not.toBeInTheDocument()
     expect(screen.getByText('Go to Overview')).toBeInTheDocument()
+  })
+
+  it('shows the realtime navigation section when realtime shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_REALTIME_NAV_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Global Navigation')).toBeInTheDocument()
+    expect(screen.getByText('Realtime Navigation')).toBeInTheDocument()
+    expect(screen.getByText('Go to Inspector')).toBeInTheDocument()
+  })
+
+  it('uses human labels for realtime inspector shortcut groups', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_REALTIME_INSPECTOR_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Realtime Inspector')).toBeInTheDocument()
+    expect(screen.getByText('Join a channel')).toBeInTheDocument()
+    expect(screen.getByText('Start/Stop listening')).toBeInTheDocument()
+    expect(screen.getByText('Broadcast a message')).toBeInTheDocument()
+    expect(screen.getByText('Copy selected message')).toBeInTheDocument()
+    expect(screen.queryByText('realtime-inspector')).not.toBeInTheDocument()
   })
 
   it('uses human labels for active surface shortcut groups', async () => {
