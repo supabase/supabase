@@ -16,7 +16,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
-import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
+import {
+  ReadReplicasWarning,
+  ValidationErrorsWarning,
+  ValidationWarningsAdmonition,
+} from './UpgradeWarnings'
 import { NoticeBar } from '@/components/interfaces/DiskManagement/ui/NoticeBar'
 import {
   ScaffoldContainer,
@@ -229,6 +233,10 @@ export const InfrastructureInfo = () => {
 
                     {showDatabaseUpgrades && data && !data.eligible && hasValidationErrors ? (
                       <ValidationErrorsWarning validationErrors={data.validation_errors ?? []} />
+                    ) : null}
+
+                    {showDatabaseUpgrades && data && (data.warnings ?? []).length > 0 ? (
+                      <ValidationWarningsAdmonition warnings={data.warnings ?? []} />
                     ) : null}
                   </>
                 )}
