@@ -8,12 +8,21 @@ execution:
   contexts:
     host:
       backend: native
+    app:
+      backend: container
+      lifecycle: persistent
+      container:
+        image: node:22-bookworm
 toolchains:
   node:
     provider: corepack
     version: ">=22"
     package_managers:
       pnpm: "10.24.0"
+tools:
+  docker:
+    version: "*"
+    required: false
 surfaces:
   www:
     kind: http
@@ -35,6 +44,9 @@ tasks:
   setup:env-www:
     context: host
     description: Create the local www env file from the repository template when missing
+    notes: |
+      This action is idempotent and non-destructive.
+      It only copies `apps/www/.env.local.example` when `apps/www/.env.local` is absent.
     category: setup
     action:
       kind: copy_if_missing
@@ -44,6 +56,9 @@ tasks:
   install:
     context: host
     description: Install monorepo dependencies with pnpm
+    notes: |
+      This is the canonical dependency hydration step for all workflows.
+      Run this first on fresh clones and after lockfile changes.
     category: setup
     run: pnpm install
     requirements:
@@ -54,9 +69,28 @@ tasks:
     depends_on:
       - setup:env-www
     safe_for_agent: true
+  install:app:
+    context: app
+    description: Install monorepo dependencies in the container context
+    notes: |
+      Container-scoped dependency hydration for container-backed workflows.
+      Keeps package manager and runtime resolution anchored to the declared image.
+      Uses Corepack to activate the contract-pinned pnpm version inside the container path.
+    category: setup
+    run: corepack prepare pnpm@10.24.0 --activate && corepack pnpm install
+    requirements:
+      toolchains:
+        - node
+      tools:
+        docker: "*"
+    depends_on:
+      - setup:env-www
+    safe_for_agent: true
   build:
     context: host
     description: Build all workspaces
+    notes: |
+      Use this for cross-workspace verification before CI-facing changes.
     category: build
     run: pnpm build
     requirements:
@@ -72,6 +106,8 @@ tasks:
   dev:www:
     context: host
     description: Run the main site development server
+    notes: |
+      Canonical local site frontend run task (`www` surface on port 3000).
     category: dev
     run: pnpm dev:www
     requirements:
@@ -91,6 +127,9 @@ tasks:
   dev:docs:
     context: host
     description: Run docs development server
+    notes: |
+      Focused docs run task (`docs` surface on port 3001).
+      Prefer this for docs-only edits to keep iteration tight.
     category: dev
     run: pnpm dev:docs
     requirements:
@@ -107,11 +146,66 @@ tasks:
       kind: service
       surfaces:
         - docs
+  dev:www:app:
+    context: app
+    description: Run the main site development server in the container context
+    notes: |
+      Container-backed variant of `dev:www` for deterministic runtime parity in CI and local container workflows.
+    category: dev
+    run: corepack prepare pnpm@10.24.0 --activate && corepack pnpm dev:www
+    requirements:
+      toolchains:
+        - node
+      tools:
+        docker: "*"
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install:app
+    safe_for_agent: true
+    runtime:
+      kind: service
+      surfaces:
+        www:
+          bind:
+            address: 0.0.0.0
+          project:
+            host:
+              primary: true
+  dev:docs:app:
+    context: app
+    description: Run docs development server in the container context
+    notes: |
+      Container-backed variant of `dev:docs` for docs-focused container execution paths.
+    category: dev
+    run: corepack prepare pnpm@10.24.0 --activate && corepack pnpm dev:docs
+    requirements:
+      toolchains:
+        - node
+      tools:
+        docker: "*"
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install:app
+    safe_for_agent: true
+    runtime:
+      kind: service
+      surfaces:
+        docs:
+          bind:
+            address: 0.0.0.0
+          project:
+            host:
+              primary: true
 workflows:
   default: app
   app:
     intent: local_development
     description: Canonical local development workflow for supabase.com
+    notes: |
+      Use this as the primary front door.
+      It prepares local env state, installs dependencies, and runs the main site surface.
     prepare:
       task: setup:env-www
     setup:
@@ -126,6 +220,8 @@ workflows:
   docs:
     intent: docs_development
     description: Selective docs development workflow
+    notes: |
+      Use this for docs-only work when the full app workflow is unnecessary.
     setup:
       task: install
     run:
@@ -138,8 +234,54 @@ workflows:
   instant:
     intent: quickstart
     description: Fast local site startup through the web development server
+    notes: |
+      Optimized for quick readiness checks and smoke paths.
+      It targets fast startup by running `dev:www` directly.
     run:
       task: dev:www
+    readiness:
+      surfaces:
+        - www
+    exposes:
+      - surface: www
+  app:container:
+    intent: local_development
+    description: Container-backed canonical local development workflow for supabase.com
+    notes: |
+      Use this when you want the runtime path to execute inside the declared container image.
+      This keeps readiness and run behavior tied to one container execution context.
+    prepare:
+      task: setup:env-www
+    setup:
+      task: install:app
+    run:
+      task: dev:www:app
+    readiness:
+      surfaces:
+        - www
+    exposes:
+      - surface: www
+  docs:container:
+    intent: docs_development
+    description: Container-backed selective docs development workflow
+    notes: |
+      Use this for docs-focused container runs when host-native execution is not desired.
+    setup:
+      task: install:app
+    run:
+      task: dev:docs:app
+    readiness:
+      surfaces:
+        - docs
+    exposes:
+      - surface: docs
+  instant:container:
+    intent: quickstart
+    description: Fast container-backed site startup through the web development server
+    notes: |
+      Optimized container quickstart path for runtime proof and smoke verification.
+    run:
+      task: dev:www:app
     readiness:
       surfaces:
         - www
@@ -158,9 +300,12 @@ agent:
   safe_tasks:
     - setup:env-www
     - install
+    - install:app
     - build
     - dev:www
     - dev:docs
+    - dev:www:app
+    - dev:docs:app
   verify_after_changes:
     - build
   writable_paths:
@@ -184,3 +329,5 @@ agent:
   notes: |
     Supabase is a large pnpm monorepo.
     Use `app` for the canonical site development loop and `docs` for docs-only changes.
+    Use `instant` for fast readiness/smoke validation when a full workflow path is unnecessary.
+    Use `app:container` / `docs:container` / `instant:container` for container-backed execution paths.

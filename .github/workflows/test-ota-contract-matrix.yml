@@ -246,3 +246,138 @@ jobs:
             ota-proof-app.json
             .ota/
           retention-days: 7
+
+  container:
+    name: Ota Contract Matrix (Container - ${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ubuntu-docker
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup ota (source branch)
+        shell: bash
+        run: |
+          curl -fsSL https://dist.ota.run/install.sh | sh -s -- --from-git --setup-path
+
+      - name: Verify ota install
+        shell: bash
+        run: ota --version
+
+      - name: Verify Docker engine availability
+        id: docker_available
+        shell: bash
+        run: |
+          docker --version
+          docker info
+
+      - name: Validate contract
+        id: validate_contract
+        shell: bash
+        run: |
+          ota validate --json . > ota-validate-container.json
+          ota validate .
+
+      - name: List app:container workflow tasks
+        id: tasks_app_container
+        shell: bash
+        run: ota tasks --workflow app:container .
+
+      - name: List docs:container workflow tasks
+        id: tasks_docs_container
+        shell: bash
+        run: ota tasks --workflow docs:container .
+
+      - name: List instant:container workflow tasks
+        id: tasks_instant_container
+        shell: bash
+        run: ota tasks --workflow instant:container .
+
+      - name: Export execution topology
+        id: topology_container
+        shell: bash
+        run: |
+          ota execution topology --json . > ota-execution-topology-container.json
+          cat ota-execution-topology-container.json
+
+      - name: Container dry-run preview (app:container)
+        id: dry_run_app_container
+        shell: bash
+        run: ota up --workflow app:container --mode container --dry-run .
+
+      - name: Container dry-run preview (docs:container)
+        id: dry_run_docs_container
+        shell: bash
+        run: ota up --workflow docs:container --mode container --dry-run .
+
+      - name: Container dry-run preview (instant:container)
+        id: dry_run_instant_container
+        shell: bash
+        run: ota up --workflow instant:container --mode container --dry-run .
+
+      - name: Proof instant:container workflow (readiness + annotations)
+        id: proof_instant_container
+        uses: ota-run/action@5c16ae2d2d9de605059f22c3f8e90dba1b29e833 # v1
+        with:
+          command: proof
+          path: .
+          workflow: instant:container
+          execution-mode: container
+          install: never
+          annotate: true
+          max-annotations: 20
+          comment-pr: false
+          fail-on-error: true
+          output-path: ota-proof-instant-container.json
+
+      - name: Ota container matrix summary
+        if: ${{ always() }}
+        shell: bash
+        env:
+          MATRIX_NAME: ${{ matrix.name }}
+          DOCKER_AVAILABLE: ${{ steps.docker_available.outcome }}
+          VALIDATE: ${{ steps.validate_contract.outcome }}
+          TASKS_APP: ${{ steps.tasks_app_container.outcome }}
+          TASKS_DOCS: ${{ steps.tasks_docs_container.outcome }}
+          TASKS_INSTANT: ${{ steps.tasks_instant_container.outcome }}
+          TOPOLOGY: ${{ steps.topology_container.outcome }}
+          DRY_RUN_APP: ${{ steps.dry_run_app_container.outcome }}
+          DRY_RUN_DOCS: ${{ steps.dry_run_docs_container.outcome }}
+          DRY_RUN_INSTANT: ${{ steps.dry_run_instant_container.outcome }}
+          PROOF_INSTANT: ${{ steps.proof_instant_container.outcome }}
+        run: |
+          {
+            echo "## Ota Contract Matrix Summary (${MATRIX_NAME})"
+            echo
+            echo "| Phase | Outcome |"
+            echo "| --- | --- |"
+            echo "| Docker availability | ${DOCKER_AVAILABLE} |"
+            echo "| Validate contract | ${VALIDATE} |"
+            echo "| List app:container tasks | ${TASKS_APP} |"
+            echo "| List docs:container tasks | ${TASKS_DOCS} |"
+            echo "| List instant:container tasks | ${TASKS_INSTANT} |"
+            echo "| Export topology | ${TOPOLOGY} |"
+            echo "| Dry-run app:container | ${DRY_RUN_APP} |"
+            echo "| Dry-run docs:container | ${DRY_RUN_DOCS} |"
+            echo "| Dry-run instant:container | ${DRY_RUN_INSTANT} |"
+            echo "| Proof instant:container | ${PROOF_INSTANT} |"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload container failure artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: ota-contract-matrix-container-${{ matrix.name }}
+          path: |
+            ota-validate-container.json
+            ota-execution-topology-container.json
+            ota-proof-instant-container.json
+            .ota/
+          retention-days: 7
