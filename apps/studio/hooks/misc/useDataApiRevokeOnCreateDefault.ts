@@ -26,7 +26,7 @@ export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
 
 type DefaultPrivilegesExposureOptions =
   | { surface: 'main'; dataApiEnabled: boolean }
-  | { surface: 'vercel' }
+  | { surface: 'vercel'; orgSlug: string | undefined }
 
 /**
  * Fires `project_creation_default_privileges_exposed` once per mount after both
@@ -47,6 +47,7 @@ export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExpo
 
   const { surface } = options
   const dataApiEnabled = options.surface === 'main' ? options.dataApiEnabled : null
+  const orgSlug = options.surface === 'vercel' ? options.orgSlug : undefined
 
   // Mark ready once org_count appears on the SDK person. A /flags/ response
   // received after our identify will have included org_count in the evaluation,
@@ -67,11 +68,16 @@ export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExpo
     if (hasTracked.current) return
     if (flag === undefined) return
     if (!orgCountReady) return
+    if (surface === 'vercel' && !orgSlug) return
     hasTracked.current = true
-    track('project_creation_default_privileges_exposed', {
-      surface,
-      ...(dataApiEnabled !== null && { dataApiEnabled }),
-      dataApiRevokeOnCreateDefaultEnabled: flag,
-    })
-  }, [flag, orgCountReady, track, surface, dataApiEnabled])
+    track(
+      'project_creation_default_privileges_exposed',
+      {
+        surface,
+        ...(dataApiEnabled !== null && { dataApiEnabled }),
+        dataApiRevokeOnCreateDefaultEnabled: flag,
+      },
+      surface === 'vercel' ? { organization: orgSlug } : undefined
+    )
+  }, [flag, orgCountReady, track, surface, dataApiEnabled, orgSlug])
 }

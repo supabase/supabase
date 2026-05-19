@@ -32,7 +32,7 @@ export const StripeSyncSettingsPage = () => {
     return (
       <PageContainer className="mx-0">
         <PageSection>
-          <Admonition type="default" title="Stripe Sync Engine is not installed" />
+          <Admonition type="default" description="Stripe Sync Engine is not installed." />
         </PageSection>
       </PageContainer>
     )

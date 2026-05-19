@@ -28,7 +28,7 @@ export const EnableIndexAdvisorButton = () => {
         type="primary"
         onClick={() => {
           setIsDialogOpen(true)
-          track('index_advisor_banner_enable_button_clicked')
+          track('index_advisor_enable_button_clicked', { origin: 'banner' })
         }}
       >
         Enable
@@ -112,7 +112,7 @@ export const EnableIndexAdvisorDialog = ({
             onClick={(e) => {
               e.preventDefault()
               onEnableIndexAdvisor()
-              track('index_advisor_dialog_enable_button_clicked')
+              track('index_advisor_enable_button_clicked', { origin: 'dialog' })
             }}
             disabled={isEnablingExtension}
           >
