@@ -31,7 +31,7 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 |---|---|---|
 | Studio (Dashboard) | `supabase/studio` | [supabase/supabase – apps/studio](https://github.com/supabase/supabase/tree/master/apps/studio) |
 | Auth | `supabase/gotrue` | [supabase/auth](https://github.com/supabase/auth) |
-| REST | `postgrest/postgrest` | [PostgREST/postgrest](https://github.com/PostgREST/postgrest) |
+| PostgREST | `postgrest/postgrest` | [PostgREST/postgrest](https://github.com/PostgREST/postgrest) |
 | Realtime | `supabase/realtime` | [supabase/realtime](https://github.com/supabase/realtime) |
 | Storage | `supabase/storage-api` | [supabase/storage](https://github.com/supabase/storage) |
 | Edge Functions | `supabase/edge-runtime` | [supabase/edge-runtime](https://github.com/supabase/edge-runtime) |
@@ -41,15 +41,15 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 
 ## Table of contents
 
-- [Studio (Dashboard)](#studio-dashboard)
-- [Auth (gotrue)](#auth-gotrue)
-- [REST (PostgREST)](#rest-postgrest)
+- [Studio (Dashboard)](#studio)
+- [Auth (GoTrue)](#auth)
+- [PostgREST](#postgrest)
 - [Realtime](#realtime)
-- [Storage (storage-api)](#storage-storage-api)
-- [Edge Functions (edge-runtime)](#edge-functions-edge-runtime)
-- [Analytics (Logflare)](#analytics-logflare)
-- [Postgres (supabase/postgres)](#postgres-supabasepostgres)
-- [Supavisor (Pooler)](#supavisor-pooler)
+- [Storage](#storage)
+- [Edge Functions](#edge-functions)
+- [Analytics (Logflare)](#analytics)
+- [Postgres (supabase/postgres)](#postgres)
+- [Supavisor](#supavisor)
 
 ---
 
@@ -142,7 +142,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 
 ---
 
-## Auth (gotrue)
+## Auth
 
 > Auth (gotrue) uses Go's [envconfig](https://github.com/kelseyhightower/envconfig) library - the env var names are programmatically derived from the `Configuration` struct in `internal/conf/configuration.go` by combining the `GOTRUE_` prefix with each nested struct's path. Aliased fields are reachable via two names: the prefixed form (`GOTRUE_API_API_EXTERNAL_URL`) and a bare-name fallback (`API_EXTERNAL_URL`).
 
@@ -756,7 +756,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ---
 
-## REST (PostgREST)
+## PostgREST
 
 | Variable | Description | CLI | Self-hosted | Notes |
 |---|---|---|---|---|
@@ -909,7 +909,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ---
 
-## Storage (storage-api)
+## Storage
 
 ### Server
 
@@ -1138,7 +1138,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ---
 
-## Edge Functions (edge-runtime)
+## Edge Functions
 
 | Variable | Description | CLI | Self-hosted | Notes |
 |---|---|---|---|---|
@@ -1205,7 +1205,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ---
 
-## Analytics (Logflare)
+## Analytics
 
 > The `analytics` container runs `supabase/logflare`, an Elixir/Phoenix application. Almost all runtime env reads live in `config/runtime.exs`. Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.yml`. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
 
@@ -1311,7 +1311,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ---
 
-## Postgres (supabase/postgres)
+## Postgres
 
 > The `db` container runs the `supabase/postgres` image, a fork of the official `postgres` image that adds Supabase-specific extensions (`pgsodium`, `pg_graphql`, `pgjwt`, etc.), default roles, and seed migrations. Most variables are inherited from the upstream `postgres` image and read by its `docker-entrypoint.sh` on first boot (initdb). A few are added by the Supabase fork or by init SQL that the self-hosted compose mounts into `/docker-entrypoint-initdb.d/init-scripts/`.
 
@@ -1351,7 +1351,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ---
 
-## Supavisor (Pooler)
+## Supavisor
 
 | Variable | Description | CLI | Self-hosted | Notes |
 |---|---|---|---|---|
