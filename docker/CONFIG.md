@@ -16,7 +16,7 @@ This document is the aggregated reference for environment variables relevant to 
 The Type column was derived from each service's parse-site code (Go struct fields, TypeScript conversions, Elixir parse calls, Rust `clap` declarations). The Description column is best-effort and was cross-checked against upstream prose where a fresh, trusted source exists:
 
 - **Auth** - against [supabase/auth](https://github.com/supabase/auth) `README.md` (which documents ~50 vars; the rest are documented from code reads)
-- **PostgREST** - against [postgrest.org/en/stable](postgrest.org/en/stable)
+- **PostgREST** - against [postgrest.org/en/stable](https://postgrest.org/en/stable)
 - **Realtime** - against [supabase/realtime](https://github.com/supabase/realtime) `ENVS.md`
 - **Storage** - against the Supabase docs YAML spec at `apps/docs/spec/storage_v0_config.yaml` for the 18 vars it covers; otherwise from code reads
 - **Analytics (Logflare)** - against the Supabase docs YAML spec at `apps/docs/spec/analytics_v0_config.yaml` (6 vars) and [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/) for the rest, with [logflare/logflare](https://github.com/logflare/logflare) `config/runtime.exs` and `config/config.exs` used as tiebreakers
@@ -32,7 +32,7 @@ Each table has five columns:
 |---|---|
 | **Variable** | Exact env var name as the service's code reads it. Names are case-sensitive. |
 | **Type** | Closed vocabulary: `string`, `integer`, `number`, `boolean`, `JSON`, `enum`, `URL`, `path`, `JWT`, `JWKS`. Numeric forms carry a unit hint where one applies - e.g. `integer (seconds)`, `integer (ms)`, `integer (bytes)`, `integer (MB)`, `integer (count)`, `number (ratio)`. String forms with a semantic hint: `string (duration)` (Go `time.Duration` strings like `10s`, `5m`, distinct from `integer (seconds)`), `string (regex)`, `string (CSV)`. |
-| **Set by** | `Both` if the variable is set both inside the corresponding container when you run `supabase start` (see the [Local development & CLI](https://supabase.com/docs/guides/local-development)) *and* in `docker/docker-compose.yml` / `docker/.env.example`. `Self-hosted` if only in the self-hosted compose/.env (including inside commented-out lines). `CLI` if only in the CLI runtime env. Blank if neither - the variable is documented because the service's code reads it, but no Supabase-side config pre-wires it. |
+| **Set by** | `Both` if the variable is set inside the corresponding container when you run `supabase start` (see the [Local development & CLI](https://supabase.com/docs/guides/local-development)) *and* in `docker/docker-compose.yml` / `docker/.env.example`. `Self-hosted` if only in the self-hosted compose/.env (including inside commented-out lines). `CLI` if only in the CLI runtime env. Blank if neither - the variable is documented because the service's code reads it, but no Supabase-side config pre-wires it. |
 | **Description** | What the variable controls. |
 | **Notes** | Default value, requirement, deprecation, alias, or scope. |
 
@@ -142,7 +142,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `OPENAI_API_KEY` | string | Both | OpenAI API key used by the AI Assistant and SQL generator. | Required for AI features in self-hosted Studio. Optional; AI panel is disabled if unset. |
+| `OPENAI_API_KEY` | string | Both | OpenAI API key used by the AI Assistant and SQL generator. | Optional; AI panel is disabled if unset. |
 
 ### Edge Functions / Snippets management
 
@@ -1048,20 +1048,20 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `STORAGE_S3_PRIVATE_ASSET_ENDPOINT` | URL |  | Endpoint used only when signing private source URLs for internal consumers (e.g. imgproxy). | Optional |
 | `STORAGE_S3_REGION` | string | CLI | AWS region for the S3 backend; falls back to `REGION`. | Required when `STORAGE_BACKEND=s3` |
 | `STORAGE_S3_UPLOAD_QUEUE_SIZE` | integer |  | Concurrent part uploads per multipart object. | Default: `2` |
-| `FILE_STORAGE_BACKEND_PATH` | path | Both | Filesystem path for the `file` backend; legacy alias for `STORAGE_FILE_BACKEND_PATH`. | Required when `STORAGE_BACKEND=file` |
 
 ### File backend
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `FILE_STORAGE_BACKEND_PATH` | path | Both | Filesystem path for the `file` backend; legacy alias for `STORAGE_FILE_BACKEND_PATH`. | Required when `STORAGE_BACKEND=file` |
 | `STORAGE_FILE_BACKEND_PATH` | path |  | Filesystem directory used by the `file` backend. | Required when `STORAGE_BACKEND=file` |
 | `STORAGE_FILE_ETAG_ALGORITHM` | enum |  | ETag algorithm for the `file` backend: `md5` or `mtime`. | Default: `md5` |
-| `ENABLE_IMAGE_TRANSFORMATION` | boolean | Both | Legacy alias for `IMAGE_TRANSFORMATION_ENABLED`. | Default: `false` |
 
 ### Image transformation
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `ENABLE_IMAGE_TRANSFORMATION` | boolean | Both | Legacy alias for `IMAGE_TRANSFORMATION_ENABLED`. | Default: `false` |
 | `IMAGE_TRANSFORMATION_ENABLED` | boolean |  | Enable image rendering via imgproxy. | Default: `false` |
 | `IMAGE_TRANSFORMATION_LIMIT_MAX_SIZE` | integer |  | Max requested dimension (px) for transformations. | Default: `2000` |
 | `IMAGE_TRANSFORMATION_LIMIT_MIN_SIZE` | integer |  | Min requested dimension (px) for transformations. | Default: `1` |
@@ -1071,12 +1071,12 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `IMGPROXY_URL` | URL | Both | imgproxy base URL. | Required when image transformation is enabled |
 | `IMG_LIMITS_MAX_SIZE` | integer |  | Legacy alias for `IMAGE_TRANSFORMATION_LIMIT_MAX_SIZE`. | Default: `2000` |
 | `IMG_LIMITS_MIN_SIZE` | integer |  | Legacy alias for `IMAGE_TRANSFORMATION_LIMIT_MIN_SIZE`. | Default: `1` |
-| `FILE_SIZE_LIMIT` | integer (bytes) | Both | Maximum upload file size; legacy alias for `UPLOAD_FILE_SIZE_LIMIT`. | Required |
 
 ### Upload limits
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `FILE_SIZE_LIMIT` | integer (bytes) | Both | Maximum upload file size; legacy alias for `UPLOAD_FILE_SIZE_LIMIT`. | Required |
 | `FILE_SIZE_LIMIT_STANDARD_UPLOAD` | integer (bytes) |  | Legacy alias for `UPLOAD_FILE_SIZE_LIMIT_STANDARD`. | Default: `0` (disabled) |
 | `SIGNED_UPLOAD_URL_EXPIRATION_TIME` | integer (seconds) | CLI | Legacy alias for `UPLOAD_SIGNED_URL_EXPIRATION_TIME`. | Default: `60` |
 | `TUS_ALLOW_S3_TAGS` | boolean |  | Propagate user metadata as S3 tags during TUS uploads. | Default: `true` |
@@ -1089,12 +1089,12 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `UPLOAD_FILE_SIZE_LIMIT` | integer (bytes) | CLI | Max upload size in bytes. | Required |
 | `UPLOAD_FILE_SIZE_LIMIT_STANDARD` | integer (bytes) | CLI | Max size in bytes for non-resumable uploads. | Default: `0` (disabled) |
 | `UPLOAD_SIGNED_URL_EXPIRATION_TIME` | integer (seconds) |  | Default lifetime (seconds) of signed upload URLs. | Default: `60` |
-| `ENABLE_RATE_LIMITER` | boolean |  | Legacy alias for `RATE_LIMITER_ENABLED`. | Default: `false` |
 
 ### Rate limiting
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `ENABLE_RATE_LIMITER` | boolean |  | Legacy alias for `RATE_LIMITER_ENABLED`. | Default: `false` |
 | `RATE_LIMITER_DRIVER` | enum |  | Rate limiter backend: `memory` or `redis`. | Default: `memory` |
 | `RATE_LIMITER_ENABLED` | boolean |  | Enable the image-transformation rate limiter. | Default: `false` |
 | `RATE_LIMITER_REDIS_COMMAND_TIMEOUT` | integer (seconds) |  | Per-command timeout (seconds) when using the Redis driver. | Default: `2` |
@@ -1102,20 +1102,20 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `RATE_LIMITER_REDIS_URL` | URL |  | Redis connection URL. | Required when `RATE_LIMITER_DRIVER=redis` |
 | `RATE_LIMITER_RENDER_PATH_MAX_REQ_SEC` | integer |  | Max requests per second on render paths. | Default: `5` |
 | `RATE_LIMITER_SKIP_ON_ERROR` | boolean |  | Allow requests through when the rate limiter errors. | Default: `false` |
-| `WEBHOOK_API_KEY` | string |  | Bearer key sent with outbound webhooks. | Optional |
 
 ### Webhook
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `WEBHOOK_API_KEY` | string |  | Bearer key sent with outbound webhooks. | Optional |
 | `WEBHOOK_QUEUE_PULL_INTERVAL` | integer (ms) |  | Polling interval (ms) for the webhook queue. | Default: `700` |
 | `WEBHOOK_URL` | URL |  | Endpoint that receives object events. | Optional |
-| `LOGFLARE_API_KEY` | string |  | Logflare ingest API key. | Required when `LOGFLARE_ENABLED=true` |
 
 ### Logging
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `LOGFLARE_API_KEY` | string |  | Logflare ingest API key. | Required when `LOGFLARE_ENABLED=true` |
 | `LOGFLARE_BATCH_SIZE` | integer |  | Max records per Logflare batch. | Default: `200` |
 | `LOGFLARE_ENABLED` | boolean |  | Forward logs to Logflare. | Default: `false` |
 | `LOGFLARE_SOURCE_TOKEN` | string |  | Logflare source identifier. | Required when `LOGFLARE_ENABLED=true` |
@@ -1137,27 +1137,27 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `TRACING_MODE` | enum |  | Tracing verbosity, e.g. `basic`, `debug`. | Default: `basic` |
 | `TRACING_RETURN_SERVER_TIMINGS` | boolean |  | Return `Server-Timing` response headers. | Default: `false` |
 | `TRACING_SERVER_TIME_MIN_DURATION` | number |  | Min span duration (ms) before it is reported in `Server-Timing`. | Default: `100.0` |
-| `VECTOR_BUCKET_REGION` | string |  | AWS region for vector buckets. | Optional |
-| `VECTOR_ENABLED` | boolean |  | Enable vector bucket support. | Default: `false` |
-| `VECTOR_MAX_BUCKETS` | integer |  | Max vector buckets per tenant. | Default: `10` |
-| `VECTOR_MAX_INDEXES` | integer |  | Max indexes per vector bucket. | Default: `20` |
-| `VECTOR_S3_BUCKETS` | string (CSV) |  | Comma-separated list of S3 buckets backing vector indexes. | Optional |
-| `ADMIN_API_KEY` | string |  | API key used by the bundled `pprof-client` script. | Optional (tooling) |
 
 ### Tenant features (Vector)
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `ADMIN_URL` | URL |  | Admin server URL used by the bundled `pprof-client` script. | Optional (tooling) |
-| `FLAME_SOURCEMAPS_DIRS` | string |  | Sourcemap directories used by the flamegraph tool. | Default: `dist` |
-| `PPROF_FLAME_MD_FORMAT` | boolean |  | Markdown format flag for the pprof flamegraph script. | Optional (tooling) |
-| `PPROF_GENERATE_FLAME` | boolean |  | Generate a flamegraph from a captured pprof profile. | Optional (tooling) |
-| `PPROF_NODE_MODULES_SOURCE_MAPS` | boolean |  | Include `node_modules` sourcemaps in flame output. | Optional (tooling) |
+| `VECTOR_BUCKET_REGION` | string |  | AWS region for vector buckets. | Optional |
+| `VECTOR_ENABLED` | boolean |  | Enable vector bucket support. | Default: `false` |
+| `VECTOR_MAX_BUCKETS` | integer |  | Max vector buckets per tenant. | Default: `10` |
+| `VECTOR_MAX_INDEXES` | integer |  | Max indexes per vector bucket. | Default: `20` |
+| `VECTOR_S3_BUCKETS` | string (CSV) |  | Comma-separated list of S3 buckets backing vector indexes. | Optional |
 
 ### Other (tooling)
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
+| `ADMIN_API_KEY` | string |  | API key used by the bundled `pprof-client` script. | Optional (tooling) |
+| `ADMIN_URL` | URL |  | Admin server URL used by the bundled `pprof-client` script. | Optional (tooling) |
+| `FLAME_SOURCEMAPS_DIRS` | string |  | Sourcemap directories used by the flamegraph tool. | Default: `dist` |
+| `PPROF_FLAME_MD_FORMAT` | boolean |  | Markdown format flag for the pprof flamegraph script. | Optional (tooling) |
+| `PPROF_GENERATE_FLAME` | boolean |  | Generate a flamegraph from a captured pprof profile. | Optional (tooling) |
+| `PPROF_NODE_MODULES_SOURCE_MAPS` | boolean |  | Include `node_modules` sourcemaps in flame output. | Optional (tooling) |
 | `PPROF_OUTPUT` | path |  | Output path for the pprof script. | Optional (tooling) |
 | `PPROF_SECONDS` | integer |  | Profile duration (seconds) for the pprof script. | Optional (tooling) |
 | `PPROF_SOURCE_MAPS` | boolean |  | Use sourcemaps when symbolicating pprof output. | Optional (tooling) |
@@ -1361,7 +1361,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ### libpq client variables (read by Supabase migration scripts on init)
 
-> The Supabase image's `migrations/db/migrate.sh` runs at first boot and reads the standard libpq env vars rather than the `POSTGRES_*` ones. The compose file sets both so both the entrypoint and the migration runner work.
+> The Supabase image's `migrations/db/migrate.sh` runs at first boot and reads the standard libpq env vars rather than the `POSTGRES_*` ones. The compose file sets both so the entrypoint and the migration runner both work.
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
