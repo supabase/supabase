@@ -12,7 +12,6 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -89,11 +88,8 @@ export const useUnifiedLogsPreview = () => {
   const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading: isOrgLoading } =
-    useIsEnterpriseOrSupabaseOrg()
-
-  const isLoading = !flagsHaveLoaded || isOrgLoading
-  const isEligible = unifiedLogsEnabled || isEnterpriseOrSupabaseOrg
+  const isLoading = !flagsHaveLoaded
+  const isEligible = unifiedLogsEnabled
   const isEnabled = isEligible && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
