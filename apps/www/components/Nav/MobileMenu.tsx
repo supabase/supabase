@@ -1,16 +1,16 @@
 'use client'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import SupabaseWordmark from './SupabaseWordmark'
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { Accordion, Button } from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import MenuItem from './MenuItem'
+import SupabaseWordmark from './SupabaseWordmark'
 import staticContent from '@/.generated/staticContent/_index.json'
 import ProductModulesData from '@/data/ProductModules'
 import { DEFAULT_EASE } from '@/lib/animations'
@@ -51,7 +51,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
   }, [setOpen])
 
   const AccordionMenuItem = ({ menuItem }: any) => (
-    <>
+    <AccordionContent className="p-0">
       {menuItem.title === 'Product' ? (
         <>
           {Object.values(menuItem.subMenu)?.map((component: any) => (
@@ -165,28 +165,20 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
           ))}
         </div>
       ) : null}
-    </>
+    </AccordionContent>
   )
 
   const Menu = () => (
-    <Accordion
-      type="default"
-      openBehaviour="multiple"
-      size="large"
-      className="space-y-1"
-      justified
-      chevronAlign="right"
-    >
+    <Accordion type="multiple" className="px-0">
       {menu.primaryNav.map((menuItem: any) => (
-        <m.div variants={listItem} className="border-b [&>div]:rounded-none!" key={menuItem.title}>
+        <m.div variants={listItem} className="border-b [&>div]:rounded-none!">
           {menuItem.hasDropdown ? (
-            <Accordion.Item
-              header={menuItem.title}
-              id={menuItem.title}
-              className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200"
-            >
+            <AccordionItem id={menuItem.title} value={menuItem.title} className="border-none">
+              <AccordionTrigger className="py-2 pl-2 pr-4 text-base font-medium text-foreground hover:bg-surface-200">
+                {menuItem.title}
+              </AccordionTrigger>
               <AccordionMenuItem menuItem={menuItem} />
-            </Accordion.Item>
+            </AccordionItem>
           ) : (
             <Link
               href={menuItem.url}

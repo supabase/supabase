@@ -139,7 +139,7 @@ export type KeyboardNavigationConfig = {
   activeInput: ActiveInputState
   setActiveInput: (input: ActiveInputState) => void
   activeFilters: FilterGroup
-  onFilterChange: (filters: FilterGroup) => void
+  commitFilters: (filters: FilterGroup) => void
   highlightedConditionPath: ConditionPath | null
   setHighlightedConditionPath: (path: ConditionPath | null) => void
 }

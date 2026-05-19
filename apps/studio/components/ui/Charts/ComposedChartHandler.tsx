@@ -357,7 +357,7 @@ const useAttributeQueries = (
   )
 
   const referenceLineQueries = referenceLines.map((line) => {
-    let value = line.value || 0
+    let value = line.value ?? line.customValue ?? 0
 
     return {
       data: {
