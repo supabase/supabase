@@ -70,6 +70,22 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
+        "Create a public Storage bucket named avatars for profile pictures. It only needs public read access; users shouldn't need signed URLs to view images.",
+    },
+    expected: {
+      requiredTools: ['execute_sql'],
+      correctAnswer:
+        'Create the avatars Storage bucket as public, such as by setting storage.buckets.public = true or using a Storage API call with public: true. Do not add a broad SELECT policy on storage.objects for public read access, because public buckets already allow object URL reads and broad SELECT policies can make bucket contents listable.',
+    },
+    metadata: {
+      category: ['rls_policies'],
+      description:
+        'Verifies the assistant does not add a Storage SELECT policy for public read access on a public bucket.',
+    },
+  },
+  {
+    input: {
+      prompt:
         'Show me customer name, order date, order, and user from the order history table in MySchema where order is not null',
       mockTables: {
         MySchema: [
