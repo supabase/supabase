@@ -41,6 +41,10 @@ export function ComponentPreview({
   const Code = Codes[index]
 
   const [expand, setExpandState] = React.useState(false)
+  const previewClassName = className
+  const hasPreviewPaddingClass = previewClassName
+    ?.split(/\s+/)
+    .some((value) => /^p[trblxy]?-\d/.test(value))
 
   const Preview = React.useMemo(() => {
     const Component = Index[config.style][name]?.component
@@ -64,11 +68,16 @@ export function ComponentPreview({
     return (
       <>
         <div
-          className={cn('preview flex min-h-[256px] w-full justify-center p-10', {
-            'items-center': align === 'center',
-            'items-start': align === 'start',
-            'items-end': align === 'end',
-          })}
+          className={cn(
+            'preview flex min-h-[256px] w-full justify-center',
+            !hasPreviewPaddingClass && 'p-10',
+            {
+              'items-center': align === 'center',
+              'items-start': align === 'start',
+              'items-end': align === 'end',
+            },
+            previewClassName
+          )}
         >
           <React.Suspense
             fallback={
@@ -80,7 +89,7 @@ export function ComponentPreview({
         </div>
       </>
     )
-  }, [Preview, align])
+  }, [Preview, align, hasPreviewPaddingClass, previewClassName])
 
   const wideClasses = wide ? '2xl:-ml-20 2xl:-mr-20' : ''
 

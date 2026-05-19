@@ -558,6 +558,14 @@
       "import": "./src/PageHeader/index.tsx",
       "types": "./src/PageHeader/index.tsx"
     },
+    "./PageBreadcrumbs": {
+      "import": "./src/PageBreadcrumbs/index.tsx",
+      "types": "./src/PageBreadcrumbs/index.tsx"
+    },
+    "./PageNav": {
+      "import": "./src/PageNav/index.tsx",
+      "types": "./src/PageNav/index.tsx"
+    },
     "./PageSection": {
       "import": "./src/PageSection/index.tsx",
       "types": "./src/PageSection/index.tsx"
