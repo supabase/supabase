@@ -166,6 +166,8 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 
 > Auth (gotrue) uses Go's [envconfig](https://github.com/kelseyhightower/envconfig) library - the env var names are programmatically derived from the `Configuration` struct in `internal/conf/configuration.go` by combining the `GOTRUE_` prefix with each nested struct's path. Aliased fields are reachable via two names: the prefixed form (`GOTRUE_API_API_EXTERNAL_URL`) and a bare-name fallback (`API_EXTERNAL_URL`).
 
+> Auth's upstream `README.md` documents many of these variables with additional prose context - operator/Netlify history, default email-template bodies, OAuth provider examples, glob-matching syntax. The rows below stay reference-style; for prose backstory and template defaults, see [supabase/auth README.md](https://github.com/supabase/auth/blob/master/README.md).
+
 ### API
 
 | Variable | Type | Set by | Description | Notes |
@@ -252,7 +254,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `GOTRUE_SMTP_MAX_FREQUENCY` | string (duration) | Both | Minimum interval between emails per address. | Default: `1m`, commented out in compose |
 | `GOTRUE_SMTP_PASS` | string | Self-hosted | SMTP password. |  |
 | `GOTRUE_SMTP_PORT` | integer | Both | SMTP relay port. | Default: `587` |
-| `GOTRUE_SMTP_SENDER_NAME` | string | Both | From name displayed on emails. |  |
+| `GOTRUE_SMTP_SENDER_NAME` | string | Both | From name displayed on emails. Falls back to `GOTRUE_SMTP_ADMIN_EMAIL` when unset. |  |
 | `GOTRUE_SMTP_USER` | string | Self-hosted | SMTP username. |  |
 
 ### Mailer notifications / subjects / templates / URL paths
@@ -346,7 +348,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_EXTERNAL_DISCORD_SKIP_NONCE_CHECK` | boolean |  | Skip OIDC nonce check for Discord. |  |
 | `GOTRUE_EXTERNAL_DISCORD_URL` | URL |  | Override Discord OAuth base URL. |  |
 | `GOTRUE_EXTERNAL_EMAIL_AUTHORIZED_ADDRESSES` | string (CSV) |  | Restrict email signup to a list of allowed addresses/domains. |  |
-| `GOTRUE_EXTERNAL_EMAIL_ENABLED` | boolean | Both | Enable email/password authentication. | Default: `true` |
+| `GOTRUE_EXTERNAL_EMAIL_ENABLED` | boolean | Both | Enable email/password authentication. When disabled, OAuth providers can still be used to sign up / sign in. | Default: `true` |
 | `GOTRUE_EXTERNAL_EMAIL_MAGIC_LINK_ENABLED` | boolean |  | Enable email magic links. | Default: `true` |
 | `GOTRUE_EXTERNAL_FACEBOOK_API_URL` | URL |  | Override Facebook API endpoint. |  |
 | `GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID` | string |  | Facebook OAuth client ID. |  |
@@ -663,8 +665,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED` | boolean | CLI | Allow admins to link identities manually. | Default: `false` |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_ALGORITHM_VERSION` | integer (count) |  | Refresh token algorithm version (0, 1 or 2). |  |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_ALLOW_REUSE` | boolean |  | Allow refresh-token reuse without rotation. |  |
-| `GOTRUE_SECURITY_REFRESH_TOKEN_REUSE_INTERVAL` | integer (seconds) | CLI | Grace period (s) during which a rotated refresh token can be reused. |  |
-| `GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED` | boolean | CLI | Rotate refresh tokens on use. | Default: `true` |
+| `GOTRUE_SECURITY_REFRESH_TOKEN_REUSE_INTERVAL` | integer (seconds) | CLI | Grace period (s) during which the immediately-previous refresh token can be reused (supports concurrency / offline retries). Only applies when rotation is enabled. |  |
+| `GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED` | boolean | CLI | Rotate refresh tokens on use; detects malicious reuse and revokes the offending token's descendants. | Default: `true` |
 | `GOTRUE_SECURITY_REFRESH_TOKEN_UPGRADE_PERCENTAGE` | integer (percent) |  | Percentage of users to upgrade to a newer refresh-token format (0-100). |  |
 | `GOTRUE_SECURITY_SB_FORWARDED_FOR_ENABLED` | boolean |  | Trust the `Sb-Forwarded-For` header. Auth parses the leftmost value as an IP address and uses it for IP tracking and rate limiting. | Default: `false` |
 | `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD` | boolean |  | Require the current password to change a password. |  |
@@ -690,7 +692,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_PASSWORD_HIBP_FAIL_CLOSED` | boolean |  | Reject requests if the HIBP lookup fails. |  |
 | `GOTRUE_PASSWORD_HIBP_USER_AGENT` | string |  | User-Agent sent to the HIBP API. | Default: `https://github.com/supabase/gotrue` |
 | `GOTRUE_PASSWORD_MIN_LENGTH` | integer (count) | CLI | Minimum password length. | Default: `6` |
-| `GOTRUE_PASSWORD_REQUIRED_CHARACTERS` | string | CLI | Colon-separated character classes required in passwords. |  |
+| `GOTRUE_PASSWORD_REQUIRED_CHARACTERS` | string | CLI | Colon-separated character classes; a password must contain at least one character from each set. Escape a literal `:` with `\`. |  |
 
 ### Sessions
 
@@ -725,7 +727,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_LOG_DISABLE_COLORS` | boolean |  | Disable ANSI color in log output. |  |
 | `GOTRUE_LOG_FIELDS` | JSON |  | Static log fields (JSON object) attached to every log line. |  |
 | `GOTRUE_LOG_FILE` | path |  | Path to a file to write logs to. |  |
-| `GOTRUE_LOG_LEVEL` | string |  | Logger level (`debug`, `info`, `warn`, `error`). |  |
+| `GOTRUE_LOG_LEVEL` | string |  | Logger level (`panic`, `fatal`, `error`, `warn`, `info`, `debug`). |  |
 | `GOTRUE_LOG_QUOTE_EMPTY_FIELDS` | boolean |  | Quote empty log field values. |  |
 | `GOTRUE_LOG_SQL` | string |  | SQL logger configuration. |  |
 | `GOTRUE_LOG_TSFORMAT` | string |  | Timestamp format string for log output. |  |
