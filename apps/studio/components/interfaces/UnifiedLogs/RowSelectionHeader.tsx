@@ -1,7 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Copy, X } from 'lucide-react'
+import { ChevronDown, Copy, X } from 'lucide-react'
 import { toast } from 'sonner'
-import { copyToClipboard } from 'ui'
+import {
+  Button,
+  copyToClipboard,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 
 import { type LogData } from '../Settings/Logs/Logs.types'
 import {
@@ -42,55 +49,68 @@ export const RowSelectionHeader = () => {
   }
 
   return (
-    <AnimatePresence>
-      {selectedRows.length > 0 && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: '40px', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{
-            type: 'spring',
-            stiffness: 420,
-            damping: 30,
-            mass: 0.4,
-          }}
-          className="pl-4 pr-2 flex items-center justify-between border-y"
-          style={{ overflow: 'hidden' }}
-        >
-          <p className="text-xs">
-            {selectedRows.length} row{selectedRows.length > 1 ? 's' : ''} selected
-          </p>
+    <div className="relative">
+      <AnimatePresence>
+        {selectedRows.length > 0 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: '36px', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{
+              type: 'spring',
+              stiffness: 420,
+              damping: 30,
+              mass: 0.4,
+            }}
+            className="pl-4 pr-2 flex items-center justify-between border-t absolute top-0 z-99 bg-surface-75 w-full"
+            style={{ overflow: 'hidden' }}
+          >
+            <p className="text-xs">
+              {selectedRows.length} row{selectedRows.length > 1 ? 's' : ''} selected
+            </p>
 
-          <div className="flex items-center justify-center gap-x-2">
-            <AiAssistantDropdown
-              label="Explain with AI"
-              buildPrompt={() => buildLogsPrompt(selectedRows)}
-              onOpenAssistant={handleOpenAiAssistant}
-              telemetrySource="log_explorer"
-              additionalDropdownItems={[
-                {
-                  label: 'Copy as JSON',
-                  icon: <Copy size={14} />,
-                  onClick: () => onCopy('json'),
-                },
-                {
-                  label: 'Copy as Markdown',
-                  icon: <Copy size={14} />,
-                  onClick: () => onCopy('markdown'),
-                },
-              ]}
-            />
+            <div className="flex items-center justify-center gap-x-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="default"
+                    size="tiny"
+                    icon={<Copy size={12} />}
+                    iconRight={<ChevronDown size={11} />}
+                  >
+                    Copy
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-44">
+                  <DropdownMenuItem onClick={() => onCopy('json')} className="gap-2 text-xs">
+                    <Copy size={13} />
+                    Copy as JSON
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onCopy('markdown')} className="gap-2 text-xs">
+                    <Copy size={13} />
+                    Copy as Markdown
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-            <ButtonTooltip
-              type="text"
-              icon={<X />}
-              className="px-1"
-              onClick={() => table.resetRowSelection()}
-              tooltip={{ content: { side: 'bottom', text: 'Clear selection' } }}
-            />
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+              <AiAssistantDropdown
+                label="Explain with AI"
+                buildPrompt={() => buildLogsPrompt(selectedRows)}
+                onOpenAssistant={handleOpenAiAssistant}
+                telemetrySource="log_explorer"
+              />
+
+              <ButtonTooltip
+                type="text"
+                icon={<X />}
+                className="px-1"
+                onClick={() => table.resetRowSelection()}
+                tooltip={{ content: { side: 'bottom', text: 'Clear selection' } }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
