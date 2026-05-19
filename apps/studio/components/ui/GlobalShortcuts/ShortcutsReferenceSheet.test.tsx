@@ -61,6 +61,7 @@ const ACTIVE_SURFACE_SHORTCUT_IDS = [
   SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST,
   SHORTCUT_IDS.FUNCTION_OVERVIEW_INTERVAL_15MIN,
   SHORTCUT_IDS.FUNCTIONS_LIST_REFRESH,
+  SHORTCUT_IDS.LOGS_PREVIEW_REFRESH,
   SHORTCUT_IDS.SQL_EDITOR_FORMAT,
   SHORTCUT_IDS.STORAGE_BUCKETS_REFRESH,
   SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
@@ -206,6 +207,7 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Edge Function Actions')).toBeInTheDocument()
     expect(screen.getByText('Edge Function Overview')).toBeInTheDocument()
     expect(screen.getByText('Edge Functions')).toBeInTheDocument()
+    expect(screen.getByText('Logs Explorer')).toBeInTheDocument()
     expect(screen.getByText('SQL Editor')).toBeInTheDocument()
     expect(screen.getByText('Storage Buckets')).toBeInTheDocument()
     expect(screen.getByText('Storage File Explorer')).toBeInTheDocument()
@@ -213,6 +215,7 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.queryByText('functions-detail')).not.toBeInTheDocument()
     expect(screen.queryByText('functions-list')).not.toBeInTheDocument()
     expect(screen.queryByText('functions-overview')).not.toBeInTheDocument()
+    expect(screen.queryByText('logs-preview')).not.toBeInTheDocument()
     expect(screen.queryByText('sql-editor')).not.toBeInTheDocument()
     expect(screen.queryByText('storage-buckets')).not.toBeInTheDocument()
     expect(screen.queryByText('storage-explorer')).not.toBeInTheDocument()

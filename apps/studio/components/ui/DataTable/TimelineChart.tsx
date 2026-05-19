@@ -97,7 +97,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
         onMouseLeave={handleMouseUp}
         style={{ cursor: 'crosshair' }}
       >
-        <CartesianGrid vertical={false} />
+        <CartesianGrid vertical={false} horizontal={false} />
         <XAxis
           dataKey={columnId}
           tickLine={false}

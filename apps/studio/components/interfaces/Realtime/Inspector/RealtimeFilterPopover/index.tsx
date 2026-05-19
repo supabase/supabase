@@ -29,12 +29,14 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-interface RealtimeFilterPopoverProps {
+type ControlledOpenProps =
+  | { open: boolean; onOpenChange: (open: boolean) => void }
+  | { open?: undefined; onOpenChange?: undefined }
+
+type RealtimeFilterPopoverProps = {
   config: RealtimeConfig
   onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-}
+} & ControlledOpenProps
 
 export const RealtimeFilterPopover = ({
   config,

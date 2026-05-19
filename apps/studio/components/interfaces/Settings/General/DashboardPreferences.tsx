@@ -96,7 +96,7 @@ export const DashboardPreferences = () => {
         {/* [Joshen] Ideally we're able to persist this for all users in the project, but will need support in our middleware */}
         <Admonition
           type="note"
-          title="These preferences control only your experience in the dashboard. Other members of this project will not be affected"
+          description="These preferences control only your experience in the dashboard. Other members of this project will not be affected."
         />
 
         {isLoading ? (

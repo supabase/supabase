@@ -51,6 +51,7 @@ const GROUP_LABELS: Record<string, string> = {
   'functions-overview': 'Edge Function Overview',
   'inline-editor': 'Inline Editor',
   'list-page': 'List pages',
+  'logs-preview': 'Logs Explorer',
   nav: 'Navigation',
   'operation-queue': 'Operation Queue',
   results: 'Results',

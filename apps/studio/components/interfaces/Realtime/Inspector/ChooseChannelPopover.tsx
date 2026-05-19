@@ -28,12 +28,14 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-interface ChooseChannelPopoverProps {
+type ControlledOpenProps =
+  | { open: boolean; onOpenChange: (open: boolean) => void }
+  | { open?: undefined; onOpenChange?: undefined }
+
+type ChooseChannelPopoverProps = {
   config: RealtimeConfig
   onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-}
+} & ControlledOpenProps
 
 const FormSchema = z.object({ channel: z.string(), isPrivate: z.boolean() })
 

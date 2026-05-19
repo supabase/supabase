@@ -3749,6 +3749,10 @@ export interface components {
             type: 'active_replication_slot'
           }
       )[]
+      warnings: {
+        /** @enum {string} */
+        type: 'pg_graphql_introspection_change'
+      }[]
     }
     ProjectUpgradeInitiateResponse: {
       tracking_id: string

@@ -35,6 +35,7 @@ export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   'functions-overview',
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_REALTIME,
   'realtime-inspector',
+  'logs-preview',
   'nav',
   'ai-assistant',
   'inline-editor',
