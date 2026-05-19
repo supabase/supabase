@@ -1009,14 +1009,14 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `JWT_CACHING_ENABLED` | boolean |  | Cache decoded JWTs in memory to reduce verification cost. | Default: `false` |
 | `JWT_JWKS` | JWKS | Both | JSON Web Key Set used to verify asymmetric JWTs (e.g. ES256). | Optional |
 | `PGRST_JWT_ALGORITHM` | enum |  | Legacy alias for `AUTH_JWT_ALGORITHM`. | Default: `HS256` |
-| `PGRST_JWT_SECRET` | string |  | Legacy alias for `AUTH_JWT_SECRET`. | Required (single-tenant) |
+| `PGRST_JWT_SECRET` | string |  | JWT secret used by Storage to verify Postgres-issued tokens; legacy alias for `AUTH_JWT_SECRET`. | Required (single-tenant) |
 
 ### Auth
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `ANON_KEY` | JWT | Both | Anon JWT served to public clients. Auto-generated from `AUTH_JWT_SECRET` when blank in single-tenant mode. | Required for self-hosted single-tenant |
-| `SERVICE_KEY` | JWT | Both | Service-role JWT. Auto-generated from `AUTH_JWT_SECRET` when blank in single-tenant mode. | Required for self-hosted single-tenant |
+| `SERVICE_KEY` | JWT | Both | Service-role JWT (bypasses Row Level Security). Auto-generated from `AUTH_JWT_SECRET` when blank in single-tenant mode. | Required for self-hosted single-tenant |
 
 ### S3 backend
 
@@ -1024,7 +1024,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 |---|---|---|---|---|
 | `AWS_ACCESS_KEY_ID` | string | Self-hosted | AWS access key id consumed by the AWS SDK to sign S3 requests. | Required when `STORAGE_BACKEND=s3` |
 | `AWS_SECRET_ACCESS_KEY` | string | Self-hosted | AWS secret key consumed by the AWS SDK to sign S3 requests. | Required when `STORAGE_BACKEND=s3` |
-| `GLOBAL_S3_BUCKET` | string | Both | Legacy alias for `STORAGE_S3_BUCKET`. | Required when `STORAGE_BACKEND=s3` |
+| `GLOBAL_S3_BUCKET` | string | Both | S3 bucket name; legacy alias for `STORAGE_S3_BUCKET`. | Required when `STORAGE_BACKEND=s3` |
 | `GLOBAL_S3_ENDPOINT` | URL | Self-hosted | Legacy alias for `STORAGE_S3_ENDPOINT`. | Optional |
 | `GLOBAL_S3_FORCE_PATH_STYLE` | boolean | Self-hosted | Legacy alias for `STORAGE_S3_FORCE_PATH_STYLE`. | Default: `false` |
 | `GLOBAL_S3_MAX_SOCKETS` | integer |  | Legacy alias for `STORAGE_S3_MAX_SOCKETS`. | Default: `200` |
@@ -1048,7 +1048,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `STORAGE_S3_PRIVATE_ASSET_ENDPOINT` | URL |  | Endpoint used only when signing private source URLs for internal consumers (e.g. imgproxy). | Optional |
 | `STORAGE_S3_REGION` | string | CLI | AWS region for the S3 backend; falls back to `REGION`. | Required when `STORAGE_BACKEND=s3` |
 | `STORAGE_S3_UPLOAD_QUEUE_SIZE` | integer |  | Concurrent part uploads per multipart object. | Default: `2` |
-| `FILE_STORAGE_BACKEND_PATH` | path | Both | Legacy alias for `STORAGE_FILE_BACKEND_PATH`. | Required when `STORAGE_BACKEND=file` |
+| `FILE_STORAGE_BACKEND_PATH` | path | Both | Filesystem path for the `file` backend; legacy alias for `STORAGE_FILE_BACKEND_PATH`. | Required when `STORAGE_BACKEND=file` |
 
 ### File backend
 
@@ -1071,7 +1071,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `IMGPROXY_URL` | URL | Both | imgproxy base URL. | Required when image transformation is enabled |
 | `IMG_LIMITS_MAX_SIZE` | integer |  | Legacy alias for `IMAGE_TRANSFORMATION_LIMIT_MAX_SIZE`. | Default: `2000` |
 | `IMG_LIMITS_MIN_SIZE` | integer |  | Legacy alias for `IMAGE_TRANSFORMATION_LIMIT_MIN_SIZE`. | Default: `1` |
-| `FILE_SIZE_LIMIT` | integer (bytes) | Both | Legacy alias for `UPLOAD_FILE_SIZE_LIMIT`. | Required |
+| `FILE_SIZE_LIMIT` | integer (bytes) | Both | Maximum upload file size; legacy alias for `UPLOAD_FILE_SIZE_LIMIT`. | Required |
 
 ### Upload limits
 
@@ -1238,6 +1238,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 > **Heads-up - always-on admin UI:** Logflare's admin pages under `/admin/*` (sources, accounts, cluster view) are reachable by default. `LOGFLARE_SUPABASE_MODE=true` provisions an auto-admin user, and the `/admin/*` routes are gated by an auth pipeline rather than an env var - there is no flag to disable them. If the `analytics` container is exposed beyond your private Docker network, **block** `/admin/*` at the reverse proxy or API gateway level.
 
+> Analytics (Logflare) upstream self-hosting docs: [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/).
+
 ### Self-host mode
 
 | Variable | Type | Set by | Description | Notes |
@@ -1381,6 +1383,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ## Supavisor
 
+> Supavisor's upstream env-var reference is at [supabase/supavisor docs/configuration/env.md](https://github.com/supabase/supavisor/blob/main/docs/configuration/env.md).
+
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `ADDR_TYPE` | enum | | Socket address family for the HTTP endpoint. Must be `inet` or `inet6`. | Default: `inet` |
@@ -1403,8 +1407,8 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `JWT_CLAIM_VALIDATORS` | JSON | | JSON object of additional JWT claims to validate (e.g. `{"iss":"supabase"}`). | Default: `{}` |
 | `LOCATION_ID` | string | | Region identifier used in the libcluster Postgres channel name. Falls back to `REGION` if unset. | Only used when `CLUSTER_POSTGRES` is set |
 | `LOCATION_KEY` | string | | Location label added to logger metadata. Falls back to `region` if unset. | Optional |
-| `LOGFLARE_API_KEY` | string | | Logflare API key. Required when `LOGS_ENGINE=logflare`. | Optional |
-| `LOGFLARE_SOURCE_ID` | string | | Logflare source ID. Required when `LOGS_ENGINE=logflare`. | Optional |
+| `LOGFLARE_API_KEY` | string | | Logflare API key. Required when `LOGS_ENGINE=logflare`. | Required when `LOGS_ENGINE=logflare`; optional otherwise |
+| `LOGFLARE_SOURCE_ID` | string | | Logflare source ID. Required when `LOGS_ENGINE=logflare`. | Required when `LOGS_ENGINE=logflare`; optional otherwise |
 | `LOGS_ENGINE` | string | | Logging backend. Set to `logflare` to enable the Logflare HTTP logger backend. | Optional |
 | `MAX_CONNECTIONS` | integer (count) | | Max concurrent connections accepted by the HTTP endpoint and Ranch proxy listeners. | Default: `1000` (HTTP), `:infinity` (proxy listeners) |
 | `METRICS_DISABLED` | boolean | | If `true`, disables Prometheus metrics children (PromEx, TenantsMetrics, MetricsCleaner). | Default: `false` |
