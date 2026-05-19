@@ -1,0 +1,186 @@
+version: 1
+project:
+  name: supabase
+  description: Supabase monorepo for web, docs, studio, and shared packages
+  type: application
+execution:
+  default_context: host
+  contexts:
+    host:
+      backend: native
+toolchains:
+  node:
+    provider: corepack
+    version: ">=22"
+    package_managers:
+      pnpm: "10.24.0"
+surfaces:
+  www:
+    kind: http
+    port: 3000
+    path: /
+    readiness:
+      kind: http
+      path: /
+      timeout: 10s
+  docs:
+    kind: http
+    port: 3001
+    path: /docs
+    readiness:
+      kind: http
+      path: /docs
+      timeout: 10s
+tasks:
+  setup:env-www:
+    context: host
+    description: Create the local www env file from the repository template when missing
+    category: setup
+    action:
+      kind: copy_if_missing
+      from: apps/www/.env.local.example
+      to: apps/www/.env.local
+    safe_for_agent: true
+  install:
+    context: host
+    description: Install monorepo dependencies with pnpm
+    category: setup
+    run: pnpm install
+    requirements:
+      toolchains:
+        - node
+      tools:
+        pnpm: "10.24.0"
+    depends_on:
+      - setup:env-www
+    safe_for_agent: true
+  build:
+    context: host
+    description: Build all workspaces
+    category: build
+    run: pnpm build
+    requirements:
+      toolchains:
+        - node
+      tools:
+        pnpm: "10.24.0"
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: true
+  dev:www:
+    context: host
+    description: Run the main site development server
+    category: dev
+    run: pnpm dev:www
+    requirements:
+      toolchains:
+        - node
+      tools:
+        pnpm: "10.24.0"
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: true
+    runtime:
+      kind: service
+      surfaces:
+        - www
+  dev:docs:
+    context: host
+    description: Run docs development server
+    category: dev
+    run: pnpm dev:docs
+    requirements:
+      toolchains:
+        - node
+      tools:
+        pnpm: "10.24.0"
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: true
+    runtime:
+      kind: service
+      surfaces:
+        - docs
+workflows:
+  default: app
+  app:
+    intent: local_development
+    description: Canonical local development workflow for supabase.com
+    prepare:
+      task: setup:env-www
+    setup:
+      task: install
+    run:
+      task: dev:www
+    readiness:
+      surfaces:
+        - www
+    exposes:
+      - surface: www
+  docs:
+    intent: docs_development
+    description: Selective docs development workflow
+    setup:
+      task: install
+    run:
+      task: dev:docs
+    readiness:
+      surfaces:
+        - docs
+    exposes:
+      - surface: docs
+  instant:
+    intent: quickstart
+    description: Fast local site startup through the web development server
+    run:
+      task: dev:www
+    readiness:
+      surfaces:
+        - www
+    exposes:
+      - surface: www
+checks:
+  - name: workspace-dependencies-installed
+    kind: file
+    severity: error
+    path: node_modules
+    expect: directory
+    timeout: 10000
+agent:
+  entrypoint: install
+  default_task: dev:www
+  safe_tasks:
+    - setup:env-www
+    - install
+    - build
+    - dev:www
+    - dev:docs
+  verify_after_changes:
+    - build
+  writable_paths:
+    - apps
+    - packages
+    - blocks
+    - examples
+    - i18n
+    - scripts
+    - package.json
+    - pnpm-lock.yaml
+    - turbo.jsonc
+    - apps/www/.env.local.example
+  protected_paths:
+    - ota.yaml
+  bootstrap:
+    ota:
+      note: Install ota when missing so contributors and agents can run the readiness workflows declared in this contract.
+      sh: curl -fsSL https://dist.ota.run/install.sh | sh
+      powershell: irm https://dist.ota.run/install.ps1 | iex
+  notes: |
+    Supabase is a large pnpm monorepo.
+    Use `app` for the canonical site development loop and `docs` for docs-only changes.
