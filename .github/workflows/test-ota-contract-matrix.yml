@@ -249,13 +249,20 @@ jobs:
 
   container:
     name: Ota Contract Matrix (Container - ${{ matrix.name }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: ubuntu-docker
+          - name: ubuntu-bash-docker
+            os: ubuntu-latest
+          - name: macos-bash-docker
+            os: macos-latest
+          - name: windows-pwsh-docker
+            os: windows-latest
+          - name: windows-git-bash-docker
+            os: windows-latest
 
     steps:
       - name: Checkout
