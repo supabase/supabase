@@ -50,7 +50,7 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
         itemClassName
       )}
     >
-      <AccordionTrigger_Shadcn_ className="py-0">{section[0].label}</AccordionTrigger_Shadcn_>
+      <AccordionTrigger_Shadcn_ className="py-1">{section[0].label}</AccordionTrigger_Shadcn_>
       <AccordionContent_Shadcn_>
         {section[0].menuItems?.map((menuItem, menuItemIndex) => (
           <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
