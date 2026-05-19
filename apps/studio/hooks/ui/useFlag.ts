@@ -48,7 +48,6 @@ export function usePHFlag<T = string | boolean>(name: string) {
   if (isObjectEmpty(store)) return undefined
 
   if (!isObjectEmpty(store) && flagValue === undefined) {
-    console.error(`Flag key "${name}" does not exist in PostHog flag store`)
     return undefined
   }
 
