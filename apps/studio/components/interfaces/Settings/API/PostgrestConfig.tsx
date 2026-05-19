@@ -272,7 +272,7 @@ export const PostgrestConfig = () => {
                 </CardContent>
               ) : isError ? (
                 <CardContent>
-                  <Admonition type="destructive" title="Failed to retrieve API settings" />
+                  <Admonition type="destructive" description="Failed to retrieve API settings." />
                 </CardContent>
               ) : (
                 <>
