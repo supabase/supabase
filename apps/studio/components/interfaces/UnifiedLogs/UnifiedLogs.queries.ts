@@ -371,8 +371,8 @@ WHERE ${baseFiltersFor('level')}
   )
 
   const facetBranches = joinSqlFragments(
-    (['method', 'status', 'pathname'] as const).map((facet) =>
-      getFacetCountQuery({ search, facet })
+    (['method', 'status', 'pathname'] as const).map(
+      (facet) => safeSql`(${getFacetCountQuery({ search, facet })})`
     ),
     ' UNION ALL '
   )
