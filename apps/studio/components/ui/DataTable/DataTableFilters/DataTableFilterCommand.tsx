@@ -39,7 +39,7 @@ export function DataTableFilterCommand({
   searchParamsParser,
   placeholder = 'Search data table...',
 }: DataTableFilterCommandProps) {
-  const { table, isLoading, filterFields: _filterFields, getFacetedUniqueValues } = useDataTable()
+  const { table, isFetching, filterFields: _filterFields, getFacetedUniqueValues } = useDataTable()
   const columnFilters = table.getState().columnFilters
   const inputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState<boolean>(false)
@@ -120,7 +120,7 @@ export function DataTableFilterCommand({
         )}
         onClick={() => setOpen(true)}
       >
-        {isLoading ? (
+        {isFetching ? (
           <LoaderCircle className="mr-2 h-4 w-4 shrink-0 animate-spin text-muted-foreground opacity-50 group-hover:text-popover-foreground" />
         ) : (
           <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground opacity-50 group-hover:text-popover-foreground" />

@@ -79,7 +79,7 @@ describe(`EditSecretModal`, () => {
 
     await screen.findByRole(`dialog`)
 
-    const nameInput = screen.getByLabelText(`Name`)
+    const nameInput = await screen.findByLabelText(`Name`)
     const descriptionInput = screen.getByLabelText(`Description`)
     const valueInput = screen.getByLabelText(`Secret value`)
     const togglePasswordButton = screen.getByRole(`button`, { name: `Show secret value` })

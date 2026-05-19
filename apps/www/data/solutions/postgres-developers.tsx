@@ -19,7 +19,7 @@ import {
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { cn, Input_Shadcn_, Switch } from 'ui'
+import { cn, Input, Switch } from 'ui'
 import { Image } from 'ui-patterns/Image'
 
 import MainProducts from '../MainProducts'
@@ -443,7 +443,7 @@ const data: () => {
                   <p className="text-sm text-foreground-light">Name of function</p>
 
                   <div className="flex flex-col gap-2">
-                    <Input_Shadcn_ placeholder="Name of function" />
+                    <Input placeholder="Name of function" />
                     <span className="text-foreground-muted text-sm">
                       Name will also be used for the function name in postgres
                     </span>

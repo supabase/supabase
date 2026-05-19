@@ -1,31 +1,35 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Datadog, Grafana, Sentry } from 'icons'
-import { BracesIcon } from 'lucide-react'
+import { Axiom, Datadog, Grafana, Last9, Otlp, Sentry } from 'icons'
+import { BracesIcon, Cloud, Server } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
-export const AnimatedLogos = () => {
+interface AnimatedLogosProps {
+  iconSize?: number
+  className?: string
+}
+
+export const AnimatedLogos = ({ iconSize = 36, className }: AnimatedLogosProps) => {
   const [currIndex, setCurrIndex] = useState(0)
   const timer = 2500
-  const iconSize = 36
+
+  const centerWrapperSize = Math.round(iconSize * 2.67)
+  const sideWrapperSize = Math.round(iconSize * 2.22)
+  const containerW = Math.round(iconSize * 5.33)
+  const containerH = Math.round(iconSize * 3.56)
+  const sideOffset = Math.round(iconSize * 2.22)
+  const hiddenOffset = Math.round(iconSize * 3.33)
 
   const logos = [
-    {
-      id: 'datadog',
-      name: 'Datadog',
-      icon: <Datadog fill="currentColor" size={iconSize} />,
-    },
-    {
-      id: 'loki',
-      name: 'Loki',
-      icon: <Grafana fill="currentColor" size={iconSize} />,
-    },
-    { id: 'https', name: 'HTTPS', icon: <BracesIcon size={iconSize} /> },
-    {
-      id: 'sentry',
-      name: 'Sentry',
-      icon: <Sentry fill="currentColor" size={iconSize} />,
-    },
+    { id: 'webhook', name: 'Custom Endpoint', icon: <BracesIcon size={iconSize} /> },
+    { id: 'otlp', name: 'OTLP', icon: <Otlp fill="currentColor" size={iconSize} /> },
+    { id: 'datadog', name: 'Datadog', icon: <Datadog fill="currentColor" size={iconSize} /> },
+    { id: 'loki', name: 'Loki', icon: <Grafana fill="currentColor" size={iconSize} /> },
+    { id: 's3', name: 'Amazon S3', icon: <Cloud size={iconSize} /> },
+    { id: 'sentry', name: 'Sentry', icon: <Sentry fill="currentColor" size={iconSize} /> },
+    { id: 'axiom', name: 'Axiom', icon: <Axiom fill="currentColor" size={iconSize} /> },
+    { id: 'last9', name: 'Last9', icon: <Last9 fill="currentColor" size={iconSize} /> },
+    { id: 'syslog', name: 'Syslog', icon: <Server size={iconSize} /> },
   ]
 
   useEffect(() => {
@@ -47,14 +51,14 @@ export const AnimatedLogos = () => {
 
   const logoVariants = {
     hidden: {
-      x: 'calc(-50% + 120px)',
+      x: `calc(-50% + ${hiddenOffset}px)`,
       y: '-50%',
       scale: 0.6,
       opacity: 0,
       filter: 'blur(1px)',
     },
     right: {
-      x: 'calc(-50% + 80px)',
+      x: `calc(-50% + ${sideOffset}px)`,
       y: '-50%',
       scale: 0.8,
       opacity: 0.5,
@@ -70,7 +74,7 @@ export const AnimatedLogos = () => {
       filter: 'blur(0px)',
     },
     left: {
-      x: 'calc(-50% - 80px)',
+      x: `calc(-50% - ${sideOffset}px)`,
       y: '-50%',
       scale: 0.8,
       opacity: 0.5,
@@ -78,7 +82,7 @@ export const AnimatedLogos = () => {
       filter: 'blur(1px)',
     },
     exit: {
-      x: 'calc(-50% - 120px)',
+      x: `calc(-50% - ${hiddenOffset}px)`,
       y: '-50%',
       scale: 0.6,
       opacity: 0,
@@ -89,21 +93,23 @@ export const AnimatedLogos = () => {
   const visibleIndices = [getPreviousIndex(), currIndex, getNextIndex()]
 
   return (
-    <div className="relative w-48 h-32 mx-auto mb-8 overflow-hidden">
+    <div
+      className={cn('relative overflow-hidden', className ?? 'mx-auto mb-8')}
+      style={{ width: containerW, height: containerH }}
+    >
       <AnimatePresence initial={false}>
         {logos.map((logo, index) => {
           if (!visibleIndices.includes(index)) return null
 
           const position = getPosition(index)
           const isCenter = index === currIndex
+          const wrapperSize = isCenter ? centerWrapperSize : sideWrapperSize
 
           return (
             <motion.div
               key={logo.id}
-              className={cn(
-                'absolute top-1/2 left-1/2 flex items-center justify-center rounded-lg',
-                isCenter ? 'w-24 h-24' : 'w-20 h-20'
-              )}
+              className="absolute top-1/2 left-1/2 flex items-center justify-center rounded-lg"
+              style={{ width: wrapperSize, height: wrapperSize }}
               variants={logoVariants}
               initial="hidden"
               animate={position}

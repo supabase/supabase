@@ -181,7 +181,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         {isBanned ? (
           <Admonition
             type="warning"
-            label={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
+            description={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
             className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5"
           />
         ) : (

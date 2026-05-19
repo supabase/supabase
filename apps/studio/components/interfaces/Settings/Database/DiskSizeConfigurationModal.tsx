@@ -8,9 +8,9 @@ import { SetStateAction, useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Form,
   FormControl,
@@ -137,10 +137,10 @@ const DiskSizeConfigurationModal = ({
         hasAccessToDiskModifications ? (
         <>
           {currentDiskSize >= maxDiskSize ? (
-            <Alert_Shadcn_ variant="warning" className="rounded-t-none border-0">
+            <Alert variant="warning" className="rounded-t-none border-0">
               <WarningIcon />
-              <AlertTitle_Shadcn_>Maximum manual disk size increase reached</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Maximum manual disk size increase reached</AlertTitle>
+              <AlertDescription>
                 <p>
                   You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
                   need more than this, contact us via support for help.
@@ -156,17 +156,15 @@ const DiskSizeConfigurationModal = ({
                     Contact support
                   </SupportLink>
                 </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           ) : (
             <>
               <Modal.Content className="w-full space-y-4">
-                <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
+                <Alert variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
                   <Info size={16} />
-                  <AlertTitle_Shadcn_>
-                    This operation is only possible every 4 hours
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>This operation is only possible every 4 hours</AlertTitle>
+                  <AlertDescription>
                     <div className="mb-4">
                       {isAbleToResizeDatabase
                         ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
@@ -181,8 +179,8 @@ const DiskSizeConfigurationModal = ({
                         Read more about disk management
                       </Link>
                     </Button>
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertDescription>
+                </Alert>
                 <Form {...form}>
                   <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} noValidate>
                     <FormField
@@ -233,14 +231,14 @@ const DiskSizeConfigurationModal = ({
           )}
         </>
       ) : (
-        <Alert_Shadcn_ className="border-none">
+        <Alert className="border-none">
           <InfoIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             {hasAccessToDiskModifications === false
               ? 'Disk size configuration is not available for projects on the Free Plan'
               : 'Disk size configuration is only available when the spend cap has been disabled'}
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          </AlertTitle>
+          <AlertDescription>
             {hasAccessToDiskModifications === false ? (
               <p>
                 If you are intending to use more than 500MB of disk space, then you will need to
@@ -264,8 +262,8 @@ const DiskSizeConfigurationModal = ({
                   : 'Disable spend cap'}
               </Link>
             </Button>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
     </Modal>
   )

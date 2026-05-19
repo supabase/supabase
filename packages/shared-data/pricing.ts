@@ -60,7 +60,6 @@ export type FeatureKey =
   | 'storage.cachedEgress'
   | 'storage.cdn'
   | 'storage.transformations'
-  | 'storage.byoc'
   | 'functions.invocations'
   | 'functions.scriptSize'
   | 'functions.numberOfFunctions'
@@ -462,17 +461,6 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         usage_based: true,
-      },
-      {
-        key: 'storage.byoc',
-        title: 'Bring your own storage provider',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
       },
     ],
   },

@@ -1753,6 +1753,13 @@
               "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
+          },
+          {
+            "name": "remove_addon",
+            "required": false,
+            "in": "query",
+            "description": "If true, also removes the custom domain add-on from the project subscription.",
+            "schema": { "default": "false", "type": "boolean" }
           }
         ],
         "responses": {
@@ -8826,6 +8833,11 @@
                     "slot_name": { "type": "string" }
                   },
                   "required": ["type", "slot_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": { "type": { "type": "string", "enum": ["x86_architecture"] } },
+                  "required": ["type"]
                 }
               ]
             }
@@ -10733,7 +10745,8 @@
                       }
                     }
                   }
-                }
+                },
+                "branches_only": { "type": "boolean" }
               },
               "required": ["role"]
             }
@@ -10779,7 +10792,8 @@
                     }
                   }
                 }
-              }
+              },
+              "branches_only": { "type": "boolean" }
             },
             "required": ["role"]
           }
@@ -10822,7 +10836,8 @@
                             }
                           }
                         }
-                      }
+                      },
+                      "branches_only": { "type": "boolean" }
                     },
                     "required": ["role"]
                   }
@@ -10865,7 +10880,8 @@
                       }
                     }
                   }
-                }
+                },
+                "branches_only": { "type": "boolean" }
               },
               "required": ["role"]
             }
@@ -10878,7 +10894,8 @@
             {
               "role": "postgres",
               "expires_at": 1740787200,
-              "allowed_networks": { "allowed_cidrs": [{ "cidr": "203.0.113.0/24" }] }
+              "allowed_networks": { "allowed_cidrs": [{ "cidr": "203.0.113.0/24" }] },
+              "branches_only": false
             }
           ]
         }

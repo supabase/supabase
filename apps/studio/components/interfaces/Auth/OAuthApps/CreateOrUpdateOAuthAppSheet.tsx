@@ -18,12 +18,12 @@ import {
   FormDescription,
   FormField,
   FormLabel,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetClose,
@@ -34,7 +34,7 @@ import {
   SheetTitle,
   Switch,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
@@ -288,7 +288,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                       render={({ field }) => (
                         <FormItemLayout label="Name">
                           <FormControl>
-                            <Input_Shadcn_ {...field} placeholder="My OAuth App" />
+                            <Input {...field} placeholder="My OAuth App" />
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -317,7 +317,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                 </div>
                                 <div className="flex min-w-0 flex-1 items-center gap-2">
                                   <div className="group relative min-w-0 flex-1">
-                                    <Input_Shadcn_
+                                    <Input
                                       {...field}
                                       value={field.value ?? ''}
                                       className={cn('flex-1', projectRef ? 'pr-10' : '')}
@@ -372,7 +372,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                             render={() => (
                               <FormItemLayout label="Client ID">
                                 <FormControl>
-                                  <Input
+                                  <PasswordInput
                                     copy
                                     readOnly
                                     className="input-mono"
@@ -492,19 +492,19 @@ export const CreateOrUpdateOAuthAppSheet = ({
                         className="px-5"
                       >
                         <FormControl>
-                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_ className="text-sm">
-                              <SelectValue_Shadcn_ />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectItem_Shadcn_ value="client_secret_basic" className="text-sm">
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="client_secret_basic" className="text-sm">
                                 HTTP Basic Auth header (client_secret_basic)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="client_secret_post" className="text-sm">
+                              </SelectItem>
+                              <SelectItem value="client_secret_post" className="text-sm">
                                 Request body (client_secret_post)
-                              </SelectItem_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}

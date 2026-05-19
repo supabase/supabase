@@ -99,7 +99,7 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
     case '2':
     case 'success':
       return {
-        text: 'text-foreground-lighter',
+        text: 'text-foreground',
         bg: '',
         border: 'border-green-200 dark:border-green-800',
       }
@@ -120,7 +120,7 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
       }
     default:
       return {
-        text: 'text-foreground-lighter',
+        text: 'text-foreground',
         bg: '',
         border: '',
       }
