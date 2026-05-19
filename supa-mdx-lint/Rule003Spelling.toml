@@ -164,6 +164,7 @@ allow_list = [
     "Authn",
     "Authy",
     "B-tree",
+    "Better Stack",
     "Basejump",
     "BigQuery",
     "Bitbucket",
