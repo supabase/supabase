@@ -112,7 +112,7 @@ jobs:
             exit 0
           fi
 
-          git config --local user.name "kevcodez"
-          git config --local user.email "k.grueneberg1994@gmail.com"
+          git config --local user.name "supabase-autofix-bot"
+          git config --local user.email "noreply@supabase.com"
           git commit -m "ci: Autofix updates from GitHub workflow"
           git -c credential.helper= push "https://x-access-token:${APP_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${TARGET_BRANCH}"
