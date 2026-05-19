@@ -94,8 +94,10 @@ In `nuxt.config.ts`, map these public env vars into runtime config keys used by 
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
-      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
-      supabasePublishableKey: process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+      // These defaults will be overridden by NUXT_PUBLIC_SUPABASE_URL and
+      // NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variables at runtime.
+      supabaseUrl: '',
+      supabasePublishableKey: '',
     },
   },
 })
