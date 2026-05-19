@@ -55,6 +55,7 @@ const GROUP_LABELS: Record<string, string> = {
   nav: 'Navigation',
   'operation-queue': 'Operation Queue',
   results: 'Results',
+  'realtime-inspector': 'Realtime Inspector',
   'schema-visualizer': 'Schema Visualizer',
   shortcuts: 'Shortcuts',
   'sql-editor': 'SQL Editor',
