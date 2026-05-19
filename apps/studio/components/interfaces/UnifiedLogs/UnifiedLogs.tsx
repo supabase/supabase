@@ -143,6 +143,8 @@ export const UnifiedLogs = () => {
 
   const {
     data: unifiedLogsData,
+    error,
+    isError,
     isLoading,
     isFetching,
     isFetchingNextPage,
@@ -152,6 +154,7 @@ export const UnifiedLogs = () => {
     fetchNextPage,
     fetchPreviousPage,
   } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
+
   const {
     data: counts,
     isPending: isLoadingCounts,
@@ -161,6 +164,7 @@ export const UnifiedLogs = () => {
     projectRef,
     search: searchParameters,
   })
+
   const {
     data: unifiedLogsChart = [],
     isFetching: isFetchingCharts,
@@ -355,6 +359,7 @@ export const UnifiedLogs = () => {
   return (
     <DataTableProvider
       table={table}
+      error={error}
       columns={UNIFIED_LOGS_COLUMNS}
       filterFields={filterFields}
       columnFilters={columnFilters}
@@ -365,6 +370,7 @@ export const UnifiedLogs = () => {
       searchParameters={searchParameters}
       enableColumnOrdering={true}
       isFetching={isFetching}
+      isError={isError}
       isLoading={isLoading}
       isLoadingCounts={isLoadingCounts}
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
