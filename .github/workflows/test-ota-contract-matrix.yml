@@ -160,17 +160,30 @@ jobs:
 
       - name: Proof instant workflow (readiness + annotations)
         id: proof_instant
-        uses: ota-run/action@5c16ae2d2d9de605059f22c3f8e90dba1b29e833 # v1
-        with:
-          command: proof
-          path: .
-          workflow: instant
-          install: never
-          annotate: true
-          max-annotations: 20
-          comment-pr: false
-          fail-on-error: true
-          output-path: ota-proof-instant.json
+        if: matrix.run_shell == 'bash'
+        shell: bash
+        run: |
+          ota clean . || true
+          ota proof runtime --workflow instant --json . > ota-proof-instant.json
+          cat ota-proof-instant.json
+          ota clean . || true
+
+      - name: Proof instant workflow (readiness + annotations) [pwsh]
+        id: proof_instant_pwsh
+        if: matrix.run_shell == 'pwsh'
+        shell: pwsh
+        run: |
+          & ota clean . *> $null
+          try {
+            & ota proof runtime --workflow instant --json . | Out-File -Encoding utf8 ota-proof-instant.json
+            Get-Content ota-proof-instant.json
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+          }
+          finally {
+            & ota clean . *> $null
+          }
 
       - name: Proof app workflow [bash]
         id: proof_app_bash
@@ -215,6 +228,7 @@ jobs:
           TOPOLOGY_BASH: ${{ steps.topology_bash.outcome }}
           TOPOLOGY_PWSH: ${{ steps.topology_pwsh.outcome }}
           PROOF_INSTANT: ${{ steps.proof_instant.outcome }}
+          PROOF_INSTANT_PWSH: ${{ steps.proof_instant_pwsh.outcome }}
           PROOF_BASH: ${{ steps.proof_app_bash.outcome }}
           PROOF_PWSH: ${{ steps.proof_app_pwsh.outcome }}
         run: |
@@ -228,7 +242,7 @@ jobs:
             echo "| List docs tasks | ${TASKS_DOCS_BASH:-$TASKS_DOCS_PWSH} |"
             echo "| List instant tasks | ${TASKS_INSTANT_BASH:-$TASKS_INSTANT_PWSH} |"
             echo "| Export topology | ${TOPOLOGY_BASH:-$TOPOLOGY_PWSH} |"
-            echo "| Instant readiness | ${PROOF_INSTANT} |"
+            echo "| Instant readiness | ${PROOF_INSTANT:-$PROOF_INSTANT_PWSH} |"
             echo "| Proof app workflow | ${PROOF_BASH:-$PROOF_PWSH} |"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
@@ -278,14 +292,41 @@ jobs:
         run: ota --version
 
       - name: Verify Docker engine availability
-        id: docker_available
+        id: docker_capability
         shell: bash
         run: |
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "supported=false" >> "$GITHUB_OUTPUT"
+            echo "reason=docker-cli-missing" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           docker --version
-          docker info
+          if ! docker info >/tmp/docker-info.log 2>&1; then
+            cat /tmp/docker-info.log
+            echo "supported=false" >> "$GITHUB_OUTPUT"
+            echo "reason=docker-engine-unavailable" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          os_type="$(docker info --format '{{.OSType}}' 2>/dev/null || true)"
+          if [ "$os_type" != "linux" ]; then
+            echo "supported=false" >> "$GITHUB_OUTPUT"
+            echo "reason=docker-ostype-$os_type" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "supported=true" >> "$GITHUB_OUTPUT"
+          echo "reason=ok" >> "$GITHUB_OUTPUT"
+
+      - name: Skip unsupported container runner
+        if: steps.docker_capability.outputs.supported != 'true'
+        shell: bash
+        env:
+          DOCKER_CAPABILITY_REASON: ${{ steps.docker_capability.outputs.reason }}
+        run: |
+          echo "::notice title=Container matrix skipped::Runner does not support Linux container execution for this contract (${DOCKER_CAPABILITY_REASON:-unknown})."
 
       - name: Validate contract
         id: validate_contract
+        if: steps.docker_capability.outputs.supported == 'true'
         shell: bash
         run: |
           ota validate --json . > ota-validate-container.json
@@ -293,21 +334,25 @@ jobs:
 
       - name: List app:container workflow tasks
         id: tasks_app_container
+        if: steps.docker_capability.outputs.supported == 'true'
         shell: bash
         run: ota tasks --workflow app:container .
 
       - name: List docs:container workflow tasks
         id: tasks_docs_container
+        if: steps.docker_capability.outputs.supported == 'true'
         shell: bash
         run: ota tasks --workflow docs:container .
 
       - name: List instant:container workflow tasks
         id: tasks_instant_container
+        if: steps.docker_capability.outputs.supported == 'true'
         shell: bash
         run: ota tasks --workflow instant:container .
 
       - name: Export execution topology
         id: topology_container
+        if: steps.docker_capability.outputs.supported == 'true'
         shell: bash
         run: |
           ota execution topology --json . > ota-execution-topology-container.json
@@ -315,40 +360,39 @@ jobs:
 
       - name: Container dry-run preview (app:container)
         id: dry_run_app_container
+        if: steps.docker_capability.outputs.supported == 'true'
         shell: bash
         run: ota up --workflow app:container --mode container --dry-run .
 
       - name: Container dry-run preview (docs:container)
         id: dry_run_docs_container
+        if: steps.docker_capability.outputs.supported == 'true'
         shell: bash
         run: ota up --workflow docs:container --mode container --dry-run .
 
       - name: Container dry-run preview (instant:container)
         id: dry_run_instant_container
+        if: steps.docker_capability.outputs.supported == 'true'
         shell: bash
         run: ota up --workflow instant:container --mode container --dry-run .
 
       - name: Proof instant:container workflow (readiness + annotations)
         id: proof_instant_container
-        uses: ota-run/action@5c16ae2d2d9de605059f22c3f8e90dba1b29e833 # v1
-        with:
-          command: proof
-          path: .
-          workflow: instant:container
-          execution-mode: container
-          install: never
-          annotate: true
-          max-annotations: 20
-          comment-pr: false
-          fail-on-error: true
-          output-path: ota-proof-instant-container.json
+        if: steps.docker_capability.outputs.supported == 'true'
+        shell: bash
+        run: |
+          ota clean . || true
+          ota proof runtime --mode container --workflow instant:container --json . > ota-proof-instant-container.json
+          cat ota-proof-instant-container.json
+          ota clean . || true
 
       - name: Ota container matrix summary
         if: ${{ always() }}
         shell: bash
         env:
           MATRIX_NAME: ${{ matrix.name }}
-          DOCKER_AVAILABLE: ${{ steps.docker_available.outcome }}
+          DOCKER_CAPABILITY: ${{ steps.docker_capability.outputs.supported }}
+          DOCKER_CAPABILITY_REASON: ${{ steps.docker_capability.outputs.reason }}
           VALIDATE: ${{ steps.validate_contract.outcome }}
           TASKS_APP: ${{ steps.tasks_app_container.outcome }}
           TASKS_DOCS: ${{ steps.tasks_docs_container.outcome }}
@@ -364,7 +408,7 @@ jobs:
             echo
             echo "| Phase | Outcome |"
             echo "| --- | --- |"
-            echo "| Docker availability | ${DOCKER_AVAILABLE} |"
+            echo "| Docker capability (linux containers) | ${DOCKER_CAPABILITY:-false} (${DOCKER_CAPABILITY_REASON:-unknown}) |"
             echo "| Validate contract | ${VALIDATE} |"
             echo "| List app:container tasks | ${TASKS_APP} |"
             echo "| List docs:container tasks | ${TASKS_DOCS} |"
