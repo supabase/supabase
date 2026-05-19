@@ -158,99 +158,19 @@ jobs:
           & ota execution topology --json . | Out-File -Encoding utf8 ota-execution-topology.json
           Get-Content ota-execution-topology.json
 
-      - name: Validate instant workflow readiness [bash]
-        id: instant_ready_bash
-        if: matrix.run_shell == 'bash'
-        shell: bash
-        run: |
-          up_pid=""
-          cleanup() {
-            ota clean . || true
-            if [ -n "${up_pid:-}" ] && kill -0 "$up_pid" 2>/dev/null; then
-              kill "$up_pid" 2>/dev/null || true
-              for _ in 1 2 3 4 5; do
-                if ! kill -0 "$up_pid" 2>/dev/null; then
-                  break
-                fi
-                sleep 1
-              done
-              kill -9 "$up_pid" 2>/dev/null || true
-            fi
-            if [ -n "${up_pid:-}" ]; then
-              wait "$up_pid" 2>/dev/null || true
-            fi
-          }
-
-          ota clean . || true
-          trap cleanup EXIT INT TERM
-
-          ota up --workflow instant --stream . > ota-up-instant.log 2>&1 &
-          up_pid=$!
-          deadline=$((SECONDS + 1200))
-          ready=0
-
-          while [ $SECONDS -lt $deadline ]; do
-            if ota doctor --workflow instant --json . > ota-doctor-instant.json 2> ota-doctor-instant.err; then
-              ready=1
-              break
-            fi
-
-            if ! kill -0 "$up_pid" 2>/dev/null; then
-              wait "$up_pid"
-              exit 1
-            fi
-
-            sleep 5
-          done
-
-          if [ "$ready" -ne 1 ]; then
-            cat ota-up-instant.log
-            exit 1
-          fi
-
-      - name: Validate instant workflow readiness [pwsh]
-        id: instant_ready_pwsh
-        if: matrix.run_shell == 'pwsh'
-        shell: pwsh
-        run: |
-          & ota clean . *> $null
-
-          $up = $null
-          try {
-            $up = Start-Process -FilePath "ota" -ArgumentList @("up", "--workflow", "instant", "--stream", ".") -NoNewWindow -RedirectStandardOutput "ota-up-instant.out.log" -RedirectStandardError "ota-up-instant.err.log" -PassThru
-            $deadline = (Get-Date).AddMinutes(20)
-            $ready = $false
-
-            while ((Get-Date) -lt $deadline) {
-              & ota doctor --workflow instant --json . 1> ota-doctor-instant.json 2> ota-doctor-instant.err
-              if ($LASTEXITCODE -eq 0) {
-                $ready = $true
-                break
-              }
-
-              if ($up.HasExited) {
-                throw "ota up exited before instant workflow became ready"
-              }
-
-              Start-Sleep -Seconds 5
-            }
-
-            if (-not $ready) {
-              Get-Content ota-up-instant.out.log -ErrorAction SilentlyContinue
-              Get-Content ota-up-instant.err.log -ErrorAction SilentlyContinue
-              throw "timed out waiting for instant workflow readiness"
-            }
-          }
-          finally {
-            & ota clean . *> $null
-            if ($null -ne $up) {
-              try {
-                Wait-Process -Id $up.Id -Timeout 30 -ErrorAction SilentlyContinue
-              }
-              catch {
-              }
-            }
-          }
+      - name: Proof instant workflow (readiness + annotations)
+        id: proof_instant
+        uses: ota-run/action@5c16ae2d2d9de605059f22c3f8e90dba1b29e833 # v1
+        with:
+          command: proof
+          path: .
+          workflow: instant
+          install: never
+          annotate: true
+          max-annotations: 20
+          comment-pr: false
+          fail-on-error: true
+          output-path: ota-proof-instant.json
 
       - name: Proof app workflow [bash]
         id: proof_app_bash
@@ -294,8 +214,7 @@ jobs:
           TASKS_INSTANT_PWSH: ${{ steps.tasks_instant_pwsh.outcome }}
           TOPOLOGY_BASH: ${{ steps.topology_bash.outcome }}
           TOPOLOGY_PWSH: ${{ steps.topology_pwsh.outcome }}
-          INSTANT_BASH: ${{ steps.instant_ready_bash.outcome }}
-          INSTANT_PWSH: ${{ steps.instant_ready_pwsh.outcome }}
+          PROOF_INSTANT: ${{ steps.proof_instant.outcome }}
           PROOF_BASH: ${{ steps.proof_app_bash.outcome }}
           PROOF_PWSH: ${{ steps.proof_app_pwsh.outcome }}
         run: |
@@ -309,25 +228,11 @@ jobs:
             echo "| List docs tasks | ${TASKS_DOCS_BASH:-$TASKS_DOCS_PWSH} |"
             echo "| List instant tasks | ${TASKS_INSTANT_BASH:-$TASKS_INSTANT_PWSH} |"
             echo "| Export topology | ${TOPOLOGY_BASH:-$TOPOLOGY_PWSH} |"
-            echo "| Instant readiness | ${INSTANT_BASH:-$INSTANT_PWSH} |"
+            echo "| Instant readiness | ${PROOF_INSTANT} |"
             echo "| Proof app workflow | ${PROOF_BASH:-$PROOF_PWSH} |"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
 
-
-      - name: Annotate instant workflow findings (ota-run/action)
-        if: ${{ always() }}
-        uses: ota-run/action@v1
-        with:
-          command: doctor
-          path: .
-          workflow: instant
-          install: never
-          annotate: true
-          max-annotations: 20
-          comment-pr: false
-          fail-on-error: false
-          output-path: ota-doctor-instant-action.json
 
       - name: Upload failure artifacts
         if: ${{ failure() }}
@@ -337,12 +242,7 @@ jobs:
           path: |
             ota-validate.json
             ota-execution-topology.json
-            ota-up-instant.log
-            ota-up-instant.out.log
-            ota-up-instant.err.log
-            ota-doctor-instant.json
-            ota-doctor-instant-action.json
-            ota-doctor-instant.err
+            ota-proof-instant.json
             ota-proof-app.json
             .ota/
           retention-days: 7
