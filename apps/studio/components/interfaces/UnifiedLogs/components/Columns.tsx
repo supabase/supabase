@@ -102,6 +102,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       meta: {
         cellClassName: 'font-mono tracking-tight w-[140px]',
         headerClassName: 'w-[140px]',
+        dataType: 'date',
       },
     },
     // Log type column - always visible
