@@ -72,6 +72,8 @@ export type FeatureKey =
   | 'security.byoc'
   | 'security.logRetention'
   | 'security.logDrain'
+  | 'security.logsIngest'
+  | 'security.logsQuery'
   | 'security.metricsEndpoint'
   | 'security.soc2'
   | 'security.iso27001'
@@ -573,6 +575,28 @@ export const pricing: Pricing = {
           enterprise: '90 days',
         },
         usage_based: false,
+      },
+      {
+        key: 'security.logsIngest',
+        title: 'Logs Ingest',
+        plans: {
+          free: '5 GB included',
+          pro: ['5 GB included', 'then $0.50 per GB'],
+          team: ['5 GB included', 'then $0.50 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
+        key: 'security.logsQuery',
+        title: 'Logs Query',
+        plans: {
+          free: '1,000 GB included',
+          pro: ['1,000 GB included', 'then $0.002 per GB'],
+          team: ['1,000 GB included', 'then $0.002 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
       },
       {
         key: 'security.logDrain',
