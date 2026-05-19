@@ -177,7 +177,7 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     ['invalid', 'Setup unavailable'],
     ['error', 'Unable to load setup'],
     ['linked', 'Organization linked'],
-    ['create-new', 'Create new organization'],
+    ['create-new', 'Create organization'],
     ['not-eligible', 'This AWS Marketplace subscription cannot be linked right now'],
     ['already-linked', 'No action required'],
     ['wrong-account', 'Sign in with the Supabase account'],
@@ -222,7 +222,12 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     const user = userEvent.setup()
     renderScreen({ mock: 'create-new' })
 
-    await user.click(await screen.findByRole('button', { name: /Create new organization/ }))
+    expect(await screen.findByRole('button', { name: 'Create organization' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Create new organization/ })
+    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Create organization' }))
 
     expect(await screen.findByText('Create and link organization')).toBeInTheDocument()
     expect(

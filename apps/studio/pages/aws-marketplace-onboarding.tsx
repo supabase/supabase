@@ -484,21 +484,23 @@ export const AwsMarketplaceOnboardingScreen = ({
 
           <InterstitialAccountRow displayName={displayName} />
 
-          <OrganizationSelector
-            organizations={linkableOrganizations}
-            unavailableOrganizations={unavailableOrganizations}
-            unavailableReason="These may have outstanding invoices or existing marketplace links."
-            getUnavailableOrganizationDescription={(organization) =>
-              getOrganizationUnavailableReason(
-                eligibilityByOrganizationSlug.get(organization.slug)?.reasons[0]
-              )
-            }
-            selectedSlug={selectedOrgSlug}
-            disabled={isLinking}
-            onSelect={setSelectedOrgSlug}
-            createLabel="Create new organization"
-            onCreate={() => setShowOrgCreationDialog(true)}
-          />
+          {hasAnyOrganizations && (
+            <OrganizationSelector
+              organizations={linkableOrganizations}
+              unavailableOrganizations={unavailableOrganizations}
+              unavailableReason="These may have outstanding invoices or existing marketplace links."
+              getUnavailableOrganizationDescription={(organization) =>
+                getOrganizationUnavailableReason(
+                  eligibilityByOrganizationSlug.get(organization.slug)?.reasons[0]
+                )
+              }
+              selectedSlug={selectedOrgSlug}
+              disabled={isLinking}
+              onSelect={setSelectedOrgSlug}
+              createLabel={hasLinkableOrganizations ? 'Create new organization' : undefined}
+              onCreate={hasLinkableOrganizations ? () => setShowOrgCreationDialog(true) : undefined}
+            />
+          )}
 
           {!hasLinkableOrganizations && hasAnyOrganizations && (
             <Admonition
