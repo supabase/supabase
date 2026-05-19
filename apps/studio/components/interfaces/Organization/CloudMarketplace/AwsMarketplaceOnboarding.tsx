@@ -18,7 +18,7 @@ import {
   useCloudMarketplaceOnboardingInfoQuery,
   type CloudMarketplaceOnboardingInfo,
 } from '@/components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
-import NewAwsMarketplaceOrgModal from '@/components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrgModal'
+import { NewAwsMarketplaceOrgModal } from '@/components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrgModal'
 import { InterstitialAccountRow } from '@/components/layouts/InterstitialLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useOrganizationLinkAwsMarketplaceMutation } from '@/data/organizations/organization-link-aws-marketplace-mutation'
