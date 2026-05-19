@@ -1,0 +1,5 @@
+{
+  "excludeCategories": ["Initializing"],
+  "categoryOrder": ["Database", "Auth", "Edge Functions", "Realtime", "Storage"],
+  "partialsOrder": ["introduction", "installing", "typescript-support"]
+}

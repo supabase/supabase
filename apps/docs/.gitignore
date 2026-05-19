@@ -36,5 +36,8 @@ public/docs.tar.gz
 # Copied examples folder
 /examples/
 
+# Generated reference content (built by scripts/build-reference-content.ts)
+/content/reference/
+
 # Sentry Config File
 .env.sentry-build-plugin
