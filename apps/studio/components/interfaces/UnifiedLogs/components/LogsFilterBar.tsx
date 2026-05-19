@@ -66,9 +66,13 @@ export const LogsFilterBar = () => {
       table.getColumn(name)?.setFilterValue(conditions.map((x) => x.value))
     })
 
-    const currentFilters = table.getState().columnFilters
-    const filterColumns = Object.keys(groupedFilterConditions)
-    const filtersToRemove = currentFilters.filter((x) => !filterColumns.includes(x.id))
+    // Only clear filters owned by this bar — leaves externally-set filters
+    // (e.g. the timeline date range) untouched.
+    const managedNames = new Set(filterProperties.map((p) => p.name))
+    const nextNames = new Set(Object.keys(groupedFilterConditions))
+    const filtersToRemove = table
+      .getState()
+      .columnFilters.filter((x) => managedNames.has(x.id) && !nextNames.has(x.id))
     filtersToRemove.forEach((x) => {
       table.getColumn(x.id)?.setFilterValue(undefined)
     })
