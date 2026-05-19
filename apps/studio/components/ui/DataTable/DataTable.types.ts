@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 // TODO: we could type the value(!) especially when using enums
 export type Option = {
   label: string
-  value: string | boolean | number | undefined
+  value: string
 }
 
 export type DatePreset = {

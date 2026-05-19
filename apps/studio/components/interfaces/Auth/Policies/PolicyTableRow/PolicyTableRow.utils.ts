@@ -1,9 +1,9 @@
 import { ident, joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PGPolicy } from '@supabase/pg-meta'
 
 import type { TableApiAccessData } from '@/data/privileges/table-api-access-query'
 
-export type Policy = Omit<PostgresPolicy, 'definition' | 'check'> & {
+export type Policy = Omit<PGPolicy, 'definition' | 'check'> & {
   definition: SafeSqlFragment | null
   check: SafeSqlFragment | null
 }

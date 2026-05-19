@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, CardContent } from 'ui'
+import { Alert, AlertTitle, CardContent } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const DataApiEnableSwitchLoading = () => (
@@ -10,8 +10,8 @@ export const DataApiEnableSwitchLoading = () => (
 )
 
 export const DataApiEnableSwitchError = () => (
-  <Alert_Shadcn_ variant="destructive">
+  <Alert variant="destructive">
     <AlertCircle size={16} />
-    <AlertTitle_Shadcn_>Failed to retrieve Data API settings</AlertTitle_Shadcn_>
-  </Alert_Shadcn_>
+    <AlertTitle>Failed to retrieve Data API settings</AlertTitle>
+  </Alert>
 )

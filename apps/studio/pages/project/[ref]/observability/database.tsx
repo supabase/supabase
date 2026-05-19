@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, Button } from 'ui'
 
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -132,13 +132,16 @@ const DatabaseUsage = () => {
     !org?.usage_billing_enabled &&
     project?.cloud_provider !== 'FLY'
 
+  const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
+
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
     project!,
     diskConfig,
     maxConnections,
     defaultMaxClientConn,
-    isSpendCapEnabled
+    isSpendCapEnabled,
+    showDiskIOBurstBalanceChart
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -401,8 +404,8 @@ const DatabaseUsage = () => {
           }}
           append={() => (
             <div className="px-6 pb-6">
-              <Alert_Shadcn_ variant="default" className="mt-4">
-                <AlertDescription_Shadcn_>
+              <Alert variant="default" className="mt-4">
+                <AlertDescription>
                   <div className="space-y-2">
                     <p>
                       New Supabase projects have a database size of ~40-60mb. This space includes
@@ -421,8 +424,8 @@ const DatabaseUsage = () => {
                       </Link>
                     </Button>
                   </div>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             </div>
           )}
         />

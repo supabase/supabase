@@ -4,13 +4,7 @@ import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
@@ -171,8 +165,8 @@ export const ProjectClaimConfirm = ({
               permissions to operate. This is normal and no action is needed from your side.
             </span>
           ) : (
-            <Collapsible_Shadcn_>
-              <CollapsibleTrigger_Shadcn_ className="pb-3 w-full flex items-center justify-between group">
+            <Collapsible>
+              <CollapsibleTrigger className="pb-3 w-full flex items-center justify-between group">
                 <p className="text-sm text-foreground-light text-left">
                   <span className="font-foreground">List of permissions</span> that{' '}
                   <span className="text-foreground">{requester.name}</span> will have for the{' '}
@@ -186,8 +180,8 @@ export const ProjectClaimConfirm = ({
                   className="text-foreground-light transition-all group-data-open:rotate-90 w-20"
                   strokeWidth={1}
                 />
-              </CollapsibleTrigger_Shadcn_>
-              <CollapsibleContent_Shadcn_
+              </CollapsibleTrigger>
+              <CollapsibleContent
                 className={cn(
                   'flex flex-col gap-8 transition-all',
                   'data-closed:animate-collapsible-up data-open:animate-collapsible-down'
@@ -255,8 +249,8 @@ export const ProjectClaimConfirm = ({
                     hasWriteScope={requester.scopes.includes(OAuthScope.STORAGE_WRITE)}
                   />
                 </div>
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </div>
       </div>

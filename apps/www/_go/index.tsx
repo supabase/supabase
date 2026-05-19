@@ -6,6 +6,8 @@ import aiEngineerEuropeContestThankYou from './events/ai-engineer-europe-2026/co
 import datadogContest from './events/dash-2026/contest'
 import datadogDinner from './events/dash-2026/exec-dinner'
 import datadogContestThankYou from './events/dash-2026/exec-dinner-thank-you'
+import pgconfDev2026Contest from './events/pgconf-dev-2026/contest'
+import pgconfDev2026ContestThankYou from './events/pgconf-dev-2026/contest-thank-you'
 import postgresconfContest from './events/postgresconf-sjc-2026/contest'
 import postgresconfContestThankYou from './events/postgresconf-sjc-2026/contest-thank-you'
 import startupGrindContest from './events/startup-grind-2026/contest'
@@ -37,6 +39,8 @@ const pages: GoPageInput[] = [
   accentureContest, // remove after May 31, 2026
   postgresconfContest, // remove after May 31, 2026
   postgresconfContestThankYou, // remove after May 31, 2026
+  pgconfDev2026Contest, // remove after May 31, 2026
+  pgconfDev2026ContestThankYou, // remove after May 31, 2026
   datadogContest, // remove after June 30, 2026
   datadogContestThankYou, // remove after June 30, 2026
   datadogDinner, // remove after June 30, 2026

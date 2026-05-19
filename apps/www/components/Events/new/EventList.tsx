@@ -73,9 +73,9 @@ export function EventList() {
                 {event.url && (
                   <Link
                     className="inset-0 absolute"
-                    href={event.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href={event.disable_page_build ? event.url : event.path || event.url}
+                    target={event.link?.target ?? '_self'}
+                    rel={event.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
                     title="Go to event page"
                     aria-hidden
                   />

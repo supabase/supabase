@@ -3,7 +3,12 @@
 import pricingFaq from '~/data/PricingFAQ.json'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Accordion } from 'ui'
+import {
+  Accordion_Shadcn_,
+  AccordionContent_Shadcn_,
+  AccordionItem_Shadcn_,
+  AccordionTrigger_Shadcn_,
+} from 'ui'
 
 const PricingFAQs = () => {
   return (
@@ -11,29 +16,24 @@ const PricingFAQs = () => {
       <div className="sm:py-18 mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
         <h2 className="h3 text-center">Frequently asked questions</h2>
         <div className="my-16">
-          <Accordion
-            type="default"
-            openBehaviour="multiple"
-            chevronAlign="right"
-            justified
-            size="medium"
-            className="text-foreground-light"
-          >
+          <Accordion_Shadcn_ type="multiple" className="text-foreground-light">
             {pricingFaq.map((faq, i) => {
               return (
                 <div className="border-b py-2" key={i}>
-                  <Accordion.Item
-                    header={<span className="text-foreground">{faq.question}</span>}
-                    id={`faq--${i.toString()}`}
-                  >
-                    <div className="prose text-foreground-lighter">
-                      <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                    </div>
-                  </Accordion.Item>
+                  <AccordionItem_Shadcn_ value={`faq--${i.toString()}`} className="border-none">
+                    <AccordionTrigger_Shadcn_>
+                      <span className="text-foreground">{faq.question}</span>
+                    </AccordionTrigger_Shadcn_>
+                    <AccordionContent_Shadcn_>
+                      <div className="prose text-foreground-lighter">
+                        <ReactMarkdown>{faq.answer}</ReactMarkdown>
+                      </div>
+                    </AccordionContent_Shadcn_>
+                  </AccordionItem_Shadcn_>
                 </div>
               )
             })}
-          </Accordion>
+          </Accordion_Shadcn_>
         </div>
         <p className="p text-center">
           Can&apos;t find the answer to your question?{' '}

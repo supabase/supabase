@@ -1,7 +1,7 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import {
+import React, {
   isValidElement,
   memo,
   ReactNode,
@@ -135,8 +135,8 @@ const baseMarkdownComponents = {
   h3: Heading3,
   code: InlineCode,
   a: Hyperlink,
-  img: ({ src }: JSX.IntrinsicElements['img']) => (
-    <span className="text-foreground-light font-mono">[Image: {src}]</span>
+  img: ({ src }: React.JSX.IntrinsicElements['img']) => (
+    <span className="text-foreground-light font-mono">[Image: {src?.toString()}]</span>
   ),
 }
 
@@ -169,7 +169,7 @@ export function MessageMarkdown({
     () => ({
       ...markdownComponents,
       ...baseMarkdownComponents,
-      pre: (props: JSX.IntrinsicElements['pre']) => (
+      pre: (props: React.JSX.IntrinsicElements['pre']) => (
         <MarkdownPre id={id} isLoading={isLoading} readOnly={readOnly}>
           {props.children}
         </MarkdownPre>
@@ -206,8 +206,11 @@ export const MarkdownPre = ({
   })
 
   const childArray = Array.isArray(children) ? children : [children]
-  const codeElement = childArray.find((child): child is ReactElement => isValidElement(child))
-  const codeProps = codeElement?.props || {}
+  const codeElement = childArray.find(
+    (child): child is ReactElement<{ className?: string; children: ReactNode }> =>
+      isValidElement<{ className?: string; children: ReactNode }>(child)
+  )
+  const codeProps = codeElement?.props || ({} as { className?: string; children: ReactNode })
   const language = codeProps.className?.replace('language-', '') || 'sql'
   const codeChildren = codeProps.children
   const rawContent = Array.isArray(codeChildren)

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import {
   Badge,
   Button,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -16,7 +16,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
-import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
+import {
+  ReadReplicasWarning,
+  ValidationErrorsWarning,
+  ValidationWarningsAdmonition,
+} from './UpgradeWarnings'
 import { NoticeBar } from '@/components/interfaces/DiskManagement/ui/NoticeBar'
 import {
   ScaffoldContainer,
@@ -82,8 +86,6 @@ export const InfrastructureInfo = () => {
 
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
-
-  const hasValidationErrors = (data?.validation_errors ?? []).length > 0
 
   return (
     <>
@@ -227,9 +229,13 @@ export const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {showDatabaseUpgrades && data && !data.eligible && hasValidationErrors ? (
-                      <ValidationErrorsWarning validationErrors={data.validation_errors ?? []} />
-                    ) : null}
+                    {showDatabaseUpgrades && data && !data.eligible && (
+                      <ValidationErrorsWarning validationErrors={data.validation_errors} />
+                    )}
+
+                    {showDatabaseUpgrades && data && (
+                      <ValidationWarningsAdmonition warnings={data.warnings} />
+                    )}
                   </>
                 )}
               </>

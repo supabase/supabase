@@ -8,17 +8,17 @@ import {
   Calendar,
   FormControl,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   SheetSection,
   Switch,
@@ -119,8 +119,8 @@ const FormField = ({
                   }
                 >
                   <FormControl>
-                    <Popover_Shadcn_>
-                      <PopoverTrigger_Shadcn_ asChild>
+                    <Popover>
+                      <PopoverTrigger asChild>
                         <Button
                           type="outline"
                           className="w-full justify-start text-left font-normal px-3 py-4"
@@ -129,8 +129,8 @@ const FormField = ({
                         >
                           {field.value ? format(new Date(field.value), 'PPP') : 'Pick a date'}
                         </Button>
-                      </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -139,8 +139,8 @@ const FormField = ({
                           }}
                           initialFocus
                         />
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                 </FormItemLayout>
               )}
@@ -179,7 +179,7 @@ const FormField = ({
                         readOnly={readOnly}
                       />
                     ) : (
-                      <Input_Shadcn_ {...field} id={name} readOnly={readOnly} />
+                      <Input {...field} id={name} readOnly={readOnly} />
                     )}
                   </FormControl>
                 </FormItemLayout>
@@ -263,7 +263,7 @@ const FormField = ({
                         </InputGroupAddon>
                       </InputGroup>
                     ) : (
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         id={name}
                         type="number"
@@ -348,17 +348,17 @@ const FormField = ({
                   }
                 >
                   <FormControl className="col-span-6">
-                    <Select_Shadcn_
+                    <Select
                       defaultValue={properties.enum[0]?.value}
                       value={field.value}
                       onValueChange={field.onChange}
                     >
-                      <SelectTrigger_Shadcn_>
-                        <SelectValue_Shadcn_ placeholder="Select an option" />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
                         {properties.enum.map((option: Enum) => (
-                          <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                          <SelectItem key={option.value} value={option.value}>
                             <span className="flex gap-2 items-center">
                               {option.icon ? (
                                 <img
@@ -369,10 +369,10 @@ const FormField = ({
                               ) : null}
                               {option.label}
                             </span>
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                 </FormItemLayout>
               )}

@@ -12,10 +12,10 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -168,25 +168,23 @@ export const AdvancedSettings = ({
                   description="Behavior when the replication slot is invalidated"
                 >
                   <FormControl>
-                    <Select_Shadcn_ value={field.value ?? 'error'} onValueChange={field.onChange}>
-                      <SelectTrigger_Shadcn_ className="capitalize">
-                        {field.value ?? 'error'}
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="error" className="[&>span]:top-2.5">
+                    <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
+                      <SelectTrigger className="capitalize">{field.value ?? 'error'}</SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="error" className="[&>span]:top-2.5">
                           <p>Error</p>
                           <p className="text-foreground-lighter">
                             Blocks startup for manual recovery
                           </p>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="recreate" className="[&>span]:top-2.5">
+                        </SelectItem>
+                        <SelectItem value="recreate" className="[&>span]:top-2.5">
                           <p>Recreate</p>
                           <p className="text-foreground-lighter">
                             Rebuilds the slot and restarts replication from scratch
                           </p>
-                        </SelectItem_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                 </FormItemLayout>
               )}

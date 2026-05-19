@@ -5,14 +5,14 @@ import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -299,32 +299,32 @@ export const QueryIndexes = ({
                       description="Index advisor could not analyze this query. This can happen if the query references tables, functions, or extensions that no longer exist or were deleted."
                     />
                   ) : (index_statements ?? []).length === 0 ? (
-                    <Alert_Shadcn_ className="[&>svg]:rounded-full">
+                    <Alert className="[&>svg]:rounded-full">
                       <Check />
-                      <AlertTitle_Shadcn_>This query is optimized</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
+                      <AlertTitle>This query is optimized</AlertTitle>
+                      <AlertDescription>
                         Recommendations for indexes will show here
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
+                      </AlertDescription>
+                    </Alert>
                   ) : (
                     <>
                       {isLinterWarning ? (
-                        <Alert_Shadcn_
+                        <Alert
                           variant="default"
                           className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand my-3"
                         >
                           <Lightbulb />
-                          <AlertTitle_Shadcn_>
+                          <AlertTitle>
                             We have {index_statements.length} index recommendation
                             {index_statements.length > 1 ? 's' : ''}
-                          </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
+                          </AlertTitle>
+                          <AlertDescription>
                             You can improve this query's performance by{' '}
                             <span className="text-brand">{totalImprovement.toFixed(2)}%</span> by
                             adding the following suggested{' '}
                             {index_statements.length > 1 ? 'indexes' : 'index'}
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
+                          </AlertDescription>
+                        </Alert>
                       ) : (
                         <IndexImprovementText
                           indexStatements={index_statements}
@@ -368,8 +368,8 @@ export const QueryIndexes = ({
                   before={total_cost_before}
                   after={total_cost_after}
                 />
-                <Collapsible_Shadcn_ open={showStartupCosts} onOpenChange={setShowStartupCosts}>
-                  <CollapsibleContent_Shadcn_ asChild className="pb-3">
+                <Collapsible open={showStartupCosts} onOpenChange={setShowStartupCosts}>
+                  <CollapsibleContent asChild className="pb-3">
                     <QueryPanelScoreSection
                       hideArrowMarkers
                       className="border-t"
@@ -378,11 +378,11 @@ export const QueryIndexes = ({
                       before={startup_cost_before}
                       after={startup_cost_after}
                     />
-                  </CollapsibleContent_Shadcn_>
-                  <CollapsibleTrigger_Shadcn_ className="text-xs py-1.5 border-t text-foreground-light bg-studio w-full rounded-b-md">
+                  </CollapsibleContent>
+                  <CollapsibleTrigger className="text-xs py-1.5 border-t text-foreground-light bg-studio w-full rounded-b-md">
                     View {showStartupCosts ? 'less' : 'more'}
-                  </CollapsibleTrigger_Shadcn_>
-                </Collapsible_Shadcn_>
+                  </CollapsibleTrigger>
+                </Collapsible>
               </div>
             </div>
           </QueryPanelSection>
