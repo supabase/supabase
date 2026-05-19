@@ -2539,6 +2539,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/analytics/endpoints/service-health': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's service health based on log levels */
+    get: operations['UsageApiController_getProjectServiceHealth']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/analytics/log-drains': {
     parameters: {
       query?: never
@@ -4719,6 +4736,15 @@ export interface components {
     AddAwsAccountToPrivateLinkBody: {
       account_name?: string
       aws_account_id: string
+    }
+    ProjectServiceHealthResponse: {
+      error?: string
+      result?: {
+        timestamp: string | number
+        ok_count: number
+        warning_count: number
+        error_count: number
+      }[]
     }
     AnalyticsResponse: {
       error?:
@@ -20567,6 +20593,66 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get project's usage api requests count */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  UsageApiController_getProjectServiceHealth: {
+    parameters: {
+      query?: {
+        granularity?: 'day' | 'hour' | 'minute'
+        /** @example 2025-03-01T23:59:59Z */
+        iso_timestamp_end: string
+        /** @example 2025-03-01T00:00:00Z */
+        iso_timestamp_start: string
+        /** @example s:edge_logs */
+        lql?: string
+        /** @example select timestamp, edge_logs from service_health */
+        sql?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectServiceHealthResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's service health */
       500: {
         headers: {
           [name: string]: unknown

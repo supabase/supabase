@@ -2,8 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
-import { LogsTableName } from '../Settings/Logs/Logs.constants'
-import { genChartQuery } from '../Settings/Logs/Logs.utils'
 import {
   calculateAggregatedMetrics,
   calculateDateRange,
@@ -11,7 +9,8 @@ import {
   transformToBarChartData,
   type RawChartData,
 } from './useServiceHealthMetrics.utils'
-import { get } from '@/data/fetchers'
+import { analyticsKeys } from '@/data/analytics/keys'
+import { getServiceHealth, type ServiceHealthGranularity } from '@/data/analytics/service-health-query'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from '@/hooks/analytics/useTimeseriesUnixToIso'
 
@@ -30,94 +29,53 @@ export type ServiceHealthData = {
   refresh: () => void
 }
 
-type ServiceConfig = {
-  table: LogsTableName
-  enabled: boolean
+const SERVICE_LQL: Record<ServiceKey, string> = {
+  db: 's:postgres_logs',
+  auth: 's:auth_logs',
+  functions: 's:function_edge_logs',
+  storage: 's:storage_logs',
+  realtime: 's:realtime_logs',
+  postgrest: 's:postgrest_logs',
 }
 
-const SERVICE_CONFIG: Record<ServiceKey, ServiceConfig> = {
-  db: { table: LogsTableName.POSTGRES, enabled: true },
-  auth: { table: LogsTableName.AUTH, enabled: true },
-  functions: { table: LogsTableName.FN_EDGE, enabled: true },
-  storage: { table: LogsTableName.STORAGE, enabled: true },
-  realtime: { table: LogsTableName.REALTIME, enabled: true },
-  postgrest: { table: LogsTableName.POSTGREST, enabled: true },
-}
-
-type ChartQueryResult = {
-  timestamp: string | number
-  ok_count: number
-  warning_count: number
-  error_count: number
+const INTERVAL_TO_GRANULARITY: Record<'1hr' | '1day' | '7day', ServiceHealthGranularity> = {
+  '1hr': 'minute',
+  '1day': 'hour',
+  '7day': 'day',
 }
 
 /**
- * Fetches service health metrics using the same logic as the logs pages
- */
-const fetchServiceHealthMetrics = async (
-  projectRef: string,
-  table: LogsTableName,
-  startDate: string,
-  endDate: string,
-  signal?: AbortSignal
-): Promise<ChartQueryResult[]> => {
-  const sql = genChartQuery(
-    table,
-    {
-      iso_timestamp_start: startDate,
-      iso_timestamp_end: endDate,
-    },
-    {}
-  )
-
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        sql,
-        iso_timestamp_start: startDate,
-        iso_timestamp_end: endDate,
-      },
-    },
-    signal,
-  })
-
-  if (error ?? data?.error) {
-    throw error ?? data?.error
-  }
-
-  return (data?.result ?? []) as ChartQueryResult[]
-}
-
-/**
- * Hook to fetch health metrics for a single service
+ * Hook to fetch health metrics for a single service using the service-health endpoint
  */
 const useServiceHealthQuery = ({
   projectRef,
   serviceKey,
   startDate,
   endDate,
+  granularity,
   enabled,
 }: {
   projectRef: string
   serviceKey: ServiceKey
   startDate: string
   endDate: string
+  granularity: ServiceHealthGranularity
   enabled: boolean
 }) => {
-  const config = SERVICE_CONFIG[serviceKey]
-  const table = config.table
+  const lql = SERVICE_LQL[serviceKey]
 
   const queryResult = useQuery({
-    queryKey: ['service-health-metrics', projectRef, serviceKey, startDate, endDate, table],
+    queryKey: analyticsKeys.serviceHealth(projectRef, { startDate, endDate, granularity, lql }),
     queryFn: ({ signal }) =>
-      fetchServiceHealthMetrics(projectRef, table, startDate, endDate, signal),
-    enabled: enabled && config.enabled && Boolean(projectRef),
+      getServiceHealth({ projectRef, startDate, endDate, granularity, lql }, signal),
+    enabled: enabled && Boolean(projectRef),
     staleTime: 1000 * 60, // 1 minute
   })
 
-  // Convert unix microseconds to ISO timestamps
-  const normalizedData = useTimeseriesUnixToIso(queryResult.data ?? [], 'timestamp')
+  const rawRows = (queryResult.data?.result ?? []) as RawChartData[]
+
+  // Convert unix microseconds to ISO timestamps (no-op if already ISO)
+  const normalizedData = useTimeseriesUnixToIso(rawRows, 'timestamp')
 
   // Fill gaps in timeseries
   const { data: filledData } = useFillTimeseriesSorted({
@@ -148,57 +106,25 @@ const useServiceHealthQuery = ({
 }
 
 /**
- * Hook to fetch observability overview data for all services using logs page queries
+ * Hook to fetch observability overview data for all services using the service-health endpoint
  */
 export const useServiceHealthMetrics = (
   projectRef: string,
   interval: '1hr' | '1day' | '7day',
   refreshKey: number
 ) => {
-  // Calculate date range based on interval
-  // refreshKey is intentionally included to force recalculation when user refreshes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const { startDate, endDate } = useMemo(() => calculateDateRange(interval), [interval, refreshKey])
 
+  const granularity = INTERVAL_TO_GRANULARITY[interval]
   const enabled = Boolean(projectRef)
 
-  // Fetch metrics for each service
-  const db = useServiceHealthQuery({ projectRef, serviceKey: 'db', startDate, endDate, enabled })
-  const auth = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'auth',
-    startDate,
-    endDate,
-    enabled,
-  })
-  const functions = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'functions',
-    startDate,
-    endDate,
-    enabled,
-  })
-  const storage = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'storage',
-    startDate,
-    endDate,
-    enabled,
-  })
-  const realtime = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'realtime',
-    startDate,
-    endDate,
-    enabled,
-  })
-  const postgrest = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'postgrest',
-    startDate,
-    endDate,
-    enabled,
-  })
+  const db = useServiceHealthQuery({ projectRef, serviceKey: 'db', startDate, endDate, granularity, enabled })
+  const auth = useServiceHealthQuery({ projectRef, serviceKey: 'auth', startDate, endDate, granularity, enabled })
+  const functions = useServiceHealthQuery({ projectRef, serviceKey: 'functions', startDate, endDate, granularity, enabled })
+  const storage = useServiceHealthQuery({ projectRef, serviceKey: 'storage', startDate, endDate, granularity, enabled })
+  const realtime = useServiceHealthQuery({ projectRef, serviceKey: 'realtime', startDate, endDate, granularity, enabled })
+  const postgrest = useServiceHealthQuery({ projectRef, serviceKey: 'postgrest', startDate, endDate, granularity, enabled })
 
   const services: Record<ServiceKey, ServiceHealthData> = useMemo(
     () => ({
@@ -212,7 +138,6 @@ export const useServiceHealthMetrics = (
     [db, auth, functions, storage, realtime, postgrest]
   )
 
-  // Calculate aggregated metrics
   const aggregated = useMemo(() => calculateAggregatedMetrics(Object.values(services)), [services])
 
   const isLoading = Object.values(services).some((s) => s.isLoading)

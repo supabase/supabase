@@ -155,6 +155,22 @@ export const analyticsKeys = {
 
   usageApiRequestsCount: (projectRef: string | undefined) =>
     ['projects', projectRef, 'usage.api-requests-count'] as const,
+
+  serviceHealth: (
+    projectRef: string | undefined,
+    {
+      startDate,
+      endDate,
+      granularity,
+      lql,
+    }: {
+      startDate?: string
+      endDate?: string
+      granularity?: string
+      lql?: string
+    }
+  ) =>
+    ['projects', projectRef, 'service-health', { startDate, endDate, granularity, lql }] as const,
 }
 
 function isoDateStringToDate(isoDateString: string | undefined): string | undefined {
