@@ -186,6 +186,15 @@ export const FilterPopoverNew = ({
 
   const handleApply = useCallback(
     (newFilterGroup: FilterGroup) => {
+      const isValid = newFilterGroup.conditions.every(
+        (condition) =>
+          isGroup(condition) ||
+          (!!condition.propertyName &&
+            !!condition.operator &&
+            condition.value !== '' &&
+            condition.value != null)
+      )
+      if (!isValid) return
       setFilters(filterGroupToFilters(newFilterGroup))
     },
     [setFilters]
