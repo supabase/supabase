@@ -1,9 +1,9 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
 import type {
   CloudMarketplaceContractLinkingEligibility,
   CloudMarketplaceOnboardingInfo,

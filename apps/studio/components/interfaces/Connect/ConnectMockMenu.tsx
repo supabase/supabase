@@ -25,9 +25,7 @@ export const getConnectMockState = <TState extends string>(
 }
 
 export const ConnectPreviewToolbar = ({ children }: PropsWithChildren) => (
-  <div className="fixed right-3 top-3 z-50 flex items-center gap-2">
-    {children}
-  </div>
+  <div className="fixed right-3 top-3 z-50 flex items-center gap-2">{children}</div>
 )
 
 export const ConnectMockMenu = <TState extends string>({

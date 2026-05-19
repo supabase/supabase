@@ -507,13 +507,6 @@ export const AwsMarketplaceOnboardingScreen = ({
             />
           )}
 
-          {!hasAnyOrganizations && (
-            <Admonition
-              type="note"
-              description="Create a new organization and it will be linked to AWS Marketplace automatically."
-            />
-          )}
-
           <div className="flex flex-col gap-5">
             <Button
               type="primary"
@@ -685,12 +678,7 @@ function ContractIneligibilityNotice({
         />
       )
     default:
-      return (
-        <Admonition
-          type="default"
-          description="Contact support if this keeps happening."
-        />
-      )
+      return <Admonition type="default" description="If the problem persists, contact support." />
   }
 }
 
