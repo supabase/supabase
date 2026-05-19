@@ -187,34 +187,54 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Configure prisma.config.ts">
 
-    Add `import "dotenv/config"` to the generated `prisma.config.ts` and change the datasource url to `DIRECT_URL`
+    Add `import "dotenv/config"` to the generated `prisma.config.ts`. If you are using a serverless environment, change the datasource url to `DIRECT_URL`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```ts prisma.config.ts
-      import "dotenv/config";
-      import { defineConfig, env } from "prisma/config";
+        <Tabs>
+            <TabPanel id="serverful" label="server-based deployments">
+                ```ts prisma.config.ts
+                import "dotenv/config";
+                import { defineConfig, env } from "prisma/config";
 
-      export default defineConfig({
-        schema: "prisma/schema",
-        migrations: {
-          path: "prisma/migrations",
-        },
-        datasource: {
-          url: env("DIRECT_URL"),
-        },
-      });
-      ```
+                export default defineConfig({
+                  schema: "prisma/schema",
+                  migrations: {
+                    path: "prisma/migrations",
+                  },
+                  datasource: {
+                    url: env("DATABASE_URL"),
+                  },
+                });
+                ```
+            </TabPanel>
+            <TabPanel id="serverless" label="serverless deployments">
+                ```ts prisma.config.ts
+                import "dotenv/config";
+                import { defineConfig, env } from "prisma/config";
+
+                export default defineConfig({
+                  schema: "prisma/schema",
+                  migrations: {
+                    path: "prisma/migrations",
+                  },
+                  datasource: {
+                    url: env("DIRECT_URL"),
+                  },
+                });
+                ```
+            </TabPanel>
+
+        </Tabs>
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
-
   <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Create your migrations">
+    <StepHikeCompact.Details title="Migrate and generate your Prisma client">
 
-    If you have already modified your Supabase database, synchronize it with your migration file. Otherwise create new tables for your database
+    If you have already modified your Supabase database, synchronize it with your migration file. Otherwise create new tables for your database, then generate the Prisma client.
 
     </StepHikeCompact.Details>
 
@@ -254,25 +274,25 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="npm_migrate" label="npm">
             ```bash
             npx prisma migrate dev --name first_prisma_migration
-
+            npx prisma generate
             ```
             </TabPanel>
             <TabPanel id="pnpm_migrate" label="pnpm">
             ```bash
             pnpx prisma migrate dev --name first_prisma_migration
-
+            pnpx prisma generate
             ```
             </TabPanel>
             <TabPanel id="yarn_migrate" label="yarn">
             ```bash
             npx prisma migrate dev --name first_prisma_migration
-
+            npx prisma generate
             ```
             </TabPanel>
             <TabPanel id="bun_migrate" label="bun">
             ```bash
             bunx prisma migrate dev --name first_prisma_migration
-
+            bunx prisma generate
             ```
             </TabPanel>
           </Tabs>
@@ -313,6 +333,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
             ```bash
             npx prisma migrate resolve --applied 0_init_supabase
+            npx prisma generate
             ```
           </TabPanel>
 
@@ -341,6 +362,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
             ```bash
             pnpx prisma migrate resolve --applied 0_init_supabase
+            pnpx prisma generate
             ```
           </TabPanel>
 
@@ -369,6 +391,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
             ```bash
             npx prisma migrate resolve --applied 0_init_supabase
+            npx prisma generate
             ```
           </TabPanel>
 
@@ -397,6 +420,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
             ```bash
             bunx prisma migrate resolve --applied 0_init_supabase
+            bunx prisma generate
             ```
           </TabPanel>
           </Tabs>
@@ -414,6 +438,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
       ```ts index.ts
+      import "dotenv/config";
       import { PrismaClient } from "./generated/prisma/client";
       import { PrismaPg } from "@prisma/adapter-pg";
 
