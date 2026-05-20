@@ -1,5 +1,17 @@
 import { routes, type VercelConfig } from '@vercel/config/v1'
 
+// STUDIO_FRAMEWORK gates the TanStack Start deploy. When the env var is
+// unset (the default — used by the Next.js prod deploy) this file returns
+// an empty `VercelConfig` so Vercel honours the dashboard-configured
+// Next.js preset untouched. Vercel reads `vercel.ts` regardless of the
+// framework preset (per vercel.com/docs/project-configuration —
+// `vercel.ts`'s `framework` field overrides the dashboard preset), so a
+// no-op early return is the only way to keep the TanStack rewrites,
+// `framework: null`, and `outputDirectory: 'dist/client'` below from
+// clobbering the Next build. Set `STUDIO_FRAMEWORK=tanstack` on the
+// TanStack Vercel project to opt in.
+const isTanstack = process.env.STUDIO_FRAMEWORK === 'tanstack'
+
 // Vite's `base` bakes the prefix into asset URLs but leaves the filesystem
 // layout at `dist/client/...`. On Vercel we strip the prefix for file lookups
 // and fall through to the SPA shell. When NEXT_PUBLIC_BASE_PATH is empty
@@ -40,18 +52,36 @@ function routesFor(prefix: string) {
   }
 }
 
-// When a base path is configured, emit both the prefixed and root rule
-// sets (prefixed first so it wins for explicit /dashboard/* hits, root as
-// a fallback for bare-domain traffic).
-const ruleSets = (basePath ? [basePath, ''] : ['']).map(routesFor)
+function buildTanstackConfig(): VercelConfig {
+  // When a base path is configured, emit both the prefixed and root rule
+  // sets (prefixed first so it wins for explicit /dashboard/* hits, root as
+  // a fallback for bare-domain traffic).
+  const ruleSets = (basePath ? [basePath, ''] : ['']).map(routesFor)
 
-export const config: VercelConfig = {
-  framework: null,
-  outputDirectory: 'dist/client',
-  cleanUrls: true,
-  rewrites: ruleSets.flatMap((r) => r.rewrites),
-  headers: ruleSets.flatMap((r) => r.headers),
+  return {
+    framework: null,
+    outputDirectory: 'dist/client',
+    cleanUrls: true,
+    rewrites: ruleSets.flatMap((r) => r.rewrites),
+    headers: ruleSets.flatMap((r) => r.headers),
+    // `api/server.js` imports the TanStack SSR bundle via a computed
+    // path so Vercel's function bundler doesn't try to statically
+    // resolve `dist/server/server.js` during the Next.js prod build
+    // (where `dist/` doesn't exist). `includeFiles` ships the SSR
+    // output into the function bundle for the TanStack build so the
+    // runtime import resolves.
+    functions: {
+      'api/server.js': {
+        includeFiles: 'dist/server/**',
+      },
+    },
+  }
 }
+
+// Empty config = no overrides; Vercel falls back to the dashboard preset.
+const passthrough: VercelConfig = {}
+
+export const config: VercelConfig = isTanstack ? buildTanstackConfig() : passthrough
 
 // Belt-and-braces: local @vercel/config CLI reads module.default, but the
 // docs claim Vercel's platform looks for a named `config` export. Export
