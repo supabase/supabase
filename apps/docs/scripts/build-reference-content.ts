@@ -296,8 +296,9 @@ function buildBySlug(
 
 /**
  * Processes one `[library]/[version]` directory: reads spec files, partials,
- * and config, builds bySlug.json, writes it to the output directory, and logs
- * a one-line summary of the counts.
+ * and config, then writes `bySlug.json` and `flat.json` to the output
+ * directory in parallel. `flat.json` is `Object.values(bySlug)` — the same
+ * entries in iteration order, used both for counting and as the array output.
  */
 async function processVersion(library: string, version: string): Promise<void> {
   const versionDir = join(SPEC_DIR, library, version)
@@ -316,20 +317,25 @@ async function processVersion(library: string, version: string): Promise<void> {
   }
 
   const bySlug = buildBySlug(functions, partials, config)
-
-  const outputDir = join(OUTPUT_DIR, library, version)
-  await mkdir(outputDir, { recursive: true })
-  await writeFile(join(outputDir, 'bySlug.json'), JSON.stringify(bySlug))
+  const flat = Object.values(bySlug)
 
   const counts = { markdown: 0, function: 0, subcategory: 0, category: 0 }
-  for (const v of Object.values(bySlug)) {
+  for (const v of flat) {
     if (v.type === 'markdown') counts.markdown++
     else if (v.type === 'category') counts.category++
     else if ('isFunc' in v && v.isFunc === false) counts.subcategory++
     else counts.function++
   }
+
+  const outputDir = join(OUTPUT_DIR, library, version)
+  await mkdir(outputDir, { recursive: true })
+  await Promise.all([
+    writeFile(join(outputDir, 'bySlug.json'), JSON.stringify(bySlug)),
+    writeFile(join(outputDir, 'flat.json'), JSON.stringify(flat)),
+  ])
+
   console.log(
-    `[${library}/${version}] wrote bySlug.json — ${functions.length} declarations scanned, ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories`
+    `[${library}/${version}] wrote bySlug.json + flat.json — ${functions.length} declarations scanned, ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories`
   )
 }
 
