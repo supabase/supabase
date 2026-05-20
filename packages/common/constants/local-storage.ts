@@ -54,6 +54,8 @@ export const LOCAL_STORAGE_KEYS = {
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
+  GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
+    `graphql-introspection-notice-collapsed-${ref}`,
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
   CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
