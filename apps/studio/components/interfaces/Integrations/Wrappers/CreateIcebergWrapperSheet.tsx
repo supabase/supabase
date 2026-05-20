@@ -33,9 +33,8 @@ import InputField from './InputField'
 import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FORM_ID = 'create-wrapper-form'
 
@@ -130,8 +129,7 @@ export const CreateIcebergWrapperSheet = ({
   onCloseWithConfirmation,
 }: CreateWrapperSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutateAsync: createFDW, isPending: isCreatingWrapper } = useFDWCreateMutation({
     onSuccess: () => {
@@ -217,16 +215,7 @@ export const CreateIcebergWrapperSheet = ({
         targetSchema: values.target_schema,
       })
 
-      sendEvent({
-        action: 'foreign_data_wrapper_created',
-        properties: {
-          wrapperType: wrapperMeta.label,
-        },
-        groups: {
-          project: project?.ref ?? 'Unknown',
-          organization: org?.slug ?? 'Unknown',
-        },
-      })
+      track('foreign_data_wrapper_created', { wrapperType: wrapperMeta.label })
     } catch (error) {
       console.error(error)
       // The error will be handled by the mutation onError callback (toast.error)
