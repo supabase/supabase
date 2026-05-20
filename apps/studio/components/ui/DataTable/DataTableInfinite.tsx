@@ -239,7 +239,7 @@ function DataTableRow<TData>({
   onSelect: () => void
 }) {
   useQueryState('live', searchParamsParser.live)
-  const rowClassName = (table.options.meta as any)?.getRowClassName?.(row)
+  const rowClassName = cn('group/row', (table.options.meta as any)?.getRowClassName?.(row))
   const cells = row.getVisibleCells()
 
   return (
