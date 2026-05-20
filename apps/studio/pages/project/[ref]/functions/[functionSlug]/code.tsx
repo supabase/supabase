@@ -14,6 +14,7 @@ import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dial
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
@@ -181,14 +182,9 @@ const CodePage = () => {
                 </li>
                 <li>
                   3. Or use the{' '}
-                  <a
-                    href="https://supabase.com/docs/reference/api/v1-deploy-a-function"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
+                  <InlineLink href="https://supabase.com/docs/reference/api/v1-deploy-a-function">
                     Management API
-                  </a>
+                  </InlineLink>
                 </li>
               </ol>
             </div>
