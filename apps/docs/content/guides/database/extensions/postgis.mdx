@@ -45,6 +45,18 @@ drop extension if exists postgis;
 </TabPanel>
 </Tabs>
 
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+## Use the TIGER geocoder
+
+The `postgis_tiger_geocoder` extension adds geocoding functions, but it does not include TIGER census data by itself. The official PostGIS TIGER geocoder setup generates command-line loader scripts that download and load data into the `tiger_data` schema.
+
+Enabling `postgis_tiger_geocoder` in a hosted Supabase project creates the extension objects, but it does not run those loader scripts or populate `tiger_data`. Enabling `address_standardizer_data_us` adds data for address standardization; it does not add the census data required by `tiger.geocode`.
+
+If you need TIGER geocoding, use a self-hosted Postgres environment where you can run the [PostGIS TIGER data loader](https://postgis.net/docs/postgis_installation.html#install_tiger_geocoder_extension), or store geocoded coordinates in your own tables before querying them with PostGIS.
+
+{/* supa-mdx-lint-enable Rule003Spelling */}
+
 ## Examples
 
 Now that we are ready to get started with PostGIS, let’s create a table and see how we can utilize PostGIS for some typical use cases. Let’s imagine we are creating a simple restaurant-searching app.
