@@ -46,7 +46,7 @@ import {
 } from '@/data/projects/org-projects-infinite-query'
 import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 interface UpdateRolesPanelProps {
@@ -63,7 +63,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
-  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: IS_PLATFORM })
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
   const totalNumOrgProjects = projectsData?.pages[0].pagination.count ?? 0
   const orgProjects =
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []

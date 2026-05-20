@@ -7,7 +7,6 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ActionCard } from '@/components/ui/ActionCard'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
-import { IS_PLATFORM } from '@/lib/constants'
 import type { Organization } from '@/types'
 
 export const OrganizationCard = ({
@@ -30,7 +29,7 @@ export const OrganizationCard = ({
   const shouldRenderDefaultDescription = description === undefined
   const { data } = useOrgProjectsInfiniteQuery(
     { slug: organization.slug },
-    { enabled: IS_PLATFORM && !isPlatformOrg && shouldRenderDefaultDescription }
+    { enabled: !isPlatformOrg && shouldRenderDefaultDescription }
   )
   const numProjects = data?.pages[0].pagination.count ?? 0
   const isMfaRequired = organization.organization_requires_mfa

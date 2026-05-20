@@ -64,13 +64,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { usePHFlag } from '@/hooks/ui/useFlag'
-import {
-  DOCS_URL,
-  IS_PLATFORM,
-  PROJECT_STATUS,
-  PROVIDERS,
-  useDefaultProvider,
-} from '@/lib/constants'
+import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
@@ -213,10 +207,7 @@ const Wizard: NextPageWithLayout = () => {
   const overdueInvoices = allOverdueInvoices.filter((x) => x.organization_id === currentOrg?.id)
   const hasOutstandingInvoices = isNotOnHigherPlan && overdueInvoices.length > 0
 
-  const { data: orgProjectsFromApi } = useOrgProjectsInfiniteQuery(
-    { slug: currentOrg?.slug },
-    { enabled: IS_PLATFORM }
-  )
+  const { data: orgProjectsFromApi } = useOrgProjectsInfiniteQuery({ slug: currentOrg?.slug })
   const allOrgProjects = useMemo(
     () => orgProjectsFromApi?.pages.flatMap((page) => page.projects),
     [orgProjectsFromApi?.pages]

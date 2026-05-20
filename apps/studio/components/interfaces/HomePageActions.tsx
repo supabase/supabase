@@ -17,7 +17,7 @@ import {
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 interface HomePageActionsProps {
   slug?: string
@@ -54,7 +54,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
-    { placeholderData: keepPreviousData, enabled: IS_PLATFORM }
+    { placeholderData: keepPreviousData }
   )
 
   useEffect(() => {
