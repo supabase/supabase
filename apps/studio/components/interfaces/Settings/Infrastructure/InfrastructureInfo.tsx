@@ -233,7 +233,7 @@ export const InfrastructureInfo = () => {
                       <ValidationErrorsWarning validationErrors={data.validation_errors} />
                     )}
 
-                    {showDatabaseUpgrades && data && (
+                    {showDatabaseUpgrades && data && data.warnings && (
                       <ValidationWarningsAdmonition warnings={data.warnings} />
                     )}
                   </>
