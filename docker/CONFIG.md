@@ -4,7 +4,7 @@ Last updated: 2026-05-19
 
 This document is the aggregated reference for environment variables relevant to a self-hosted Supabase deployment. It aims to be comprehensive for the self-hosted use case rather than literally exhaustive - variables that only apply on the hosted platform are typically omitted or marked as such. For the complete set a given service can read, refer to its [upstream repositories](#upstream-repositories) below.
 
-The default self-hosted setup already includes explicit values for all required variables, and the remaining configuration inherits sensible defaults from the services themselves. Otherwise, it serves as a reference for advanced customization or educational purposes. For more guidance on the essential keys and secrets, see [Configuring Secrets](https://supabase.com/docs/guides/self-hosting/docker#configuring-secrets) in the self-hosting guide.
+The default self-hosted setup already includes explicit values for all required variables, and the remaining configuration inherits sensible defaults from the services themselves. Otherwise, it serves as a reference for advanced customization or educational purposes. For more guidance on the essential keys and secrets, see [Configuring secrets](https://supabase.com/docs/guides/self-hosting/docker#configuring-secrets) in the self-hosting guide.
 
 > **A note on accuracy.** This reference is compiled from each service's source code and upstream docs as a self-hosting overview - it is **not** maintained by the individual product teams and shouldn't be treated as canonical. Within each row:
 >
@@ -20,8 +20,8 @@ The Type column was derived from each service's parse-site code (Go struct field
 - **Auth** - against [supabase/auth/README.md](https://github.com/supabase/auth/blob/master/README.md)
 - **PostgREST** - against [postgrest.org/en/stable](https://docs.postgrest.org/en/stable/references/configuration.html)
 - **Realtime** - against [supabase/realtime/ENVS.md](https://github.com/supabase/realtime/blob/main/ENVS.md)
-- **Storage** - against the Supabase docs [YAML spec](https://github.com/supabase/supabase/blob/master/apps/docs/spec/storage_v0_config.yaml) for the 18 vars it covers; otherwise from code reads
-- **Analytics (Logflare)** - against the Supabase docs [YAML spec](https://github.com/supabase/supabase/blob/master/apps/docs/spec/analytics_v0_config.yaml) (6 vars) and [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/) for the rest, with [logflare/config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs) and [logflare/config/config.exs](https://github.com/Logflare/logflare/blob/main/config/config.exs) used as tiebreakers
+- **Storage** - against the Supabase docs [YAML spec](https://github.com/supabase/supabase/blob/master/apps/docs/spec/storage_v0_config.yaml) for the variables it covers; otherwise from code reads
+- **Analytics (Logflare)** - against the Supabase docs [YAML spec](https://github.com/supabase/supabase/blob/master/apps/docs/spec/analytics_v0_config.yaml) and [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/) for the rest, with [logflare/config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs) and [logflare/config/config.exs](https://github.com/Logflare/logflare/blob/main/config/config.exs) used as tiebreakers
 - **Supavisor** - against [supabase/supavisor/docs/configuration/env.md](https://github.com/supabase/supavisor/blob/main/docs/configuration/env.md)
 
 Other sections (Studio, Edge Functions, Postgres) appeared to have no comparable upstream prose documentation and were documented by reading the source repos. Corrections welcome via PR.
