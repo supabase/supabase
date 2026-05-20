@@ -139,7 +139,10 @@ export const MarketplaceFeaturedHero = ({
           </div>
         </Link>
 
-        <div className="grid grid-cols-2 border-t @md:grid-cols-3">
+        <div
+          className="grid border-t"
+          style={{ gridTemplateColumns: `repeat(${integrations.length}, minmax(0, 1fr))` }}
+        >
           {integrations.map((integration, idx) => {
             const isActive = idx === activeIndex
             const slug = integration.categories?.[0]
@@ -155,7 +158,11 @@ export const MarketplaceFeaturedHero = ({
                 )}
                 aria-pressed={isActive}
               >
-                <IntegrationLogo integration={integration} size="h-7 w-7" />
+                <IntegrationLogo
+                  integration={integration}
+                  size="h-7 w-7"
+                  className="hidden sm:flex"
+                />
                 <div className="min-w-0 flex-1">
                   <div
                     className={cn(
