@@ -57,6 +57,11 @@ export const ExposedSchemaSelector = ({
     [allSchemas]
   )
 
+  const missingExposedSchema = useMemo(
+    () => selectedSchemas.filter((schema) => !schemas.some((s) => s.name === schema)),
+    [schemas, selectedSchemas]
+  )
+
   const selectedSet = useMemo(() => new Set(selectedSchemas), [selectedSchemas])
   const selectedCount = schemas.filter((s) => selectedSet.has(s.name)).length
 
@@ -110,6 +115,26 @@ export const ExposedSchemaSelector = ({
                     </p>
                   </CommandEmpty>
                   <ScrollArea className={schemas.length > 7 ? 'h-[210px]' : ''}>
+                    {missingExposedSchema.map((schema) => (
+                      <CommandItem
+                        key={schema}
+                        value={schema}
+                        className="cursor-pointer w-full"
+                        onSelect={() => {
+                          onToggleSchema(schema)
+                        }}
+                      >
+                        <div className="w-full flex flex-col">
+                          <div className="w-full flex items-center gap-x-2">
+                            <Check size={16} className="text-brand shrink-0" />
+                            <span className="truncate">{schema}</span>
+                          </div>
+                          <span className="pl-6 text-destructive text-[11px]">
+                            This schema does not exist
+                          </span>
+                        </div>
+                      </CommandItem>
+                    ))}
                     {schemas.map((schema) => {
                       const isExposed = selectedSet.has(schema.name)
 
