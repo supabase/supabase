@@ -9,23 +9,18 @@ const Globe = () => {
   useEffect(() => {
     let rotation = 0
     let width = 0
+    let previousWidth = 0
 
-    const onResize = () => {
-      if (canvasRef.current) {
-        width = canvasRef.current.offsetWidth
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        width = Math.round(entry.contentRect.width)
       }
-    }
-
-    // Use ResizeObserver to catch container size changes reliably in local dev
-    const resizeObserver = new ResizeObserver(() => {
-      onResize()
     })
 
     if (canvasRef.current) {
       resizeObserver.observe(canvasRef.current)
+      width = Math.round(canvasRef.current.getBoundingClientRect().width)
     }
-
-    onResize()
 
     const cobe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
@@ -61,8 +56,11 @@ const Globe = () => {
       onRender: (state) => {
         state.phi = rotation
         rotation += 0.0025
-        state.width = width * 2
-        state.height = width * 2
+        if (width !== previousWidth) {
+          state.width = width * 2
+          state.height = width * 2
+          previousWidth = width
+        }
       },
     })
 
