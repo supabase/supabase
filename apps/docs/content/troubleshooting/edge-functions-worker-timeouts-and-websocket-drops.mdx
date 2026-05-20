@@ -16,7 +16,7 @@ The supervisor enforces resource limits:
 - CPU time (soft + hard limits)
 - Memory usage
 
-It also supports early retirement (`EarlyDrop`) when the isolate appears idle:
+It may retire early (`EarlyDrop` event) if the isolate is idle Isolate is considered idle if following conditions are met:
 
 - The HTTP response has already been returned.
 - All `EdgeRuntime.waitUntil()` promises have resolved.
