@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
 import useLatest from '@/hooks/misc/useLatest'
@@ -55,7 +55,9 @@ const createSidebarManagerState = () => {
         ...handlers,
       }
 
-      // If this sidebar was pending to be opened, open it now
+      // If this sidebar was pending to be opened, open it now.
+      // This covers both the initial "openSidebar before register" case and
+      // the restore-after-transient-unregister case set in unregisterSidebar.
       if (state.pendingSidebarOpen === id) {
         state.pendingSidebarOpen = undefined
         state.openSidebar(id)
@@ -76,6 +78,13 @@ const createSidebarManagerState = () => {
       if (state.activeSidebar?.id === id) {
         state.activeSidebar = undefined
         panel.onClose?.()
+
+        // Queue a restore for when this sidebar re-registers. This handles transient
+        // enabled=false cycles (e.g. project briefly undefined during navigation) so
+        // the panel snaps back open without the user losing their place.
+        // The pending intent is cleared by any explicit user close action
+        // (closeSidebar, closeActive, toggleSidebar) so intentional dismissals are respected.
+        state.pendingSidebarOpen = id
       }
     },
 
@@ -87,7 +96,9 @@ const createSidebarManagerState = () => {
         return
       }
 
-      // Clear any pending request since we're opening a sidebar now
+      // Clear any pending restore/open request. Opening a registered sidebar
+      // is an explicit action that supersedes any queued intent, including
+      // the restore-after-transient-unregister set in unregisterSidebar.
       state.pendingSidebarOpen = undefined
 
       if (state.activeSidebar?.id === id) {
@@ -113,6 +124,10 @@ const createSidebarManagerState = () => {
       if (state.activeSidebar?.id === id) {
         panel.onClose?.()
         state.activeSidebar = undefined
+        // User explicitly toggled closed — cancel any pending restore for this sidebar
+        if (state.pendingSidebarOpen === id) {
+          state.pendingSidebarOpen = undefined
+        }
         return
       }
 
@@ -133,6 +148,10 @@ const createSidebarManagerState = () => {
 
       panel.onClose?.()
       state.activeSidebar = undefined
+      // User explicitly closed — cancel any pending restore for this sidebar
+      if (state.pendingSidebarOpen === id) {
+        state.pendingSidebarOpen = undefined
+      }
       return
     },
 
@@ -142,11 +161,20 @@ const createSidebarManagerState = () => {
 
     closeActive() {
       if (!state.activeSidebar) return
-      state.activeSidebar?.onClose?.()
+      const id = state.activeSidebar.id
+      state.activeSidebar.onClose?.()
       state.activeSidebar = undefined
+      // User explicitly closed — cancel any pending restore for this sidebar
+      if (state.pendingSidebarOpen === id) {
+        state.pendingSidebarOpen = undefined
+      }
     },
 
     clearActiveSidebar() {
+      // Intentionally does not cancel pendingSidebarOpen or call onClose.
+      // Used by the mobile UI to displace an open sidebar without treating it
+      // as a deliberate user dismissal — the sidebar will still restore if
+      // it re-registers while pendingSidebarOpen was already set.
       state.activeSidebar = undefined
     },
   })
@@ -169,29 +197,10 @@ export const useRegisterSidebar = (
 ) => {
   const componentRef = useLatest(component)
   const handlersRef = useLatest(handlers)
-  const prevEnabledRef = useRef(enabled)
-  const shouldRestoreRef = useRef(false)
-
-  // Track mid-render when transitioning from enabled to disabled while the sidebar is open.
-  // Must happen during render (not in an effect) so we capture activeSidebar before
-  // unregisterSidebar runs and clears it. Note: in React Strict Mode (dev only) the
-  // double-effect invocation will consume the restore flag on the first mount, so the
-  // second cleanup/remount cycle won't re-open — this is dev-only and acceptable.
-  if (prevEnabledRef.current && !enabled) {
-    if (sidebarManagerState.activeSidebar?.id === id) {
-      shouldRestoreRef.current = true
-    }
-  }
-  prevEnabledRef.current = enabled
 
   useEffect(() => {
     if (enabled) {
       sidebarManagerState.registerSidebar(id, () => componentRef.current(), handlersRef.current)
-      // Restore sidebar if it was open before enabled briefly became false
-      if (shouldRestoreRef.current) {
-        sidebarManagerState.openSidebar(id)
-        shouldRestoreRef.current = false
-      }
     }
 
     return () => {

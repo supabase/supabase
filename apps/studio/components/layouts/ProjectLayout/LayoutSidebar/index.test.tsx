@@ -86,10 +86,13 @@ vi.mock('@/data/telemetry/send-event-mutation', () => ({
 }))
 
 const resetSidebarManagerState = () => {
+  // Close active first so unregisterSidebar does not set pendingSidebarOpen
+  sidebarManagerState.closeActive()
   Object.keys(sidebarManagerState.sidebars).forEach((id) => {
     sidebarManagerState.unregisterSidebar(id)
   })
-  sidebarManagerState.closeActive()
+  // Ensure no pending restore leaks between tests
+  sidebarManagerState.pendingSidebarOpen = undefined
 }
 
 describe('LayoutSidebar', () => {
