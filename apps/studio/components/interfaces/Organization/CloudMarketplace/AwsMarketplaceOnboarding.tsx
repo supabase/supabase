@@ -10,17 +10,7 @@ import {
   ContractIneligibilityNotice,
   getContractIneligibilityDescription,
   getOrganizationUnavailableReason,
-  MockAwsMarketplaceOrgDialog,
 } from './AwsMarketplaceOnboarding.components'
-import {
-  createMockAwsEligibility,
-  createMockAwsOnboardingInfo,
-  EMPTY_ORGANIZATIONS,
-  getMockAwsOrganizations,
-  MOCK_BUYER_ID,
-  MOCK_LINKED_ORG_SLUG,
-  type AwsMarketplaceMockState,
-} from './AwsMarketplaceOnboarding.mocks'
 import { OrganizationSelector } from '@/components/interfaces/Connect/OrganizationSelector'
 import AwsMarketplaceAutoRenewalWarning from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceAutoRenewalWarning'
 import {
@@ -37,40 +27,27 @@ import { DOCS_URL } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 import type { Organization } from '@/types'
 
-export {
-  AWS_MARKETPLACE_MOCK_STATES,
-  type AwsMarketplaceMockState,
-} from './AwsMarketplaceOnboarding.mocks'
+const EMPTY_ORGANIZATIONS: Organization[] = []
 
-export const AwsMarketplaceOnboardingScreen = ({
-  buyerId,
-  mock,
-}: {
-  buyerId?: string
-  mock?: AwsMarketplaceMockState
-}) => {
+export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }) => {
   const { profile } = useProfile()
-  const effectiveBuyerId = buyerId ?? (mock ? MOCK_BUYER_ID : undefined)
-  const isMockMode = !!mock
 
-  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string | null>(
-    mock === 'linking' ? MOCK_LINKED_ORG_SLUG : null
-  )
+  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string | null>(null)
   const [linkedOrgSlug, setLinkedOrgSlug] = useState<string | null>(null)
   const [showOrgCreationDialog, setShowOrgCreationDialog] = useState(false)
 
   useEffect(() => {
-    setSelectedOrgSlug(mock === 'linking' ? MOCK_LINKED_ORG_SLUG : null)
+    setSelectedOrgSlug(null)
     setLinkedOrgSlug(null)
     setShowOrgCreationDialog(false)
-  }, [effectiveBuyerId, mock])
+  }, [buyerId])
 
   const {
     data: organizations,
     error: organizationsError,
     isPending: isLoadingOrganizations,
     isError: isOrganizationsError,
-  } = useOrganizationsQuery({ enabled: !isMockMode })
+  } = useOrganizationsQuery({ enabled: !!buyerId })
 
   const {
     data: contractLinkingEligibility,
@@ -78,12 +55,11 @@ export const AwsMarketplaceOnboardingScreen = ({
     isPending: isLoadingEligibility,
     isError: isEligibilityError,
   } = useCloudMarketplaceContractLinkingEligibilityQuery(
-    { buyerId: effectiveBuyerId ?? '' },
-    { enabled: !isMockMode && !!effectiveBuyerId }
+    { buyerId: buyerId ?? '' },
+    { enabled: !!buyerId }
   )
 
-  const shouldLoadOnboardingInfo =
-    !isMockMode && !!effectiveBuyerId && contractLinkingEligibility?.eligibility.is_eligible
+  const shouldLoadOnboardingInfo = !!buyerId && contractLinkingEligibility?.eligibility.is_eligible
 
   const {
     data: onboardingInfo,
@@ -91,7 +67,7 @@ export const AwsMarketplaceOnboardingScreen = ({
     isPending: isLoadingOnboardingInfo,
     isError: isOnboardingInfoError,
   } = useCloudMarketplaceOnboardingInfoQuery(
-    { buyerId: effectiveBuyerId ?? '' },
+    { buyerId: buyerId ?? '' },
     { enabled: !!shouldLoadOnboardingInfo }
   )
 
@@ -105,32 +81,21 @@ export const AwsMarketplaceOnboardingScreen = ({
       },
     })
 
-  const mockOrganizations = getMockAwsOrganizations(mock)
-  const mockEligibility = createMockAwsEligibility(mock)
-  const mockOnboardingInfo = createMockAwsOnboardingInfo(mockOrganizations)
-
   const effectiveOrganizations = useMemo(
-    () => (isMockMode ? mockOrganizations : (organizations ?? EMPTY_ORGANIZATIONS)),
-    [isMockMode, mockOrganizations, organizations]
+    () => organizations ?? EMPTY_ORGANIZATIONS,
+    [organizations]
   )
-  const effectiveEligibility = isMockMode ? mockEligibility : contractLinkingEligibility
-  const effectiveOnboardingInfo = isMockMode ? mockOnboardingInfo : onboardingInfo
   const effectiveIsLoading =
-    mock === 'loading' ||
-    (!isMockMode &&
-      (!effectiveBuyerId ||
-        isLoadingOrganizations ||
-        isLoadingEligibility ||
-        (effectiveEligibility?.eligibility.is_eligible && isLoadingOnboardingInfo)))
-  const effectiveIsError =
-    mock === 'error' || isOrganizationsError || isEligibilityError || isOnboardingInfoError
+    isLoadingOrganizations ||
+    isLoadingEligibility ||
+    (contractLinkingEligibility?.eligibility.is_eligible && isLoadingOnboardingInfo)
+  const effectiveIsError = isOrganizationsError || isEligibilityError || isOnboardingInfoError
   const effectiveError = organizationsError ?? eligibilityError ?? onboardingInfoError
   const displayName = profile?.primary_email ?? profile?.username
   const selectedOrganization = effectiveOrganizations.find(({ slug }) => slug === selectedOrgSlug)
-  const orgLinked = mock === 'linked' || linkedOrgSlug !== null
+  const orgLinked = linkedOrgSlug !== null
   const linkedOrganization =
-    effectiveOrganizations.find(({ slug }) => slug === (linkedOrgSlug ?? MOCK_LINKED_ORG_SLUG)) ??
-    selectedOrganization
+    effectiveOrganizations.find(({ slug }) => slug === linkedOrgSlug) ?? selectedOrganization
 
   const { linkableOrganizations, unavailableOrganizations, eligibilityByOrganizationSlug } =
     useMemo(() => {
@@ -138,7 +103,7 @@ export const AwsMarketplaceOnboardingScreen = ({
         .slice()
         .sort((a, b) => a.name.localeCompare(b.name))
 
-      if (!effectiveOnboardingInfo) {
+      if (!onboardingInfo) {
         return {
           linkableOrganizations: [],
           unavailableOrganizations: sortedOrganizations,
@@ -150,7 +115,7 @@ export const AwsMarketplaceOnboardingScreen = ({
       }
 
       const eligibilityBySlug = new Map(
-        effectiveOnboardingInfo.organization_linking_eligibility.map((eligibility) => [
+        onboardingInfo.organization_linking_eligibility.map((eligibility) => [
           eligibility.slug,
           eligibility,
         ])
@@ -174,9 +139,9 @@ export const AwsMarketplaceOnboardingScreen = ({
         unavailableOrganizations: unavailable,
         eligibilityByOrganizationSlug: eligibilityBySlug,
       }
-    }, [effectiveOnboardingInfo, effectiveOrganizations])
+    }, [onboardingInfo, effectiveOrganizations])
 
-  if (mock === 'invalid' || (!isMockMode && !effectiveBuyerId)) {
+  if (!buyerId) {
     return (
       <AwsMarketplaceInterstitial>
         <div className="flex flex-col gap-3">
@@ -208,22 +173,6 @@ export const AwsMarketplaceOnboardingScreen = ({
     )
   }
 
-  if (mock === 'wrong-account') {
-    return (
-      <AwsMarketplaceInterstitial>
-        <div className="flex flex-col gap-3">
-          <Admonition
-            type="warning"
-            description="Sign in with the Supabase account that owns the organization you want to bill through AWS Marketplace, then open the onboarding link again."
-          />
-          <Button type="default" block asChild>
-            <Link href="/organizations">Back to dashboard</Link>
-          </Button>
-        </div>
-      </AwsMarketplaceInterstitial>
-    )
-  }
-
   if (effectiveIsError) {
     return (
       <AwsMarketplaceInterstitial>
@@ -250,8 +199,8 @@ export const AwsMarketplaceOnboardingScreen = ({
     )
   }
 
-  if (!effectiveEligibility?.eligibility.is_eligible) {
-    const reason = effectiveEligibility?.eligibility.reasons[0]
+  if (!contractLinkingEligibility?.eligibility.is_eligible) {
+    const reason = contractLinkingEligibility?.eligibility.reasons[0]
 
     return (
       <AwsMarketplaceInterstitial description={getContractIneligibilityDescription(reason)}>
@@ -279,9 +228,7 @@ export const AwsMarketplaceOnboardingScreen = ({
             }
           />
           <Button type="primary" block asChild>
-            <Link
-              href={`/org/${linkedOrganization?.slug ?? linkedOrgSlug ?? MOCK_LINKED_ORG_SLUG}`}
-            >
+            <Link href={`/org/${linkedOrganization?.slug ?? linkedOrgSlug}`}>
               Go to organization
             </Link>
           </Button>
@@ -291,21 +238,17 @@ export const AwsMarketplaceOnboardingScreen = ({
   }
 
   const showAutoRenewalWarning =
-    effectiveOnboardingInfo &&
-    !effectiveOnboardingInfo.aws_contract_auto_renewal &&
-    !effectiveOnboardingInfo.aws_contract_is_private_offer
+    onboardingInfo &&
+    !onboardingInfo.aws_contract_auto_renewal &&
+    !onboardingInfo.aws_contract_is_private_offer
   const hasLinkableOrganizations = linkableOrganizations.length > 0
   const hasAnyOrganizations = effectiveOrganizations.length > 0
-  const isLinking = mock === 'linking' || isLinkingOrganization
+  const isLinking = isLinkingOrganization
   const primaryLabel = hasLinkableOrganizations ? 'Link organization' : 'Create organization'
   const primaryAction = hasLinkableOrganizations
     ? () => {
-        if (!selectedOrgSlug || !effectiveBuyerId) return
-        if (isMockMode) {
-          setLinkedOrgSlug(selectedOrgSlug)
-          return
-        }
-        linkOrganization({ slug: selectedOrgSlug, buyerId: effectiveBuyerId })
+        if (!selectedOrgSlug || !buyerId) return
+        linkOrganization({ slug: selectedOrgSlug, buyerId })
       }
     : () => setShowOrgCreationDialog(true)
 
@@ -315,8 +258,8 @@ export const AwsMarketplaceOnboardingScreen = ({
         <div className="flex flex-col gap-5">
           {showAutoRenewalWarning && (
             <AwsMarketplaceAutoRenewalWarning
-              awsContractEndDate={effectiveOnboardingInfo.aws_contract_end_date}
-              awsContractSettingsUrl={effectiveOnboardingInfo.aws_contract_settings_url}
+              awsContractEndDate={onboardingInfo.aws_contract_end_date}
+              awsContractSettingsUrl={onboardingInfo.aws_contract_settings_url}
             />
           )}
 
@@ -367,25 +310,14 @@ export const AwsMarketplaceOnboardingScreen = ({
         </div>
       </AwsMarketplaceInterstitial>
 
-      {!isMockMode && effectiveBuyerId && (
+      {buyerId && (
         <NewAwsMarketplaceOrgModal
           visible={showOrgCreationDialog}
           onClose={() => setShowOrgCreationDialog(false)}
-          buyerId={effectiveBuyerId}
+          buyerId={buyerId}
           onSuccess={(newlyCreatedOrgSlug) => {
             setShowOrgCreationDialog(false)
             setLinkedOrgSlug(newlyCreatedOrgSlug)
-          }}
-        />
-      )}
-
-      {isMockMode && (
-        <MockAwsMarketplaceOrgDialog
-          visible={showOrgCreationDialog}
-          onClose={() => setShowOrgCreationDialog(false)}
-          onShowLinkedState={() => {
-            setShowOrgCreationDialog(false)
-            setLinkedOrgSlug('mock-created-organization')
           }}
         />
       )}

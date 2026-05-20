@@ -4,10 +4,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import {
-  AwsMarketplaceOnboardingScreen,
-  type AwsMarketplaceMockState,
-} from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboarding'
+import { AwsMarketplaceOnboardingScreen } from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboarding'
 import type {
   CloudMarketplaceContractLinkingEligibility,
   CloudMarketplaceOnboardingInfo,
@@ -170,25 +167,60 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     await screen.findByText('Organization linked')
   })
 
-  test.each([
-    ['loading', 'Link AWS Marketplace'],
-    ['link-existing', 'Acme Production'],
-    ['linking', 'Link organization'],
-    ['invalid', 'Setup unavailable'],
-    ['error', 'Unable to load setup'],
-    ['linked', 'Organization linked'],
-    ['create-new', 'Create organization'],
-    ['not-eligible', 'This AWS Marketplace subscription cannot be linked right now'],
-    ['already-linked', 'No action required'],
-    ['wrong-account', 'Sign in with the Supabase account'],
-  ] satisfies Array<[AwsMarketplaceMockState, string]>)(
-    'renders %s mock state',
-    async (mock, expectedText) => {
-      renderScreen({ mock })
-      expect(await screen.findByText('Link AWS Marketplace')).toBeInTheDocument()
-      expect(await screen.findByText(new RegExp(expectedText))).toBeInTheDocument()
-    }
-  )
+  test('renders setup unavailable when the buyer ID is missing', async () => {
+    renderScreen({ buyerId: undefined })
+
+    expect(await screen.findByText('Setup unavailable')).toBeInTheDocument()
+    expect(screen.getByText('buyer_id')).toBeInTheDocument()
+  })
+
+  test('renders an error state when onboarding info fails to load', async () => {
+    mockAwsEndpoints()
+    mswServer.use(
+      http.get(`${API_URL}/platform/cloud-marketplace/buyers/:buyer_id/onboarding-info`, () =>
+        HttpResponse.json({ message: 'Failed to load onboarding info' }, { status: 500 })
+      )
+    )
+
+    renderScreen()
+
+    expect(await screen.findByText('Unable to load setup')).toBeInTheDocument()
+  })
+
+  test('renders the generic ineligible state', async () => {
+    mockAwsEndpoints({
+      eligibility: {
+        eligibility: {
+          is_eligible: false,
+          reasons: [],
+          aws_agreement_id: 'agreement-test',
+        },
+      },
+    })
+
+    renderScreen()
+
+    expect(
+      await screen.findByText('This AWS Marketplace subscription cannot be linked right now')
+    ).toBeInTheDocument()
+    expect(screen.getByText('If the problem persists, contact support.')).toBeInTheDocument()
+  })
+
+  test('renders the already-linked ineligible state', async () => {
+    mockAwsEndpoints({
+      eligibility: {
+        eligibility: {
+          is_eligible: false,
+          reasons: ['AGREEMENT_BASED_OFFER'],
+          aws_agreement_id: 'agreement-test',
+        },
+      },
+    })
+
+    renderScreen()
+
+    expect(await screen.findByText('No action required')).toBeInTheDocument()
+  })
 
   test('promotes the last visited organization into the first visible organizations', async () => {
     const organizations = [
@@ -218,24 +250,17 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     expect(screen.getByRole('button', { name: 'Show 2 more' })).toBeInTheDocument()
   })
 
-  test('shows what happens when creating an organization in the AWS mock flow', async () => {
-    const user = userEvent.setup()
-    renderScreen({ mock: 'create-new' })
+  test('renders a create organization action when there are no existing organizations', async () => {
+    mockAwsEndpoints({
+      organizations: [],
+      onboardingInfo: createOnboardingInfo({ organizations: [] }),
+    })
+
+    renderScreen()
 
     expect(await screen.findByRole('button', { name: 'Create organization' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: /Create new organization/ })
     ).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Create organization' }))
-
-    expect(await screen.findByText('Create and link organization')).toBeInTheDocument()
-    expect(
-      screen.getByText(/create an AWS-managed organization, then links it/i)
-    ).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Show linked state' }))
-
-    expect(await screen.findByText('Organization linked')).toBeInTheDocument()
   })
 })

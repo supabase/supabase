@@ -1,15 +1,5 @@
 import { type ReactNode } from 'react'
-import {
-  Button,
-  Card,
-  CardContent,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from 'ui'
+import { Card, CardContent } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
 import type {
@@ -47,36 +37,6 @@ export const AwsMarketplaceInterstitial = ({
   >
     <div className="px-6 pb-6">{children}</div>
   </InterstitialLayout>
-)
-
-export const MockAwsMarketplaceOrgDialog = ({
-  visible,
-  onClose,
-  onShowLinkedState,
-}: {
-  visible: boolean
-  onClose: () => void
-  onShowLinkedState: () => void
-}) => (
-  <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
-    <DialogContent size="medium">
-      <DialogHeader>
-        <DialogTitle>Create and link organization</DialogTitle>
-        <DialogDescription>
-          In production, this opens a form to create an AWS-managed organization, then links it to
-          the Marketplace subscription automatically
-        </DialogDescription>
-      </DialogHeader>
-      <DialogFooter>
-        <Button type="default" onClick={onClose}>
-          Close
-        </Button>
-        <Button type="primary" onClick={onShowLinkedState}>
-          Show linked state
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
 )
 
 export const ConnectLoadingCards = () => (
