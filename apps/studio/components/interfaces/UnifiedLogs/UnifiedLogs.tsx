@@ -427,6 +427,7 @@ export const UnifiedLogs = () => {
                   isFetchingCharts && 'opacity-60 transition-opacity duration-150'
                 )}
                 columnId="timestamp"
+                filterColumnId="date"
                 chartConfig={filteredChartConfig}
               />
             </div>
