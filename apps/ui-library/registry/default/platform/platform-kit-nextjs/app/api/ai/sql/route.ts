@@ -104,8 +104,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ sql })
   } catch (error: any) {
     console.error('AI SQL generation error:', error)
-    const errorMessage = error.message || 'An unexpected error occurred.'
     const status = error.response?.status || 500
-    return NextResponse.json({ message: errorMessage }, { status })
+    return NextResponse.json({ message: 'An unexpected error occurred.' }, { status })
   }
 }
