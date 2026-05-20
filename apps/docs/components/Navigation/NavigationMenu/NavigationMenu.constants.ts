@@ -1656,6 +1656,10 @@ export const functions: NavMenuConstant = {
           name: 'Troubleshooting',
           url: '/guides/functions/troubleshooting' as `/${string}`,
         },
+        {
+          name: 'Worker timeouts and WebSocket drops',
+          url: '/docs/troubleshooting/edge-functions-worker-timeouts-and-websocket-drops' as `/${string}`,
+        },
       ],
     },
     {
@@ -1782,6 +1786,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Image Transformation & Optimization',
           url: '/guides/functions/examples/image-manipulation' as `/${string}`,
+        },
+        {
+          name: 'Resumable WebSockets with replay',
+          url: '/guides/functions/examples/resumable-websockets' as `/${string}`,
         },
       ],
     },
