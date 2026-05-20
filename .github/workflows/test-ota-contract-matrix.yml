@@ -2,12 +2,6 @@ name: 'Test: Ota contract matrix'
 
 on:
   workflow_dispatch:
-    inputs:
-      ota_ref:
-        description: 'Ota git branch/tag/sha for --from-git install'
-        required: false
-        default: 'bobai/tool-chain-and-providers'
-        type: string
   pull_request:
     paths:
       - 'ota.yaml'
@@ -26,7 +20,6 @@ permissions:
 
 env:
   OTA_NO_UPDATE_CHECK: '1'
-  OTA_GIT_BRANCH: ${{ github.event.inputs.ota_ref || 'bobai/tool-chain-and-providers' }}
 
 jobs:
   native:
@@ -79,10 +72,8 @@ jobs:
           corepack prepare pnpm@10.24.0 --activate
           pnpm --version
 
-      - name: Setup ota (source branch)
-        shell: bash
-        run: |
-          curl -fsSL https://dist.ota.run/install.sh | sh -s -- --from-git --setup-path
+      - name: Setup ota
+        uses: ota-run/setup@v1
 
       - name: Verify ota install [bash]
         if: matrix.run_shell == 'bash'
@@ -164,6 +155,30 @@ jobs:
           & ota execution topology --json . | Out-File -Encoding utf8 ota-execution-topology.json
           Get-Content ota-execution-topology.json
 
+      - name: Doctor instant workflow + annotations [bash]
+        id: doctor_instant_bash
+        if: matrix.run_shell == 'bash'
+        shell: bash
+        run: |
+          set +e
+          ota doctor --workflow instant --json . > ota-doctor-instant.json
+          doctor_status=$?
+          set -e
+          ota annotations --mode doctor --format github --input ota-doctor-instant.json
+          exit $doctor_status
+
+      - name: Doctor instant workflow + annotations [pwsh]
+        id: doctor_instant_pwsh
+        if: matrix.run_shell == 'pwsh'
+        shell: pwsh
+        run: |
+          & ota doctor --workflow instant --json . | Out-File -Encoding utf8 ota-doctor-instant.json
+          $doctor_status = $LASTEXITCODE
+          ota annotations --mode doctor --format github --input ota-doctor-instant.json
+          if ($doctor_status -ne 0) {
+            exit $doctor_status
+          }
+
       - name: Proof instant workflow (readiness + annotations)
         id: proof_instant
         if: matrix.run_shell == 'bash'
@@ -177,13 +192,37 @@ jobs:
       - name: Proof instant workflow (readiness + annotations) [pwsh]
         id: proof_instant_pwsh
         if: matrix.run_shell == 'pwsh'
-        timeout-minutes: 12
+        timeout-minutes: 20
         shell: pwsh
         run: |
-          & ota proof runtime --workflow instant --json . | Out-File -Encoding utf8 ota-proof-instant.json
-          Get-Content ota-proof-instant.json
-          if ($LASTEXITCODE -ne 0) {
-            exit $LASTEXITCODE
+          $proofOut = "ota-proof-instant.json"
+          $proofErr = "ota-proof-instant.stderr.log"
+          $proofTimeoutFlag = "ota-proof-timeout.flag"
+          if (Test-Path $proofOut) { Remove-Item $proofOut -Force }
+          if (Test-Path $proofErr) { Remove-Item $proofErr -Force }
+          if (Test-Path $proofTimeoutFlag) { Remove-Item $proofTimeoutFlag -Force }
+
+          $proc = Start-Process `
+            -FilePath "ota" `
+            -ArgumentList @("proof", "runtime", "--workflow", "instant", "--json", ".") `
+            -NoNewWindow `
+            -RedirectStandardOutput $proofOut `
+            -RedirectStandardError $proofErr `
+            -PassThru
+
+          $finished = $proc.WaitForExit(600000)
+          if (-not $finished) {
+            taskkill /PID $proc.Id /T /F | Out-Null
+            "1" | Out-File -FilePath $proofTimeoutFlag -Encoding utf8
+            Write-Output "::error title=Instant proof timed out in matrix wrapper::ota proof runtime exceeded 10 minutes. See ota-proof-instant.stderr.log and ./.ota/proof/instant/up-detached-run.log"
+            if (Test-Path $proofErr) { Get-Content $proofErr }
+            exit 124
+          }
+
+          if (Test-Path $proofOut) { Get-Content $proofOut }
+          if (Test-Path $proofErr) { Get-Content $proofErr }
+          if ($proc.ExitCode -ne 0) {
+            exit $proc.ExitCode
           }
 
       - name: Proof app workflow [bash]
@@ -241,8 +280,12 @@ jobs:
           if ("${{ steps.proof_instant_pwsh.outcome }}" -eq "failure") {
             $classification = "readiness_failure"
             $detail = "Instant proof failed before readiness completed."
+            if (Test-Path "ota-proof-timeout.flag") {
+              $classification = "proof_timeout"
+              $detail = "Instant proof exceeded the matrix wrapper timeout (10 minutes)."
+            }
             $logPath = ".\.ota\proof\instant\up-detached-run.log"
-            if (Test-Path $logPath) {
+            if ($classification -ne "proof_timeout" -and (Test-Path $logPath)) {
               $pattern = "node-gyp|gyp ERR|error C[0-9]{4}|ELIFECYCLE|Local package.json exists, but node_modules missing|turbo: not found|not recognized as an internal or external command"
               if (Select-String -Path $logPath -Pattern $pattern -Quiet) {
                 $classification = "install_or_toolchain_failure"
@@ -254,6 +297,8 @@ jobs:
           "detail=$detail" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           if ($classification -eq "install_or_toolchain_failure") {
             Write-Output "::error title=Instant proof blocked by install/toolchain::$detail See ./.ota/proof/instant/up-detached-run.log"
+          } elseif ($classification -eq "proof_timeout") {
+            Write-Output "::error title=Instant proof hit matrix timeout::$detail See ota-proof-instant.stderr.log and ./.ota/proof/instant/up-detached-run.log"
           } elseif ($classification -eq "readiness_failure") {
             Write-Output "::error title=Instant proof blocked by readiness::$detail See ota-proof-instant.json and ./.ota/proof/instant/up.log"
           }
@@ -273,6 +318,8 @@ jobs:
           TASKS_INSTANT_PWSH: ${{ steps.tasks_instant_pwsh.outcome }}
           TOPOLOGY_BASH: ${{ steps.topology_bash.outcome }}
           TOPOLOGY_PWSH: ${{ steps.topology_pwsh.outcome }}
+          DOCTOR_INSTANT_BASH: ${{ steps.doctor_instant_bash.outcome }}
+          DOCTOR_INSTANT_PWSH: ${{ steps.doctor_instant_pwsh.outcome }}
           PROOF_INSTANT: ${{ steps.proof_instant.outcome }}
           PROOF_INSTANT_PWSH: ${{ steps.proof_instant_pwsh.outcome }}
           PROOF_FAILURE_CLASS_BASH: ${{ steps.classify_proof_instant_bash.outputs.classification }}
@@ -300,6 +347,7 @@ jobs:
             echo "| List docs tasks | ${TASKS_DOCS_BASH:-$TASKS_DOCS_PWSH} |"
             echo "| List instant tasks | ${TASKS_INSTANT_BASH:-$TASKS_INSTANT_PWSH} |"
             echo "| Export topology | ${TOPOLOGY_BASH:-$TOPOLOGY_PWSH} |"
+            echo "| Doctor instant (+ annotations) | ${DOCTOR_INSTANT_BASH:-$DOCTOR_INSTANT_PWSH} |"
             echo "| Instant readiness | ${PROOF_INSTANT:-$PROOF_INSTANT_PWSH} |"
             echo "| Instant failure class | ${proof_failure_class} (${proof_failure_detail}) |"
             echo "| Proof app workflow | ${PROOF_BASH:-$PROOF_PWSH} |"
@@ -316,6 +364,7 @@ jobs:
           path: |
             ota-validate.json
             ota-execution-topology.json
+            ota-doctor-instant.json
             ota-proof-instant.json
             ota-proof-app.json
             .ota/
@@ -342,10 +391,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Setup ota (source branch)
-        shell: bash
-        run: |
-          curl -fsSL https://dist.ota.run/install.sh | sh -s -- --from-git --setup-path
+      - name: Setup ota
+        uses: ota-run/setup@v1
 
       - name: Verify ota install
         shell: bash
