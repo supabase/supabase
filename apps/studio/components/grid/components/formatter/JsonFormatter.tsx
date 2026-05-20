@@ -4,12 +4,16 @@ import type { RenderCellProps } from 'react-data-grid'
 import type { SupaRow } from '../../types'
 import { EmptyValue } from '../common/EmptyValue'
 import { NullValue } from '../common/NullValue'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export const JsonFormatter = (p: PropsWithChildren<RenderCellProps<SupaRow, unknown>>) => {
+  const snap = useTableEditorTableStateSnapshot()
   let value = p.row[p.column.key]
+  const isMasked = snap.sensitiveDataColumns.has(p.column.key as string)
 
   if (value === null) return <NullValue />
   if (value === '') return <EmptyValue />
+  if (isMasked) return <>*****</>
 
   // [Joshen] With reference to table-rows-query, we're only pulling max n characters on text/jsonb columns
   // If column value is longer, value will be concatenated with ..., and we just want to make sure the JSON

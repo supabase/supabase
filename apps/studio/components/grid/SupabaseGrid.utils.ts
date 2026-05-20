@@ -190,12 +190,14 @@ export function saveTableEditorStateToLocalStorage({
   gridColumns,
   sorts,
   filters,
+  sensitiveDataColumns,
 }: {
   projectRef: string
   tableId: number
   gridColumns?: CalculatedColumn<any, any>[]
   sorts?: string[]
   filters?: string[]
+  sensitiveDataColumns?: string[]
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   const savedStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
@@ -204,6 +206,7 @@ export function saveTableEditorStateToLocalStorage({
     ...(gridColumns !== undefined && { gridColumns }),
     ...(sorts !== undefined && { sorts: sorts.filter((sort) => sort !== '') }),
     ...(filters !== undefined && { filters: filters.filter((filter) => filter !== '') }),
+    ...(sensitiveDataColumns !== undefined && { sensitiveDataColumns }),
   }
 
   let savedJson
@@ -280,6 +283,7 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
     rows: TRow[]
     columns: SupaColumn[]
     onRowsChange: (rows: TRow[], data: RowsChangeData<TRow, unknown>) => void
+    sensitiveDataColumns?: Set<string>
   }
 ) => {
   const { mode, column, row, rowIdx } = args
@@ -289,11 +293,16 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
   if (key === 'c' && (event.metaKey || event.ctrlKey)) {
     if (window.getSelection()?.isCollapsed === false) return
 
+    const isSensitive = context?.sensitiveDataColumns?.has(column.key as string)
     const value = formatClipboardValue(row[column.key] ?? '')
     event.preventDefault()
     event.preventGridDefault()
     void copyToClipboard(value, () => {
-      toast.success('Copied cell value to clipboard')
+      if (isSensitive) {
+        toast.warning('Copied sensitive data to clipboard')
+      } else {
+        toast.success('Copied cell value to clipboard')
+      }
     })
     return
   }

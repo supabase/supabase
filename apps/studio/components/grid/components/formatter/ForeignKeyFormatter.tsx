@@ -14,6 +14,7 @@ import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useTableQuery } from '@/data/tables/table-retrieve-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
   tableId?: number
@@ -21,7 +22,10 @@ interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
 
 export const ForeignKeyFormatter = (props: Props) => {
   const { tableId, row, column } = props
+  const snap = useTableEditorTableStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
+
+  const isMasked = snap.sensitiveDataColumns.has(column.key as string)
 
   const { data, isPending: isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -58,7 +62,7 @@ export const ForeignKeyFormatter = (props: Props) => {
   return (
     <div className="sb-grid-foreign-key-formatter flex justify-between">
       <span className="sb-grid-foreign-key-formatter__text">
-        {formattedValue === null ? <NullValue /> : formattedValue}
+        {formattedValue === null ? <NullValue /> : isMasked ? '*****' : formattedValue}
       </span>
       {isLoading && formattedValue !== null && (
         <div className="w-6 h-6 flex items-center justify-center">

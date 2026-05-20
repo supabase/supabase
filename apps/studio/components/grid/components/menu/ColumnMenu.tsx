@@ -1,5 +1,18 @@
-import { ArrowDown, ArrowUp, ChevronDown, Copy, Edit, Lock, Trash, Unlock } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  Copy,
+  Edit,
+  Eye,
+  EyeOff,
+  Lock,
+  Trash,
+  Unlock,
+} from 'lucide-react'
+import { useContext, useEffect, useState } from 'react'
 import type { CalculatedColumn } from 'react-data-grid'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
@@ -17,7 +30,10 @@ import {
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
 import type { Sort } from '@/components/grid/types'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
-import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
+import {
+  TableEditorTableStateContext,
+  useTableEditorTableStateSnapshot,
+} from '@/state/table-editor-table'
 
 interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
@@ -27,7 +43,11 @@ interface ColumnMenuProps {
 export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const state = useContext(TableEditorTableStateContext)
   const { sorts, addOrUpdateSort, removeSort } = useTableSort()
+  const [tempRevealTimeouts, setTempRevealTimeouts] = useState<Map<string, NodeJS.Timeout>>(
+    new Map()
+  )
 
   const columnKey = column.key
   const columnName = column.name as string
@@ -51,6 +71,48 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
     const pgColumn = snap.originalTable.columns.find((c) => c.name === column.name)
     if (pgColumn) {
       tableEditorSnap.onDeleteColumn(pgColumn)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      tempRevealTimeouts.forEach((timeout) => clearTimeout(timeout))
+    }
+  }, [tempRevealTimeouts])
+
+  function onToggleSensitiveData() {
+    const isMasked = snap.sensitiveDataColumns.has(columnKey)
+
+    if (isMasked) {
+      // Temporarily reveal for 5 seconds
+      const existingTimeout = tempRevealTimeouts.get(columnKey)
+      if (existingTimeout) clearTimeout(existingTimeout)
+
+      state.toggleSensitiveDataColumn(columnKey) // unmask
+
+      const timeout = setTimeout(() => {
+        state.toggleSensitiveDataColumn(columnKey) // re-mask
+        setTempRevealTimeouts((prev) => {
+          const next = new Map(prev)
+          next.delete(columnKey)
+          return next
+        })
+      }, 5000)
+
+      setTempRevealTimeouts((prev) => new Map(prev).set(columnKey, timeout))
+      toast.info('Data will be hidden again in 5 seconds')
+    } else {
+      // Column is currently revealed, immediately re-mask it
+      const existingTimeout = tempRevealTimeouts.get(columnKey)
+      if (existingTimeout) clearTimeout(existingTimeout)
+
+      state.toggleSensitiveDataColumn(columnKey) // mask
+
+      setTempRevealTimeouts((prev) => {
+        const next = new Map(prev)
+        next.delete(columnKey)
+        return next
+      })
     }
   }
 
@@ -137,6 +199,19 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             <>
               <Lock size={14} strokeWidth={1.5} />
               <span>Freeze column</span>
+            </>
+          )}
+        </DropdownMenuItem>
+        <DropdownMenuItem className="space-x-2" onClick={onToggleSensitiveData}>
+          {snap.sensitiveDataColumns.has(columnKey) ? (
+            <>
+              <Eye size={14} strokeWidth={1.5} />
+              <span>Show data</span>
+            </>
+          ) : (
+            <>
+              <EyeOff size={14} strokeWidth={1.5} />
+              <span>Hide sensitive data</span>
             </>
           )}
         </DropdownMenuItem>

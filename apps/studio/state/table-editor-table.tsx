@@ -17,6 +17,12 @@ import { Entity } from '@/data/table-editor/table-editor-types'
 
 const FALLBACK_TABLE_STATE = proxy({}) as TableEditorTableState
 
+// Helper to extract sensitive data marker from column comment
+const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+const isSensitiveDataColumn = (comment: string | null | undefined): boolean => {
+  return comment ? comment.includes(SENSITIVE_DATA_MARKER) : false
+}
+
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
@@ -49,6 +55,14 @@ export const createTableEditorTableState = ({
     savedState
   )
 
+  // Initialize sensitive data columns from both column metadata and localStorage
+  const defaultSensitiveColumns = new Set(
+    table.columns.filter((col) => isSensitiveDataColumn(col.comment)).map((col) => col.name)
+  )
+  const savedSensitiveColumns = new Set(savedState?.sensitiveDataColumns ?? [])
+  // Merge: saved state takes precedence for explicitly toggled columns
+  const allSensitiveColumns = new Set([...defaultSensitiveColumns, ...savedSensitiveColumns])
+
   const state = proxy({
     /* Table */
     table,
@@ -74,6 +88,12 @@ export const createTableEditorTableState = ({
         { gridColumns: state.gridColumns }
       )
 
+      // Recalculate which columns should be masked based on updated column definitions
+      const updatedDefaultSensitiveColumns = new Set(
+        table.columns.filter((col) => isSensitiveDataColumn(col.comment)).map((col) => col.name)
+      )
+      state.sensitiveDataColumns = proxySet(updatedDefaultSensitiveColumns)
+
       state.table = supaTable
       state.gridColumns = gridColumns
       state.originalTable = table
@@ -94,6 +114,14 @@ export const createTableEditorTableState = ({
 
     /* Columns */
     gridColumns,
+    sensitiveDataColumns: proxySet<string>(allSensitiveColumns),
+    toggleSensitiveDataColumn: (columnKey: string) => {
+      if (state.sensitiveDataColumns.has(columnKey)) {
+        state.sensitiveDataColumns.delete(columnKey)
+      } else {
+        state.sensitiveDataColumns.add(columnKey)
+      }
+    },
     moveColumn: (fromKey: string, toKey: string) => {
       const fromIdx = state.gridColumns.findIndex((x) => x.key === fromKey)
       const toIdx = state.gridColumns.findIndex((x) => x.key === toKey)
@@ -250,6 +278,7 @@ export const TableEditorTableStateContextProvider = ({
           gridColumns: state.gridColumns,
           projectRef,
           tableId: state.table.id,
+          sensitiveDataColumns: Array.from(state.sensitiveDataColumns),
         })
       })
     }
