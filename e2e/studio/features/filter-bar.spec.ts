@@ -52,6 +52,54 @@ test.describe('Filter Bar', () => {
       }
     })
 
+    test('selecting a column without a value does not trigger a row request', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_no_value_no_req`
+      const columnName = 'name'
+
+      await createTable(tableName, columnName, [{ name: 'Alice' }, { name: 'Bob' }])
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await expect(page.getByRole('gridcell', { name: 'Alice' })).toBeVisible()
+        await expect(page.getByRole('gridcell', { name: 'Bob' })).toBeVisible()
+
+        // Count any new table-rows requests fired after the column/operator are picked.
+        // A request here means the filter applied before a value was entered — the regression.
+        let tableRowsRequests = 0
+        const rowsListener = (request: { url: () => string }) => {
+          if (request.url().includes('query?key=table-rows-')) tableRowsRequests++
+        }
+        page.on('request', rowsListener)
+
+        try {
+          await selectColumnFilter(page, columnName)
+          await expect(page.getByTestId(`filter-condition-${columnName}`)).toBeVisible()
+
+          await selectOperator(page, columnName, '=')
+
+          // Allow any debounced request to fire before we assert.
+          await page.waitForTimeout(500)
+
+          expect(
+            tableRowsRequests,
+            'No table-rows request should fire until a filter value is entered'
+          ).toBe(0)
+
+          await expect(page.getByRole('gridcell', { name: 'Alice' })).toBeVisible()
+          await expect(page.getByRole('gridcell', { name: 'Bob' })).toBeVisible()
+        } finally {
+          page.off('request', rowsListener)
+        }
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+
     test('entering value filters the grid', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_val_filt`
       const columnName = 'name'
