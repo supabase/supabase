@@ -10,7 +10,7 @@ import AddPaymentMethodForm from './AddPaymentMethodForm'
 import { getStripeElementsAppearanceOptions } from './Payment.utils'
 import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
 interface AddNewPaymentMethodModalProps {
   visible: boolean
@@ -19,7 +19,7 @@ interface AddNewPaymentMethodModalProps {
   onConfirm: () => void
 }
 
-const stripePromise = IS_PLATFORM ? loadStripe(STRIPE_PUBLIC_KEY) : null
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const AddNewPaymentMethodModal = ({
   visible,

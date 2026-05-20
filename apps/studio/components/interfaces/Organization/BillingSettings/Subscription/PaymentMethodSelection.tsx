@@ -31,9 +31,9 @@ import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { BASE_PATH, IS_PLATFORM, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { BASE_PATH, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
-const stripePromise = IS_PLATFORM ? loadStripe(STRIPE_PUBLIC_KEY) : null
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string

@@ -31,14 +31,13 @@ import { OrgPlan, SubscriptionTier } from '@/data/subscriptions/types'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   DOCS_URL,
-  IS_PLATFORM,
   PRICING_TIER_PRODUCT_IDS,
   PROJECT_STATUS,
   STRIPE_PUBLIC_KEY,
 } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 
-const stripePromise = IS_PLATFORM ? loadStripe(STRIPE_PUBLIC_KEY) : null
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const PLAN_HEADINGS = {
   tier_pro:

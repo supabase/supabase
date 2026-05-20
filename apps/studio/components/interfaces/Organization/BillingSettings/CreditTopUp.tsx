@@ -45,10 +45,10 @@ import { useCreditTopUpPreview } from '@/data/organizations/organization-credit-
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { IS_PLATFORM, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 
-const stripePromise = IS_PLATFORM ? loadStripe(STRIPE_PUBLIC_KEY) : null
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const FORM_ID = 'credit-top-up'
 const MIN_TOP_UP_AMOUNT = 300
