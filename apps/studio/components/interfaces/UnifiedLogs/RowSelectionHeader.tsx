@@ -69,17 +69,16 @@ export const RowSelectionHeader = () => {
               {selectedRows.length} row{selectedRows.length > 1 ? 's' : ''} selected
             </p>
 
-            <div className="flex items-center justify-center gap-x-1">
+            <div className="flex items-center justify-center gap-x-1.5">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
+                  <ButtonTooltip
                     type="default"
                     size="tiny"
                     icon={<Copy size={12} />}
-                    iconRight={<ChevronDown size={11} />}
-                  >
-                    Copy
-                  </Button>
+                    className="w-7"
+                    tooltip={{ content: { side: 'bottom', text: 'Copy selected logs' } }}
+                  />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-44">
                   <DropdownMenuItem onClick={() => onCopy('json')} className="gap-2 text-xs">

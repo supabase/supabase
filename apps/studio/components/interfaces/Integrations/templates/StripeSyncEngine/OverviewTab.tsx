@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -40,6 +39,7 @@ import {
   isUninstalling,
 } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 import { useStripeSyncInstallMutation } from '@/data/database-integrations/stripe/stripe-sync-install-mutation'
 import { useStripeSyncUninstallMutation } from '@/data/database-integrations/stripe/stripe-sync-uninstall-mutation'
@@ -56,7 +56,7 @@ export const StripeSyncEngineOverviewTab = () => {
   const track = useTrack()
   const hasTrackedInstallFailed = useRef(false)
   const { data: project } = useSelectedProjectQuery()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const [showUninstallModal, setShowUninstallModal] = useState(false)
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
