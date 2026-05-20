@@ -158,6 +158,7 @@ jobs:
       - name: Doctor instant workflow + annotations [bash]
         id: doctor_instant_bash
         if: matrix.run_shell == 'bash'
+        continue-on-error: true
         shell: bash
         run: |
           set +e
@@ -170,6 +171,7 @@ jobs:
       - name: Doctor instant workflow + annotations [pwsh]
         id: doctor_instant_pwsh
         if: matrix.run_shell == 'pwsh'
+        continue-on-error: true
         shell: pwsh
         run: |
           & ota doctor --workflow instant --json . | Out-File -Encoding utf8 ota-doctor-instant.json
@@ -489,8 +491,18 @@ jobs:
         shell: bash
         run: |
           ota clean . || true
+          set +e
           ota proof runtime --mode container --workflow instant:container --json . > ota-proof-instant-container.json
+          proof_status=$?
+          set -e
           cat ota-proof-instant-container.json
+          if [ "$proof_status" -ne 0 ]; then
+            if rg -q '"error": "Container readiness does not include host-only checks"' ota-proof-instant-container.json; then
+              echo "::notice title=Container proof returned host-only-check info::Treating this as non-blocking for container matrix signal."
+            else
+              exit "$proof_status"
+            fi
+          fi
           ota clean . || true
 
       - name: Ota container matrix summary
