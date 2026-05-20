@@ -410,6 +410,18 @@ export default defineConfig(({ mode }) => {
         'awesome-debounce-promise',
         '@sentry/nextjs',
       ],
+      // Vite 8.0.13's SSR module runner evaluates `@sentry/nextjs`'s
+      // CJS file via `runInlinedModule` without the CJS-compat wrapper
+      // older vite applied, crashing with "exports is not defined" at
+      // SSR. Forcing pre-bundling via esbuild rewrites it to ESM
+      // before the SSR runner sees it. Only `@sentry/nextjs` needs
+      // this — the other CJS deps in `noExternal` work via vite's SSR
+      // transform; pre-bundling React-using deps (e.g. `react-use`)
+      // inlines a duplicate React into the bundle and breaks hook
+      // dedupe at SSR (useRef → null).
+      optimizeDeps: {
+        include: ['@sentry/nextjs'],
+      },
     },
     plugins: [
       nextCompat(),
