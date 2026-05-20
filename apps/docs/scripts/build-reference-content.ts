@@ -34,6 +34,12 @@ interface Comment {
   blockTags?: BlockTag[]
 }
 
+interface Param {
+  name: string
+  type: unknown
+  flags?: { isOptional?: boolean }
+}
+
 interface Declaration {
   id?: number
   name?: string
@@ -42,19 +48,46 @@ interface Declaration {
   comment?: Comment
   signatures?: Declaration[]
   children?: Declaration[]
+  // signature-only / variable-only fields:
+  parameters?: Param[]
+  type?: unknown
+  flags?: { isOptional?: boolean; isConst?: boolean }
 }
 
 interface FunctionEntry {
   name: string
   category: string
   subcategory: string | null
+  $ref: string
+}
+
+interface FunctionsEntry {
+  id: string
+  $ref: string
+}
+
+interface TypeSpecMethod {
+  ref: string
+  params: Array<{ name: string; type: unknown; isOptional?: boolean }>
+  returnType?: unknown
+}
+
+interface TypeSpecVariable {
+  ref: string
+  type?: unknown
+  isConst?: boolean
+}
+
+interface TypeSpec {
+  methods: Record<string, TypeSpecMethod>
+  variables: Record<string, TypeSpecVariable>
 }
 
 interface BySlugFunction {
   id: string
   title: string
   slug: string
-  product: string
+  product?: string
   type: 'function'
   isFunc?: false
 }
@@ -86,6 +119,7 @@ interface VersionConfig {
 interface PartialEntry {
   name: string
   title: string
+  ref?: string
 }
 
 /** Converts a camelCase identifier to kebab-case (e.g. `linkIdentity` → `link-identity`). */
@@ -109,13 +143,15 @@ function reorder<T>(items: T[], order: string[] | undefined, key: (item: T) => s
   return [...items].sort((a, b) => (idx.get(key(a)) ?? Infinity) - (idx.get(key(b)) ?? Infinity))
 }
 
-/** Builds a markdown-type bySlug entry for a partial file. */
-const partialEntry = (p: PartialEntry): BySlugMarkdown => ({
-  id: p.name,
-  title: p.title,
-  slug: p.name,
-  type: 'markdown',
-})
+/**
+ * Builds a bySlug entry for a partial file. When the partial declares a `ref`
+ * in its frontmatter, it acts as a named function (linked to TypeDoc-derived
+ * code) and is emitted as `type: 'function'`; otherwise it's plain `markdown`.
+ */
+const partialEntry = (p: PartialEntry): BySlugMarkdown | BySlugFunction =>
+  p.ref
+    ? { id: p.name, title: p.title, slug: p.name, type: 'function' }
+    : { id: p.name, title: p.title, slug: p.name, type: 'markdown' }
 
 /** Builds a category-type bySlug entry from a category title. */
 const categoryEntry = (title: string): BySlugCategory => ({ type: 'category', title })
@@ -169,22 +205,63 @@ function readTagFromDeclOrSignature(decl: Declaration, tagName: string): string 
 }
 
 /**
- * Recursively walks a TypeDoc declaration tree, appending every declaration
- * that carries an `@category` tag to `results` along with its optional
- * `@subcategory`.
+ * Recursively walks a TypeDoc declaration tree. Builds two outputs in one pass:
+ *   - `functions`: declarations carrying an `@category` tag (with optional
+ *     `@subcategory`) plus a constructed `$ref` of the form
+ *     `<package>.<class…>.<name>`.
+ *   - `typeSpec`: separate `methods` and `variables` maps keyed by the same
+ *     `$ref`. Methods get their first signature's parameters and return type;
+ *     variables (kind 32) get their type and `isConst` flag. Not filtered by
+ *     category or `excludeDefinitions`, so partials that link to "hidden"
+ *     methods (e.g. a constructor) can still resolve.
+ *
+ * Context is threaded down via `pkg` (the top-level project name) and
+ * `classes` (the chain of enclosing class names).
  */
-function collectFunctions(node: Declaration, results: FunctionEntry[]): void {
-  if (node.name && node.variant === 'declaration') {
+function collectFunctions(
+  node: Declaration,
+  out: { functions: FunctionEntry[]; typeSpec: TypeSpec },
+  ctx: { pkg: string | null; classes: string[] } = { pkg: null, classes: [] }
+): void {
+  let nextCtx = ctx
+  if (node.kind === 1 && node.name) {
+    nextCtx = { pkg: node.name, classes: [] }
+  } else if (node.kind === 128 && node.name) {
+    nextCtx = { ...ctx, classes: [...ctx.classes, node.name] }
+  }
+
+  if (ctx.pkg && node.name) {
+    const ref = [ctx.pkg, ...ctx.classes, node.name].join('.')
+    if (node.signatures?.length) {
+      const sig = node.signatures[0]
+      out.typeSpec.methods[ref] = {
+        ref,
+        params: (sig.parameters ?? []).map((p) => {
+          const entry: TypeSpecMethod['params'][number] = { name: p.name, type: p.type }
+          if (p.flags?.isOptional) entry.isOptional = true
+          return entry
+        }),
+        returnType: sig.type,
+      }
+    } else if (node.kind === 32 && node.type) {
+      const entry: TypeSpecVariable = { ref, type: node.type }
+      if (node.flags?.isConst) entry.isConst = true
+      out.typeSpec.variables[ref] = entry
+    }
+  }
+
+  if (ctx.pkg && node.name && node.variant === 'declaration') {
     const category = readTagFromDeclOrSignature(node, '@category')
     if (category) {
       const subcategory = readTagFromDeclOrSignature(node, '@subcategory')
-      results.push({ name: node.name, category, subcategory })
+      const $ref = [ctx.pkg, ...ctx.classes, node.name].join('.')
+      out.functions.push({ name: node.name, category, subcategory, $ref })
     }
   }
 
   if (node.children) {
     for (const child of node.children) {
-      collectFunctions(child, results)
+      collectFunctions(child, out, nextCtx)
     }
   }
 }
@@ -223,7 +300,8 @@ async function readPartials(versionDir: string): Promise<PartialEntry[]> {
     const { data } = matter(raw)
     const name = file.slice(0, -ext.length)
     const title = typeof data.title === 'string' ? data.title : name
-    partials.push({ name, title })
+    const ref = typeof data.ref === 'string' ? data.ref : undefined
+    partials.push({ name, title, ref })
   }
 
   // Default to alphabetical so `reorder` can place ranked items first and leave
@@ -232,24 +310,33 @@ async function readPartials(versionDir: string): Promise<PartialEntry[]> {
 }
 
 /**
- * Builds bySlug (a flat slug→entry map) and sections (the same data shaped as a
+ * Builds bySlug (a flat slug→entry map), sections (the same data shaped as a
  * nested tree: partials, then each category containing its functions and
- * subcategories) in a single pass. Categories are filtered by `excludeCategories`
- * and ordered by `categoryOrder`; individual declarations are filtered by
- * `excludeDefinitions` (matched on the source name, case-sensitive).
+ * subcategories), and a functions list (id→$ref pairs for functions.json) in
+ * a single pass. Categories are filtered by `excludeCategories` and ordered by
+ * `categoryOrder`; individual declarations are filtered by `excludeDefinitions`
+ * (matched on the source name, case-sensitive). Partials with a `ref` in
+ * frontmatter are emitted as `type: 'function'` entries and contribute to
+ * the functions list.
  */
 function buildBySlug(
   functions: FunctionEntry[],
   partials: PartialEntry[],
   config: VersionConfig
-): { bySlug: Record<string, BySlugEntry>; sections: SectionEntry[] } {
+): {
+  bySlug: Record<string, BySlugEntry>
+  sections: SectionEntry[]
+  functionsList: FunctionsEntry[]
+} {
   const bySlug: Record<string, BySlugEntry> = {}
   const sections: SectionEntry[] = []
+  const functionsList: FunctionsEntry[] = []
 
   for (const p of reorder(partials, config.partialsOrder, (x) => x.name)) {
     const entry = partialEntry(p)
     bySlug[p.name] = entry
     sections.push(entry)
+    if (p.ref) functionsList.push({ id: p.name, $ref: p.ref })
   }
 
   const excludeCats = new Set(config.excludeCategories ?? [])
@@ -289,6 +376,7 @@ function buildBySlug(
     if (entry.slug in bySlug) return
     bySlug[entry.slug] = entry
     items.push(entry)
+    functionsList.push({ id: entry.slug, $ref: fn.$ref })
   }
 
   for (const category of orderedCategories) {
@@ -313,15 +401,16 @@ function buildBySlug(
     }
   }
 
-  return { bySlug, sections }
+  return { bySlug, sections, functionsList }
 }
 
 /**
  * Processes one `[library]/[version]` directory: reads spec files, partials,
- * and config, then writes `bySlug.json`, `flat.json`, and `sections.json` to
- * the output directory in parallel. `flat.json` is `Object.values(bySlug)`
- * (used both for counting and the array output); `sections.json` is the same
- * data nested as a tree, built alongside bySlug in a single pass.
+ * and config, then writes all five output files (`bySlug.json`, `flat.json`,
+ * `sections.json`, `functions.json`, `typeSpec.json`) in parallel. `flat.json`
+ * is `Object.values(bySlug)`, `sections.json` is the nested tree, `functions.json`
+ * maps each slug/partial to its `$ref`, and `typeSpec.json` holds the raw
+ * parameter and return-type signatures keyed by ref.
  */
 async function processVersion(library: string, version: string): Promise<void> {
   const versionDir = join(SPEC_DIR, library, version)
@@ -332,14 +421,17 @@ async function processVersion(library: string, version: string): Promise<void> {
   const config = await readConfig(versionDir)
   const partials = await readPartials(versionDir)
 
-  const functions: FunctionEntry[] = []
+  const collected = {
+    functions: [] as FunctionEntry[],
+    typeSpec: { methods: {}, variables: {} } as TypeSpec,
+  }
   for (const file of files) {
     const raw = await readFile(join(versionDir, file), 'utf-8')
     const spec = JSON.parse(raw) as Declaration
-    collectFunctions(spec, functions)
+    collectFunctions(spec, collected)
   }
 
-  const { bySlug, sections } = buildBySlug(functions, partials, config)
+  const { bySlug, sections, functionsList } = buildBySlug(collected.functions, partials, config)
   const flat = Object.values(bySlug)
 
   const counts = { markdown: 0, function: 0, subcategory: 0, category: 0 }
@@ -356,10 +448,14 @@ async function processVersion(library: string, version: string): Promise<void> {
     writeFile(join(outputDir, 'bySlug.json'), JSON.stringify(bySlug)),
     writeFile(join(outputDir, 'flat.json'), JSON.stringify(flat)),
     writeFile(join(outputDir, 'sections.json'), JSON.stringify(sections)),
+    writeFile(join(outputDir, 'functions.json'), JSON.stringify(functionsList)),
+    writeFile(join(outputDir, 'typeSpec.json'), JSON.stringify(collected.typeSpec)),
   ])
 
+  const typeSpecMethods = Object.keys(collected.typeSpec.methods).length
+  const typeSpecVariables = Object.keys(collected.typeSpec.variables).length
   console.log(
-    `[${library}/${version}] wrote bySlug.json + flat.json + sections.json — ${functions.length} declarations scanned, ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories`
+    `[${library}/${version}] wrote 5 files — ${collected.functions.length} declarations scanned, ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories, ${functionsList.length} functions.json entries, ${typeSpecMethods} typeSpec methods, ${typeSpecVariables} typeSpec variables`
   )
 }
 

@@ -270,3 +270,5 @@ export function normalizeMarkdown(markdownUnescaped: string): string {
 
   return content
 }
+
+export const SUPPORTS_NEW_REFERENCE_PROCESS = new Set(['javascript-v2'])
