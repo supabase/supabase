@@ -25,22 +25,33 @@ const VALID_VARIANTS: UpgradeCtaPlacement[] = [
 /**
  * Shared experiment state for the upgrade CTA placement test.
  *
- * Fires experiment exposure for every free-plan user enrolled in any variant
- * (including control), so the conversion analysis has a baseline cohort.
+ * The returned `variant` is optimistic during the initial organization query — as soon
+ * as the PostHog flag resolves to a valid variant, callers can render skeleton
+ * placeholders even before the org plan is known. Once the org query settles, the
+ * variant is withdrawn if the user turns out not to be on the free plan, which hides
+ * the placeholder cleanly.
  *
- * Returns `variant: undefined` when the user is paid, not enrolled, or the
- * flag store hasn't loaded yet — callers should render nothing in that case.
+ * Exposure tracking only fires once the user is confirmed free-plan + in the
+ * experiment, so the experiment cohort stays accurate even though render starts early.
  */
 export const useUpgradeCtaExperiment = () => {
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: organization, isPending: isOrgPending } = useSelectedOrganizationQuery()
   const flagValue = usePHFlag<UpgradeCtaPlacement | false>(UPGRADE_CTA_FLAG_NAME)
 
   const isFreePlan = organization?.plan?.id === 'free'
   const isInExperiment =
     typeof flagValue === 'string' && VALID_VARIANTS.includes(flagValue as UpgradeCtaPlacement)
 
-  const variant = isFreePlan && isInExperiment ? (flagValue as UpgradeCtaPlacement) : undefined
-  useTrackExperimentExposure(UPGRADE_CTA_EXPERIMENT_ID, variant)
+  // Optimistic during org-pending: render-eligible if the PostHog flag has resolved to a
+  // variant. PostHog targets the flag to free-plan users so the false-positive (paid
+  // user briefly seeing a skeleton) is a rare edge case.
+  const renderEligible = isInExperiment && (isOrgPending || isFreePlan)
+  const variant = renderEligible ? (flagValue as UpgradeCtaPlacement) : undefined
+
+  // Exposure fires only once we have confirmation the user is actually on the free plan.
+  const confirmedVariant =
+    isFreePlan && isInExperiment ? (flagValue as UpgradeCtaPlacement) : undefined
+  useTrackExperimentExposure(UPGRADE_CTA_EXPERIMENT_ID, confirmedVariant)
 
   return { isFreePlan, variant }
 }
