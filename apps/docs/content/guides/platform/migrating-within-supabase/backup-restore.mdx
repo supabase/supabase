@@ -248,6 +248,32 @@ If you encounter permission errors related to `supabase_admin` during restore:
   ALTER ... OWNER TO "supabase_admin"
 ```
 
+#### `pgsodium.key` or `vault.secrets` permission errors
+
+If `data.sql` fails with permission errors for sensitive system tables such as
+`pgsodium.key` or `vault.secrets`, remove the generated restore statements for those
+tables before running the restore again. These tables are managed by Supabase and
+can't be restored through the normal `psql` data import.
+
+- Open `data.sql`
+- Comment out or remove the `COPY` sections for:
+
+```sql
+COPY "pgsodium"."key" ...
+COPY "vault"."secrets" ...
+```
+
+- Comment out or remove any related sequence statements, such as:
+
+```sql
+SELECT pg_catalog.setval('"pgsodium"."key_key_id_seq"', ...);
+```
+
+If you use [column encryption](/docs/guides/database/column-encryption), copy the
+root encryption key to the new project as described in the **Column encryption
+enabled** restore step before retrying. Recreate any required Vault secrets in the
+target project after the restore.
+
 #### `cli_login_postgres` role grant error
 
 If you encounter the error:
