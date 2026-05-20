@@ -94,7 +94,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSidebar])
+  }, [activeSidebar, track])
 
   // Handle toggling of sidebars on page init
   // Prioritize URL params first, then local storage

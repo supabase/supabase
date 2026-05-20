@@ -48,8 +48,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
       track('realtime_inspector_database_role_updated')
     }
     isMounted.current = true
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snap.role])
+  }, [snap.role, track])
 
   useEffect(() => {
     const triggerUpdateTokenBearer = async () => {

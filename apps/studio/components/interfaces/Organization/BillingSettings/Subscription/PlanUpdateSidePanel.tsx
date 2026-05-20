@@ -168,7 +168,7 @@ export const PlanUpdateSidePanel = () => {
       track('studio_pricing_side_panel_opened', properties)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible])
+  }, [visible, track])
 
   useEffect(() => {
     if (visible && isSuccessSubscription && subscription.plan.id) {

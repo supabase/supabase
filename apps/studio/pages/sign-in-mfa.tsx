@@ -82,7 +82,8 @@ const SignInMfaPage: NextPageWithLayout = () => {
         setLoading(false)
         router.push({ pathname: '/sign-in', query: router.query })
       })
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [track])
 
   if (loading) {
     return (
