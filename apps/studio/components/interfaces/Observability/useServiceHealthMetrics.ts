@@ -32,15 +32,6 @@ export type ServiceHealthData = {
   refresh: () => void
 }
 
-const SERVICE_LQL: Record<ServiceKey, string> = {
-  db: 's:postgres_logs',
-  auth: 's:auth_logs',
-  functions: 's:function_edge_logs',
-  storage: 's:storage_logs',
-  realtime: 's:realtime_logs',
-  postgrest: 's:postgrest_logs',
-}
-
 const INTERVAL_TO_GRANULARITY: Record<'1hr' | '1day' | '7day', ServiceHealthGranularity> = {
   '1hr': 'minute',
   '1day': 'hour',
@@ -48,29 +39,28 @@ const INTERVAL_TO_GRANULARITY: Record<'1hr' | '1day' | '7day', ServiceHealthGran
 }
 
 /**
- * Hook to fetch health metrics for a single service using the service-health endpoint
+ * Hook to fetch health metrics for a single service using the service-health endpoint.
+ * NOTE: lql is intentionally omitted while the backend team confirms the expected
+ * per-service filtering contract. Without lql all 6 calls share the same query key
+ * and React Query deduplicates them to a single network request.
  */
 const useServiceHealthQuery = ({
   projectRef,
-  serviceKey,
   startDate,
   endDate,
   granularity,
   enabled,
 }: {
   projectRef: string
-  serviceKey: ServiceKey
   startDate: string
   endDate: string
   granularity: ServiceHealthGranularity
   enabled: boolean
 }) => {
-  const lql = SERVICE_LQL[serviceKey]
-
   const queryResult = useQuery({
-    queryKey: analyticsKeys.serviceHealth(projectRef, { startDate, endDate, granularity, lql }),
+    queryKey: analyticsKeys.serviceHealth(projectRef, { startDate, endDate, granularity }),
     queryFn: ({ signal }) =>
-      getServiceHealth({ projectRef, startDate, endDate, granularity, lql }, signal),
+      getServiceHealth({ projectRef, startDate, endDate, granularity }, signal),
     enabled: enabled && Boolean(projectRef),
     staleTime: 1000 * 60, // 1 minute
   })
@@ -122,54 +112,14 @@ export const useServiceHealthMetrics = (
   const granularity = INTERVAL_TO_GRANULARITY[interval]
   const enabled = Boolean(projectRef)
 
-  const db = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'db',
-    startDate,
-    endDate,
-    granularity,
-    enabled,
-  })
-  const auth = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'auth',
-    startDate,
-    endDate,
-    granularity,
-    enabled,
-  })
-  const functions = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'functions',
-    startDate,
-    endDate,
-    granularity,
-    enabled,
-  })
-  const storage = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'storage',
-    startDate,
-    endDate,
-    granularity,
-    enabled,
-  })
-  const realtime = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'realtime',
-    startDate,
-    endDate,
-    granularity,
-    enabled,
-  })
-  const postgrest = useServiceHealthQuery({
-    projectRef,
-    serviceKey: 'postgrest',
-    startDate,
-    endDate,
-    granularity,
-    enabled,
-  })
+  const sharedParams = { projectRef, startDate, endDate, granularity, enabled }
+
+  const db = useServiceHealthQuery(sharedParams)
+  const auth = useServiceHealthQuery(sharedParams)
+  const functions = useServiceHealthQuery(sharedParams)
+  const storage = useServiceHealthQuery(sharedParams)
+  const realtime = useServiceHealthQuery(sharedParams)
+  const postgrest = useServiceHealthQuery(sharedParams)
 
   const services: Record<ServiceKey, ServiceHealthData> = useMemo(
     () => ({
