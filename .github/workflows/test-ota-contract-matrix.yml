@@ -177,6 +177,7 @@ jobs:
       - name: Proof instant workflow (readiness + annotations) [pwsh]
         id: proof_instant_pwsh
         if: matrix.run_shell == 'pwsh'
+        timeout-minutes: 12
         shell: pwsh
         run: |
           & ota clean . *> $null
@@ -204,6 +205,7 @@ jobs:
       - name: Proof app workflow [pwsh]
         id: proof_app_pwsh
         if: matrix.full_proof && matrix.run_shell == 'pwsh'
+        timeout-minutes: 12
         shell: pwsh
         run: |
           & ota clean . *> $null
