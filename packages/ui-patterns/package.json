@@ -86,11 +86,11 @@
       "import": "./src/CommandMenu/api/CommandHeader.tsx",
       "types": "./src/CommandMenu/api/CommandHeader.tsx"
     },
-    "./CommandMenu/api/CommandInput": {
+    "./CommandMenu/api/CommandMenuInput": {
       "import": "./src/CommandMenu/api/CommandMenuInput.tsx",
       "types": "./src/CommandMenu/api/CommandMenuInput.tsx"
     },
-    "./CommandMenu/api/CommandList": {
+    "./CommandMenu/api/CommandMenuList": {
       "import": "./src/CommandMenu/api/CommandMenuList.tsx",
       "types": "./src/CommandMenu/api/CommandMenuList.tsx"
     },
