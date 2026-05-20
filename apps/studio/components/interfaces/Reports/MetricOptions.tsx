@@ -20,10 +20,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DEPRECATED_REPORTS } from './Reports.constants'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentQuery } from '@/data/content/content-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { Metric, METRIC_CATEGORIES, METRICS } from '@/lib/constants/metrics'
+import { useTrack } from '@/lib/telemetry/track'
 import { editorPanelState } from '@/state/editor-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import type { Dashboards } from '@/types'
@@ -41,7 +40,6 @@ interface MetricOptionsProps {
 
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const [search, setSearch] = useState('')
 
@@ -56,7 +54,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
     return true
   })
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const debouncedSearch = useDebounce(search, 300)
   const {
@@ -152,13 +150,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                             },
                             isAddingChart: true,
                           })
-                          sendEvent({
-                            action: 'custom_report_add_sql_block_clicked',
-                            groups: {
-                              project: projectRef ?? 'Unknown',
-                              organization: selectedOrganization?.slug ?? 'Unknown',
-                            },
-                          })
+                          track('custom_report_add_sql_block_clicked')
                         }
                       }}
                     >
