@@ -62,7 +62,7 @@ export const ForeignKeyFormatter = (props: Props) => {
   return (
     <div className="sb-grid-foreign-key-formatter flex justify-between">
       <span className="sb-grid-foreign-key-formatter__text">
-        {formattedValue === null ? <NullValue /> : isMasked ? '*****' : formattedValue}
+        {formattedValue === null ? <NullValue /> : isMasked ? '••••••••' : formattedValue}
       </span>
       {isLoading && formattedValue !== null && (
         <div className="w-6 h-6 flex items-center justify-center">

@@ -12,7 +12,7 @@ export const BinaryFormatter = (p: PropsWithChildren<RenderCellProps<SupaRow, un
   const isMasked = snap.sensitiveDataColumns.has(p.column.key as string)
 
   if (!value) return <NullValue />
-  if (isMasked) return <>*****</>
+  if (isMasked) return <>••••••••</>
   const binaryValue = convertByteaToHex(value)
   return <>{binaryValue}</>
 }

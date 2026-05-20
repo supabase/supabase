@@ -11,6 +11,6 @@ export const BooleanFormatter = (p: PropsWithChildren<RenderCellProps<SupaRow, u
   const isMasked = snap.sensitiveDataColumns.has(p.column.key as string)
 
   if (value === null) return <NullValue />
-  if (isMasked) return <>*****</>
+  if (isMasked) return <>••••••••</>
   return <>{value ? 'TRUE' : 'FALSE'}</>
 }

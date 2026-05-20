@@ -15,7 +15,7 @@ export const DefaultFormatter = (p: PropsWithChildren<RenderCellProps<SupaRow, u
 
   if (value === null) return <NullValue />
   if (value === '') return <EmptyValue />
-  if (isMasked) return <>••••••••••• </>
+  if (isMasked) return <>••••••••</>
   if (typeof value == 'object' || Array.isArray(value)) {
     value = JSON.stringify(value)
   }
