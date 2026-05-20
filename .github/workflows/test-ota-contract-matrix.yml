@@ -208,6 +208,56 @@ jobs:
             exit $LASTEXITCODE
           }
 
+      - name: Classify instant proof failure [bash]
+        id: classify_proof_instant_bash
+        if: ${{ always() && matrix.run_shell == 'bash' }}
+        shell: bash
+        run: |
+          classification="none"
+          detail=""
+          if [ "${{ steps.proof_instant.outcome }}" = "failure" ]; then
+            classification="readiness_failure"
+            detail="Instant proof failed before readiness completed."
+            if [ -f ./.ota/proof/instant/up-detached-run.log ] && rg -q "node-gyp|gyp ERR|error C[0-9]{4}|ELIFECYCLE|Local package.json exists, but node_modules missing|turbo: not found|not recognized as an internal or external command" ./.ota/proof/instant/up-detached-run.log; then
+              classification="install_or_toolchain_failure"
+              detail="Install/toolchain build failed during proof run."
+            fi
+          fi
+          echo "classification=$classification" >> "$GITHUB_OUTPUT"
+          echo "detail=$detail" >> "$GITHUB_OUTPUT"
+          if [ "$classification" = "install_or_toolchain_failure" ]; then
+            echo "::error title=Instant proof blocked by install/toolchain::${detail} See ./.ota/proof/instant/up-detached-run.log"
+          elif [ "$classification" = "readiness_failure" ]; then
+            echo "::error title=Instant proof blocked by readiness::${detail} See ota-proof-instant.json and ./.ota/proof/instant/up.log"
+          fi
+
+      - name: Classify instant proof failure [pwsh]
+        id: classify_proof_instant_pwsh
+        if: ${{ always() && matrix.run_shell == 'pwsh' }}
+        shell: pwsh
+        run: |
+          $classification = "none"
+          $detail = ""
+          if ("${{ steps.proof_instant_pwsh.outcome }}" -eq "failure") {
+            $classification = "readiness_failure"
+            $detail = "Instant proof failed before readiness completed."
+            $logPath = ".\.ota\proof\instant\up-detached-run.log"
+            if (Test-Path $logPath) {
+              $pattern = "node-gyp|gyp ERR|error C[0-9]{4}|ELIFECYCLE|Local package.json exists, but node_modules missing|turbo: not found|not recognized as an internal or external command"
+              if (Select-String -Path $logPath -Pattern $pattern -Quiet) {
+                $classification = "install_or_toolchain_failure"
+                $detail = "Install/toolchain build failed during proof run."
+              }
+            }
+          }
+          "classification=$classification" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "detail=$detail" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          if ($classification -eq "install_or_toolchain_failure") {
+            Write-Output "::error title=Instant proof blocked by install/toolchain::$detail See ./.ota/proof/instant/up-detached-run.log"
+          } elseif ($classification -eq "readiness_failure") {
+            Write-Output "::error title=Instant proof blocked by readiness::$detail See ota-proof-instant.json and ./.ota/proof/instant/up.log"
+          }
+
       - name: Ota matrix summary + annotations
         if: ${{ always() }}
         shell: bash
@@ -225,9 +275,21 @@ jobs:
           TOPOLOGY_PWSH: ${{ steps.topology_pwsh.outcome }}
           PROOF_INSTANT: ${{ steps.proof_instant.outcome }}
           PROOF_INSTANT_PWSH: ${{ steps.proof_instant_pwsh.outcome }}
+          PROOF_FAILURE_CLASS_BASH: ${{ steps.classify_proof_instant_bash.outputs.classification }}
+          PROOF_FAILURE_DETAIL_BASH: ${{ steps.classify_proof_instant_bash.outputs.detail }}
+          PROOF_FAILURE_CLASS_PWSH: ${{ steps.classify_proof_instant_pwsh.outputs.classification }}
+          PROOF_FAILURE_DETAIL_PWSH: ${{ steps.classify_proof_instant_pwsh.outputs.detail }}
           PROOF_BASH: ${{ steps.proof_app_bash.outcome }}
           PROOF_PWSH: ${{ steps.proof_app_pwsh.outcome }}
         run: |
+          proof_failure_class="${PROOF_FAILURE_CLASS_BASH:-$PROOF_FAILURE_CLASS_PWSH}"
+          proof_failure_detail="${PROOF_FAILURE_DETAIL_BASH:-$PROOF_FAILURE_DETAIL_PWSH}"
+          if [ -z "$proof_failure_class" ]; then
+            proof_failure_class="n/a"
+          fi
+          if [ -z "$proof_failure_detail" ]; then
+            proof_failure_detail="n/a"
+          fi
           {
             echo "## Ota Contract Matrix Summary (${MATRIX_NAME})"
             echo
@@ -239,6 +301,7 @@ jobs:
             echo "| List instant tasks | ${TASKS_INSTANT_BASH:-$TASKS_INSTANT_PWSH} |"
             echo "| Export topology | ${TOPOLOGY_BASH:-$TOPOLOGY_PWSH} |"
             echo "| Instant readiness | ${PROOF_INSTANT:-$PROOF_INSTANT_PWSH} |"
+            echo "| Instant failure class | ${proof_failure_class} (${proof_failure_detail}) |"
             echo "| Proof app workflow | ${PROOF_BASH:-$PROOF_PWSH} |"
             echo
           } >> "$GITHUB_STEP_SUMMARY"
