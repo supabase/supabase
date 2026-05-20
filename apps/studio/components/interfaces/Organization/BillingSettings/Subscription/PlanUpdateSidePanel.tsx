@@ -32,6 +32,7 @@ import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-q
 import type { OrgPlan } from '@/data/subscriptions/types'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { formatCurrency } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
@@ -150,6 +151,12 @@ export const PlanUpdateSidePanel = () => {
     // this data from the organization query
     orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
 
+  const onPanelOpened = useStaticEffectEvent(
+    (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
+      track('studio_pricing_side_panel_opened', properties)
+    }
+  )
+
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
@@ -165,10 +172,10 @@ export const PlanUpdateSidePanel = () => {
       if (source) {
         properties.origin = source
       }
-      track('studio_pricing_side_panel_opened', properties)
+      onPanelOpened(properties)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, track])
+  }, [visible])
 
   useEffect(() => {
     if (visible && isSuccessSubscription && subscription.plan.id) {

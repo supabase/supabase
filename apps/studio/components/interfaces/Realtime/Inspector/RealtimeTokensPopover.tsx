@@ -8,6 +8,7 @@ import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { IS_PLATFORM } from '@/lib/constants'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
@@ -39,16 +40,20 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   const jwtSecret = postgrestConfig?.jwt_secret
 
   const track = useTrack()
+  const onRoleUpdated = useStaticEffectEvent(() => {
+    track('realtime_inspector_database_role_updated')
+  })
 
   // only send a telemetry event if the user changes the role. Don't send an event during initial render.
   const isMounted = useRef(false)
 
   useEffect(() => {
     if (isMounted.current) {
-      track('realtime_inspector_database_role_updated')
+      onRoleUpdated()
     }
     isMounted.current = true
-  }, [snap.role, track])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snap.role])
 
   useEffect(() => {
     const triggerUpdateTokenBearer = async () => {

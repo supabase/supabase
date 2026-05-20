@@ -9,6 +9,7 @@ import useLatest from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -81,12 +82,16 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   )
 
+  const onSidebarChanged = useStaticEffectEvent(
+    (sidebarId: (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]) => {
+      track('sidebar_opened', { sidebar: sidebarId })
+    }
+  )
+
   useEffect(() => {
     if (!!project) {
       if (activeSidebar) {
-        track('sidebar_opened', {
-          sidebar: activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS],
-        })
+        onSidebarChanged(activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS])
         setSidebarLocalStorage(activeSidebar.id)
       } else {
         setSidebarLocalStorage('')
@@ -94,7 +99,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSidebar, track])
+  }, [activeSidebar])
 
   // Handle toggling of sidebars on page init
   // Prioritize URL params first, then local storage
