@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef, useRef } from 'react'
-import { cn, CommandList_Shadcn_ } from 'ui'
+import { cn, CommandList } from 'ui'
 
 import { CommandMenuEmpty } from '../internal/CommandMenuEmpty'
 import { CommandMenuGroup } from '../internal/CommandMenuGroup'
@@ -11,8 +11,8 @@ import { useQuery } from './hooks/queryHooks'
 import { TextHighlighter } from './TextHighlighter'
 
 const CommandMenuList = forwardRef<
-  React.ElementRef<typeof CommandList_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof CommandList_Shadcn_>
+  React.ElementRef<typeof CommandList>,
+  React.ComponentPropsWithoutRef<typeof CommandList>
 >(({ className, ...props }, ref) => {
   const commandSections = useCommands()
   const query = useQuery()
@@ -26,7 +26,7 @@ const CommandMenuList = forwardRef<
   }
 
   return (
-    <CommandList_Shadcn_
+    <CommandList
       ref={setRef}
       className={cn('max-h-[initial] overflow-y-auto overflow-x-hidden bg-transparent', className)}
       {...props}
@@ -47,7 +47,7 @@ const CommandMenuList = forwardRef<
           </CommandMenuGroup>
         )
       })}
-    </CommandList_Shadcn_>
+    </CommandList>
   )
 })
 CommandMenuList.displayName = 'CommandMenuList'

@@ -3,7 +3,7 @@
 import { useBreakpoint, useDebounce } from 'common'
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
-import { cn, CommandInput_Shadcn_ } from 'ui'
+import { cn, CommandInput } from 'ui'
 
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
@@ -42,8 +42,8 @@ function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) 
 }
 
 const CommandMenuInput = forwardRef<
-  React.ElementRef<typeof CommandInput_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof CommandInput_Shadcn_>
+  React.ElementRef<typeof CommandInput>,
+  React.ComponentPropsWithoutRef<typeof CommandInput>
 >(({ className, ...props }, ref) => {
   const inputRef = useFocusInputOnWiderScreens(ref)
 
@@ -113,7 +113,7 @@ const CommandMenuInput = forwardRef<
 
   return (
     <div className="relative w-full" cmdk-input-wrapper="">
-      <CommandInput_Shadcn_
+      <CommandInput
         // Focus needs to be manually handled to check breakpoint first, due to
         // delays from useEffect
         autoFocus={false}
