@@ -1,6 +1,7 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
+import matter from 'gray-matter'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,22 +11,41 @@ interface Source {
   enabled: boolean
 }
 
-// Resolved relative to apps/www (process.cwd() at runtime). The directory is
-// included in the serverless bundle via outputFileTracingIncludes in
-// next.config.mjs so this readdir works on Vercel.
+/**
+ * Resolved relative to apps/www (process.cwd() at runtime). The directory is
+ * included in the serverless bundle via outputFileTracingIncludes in
+ * next.config.mjs so this readdir works on Vercel.
+ */
 const GUIDES_CONTENT_DIR = path.join(process.cwd(), '..', 'docs', 'content', 'guides')
+
+async function readFrontmatterTitle(dirName: string): Promise<string | null> {
+  try {
+    const mdxPath = path.join(GUIDES_CONTENT_DIR, `${dirName}.mdx`)
+    const raw = await fs.readFile(mdxPath, 'utf-8')
+    const { data } = matter(raw)
+    return typeof data.title === 'string' && data.title.length > 0 ? data.title : null
+  } catch {
+    return null
+  }
+}
 
 async function getGuideSources(): Promise<Source[]> {
   const entries = await fs.readdir(GUIDES_CONTENT_DIR, { withFileTypes: true })
-  return entries
+  const dirNames = entries
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .sort()
-    .map((dirName) => ({
-      title: dirName.toUpperCase(),
-      relPath: `docs/guides/${dirName}.md`,
-      enabled: true,
-    }))
+
+  return Promise.all(
+    dirNames.map(async (dirName) => {
+      const frontmatterTitle = await readFrontmatterTitle(dirName)
+      return {
+        title: `Supabase - ${frontmatterTitle ?? dirName}`,
+        relPath: `docs/guides/${dirName}.md`,
+        enabled: true,
+      }
+    })
+  )
 }
 
 async function getSources(): Promise<Source[]> {
