@@ -160,7 +160,11 @@ export const ProjectList = ({
   }
 
   if (isLoadingPermissions || isLoadingProjects || !organization) {
-    return viewMode === 'table' ? <LoadingTableView /> : <LoadingCardView />
+    return viewMode === 'table' ? (
+      <LoadingTableView />
+    ) : (
+      <LoadingCardView prependCard={prependCard} />
+    )
   }
 
   if (isEmpty) {

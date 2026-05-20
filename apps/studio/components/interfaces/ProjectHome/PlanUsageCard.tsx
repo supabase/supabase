@@ -216,14 +216,30 @@ export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCar
         <div
           className={cn(
             'group relative bg-surface-100 border border-surface rounded-md',
-            'min-h-44 p-4 flex flex-col gap-y-2.5'
+            'h-44 p-4 flex flex-col gap-y-2'
           )}
         >
-          <div className="flex flex-col gap-y-0.5">
-            <h5 className="text-sm text-foreground">Free plan usage</h5>
-            <p className="text-xs text-foreground-lighter">Current billing cycle</p>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-y-0.5 min-w-0">
+              <h5 className="text-sm text-foreground truncate">Free plan usage</h5>
+              <p className="text-xs text-foreground-lighter truncate">Current billing cycle</p>
+            </div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <UpgradePlanButton
+                source={placement}
+                plan="Pro"
+                onClick={() => track('upgrade_cta_clicked', { placement })}
+              />
+              <Link
+                href={`/org/${organization?.slug ?? '_'}/usage`}
+                className="text-xs text-foreground-light hover:text-foreground inline-flex items-center gap-1"
+              >
+                View all usage
+                <ArrowRight size={11} strokeWidth={1.5} />
+              </Link>
+            </div>
           </div>
-          <div className="flex-1 flex flex-col gap-y-2 justify-center">
+          <div className="flex-1 flex flex-col gap-y-1.5 justify-end pb-0.5">
             {isSuccess
               ? visibleRows.map(({ config, usageItem }) => (
                   <CompactMetricRow key={config.key} usageItem={usageItem} config={config} />
@@ -231,20 +247,6 @@ export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCar
               : METRICS.map((config) => (
                   <SkeletonMetricRow key={config.key} label={config.label} />
                 ))}
-          </div>
-          <div className="flex items-center justify-between gap-2 mt-auto">
-            <Link
-              href={`/org/${organization?.slug ?? '_'}/usage`}
-              className="text-xs text-foreground-light hover:text-foreground inline-flex items-center gap-1"
-            >
-              View all usage
-              <ArrowRight size={11} strokeWidth={1.5} />
-            </Link>
-            <UpgradePlanButton
-              source={placement}
-              plan="Pro"
-              onClick={() => track('upgrade_cta_clicked', { placement })}
-            />
           </div>
         </div>
       </li>
