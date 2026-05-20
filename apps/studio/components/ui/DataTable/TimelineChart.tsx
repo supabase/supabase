@@ -98,7 +98,6 @@ export function TimelineChart<TChart extends BaseChartSchema>({
           className
         )}
       >
-        {/* [Joshen] Just one minor bug left: Clicking the second time, starts the reference area at the left edge, but its not what i want */}
         <BarChart
           data={chart}
           margin={{ top: 0, left: 0, right: 0, bottom: 0 }}
