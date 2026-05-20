@@ -47,10 +47,8 @@ import {
   isView as isTableLikeView,
 } from '@/data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
@@ -68,8 +66,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const appSnap = useAppStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [realtimeDialogOpen, setRealtimeDialogOpen] = useState(false)
@@ -163,16 +159,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     appSnap.setActiveDocsSection(['entities', table.name])
     appSnap.setShowProjectApiDocs(true)
 
-    sendEvent({
-      action: 'api_docs_opened',
-      properties: {
-        source: 'table_editor',
-      },
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('api_docs_opened', { source: 'table_editor' })
   }
 
   const onToggleRLS = async () => {
