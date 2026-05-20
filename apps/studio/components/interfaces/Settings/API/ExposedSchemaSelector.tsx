@@ -127,9 +127,9 @@ export const ExposedSchemaSelector = ({
                         <div className="w-full flex flex-col">
                           <div className="w-full flex items-center gap-x-2">
                             <Check size={16} className="text-brand shrink-0" />
-                            <span className="truncate text-sm">{schema}</span>
+                            <span className="truncate">{schema}</span>
                           </div>
-                          <span className="pl-6 text-destructive text-xs">
+                          <span className="pl-6 text-destructive text-[11px]">
                             This schema does not exist
                           </span>
                         </div>
@@ -151,7 +151,7 @@ export const ExposedSchemaSelector = ({
                             className={cn('w-full flex items-center gap-x-2', !isExposed && 'ml-6')}
                           >
                             {isExposed && <Check size={16} className="text-brand shrink-0" />}
-                            <span className="truncate text-sm">{schema.name}</span>
+                            <span className="truncate">{schema.name}</span>
                           </div>
                         </CommandItem_Shadcn_>
                       )
