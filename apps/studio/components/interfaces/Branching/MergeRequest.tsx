@@ -130,8 +130,12 @@ export const MergeActions = ({
   })
 
   const parentProjectRef = project?.parent_project_ref
-  const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
-  const { data: ghConnection } = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
+  const { data: parentProject } = useProjectDetailQuery({
+    ref: parentProjectRef,
+  })
+  const { data: ghConnection } = useProjectGitHubConnectionQuery({
+    ref: parentProjectRef,
+  })
 
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
@@ -225,7 +229,9 @@ export const MergeActions = ({
                   onSuccess: () => {
                     toast.success('Successfully closed merge request')
                     router.push(`/project/${project?.ref}/branches?tab=prs`)
-                    track('branch_close_merge_request_button_clicked')
+                    track('branch_close_merge_request_button_clicked', undefined, {
+                      project: parentProjectRef,
+                    })
                   },
                 }
               )

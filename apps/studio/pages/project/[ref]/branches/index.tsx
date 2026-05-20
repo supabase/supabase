@@ -108,10 +108,14 @@ const BranchesPage: NextPageWithLayout = () => {
           if (branchRef === ref) {
             router.push(`/project/${projectRef}/branches`)
           }
-          track('branch_delete_button_clicked', {
-            branchType: persistent ? 'persistent' : 'preview',
-            origin: 'branches_page',
-          })
+          track(
+            'branch_delete_button_clicked',
+            {
+              branchType: persistent ? 'persistent' : 'preview',
+              origin: 'branches_page',
+            },
+            { project: projectRef }
+          )
         },
       }
     )

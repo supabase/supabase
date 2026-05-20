@@ -50,8 +50,12 @@ const MergePage: NextPageWithLayout = () => {
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
 
-  const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
-  const { data: ghConnection } = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
+  const { data: parentProject } = useProjectDetailQuery({
+    ref: parentProjectRef,
+  })
+  const { data: ghConnection } = useProjectGitHubConnectionQuery({
+    ref: parentProjectRef,
+  })
 
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
@@ -177,7 +181,7 @@ const MergePage: NextPageWithLayout = () => {
         addWorkflowRun(data.workflow_run_id)
       }
 
-      track('branch_updated', { source: 'merge_page' })
+      track('branch_updated', { source: 'merge_page' }, { project: parentProjectRef })
     },
     onError: (error) => {
       toast.error(`Failed to update branch: ${error.message}`)
@@ -193,9 +197,11 @@ const MergePage: NextPageWithLayout = () => {
         toast.success('Branch merge initiated!')
         addWorkflowRun(data.workflowRunId)
 
-        track('branch_merge_completed', {
-          branchType: currentBranch?.persistent ? 'persistent' : 'preview',
-        })
+        track(
+          'branch_merge_completed',
+          { branchType: currentBranch?.persistent ? 'persistent' : 'preview' },
+          { project: parentProjectRef }
+        )
       } else {
         toast.info('No changes to merge')
       }
@@ -204,10 +210,14 @@ const MergePage: NextPageWithLayout = () => {
       setIsSubmitting(false)
       toast.error(`Failed to merge branch: ${error.message}`)
 
-      track('branch_merge_failed', {
-        branchType: currentBranch?.persistent ? 'persistent' : 'preview',
-        error: error.message,
-      })
+      track(
+        'branch_merge_failed',
+        {
+          branchType: currentBranch?.persistent ? 'persistent' : 'preview',
+          error: error.message,
+        },
+        { project: parentProjectRef }
+      )
     },
   })
 
@@ -215,7 +225,7 @@ const MergePage: NextPageWithLayout = () => {
     onSuccess: () => {
       toast.success('Branch closed successfully')
       router.push(`/project/${parentProjectRef}/branches`)
-      track('branch_delete_button_clicked', { origin: 'merge_page' })
+      track('branch_delete_button_clicked', { origin: 'merge_page' }, { project: parentProjectRef })
     },
     onError: (error) => {
       toast.error(`Failed to close branch: ${error.message}`)
@@ -242,7 +252,7 @@ const MergePage: NextPageWithLayout = () => {
     if (!ref || !parentProjectRef) return
     setIsSubmitting(true)
 
-    track('branch_merge_submitted')
+    track('branch_merge_submitted', undefined, { project: parentProjectRef })
 
     mergeBranch({
       branchProjectRef: ref,
@@ -445,7 +455,9 @@ const MergePage: NextPageWithLayout = () => {
       <ConfirmationModal
         visible={showConfirmDialog}
         title="Confirm Branch Merge"
-        description={`Are you sure you want to merge "${currentBranch?.name}" into "${mainBranch?.name || 'main'}"? This action cannot be undone.`}
+        description={`Are you sure you want to merge "${
+          currentBranch?.name
+        }" into "${mainBranch?.name || 'main'}"? This action cannot be undone.`}
         confirmLabel="Merge branch"
         confirmLabelLoading="Merging..."
         onConfirm={() => {

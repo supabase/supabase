@@ -111,10 +111,14 @@ const MergeRequestsPage: NextPageWithLayout = () => {
         onSuccess: () => {
           toast.success('Merge request created')
 
-          track('branch_create_merge_request_button_clicked', {
-            branchType: persistent ? 'persistent' : 'preview',
-            origin: 'merge_page',
-          })
+          track(
+            'branch_create_merge_request_button_clicked',
+            {
+              branchType: persistent ? 'persistent' : 'preview',
+              origin: 'merge_page',
+            },
+            { project: projectRef }
+          )
 
           router.push(`/project/${branchRef}/merge`)
         },
@@ -136,7 +140,9 @@ const MergeRequestsPage: NextPageWithLayout = () => {
         onSuccess: () => {
           toast.success('Merge request closed')
 
-          track('branch_close_merge_request_button_clicked')
+          track('branch_close_merge_request_button_clicked', undefined, {
+            project: projectRef,
+          })
         },
       }
     )
@@ -329,10 +335,14 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
         onSuccess: () => {
           toast.success('Merge request created')
 
-          track('branch_create_merge_request_button_clicked', {
-            branchType: persistent ? 'persistent' : 'preview',
-            origin: 'branch_selector',
-          })
+          track(
+            'branch_create_merge_request_button_clicked',
+            {
+              branchType: persistent ? 'persistent' : 'preview',
+              origin: 'branch_selector',
+            },
+            { project: projectRef }
+          )
 
           router.push(`/project/${branchRef}/merge`)
         },

@@ -30,7 +30,9 @@ export const ReviewWithAI = ({
   const track = useTrack()
 
   // Get parent project for production schema
-  const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
+  const { data: parentProject } = useProjectDetailQuery({
+    ref: parentProjectRef,
+  })
 
   // Fetch production schema tables
   const { data: productionTables } = useTablesQuery(
@@ -46,7 +48,9 @@ export const ReviewWithAI = ({
   const handleReviewWithAssistant = () => {
     if (!currentBranch || !mainBranch) return
 
-    track('branch_review_with_assistant_clicked')
+    track('branch_review_with_assistant_clicked', undefined, {
+      project: parentProjectRef,
+    })
 
     // Prepare diff content for the assistant
     const sqlSnippets = []
@@ -74,7 +78,11 @@ export const ReviewWithAI = ({
     aiSnap.newChat({
       name: `Review merge: ${currentBranch.name} → ${mainBranch.name}`,
       sqlSnippets: sqlSnippets.length > 0 ? sqlSnippets : undefined,
-      initialInput: `I want to run the attached database changes on my production database branch as part of a branch merge from "${currentBranch.name}" into "${mainBranch.name || 'main'}". I've included the current production database schema as extra context. Please analyze the proposed schema changes and provide concise feedback on their impact on the production schema including any migration concerns and potential conflicts.`,
+      initialInput: `I want to run the attached database changes on my production database branch as part of a branch merge from "${
+        currentBranch.name
+      }" into "${
+        mainBranch.name || 'main'
+      }". I've included the current production database schema as extra context. Please analyze the proposed schema changes and provide concise feedback on their impact on the production schema including any migration concerns and potential conflicts.`,
       suggestions: {
         title: `I can help you review the database schema changes from "${currentBranch.name}" to "${mainBranch.name}", here are some specific areas I can focus on:`,
         prompts: [
