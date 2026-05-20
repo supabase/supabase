@@ -1,18 +1,18 @@
 # Supabase Swift User Management
 
-This repo is a quick sample of how you can get started building apps using Swift and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Swift guide](https://supabase.com/docs/guides/getting-started/quickstarts/ios-swiftui).
+This repo is a quick sample of how you can get started building apps using Swift and Supabase. You can find a step by step guide of how to build out this app in the [Swift user management tutorial](https://supabase.com/docs/guides/getting-started/tutorials/with-swift).
 
 This repo will demonstrate how to:
 
-- Sign users in with Supabase Auth using [magic link](https://supabase.com/docs/reference/dart/auth-signinwithotp)
-- Store and retrieve data with [Supabase database](https://supabase.io/docs/guides/database)
-- Store image files in [Supabase storage](https://supabase.io/docs/guides/storage)
+- Sign users in with Supabase Auth using [magic link](https://supabase.com/docs/reference/swift/auth-signinwithotp)
+- Store and retrieve data with [Supabase database](https://supabase.com/docs/guides/database)
+- Store image files in [Supabase storage](https://supabase.com/docs/guides/storage)
 
 ![Supabase User Management example](supabase-swift-demo.png)
 
 ## Getting Started
 
-Run `cp .env.example .env` and fill in [your credentials](https://supabase.io/docs/guides/with-flutter#get-the-api-keys).
+Run `cp .env.example .env` and fill in [your credentials](https://supabase.com/docs/guides/getting-started/tutorials/with-swift#get-api-details).
 
 Run the application in a device or simulator using Xcode.
 
