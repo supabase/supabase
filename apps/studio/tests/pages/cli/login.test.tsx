@@ -1,9 +1,9 @@
 import { waitFor } from '@testing-library/dom'
 import { expect, test, vi } from 'vitest'
 
-import { CliLoginScreen } from './login'
 import * as cliLogin from '@/data/cli/login'
 import { ProfileContextType } from '@/lib/profile'
+import { CliLoginScreen } from '@/pages/cli/login'
 import { customRender } from '@/tests/lib/custom-render'
 
 const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
