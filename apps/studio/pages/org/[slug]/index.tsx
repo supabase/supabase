@@ -44,11 +44,14 @@ const ProjectsPage: NextPageWithLayout = () => {
           />
         ) : (
           <div className="flex flex-col gap-y-4">
-            {showOrgProjectsListUsageCard && (
-              <PlanUsageCard placement="org_projects_list" standalone />
-            )}
             <HomePageActions />
-            <ProjectList />
+            <ProjectList
+              prependCard={
+                showOrgProjectsListUsageCard && (
+                  <PlanUsageCard placement="org_projects_list" asProjectCard />
+                )
+              }
+            />
           </div>
         )}
       </ScaffoldSection>

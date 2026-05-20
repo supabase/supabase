@@ -134,11 +134,41 @@ interface PlanUsageCardProps {
    * tracking parameter routed through `UpgradePlanButton`. */
   placement: PlanUsageCardPlacement
   /**
-   * When false (default) the component renders the sections as a bare fragment so a parent
-   * can embed them inside its own card container (e.g. the Primary Database React Flow
-   * node). When true the component wraps the sections in its own card with title.
+   * When true, renders the card with the same shape as a `ProjectCard` so it can be
+   * slotted into the org project list grid as the first `<li>` and visually read like
+   * another project tile. Defaults to false (bare fragment for embedding inside another
+   * card container, e.g. the Primary Database React Flow node).
    */
-  standalone?: boolean
+  asProjectCard?: boolean
+}
+
+const CompactMetricRow = ({
+  usageItem,
+  config,
+}: {
+  usageItem: OrgMetricsUsage
+  config: MetricConfig
+}) => {
+  const current = usageItem.usage ?? 0
+  const limit = usageItem.pricing_free_units ?? 0
+  const ratio = limit > 0 ? current / limit : 0
+  const isOver = limit > 0 && current >= limit
+  const isApproaching = limit > 0 && ratio >= 0.8 && !isOver
+
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2 min-w-0">
+        <ProgressRing ratio={ratio} isOver={isOver} isApproaching={isApproaching} />
+        <span className="text-xs text-foreground truncate">{config.label}</span>
+      </div>
+      <span className="text-[11px] font-mono tabular-nums whitespace-nowrap">
+        <span className={cn(isOver ? 'text-warning' : 'text-foreground-light')}>
+          {formatValue(current, config.unit)}
+        </span>
+        <span className="text-foreground-lighter"> / {formatLimit(limit, config.unit)}</span>
+      </span>
+    </div>
+  )
 }
 
 /**
@@ -146,7 +176,7 @@ interface PlanUsageCardProps {
  * on the experiment variant + free plan — this component only renders the visual
  * sections once usage data is available.
  */
-export const PlanUsageCard = ({ placement, standalone = false }: PlanUsageCardProps) => {
+export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCardProps) => {
   const track = useTrack()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: usage, isSuccess } = useOrgUsageQuery({ orgSlug: organization?.slug })
@@ -163,9 +193,46 @@ export const PlanUsageCard = ({ placement, standalone = false }: PlanUsageCardPr
 
   if (visibleRows.length === 0) return null
 
-  const sections = (
+  if (asProjectCard) {
+    return (
+      <li className="list-none h-min">
+        <div
+          className={cn(
+            'group relative bg-surface-100 border border-surface rounded-md',
+            'h-44 px-5 pt-5 pb-3 flex flex-col gap-y-3 overflow-hidden'
+          )}
+        >
+          <div className="flex flex-col gap-y-0.5">
+            <h5 className="text-sm text-foreground">Free plan usage</h5>
+            <p className="text-xs text-foreground-lighter">Current billing cycle</p>
+          </div>
+          <div className="flex-1 flex flex-col gap-y-1.5">
+            {visibleRows.map(({ config, usageItem }) => (
+              <CompactMetricRow key={config.key} usageItem={usageItem} config={config} />
+            ))}
+          </div>
+          <div className="flex items-center justify-between gap-2 mt-auto">
+            <Link
+              href={`/org/${organization?.slug ?? '_'}/usage`}
+              className="text-xs text-foreground-light hover:text-foreground inline-flex items-center gap-1"
+            >
+              View all usage
+              <ArrowRight size={11} strokeWidth={1.5} />
+            </Link>
+            <UpgradePlanButton
+              source={placement}
+              plan="Pro"
+              onClick={() => track('upgrade_cta_clicked', { placement })}
+            />
+          </div>
+        </div>
+      </li>
+    )
+  }
+
+  return (
     <>
-      <div className={cn('px-3 py-2', !standalone && 'border-t')}>
+      <div className="px-3 py-2 border-t">
         <span className="text-[11px] uppercase tracking-wider text-foreground-lighter">
           Free plan &middot; Current billing cycle
         </span>
@@ -190,13 +257,5 @@ export const PlanUsageCard = ({ placement, standalone = false }: PlanUsageCardPr
         />
       </div>
     </>
-  )
-
-  if (!standalone) return sections
-
-  return (
-    <div className="flex flex-col rounded-md bg-surface-100 border border-default w-full max-w-sm">
-      {sections}
-    </div>
   )
 }
