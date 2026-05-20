@@ -16,7 +16,7 @@ import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import {
   Breadcrumb,
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   escapeAttributeSelector,
   generateCommandClassNames,
@@ -118,7 +118,7 @@ function RunSnippetPage() {
     <CommandWrapper>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput autoFocus />
+        <CommandMenuInput autoFocus />
       </CommandHeader>
       {isLoading && <LoadingState />}
       {isError && <ErrorState />}
@@ -319,7 +319,7 @@ function TableSelector() {
     <CommandWrapper>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput autoFocus />
+        <CommandMenuInput autoFocus />
       </CommandHeader>
       <CommandList_Shadcn_>
         {isLoading && <LoadingState />}

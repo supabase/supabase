@@ -3,7 +3,7 @@
 import { forwardRef } from 'react'
 import { cn, CommandGroup_Shadcn_ } from 'ui'
 
-const CommandGroup = forwardRef<
+const CommandMenuGroup = forwardRef<
   React.ElementRef<typeof CommandGroup_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof CommandGroup_Shadcn_>
 >(({ className, ...props }, ref) => {
@@ -18,6 +18,6 @@ const CommandGroup = forwardRef<
     />
   )
 })
-CommandGroup.displayName = CommandGroup_Shadcn_.displayName
+CommandMenuGroup.displayName = 'CommandMenuGroup'
 
-export { CommandGroup }
+export { CommandMenuGroup }
