@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { MobileSheetNav } from 'ui-patterns'
 
-import { HeaderUpgradeButton } from '../LayoutHeader/HeaderUpgradeButton'
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
@@ -71,7 +70,6 @@ const MobileNavigationBar = ({
           )}
         </div>
         <div className="flex shrink-0 gap-2">
-          {IS_PLATFORM && <HeaderUpgradeButton />}
           {IS_PLATFORM ? <UserDropdown /> : <LocalDropdown />}
           {!hideMobileMenu && (
             <Button
