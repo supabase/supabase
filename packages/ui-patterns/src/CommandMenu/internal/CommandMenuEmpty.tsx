@@ -5,7 +5,7 @@ import { cn } from 'ui'
 
 import { useQuery } from '../api/hooks/queryHooks'
 
-const CommandEmpty = ({
+const CommandMenuEmpty = ({
   children,
   className,
   listRef,
@@ -37,4 +37,4 @@ const CommandEmpty = ({
   )
 }
 
-export { CommandEmpty }
+export { CommandMenuEmpty }

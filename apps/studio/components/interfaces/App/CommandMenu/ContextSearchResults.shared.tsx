@@ -3,8 +3,8 @@
 import { cn, CommandList_Shadcn_ } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { TextHighlighter } from 'ui-patterns/CommandMenu'
-import { CommandItem } from 'ui-patterns/CommandMenu/internal/Command'
-import { CommandGroup } from 'ui-patterns/CommandMenu/internal/CommandGroup'
+import { CommandMenuGroup } from 'ui-patterns/CommandMenu/internal/CommandMenuGroup'
+import { CommandMenuItem } from 'ui-patterns/CommandMenu/internal/CommandMenuItem'
 import type { IActionCommand, IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
 export interface SearchResult {
@@ -92,9 +92,9 @@ export function ResultsList({
         className
       )}
     >
-      <CommandGroup>
+      <CommandMenuGroup>
         {commands.map((command) => (
-          <CommandItem key={command.id} command={command}>
+          <CommandMenuItem key={command.id} command={command}>
             <div className="flex flex-col min-w-0 text-foreground-light">
               <TextHighlighter>{command.name}</TextHighlighter>
               {command.value && command.value !== command.name && (
@@ -103,9 +103,9 @@ export function ResultsList({
                 </p>
               )}
             </div>
-          </CommandItem>
+          </CommandMenuItem>
         ))}
-      </CommandGroup>
+      </CommandMenuGroup>
     </CommandList_Shadcn_>
   )
 }
