@@ -44,7 +44,7 @@ export const RegionLimitation = () => {
             className="[&>div>div>h3]:flex [&>div>div>h3]:items-center [&>div>div>h3]:gap-x-2"
             title="Coming soon to your project's region"
             description={
-              <p>
+              <>
                 Your project is in{' '}
                 <Tooltip>
                   <TooltipTrigger className={InlineLinkClassName}>
@@ -67,7 +67,7 @@ export const RegionLimitation = () => {
                   </TooltipContent>
                 </Tooltip>
                 . We're actively looking to expand that soon.
-              </p>
+              </>
             }
           />
         </PageSectionContent>
