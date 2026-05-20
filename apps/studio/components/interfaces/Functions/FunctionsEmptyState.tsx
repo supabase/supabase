@@ -29,10 +29,9 @@ import { ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -42,8 +41,7 @@ export const FunctionsEmptyState = () => {
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const [, setCreateMethod] = useQueryState('create', parseAsString)
 
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
@@ -76,11 +74,7 @@ export const FunctionsEmptyState = () => {
               type="default"
               onClick={() => {
                 router.push(`/project/${ref}/functions/new`)
-                sendEvent({
-                  action: 'edge_function_via_editor_button_clicked',
-                  properties: { origin: 'no_functions_block' },
-                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                })
+                track('edge_function_via_editor_button_clicked', { origin: 'no_functions_block' })
               }}
             >
               Open Editor
@@ -124,11 +118,7 @@ export const FunctionsEmptyState = () => {
                     ],
                   },
                 })
-                sendEvent({
-                  action: 'edge_function_ai_assistant_button_clicked',
-                  properties: { origin: 'no_functions_block' },
-                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                })
+                track('edge_function_ai_assistant_button_clicked', { origin: 'no_functions_block' })
               }}
             >
               Open Assistant
@@ -150,11 +140,7 @@ export const FunctionsEmptyState = () => {
               type="default"
               onClick={() => {
                 setCreateMethod('cli')
-                sendEvent({
-                  action: 'edge_function_via_cli_button_clicked',
-                  properties: { origin: 'no_functions_block' },
-                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                })
+                track('edge_function_via_cli_button_clicked', { origin: 'no_functions_block' })
               }}
             >
               View CLI Instructions
@@ -171,10 +157,9 @@ export const FunctionsEmptyState = () => {
             key={template.name}
             media={<Code strokeWidth={1.5} size={16} className="translate-y-[-9px]" />}
             onClick={() => {
-              sendEvent({
-                action: 'edge_function_template_clicked',
-                properties: { templateName: template.name, origin: 'functions_page' },
-                groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+              track('edge_function_template_clicked', {
+                templateName: template.name,
+                origin: 'functions_page',
               })
             }}
           >
