@@ -5,9 +5,8 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Branch } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { tablesToSQL } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -28,8 +27,7 @@ export const ReviewWithAI = ({
 }: ReviewWithAIProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   // Get parent project for production schema
   const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
@@ -48,14 +46,7 @@ export const ReviewWithAI = ({
   const handleReviewWithAssistant = () => {
     if (!currentBranch || !mainBranch) return
 
-    // Track review with assistant button pressed
-    sendEvent({
-      action: 'branch_review_with_assistant_clicked',
-      groups: {
-        project: parentProjectRef ?? 'Unknown',
-        organization: selectedOrg?.slug ?? 'Unknown',
-      },
-    })
+    track('branch_review_with_assistant_clicked')
 
     // Prepare diff content for the assistant
     const sqlSnippets = []

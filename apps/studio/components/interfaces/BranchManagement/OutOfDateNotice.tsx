@@ -14,9 +14,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface OutOfDateNoticeProps {
   isBranchOutOfDateMigrations: boolean
@@ -43,9 +42,8 @@ export const OutOfDateNotice = ({
 }: OutOfDateNoticeProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const hasOutdatedMigrations = isBranchOutOfDateMigrations && missingMigrationsCount > 0
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = isBranch ? project?.parent_project_ref : project?.ref
@@ -70,17 +68,9 @@ export const OutOfDateNotice = ({
       setIsDialogOpen(false)
     }
 
-    // Track branch update
-    sendEvent({
-      action: 'branch_updated',
-      properties: {
-        modifiedEdgeFunctions: hasEdgeFunctionModifications,
-        source: 'out_of_date_notice',
-      },
-      groups: {
-        project: parentProjectRef ?? 'Unknown',
-        organization: selectedOrg?.slug ?? 'Unknown',
-      },
+    track('branch_updated', {
+      modifiedEdgeFunctions: hasEdgeFunctionModifications,
+      source: 'out_of_date_notice',
     })
 
     onPush()
