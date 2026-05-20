@@ -47,7 +47,6 @@ import { FeaturePreviewContextProvider } from '@/components/interfaces/App/Featu
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
-import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -65,6 +64,14 @@ import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 import type { AppPropsWithLayout } from '@/types'
+
+const UpdateBillingAddressModal = IS_PLATFORM
+  ? dynamic(() =>
+      import('@/components/interfaces/App/UpdateBillingAddressModal').then((m) => ({
+        default: m.UpdateBillingAddressModal,
+      }))
+    )
+  : () => null
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
