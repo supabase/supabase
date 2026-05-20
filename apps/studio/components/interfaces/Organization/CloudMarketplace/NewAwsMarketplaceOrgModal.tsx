@@ -58,7 +58,7 @@ export const NewAwsMarketplaceOrgModal = ({ buyerId, visible, onSuccess, onClose
   )
 }
 
-export const AwsMarketplaceOrgCreationDialog = ({
+const AwsMarketplaceOrgCreationDialog = ({
   visible,
   onClose,
   onSubmit,
