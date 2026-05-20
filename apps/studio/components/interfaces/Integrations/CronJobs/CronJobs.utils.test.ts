@@ -52,6 +52,16 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should return a sql function command for lowercase select', () => {
+    const command = 'select lowercase.issue ()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'lowercase',
+      functionName: 'issue',
+      snippet: command,
+    })
+  })
+
   it('should return a sql snippet command when the command is SELECT public.test_fn(1, 2)', () => {
     const command = 'SELECT public.test_fn(1, 2)'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
@@ -230,6 +240,22 @@ describe('parseCronJobCommand', () => {
       httpHeaders: [{ name: 'X-Name', value: "O'Reilly" }],
       httpBody: `{"message":"hello  there","name":"O'Reilly"}`,
       timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should return an HTTP request config with POST method, escape-string headers and body with backslashes', () => {
+    const command = String.raw`select net.http_post( url:='https://example.com/api/endpoint', headers:=E'{"Content-Type":"application/json","X-Regex":"^\\\\d+$"}'::jsonb,body:=E'{"path":"C:\\\\tmp","regex":"^\\\\d+$"}',timeout_milliseconds:=1000);`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [
+        { name: 'Content-Type', value: 'application/json' },
+        { name: 'X-Regex', value: String.raw`^\d+$` },
+      ],
+      httpBody: String.raw`{"path":"C:\\tmp","regex":"^\\d+$"}`,
+      timeoutMs: 1000,
       type: 'http_request',
       snippet: command,
     })

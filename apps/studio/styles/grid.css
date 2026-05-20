@@ -1,4 +1,4 @@
-@reference "./main.css";
+@reference "./globals.css";
 
 .sb-grid {
   @apply flex h-full flex-col;

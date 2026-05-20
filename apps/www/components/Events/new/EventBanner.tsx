@@ -28,12 +28,14 @@ export function EventBanner() {
                 </Badge>
               )}
             </div>
-            <p
-              className="text-lg font-medium text-foreground-light"
-              title={`Hosted by ${formatHosts(featuredEvent.hosts).fullList}`}
-            >
-              {formatHosts(featuredEvent.hosts).displayText}
-            </p>
+            {featuredEvent.hosts.length > 0 && (
+              <p
+                className="text-lg font-medium text-foreground-light"
+                title={`Hosted by ${formatHosts(featuredEvent.hosts).fullList}`}
+              >
+                {formatHosts(featuredEvent.hosts).displayText}
+              </p>
+            )}
           </div>
 
           <p className="text-foreground-light line-clamp-3 lg:line-clamp-4">

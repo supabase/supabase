@@ -4,10 +4,12 @@ import dayjs from 'dayjs'
 import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,6 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 
 import {
   ERROR_STATES,
@@ -25,6 +28,7 @@ import {
   NODE_SEP,
   NODE_WIDTH,
   PrimaryNodeData,
+  REGION_NODE_HEIGHT,
   REPLICA_STATUS,
   ReplicaNodeData,
 } from './InstanceConfiguration.constants'
@@ -129,7 +133,19 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
                 <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-sm text-foreground-light">{region.region}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="text-sm transition text-foreground-light hover:text-foreground"
+                      onClick={async () =>
+                        await copyToClipboard(region.region, () => toast('Copied project region'))
+                      }
+                    >
+                      {region.region}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Click to copy</TooltipContent>
+                </Tooltip>
                 {projectHomepageShowInstanceSize && (
                   <>
                     <span className="text-sm text-foreground-lighter">·</span>
@@ -318,7 +334,19 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
             <div className="my-0.5">
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
-                <span>{region.region}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="text-sm transition text-foreground-light hover:text-foreground"
+                      onClick={async () =>
+                        await copyToClipboard(region.region, () => toast('Copied replica region'))
+                      }
+                    >
+                      {region.region}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Click to copy</TooltipContent>
+                </Tooltip>
                 {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span className="text-foreground-lighter">·</span>
@@ -366,7 +394,10 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
                 Error: {ERROR_STATES[error as keyof typeof ERROR_STATES]}
               </p>
             ) : (
-              <p className="text-sm text-foreground-light">Created: {created}</p>
+              <p className="text-sm text-foreground-light">
+                Created:{' '}
+                <TimestampInfo className="text-sm" utcTimestamp={inserted_at} label={created} />
+              </p>
             )}
           </div>
         </div>
@@ -405,7 +436,7 @@ export const RegionNode = ({ data }: any) => {
   return (
     <div
       className="relative flex justify-between rounded-sm bg-black/10 border border-default border-white/10 border-2 p-3"
-      style={{ width: regionNodeWidth, height: 162 }}
+      style={{ width: regionNodeWidth, height: REGION_NODE_HEIGHT }}
     >
       <div className="absolute bottom-2 flex items-center justify-between gap-x-2">
         <img

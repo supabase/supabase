@@ -1,4 +1,3 @@
-import { html } from 'monaco-editor'
 import { Metadata } from 'next'
 
 import { BaseInjector } from './../base-injector'

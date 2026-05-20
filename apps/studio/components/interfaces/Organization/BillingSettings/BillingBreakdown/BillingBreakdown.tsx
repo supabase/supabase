@@ -84,9 +84,8 @@ const BillingBreakdown = () => {
               </>
             ) : (
               <>
-                Your upcoming invoice (excluding credits) will continue to update until the end of
-                your billing cycle on {billingCycleEnd.format('MMMM DD')}. For a more detailed
-                breakdown, visit the{' '}
+                Your upcoming invoice will continue to update until the end of your billing cycle on{' '}
+                {billingCycleEnd.format('MMMM DD')}. For a more detailed breakdown, visit the{' '}
                 <InlineLink href={`/org/${orgSlug}/usage`}>usage page.</InlineLink>
               </>
             )}

@@ -4,14 +4,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
-import {
-  Badge,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  FormField,
-  Switch,
-} from 'ui'
+import { Badge, Collapsible, CollapsibleContent, CollapsibleTrigger, FormField, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { ExtendedSupportCategories } from './Support.constants'
@@ -25,9 +18,11 @@ export const DISABLE_SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
 
 interface SupportAccessToggleProps {
   form: UseFormReturn<SupportFormValues>
+  align?: 'left' | 'right'
+  className?: string
 }
 
-export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
+export function SupportAccessToggle({ form, align = 'left', className }: SupportAccessToggleProps) {
   return (
     <FormField
       name="allowSupportAccess"
@@ -37,8 +32,9 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
           <FormItemLayout
             hideMessage
             name="allowSupportAccess"
-            className="px-6"
+            className={className}
             layout="flex"
+            align={align}
             label={
               <div className="flex items-center gap-x-2">
                 <span className="text-foreground">Allow support access to your project</span>
@@ -50,8 +46,8 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
                 <span className="text-foreground-light">
                   Human support and AI diagnostic access.
                 </span>
-                <Collapsible_Shadcn_ className="mt-2">
-                  <CollapsibleTrigger_Shadcn_
+                <Collapsible className="mt-2">
+                  <CollapsibleTrigger
                     className={
                       'group flex items-center gap-x-1 group-data-open:text-foreground hover:text-foreground transition'
                     }
@@ -61,8 +57,8 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
                       className="transition-all group-data-open:rotate-90 text-foreground-muted -ml-1"
                     />
                     <span className="text-sm">More information</span>
-                  </CollapsibleTrigger_Shadcn_>
-                  <CollapsibleContent_Shadcn_ className="text-sm text-foreground-light mt-2 space-y-2">
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="text-sm text-foreground-light mt-2 space-y-2">
                     <p>
                       By enabling this, you grant permission for our support team to access your
                       project temporarily and, if applicable, to use AI tools to assist in
@@ -82,8 +78,8 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
                         Privacy Policy
                       </Link>
                     </p>
-                  </CollapsibleContent_Shadcn_>
-                </Collapsible_Shadcn_>
+                  </CollapsibleContent>
+                </Collapsible>
               </div>
             }
           >

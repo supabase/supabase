@@ -14,7 +14,7 @@ import { SurveyChapterSection } from './components/SurveyChapterSection'
 import { SurveySectionBreak } from './components/SurveySectionBreak'
 
 interface FloatingTocProps {
-  tocRef: RefObject<HTMLDivElement>
+  tocRef: RefObject<HTMLDivElement | null>
   isTocOpen: boolean
   setIsTocOpen: (open: boolean) => void
   activeChapter: number

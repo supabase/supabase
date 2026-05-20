@@ -1,5 +1,5 @@
 import dagre from '@dagrejs/dagre'
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PGSchema, PGTable } from '@supabase/pg-meta'
 import { Edge, Node, Position } from '@xyflow/react'
 import { uniqBy } from 'lodash'
 
@@ -16,8 +16,8 @@ const RANK_SEP = 50
 
 export async function getGraphDataFromTables(
   ref?: string,
-  schema?: PostgresSchema,
-  tables?: PostgresTable[]
+  schema?: PGSchema,
+  tables?: PGTable[]
 ): Promise<{
   nodes: Node<TableNodeData>[]
   edges: Edge[]
@@ -166,7 +166,7 @@ export async function getGraphDataFromTables(
 }
 
 function findTablesHandleIds(
-  tables: PostgresTable[],
+  tables: PGTable[],
   table_name: string,
   column_name: string
 ): [string?, string?] {

@@ -101,16 +101,53 @@ export const threeColumnSectionSchema = z.object({
 
 // ----- Form field schemas -----
 
+/**
+ * Conditional visibility rule: a field is visible only when the referenced
+ * field's current value satisfies all of the supplied criteria.
+ *
+ * - `equals` / `notEquals` — strict string compare against the live value.
+ * - `in` / `notIn` — membership check against a list of values.
+ * - `truthy` — when `true`, requires a non-empty value; when `false`, requires empty.
+ *
+ * Multiple criteria within the same `showWhen` are combined with AND. Hidden
+ * fields are excluded from the submitted payload.
+ */
+export const showWhenSchema = z
+  .object({
+    field: z.string().min(1),
+    equals: z.string().optional(),
+    notEquals: z.string().optional(),
+    in: z.array(z.string()).optional(),
+    notIn: z.array(z.string()).optional(),
+    truthy: z.boolean().optional(),
+  })
+  .refine(
+    (v) =>
+      v.equals !== undefined ||
+      v.notEquals !== undefined ||
+      v.in !== undefined ||
+      v.notIn !== undefined ||
+      v.truthy !== undefined,
+    { message: 'showWhen must include at least one of: equals, notEquals, in, notIn, truthy' }
+  )
+
 const formFieldBase = z.object({
   name: z.string().min(1),
   label: z.string().min(1),
+  /** Helper text rendered beneath the input. */
+  description: z.string().optional(),
   placeholder: z.string().optional(),
   required: z.boolean().optional().default(false),
   half: z.boolean().optional().default(false),
+  showWhen: showWhenSchema.optional(),
 })
 
 export const textFieldSchema = formFieldBase.extend({
   type: z.literal('text'),
+})
+
+export const urlFieldSchema = formFieldBase.extend({
+  type: z.literal('url'),
 })
 
 export const emailFieldSchema = formFieldBase.extend({
@@ -127,11 +164,17 @@ export const selectFieldSchema = formFieldBase.extend({
   options: z.array(z.object({ label: z.string(), value: z.string() })).min(1),
 })
 
+export const checkboxFieldSchema = formFieldBase.extend({
+  type: z.literal('checkbox'),
+})
+
 export const formFieldSchema = z.discriminatedUnion('type', [
   textFieldSchema,
+  urlFieldSchema,
   emailFieldSchema,
   textareaFieldSchema,
   selectFieldSchema,
+  checkboxFieldSchema,
 ])
 
 // ----- Form CRM config schemas -----
@@ -401,6 +444,7 @@ export type GoSingleColumnSection = z.infer<typeof singleColumnSectionSchema>
 export type GoTwoColumnSection = z.infer<typeof twoColumnSectionSchema>
 export type GoThreeColumnSection = z.infer<typeof threeColumnSectionSchema>
 export type GoFormField = z.infer<typeof formFieldSchema>
+export type GoFormFieldShowWhen = z.infer<typeof showWhenSchema>
 export type GoFormSection = z.infer<typeof formSectionSchema>
 export type GoHubSpotFormConfig = z.infer<typeof hubspotFormConfigSchema>
 export type GoCustomerIOFormConfig = z.infer<typeof customerioFormConfigSchema>

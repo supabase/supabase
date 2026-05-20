@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
+import { FeatureFlagContext, IS_PLATFORM } from 'common'
+import { fullImageUrl } from 'common/marketplace-client'
 import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -7,14 +8,10 @@ import { useContext, useMemo } from 'react'
 import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-
-const fullImageUrl = (imagePath: string) => {
-  const API_URL = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL || ''
-  return `${API_URL}${imagePath}`
-}
 
 /**
  * [Joshen] Returns a combination of
@@ -23,7 +20,7 @@ const fullImageUrl = (imagePath: string) => {
  */
 export const useAvailableIntegrations = () => {
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
 
   const { data: cliData } = useCLIReleaseVersionQuery()
@@ -46,6 +43,7 @@ export const useAvailableIntegrations = () => {
           id: listingId,
           slug,
           categories,
+          featured,
           title,
           description,
           documentation_url: docsUrl,
@@ -54,6 +52,7 @@ export const useAvailableIntegrations = () => {
           installation_url_type: installUrlType,
           installation_identification_method: installMethod,
           secret_key_prefix: secretKeyPrefix,
+          edge_function_secret_name: edgeFunctionSecretName,
           images,
           content,
           partner_name: authorName,
@@ -67,7 +66,9 @@ export const useAvailableIntegrations = () => {
           id: slug ?? '',
           name: title ?? '',
           status,
+          featured: !!featured,
           type: 'oauth' as const, // Currently marketplace only supports oauth apps
+          source: 'Partner' as const,
           categories: Array.isArray(categories)
             ? (categories as Array<{ slug: string }>).map((x) => x.slug)
             : [],
@@ -80,6 +81,7 @@ export const useAvailableIntegrations = () => {
           installUrlType: installUrlType ?? undefined,
           installIdentificationMethod: installMethod ?? undefined,
           secretKeyPrefix: secretKeyPrefix ?? undefined,
+          edgeFunctionSecretName: edgeFunctionSecretName ?? undefined,
           listingId: listingId ?? undefined,
           author,
           requiredExtensions: [],

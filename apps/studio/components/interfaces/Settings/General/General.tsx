@@ -2,18 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -25,6 +16,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { ProjectAccessSection } from './ProjectAccessSection'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
@@ -55,6 +47,10 @@ export const General = () => {
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
   })
+
+  const regionLabel = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    project?.region?.includes(region.region)
+  )
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project?.ref) return console.error('Ref is required')
@@ -116,7 +112,7 @@ export const General = () => {
                           className="[&>div]:md:w-1/2"
                         >
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
                               disabled={isBranch || !canUpdateProject}
                               autoComplete="off"
@@ -126,6 +122,7 @@ export const General = () => {
                       )}
                     />
                   </CardContent>
+
                   <CardContent>
                     <FormItemLayout
                       layout="flex-row-reverse"
@@ -134,10 +131,24 @@ export const General = () => {
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
                       <FormControl>
-                        <Input copy readOnly size="small" value={project?.ref ?? ''} />
+                        <PasswordInput copy readOnly size="small" value={project.ref} />
                       </FormControl>
                     </FormItemLayout>
                   </CardContent>
+
+                  <CardContent>
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Project region"
+                      description={regionLabel?.name}
+                      className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                    >
+                      <FormControl>
+                        <PasswordInput copy readOnly size="small" value={project.region} />
+                      </FormControl>
+                    </FormItemLayout>
+                  </CardContent>
+
                   <CardFooter className="justify-end space-x-2">
                     {form.formState.isDirty && (
                       <Button

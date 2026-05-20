@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { checkIfAppendLimitRequired, suffixWithLimit } from '../../SQLEditor/SQLEditor.utils'
 import { type ParseQueryResults } from './RLSTester.types'
+import { filterTablePolicies } from './useTestQueryRLS.utils'
 import { useParseClientCodeMutation } from '@/data/ai/parse-client-code-mutation'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useCheckTableRLSStatusMutation } from '@/data/database/table-check-rls-mutation'
@@ -11,6 +12,7 @@ import { useParseSQLQueryMutation } from '@/data/misc/parse-query-mutation'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { usePostgresSandbox } from '@/state/postgres-sandbox/sandbox'
 import {
   isRoleImpersonationEnabled,
   useGetImpersonatedRoleState,
@@ -34,20 +36,23 @@ export const useTestQueryRLS = () => {
   const { data: project } = useSelectedProjectQuery()
   const { role } = useRoleImpersonationStateSnapshot()
 
+  const { sandbox } = usePostgresSandbox()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const impersonatedRoleState = getImpersonatedRoleState()
   const user = useImpersonatedUser()
 
   const [isLoading, setIsLoading] = useState(false)
+  const [sandboxError, setSandboxError] = useState<Error>()
 
   const { data: policies = [] } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const { mutateAsync: executeSql, error: executeSqlError } = useExecuteSqlMutation({
+  const { mutateAsync: executeSql, error: executeSqlMutationError } = useExecuteSqlMutation({
     onError: () => {},
   })
+  const executeSqlError = sandbox ? sandboxError : executeSqlMutationError
 
   const {
     mutateAsync: parseClientCode,
@@ -103,13 +108,14 @@ export const useTestQueryRLS = () => {
 
     try {
       setIsLoading(true)
+      setSandboxError(undefined)
 
       const { appendAutoLimit } = checkIfAppendLimitRequired(value, limit)
       const formattedSql = suffixWithLimit(value, limit)
       const data = await parseQuery({ sql: formattedSql })
 
       if (data.operation !== 'SELECT') {
-        return toast('Only SELECT statements are supported for now')
+        return toast('Only SELECT statements are supported with the RLS Tester at the moment')
       }
 
       const formattedTables = data.tables.map((x) => {
@@ -124,14 +130,13 @@ export const useTestQueryRLS = () => {
 
       const tables = response
         .map(({ table, schema, rls_enabled }) => {
-          const tablePolicies = policies.filter(
-            (x) =>
-              x.schema === schema &&
-              x.table === table &&
-              (x.roles.includes(role?.role ?? '') ||
-                (x.roles.length === 1 && x.roles[0] === 'public')) &&
-              x.command === data.operation
-          )
+          const tablePolicies = filterTablePolicies({
+            policies,
+            schema,
+            table,
+            role: role?.role,
+            operation: data.operation,
+          })
           return {
             table,
             schema,
@@ -146,19 +151,25 @@ export const useTestQueryRLS = () => {
         })
 
       const autoLimit = appendAutoLimit ? limit : undefined
-      const { result } = await executeSql({
-        autoLimit,
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
-        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
-        isStatementTimeoutDisabled: true,
-        handleError: (error) => {
-          throw error
-        },
-        queryKey: ['rls-tester'],
-      })
+      const sql = wrapWithRoleImpersonation(formattedSql, impersonatedRoleState)
 
+      const { result } = sandbox
+        ? await sandbox.run({ sql }).catch((e) => {
+            setSandboxError(e instanceof Error ? e : new Error(String(e)))
+            throw e
+          })
+        : await executeSql({
+            sql,
+            autoLimit,
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+            isStatementTimeoutDisabled: true,
+            handleError: (e) => {
+              throw e
+            },
+            queryKey: ['rls-tester'],
+          })
       onExecuteSQL({ result, isAutoLimit: !!autoLimit })
 
       onParseQuery({

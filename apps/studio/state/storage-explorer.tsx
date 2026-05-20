@@ -165,6 +165,8 @@ function createStorageExplorerState({
     isSearching: false,
     setIsSearching: (value: boolean) => (state.isSearching = value),
 
+    isRefreshing: false,
+
     selectedFilePreview: undefined as StorageItemWithColumn | undefined,
     setSelectedFilePreview: (file?: StorageItemWithColumn) => (state.selectedFilePreview = file),
 
@@ -396,6 +398,15 @@ function createStorageExplorerState({
     refetchAllOpenedFolders: async () => {
       const paths = state.openedFolders.map((folder) => folder.name)
       await state.fetchFoldersByPath({ paths })
+    },
+
+    refreshAll: async () => {
+      state.isRefreshing = true
+      try {
+        await state.refetchAllOpenedFolders()
+      } finally {
+        state.isRefreshing = false
+      }
     },
 
     fetchFoldersByPath: async ({

@@ -213,6 +213,11 @@ show log_min_messages;
 
 Note that `LOG` is a higher level than `WARNING` and `ERROR`, so if your level is set to `LOG`, you will not see `WARNING` and `ERROR` messages.
 
+### Limits and caveats
+
+- Postgres log events on the Supabase Platform are limited to 100,000 characters. If a log event exceeds this limit, it will be truncated. This does not apply to self-hosting.
+- Internal connection logs to Postgres within the Supabase Platform by internal services are not logged. This does not apply to self-hosting.
+
 ## Logging realtime connections
 
 Realtime doesn't log new WebSocket connections or Channel joins by default. Enable connection logging per client by including an `info` `log_level` parameter when instantiating the Supabase client.

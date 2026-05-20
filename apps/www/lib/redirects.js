@@ -1579,6 +1579,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/auth#understanding-authorization-headers',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/auth#the-verify_jwt-platform-check',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/examples',
     destination: '/docs/guides/functions',
   },
@@ -1826,7 +1836,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/features',
-    destination: '/docs/guides/getting-started/features',
+    destination: '/features',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/features',
+    destination: '/features',
   },
   {
     permanent: true,
@@ -2674,12 +2689,27 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/replication/etl-destinations',
-    destination: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/external-replication-setup',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/analytics/replication',
-    destination: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/external-replication-setup',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/external-replication-setup',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-monitoring',
+    destination: '/docs/guides/database/replication/external-replication-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-faq',
+    destination: '/docs/guides/database/replication/external-replication-faq',
   },
   {
     permanent: true,
@@ -3099,6 +3129,42 @@ module.exports = [
     destination: '/docs/guides/database/overview',
   },
 
+  // AI tools move
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/plugins',
+    destination: '/docs/guides/ai-tools/plugins',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts/:slug',
+    destination: '/docs/guides/ai-tools/ai-prompts/:slug',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/mcp',
+    destination: '/docs/guides/ai-tools/mcp',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/byo-mcp',
+    destination: '/docs/guides/ai-tools/byo-mcp',
+  },
   // design
   {
     permanent: true,

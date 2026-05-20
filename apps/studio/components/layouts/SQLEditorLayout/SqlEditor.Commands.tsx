@@ -1,22 +1,16 @@
-import { type PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef } from 'react'
-import {
-  cn,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-} from 'ui'
+import { cn, CommandEmpty, CommandGroup, CommandItem, CommandList } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import {
   Breadcrumb,
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   escapeAttributeSelector,
   generateCommandClassNames,
@@ -118,7 +112,7 @@ function RunSnippetPage() {
     <CommandWrapper>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput autoFocus />
+        <CommandMenuInput autoFocus />
       </CommandHeader>
       {isLoading && <LoadingState />}
       {isError && <ErrorState />}
@@ -166,17 +160,17 @@ function EmptyState({
   return (
     <div className="p-6">
       <p className="mb-2 text-center">No snippets found.</p>
-      <CommandList_Shadcn_ className="py-2">
-        <CommandGroup_Shadcn_>
-          <CommandItem_Shadcn_
+      <CommandList className="py-2">
+        <CommandGroup>
+          <CommandItem
             id="create-snippet"
             className={generateCommandClassNames(false)}
             onSelect={() => router.push(`/project/${projectRef ?? '_'}/sql/new`)}
           >
             {canCreateNew ? 'Create new snippet' : 'Run new SQL'}
-          </CommandItem_Shadcn_>
-        </CommandGroup_Shadcn_>
-      </CommandList_Shadcn_>
+          </CommandItem>
+        </CommandGroup>
+      </CommandList>
     </div>
   )
 }
@@ -198,16 +192,16 @@ function SnippetSelector({
 
   return (
     <div className="w-full grow min-h-0 grid gap-4 md:grid-cols-2">
-      <CommandList_Shadcn_
+      <CommandList
         className={cn(
           'h-full! min-h-0 max-h-[unset] py-2 overflow-hidden',
           '*:[[cmdk-list-sizer]]:h-full *:[[cmdk-list-sizer]]:flex *:[[cmdk-list-sizer]]:flex-col'
         )}
       >
         {!!snippets && snippets.length > 0 && (
-          <CommandGroup_Shadcn_ className="grow min-h-0 overflow-auto">
+          <CommandGroup className="grow min-h-0 overflow-auto">
             {snippets.map((snippet) => (
-              <CommandItem_Shadcn_
+              <CommandItem
                 key={snippet.id}
                 id={`${snippet.id}-${snippet.name}`}
                 className={generateCommandClassNames(false)}
@@ -215,26 +209,26 @@ function SnippetSelector({
                 onSelect={() => void router.push(`/project/${projectRef ?? '_'}/sql/${snippet.id}`)}
               >
                 {snippet.name}
-              </CommandItem_Shadcn_>
+              </CommandItem>
             ))}
-          </CommandGroup_Shadcn_>
+          </CommandGroup>
         )}
         {canCreateNew && (
           <div className="min-h-fit grow-0">
             <hr className="mt-4 mb-2 mx-2" />
-            <CommandGroup_Shadcn_ forceMount={true}>
-              <CommandItem_Shadcn_
+            <CommandGroup forceMount={true}>
+              <CommandItem
                 id="create-snippet"
                 className={generateCommandClassNames(false)}
                 onSelect={() => router.push(`/project/${projectRef ?? '_'}/sql/new`)}
                 forceMount={true}
               >
                 Create new snippet
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
+              </CommandItem>
+            </CommandGroup>
           </div>
         )}
-      </CommandList_Shadcn_>
+      </CommandList>
       <CodeBlock
         language="sql"
         value={isSQLSnippet ? selectedSnippet?.content?.unchecked_sql : ''}
@@ -319,17 +313,17 @@ function TableSelector() {
     <CommandWrapper>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput autoFocus />
+        <CommandMenuInput autoFocus />
       </CommandHeader>
-      <CommandList_Shadcn_>
+      <CommandList>
         {isLoading && <LoadingState />}
         {isError && <ErrorState />}
         {isSuccess && (
           <>
-            <CommandEmpty_Shadcn_ />
-            <CommandGroup_Shadcn_>
+            <CommandEmpty />
+            <CommandGroup>
               {tables?.map((table) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={table.id}
                   className={generateCommandClassNames(false)}
                   value={escapeAttributeSelector(`${table.schema}.${table.name}`)}
@@ -340,17 +334,17 @@ function TableSelector() {
                   }}
                 >
                   {`${table.schema}.${table.name}`}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
+            </CommandGroup>
           </>
         )}
-      </CommandList_Shadcn_>
+      </CommandList>
     </CommandWrapper>
   )
 }
 
-function generateSelectStatement(table: TablesData[number] & { columns?: Array<PostgresColumn> }) {
+function generateSelectStatement(table: TablesData[number] & { columns?: Array<PGColumn> }) {
   return `
 select ${
     !table.columns

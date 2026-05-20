@@ -3,8 +3,8 @@ import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateDatabaseMenu } from './DatabaseMenu.utils'
-import { DatabaseNavShortcuts } from '@/components/interfaces/DatabaseNavShortcuts'
 import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { withAuth } from '@/hooks/misc/withAuth'
 
 export interface DatabaseLayoutProps {
@@ -20,14 +20,18 @@ export const DatabaseProductMenu = () => {
 }
 
 const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
+  const router = useRouter()
+  const page = router.pathname.split('/')[4]
+  const menu = useGenerateDatabaseMenu()
+
   return (
     <ProjectLayout
       product="Database"
       browserTitle={{ section: title }}
-      productMenu={<DatabaseProductMenu />}
+      productMenu={<ProductMenu page={page} menu={menu} />}
       isBlocking={false}
     >
-      <DatabaseNavShortcuts />
+      <ProductMenuShortcuts menu={menu} />
       {children}
     </ProjectLayout>
   )

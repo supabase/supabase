@@ -14,9 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -31,7 +31,10 @@ import { SecurityDefinerViewPopover } from './SecurityDefinerViewPopover'
 import { ViewEntityAutofixSecurityModal } from './ViewEntityAutofixSecurityModal'
 import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
 import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
-import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  getEntityLintDetails,
+  getTablePoliciesUrl,
+} from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useIsTableRealtimeEnabled } from '@/data/database-publications/database-publications-query'
@@ -228,10 +231,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       },
                     }}
                   >
-                    <Link
-                      passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.name}&schema=${table.schema}`}
-                    >
+                    <Link passHref href={getTablePoliciesUrl(projectRef, table.schema, table.name)}>
                       Add RLS policy
                     </Link>
                   </ButtonTooltip>
@@ -258,23 +258,20 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       )
                     }
                   >
-                    <Link
-                      passHref
-                      href={`/project/${projectRef}/auth/policies?search=${table.name}&schema=${table.schema}`}
-                    >
+                    <Link passHref href={getTablePoliciesUrl(projectRef, table.schema, table.name)}>
                       RLS {policies.length > 1 ? 'policies' : 'policy'}
                     </Link>
                   </Button>
                 )}
               </>
             ) : tableHasLints ? (
-              <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-                <PopoverTrigger_Shadcn_ asChild>
+              <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+                <PopoverTrigger asChild>
                   <Button type="danger" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
+                </PopoverTrigger>
+                <PopoverContent className="w-80 text-sm" align="end">
                   <h4 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
                   </h4>
@@ -297,8 +294,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       </Button>
                     )}
                   </div>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                </PopoverContent>
+              </Popover>
             ) : null
           ) : null}
 
@@ -316,13 +313,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           )}
 
           {isForeignTable && table.schema === 'public' && (
-            <Popover_Shadcn_ modal={false} open={showWarning} onOpenChange={setShowWarning}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
+              <PopoverTrigger asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Unprotected Data API access
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              </PopoverTrigger>
+              <PopoverContent className="min-w-[395px] text-sm" align="end">
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure Foreign table
                 </h3>
@@ -344,15 +341,20 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </Button>
                   </div>
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
           <RoleImpersonationPopover header="View data as a role" align="center" />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" icon={<MoreVertical />} className="h-7 w-7" />
+              <Button
+                type="default"
+                icon={<MoreVertical />}
+                className="h-7 w-7"
+                aria-label="More actions"
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48">
               {isTable && realtimeEnabled && (

@@ -99,16 +99,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         ? 'Upgrade to Pro to prevent pauses and unlock features like branching, compute upgrades, and daily backups.'
                         : 'To prevent future pauses, consider upgrading to Pro.'}
                     </p>
-                    {!!pauseStatus.last_paused_on && (
-                      <p className="text-foreground-lighter text-sm">
-                        Project last paused on{' '}
-                        <TimestampInfo
-                          className="text-sm"
-                          labelFormat="DD MMM YYYY"
-                          utcTimestamp={pauseStatus.last_paused_on}
-                        />
-                      </p>
-                    )}
                   </>
                 ) : (
                   <p className="text-sm">

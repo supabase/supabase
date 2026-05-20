@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import errorGif from 'public/images/ai/error.gif'
 import { useEffect, useRef, useState } from 'react'
-import { AiIconAnimation, cn, Input_Shadcn_ as Input } from 'ui'
+import { AiIconAnimation, cn, Input } from 'ui'
 
 import styles from './assistant.module.css'
 
