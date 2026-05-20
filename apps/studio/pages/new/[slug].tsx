@@ -163,6 +163,14 @@ const Wizard: NextPageWithLayout = () => {
     highAvailability,
   } = useWatch({ control: form.control })
 
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (getFieldState('dataApiDefaultPrivileges', form.formState).isDirty) return
+    setValue('dataApiDefaultPrivileges', !dataApiRevokeOnCreateDefaultFlag, {
+      shouldDirty: false,
+    })
+  }, [dataApiRevokeOnCreateDefaultFlag, getFieldState, setValue, form.formState])
+
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
   // an in-between render, but watchedInstanceSize is still undefined from the

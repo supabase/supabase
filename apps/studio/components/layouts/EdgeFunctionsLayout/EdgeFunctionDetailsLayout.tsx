@@ -263,6 +263,7 @@ const EdgeFunctionDetailsLayout = ({
   useFunctionsDetailShortcuts({
     projectRef: ref,
     functionSlug,
+    canReadFunctions,
     isPlatform: IS_PLATFORM,
     onOpenTest: openTestSheet,
     onOpenDownload: () => setIsDownloadOpen((prev) => !prev),

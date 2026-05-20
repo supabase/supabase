@@ -6,7 +6,6 @@ export * from './src/components/Icon/IconBackground'
 // DISPLAYS
 
 export * from './src/components/Tabs'
-export * from './src/components/Accordion'
 
 // NAV
 
@@ -88,12 +87,7 @@ export * from './src/components/shadcn/ui/form'
 
 export * from './src/components/shadcn/ui/popover'
 
-export {
-  Accordion as Accordion_Shadcn_,
-  AccordionItem as AccordionItem_Shadcn_,
-  AccordionTrigger as AccordionTrigger_Shadcn_,
-  AccordionContent as AccordionContent_Shadcn_,
-} from './src/components/shadcn/ui/accordion'
+export * from './src/components/shadcn/ui/accordion'
 
 export * from './src/components/shadcn/ui/select'
 

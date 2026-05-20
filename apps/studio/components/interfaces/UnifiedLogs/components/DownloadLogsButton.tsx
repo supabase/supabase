@@ -94,7 +94,7 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <ButtonTooltip
             type="default"
             className="w-[26px]"
