@@ -3,7 +3,7 @@ import { Terminal } from 'lucide-react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
@@ -47,6 +47,19 @@ const CliLoginInterstitial = ({
     <div className="px-6 pb-6">{children}</div>
   </InterstitialLayout>
 )
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as { message: unknown }).message === 'string'
+  ) {
+    return (error as { message: string }).message
+  }
+  return 'Unknown error'
+}
 
 const CliLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -98,6 +111,7 @@ export const CliLoginScreen = ({
 }) => {
   const { profile } = useProfile()
   const [status, setStatus] = useState<CliLoginStatus>({ _tag: 'loading' })
+  const startedForSessionIdRef = useRef<string | undefined>(undefined)
   const displayName = profile?.primary_email ?? profile?.username
 
   useEffect(() => {
@@ -117,6 +131,13 @@ export const CliLoginScreen = ({
       return
     }
 
+    // Guard against re-render loops triggered by unstable deps (e.g. a new
+    // `navigate` reference on each parent render) firing the POST more than
+    // once per session_id. Without this, the dashboard creates several
+    // identical access tokens before navigating to the device_code view.
+    if (startedForSessionIdRef.current === sessionId) return
+    startedForSessionIdRef.current = sessionId
+
     let isActive = true
     setStatus({ _tag: 'loading' })
 
@@ -133,10 +154,7 @@ export const CliLoginScreen = ({
         }
       } catch (error: unknown) {
         if (!isActive) return
-        setStatus({
-          _tag: 'error',
-          message: error instanceof Error ? error.message : 'Unknown error',
-        })
+        setStatus({ _tag: 'error', message: getErrorMessage(error) })
       }
     }
 
