@@ -42,7 +42,7 @@ export function SupportAssistantSuccessCard({
   const aiAssistant = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const track = useTrack()
-  const createdChatIdRef = useRef<string>()
+  const createdChatIdRef = useRef<string>(null)
   const [chatId, setChatId] = useState<string>()
   const chat = chatId ? aiAssistant.chatInstances[chatId] : undefined
 
