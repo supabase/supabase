@@ -14,7 +14,7 @@ import { StatusIcon } from 'ui/src/components/StatusIcon'
 import {
   Breadcrumb,
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   escapeAttributeSelector,
   generateCommandClassNames,
@@ -191,7 +191,7 @@ const DocsSearchPage = () => {
     <CommandWrapper>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput placeholder="Search..." ref={inputRef} />
+        <CommandMenuInput placeholder="Search..." ref={inputRef} />
       </CommandHeader>
       <CommandList_Shadcn_ className="max-h-[initial]">
         {hasResults &&
