@@ -105,7 +105,6 @@ export const AwsMarketplaceOrgCreationDialog = ({
             form={CREATE_AWS_MANAGED_ORG_FORM_ID}
             htmlType="submit"
             loading={isCreatingOrganization}
-            size="medium"
           >
             Create and link organization
           </Button>
