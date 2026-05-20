@@ -8,9 +8,6 @@ import { Index } from '@/__registry__'
 import { useConfig } from '@/hooks/use-config'
 import { styles } from '@/registry/styles'
 
-const previewPaddingClassNameRegex =
-  /^(?:(?:\[[^\]]+\]|[^\s:]+):)*!?p[trblxy]?-(?:\d+(?:\.\d+)?|px|\[[^\]]+\])$/
-
 interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string
   extractClassname?: boolean
@@ -21,6 +18,7 @@ interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   showDottedGrid?: boolean
   wide?: boolean
   hideCode?: boolean
+  padded?: boolean
 }
 
 export function ComponentPreview({
@@ -35,6 +33,7 @@ export function ComponentPreview({
   showDottedGrid = true,
   wide = false,
   hideCode = false,
+  padded = true,
   ...props
 }: ComponentPreviewProps) {
   const [config] = useConfig()
@@ -45,9 +44,6 @@ export function ComponentPreview({
 
   const [expand, setExpandState] = React.useState(false)
   const previewClassName = className
-  const hasPreviewPaddingClass = previewClassName
-    ?.split(/\s+/)
-    .some((value) => previewPaddingClassNameRegex.test(value))
 
   const Preview = React.useMemo(() => {
     const Component = Index[config.style][name]?.component
@@ -73,7 +69,7 @@ export function ComponentPreview({
         <div
           className={cn(
             'preview flex min-h-[256px] w-full justify-center',
-            !hasPreviewPaddingClass && 'p-10',
+            padded && 'p-10',
             {
               'items-center': align === 'center',
               'items-start': align === 'start',
@@ -92,7 +88,7 @@ export function ComponentPreview({
         </div>
       </>
     )
-  }, [Preview, align, hasPreviewPaddingClass, previewClassName])
+  }, [Preview, align, padded, previewClassName])
 
   const wideClasses = wide ? '2xl:-ml-20 2xl:-mr-20' : ''
 
