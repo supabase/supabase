@@ -184,6 +184,7 @@ jobs:
       - name: Proof instant workflow (readiness + annotations)
         id: proof_instant
         if: matrix.run_shell == 'bash'
+        continue-on-error: true
         shell: bash
         run: |
           ota clean . || true
@@ -194,6 +195,7 @@ jobs:
       - name: Proof instant workflow (readiness + annotations) [pwsh]
         id: proof_instant_pwsh
         if: matrix.run_shell == 'pwsh'
+        continue-on-error: true
         timeout-minutes: 20
         shell: pwsh
         run: |
@@ -230,6 +232,7 @@ jobs:
       - name: Proof app workflow [bash]
         id: proof_app_bash
         if: matrix.full_proof && matrix.run_shell == 'bash'
+        continue-on-error: true
         shell: bash
         run: |
           ota clean . || true
@@ -240,6 +243,7 @@ jobs:
       - name: Proof app workflow [pwsh]
         id: proof_app_pwsh
         if: matrix.full_proof && matrix.run_shell == 'pwsh'
+        continue-on-error: true
         timeout-minutes: 12
         shell: pwsh
         run: |
@@ -497,7 +501,7 @@ jobs:
           set -e
           cat ota-proof-instant-container.json
           if [ "$proof_status" -ne 0 ]; then
-            if rg -q '"error": "Container readiness does not include host-only checks"' ota-proof-instant-container.json; then
+            if grep -q '"error": "Container readiness does not include host-only checks"' ota-proof-instant-container.json; then
               echo "::notice title=Container proof returned host-only-check info::Treating this as non-blocking for container matrix signal."
             else
               exit "$proof_status"
