@@ -1,3 +1,5 @@
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
 
 export const dynamic = 'force-dynamic'
@@ -8,7 +10,25 @@ interface Source {
   enabled: boolean
 }
 
-function getSources(): Source[] {
+// Resolved relative to apps/www (process.cwd() at runtime). The directory is
+// included in the serverless bundle via outputFileTracingIncludes in
+// next.config.mjs so this readdir works on Vercel.
+const GUIDES_CONTENT_DIR = path.join(process.cwd(), '..', 'docs', 'content', 'guides')
+
+async function getGuideSources(): Promise<Source[]> {
+  const entries = await fs.readdir(GUIDES_CONTENT_DIR, { withFileTypes: true })
+  return entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+    .map((dirName) => ({
+      title: dirName.toUpperCase(),
+      relPath: `docs/guides/${dirName}.md`,
+      enabled: true,
+    }))
+}
+
+async function getSources(): Promise<Source[]> {
   const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
     'sdk:csharp',
     'sdk:dart',
@@ -17,8 +37,10 @@ function getSources(): Source[] {
     'sdk:swift',
   ])
 
+  const guideSources = await getGuideSources()
+
   return [
-    { title: 'Supabase Guides', relPath: 'llms/guides.txt', enabled: true },
+    ...guideSources,
     { title: 'Supabase Reference (JavaScript)', relPath: 'llms/js.txt', enabled: true },
     { title: 'Supabase Reference (Dart)', relPath: 'llms/dart.txt', enabled: sdkDart },
     { title: 'Supabase Reference (Swift)', relPath: 'llms/swift.txt', enabled: sdkSwift },
@@ -47,7 +69,7 @@ const PRODUCT_OVERVIEW_LINKS = [
 ].join('\n')
 
 export async function GET() {
-  const sources = getSources()
+  const sources = await getSources()
 
   const sourceLinks = sources
     .filter((source) => source.enabled)

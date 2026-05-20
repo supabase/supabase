@@ -71,6 +71,15 @@ const nextConfig = {
       'public/**/*',
     ],
   },
+  /**
+   * /llms.txt enumerates top-level guide directories at runtime via fs.readdir.
+   * Include just the immediate children of apps/docs/content/guides so the
+   * directory entries exist in the serverless bundle without pulling every
+   * nested .mdx file.
+   */
+  outputFileTracingIncludes: {
+    '/llms.txt': ['../docs/content/guides/*'],
+  },
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
