@@ -86,7 +86,7 @@ export const MarketplaceFilterBar = ({
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder={`Search integration${resultCount === 1 ? '' : 's'}…`}
         icon={<Search size={14} />}
-        className="max-w-60 grow flex-1"
+        containerClassName="w-full min-w-40 max-w-60 grow flex-1"
       />
 
       <DropdownMenu>

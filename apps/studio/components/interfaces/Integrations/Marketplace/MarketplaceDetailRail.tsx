@@ -15,7 +15,7 @@ interface RailRowProps {
 const RailRow = ({ label, value, href, mono }: RailRowProps) => {
   const valueCls = cn(
     'flex items-center gap-1 text-sm',
-    href ? 'text-brand' : 'text-foreground',
+    href ? 'text-brand-link' : 'text-foreground',
     mono && 'font-mono'
   )
   const content = (

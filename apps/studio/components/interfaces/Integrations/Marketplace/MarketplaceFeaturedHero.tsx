@@ -78,7 +78,7 @@ export const MarketplaceFeaturedHero = ({
     <section>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm">Featured Partners Integrations</h2>
+          <h2 className="text-sm">Featured integrations</h2>
         </div>
         <Button
           aria-label={isPaused ? 'Resume auto-rotation' : 'Pause auto-rotation'}
@@ -108,11 +108,7 @@ export const MarketplaceFeaturedHero = ({
                   </div>
                   <div className="flex items-center gap-2">
                     <MarketplaceSourceBadge source={source} />
-                    {active.status && (
-                      <Badge variant="warning" className="capitalize">
-                        {active.status}
-                      </Badge>
-                    )}
+                    {active.status && <Badge variant="warning">{active.status}</Badge>}
                   </div>
                 </div>
               </div>
