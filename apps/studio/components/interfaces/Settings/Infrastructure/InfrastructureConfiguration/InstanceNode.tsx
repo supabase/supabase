@@ -212,7 +212,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
           </TooltipTrigger>
           <TooltipContent side="bottom">Go to Database Report</TooltipContent>
         </Tooltip>
-        {showPlanUsage && <PlanUsageCard />}
+        {showPlanUsage && <PlanUsageCard placement="home_usage_card" />}
       </div>
       <Handle
         type="source"

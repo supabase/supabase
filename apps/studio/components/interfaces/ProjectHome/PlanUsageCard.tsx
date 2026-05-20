@@ -127,14 +127,26 @@ const MetricRow = ({ usageItem, config }: { usageItem: OrgMetricsUsage; config: 
   )
 }
 
+type PlanUsageCardPlacement = 'home_usage_card' | 'org_projects_list'
+
+interface PlanUsageCardProps {
+  /** Identifies the surface where the card is rendered. Drives telemetry + the `source`
+   * tracking parameter routed through `UpgradePlanButton`. */
+  placement: PlanUsageCardPlacement
+  /**
+   * When false (default) the component renders the sections as a bare fragment so a parent
+   * can embed them inside its own card container (e.g. the Primary Database React Flow
+   * node). When true the component wraps the sections in its own card with title.
+   */
+  standalone?: boolean
+}
+
 /**
- * Renders the upgrade CTA's plan-usage sections as a fragment of `border-t`-separated
- * blocks. Designed to be embedded inside another card container (the Primary Database
- * React Flow node in `PrimaryNode`). The parent is responsible for gating on the
- * experiment variant + free plan — this component only renders the visual sections
- * once usage data is available.
+ * Renders the upgrade CTA's plan-usage sections. The parent is responsible for gating
+ * on the experiment variant + free plan — this component only renders the visual
+ * sections once usage data is available.
  */
-export const PlanUsageCard = () => {
+export const PlanUsageCard = ({ placement, standalone = false }: PlanUsageCardProps) => {
   const track = useTrack()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: usage, isSuccess } = useOrgUsageQuery({ orgSlug: organization?.slug })
@@ -151,14 +163,14 @@ export const PlanUsageCard = () => {
 
   if (visibleRows.length === 0) return null
 
-  return (
+  const sections = (
     <>
-      <div className="px-3 py-2 border-t">
+      <div className={cn('px-3 py-2', !standalone && 'border-t')}>
         <span className="text-[11px] uppercase tracking-wider text-foreground-lighter">
           Free plan &middot; Current billing cycle
         </span>
       </div>
-      <div className="flex flex-col divide-y">
+      <div className="flex flex-col divide-y border-t">
         {visibleRows.map(({ config, usageItem }) => (
           <MetricRow key={config.key} usageItem={usageItem} config={config} />
         ))}
@@ -172,11 +184,19 @@ export const PlanUsageCard = () => {
           <ArrowRight size={11} strokeWidth={1.5} />
         </Link>
         <UpgradePlanButton
-          source="home_usage_card"
+          source={placement}
           plan="Pro"
-          onClick={() => track('upgrade_cta_clicked', { placement: 'home_usage_card' })}
+          onClick={() => track('upgrade_cta_clicked', { placement })}
         />
       </div>
     </>
+  )
+
+  if (!standalone) return sections
+
+  return (
+    <div className="flex flex-col rounded-md bg-surface-100 border border-default w-full max-w-sm">
+      {sections}
+    </div>
   )
 }

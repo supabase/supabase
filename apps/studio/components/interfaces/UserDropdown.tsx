@@ -49,7 +49,11 @@ export function UserDropdown({
   const track = useTrack()
 
   const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
-  const showUpgradeCta = upgradeCtaVariant === 'user_dropdown'
+  // Per Slack feedback (Jonny): the upgrade CTA is org-scoped, so only show it on routes
+  // where an org is in scope. Excludes /account/*, /organizations, /new, marketing routes, etc.
+  const isOrgScopedRoute =
+    router.pathname.startsWith('/project/') || router.pathname.startsWith('/org/')
+  const showUpgradeCta = upgradeCtaVariant === 'user_dropdown' && isOrgScopedRoute
 
   const [isOpen, setIsOpen] = useState(false)
 

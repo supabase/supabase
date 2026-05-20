@@ -5,18 +5,22 @@ import { Admonition } from 'ui-patterns'
 
 import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from '@/components/interfaces/HomePageActions'
+import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
 import type { NextPageWithLayout } from '@/types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const { data: org } = useSelectedOrganizationQuery()
+  const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
 
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
+  const showOrgProjectsListUsageCard = upgradeCtaVariant === 'org_projects_list'
 
   return (
     <ScaffoldContainer className="grow flex">
@@ -40,6 +44,9 @@ const ProjectsPage: NextPageWithLayout = () => {
           />
         ) : (
           <div className="flex flex-col gap-y-4">
+            {showOrgProjectsListUsageCard && (
+              <PlanUsageCard placement="org_projects_list" standalone />
+            )}
             <HomePageActions />
             <ProjectList />
           </div>
