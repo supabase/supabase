@@ -10,7 +10,10 @@ import {
   type RawChartData,
 } from './useServiceHealthMetrics.utils'
 import { analyticsKeys } from '@/data/analytics/keys'
-import { getServiceHealth, type ServiceHealthGranularity } from '@/data/analytics/service-health-query'
+import {
+  getServiceHealth,
+  type ServiceHealthGranularity,
+} from '@/data/analytics/service-health-query'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from '@/hooks/analytics/useTimeseriesUnixToIso'
 
@@ -119,12 +122,54 @@ export const useServiceHealthMetrics = (
   const granularity = INTERVAL_TO_GRANULARITY[interval]
   const enabled = Boolean(projectRef)
 
-  const db = useServiceHealthQuery({ projectRef, serviceKey: 'db', startDate, endDate, granularity, enabled })
-  const auth = useServiceHealthQuery({ projectRef, serviceKey: 'auth', startDate, endDate, granularity, enabled })
-  const functions = useServiceHealthQuery({ projectRef, serviceKey: 'functions', startDate, endDate, granularity, enabled })
-  const storage = useServiceHealthQuery({ projectRef, serviceKey: 'storage', startDate, endDate, granularity, enabled })
-  const realtime = useServiceHealthQuery({ projectRef, serviceKey: 'realtime', startDate, endDate, granularity, enabled })
-  const postgrest = useServiceHealthQuery({ projectRef, serviceKey: 'postgrest', startDate, endDate, granularity, enabled })
+  const db = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'db',
+    startDate,
+    endDate,
+    granularity,
+    enabled,
+  })
+  const auth = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'auth',
+    startDate,
+    endDate,
+    granularity,
+    enabled,
+  })
+  const functions = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'functions',
+    startDate,
+    endDate,
+    granularity,
+    enabled,
+  })
+  const storage = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'storage',
+    startDate,
+    endDate,
+    granularity,
+    enabled,
+  })
+  const realtime = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'realtime',
+    startDate,
+    endDate,
+    granularity,
+    enabled,
+  })
+  const postgrest = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'postgrest',
+    startDate,
+    endDate,
+    granularity,
+    enabled,
+  })
 
   const services: Record<ServiceKey, ServiceHealthData> = useMemo(
     () => ({
