@@ -5,11 +5,11 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, type PropsWithChildren } from 'react'
 
 import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import useLatest from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import {
@@ -44,7 +44,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { openSidebar, closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   const [sidebarURLParam, setSidebarUrlParam] = useQueryState('sidebar', parseAsString)
@@ -84,16 +84,8 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (!!project) {
       if (activeSidebar) {
-        // add event tracking
-        sendEvent({
-          action: 'sidebar_opened',
-          properties: {
-            sidebar: activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS],
-          },
-          groups: {
-            project: project?.ref ?? 'Unknown',
-            organization: org?.slug ?? 'Unknown',
-          },
+        track('sidebar_opened', {
+          sidebar: activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS],
         })
         setSidebarLocalStorage(activeSidebar.id)
       } else {

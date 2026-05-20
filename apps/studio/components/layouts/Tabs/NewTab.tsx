@@ -25,13 +25,12 @@ import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
 import { SQL_TEMPLATES } from '@/components/interfaces/SQLEditor/SQLEditor.queries'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   useImpersonatedAAL,
   useImpersonatedExternalAuth,
@@ -49,8 +48,8 @@ export function NewTab() {
   const { ref } = useParams()
   const editor = useEditorType()
   const { profile } = useProfile()
-  const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
+  const track = useTrack()
   const { selectedSchema } = useQuerySchemaState()
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
@@ -66,7 +65,6 @@ export function NewTab() {
   const impersonatedExternalUser = useImpersonatedExternalAuth()
   const impersonatedAAL = useImpersonatedAAL()
 
-  const { mutate: sendEvent } = useSendEventMutation()
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
@@ -192,11 +190,7 @@ export function NewTab() {
                   <ActionCard
                     onClick={() => {
                       handleNewQuery(item.sql, item.title)
-                      sendEvent({
-                        action: 'sql_editor_template_clicked',
-                        properties: { templateName: item.title },
-                        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                      })
+                      track('sql_editor_template_clicked', { templateName: item.title })
                     }}
                     bgColor="bg-alternative border"
                     key={`action-card-${i}`}
@@ -219,11 +213,7 @@ export function NewTab() {
                   <ActionCard
                     onClick={() => {
                       handleNewQuery(item.sql, item.title)
-                      sendEvent({
-                        action: 'sql_editor_quickstart_clicked',
-                        properties: { quickstartName: item.title },
-                        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                      })
+                      track('sql_editor_quickstart_clicked', { quickstartName: item.title })
                     }}
                     bgColor="bg-alternative border"
                     key={`action-card-${i}`}
