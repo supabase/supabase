@@ -33,6 +33,12 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
 
     Here's an example of how to upload a file using `tus-js-client`:
 
+    <Admonition type="note">
+
+    Typically we advise against using `getSession`, because the session is read from local storage and you can't trust its claims for auth decisions. In this case however, the code only needs the raw access token string to forward as a credential to Supabase storage, which validates the token server-side. Since no client-side auth decision is made based on the session data, `getSession` is appropriate here.
+
+    </Admonition>
+
     ```javascript
     const tus = require('tus-js-client')
 

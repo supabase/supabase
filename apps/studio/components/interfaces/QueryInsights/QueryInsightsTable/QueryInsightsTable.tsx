@@ -1,3 +1,4 @@
+import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useParams } from 'common'
 import { Search, TextSearch, X } from 'lucide-react'
@@ -27,7 +28,7 @@ import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/Exp
 import { FilterPill } from '@/components/interfaces/QueryPerformance/components/FilterPill'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { FilterPopover } from '@/components/ui/FilterPopover'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -174,7 +175,7 @@ export const QueryInsightsTable = ({
   }, [mode, selectedTriageRow, selectedRow, filteredTriageItems, explorerItems])
 
   const runExplain = useCallback(
-    (query: string) => {
+    (query: SafeSqlFragment) => {
       if (explainResults[query]) return
       if (explainLoadingQuery) return
       const requestQuery = query
@@ -183,7 +184,7 @@ export const QueryInsightsTable = ({
         {
           projectRef: project?.ref,
           connectionString: project?.connectionString,
-          sql: wrapWithRollback(`EXPLAIN ANALYZE ${requestQuery}`),
+          sql: wrapWithRollback(safeSql`EXPLAIN ANALYZE ${requestQuery}`),
         },
         {
           onSuccess(data) {
@@ -341,7 +342,7 @@ export const QueryInsightsTable = ({
               options={['explorer', 'triage']}
               activeOption={mode}
               borderOverride="border"
-              onClickOption={setMode}
+              onClickOption={(mode) => setMode(mode as Mode)}
             />
             {appNameFilter.length > 0 ? (
               <FilterPill
@@ -365,28 +366,28 @@ export const QueryInsightsTable = ({
           <div className="flex items-center">
             {mode === 'triage' ? (
               <Tabs_Shadcn_ value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
-                <TabsList_Shadcn_ className="flex gap-x-4 rounded-none !mt-0 pt-0 !border-none">
+                <TabsList_Shadcn_ className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
                   <TabsTrigger_Shadcn_
                     value="all"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     All{triageItems.length > 0 && ` (${triageItems.length})`}
                   </TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_
                     value="error"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     Errors{errorCount > 0 && ` (${errorCount})`}
                   </TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_
                     value="index"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     Index{indexCount > 0 && ` (${indexCount})`}
                   </TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_
                     value="slow"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     Slow{slowCount > 0 && ` (${slowCount})`}
                   </TabsTrigger_Shadcn_>
@@ -465,7 +466,7 @@ export const QueryInsightsTable = ({
                   `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : isCharted ? 'bg-surface-200 dark:bg-surface-200' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
                   '[&>div:first-child]:border-l-4 [&>div:first-child]:pl-5 [&>div:last-child]:pr-6',
                   `${isSelected || isCharted ? '[&>div:first-child]:border-l-foreground' : '[&>div:first-child]:border-l-transparent'}`,
-                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
+                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
                   '[&>.rdg-cell.column-prop_total_time]:relative',
                 ].join(' ')
               }}
@@ -521,7 +522,7 @@ export const QueryInsightsTable = ({
                   `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : isCharted ? 'bg-surface-200 dark:bg-surface-200' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
                   '[&>div:first-child]:border-l-4 [&>div:first-child]:pl-5 [&>div:last-child]:pr-6',
                   `${isSelected || isCharted ? '[&>div:first-child]:border-l-foreground' : '[&>div:first-child]:border-l-transparent'}`,
-                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
+                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
                   '[&>.rdg-cell.column-prop_total_time]:relative',
                 ].join(' ')
               }}

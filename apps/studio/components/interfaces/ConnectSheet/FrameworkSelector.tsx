@@ -9,9 +9,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { ConnectionType } from '@/components/interfaces/ConnectSheet/Connect.constants'
@@ -42,9 +42,9 @@ export const FrameworkSelector = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <div className={cn('flex', className)}>
-        <PopoverTrigger_Shadcn_ asChild>
+        <PopoverTrigger asChild>
           <Button
             size={size}
             type="default"
@@ -56,10 +56,10 @@ export const FrameworkSelector = ({
               {selectedItem?.label}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
+        </PopoverTrigger>
       </div>
-      <PopoverContent_Shadcn_
-        className="p-0 w-[var(--radix-popover-trigger-width)] min-w-48"
+      <PopoverContent
+        className="p-0 w-radix-popover-trigger-width min-w-48"
         side="bottom"
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
@@ -87,7 +87,7 @@ export const FrameworkSelector = ({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

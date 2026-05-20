@@ -15,7 +15,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -175,7 +175,7 @@ export const CreateVectorBucketDialog = ({
 
         <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col !p-0">
+            <DialogSection className="flex flex-col p-0!">
               <FormField
                 key="name"
                 name="name"
@@ -189,7 +189,7 @@ export const CreateVectorBucketDialog = ({
                     description="Must be between 3–63 characters. Only lowercase letters, numbers, and hyphens are allowed"
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="name"
                         data-1p-ignore
                         data-lpignore="true"

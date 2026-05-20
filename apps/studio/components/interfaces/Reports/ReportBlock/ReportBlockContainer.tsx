@@ -35,7 +35,7 @@ export const ReportBlockContainer = ({
       draggable={draggable}
       unselectable={draggable ? 'on' : undefined}
       onDragStart={onDragStart}
-      className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded border shadow-sm"
+      className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded-sm border shadow-xs"
     >
       <Tooltip>
         <TooltipTrigger asChild>

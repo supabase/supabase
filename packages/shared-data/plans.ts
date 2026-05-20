@@ -1,7 +1,7 @@
 export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
 export interface PricingInformation {
-  id: string
+  id: 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'
   planId: PlanId
   name: string
   nameBadge?: string

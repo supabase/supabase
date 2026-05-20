@@ -53,17 +53,17 @@ const EnableReplicationModal = () => {
           <DialogTitle>Enable external replication</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <DialogSection className="flex flex-col gap-y-2 !p-0">
+        <DialogSection className="flex flex-col gap-y-2 p-0!">
           <Admonition
             type="warning"
             className="rounded-none border-0"
             title="Replication is currently in Alpha"
           >
-            <p className="text-sm !leading-normal">
+            <p className="text-sm leading-normal!">
               This feature is in active development and may change as we gather feedback.
               Availability and behavior can evolve while in Alpha.
             </p>
-            <p className="text-sm !leading-normal">
+            <p className="text-sm leading-normal!">
               Pricing has not been finalized yet. You can enable replication now; we'll announce
               pricing later and notify you before any charges apply.
             </p>

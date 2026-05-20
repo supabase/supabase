@@ -85,23 +85,43 @@ export const RealtimeSettings = () => {
       },
     })
 
-  const FormSchema = z.object({
-    connection_pool: z.coerce
-      .number()
-      .min(1)
-      .max(maxConn?.maxConnections ?? 100),
-    max_concurrent_users: z.coerce.number().min(1).max(50000),
-    max_events_per_second: z.coerce.number().min(1).max(10000),
-    max_presence_events_per_second: z.coerce.number().min(1).max(10000),
-    max_payload_size_in_kb: z.coerce.number().min(1).max(3000),
-    suspend: z.boolean(),
-    // [Joshen] These fields are temporarily hidden from the UI
-    // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
-    // max_channels_per_client: z.coerce.number().min(1).max(10000),
-    // max_joins_per_second: z.coerce.number().min(1).max(5000),
+  const FormSchema = z.discriminatedUnion('suspend', [
+    z.object({
+      suspend: z.literal(true),
+      connection_pool: z.coerce
+        .number()
+        .min(1)
+        .max(maxConn?.maxConnections ?? 100)
+        .optional(),
+      max_concurrent_users: z.coerce.number().min(1).max(50000).optional(),
+      max_events_per_second: z.coerce.number().min(1).max(10000).optional(),
+      max_presence_events_per_second: z.coerce.number().min(1).max(10000).optional(),
+      max_payload_size_in_kb: z.coerce.number().min(1).max(3000).optional(),
+      // [Joshen] These fields are temporarily hidden from the UI
+      // max_bytes_per_second: z.coerce.number().min(1).max(10000000).optional(),
+      // max_channels_per_client: z.coerce.number().min(1).max(10000).optional(),
+      // max_joins_per_second: z.coerce.number().min(1).max(5000).optional(),
 
-    allow_public: z.boolean(),
-  })
+      allow_public: z.boolean().optional(),
+    }),
+    z.object({
+      suspend: z.literal(false),
+      connection_pool: z.coerce
+        .number()
+        .min(1)
+        .max(maxConn?.maxConnections ?? 100),
+      max_concurrent_users: z.coerce.number().min(1).max(50000),
+      max_events_per_second: z.coerce.number().min(1).max(10000),
+      max_presence_events_per_second: z.coerce.number().min(1).max(10000),
+      max_payload_size_in_kb: z.coerce.number().min(1).max(3000),
+      // [Joshen] These fields are temporarily hidden from the UI
+      // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
+      // max_channels_per_client: z.coerce.number().min(1).max(10000),
+      // max_joins_per_second: z.coerce.number().min(1).max(5000),
+
+      allow_public: z.boolean(),
+    }),
+  ])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -127,19 +147,37 @@ export const RealtimeSettings = () => {
 
   const onConfirmSave = () => {
     if (!projectRef) return console.error('Project ref is required')
-    const data = form.getValues()
+    const values = form.getValues()
 
     // [Joshen] Casting to `Number` here as the values are being set as string when edited in the form
     // and returned in form.getValues() - I might be missing some easy util function from RHF though
     updateRealtimeConfig({
       ref: projectRef,
-      private_only: !data.allow_public,
-      connection_pool: Number(data.connection_pool),
-      max_concurrent_users: Number(data.max_concurrent_users),
-      max_events_per_second: Number(data.max_events_per_second),
-      max_presence_events_per_second: Number(data.max_presence_events_per_second),
-      max_payload_size_in_kb: Number(data.max_payload_size_in_kb),
-      suspend: data.suspend,
+      private_only: !values.allow_public,
+      connection_pool: Number(
+        values.connection_pool ?? data?.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool
+      ),
+      max_concurrent_users: Number(
+        values.max_concurrent_users ??
+          data?.max_concurrent_users ??
+          REALTIME_DEFAULT_CONFIG.max_concurrent_users
+      ),
+      max_events_per_second: Number(
+        values.max_events_per_second ??
+          data?.max_events_per_second ??
+          REALTIME_DEFAULT_CONFIG.max_events_per_second
+      ),
+      max_presence_events_per_second: Number(
+        values.max_presence_events_per_second ??
+          data?.max_presence_events_per_second ??
+          REALTIME_DEFAULT_CONFIG.max_presence_events_per_second
+      ),
+      max_payload_size_in_kb: Number(
+        values.max_payload_size_in_kb ??
+          data?.max_payload_size_in_kb ??
+          REALTIME_DEFAULT_CONFIG.max_payload_size_in_kb
+      ),
+      suspend: values.suspend,
     })
   }
 
@@ -158,12 +196,14 @@ export const RealtimeSettings = () => {
                   render={({ field }) => (
                     <>
                       <FormItemLayout
+                        id="suspend"
                         layout="flex-row-reverse"
                         label="Enable Realtime service"
                         description="If disabled, no clients will be able to connect and new connections will be rejected"
                       >
                         <FormControl>
                           <Switch
+                            id="suspend"
                             checked={!field.value}
                             onCheckedChange={(checked) => field.onChange(!checked)}
                             disabled={!canUpdateConfig}
@@ -214,12 +254,14 @@ export const RealtimeSettings = () => {
                       render={({ field }) => (
                         <>
                           <FormItemLayout
+                            id="allow_public"
                             layout="flex-row-reverse"
                             label="Allow public access to channels"
                             description="If disabled, only private channels will be allowed"
                           >
                             <FormControl>
                               <Switch
+                                id="allow_public"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!canUpdateConfig}
@@ -266,6 +308,7 @@ export const RealtimeSettings = () => {
                       render={({ field }) => (
                         <>
                           <FormItemLayout
+                            id="connection_pool"
                             layout="flex-row-reverse"
                             label="Database connection pool size"
                             description="Realtime Authorization uses this database pool to check client access"
@@ -274,6 +317,7 @@ export const RealtimeSettings = () => {
                               <InputGroup>
                                 <FormInputGroupInput
                                   {...field}
+                                  id="connection_pool"
                                   type="number"
                                   disabled={!canUpdateConfig}
                                   value={field.value || ''}
@@ -284,14 +328,16 @@ export const RealtimeSettings = () => {
                               </InputGroup>
                             </FormControl>
                           </FormItemLayout>
-                          {!!maxConn && field.value > maxConn.maxConnections * 0.5 && (
-                            <Admonition
-                              showIcon={false}
-                              type="warning"
-                              title={`Pool size is greater than 50% of the max connections (${maxConn.maxConnections}) on your database`}
-                              description="This may result in instability and unreliability with your database connections."
-                            />
-                          )}
+                          {!!maxConn &&
+                            field.value &&
+                            field.value > maxConn.maxConnections * 0.5 && (
+                              <Admonition
+                                showIcon={false}
+                                type="warning"
+                                title={`Pool size is greater than 50% of the max connections (${maxConn.maxConnections}) on your database`}
+                                description="This may result in instability and unreliability with your database connections."
+                              />
+                            )}
                         </>
                       )}
                     />
@@ -302,6 +348,7 @@ export const RealtimeSettings = () => {
                       name="max_concurrent_users"
                       render={({ field }) => (
                         <FormItemLayout
+                          id="max_concurrent_users"
                           layout="flex-row-reverse"
                           label="Max concurrent clients"
                           description="Sets maximum number of concurrent clients that can connect to your Realtime service"
@@ -310,6 +357,7 @@ export const RealtimeSettings = () => {
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
+                                id="max_concurrent_users"
                                 type="number"
                                 disabled={!canUpdateConfig}
                                 value={field.value || ''}
@@ -329,6 +377,7 @@ export const RealtimeSettings = () => {
                       name="max_events_per_second"
                       render={({ field }) => (
                         <FormItemLayout
+                          id="max_events_per_second"
                           layout="flex-row-reverse"
                           label="Max events per second"
                           description="Sets maximum number of events per second that can be sent to your Realtime service"
@@ -337,6 +386,7 @@ export const RealtimeSettings = () => {
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
+                                id="max_events_per_second"
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
@@ -383,6 +433,7 @@ export const RealtimeSettings = () => {
                       name="max_presence_events_per_second"
                       render={({ field }) => (
                         <FormItemLayout
+                          id="max_presence_events_per_second"
                           layout="flex-row-reverse"
                           label="Max presence events per second"
                           description="Sets maximum number of presence events per second that can be sent to your Realtime service"
@@ -391,6 +442,7 @@ export const RealtimeSettings = () => {
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
+                                id="max_presence_events_per_second"
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
@@ -437,6 +489,7 @@ export const RealtimeSettings = () => {
                       name="max_payload_size_in_kb"
                       render={({ field }) => (
                         <FormItemLayout
+                          id="max_payload_size_in_kb"
                           layout="flex-row-reverse"
                           label="Max payload size in KB"
                           description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
@@ -445,6 +498,7 @@ export const RealtimeSettings = () => {
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
+                                id="max_payload_size_in_kb"
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}

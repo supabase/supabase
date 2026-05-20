@@ -68,7 +68,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       </TableCell>
       <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-[30rem]">
+          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-120">
             {functionUrl}
           </p>
           <button

@@ -13,7 +13,7 @@
   "files": [
     {
       "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
-      "content": "import { MousePointer2 } from 'lucide-react'\n\nimport { cn } from '@/lib/utils'\n\nexport const Cursor = ({\n  className,\n  style,\n  color,\n  name,\n}: {\n  className?: string\n  style?: React.CSSProperties\n  color: string\n  name: string\n}) => {\n  return (\n    <div className={cn('pointer-events-none', className)} style={style}>\n      <MousePointer2 color={color} fill={color} size={30} />\n\n      <div\n        className=\"mt-1 px-2 py-1 rounded text-xs font-bold text-white text-center\"\n        style={{ backgroundColor: color }}\n      >\n        {name}\n      </div>\n    </div>\n  )\n}\n",
+      "content": "import { MousePointer2 } from 'lucide-react'\n\nimport { cn } from '@/lib/utils'\n\nexport const Cursor = ({\n  className,\n  style,\n  color,\n  name,\n}: {\n  className?: string\n  style?: React.CSSProperties\n  color: string\n  name: string\n}) => {\n  return (\n    <div className={cn('pointer-events-none', className)} style={style}>\n      <MousePointer2 color={color} fill={color} size={30} />\n\n      <div\n        className=\"mt-1 px-2 py-1 rounded-sm text-xs font-bold text-white text-center\"\n        style={{ backgroundColor: color }}\n      >\n        {name}\n      </div>\n    </div>\n  )\n}\n",
       "type": "registry:component"
     },
     {

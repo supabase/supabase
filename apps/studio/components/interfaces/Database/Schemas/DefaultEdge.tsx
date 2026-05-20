@@ -53,7 +53,7 @@ export const DefaultEdge = ({
       <BaseEdge
         id={id}
         path={edgePath}
-        className={cn(selected ? '!stroke-brand' : isDownloading ? '!stroke-black' : undefined)}
+        className={cn(selected ? 'stroke-brand!' : isDownloading ? 'stroke-black!' : undefined)}
         stroke="#000000"
         {...props}
       />

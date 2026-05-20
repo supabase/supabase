@@ -15,7 +15,7 @@ export const AdvisorRulesLayout = ({ children }: PropsWithChildren<{}>) => {
       <AdvisorsLayout>
         <PageLayout
           title={
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-x-4">
               Advisor Settings
               {isAdvisorRulesEnabled && (
                 <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES} />

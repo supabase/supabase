@@ -3,7 +3,14 @@ import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
-import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
@@ -153,31 +160,26 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Popover
-      open={isPopoverOpen}
-      side="bottom"
-      align="start"
-      sideOffset={-35}
-      className="rounded-none"
-      overlay={
-        isTruncated && !isSuccess ? (
-          <div
-            style={{ width: `${column.width}px` }}
-            className="flex items-center justify-center flex-col relative"
-          >
-            <MonacoEditor
-              readOnly
-              onChange={() => {}}
-              width={`${column.width}px`}
-              value={value ?? ''}
-              language="markdown"
-            />
+    <Popover open={isPopoverOpen}>
+      <PopoverTrigger asChild>
+        <div
+          className={`${
+            !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
+          } sb-grid-json-editor__trigger`}
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        >
+          {value === null || value === '' ? <NullValue /> : jsonString}
+        </div>
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" sideOffset={-35} className="rounded-none p-0">
+        {isTruncated && !isSuccess ? (
+          <div className="flex items-center justify-center flex-col relative">
+            <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />
             <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
           </div>
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
             <MonacoEditor
-              width={`${column.width}px`}
               value={value ?? ''}
               language="json"
               readOnly={!isEditable}
@@ -187,13 +189,13 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               {isEditable && (
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
-                    <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                    <div className="px-1.5 py-[2.5px] rounded-sm bg-selection border border-strong flex items-center justify-center">
                       <span className="text-[10px]">⏎</span>
                     </div>
                     <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                    <div className="px-1 py-[2.5px] rounded-sm bg-selection border border-strong flex items-center justify-center">
                       <span className="text-[10px]">Esc</span>
                     </div>
                     <p className="text-xs text-foreground-light">Cancel changes</p>
@@ -204,7 +206,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                 <TooltipTrigger asChild>
                   <div
                     className={[
-                      'border border-strong rounded p-1 flex items-center justify-center',
+                      'border border-strong rounded-sm p-1 flex items-center justify-center',
                       'transition cursor-pointer bg-selection hover:bg-border-strong',
                     ].join(' ')}
                     onClick={() => onSelectExpand()}
@@ -218,17 +220,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               </Tooltip>
             </div>
           </BlockKeys>
-        )
-      }
-    >
-      <div
-        className={`${
-          !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
-        } sb-grid-json-editor__trigger`}
-        onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-      >
-        {value === null || value === '' ? <NullValue /> : jsonString}
-      </div>
+        )}
+      </PopoverContent>
     </Popover>
   )
 }

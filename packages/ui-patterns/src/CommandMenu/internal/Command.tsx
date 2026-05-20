@@ -29,10 +29,10 @@ const generateCommandClassNames = (isLink: boolean) =>
 bg-transparent
 px-2
 transition-all
-outline-none
+outline-hidden
 aria-selected:border-overlay
 aria-selected:bg-selection/90
-aria-selected:shadow-sm
+aria-selected:shadow-xs
 aria-selected:scale-[100.3%]
 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50`
       : `

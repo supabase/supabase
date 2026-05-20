@@ -134,14 +134,14 @@ const PropertyRow = ({
         <DropdownMenuTrigger className="group w-full" data-testid={dataTestId}>
           <div className="rounded-md w-full overflow-hidden">
             <div
-              className={cn('flex h-[var(--header-height)] w-full', {
+              className={cn('flex h-(--header-height) w-full', {
                 'flex-col gap-1.5 h-auto': isExpanded,
                 'items-center group-hover:bg-surface-300 gap-4': !isExpanded,
               })}
             >
               <h3
                 className={cn('pl-3 text-foreground-lighter text-sm text-left', {
-                  'h-[var(--header-height)] flex items-center': isExpanded,
+                  'h-(--header-height) flex items-center': isExpanded,
                 })}
               >
                 {keyName}

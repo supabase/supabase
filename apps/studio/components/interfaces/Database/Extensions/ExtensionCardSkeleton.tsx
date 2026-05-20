@@ -7,7 +7,7 @@ export interface ExtensionCardSkeletonProps {
 
 const ExtensionCardSkeleton = ({ index = 0 }: ExtensionCardSkeletonProps) => {
   return (
-    <div className="flex border-overlay flex-col overflow-hidden rounded border shadow-sm">
+    <div className="flex border-overlay flex-col overflow-hidden rounded-sm border shadow-xs">
       <div className="border-overlay bg-surface-100 flex justify-between w-full border-b py-3 px-4">
         <div className="flex items-center gap-1 max-w-[85%]">
           <div className="flex items-center space-x-2 truncate">

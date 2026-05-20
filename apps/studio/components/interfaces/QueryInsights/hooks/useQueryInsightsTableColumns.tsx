@@ -78,7 +78,7 @@ export function useQueryInsightsTableColumns({
           return (
             <div className="flex items-center justify-between text-xs w-full">
               <div className="flex items-center gap-x-2">
-                <p className="!text-foreground font-medium">{col.name}</p>
+                <p className="text-foreground! font-medium">{col.name}</p>
                 {col.description && (
                   <p className="text-foreground-lighter font-normal">{col.description}</p>
                 )}
@@ -154,8 +154,8 @@ export function useQueryInsightsTableColumns({
                 </div>
                 <CodeBlock
                   language="pgsql"
-                  className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-20 pointer-events-none"
-                  wrapperClassName="!max-w-full flex-1"
+                  className="bg-transparent! p-0! m-0! border-none! whitespace-nowrap! [&>code]:whitespace-nowrap! [&>code]:wrap-break-word overflow-visible! truncate! w-full! pr-20! pointer-events-none"
+                  wrapperClassName="max-w-full! flex-1"
                   hideLineNumbers
                   hideCopy
                   value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
@@ -322,7 +322,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'first:pl-6 cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Query</p>
+            <p className="text-foreground! font-medium">Query</p>
           </div>
         ),
         renderCell: (props) => {
@@ -394,7 +394,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Time consumed</p>
+            <p className="text-foreground! font-medium">Time consumed</p>
           </div>
         ),
         renderCell: (props) => {
@@ -437,7 +437,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Calls</p>
+            <p className="text-foreground! font-medium">Calls</p>
           </div>
         ),
         renderCell: (props) => {
@@ -463,7 +463,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Mean time</p>
+            <p className="text-foreground! font-medium">Mean time</p>
           </div>
         ),
         renderCell: (props) => {
@@ -489,7 +489,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Actions</p>
+            <p className="text-foreground! font-medium">Actions</p>
           </div>
         ),
         renderCell: (props) => {

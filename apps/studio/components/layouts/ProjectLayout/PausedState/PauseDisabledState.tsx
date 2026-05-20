@@ -124,7 +124,7 @@ export const PauseDisabledState = () => {
         className="rounded-none border-0 px-6 [&>div>div>div]:flex [&>div>div>div]:flex-col [&>div>div>div]:gap-y-3"
         title="Project can no longer be restored through the dashboard"
       >
-        <p className="!leading-normal">
+        <p className="leading-normal!">
           This project has been paused for over{' '}
           <span className="text-foreground">
             {pauseStatus?.max_days_till_restore_disabled ?? 90} days
@@ -145,7 +145,7 @@ export const PauseDisabledState = () => {
         )}
 
         <div>
-          <p className="!leading-normal !mb-1">Recovery options:</p>
+          <p className="leading-normal! mb-1!">Recovery options:</p>
           <ul className="flex flex-col gap-y-0.5">
             <li className="flex items-center gap-x-2">
               <ExternalLink size={14} />

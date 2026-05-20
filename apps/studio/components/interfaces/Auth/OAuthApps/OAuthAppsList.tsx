@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -13,7 +13,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Table,
   TableBody,
   TableCell,
@@ -38,11 +40,15 @@ import {
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthServerAppDeleteMutation } from '@/data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from '@/data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const OAUTH_APPS_SORT_VALUES = [
   'name:asc',
@@ -74,6 +80,7 @@ export const OAuthAppsList = () => {
   const [filteredRegistrationTypes, setFilteredRegistrationTypes] = useState<string[]>([])
   const [filteredClientTypes, setFilteredClientTypes] = useState<string[]>([])
   const [filterString, setFilterString] = useState<string>('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
   const {
@@ -160,6 +167,17 @@ export const OAuthAppsList = () => {
     setFilteredClientTypes([])
   }
 
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search OAuth apps' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, handleResetFilters)
+
   const handleSortChange = (column: OAuthAppsSortColumn) => {
     const [currentCol, currentOrder] = sort.split(':') as [OAuthAppsSortColumn, OAuthAppsSortOrder]
     if (currentCol === column) {
@@ -231,14 +249,19 @@ export const OAuthAppsList = () => {
         )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-            <Input
-              placeholder="Search OAuth apps"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-            />
+            <InputGroup className="w-full lg:w-52">
+              <InputGroupInput
+                ref={searchInputRef}
+                size="tiny"
+                placeholder="Search OAuth apps"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+              />
+              <InputGroupAddon>
+                <Search />
+              </InputGroupAddon>
+            </InputGroup>
             <FilterPopover
               name="Registration Type"
               options={OAUTH_APP_REGISTRATION_TYPE_OPTIONS}
@@ -274,22 +297,38 @@ export const OAuthAppsList = () => {
             )}
           </div>
           <div className="flex items-center gap-x-2">
-            <ButtonTooltip
-              disabled={!isOAuthServerEnabled}
-              icon={<Plus />}
-              onClick={() => setShowCreateSheet(true)}
-              className="grow"
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !isOAuthServerEnabled
-                    ? 'OAuth server must be enabled in settings'
-                    : undefined,
-                },
-              }}
-            >
-              New OAuth App
-            </ButtonTooltip>
+            {isOAuthServerEnabled ? (
+              <Shortcut
+                id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                label="Create new OAuth app"
+                onTrigger={() => setShowCreateSheet(true)}
+                side="bottom"
+              >
+                <Button
+                  type="primary"
+                  icon={<Plus />}
+                  onClick={() => setShowCreateSheet(true)}
+                  className="grow"
+                >
+                  New OAuth App
+                </Button>
+              </Shortcut>
+            ) : (
+              <ButtonTooltip
+                disabled
+                icon={<Plus />}
+                onClick={() => setShowCreateSheet(true)}
+                className="grow"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'OAuth server must be enabled in settings',
+                  },
+                }}
+              >
+                New OAuth App
+              </ButtonTooltip>
+            )}
           </div>
         </div>
 
@@ -332,7 +371,7 @@ export const OAuthAppsList = () => {
                     </TableHeadSort>
                   </TableHead>
                   <TableHead className="w-8 px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
+                    <div className="bg-200! px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -350,7 +389,7 @@ export const OAuthAppsList = () => {
                       <TableCell title={app.client_name}>
                         <Button
                           type="text"
-                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
+                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:w-full!"
                           onClick={() => setSelectedAppToEdit(app.client_id)}
                           title={app.client_name}
                         >

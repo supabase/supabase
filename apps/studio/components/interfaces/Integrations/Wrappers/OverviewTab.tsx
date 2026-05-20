@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -13,6 +13,7 @@ import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -105,7 +106,7 @@ const AddNewWrapperCTA = () => {
   if (!!wrapperMeta && isWrappersExtensionInstalled && !hasRequiredVersion) {
     return (
       <Admonition type="warning" title="Your extension version is outdated for this wrapper">
-        <div className="flex flex-col gap-y-2 [&>p]:!mb-0">
+        <div className="flex flex-col gap-y-2 [&>p]:mb-0!">
           <p>
             The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
@@ -157,7 +158,7 @@ const AddNewWrapperCTA = () => {
 export const WrapperOverviewTab = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const { data: integrations = [] } = useAvailableIntegrations()
   const integration = integrations.find((i) => i.id === id)

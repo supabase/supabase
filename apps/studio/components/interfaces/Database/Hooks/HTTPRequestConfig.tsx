@@ -5,12 +5,12 @@ import {
   Button,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   useWatch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -40,7 +40,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
   return (
     <FormSection
       header={
-        <FormSectionLabel className="lg:!col-span-4">
+        <FormSectionLabel className="lg:col-span-4!">
           {functionType === 'http_request'
             ? 'HTTP Request'
             : functionType === 'supabase_function'
@@ -49,23 +49,23 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
         </FormSectionLabel>
       }
     >
-      <FormSectionContent loading={false} className="lg:!col-span-8">
+      <FormSectionContent loading={false} className="lg:col-span-8!">
         <FormField
           control={form.control}
           name="http_method"
           render={({ field }) => (
             <FormItemLayout label="Method" layout="vertical" className="gap-1">
-              <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+              <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ />
-                  </SelectTrigger_Shadcn_>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                 </FormControl>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                <SelectContent>
+                  <SelectItem value="GET">GET</SelectItem>
+                  <SelectItem value="POST">POST</SelectItem>
+                </SelectContent>
+              </Select>
             </FormItemLayout>
           )}
         />
@@ -82,7 +82,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
                 description="URL of the HTTP request. Must include HTTP/HTTPS"
               >
                 <FormControl>
-                  <Input_Shadcn_ {...field} placeholder="http://api.com/path/resource" />
+                  <Input {...field} placeholder="http://api.com/path/resource" />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -90,7 +90,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
         ) : functionType === 'supabase_function' && edgeFunctions.length === 0 ? (
           <div className="space-y-1">
             <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
-            <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
+            <div className="px-4 py-4 border rounded-sm bg-surface-300 border-strong flex items-center justify-between space-x-4">
               <p className="text-sm">No edge functions created yet</p>
               <Button asChild>
                 <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
@@ -107,26 +107,26 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
                 layout="vertical"
                 className="gap-1"
               >
-                <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="Select an edge function" />
-                    </SelectTrigger_Shadcn_>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an edge function" />
+                    </SelectTrigger>
                   </FormControl>
-                  <SelectContent_Shadcn_>
+                  <SelectContent>
                     {edgeFunctions.map((fn) => {
                       const restUrl = selectedProject?.restUrl
                       const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
                       const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
 
                       return (
-                        <SelectItem_Shadcn_ key={fn.id} value={functionUrl}>
+                        <SelectItem key={fn.id} value={functionUrl}>
                           {fn.name}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       )
                     })}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
             )}
           />
@@ -144,7 +144,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
             >
               <FormControl>
                 <div className="relative">
-                  <Input_Shadcn_
+                  <Input
                     {...field}
                     type="number"
                     onChange={(e) => field.onChange(Number(e.target.value))}

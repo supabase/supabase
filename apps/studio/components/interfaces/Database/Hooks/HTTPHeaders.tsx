@@ -43,9 +43,9 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
 
   return (
     <FormSection
-      header={<FormSectionLabel className="lg:!col-span-4">HTTP Headers</FormSectionLabel>}
+      header={<FormSectionLabel className="lg:col-span-4!">HTTP Headers</FormSectionLabel>}
     >
-      <FormSectionContent loading={false} className="lg:!col-span-8">
+      <FormSectionContent loading={false} className="lg:col-span-8!">
         <KeyValueFieldArray
           control={form.control}
           name="httpHeaders"

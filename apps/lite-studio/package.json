@@ -25,7 +25,6 @@
     "@types/node": "^22",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "autoprefixer": "^10.4.27",
     "config": "workspace:*",
     "postcss": "catalog:",
     "tailwindcss": "catalog:",

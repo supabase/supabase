@@ -21,7 +21,7 @@ export const PgDeltaDiffPreview = () => {
           </li>
         </ul>
       </div>
-      <div className="space-y-2 !mt-4">
+      <div className="space-y-2 mt-4!">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>Use pg-delta to compute schema diffs when comparing branches, instead of migra</li>

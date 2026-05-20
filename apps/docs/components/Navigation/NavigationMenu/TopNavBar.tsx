@@ -32,9 +32,9 @@ const TopNavBar: FC = () => {
     <>
       <nav
         aria-label="top bar"
-        className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg-default/75"
+        className="w-full z-40 flex flex-col border-b backdrop-blur-sm backdrop-filter bg-default/75"
       >
-        <div className="w-full px-5 lg:pl-10 flex justify-between h-[var(--header-height)] gap-3">
+        <div className="w-full px-5 lg:pl-10 flex justify-between h-(--header-height) gap-3">
           <div className="hidden lg:flex h-full items-center justify-center gap-2">
             <HeaderLogo />
             <GlobalNavigationMenu />
@@ -58,7 +58,7 @@ const TopNavBar: FC = () => {
                 title="Menu dropdown button"
                 className={cn(
                   buttonVariants({ type: 'default' }),
-                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
+                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30'
                 )}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
@@ -100,11 +100,11 @@ const HeaderLogo = memo(() => {
       href="/"
       className={cn(
         buttonVariants({ type: 'default' }),
-        'flex shrink-0 items-center w-fit !bg-transparent !border-none !shadow-none'
+        'flex shrink-0 items-center w-fit bg-transparent! border-none! shadow-none!'
       )}
     >
       <Image
-        className={cn('hidden dark:block !m-0', largeLogo && 'h-[36px]')}
+        className={cn('hidden dark:block m-0!', largeLogo && 'h-[36px]')}
         src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
         priority={true}
         loading="eager"
@@ -113,7 +113,7 @@ const HeaderLogo = memo(() => {
         alt="Supabase wordmark"
       />
       <Image
-        className={cn('block dark:hidden !m-0', largeLogo && 'h-[36px]')}
+        className={cn('block dark:hidden m-0!', largeLogo && 'h-[36px]')}
         src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"

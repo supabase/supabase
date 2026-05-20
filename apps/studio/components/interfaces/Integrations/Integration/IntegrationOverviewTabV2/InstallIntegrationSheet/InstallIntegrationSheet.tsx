@@ -222,7 +222,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
           <SheetContent
             size="default"
             aria-describedby={undefined}
-            className="flex flex-col gap-0 !w-[650px]"
+            className="flex flex-col gap-0 w-[650px]!"
           >
             <SheetHeader className="flex items-center gap-x-4">
               <div className="shrink-0 w-11 h-11 relative bg-white border rounded-md flex items-center justify-center">

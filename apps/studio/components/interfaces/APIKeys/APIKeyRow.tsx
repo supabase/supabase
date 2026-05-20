@@ -88,7 +88,7 @@ export const APIKeyRow = ({
         <TableCell className="py-2">
           <div className="flex justify-end">
             <DropdownMenu>
-              <DropdownMenuTrigger className="px-1 focus-visible:outline-none" asChild>
+              <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
                 <Button
                   type="text"
                   size="tiny"

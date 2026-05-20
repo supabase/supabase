@@ -1,9 +1,19 @@
+import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { AiIconAnimation, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  AiIconAnimation,
+  Button,
+  Card,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -20,20 +30,24 @@ import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseFunctionDeleteMutation } from '@/data/database-functions/database-functions-delete-mutation'
-import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-const createFunctionSnippet = `create function function_name()
+const createFunctionSnippet = safeSql`create function function_name()
 returns void
 language plpgsql
 as $$
@@ -66,7 +80,7 @@ export const FunctionsList = () => {
     }
   }
 
-  const duplicateFunction = (fn: DatabaseFunction) => {
+  const duplicateFunction = (fn: SavedDatabaseFunction) => {
     if (isInlineEditorEnabled) {
       const dupFn = {
         ...fn,
@@ -81,7 +95,7 @@ export const FunctionsList = () => {
     }
   }
 
-  const editFunction = (fn: DatabaseFunction) => {
+  const editFunction = (fn: SavedDatabaseFunction) => {
     setSelectedFunctionIdToDuplicate(null)
     if (isInlineEditorEnabled) {
       setEditorPanelValue(fn.complete_statement)
@@ -107,12 +121,32 @@ export const FunctionsList = () => {
     parseAsJson(selectFilterSchema.parse)
   )
 
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
   const { can: canCreateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+
+  const canAddFunctions = canCreateFunctions && !isSchemaLocked
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search functions' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+    setReturnTypeFilter(null)
+    setSecurityFilter(null)
+  })
 
   // [Joshen] This is to preload the data for the Schema Selector
   useSchemasQuery({
@@ -236,23 +270,34 @@ export const FunctionsList = () => {
         <div className="w-full space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
             <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-              <SchemaSelector
-                className="w-full lg:w-[180px]"
-                size="tiny"
-                showError={false}
-                selectedSchemaName={selectedSchema}
-                onSelectSchema={(schema) => {
-                  setFilterString('')
-                  setSelectedSchema(schema)
-                }}
-              />
+              <Shortcut
+                id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+                onTrigger={() => setSchemaSelectorOpen(true)}
+                side="bottom"
+                tooltipOpen={schemaSelectorOpen ? false : undefined}
+              >
+                <SchemaSelector
+                  className="w-full lg:w-[180px]"
+                  size="tiny"
+                  showError={false}
+                  selectedSchemaName={selectedSchema}
+                  onSelectSchema={(schema) => {
+                    setFilterString('')
+                    setSelectedSchema(schema)
+                  }}
+                  open={schemaSelectorOpen}
+                  onOpenChange={setSchemaSelectorOpen}
+                />
+              </Shortcut>
               <Input
+                ref={searchInputRef}
                 placeholder="Search for a function"
                 size="tiny"
                 icon={<Search />}
                 value={filterString}
                 className="w-full lg:w-52"
                 onChange={(e) => setFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
               />
               <ReportsSelectFilter
                 label="Return Type"
@@ -275,21 +320,31 @@ export const FunctionsList = () => {
             <div className="flex items-center gap-x-2">
               {!isSchemaLocked && (
                 <>
-                  <ButtonTooltip
-                    disabled={!canCreateFunctions}
-                    onClick={() => createFunction()}
-                    className="grow"
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canCreateFunctions
-                          ? 'You need additional permissions to create functions'
-                          : undefined,
-                      },
-                    }}
-                  >
-                    Create a new function
-                  </ButtonTooltip>
+                  {canAddFunctions ? (
+                    <Shortcut
+                      id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                      label="Create new function"
+                      onTrigger={() => createFunction()}
+                      side="bottom"
+                    >
+                      <Button className="grow" onClick={() => createFunction()}>
+                        Create a new function
+                      </Button>
+                    </Shortcut>
+                  ) : (
+                    <ButtonTooltip
+                      disabled
+                      className="grow"
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: 'You need additional permissions to create functions',
+                        },
+                      }}
+                    >
+                      Create a new function
+                    </ButtonTooltip>
+                  )}
                   <ButtonTooltip
                     type="default"
                     disabled={!canCreateFunctions}

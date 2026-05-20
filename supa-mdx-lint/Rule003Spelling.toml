@@ -225,6 +225,7 @@ allow_list = [
     "Grafana",
     "Grafana OnCall",
     "GraphQL",
+    "GraphiQL",
     "Groonga",
     "HackerOne",
     "[Hh][Aa][Pp]roxy",
@@ -470,6 +471,7 @@ allow_list = [
     "vecs",
     "vs",
     "watchOS",
+    "WebCrypto",
     "[Xx]min",
 ]
 

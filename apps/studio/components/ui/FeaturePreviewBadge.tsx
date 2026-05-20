@@ -15,7 +15,7 @@ export const FeaturePreviewBadge = ({ featureKey, className }: FeaturePreviewBad
     <button
       type="button"
       onClick={() => selectFeaturePreview(featureKey)}
-      className="group"
+      className="group flex items-center"
       title="Feature preview — click to manage"
     >
       <Badge
@@ -26,7 +26,7 @@ export const FeaturePreviewBadge = ({ featureKey, className }: FeaturePreviewBad
         )}
       >
         <FlaskConical size={8} strokeWidth={1.5} />
-        Feature preview
+        Preview
       </Badge>
     </button>
   )

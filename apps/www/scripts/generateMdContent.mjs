@@ -1,31 +1,91 @@
 // @ts-check
 
 /**
- * Scans content/md/ and emits a TypeScript module exporting the markdown
- * content as a Map plus the slug allowlist as a Set. Static imports of the
- * generated file make the content traceable by @vercel/nft so it ends up in
- * the serverless bundle without runtime fs.readFile.
- *
- * Drop a new .md file in content/md/ and the route handler picks it up on
- * the next content:build — no constant to edit.
+ * Scans content/md/ + _blog/ + _customers/ + _events/ and emits a TypeScript
+ * module exporting MD_CONTENT (slug → markdown) and MD_PAGES (allowlist Set).
+ * The static import keeps content traceable by @vercel/nft, no runtime fs reads.
  */
 
 import { promises as fs } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import matter from 'gray-matter'
+
+import { mdxBodyToMarkdown } from './lib/mdxToMarkdown.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const contentDir = path.join(__dirname, '../content/md')
-const outputPath = path.join(__dirname, '../app/api-v2/md/content.generated.ts')
+const wwwDir = path.join(__dirname, '..')
+const contentDir = path.join(wwwDir, 'content/md')
+const outputPath = path.join(wwwDir, 'app/api-v2/md/content.generated.ts')
 
-// 'pricing' is served dynamically via generatePricingContent() instead of
-// from a .md file; it still needs to be in MD_PAGES so middleware rewrites
-// /pricing.md to the API route.
+// Matches lib/posts.tsx FILENAME_SUBSTRING — strips YYYY-MM-DD- (11 chars).
+const DATE_PREFIX = 11
+
+// Slugs handled by a dynamic generator in the route handler. Listed here so
+// MD_PAGES still includes them (middleware relies on the allowlist).
 const DYNAMIC_SLUGS = ['pricing']
+
+function pickFields(data, fields) {
+  const picked = {}
+  for (const field of fields) {
+    const value = data[field]
+    if (value == null || value === '' || (Array.isArray(value) && value.length === 0)) continue
+    picked[field] = value
+  }
+  return picked
+}
+
+const MDX_SECTIONS = [
+  {
+    dir: '_blog',
+    urlPrefix: 'blog',
+    stripDatePrefix: true,
+    frontmatterFields: ['title', 'description', 'author', 'date', 'tags', 'categories'],
+  },
+  {
+    dir: '_customers',
+    urlPrefix: 'customers',
+    stripDatePrefix: false,
+    frontmatterFields: [
+      'name',
+      'title',
+      'description',
+      'company_url',
+      'industry',
+      'region',
+      'company_size',
+      'supabase_products',
+      'date',
+    ],
+  },
+  {
+    dir: '_events',
+    urlPrefix: 'events',
+    stripDatePrefix: true,
+    frontmatterFields: [
+      'title',
+      'subtitle',
+      'description',
+      'type',
+      'date',
+      'end_date',
+      'timezone',
+      'duration',
+      'onDemand',
+    ],
+    skipIf: (data) => data.disable_page_build === true,
+  },
+]
 
 async function collectMdFiles(dir, prefix = '') {
   const results = []
-  const dirents = await fs.readdir(dir, { withFileTypes: true })
+  let dirents
+  try {
+    dirents = await fs.readdir(dir, { withFileTypes: true })
+  } catch (err) {
+    if (err.code === 'ENOENT') return results
+    throw err
+  }
   for (const dirent of dirents) {
     const slug = prefix ? `${prefix}/${dirent.name}` : dirent.name
     if (dirent.isDirectory()) {
@@ -37,56 +97,117 @@ async function collectMdFiles(dir, prefix = '') {
   return results
 }
 
-// homepage first (it's the site overview), then everything else alphabetical.
+// _events double-underscore filenames (`2024-08-30__launch-...`) produce slugs
+// with a leading underscore. The HTML page is at `/events/_launch-...`, so the
+// .md slug must keep the underscore to match.
+function deriveSlug(filename, stripDatePrefix) {
+  const base = filename.replace(/\.mdx$/, '')
+  return stripDatePrefix ? base.substring(DATE_PREFIX) : base
+}
+
+async function ingestMdxSection(section) {
+  const dir = path.join(wwwDir, section.dir)
+  let filenames
+  try {
+    filenames = await fs.readdir(dir)
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      console.warn(`  ⚠ Section directory missing: ${section.dir}`)
+      return []
+    }
+    throw err
+  }
+
+  const mdxFilenames = filenames.filter((f) => f.endsWith('.mdx'))
+  const results = await Promise.all(
+    mdxFilenames.map(async (filename) => {
+      const fullPath = path.join(dir, filename)
+      try {
+        const raw = await fs.readFile(fullPath, 'utf-8')
+        const parsed = matter(raw)
+        const data = parsed.data ?? {}
+        if (section.skipIf?.(data)) return null
+
+        const slug = `${section.urlPrefix}/${deriveSlug(filename, section.stripDatePrefix)}`
+        const body = await mdxBodyToMarkdown(parsed.content)
+        const content = matter.stringify(body, pickFields(data, section.frontmatterFields))
+        return { slug, content }
+      } catch (err) {
+        throw new Error(`${section.dir}/${filename}: ${err.message}`, { cause: err })
+      }
+    })
+  )
+  return results.filter((entry) => entry !== null)
+}
+
 function sortSlugs(a, b) {
   if (a === 'homepage') return -1
   if (b === 'homepage') return 1
   return a.localeCompare(b)
 }
 
-const slugs = (await collectMdFiles(contentDir)).sort(sortSlugs)
+const staticSlugs = (await collectMdFiles(contentDir)).sort(sortSlugs)
 
-if (slugs.length === 0) {
+if (staticSlugs.length === 0) {
   console.error('❌ No .md files found in content/md/')
   process.exit(1)
 }
 
-// A static file with the same slug as a dynamic generator would land in both
-// MD_CONTENT and the dynamic append path, so /llms-full.txt would emit it
-// twice. Fail the build instead of shipping a duplicate.
-const collisions = slugs.filter((s) => DYNAMIC_SLUGS.includes(s))
-if (collisions.length > 0) {
+const staticEntries = await Promise.all(
+  staticSlugs.map(async (slug) => ({
+    slug,
+    content: await fs.readFile(path.join(contentDir, `${slug}.md`), 'utf-8'),
+  }))
+)
+
+const mdxEntries = []
+for (const section of MDX_SECTIONS) {
+  console.log(`📚 Ingesting ${section.dir}...`)
+  const sectionEntries = await ingestMdxSection(section)
+  console.log(`   ${sectionEntries.length} entries`)
+  mdxEntries.push(...sectionEntries)
+}
+
+const allEntries = [...staticEntries, ...mdxEntries]
+
+const dynamicCollisions = staticSlugs.filter((s) => DYNAMIC_SLUGS.includes(s))
+if (dynamicCollisions.length > 0) {
   console.error(
-    `❌ Slug collision: [${collisions.join(', ')}] is reserved for a dynamic generator. ` +
-      `Remove the corresponding file from content/md/ or update DYNAMIC_SLUGS.`
+    `❌ Slug collision: [${dynamicCollisions.join(', ')}] reserved for a dynamic generator.`
   )
   process.exit(1)
 }
 
-const entries = []
-const errors = []
-for (const slug of slugs) {
-  const filePath = path.join(contentDir, `${slug}.md`)
-  try {
-    const content = await fs.readFile(filePath, 'utf-8')
-    entries.push(`  [${JSON.stringify(slug)}, ${JSON.stringify(content)}]`)
-  } catch (err) {
-    errors.push(`${slug}.md: ${err.message}`)
-  }
-}
-
-if (errors.length > 0) {
-  console.error('❌ Failed to read .md files:')
-  errors.forEach((e) => console.error(`   ${e}`))
+const sectionRoots = MDX_SECTIONS.map((s) => s.urlPrefix)
+const sectionRootCollisions = [...staticSlugs, ...DYNAMIC_SLUGS].filter((s) =>
+  sectionRoots.includes(s)
+)
+if (sectionRootCollisions.length > 0) {
+  console.error(
+    `❌ Section-root collision: [${sectionRootCollisions.join(', ')}] shadows an MDX section.`
+  )
   process.exit(1)
 }
 
-const allSlugs = [...slugs, ...DYNAMIC_SLUGS]
-const pageEntries = allSlugs.map((s) => `  ${JSON.stringify(s)}`).join(',\n')
+const seen = new Set()
+for (const entry of allEntries) {
+  if (seen.has(entry.slug)) {
+    console.error(`❌ Duplicate slug emitted: ${entry.slug}`)
+    process.exit(1)
+  }
+  seen.add(entry.slug)
+}
+
+const contentEntries = allEntries
+  .map((e) => `  [${JSON.stringify(e.slug)}, ${JSON.stringify(e.content)}]`)
+  .join(',\n')
+
+const allPageSlugs = [...allEntries.map((e) => e.slug), ...DYNAMIC_SLUGS]
+const pageEntries = allPageSlugs.map((s) => `  ${JSON.stringify(s)}`).join(',\n')
 
 const output = `// AUTO-GENERATED by scripts/generateMdContent.mjs — do not edit
 export const MD_CONTENT = new Map<string, string>([
-${entries.join(',\n')},
+${contentEntries},
 ])
 
 export const MD_PAGES = new Set<string>([
@@ -95,4 +216,4 @@ ${pageEntries},
 `
 
 await fs.writeFile(outputPath, output, 'utf-8')
-console.log(`✅ Generated ${outputPath} (${entries.length} files, ${allSlugs.length} pages)`)
+console.log(`✅ Generated ${outputPath} (${allEntries.length} files, ${allPageSlugs.length} pages)`)

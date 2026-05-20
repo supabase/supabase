@@ -4,12 +4,12 @@ import { Control, ControllerRenderProps } from 'react-hook-form'
 import {
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -72,11 +72,7 @@ export const BasicInfo = ({
         render={({ field }) => (
           <FormItemLayout name="tokenName" label="Name">
             <FormControl>
-              <Input_Shadcn_
-                id="tokenName"
-                {...field}
-                placeholder="Provide a name for your token"
-              />
+              <Input id="tokenName" {...field} placeholder="Provide a name for your token" />
             </FormControl>
           </FormItemLayout>
         )}
@@ -90,23 +86,23 @@ export const BasicInfo = ({
           <FormItemLayout name="expiresAt" label="Expires in">
             <div className="flex gap-2">
               <FormControl className="grow">
-                <Select_Shadcn_
+                <Select
                   value={field.value}
                   onValueChange={(value) => handleExpiryChange(value, field)}
                 >
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="Expires at" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Expires at" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {Object.values(EXPIRES_AT_OPTIONS).map(
                       (option: { value: string; label: string }) => (
-                        <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                        <SelectItem key={option.value} value={option.value}>
                           {option.label}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       )
                     )}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormControl>
               {isCustomSelected && (
                 <DatePicker

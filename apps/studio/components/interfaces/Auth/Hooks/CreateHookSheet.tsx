@@ -1,4 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  ident,
+  joinSqlFragments,
+  safeSql,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta/src/pg-format'
 import { useParams } from 'common'
 import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
@@ -9,7 +15,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -170,7 +176,7 @@ export const CreateHookSheet = ({
   })
 
   const statements = useMemo(() => {
-    let permissionChanges: string[] = []
+    let permissionChanges: Array<SafeSqlFragment> = []
     if (hook.method.type === 'postgres') {
       if (
         hook.method.schema !== '' &&
@@ -185,11 +191,16 @@ export const CreateHookSheet = ({
     }
 
     if (values.postgresValues.functionName !== '') {
+      const schema = values.postgresValues.schema
+      const functionName = values.postgresValues.functionName
       permissionChanges = [
         ...permissionChanges,
-        `-- Grant access to function to supabase_auth_admin\ngrant execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} to supabase_auth_admin;`,
-        `-- Grant access to schema to supabase_auth_admin\ngrant usage on schema ${values.postgresValues.schema} to supabase_auth_admin;`,
-        `-- Revoke function permissions from authenticated, anon and public\nrevoke execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} from authenticated, anon, public;`,
+        safeSql`-- Grant access to function to supabase_auth_admin
+grant execute on function ${ident(schema)}.${ident(functionName)} to supabase_auth_admin;`,
+        safeSql`-- Grant access to schema to supabase_auth_admin
+grant usage on schema ${ident(schema)} to supabase_auth_admin;`,
+        safeSql`-- Revoke function permissions from authenticated, anon and public
+revoke execute on function ${ident(schema)}.${ident(functionName)} from authenticated, anon, public;`,
       ]
     }
     return permissionChanges
@@ -202,7 +213,7 @@ export const CreateHookSheet = ({
         executeSql({
           projectRef,
           connectionString: project!.connectionString,
-          sql: statements.join('\n'),
+          sql: joinSqlFragments(statements, '\n'),
         })
       }
       onClose()
@@ -451,7 +462,7 @@ export const CreateHookSheet = ({
                         description="Supabase Auth will send a HTTPS POST request to this URL each time the hook is triggered."
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} />
+                          <Input {...field} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -479,7 +490,7 @@ export const CreateHookSheet = ({
                       >
                         <FormControl>
                           <div className="flex flex-row">
-                            <Input_Shadcn_ {...field} className="rounded-r-none border-r-0" />
+                            <Input {...field} className="rounded-r-none border-r-0" />
                             <Button
                               type="default"
                               size="small"

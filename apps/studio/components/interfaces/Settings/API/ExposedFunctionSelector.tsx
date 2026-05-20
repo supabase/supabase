@@ -10,9 +10,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -96,13 +96,13 @@ export const ExposedFunctionSelector = ({
   }, [entry?.isIntersecting, hasNextPage, isFetching, isFetchingNextPage, isPending, fetchNextPage])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <Button
           size="small"
           disabled={disabled}
           type="default"
-          className="w-full [&>span]:w-full !pr-1 space-x-1"
+          className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
           <div className="w-full flex gap-1">
@@ -119,8 +119,8 @@ export const ExposedFunctionSelector = ({
             </p>
           </div>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
         align="start"
@@ -184,7 +184,7 @@ export const ExposedFunctionSelector = ({
                           value={key}
                           className={cn(
                             'w-full',
-                            isSchemaExposed ? 'cursor-pointer' : 'opacity-50 !cursor-not-allowed'
+                            isSchemaExposed ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed!'
                           )}
                           onSelect={() => {
                             if (!isSchemaExposed) return
@@ -281,8 +281,8 @@ export const ExposedFunctionSelector = ({
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 

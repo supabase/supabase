@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -11,12 +11,12 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetContent,
@@ -76,7 +76,7 @@ const defaultValues: z.infer<typeof FormSchema> = {
 }
 
 interface TriggerSheetProps {
-  selectedTrigger?: PostgresTrigger
+  selectedTrigger?: PGTrigger
   isDuplicatingTrigger?: boolean
   open: boolean
   onClose: () => void
@@ -218,7 +218,7 @@ export const TriggerSheet = ({
                     description="Do not use spaces/whitespace."
                   >
                     <FormControl>
-                      <Input_Shadcn_ {...field} placeholder="Name of trigger" />
+                      <Input {...field} placeholder="Name of trigger" />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -236,22 +236,22 @@ export const TriggerSheet = ({
                       description="Determines if a trigger should or should not fire. Can also be used to disable a trigger, but not delete it."
                     >
                       <FormControl>
-                        <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_ className="col-span-8">
+                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className="col-span-8">
                             {
                               TRIGGER_ENABLED_MODES.find((option) => option.value === field.value)
                                 ?.label
                             }
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                          </SelectTrigger>
+                          <SelectContent>
                             {TRIGGER_ENABLED_MODES.map((option) => (
-                              <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                              <SelectItem key={option.value} value={option.value}>
                                 <p className="text-foreground">{option.label}</p>
                                 <p className="text-foreground-lighter">{option.description}</p>
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -271,7 +271,7 @@ export const TriggerSheet = ({
                         description="Trigger will watch for changes on this table"
                       >
                         <FormControl>
-                          <Select_Shadcn_
+                          <Select
                             defaultValue={field.value}
                             onValueChange={(val) => {
                               // mark table ID as dirty to trigger validation
@@ -283,18 +283,18 @@ export const TriggerSheet = ({
                               }
                             }}
                           >
-                            <SelectTrigger_Shadcn_ className="col-span-8">
-                              <SelectValue_Shadcn_ />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectTrigger className="col-span-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
                               {tables.map((table) => (
-                                <SelectItem_Shadcn_ key={table.id} value={table.id.toString()}>
+                                <SelectItem key={table.id} value={table.id.toString()}>
                                   <span className="text-foreground-light">{table.schema}.</span>
                                   <span className="text-foreground">{table.name}</span>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -354,19 +354,19 @@ export const TriggerSheet = ({
                         description="Determines when your trigger fires"
                       >
                         <FormControl>
-                          <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_ className="col-span-8">
+                          <Select defaultValue={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="col-span-8">
                               {TRIGGER_TYPES.find((option) => option.value === field.value)?.label}
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            </SelectTrigger>
+                            <SelectContent>
                               {TRIGGER_TYPES.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   <p className="text-foreground">{option.label}</p>
                                   <p className="text-foreground-lighter">{option.description}</p>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -383,22 +383,22 @@ export const TriggerSheet = ({
                         description="Identifies whether the trigger fires once for each processed row or once for each statement"
                       >
                         <FormControl>
-                          <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_ className="col-span-8">
+                          <Select defaultValue={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className="col-span-8">
                               {
                                 TRIGGER_ORIENTATIONS.find((option) => option.value === field.value)
                                   ?.label
                               }
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            </SelectTrigger>
+                            <SelectContent>
                               {TRIGGER_ORIENTATIONS.map((option) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   <p className="text-foreground">{option.label}</p>
                                   <p className="text-foreground-lighter">{option.description}</p>
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -418,8 +418,8 @@ export const TriggerSheet = ({
                               <button
                                 type="button"
                                 className={cn(
-                                  'relative w-full rounded border border-default',
-                                  'bg-surface-200 px-5 py-1 shadow-sm transition-all',
+                                  'relative w-full rounded-sm border border-default',
+                                  'bg-surface-200 px-5 py-1 shadow-xs transition-all',
                                   'hover:border-strong hover:bg-overlay-hover'
                                 )}
                                 onClick={() => setShowFunctionSelector(true)}
@@ -434,11 +434,11 @@ export const TriggerSheet = ({
                                 className={cn(
                                   'relative w-full flex items-center justify-between',
                                   'space-x-3 px-5 py-4 border border-default',
-                                  'rounded shadow-sm transition-shadow'
+                                  'rounded-sm shadow-xs transition-shadow'
                                 )}
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-foreground/10">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-foreground text-background focus-within:bg-foreground/10">
                                     <Terminal size="18" strokeWidth={2} width={14} />
                                   </div>
                                   <p>

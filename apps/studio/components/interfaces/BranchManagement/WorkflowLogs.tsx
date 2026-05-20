@@ -98,7 +98,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
 
         <DialogSectionSeparator />
 
-        <DialogSection className={cn('!px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '!py-0')}>
+        <DialogSection className={cn('px-0!', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : 'py-0!')}>
           {!selectedWorkflowRun ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-4" />}

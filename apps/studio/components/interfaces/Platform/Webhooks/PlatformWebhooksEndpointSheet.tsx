@@ -3,18 +3,18 @@ import { ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Accordion_Shadcn_ as Accordion,
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Button,
   Checkbox,
   cn,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_ as InputField,
-  Label_Shadcn_ as Label,
+  Input,
+  Label,
   Separator,
   Sheet,
   SheetContent,
@@ -24,7 +24,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  TextArea_Shadcn_ as Textarea,
+  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
@@ -286,7 +286,7 @@ export const PlatformWebhooksEndpointSheet = ({
                       className="gap-1"
                     >
                       <FormControl>
-                        <InputField {...field} placeholder="winged-envelope" maxLength={64} />
+                        <Input {...field} placeholder="winged-envelope" maxLength={64} />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -298,10 +298,7 @@ export const PlatformWebhooksEndpointSheet = ({
                   render={({ field }) => (
                     <FormItemLayout label="Endpoint URL" layout="vertical" className="gap-1">
                       <FormControl>
-                        <InputField
-                          {...field}
-                          placeholder="https://api.example.com/webhooks/supabase"
-                        />
+                        <Input {...field} placeholder="https://api.example.com/webhooks/supabase" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -505,7 +502,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                             {allSelected ? 'Clear all' : 'Select all'}
                                           </span>
                                         )}
-                                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-open:rotate-180" />
                                       </div>
                                     </div>
                                   </AccordionTrigger>

@@ -1,4 +1,4 @@
-import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
+import { FOREIGN_KEY_CASCADE_ACTION, safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -458,7 +458,7 @@ describe('createTable', () => {
       createColumnField({
         name: 'age',
         format: 'int4',
-        check: 'age >= 0',
+        check: safeSql`age >= 0`,
         isNullable: false,
       }),
     ]

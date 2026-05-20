@@ -26,7 +26,7 @@ const ButtonCard: FC<Props> = ({
     <Link
       href={to}
       className={cn(
-        'h-full block shadow-none bg-surface-100 rounded transition',
+        'h-full block shadow-none bg-surface-100 rounded-sm transition',
         'border border-transparent hover:border-overlay',
         className
       )}

@@ -10,9 +10,14 @@ import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 interface AIAssistantOptionProps {
   projectRef?: string | null
   organizationSlug?: string | null
+  onClick?: () => void
 }
 
-export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
+export const AIAssistantOption = ({
+  projectRef,
+  organizationSlug,
+  onClick,
+}: AIAssistantOptionProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
   const [isVisible, setIsVisible] = useState(false)
 
@@ -32,7 +37,9 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
             : organizationSlug,
       },
     })
-  }, [projectRef, organizationSlug, sendEvent])
+
+    onClick?.()
+  }, [onClick, projectRef, organizationSlug, sendEvent])
 
   // If no specific project selected, use the wildcard route
   const aiLink = `/project/${projectRef !== NO_PROJECT_MARKER ? projectRef : '_'}?sidebar=ai-assistant&slug=${organizationSlug}`
@@ -49,7 +56,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
           className="w-full overflow-hidden border rounded-md relative bg-200"
         >
           <div className="flex items-center p-6">
-            <div className="flex flex-col gap-3 z-[2] shrink-0 w-full">
+            <div className="flex flex-col gap-3 z-2 shrink-0 w-full">
               <div>
                 <h5 className="text-sm font-medium text-foreground">Try Supabase Assistant</h5>
                 <p className="text-sm text-foreground-lighter">
@@ -57,15 +64,26 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
                 </p>
               </div>
               <div>
-                <Link href={aiLink} onClick={onAiAssistantClicked}>
-                  <Button size="tiny" type="default" icon={<AiIconAnimation size={14} />}>
+                {onClick ? (
+                  <Button
+                    size="tiny"
+                    type="default"
+                    icon={<AiIconAnimation size={14} />}
+                    onClick={onAiAssistantClicked}
+                  >
                     Ask the Assistant
                   </Button>
-                </Link>
+                ) : (
+                  <Link href={aiLink} onClick={onAiAssistantClicked}>
+                    <Button size="tiny" type="default" icon={<AiIconAnimation size={14} />}>
+                      Ask the Assistant
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
             {/* Decorative background */}
-            <div className="absolute z-[1] scale-75 -right-40 md:-right-24 -top-6 md:top-0">
+            <div className="absolute z-1 scale-75 -right-40 md:-right-24 -top-6 md:top-0">
               <div className="relative grow flex flex-col gap-3 w-[400px]">
                 <div className="flex items-start gap-3 pl-12">
                   <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
@@ -86,7 +104,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
                   </div>
                 </div>
               </div>
-              <div className="absolute -inset-2 bg-gradient-to-l from-transparent via-background-200 via-[90%] to-background-200 to-[100%] z-[1]" />
+              <div className="absolute -inset-2 bg-linear-to-l from-transparent via-background-200 via-90% to-background-200 to-100% z-1" />
             </div>
           </div>
         </motion.aside>

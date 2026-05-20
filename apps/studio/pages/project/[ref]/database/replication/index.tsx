@@ -37,7 +37,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
       <ReplicationDiagram />
 
       <ScaffoldContainer>
-        <ScaffoldSection isFullWidth className="!pt-6">
+        <ScaffoldSection isFullWidth className="pt-6!">
           <Destinations />
         </ScaffoldSection>
       </ScaffoldContainer>

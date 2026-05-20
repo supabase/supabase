@@ -86,7 +86,7 @@ export const ProjectHome = () => {
         <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
           <ScaffoldSection
             isFullWidth
-            className={cn(isPaused ? 'h-full flex justify-center !p-0' : 'pb-0')}
+            className={cn(isPaused ? 'h-full flex justify-center p-0!' : 'pb-0')}
           >
             <TopSection />
           </ScaffoldSection>

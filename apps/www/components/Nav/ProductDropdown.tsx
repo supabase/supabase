@@ -51,7 +51,7 @@ export const ProductDropdown = () => {
                     flex items-start gap-2
                     text-xs leading-none
                     text-foreground-light hover:text-foreground
-                    no-underline outline-none select-none
+                    no-underline outline-hidden select-none
                     focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground
                     "
                   >
@@ -98,7 +98,7 @@ export const ProductDropdown = () => {
                 flex items-start gap-2
                 text-xs leading-none
                 text-foreground-light hover:text-foreground
-                no-underline outline-none select-none
+                no-underline outline-hidden select-none
                 focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground
               "
               >
@@ -127,7 +127,7 @@ export const ProductDropdown = () => {
           <div>
             <Link
               href="/customers"
-              className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
+              className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-4 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs focus-visible:text-foreground"
             >
               Customer Stories
               <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
@@ -137,14 +137,14 @@ export const ProductDropdown = () => {
                 <li key={customer.organization}>
                   <Link
                     href={customer.url}
-                    className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded"
+                    className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
                   >
                     <div className="relative rounded-md bg-background border group-hover:border-foreground-muted/50 h-14 w-28 xl:h-14 xl:w-20 shrink-0 overflow-auto">
                       <Image
                         src={`/${customer.imgUrl}`}
                         alt={customer.title}
                         fill
-                        className="!p-3 object-contain brightness-70 contrast-[.35] filter"
+                        className="p-3! object-contain brightness-70 contrast-[.35] filter"
                       />
                     </div>
                     <div className="flex flex-col">

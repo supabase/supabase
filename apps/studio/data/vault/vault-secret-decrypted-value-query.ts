@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
 
@@ -8,7 +9,7 @@ import { UseCustomQueryOptions } from '@/types'
 const vaultSecretDecryptedValueQuery = (id: string) => {
   const sql = new Query()
     .from('decrypted_secrets', 'vault')
-    .select('decrypted_secret')
+    .select(safeSql`decrypted_secret`)
     .match({ id })
     .toSql()
 
@@ -18,7 +19,7 @@ const vaultSecretDecryptedValueQuery = (id: string) => {
 const vaultSecretDecryptedValuesQuery = (ids: string[]) => {
   const sql = new Query()
     .from('decrypted_secrets', 'vault')
-    .select('id,decrypted_secret')
+    .select(safeSql`id,decrypted_secret`)
     .filter('id', 'in', ids)
     .toSql()
 

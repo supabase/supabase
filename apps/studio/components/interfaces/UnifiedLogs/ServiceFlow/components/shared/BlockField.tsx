@@ -46,7 +46,7 @@ export const BlockField = ({
           <TruncatedTextWithPopover
             text={stringValue}
             maxLength={maxLength}
-            className="px-2 py-1 text-xs font-mono border border-border rounded bg-surface-100"
+            className="px-2 py-1 text-xs font-mono border border-border rounded-sm bg-surface-100"
           />
         ) : displayValue !== 'N/A' ? (
           <TruncatedTextWithPopover
@@ -76,7 +76,7 @@ export const BlockField = ({
         filterFields={filterFields}
         value={stringValue}
         table={table}
-        className="flex justify-between items-center py-1 px-2  rounded hover:bg-accent/50 cursor-pointer w-full hover:bg-surface-400"
+        className="flex justify-between items-center py-1 px-2  rounded-sm hover:bg-accent/50 cursor-pointer w-full hover:bg-surface-400"
       >
         {fieldContent}
       </DataTableSheetRowAction>

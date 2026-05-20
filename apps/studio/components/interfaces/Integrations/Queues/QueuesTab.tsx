@@ -111,7 +111,7 @@ export const QueuesTab = () => {
             rowClass={() => {
               return cn(
                 'cursor-pointer',
-                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                 '[&>.rdg-cell:first-child>div]:ml-8'
               )
             }}

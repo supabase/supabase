@@ -33,7 +33,7 @@ const NodeContainer = ({ className, children }: PropsWithChildren<{ className?: 
     <div
       style={{ width: NODE_WIDTH / 2 + 55 }}
       className={cn(
-        'flex items-start justify-between p-3 rounded bg-surface-100 border border-default',
+        'flex items-start justify-between p-3 rounded-sm bg-surface-100 border border-default',
         className
       )}
     >
@@ -65,7 +65,7 @@ export const PrimaryDatabaseNode = () => {
       {!!project && (
         <img
           alt="region icon"
-          className="w-8 rounded-sm mt-0.5"
+          className="w-8 rounded-xs mt-0.5"
           src={`${BASE_PATH}/img/regions/${project?.region}.svg`}
         />
       )}

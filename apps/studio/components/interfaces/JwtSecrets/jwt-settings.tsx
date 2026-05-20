@@ -26,9 +26,9 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -219,7 +219,7 @@ export const JWTSettings = () => {
           </div>
         }
       >
-        <Panel.Content className="border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+        <Panel.Content className="border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark">
           <Form {...form}>
             <form
               id={formId}
@@ -239,7 +239,7 @@ export const JWTSettings = () => {
                       type="warning"
                       title="Legacy JWT secret has been migrated to new JWT Signing Keys"
                     >
-                      <p className="!leading-normal">
+                      <p className="leading-normal!">
                         Legacy JWT secret can only be changed by rotating to a standby key and then
                         revoking it. It is used to{' '}
                         <em className="text-foreground not-italic">
@@ -249,7 +249,7 @@ export const JWTSettings = () => {
                       </p>
 
                       {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
-                        <p className="!leading-normal">
+                        <p className="leading-normal!">
                           <em className="text-warning not-italic">
                             This includes the <code className="text-code-inline">anon</code> and{' '}
                             <code className="text-code-inline">service_role</code> JWT based API
@@ -372,16 +372,16 @@ export const JWTSettings = () => {
                 </Admonition>
               )}
 
-              <Collapsible_Shadcn_ className="bg border rounded-md mt-4">
-                <CollapsibleTrigger_Shadcn_ className="p-4 w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
+              <Collapsible className="bg border rounded-md mt-4">
+                <CollapsibleTrigger className="p-4 w-full flex items-center justify-between [&[data-state=open]>svg]:-rotate-180!">
                   <p className="text-sm">
                     {disableLegacyJwtSecretRotation
                       ? 'How to migrate to the new API keys?'
                       : 'How to change your JWT secret?'}
                   </p>
                   <ChevronDown size={14} className="transition-transform duration-200" />
-                </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="border-t p-4">
+                </CollapsibleTrigger>
+                <CollapsibleContent className="border-t p-4">
                   <p className="text-sm text-foreground-light text-balance mb-2">
                     {disableLegacyJwtSecretRotation
                       ? 'Migrate to the new publishable and secret API keys to enable rotation with zero downtime and without signing users out. The change is reversible until you revoke the legacy secret.'
@@ -412,7 +412,7 @@ export const JWTSettings = () => {
                           </InlineLink>
                           , create a publishable key and secret key, then swap them into your apps
                           in place of <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline !break-keep">service_role</code>{' '}
+                          <code className="text-code-inline break-keep!">service_role</code>{' '}
                           respectively. Watch the "Last used" indicators to confirm no traffic still
                           depends on the legacy keys.
                         </p>
@@ -521,8 +521,8 @@ export const JWTSettings = () => {
                       </DropdownMenu>
                     )}
                   </div>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
+                </CollapsibleContent>
+              </Collapsible>
             </>
           )}
         </Panel.Content>

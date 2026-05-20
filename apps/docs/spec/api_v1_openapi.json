@@ -1753,6 +1753,13 @@
               "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
+          },
+          {
+            "name": "remove_addon",
+            "required": false,
+            "in": "query",
+            "description": "If true, also removes the custom domain add-on from the project subscription.",
+            "schema": { "default": "false", "type": "boolean" }
           }
         ],
         "responses": {
@@ -1920,7 +1927,7 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": { "schema": { "$ref": "#/components/schemas/JitStateResponse" } }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -1964,7 +1971,7 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+              "application/json": { "schema": { "$ref": "#/components/schemas/JitStateResponse" } }
             }
           },
           "401": { "description": "Unauthorized" },
@@ -6857,6 +6864,45 @@
         "x-oauth-scope": "database:read"
       }
     },
+    "/v1/projects/{ref}/database/backups/restore": {
+      "post": {
+        "operationId": "v1-restore-physical-backup",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/V1RestoreBackupBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_write"] }],
+        "summary": "Restores a physical backup for a database",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["infra"],
+        "x-internal": true,
+        "x-oauth-scope": "database:write"
+      }
+    },
     "/v1/projects/{ref}/database/backups/undo": {
       "post": {
         "operationId": "v1-undo",
@@ -8306,44 +8352,33 @@
         "required": ["custom_hostname"],
         "example": { "custom_hostname": "docs.example.com" }
       },
-      "JitAccessResponse": {
-        "type": "object",
-        "properties": {
-          "user_id": { "type": "string", "format": "uuid" },
-          "user_roles": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "role": { "type": "string", "minLength": 1 },
-                "expires_at": { "type": "number" },
-                "allowed_networks": {
-                  "type": "object",
-                  "properties": {
-                    "allowed_cidrs": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": { "cidr": { "type": "string" } },
-                        "required": ["cidr"]
-                      }
-                    },
-                    "allowed_cidrs_v6": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": { "cidr": { "type": "string" } },
-                        "required": ["cidr"]
-                      }
-                    }
-                  }
-                }
-              },
-              "required": ["role"]
-            }
+      "JitStateResponse": {
+        "discriminator": { "propertyName": "state" },
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": { "type": "string", "enum": ["enabled", "disabled"] },
+              "appliedSuccessfully": { "type": "boolean" }
+            },
+            "required": ["state"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": { "type": "string", "enum": ["unavailable"] },
+              "unavailableReason": {
+                "type": "string",
+                "enum": [
+                  "manual_migration_required",
+                  "postgres_upgrade_required",
+                  "temporarily_unavailable"
+                ]
+              }
+            },
+            "required": ["state", "unavailableReason"]
           }
-        },
-        "required": ["user_id", "user_roles"]
+        ]
       },
       "JitAccessRequestRequest": {
         "type": "object",
@@ -8798,6 +8833,11 @@
                     "slot_name": { "type": "string" }
                   },
                   "required": ["type", "slot_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": { "type": { "type": "string", "enum": ["x86_architecture"] } },
+                  "required": ["type"]
                 }
               ]
             }
@@ -10674,6 +10714,46 @@
         "properties": { "message": { "type": "string" } },
         "required": ["message"]
       },
+      "JitAccessResponse": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "string", "format": "uuid" },
+          "user_roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": { "type": "string", "minLength": 1 },
+                "expires_at": { "type": "number" },
+                "allowed_networks": {
+                  "type": "object",
+                  "properties": {
+                    "allowed_cidrs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    },
+                    "allowed_cidrs_v6": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    }
+                  }
+                },
+                "branches_only": { "type": "boolean" }
+              },
+              "required": ["role"]
+            }
+          }
+        },
+        "required": ["user_id", "user_roles"]
+      },
       "AuthorizeJitAccessBody": {
         "type": "object",
         "properties": {
@@ -10712,7 +10792,8 @@
                     }
                   }
                 }
-              }
+              },
+              "branches_only": { "type": "boolean" }
             },
             "required": ["role"]
           }
@@ -10755,7 +10836,8 @@
                             }
                           }
                         }
-                      }
+                      },
+                      "branches_only": { "type": "boolean" }
                     },
                     "required": ["role"]
                   }
@@ -10798,7 +10880,8 @@
                       }
                     }
                   }
-                }
+                },
+                "branches_only": { "type": "boolean" }
               },
               "required": ["role"]
             }
@@ -10811,7 +10894,8 @@
             {
               "role": "postgres",
               "expires_at": 1740787200,
-              "allowed_networks": { "allowed_cidrs": [{ "cidr": "203.0.113.0/24" }] }
+              "allowed_networks": { "allowed_cidrs": [{ "cidr": "203.0.113.0/24" }] },
+              "branches_only": false
             }
           ]
         }
@@ -11988,6 +12072,7 @@
             "items": {
               "type": "object",
               "properties": {
+                "id": { "type": "integer" },
                 "is_physical_backup": { "type": "boolean" },
                 "status": {
                   "type": "string",
@@ -11995,7 +12080,7 @@
                 },
                 "inserted_at": { "type": "string" }
               },
-              "required": ["is_physical_backup", "status", "inserted_at"]
+              "required": ["id", "is_physical_backup", "status", "inserted_at"]
             }
           },
           "physical_backup_data": {
@@ -12030,6 +12115,12 @@
           "completed_on": { "type": "string", "format": "date-time", "nullable": true }
         },
         "required": ["name", "status", "completed_on"]
+      },
+      "V1RestoreBackupBody": {
+        "type": "object",
+        "properties": { "id": { "type": "integer" } },
+        "required": ["id"],
+        "example": { "id": 12345 }
       },
       "V1UndoBody": {
         "type": "object",
@@ -12088,6 +12179,7 @@
                         "auth.advanced_auth_settings",
                         "auth.performance_settings",
                         "auth.password_hibp",
+                        "auth.custom_oauth.max_providers",
                         "backup.retention_days",
                         "backup.restore_to_new_project",
                         "function.max_count",

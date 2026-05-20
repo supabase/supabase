@@ -102,7 +102,7 @@ export const AdvisorPanel = () => {
   }
 
   const lintItems = useMemo<AdvisorItem[]>(() => {
-    return createAdvisorLintItems(lintData)
+    return createAdvisorLintItems(lintData ?? [])
   }, [lintData])
 
   const notificationItems = useMemo<AdvisorItem[]>(() => {
@@ -240,6 +240,7 @@ export const AdvisorPanel = () => {
                 item={selectedItem}
                 projectRef={project?.ref ?? ''}
                 onUpdateNotificationStatus={handleUpdateNotificationStatus}
+                onAfterLintAction={handleBackToList}
               />
             ) : (
               <div className="px-6 py-8">

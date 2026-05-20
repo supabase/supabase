@@ -42,7 +42,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
   return (
     <TableRow>
-      <TableCell className="gap-2 align-top !py-3 min-w-80">
+      <TableCell className="gap-2 align-top py-3! min-w-80">
         {wrapper.name}
 
         {visibleMetadata.map((metadata) => (
@@ -58,13 +58,13 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
         ))}
       </TableCell>
 
-      <TableCell className="space-y-2 !p-4">
+      <TableCell className="space-y-2 p-4!">
         {_tables?.map((table) => {
           const target = table.table ?? table.object ?? table.src_key
 
           return (
             <div key={table.id} className="flex items-center">
-              <Badge className="bg-surface-300/100 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
+              <Badge className="bg-surface-300 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
                 <div className="relative w-3 h-3 flex items-center justify-center">
                   {integration.icon({ className: 'p-0' })}
                 </div>
@@ -72,7 +72,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                   <TooltipTrigger className="truncate max-w-28">{target}</TooltipTrigger>
                   <TooltipContent
                     side="bottom"
-                    className="max-w-64 whitespace-pre-wrap break-words"
+                    className="max-w-64 whitespace-pre-wrap wrap-break-word"
                   >
                     {target}
                   </TooltipContent>
@@ -89,7 +89,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                     </TooltipTrigger>
                     <TooltipContent
                       side="bottom"
-                      className="max-w-64 whitespace-pre-wrap break-words"
+                      className="max-w-64 whitespace-pre-wrap wrap-break-word"
                     >
                       {table.schema}.{table.table_name}
                     </TooltipContent>

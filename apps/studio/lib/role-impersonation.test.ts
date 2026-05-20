@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
 import type { RoleImpersonationState } from './role-impersonation'
@@ -119,7 +120,7 @@ describe('getPostgrestClaims', () => {
 })
 
 describe('wrapWithRoleImpersonation', () => {
-  const sql = 'select * from colors;'
+  const sql = safeSql`select * from colors;`
   const ref = 'default'
 
   describe('postgres role (undefined)', () => {

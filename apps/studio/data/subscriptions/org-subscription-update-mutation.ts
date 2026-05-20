@@ -78,6 +78,7 @@ export const useOrgSubscriptionUpdateMutation = ({
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
           queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgPlans(slug) }),
+          queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgBalance(slug) }),
           queryClient.invalidateQueries({ queryKey: usageKeys.orgUsage(slug) }),
           queryClient.invalidateQueries({ queryKey: invoicesKeys.orgUpcomingPreview(slug) }),
           queryClient.invalidateQueries({ queryKey: organizationKeys.detail(slug) }),

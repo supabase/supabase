@@ -2,11 +2,11 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 import {
   Badge,
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
 } from 'ui'
 import {
   PageHeader,
@@ -62,7 +62,7 @@ export const PlatformWebhooksHeader = ({
       <PageHeaderMeta>
         <PageHeaderSummary className="min-w-0">
           <PageHeaderTitle className="min-w-0 w-full">
-            <span className="flex w-full min-w-0 items-center gap-2">
+            <span className="flex w-full min-w-0 items-center gap-x-4">
               <span className="block min-w-0 truncate leading-tight">{headerTitle}</span>
               {hasSelectedEndpoint && endpointStatus && (
                 <Badge
