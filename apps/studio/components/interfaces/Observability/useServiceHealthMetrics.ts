@@ -52,10 +52,7 @@ const SERVICE_RESPONSE_KEY: Record<
 }
 
 /** Extracts a single service's timeseries rows from the shared service-health response */
-export function extractServiceRows(
-  rows: ServiceHealthResultRow[],
-  serviceKey: ServiceKey
-): RawChartData[] {
+export function extractServiceRows(rows: ServiceHealthResultRow[], serviceKey: ServiceKey) {
   const responseKey = SERVICE_RESPONSE_KEY[serviceKey]
   return rows.map((row) => {
     const svc = row[responseKey]
