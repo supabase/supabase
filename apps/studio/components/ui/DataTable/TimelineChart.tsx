@@ -73,7 +73,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
     () => [
       {
         id: 'zoom-in',
-        label: 'Zoom in',
+        label: 'Filter logs to selected range',
         icon: <SearchIcon className="text-foreground-lighter" size={12} />,
         onSelect: ({ start, end, clear }) => {
           const [left, right] = [start, end].sort(
