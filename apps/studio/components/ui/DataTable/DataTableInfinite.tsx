@@ -1,11 +1,5 @@
 import { type FetchNextPageOptions } from '@tanstack/react-query'
-import type {
-  ColumnDef,
-  Row,
-  RowData,
-  Table as TTable,
-  VisibilityState,
-} from '@tanstack/react-table'
+import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
@@ -19,18 +13,6 @@ import { useDataTable } from './providers/DataTableProvider'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-
-declare module '@tanstack/react-table' {
-  interface TableMeta<TData extends RowData> {
-    getRowClassName?: (row: Row<TData>) => string
-    [key: string]: unknown
-  }
-  interface ColumnMeta<TData extends RowData, TValue> {
-    headerClassName?: string
-    cellClassName?: string
-    [key: string]: unknown
-  }
-}
 
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
@@ -103,7 +85,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             const sort = header.column.getIsSorted()
             const canResize = header.column.getCanResize()
             const onResize = header.getResizeHandler()
-            const headerClassName = header.column.columnDef.meta?.headerClassName
+            const headerClassName = (header.column.columnDef.meta as any)?.headerClassName
 
             return (
               <TableHead
@@ -254,7 +236,7 @@ function DataTableRow<TData>({
   searchParamsParser: any
 }) {
   useQueryState('live', searchParamsParser.live)
-  const rowClassName = cn('group/row', table.options.meta?.getRowClassName?.(row))
+  const rowClassName = cn('group/row', (table.options.meta as any)?.getRowClassName?.(row))
   const cells = row.getVisibleCells()
 
   return (
@@ -272,7 +254,7 @@ function DataTableRow<TData>({
       className={cn(rowClassName)}
     >
       {cells.map((cell) => {
-        const cellClassName = cell.column.columnDef.meta?.cellClassName
+        const cellClassName = (cell.column.columnDef.meta as any)?.cellClassName
         return (
           <TableCell key={cell.id} className={cn(cellClassName)}>
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
