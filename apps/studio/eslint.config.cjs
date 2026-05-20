@@ -25,6 +25,20 @@ module.exports = defineConfig([
               name: 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader',
               message: 'Use TanStackTableHeadSort from ui-patterns/Table instead.',
             },
+            {
+              name: '@/data/telemetry/send-event-mutation',
+              message: 'Use useTrack from @/lib/telemetry/track instead.',
+            },
+            {
+              name: 'data/telemetry/send-event-mutation',
+              message: 'Use useTrack from @/lib/telemetry/track instead.',
+            },
+          ],
+          patterns: [
+            {
+              group: ['**/data/telemetry/send-event-mutation'],
+              message: 'Use useTrack from @/lib/telemetry/track instead.',
+            },
           ],
         },
       ],

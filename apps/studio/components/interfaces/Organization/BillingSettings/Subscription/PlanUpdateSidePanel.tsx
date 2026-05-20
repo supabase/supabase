@@ -30,11 +30,11 @@ import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infini
 import { useOrgPlansQuery } from '@/data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import type { OrgPlan } from '@/data/subscriptions/types'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { formatCurrency } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 import { Organization } from '@/types/base'
 
@@ -68,7 +68,7 @@ export const PlanUpdateSidePanel = () => {
   )
   const isStripeManagedOrganization =
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const originalPlanRef = useRef<string>(undefined)
 
@@ -165,11 +165,7 @@ export const PlanUpdateSidePanel = () => {
       if (source) {
         properties.origin = source
       }
-      sendEvent({
-        action: 'studio_pricing_side_panel_opened',
-        properties,
-        groups: { organization: slug ?? 'Unknown' },
-      })
+      track('studio_pricing_side_panel_opened', properties)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
@@ -325,13 +321,9 @@ export const PlanUpdateSidePanel = () => {
                         }
                         onClick={() => {
                           setSelectedTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')
-                          sendEvent({
-                            action: 'studio_pricing_plan_cta_clicked',
-                            properties: {
-                              selectedPlan: plan.name,
-                              currentPlan: subscription?.plan?.name,
-                            },
-                            groups: { organization: slug ?? 'Unknown' },
+                          track('studio_pricing_plan_cta_clicked', {
+                            selectedPlan: plan.name,
+                            currentPlan: subscription?.plan?.name,
                           })
                         }}
                         tooltip={{

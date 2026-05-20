@@ -9,9 +9,9 @@ import { LogoLoader } from 'ui'
 import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import useLatest from '@/hooks/misc/useLatest'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
 import type { NextPageWithLayout } from '@/types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
@@ -24,7 +24,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
   } = useParams()
   const signInMethodRef = useLatest(signInMethod)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const [loading, setLoading] = useState(true)
@@ -54,12 +54,9 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            sendEvent({
-              action: 'sign_in',
-              properties: {
-                category: 'account',
-                method: signInMethodRef.current,
-              },
+            track('sign_in', {
+              category: 'account',
+              method: signInMethodRef.current,
             })
             addLoginEvent({})
 
