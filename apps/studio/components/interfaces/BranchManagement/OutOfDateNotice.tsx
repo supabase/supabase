@@ -14,7 +14,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 
 interface OutOfDateNoticeProps {
@@ -42,11 +41,7 @@ export const OutOfDateNotice = ({
 }: OutOfDateNoticeProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const hasOutdatedMigrations = isBranchOutOfDateMigrations && missingMigrationsCount > 0
-  const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
-
-  const isBranch = project?.parent_project_ref !== undefined
-  const parentProjectRef = isBranch ? project?.parent_project_ref : project?.ref
 
   const getTitle = () => {
     if (hasOutdatedMigrations && (hasMissingFunctions || hasOutOfDateFunctions)) {

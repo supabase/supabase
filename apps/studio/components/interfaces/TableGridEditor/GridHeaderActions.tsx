@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Realtime } from 'icons'
 import { BookOpenText, Lightbulb, Lock, MoreVertical, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
@@ -62,7 +61,6 @@ export interface GridHeaderActionsProps {
 }
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const track = useTrack()
-  const { ref } = useParams()
   const appSnap = useAppStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const { data: project } = useSelectedProjectQuery()

@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { ArrowUp, ChevronDown, FileText } from 'lucide-react'
 import {
   Button,
@@ -19,7 +18,6 @@ import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export const InsertButton = () => {
-  const { ref: projectRef } = useParams()
   const track = useTrack()
 
   const snap = useTableEditorTableStateSnapshot()

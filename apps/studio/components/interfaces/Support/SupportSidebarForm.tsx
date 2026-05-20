@@ -13,11 +13,11 @@ import type { SupportFormUrlKeys } from './SupportForm.utils'
 import { SupportFormV3 } from './SupportFormV3'
 import { useSupportForm } from './useSupportForm'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
+import { useTrack } from '@/lib/telemetry/track'
 
 function useSupportFormTelemetry() {
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return useCallback(
     ({
@@ -29,17 +29,12 @@ function useSupportFormTelemetry() {
       orgSlug: string | undefined
       category: ExtendedSupportCategories
     }) =>
-      sendEvent({
-        action: 'support_ticket_submitted',
-        properties: {
-          ticketCategory: category,
-        },
-        groups: {
-          project: projectRef,
-          organization: orgSlug,
-        },
-      }),
-    [sendEvent]
+      track(
+        'support_ticket_submitted',
+        { ticketCategory: category },
+        { project: projectRef, organization: orgSlug }
+      ),
+    [track]
   )
 }
 

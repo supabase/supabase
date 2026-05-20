@@ -2,9 +2,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
 
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 type SingleStatProps = {
   icon: ReactNode
@@ -28,20 +26,11 @@ export const SingleStat = ({
   onClick,
   trackingProperties,
 }: SingleStatProps) => {
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const trackActivityStat = () => {
-    if (trackingProperties && project?.ref && organization?.slug) {
-      sendEvent({
-        action: 'home_activity_stat_clicked',
-        properties: trackingProperties,
-        groups: {
-          project: project.ref,
-          organization: organization.slug,
-        },
-      })
+    if (trackingProperties) {
+      track('home_activity_stat_clicked', trackingProperties)
     }
   }
   const content = (

@@ -32,10 +32,9 @@ import { RLSTesterPreview } from './RLSTesterPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
@@ -58,9 +57,8 @@ export const FeaturePreviewModal = () => {
     selectFeaturePreview,
     toggleFeaturePreviewModal,
   } = useFeaturePreviewModal()
-  const { data: org } = useSelectedOrganizationQuery()
   const featurePreviewContext = useFeaturePreviewContext()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { dismissBanner } = useBannerStack()
   const [, setIsDismissedRlsTesterBanner] = useLocalStorageQuery(
@@ -87,10 +85,8 @@ export const FeaturePreviewModal = () => {
     }
 
     onUpdateFlag(selectedFeature.key, !isSelectedFeatureEnabled)
-    sendEvent({
-      action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',
-      properties: { feature: selectedFeature.key },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    track(isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled', {
+      feature: selectedFeature.key,
     })
   }
 

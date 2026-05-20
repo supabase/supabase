@@ -1,5 +1,4 @@
 import type { PGTable } from '@supabase/pg-meta'
-import { useParams } from 'common'
 import { noop } from 'lodash'
 import { useCallback, type ChangeEvent, type DragEvent } from 'react'
 import { toast } from 'sonner'
@@ -37,7 +36,6 @@ export const SpreadsheetImport = ({
   closePanel,
   updateEditorDirty = noop,
 }: SpreadsheetImportProps) => {
-  const { ref: projectRef } = useParams()
   const track = useTrack()
   const {
     state,

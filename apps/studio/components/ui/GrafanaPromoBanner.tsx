@@ -1,11 +1,9 @@
-import { useParams } from 'common'
 import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const GrafanaPromoBanner = () => (
   <Alert className="relative overflow-hidden">
@@ -51,9 +49,7 @@ const GrafanaPromoBanner = () => (
 )
 
 const GrafanaBannerActions = ({ className }: { className?: string }) => {
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return (
     <div className={cn('flex gap-2', className)}>
@@ -61,12 +57,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
         <Link
           href={`${DOCS_URL}/guides/telemetry/metrics`}
           target="_blank"
-          onClick={() =>
-            sendEvent({
-              action: 'reports_database_grafana_banner_clicked',
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
-          }
+          onClick={() => track('reports_database_grafana_banner_clicked')}
         >
           Docs
         </Link>
@@ -75,12 +66,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
         <Link
           href="https://github.com/supabase/supabase-grafana"
           target="_blank"
-          onClick={() =>
-            sendEvent({
-              action: 'reports_database_grafana_banner_clicked',
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
-          }
+          onClick={() => track('reports_database_grafana_banner_clicked')}
         >
           Configure Grafana
         </Link>
