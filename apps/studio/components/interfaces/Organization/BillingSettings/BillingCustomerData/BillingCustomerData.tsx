@@ -30,9 +30,9 @@ import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizatio
 import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { IS_PLATFORM, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
-const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
+const stripePromise = IS_PLATFORM ? loadStripe(STRIPE_PUBLIC_KEY) : null
 
 export const BillingCustomerData = () => {
   const { slug } = useParams()

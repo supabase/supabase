@@ -49,7 +49,7 @@ import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useConfirmPendingSubscriptionCreateMutation } from '@/data/subscriptions/org-subscription-confirm-pending-create'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { IS_PLATFORM, PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 
 const ORG_KIND_TYPES = {
@@ -97,7 +97,7 @@ const formSchema = z.object({
 
 type FormState = z.infer<typeof formSchema>
 
-const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
+const stripePromise = IS_PLATFORM ? loadStripe(STRIPE_PUBLIC_KEY) : null
 
 const FORM_ID = 'new-org-form'
 

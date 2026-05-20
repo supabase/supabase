@@ -27,6 +27,7 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export function OrgSelector() {
   const router = useRouter()
@@ -42,7 +43,7 @@ export function OrgSelector() {
   const selectedOrgInitial = selectedOrganization?.name?.trim().charAt(0).toUpperCase() || 'O'
   const { data: projects } = useOrgProjectsInfiniteQuery(
     { slug, limit: 1 },
-    { enabled: Boolean(slug) && !isPlatformOrg }
+    { enabled: Boolean(slug) && !isPlatformOrg && IS_PLATFORM }
   )
 
   const numProjects = projects?.pages[0]?.pagination.count

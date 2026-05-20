@@ -22,6 +22,7 @@ import { useOrganizationRolesV2Query } from '@/data/organization-members/organiz
 import { OrganizationMember } from '@/data/organizations/organization-members-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 
 interface MemberRowProps {
@@ -42,7 +43,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
-  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: IS_PLATFORM })
   const orgProjects =
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 

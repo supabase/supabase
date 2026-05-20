@@ -30,6 +30,7 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
@@ -102,7 +103,7 @@ export const AuditLogs = () => {
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { placeholderData: keepPreviousData, enabled: showFilters }
+    { placeholderData: keepPreviousData, enabled: IS_PLATFORM && showFilters }
   )
   const { data: organizations } = useOrganizationsQuery({
     enabled: showFilters,

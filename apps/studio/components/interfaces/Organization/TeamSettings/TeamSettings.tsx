@@ -18,7 +18,7 @@ import {
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export const TeamSettings = () => {
   const { slug } = useParams()
@@ -27,7 +27,7 @@ export const TeamSettings = () => {
   const { data: roles } = useOrganizationRolesV2Query({ slug })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
-  const { data } = useOrgProjectsInfiniteQuery({ slug })
+  const { data } = useOrgProjectsInfiniteQuery({ slug }, { enabled: IS_PLATFORM })
   const totalCount = data?.pages[0].pagination.count ?? 0
   const threshold = 1000
 

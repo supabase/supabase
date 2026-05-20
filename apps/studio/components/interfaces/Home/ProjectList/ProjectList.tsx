@@ -80,6 +80,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     },
     {
       placeholderData: keepPreviousData,
+      enabled: IS_PLATFORM,
     }
   )
   const orgProjects =
