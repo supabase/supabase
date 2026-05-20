@@ -8,6 +8,9 @@ import { Index } from '@/__registry__'
 import { useConfig } from '@/hooks/use-config'
 import { styles } from '@/registry/styles'
 
+const previewPaddingClassNameRegex =
+  /^(?:(?:\[[^\]]+\]|[^\s:]+):)*!?p[trblxy]?-(?:\d+(?:\.\d+)?|px|\[[^\]]+\])$/
+
 interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string
   extractClassname?: boolean
@@ -44,7 +47,7 @@ export function ComponentPreview({
   const previewClassName = className
   const hasPreviewPaddingClass = previewClassName
     ?.split(/\s+/)
-    .some((value) => /^p[trblxy]?-\d/.test(value))
+    .some((value) => previewPaddingClassNameRegex.test(value))
 
   const Preview = React.useMemo(() => {
     const Component = Index[config.style][name]?.component

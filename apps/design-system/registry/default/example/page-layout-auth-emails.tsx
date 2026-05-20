@@ -169,6 +169,11 @@ function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
     },
   })
 
+  const handleSave = (values: z.infer<typeof NotificationsFormSchema>) => {
+    notificationsForm.reset(values)
+    notificationsForm.clearErrors()
+  }
+
   return (
     <>
       <PageHeader size="small">
@@ -230,7 +235,7 @@ function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
           </PageSectionMeta>
           <PageSectionContent>
             <Form {...notificationsForm}>
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={notificationsForm.handleSubmit(handleSave)}>
                 <Card>
                   {SECURITY_TEMPLATES.map((template) => {
                     const fieldName =
@@ -290,8 +295,6 @@ function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
 }
 
 function SmtpPage() {
-  const [enableSmtp, setEnableSmtp] = useState(false)
-
   const form = useForm<z.infer<typeof SmtpFormSchema>>({
     resolver: zodResolver(SmtpFormSchema),
     defaultValues: {
@@ -304,6 +307,7 @@ function SmtpPage() {
       SMTP_USER: '',
     },
   })
+  const enableSmtp = form.watch('ENABLE_SMTP')
 
   return (
     <>
@@ -335,13 +339,7 @@ function SmtpPage() {
                           description="Emails will be sent using your custom SMTP provider. Email rate limits can be adjusted in rate limits settings."
                         >
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={(value) => {
-                                field.onChange(value)
-                                setEnableSmtp(value)
-                              }}
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                         </FormItemLayout>
                       )}

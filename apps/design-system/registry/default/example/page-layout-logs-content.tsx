@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { FilterBar, type FilterGroup } from 'ui-patterns'
+import { FilterBar, isGroup, type FilterCondition, type FilterGroup } from 'ui-patterns'
 
 const logs = [
   ['10:42:01.129', 'POST /hello-world', '200', '132ms', 'iad1'],
@@ -39,9 +39,69 @@ const initialLogFilters: FilterGroup = {
   conditions: [],
 }
 
+type LogRow = (typeof logs)[number]
+
+function getLogValue(log: LogRow, propertyName: string) {
+  const [, request, status, , region] = log
+
+  switch (propertyName) {
+    case 'request':
+      return request
+    case 'status':
+      return status
+    case 'region':
+      return region
+    default:
+      return undefined
+  }
+}
+
+function matchesLogCondition(log: LogRow, condition: FilterCondition) {
+  const actualValue = getLogValue(log, condition.propertyName)
+
+  if (actualValue === undefined || condition.value === '' || condition.value === null) {
+    return true
+  }
+
+  const actual = String(actualValue).toLowerCase()
+  const expected = String(condition.value).toLowerCase()
+
+  switch (condition.operator) {
+    case '=':
+      return actual === expected
+    case '!=':
+      return actual !== expected
+    case 'CONTAINS':
+      return actual.includes(expected)
+    default:
+      return true
+  }
+}
+
+function matchesLogFilters(log: LogRow, filterGroup: FilterGroup): boolean {
+  if (filterGroup.conditions.length === 0) {
+    return true
+  }
+
+  const conditionMatches = filterGroup.conditions.map((condition) =>
+    isGroup(condition) ? matchesLogFilters(log, condition) : matchesLogCondition(log, condition)
+  )
+
+  return filterGroup.logicalOperator === 'AND'
+    ? conditionMatches.every(Boolean)
+    : conditionMatches.some(Boolean)
+}
+
 export function PageLayoutLogsContent() {
   const [filters, setFilters] = useState<FilterGroup>(initialLogFilters)
   const [freeformText, setFreeformText] = useState('')
+  const normalizedFreeformText = freeformText.trim().toLowerCase()
+  const filteredLogs = logs.filter(
+    (log) =>
+      matchesLogFilters(log, filters) &&
+      (normalizedFreeformText === '' ||
+        log.some((value) => value.toLowerCase().includes(normalizedFreeformText)))
+  )
 
   return (
     <div className="overflow-hidden bg-surface-75">
@@ -78,7 +138,7 @@ export function PageLayoutLogsContent() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {logs.map(([time, request, status, duration, region]) => (
+          {filteredLogs.map(([time, request, status, duration, region]) => (
             <TableRow key={`${time}-${region}`}>
               <TableCell className="font-mono text-xs text-foreground-lighter">{time}</TableCell>
               <TableCell className="font-mono text-xs">{request}</TableCell>
