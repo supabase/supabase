@@ -47,8 +47,12 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
   const { copy, isCopied } = useCopyToClipboard()
+
   const field = !!fieldValue ? filterFields.find((f) => f.value === fieldValue) : undefined
-  const column = !!fieldValue ? table.getColumn(fieldValue.toString()) : undefined
+  const column =
+    !!fieldValue && !!field
+      ? table.getAllColumns().find((c) => c.id === fieldValue.toString())
+      : undefined
 
   function renderOptions() {
     if (!field) return null

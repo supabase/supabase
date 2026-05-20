@@ -91,9 +91,24 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const cloudProvider = useDefaultProvider()
+
+  const getConfigCatFlags = useCallback(
+    (userEmail?: string) => {
+      const customAttributes: Record<string, string> = {}
+      if (cloudProvider) customAttributes.cloud_provider = cloudProvider
+      if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      return getFlags(userEmail, customAttributes)
+    },
+    [cloudProvider, selectedOrganization?.plan?.id]
+  )
 
   return (
-    <FeatureFlagProvider {...props} organizationSlug={selectedOrganization?.slug ?? undefined}>
+    <FeatureFlagProvider
+      {...props}
+      getConfigCatFlags={getConfigCatFlags}
+      organizationSlug={selectedOrganization?.slug ?? undefined}
+    >
       {children}
     </FeatureFlagProvider>
   )
@@ -149,16 +164,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   // [Joshen] Should target hosted staging, local dev, and local CLI only
   const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
 
-  const cloudProvider = useDefaultProvider()
-
-  const getConfigCatFlags = useCallback(
-    (userEmail?: string) => {
-      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
-      return getFlags(userEmail, customAttributes)
-    },
-    [cloudProvider]
-  )
-
   const checkCliEnvironment = async () => {
     const data = await getCLIReleaseVersion()
     if (!!data.current) setIsCLI(true)
@@ -174,11 +179,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         <NuqsAdapter>
           <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
-              <FeatureFlagProviderWithOrgContext
-                API_URL={API_URL}
-                enabled={IS_PLATFORM}
-                getConfigCatFlags={getConfigCatFlags}
-              >
+              <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
                 <ProfileProvider>
                   <TimezoneProvider>
                     <TimestampInfoTimezoneBridge>

@@ -4,12 +4,12 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import * as React from 'react'
 import {
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -61,13 +61,13 @@ export default function ComboboxDemo() {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search framework..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No framework found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+        <Command>
+          <CommandInput placeholder="Search framework..." />
+          <CommandList>
+            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandGroup>
               {frameworks.map((framework) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={framework.value}
                   value={framework.value}
                   onSelect={(currentValue) => {
@@ -82,11 +82,11 @@ export default function ComboboxDemo() {
                     )}
                   />
                   {framework.label}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   )

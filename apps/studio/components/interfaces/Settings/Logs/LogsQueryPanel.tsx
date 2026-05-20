@@ -7,12 +7,12 @@ import {
   Badge,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
@@ -280,13 +280,13 @@ const LogsQueryPanel = ({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="p-0" sameWidthAsTrigger>
-                  <Command_Shadcn_>
-                    <CommandInput_Shadcn_ placeholder="Search source..." />
-                    <CommandList_Shadcn_>
-                      <CommandEmpty_Shadcn_>No source found.</CommandEmpty_Shadcn_>
-                      <CommandGroup_Shadcn_>
+                  <Command>
+                    <CommandInput placeholder="Search source..." />
+                    <CommandList>
+                      <CommandEmpty>No source found.</CommandEmpty>
+                      <CommandGroup>
                         {logConstants.schemas.map((schema) => (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             key={schema.reference}
                             value={schema.reference}
                             onSelect={() => {
@@ -301,11 +301,11 @@ const LogsQueryPanel = ({
                               )}
                             />
                             {schema.name}
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         ))}
-                      </CommandGroup_Shadcn_>
-                    </CommandList_Shadcn_>
-                  </Command_Shadcn_>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
                 </PopoverContent>
               </Popover>
               <Table

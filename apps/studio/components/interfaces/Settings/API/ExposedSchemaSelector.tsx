@@ -3,12 +3,12 @@ import { useMemo, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -90,10 +90,10 @@ export const ExposedSchemaSelector = ({
         align="start"
         sameWidthAsTrigger
       >
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ className="text-xs" placeholder="Find schema..." />
-          <CommandList_Shadcn_>
-            <CommandGroup_Shadcn_>
+        <Command>
+          <CommandInput className="text-xs" placeholder="Find schema..." />
+          <CommandList>
+            <CommandGroup>
               {isPending ? (
                 <>
                   <div className="px-2 py-1">
@@ -109,11 +109,11 @@ export const ExposedSchemaSelector = ({
                 </div>
               ) : (
                 <>
-                  <CommandEmpty_Shadcn_>
+                  <CommandEmpty>
                     <p className="text-xs text-center text-foreground-lighter py-3">
                       No schemas found
                     </p>
-                  </CommandEmpty_Shadcn_>
+                  </CommandEmpty>
                   <ScrollArea className={schemas.length > 7 ? 'h-[210px]' : ''}>
                     {missingExposedSchema.map((schema) => (
                       <CommandItem_Shadcn_
@@ -139,7 +139,7 @@ export const ExposedSchemaSelector = ({
                       const isExposed = selectedSet.has(schema.name)
 
                       return (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={schema.id}
                           value={schema.name}
                           className="cursor-pointer w-full"
@@ -153,15 +153,15 @@ export const ExposedSchemaSelector = ({
                             {isExposed && <Check size={16} className="text-brand shrink-0" />}
                             <span className="truncate">{schema.name}</span>
                           </div>
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       )
                     })}
                   </ScrollArea>
                 </>
               )}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   )

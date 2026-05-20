@@ -2,17 +2,17 @@
 
 import React, { ComponentProps, useState } from 'react'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
+  AccordionContent,
+  AccordionTrigger,
+  Accordion as BaseAccordion,
+  AccordionItem as BaseAccordionItem,
   cn,
 } from 'ui'
 
 type Type = 'default' | 'bordered'
 type Align = 'left' | 'right'
 
-type BaseAccordionProps = ComponentProps<typeof Accordion_Shadcn_>
+type BaseAccordionProps = ComponentProps<typeof Accordion>
 
 export interface AccordionProps {
   children?: React.ReactNode
@@ -39,14 +39,14 @@ export function Accordion({
 }: AccordionProps) {
   return (
     // @ts-expect-error: This is because the Radix component has 2 interfaces discriminated by its type prop. Safe to ignore
-    <Accordion_Shadcn_
+    <BaseAccordion
       type={openBehaviour}
       onValueChange={onChange}
       defaultValue={defaultValue}
       className={className}
     >
       {children}
-    </Accordion_Shadcn_>
+    </BaseAccordion>
   )
 }
 
@@ -63,7 +63,7 @@ export function AccordionItem({ children, className, header, id, disabled }: Ite
   const [open, setOpen] = useState(false)
 
   return (
-    <AccordionItem_Shadcn_
+    <BaseAccordionItem
       value={id}
       // my-0 is required to avoid issues with the prose classes
       className={cn('*:my-0', className)}
@@ -72,8 +72,8 @@ export function AccordionItem({ children, className, header, id, disabled }: Ite
         setOpen(!open)
       }}
     >
-      <AccordionTrigger_Shadcn_ className="text-sm">{header}</AccordionTrigger_Shadcn_>
-      <AccordionContent_Shadcn_>{children}</AccordionContent_Shadcn_>
-    </AccordionItem_Shadcn_>
+      <AccordionTrigger className="text-sm">{header}</AccordionTrigger>
+      <AccordionContent>{children}</AccordionContent>
+    </BaseAccordionItem>
   )
 }

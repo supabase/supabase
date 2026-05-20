@@ -3,10 +3,10 @@ import { ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Accordion_Shadcn_ as Accordion,
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Button,
   Checkbox,
   cn,

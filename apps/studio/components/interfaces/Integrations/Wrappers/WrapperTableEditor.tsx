@@ -12,12 +12,12 @@ import {
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Form,
   FormControl,
   FormField,
@@ -136,14 +136,14 @@ const WrapperTableEditor = ({
                 </Button>
               </PopoverTrigger>
               <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Find a table..." />
-                  <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No targets found</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
+                <Command>
+                  <CommandInput placeholder="Find a table..." />
+                  <CommandList>
+                    <CommandEmpty>No targets found</CommandEmpty>
+                    <CommandGroup>
                       <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
                         {(tables ?? []).map((table, i) => (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             key={table.label}
                             className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                             onSelect={() => {
@@ -162,12 +162,12 @@ const WrapperTableEditor = ({
                             {String(i) === selectedTableIndex && (
                               <Check className={cn('mr-2 h-4 w-4')} />
                             )}
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         ))}
                       </ScrollArea>
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
               </PopoverContent>
             </Popover>
           </div>

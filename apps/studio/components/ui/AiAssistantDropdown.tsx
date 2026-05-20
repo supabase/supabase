@@ -1,6 +1,7 @@
 import { AiAssistantSource } from 'common/telemetry-constants'
 import { Chatgpt, Claude } from 'icons'
 import { Check, ChevronDown, Copy } from 'lucide-react'
+import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import {
   AiIconAnimation,
@@ -41,7 +42,8 @@ const EXTERNAL_AI_TOOLS = [
 export interface AiAssistantDropdownItem {
   label: string
   icon?: ReactNode
-  onClick: () => void
+  href?: string
+  onClick?: () => void
 }
 
 export interface AiAssistantDropdownProps {
@@ -59,7 +61,6 @@ export interface AiAssistantDropdownProps {
   tooltip?: string
   copyLabel?: string
   showExternalAI?: boolean
-  extraDropdownItems?: ReactNode
   additionalDropdownItems?: AiAssistantDropdownItem[]
 }
 
@@ -78,7 +79,6 @@ export function AiAssistantDropdown({
   tooltip,
   copyLabel = 'Copy prompt',
   showExternalAI = false,
-  extraDropdownItems,
   additionalDropdownItems,
 }: AiAssistantDropdownProps) {
   const track = useTrack()
@@ -150,11 +150,11 @@ export function AiAssistantDropdown({
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
-          {extraDropdownItems}
           <DropdownMenuItem onClick={handleCopyPrompt} className="gap-2">
             {showCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
             {showCopied ? 'Copied!' : copyLabel}
           </DropdownMenuItem>
+
           {showExternalAI && (
             <>
               <DropdownMenuSeparator />
@@ -170,13 +170,23 @@ export function AiAssistantDropdown({
               ))}
             </>
           )}
+
           {additionalDropdownItems && additionalDropdownItems.length > 0 && (
             <>
               <DropdownMenuSeparator />
               {additionalDropdownItems.map((item, i) => (
                 <DropdownMenuItem key={i} onClick={item.onClick} className="gap-2">
-                  {item.icon}
-                  {item.label}
+                  {item.href ? (
+                    <Link href={item.href} target="_blank" rel="noreferrer">
+                      {item.icon}
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <>
+                      {item.icon}
+                      {item.label}
+                    </>
+                  )}
                 </DropdownMenuItem>
               ))}
             </>

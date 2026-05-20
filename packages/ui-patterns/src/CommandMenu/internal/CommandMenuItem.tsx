@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef, type PropsWithChildren } from 'react'
-import { cn, CommandItem_Shadcn_ } from 'ui'
+import { cn, CommandItem } from 'ui'
 
 import { useQuery } from '../api/hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from '../api/hooks/useCommandMenuTelemetryContext'
@@ -45,12 +45,12 @@ data-[disabled=true]:opacity-50
 `
   )
 
-interface CommandItemProps extends React.ComponentPropsWithoutRef<typeof CommandItem_Shadcn_> {
+interface CommandItemProps extends React.ComponentPropsWithoutRef<typeof CommandItem> {
   command: ICommand
 }
 
-const CommandItem = forwardRef<
-  React.ElementRef<typeof CommandItem_Shadcn_>,
+const CommandMenuItem = forwardRef<
+  React.ElementRef<typeof CommandItem>,
   PropsWithChildren<CommandItemProps>
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useCrossCompatRouter()
@@ -95,7 +95,7 @@ const CommandItem = forwardRef<
   }
 
   return (
-    <CommandItem_Shadcn_
+    <CommandItem
       ref={ref}
       onSelect={handleCommandSelect}
       value={command.value ?? command.name}
@@ -114,9 +114,9 @@ const CommandItem = forwardRef<
         </div>
         {command.badge?.()}
       </div>
-    </CommandItem_Shadcn_>
+    </CommandItem>
   )
 })
-CommandItem.displayName = CommandItem_Shadcn_.displayName
+CommandMenuItem.displayName = 'CommandMenuItem'
 
-export { CommandItem, generateCommandClassNames }
+export { CommandMenuItem, generateCommandClassNames }
