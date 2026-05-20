@@ -4,16 +4,16 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import {
+  AwsMarketplaceOnboardingScreen,
+  type AwsMarketplaceMockState,
+} from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboarding'
 import type {
   CloudMarketplaceContractLinkingEligibility,
   CloudMarketplaceOnboardingInfo,
 } from '@/components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
 import { API_URL } from '@/lib/constants'
 import type { ProfileContextType } from '@/lib/profile'
-import {
-  AwsMarketplaceOnboardingScreen,
-  type AwsMarketplaceMockState,
-} from '@/pages/aws-marketplace-onboarding'
 import { createMockOrganization } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
