@@ -13,9 +13,9 @@ import { analyticsKeys } from '@/data/analytics/keys'
 import {
   getServiceHealth,
   type ServiceHealthGranularity,
+  type ServiceHealthResultRow,
 } from '@/data/analytics/service-health-query'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
-import useTimeseriesUnixToIso from '@/hooks/analytics/useTimeseriesUnixToIso'
 
 export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'
 
@@ -38,20 +38,47 @@ const INTERVAL_TO_GRANULARITY: Record<'1hr' | '1day' | '7day', ServiceHealthGran
   '7day': 'day',
 }
 
+/** Maps our service keys to the field names returned by the service-health endpoint */
+const SERVICE_RESPONSE_KEY: Record<ServiceKey, keyof ServiceHealthResultRow> = {
+  db: 'postgres_logs',
+  auth: 'auth_logs',
+  functions: 'function_edge_logs',
+  storage: 'storage_logs',
+  realtime: 'realtime_logs',
+  postgrest: 'postgrest_logs',
+}
+
+/** Extracts a single service's rows from the shared service-health response */
+function extractServiceRows(
+  rows: ServiceHealthResultRow[],
+  serviceKey: ServiceKey
+): RawChartData[] {
+  const responseKey = SERVICE_RESPONSE_KEY[serviceKey]
+  return rows.map((row) => {
+    const svc = row[responseKey] as { ok: number; warning: number; error: number }
+    return {
+      timestamp: row.timestamp,
+      ok_count: svc?.ok ?? 0,
+      warning_count: svc?.warning ?? 0,
+      error_count: svc?.error ?? 0,
+    }
+  })
+}
+
 /**
- * Hook to fetch health metrics for a single service using the service-health endpoint.
- * NOTE: lql is intentionally omitted while the backend team confirms the expected
- * per-service filtering contract. Without lql all 6 calls share the same query key
- * and React Query deduplicates them to a single network request.
+ * Hook to fetch and process health metrics for a single service.
+ * All service hooks share one deduplicated network request via the same query key.
  */
 const useServiceHealthQuery = ({
   projectRef,
+  serviceKey,
   startDate,
   endDate,
   granularity,
   enabled,
 }: {
   projectRef: string
+  serviceKey: ServiceKey
   startDate: string
   endDate: string
   granularity: ServiceHealthGranularity
@@ -62,17 +89,18 @@ const useServiceHealthQuery = ({
     queryFn: ({ signal }) =>
       getServiceHealth({ projectRef, startDate, endDate, granularity }, signal),
     enabled: enabled && Boolean(projectRef),
-    staleTime: 1000 * 60, // 1 minute
+    staleTime: 1000 * 60,
   })
 
-  const rawRows = (queryResult.data?.result ?? []) as RawChartData[]
-
-  // Convert unix microseconds to ISO timestamps (no-op if already ISO)
-  const normalizedData = useTimeseriesUnixToIso(rawRows, 'timestamp')
+  const rawRows = useMemo(
+    () => extractServiceRows(queryResult.data?.result ?? [], serviceKey),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [queryResult.data, serviceKey]
+  )
 
   // Fill gaps in timeseries
   const { data: filledData } = useFillTimeseriesSorted({
-    data: normalizedData,
+    data: rawRows as any,
     timestampKey: 'timestamp',
     valueKey: 'ok_count',
     defaultValue: 0,
@@ -80,13 +108,11 @@ const useServiceHealthQuery = ({
     endDate,
   })
 
-  // Transform to LogsBarChartDatum format
   const eventChartData: LogsBarChartDatum[] = useMemo(
     () => transformToBarChartData(filledData as RawChartData[]),
     [filledData]
   )
 
-  // Calculate metrics
   const metrics = useMemo(() => calculateHealthMetrics(eventChartData), [eventChartData])
 
   return {
@@ -99,7 +125,8 @@ const useServiceHealthQuery = ({
 }
 
 /**
- * Hook to fetch observability overview data for all services using the service-health endpoint
+ * Hook to fetch observability overview data for all services using the service-health endpoint.
+ * One network request is made; results are fanned out to each service by field name.
  */
 export const useServiceHealthMetrics = (
   projectRef: string,
@@ -114,22 +141,15 @@ export const useServiceHealthMetrics = (
 
   const sharedParams = { projectRef, startDate, endDate, granularity, enabled }
 
-  const db = useServiceHealthQuery(sharedParams)
-  const auth = useServiceHealthQuery(sharedParams)
-  const functions = useServiceHealthQuery(sharedParams)
-  const storage = useServiceHealthQuery(sharedParams)
-  const realtime = useServiceHealthQuery(sharedParams)
-  const postgrest = useServiceHealthQuery(sharedParams)
+  const db = useServiceHealthQuery({ ...sharedParams, serviceKey: 'db' })
+  const auth = useServiceHealthQuery({ ...sharedParams, serviceKey: 'auth' })
+  const functions = useServiceHealthQuery({ ...sharedParams, serviceKey: 'functions' })
+  const storage = useServiceHealthQuery({ ...sharedParams, serviceKey: 'storage' })
+  const realtime = useServiceHealthQuery({ ...sharedParams, serviceKey: 'realtime' })
+  const postgrest = useServiceHealthQuery({ ...sharedParams, serviceKey: 'postgrest' })
 
   const services: Record<ServiceKey, ServiceHealthData> = useMemo(
-    () => ({
-      db,
-      auth,
-      functions,
-      storage,
-      realtime,
-      postgrest,
-    }),
+    () => ({ db, auth, functions, storage, realtime, postgrest }),
     [db, auth, functions, storage, realtime, postgrest]
   )
 

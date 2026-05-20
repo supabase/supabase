@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { paths } from 'api-types'
 
 import { analyticsKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
@@ -7,28 +6,42 @@ import { UseCustomQueryOptions } from '@/types'
 
 export type ServiceHealthGranularity = 'day' | 'hour' | 'minute'
 
-export type ServiceHealthRow = {
-  timestamp: string | number
-  ok_count: number
-  warning_count: number
-  error_count: number
+export type ServiceHealthServiceData = {
+  error: number
+  ok: number
+  warning: number
+  total: number
 }
 
-export type ProjectServiceHealthResponse = NonNullable<
-  paths['/platform/projects/{ref}/analytics/endpoints/service-health']['get']['responses']['200']['content']['application/json']
->
+/** Shape of a single result row returned by the service-health endpoint */
+export type ServiceHealthResultRow = {
+  timestamp: string
+  postgres_logs: ServiceHealthServiceData
+  auth_logs: ServiceHealthServiceData
+  function_edge_logs: ServiceHealthServiceData
+  storage_logs: ServiceHealthServiceData
+  realtime_logs: ServiceHealthServiceData
+  postgrest_logs: ServiceHealthServiceData
+  edge_logs: ServiceHealthServiceData
+  supavisor_logs: ServiceHealthServiceData
+  function_logs: ServiceHealthServiceData
+  etl_replication_logs: ServiceHealthServiceData
+}
+
+export type ProjectServiceHealthResponse = {
+  error?: string | null
+  result?: ServiceHealthResultRow[]
+}
 
 export type ServiceHealthVariables = {
   projectRef?: string
   startDate?: string
   endDate?: string
   granularity?: ServiceHealthGranularity
-  lql?: string
-  sql?: string
 }
 
 export async function getServiceHealth(
-  { projectRef, startDate, endDate, granularity, lql, sql }: ServiceHealthVariables,
+  { projectRef, startDate, endDate, granularity }: ServiceHealthVariables,
   signal?: AbortSignal
 ): Promise<ProjectServiceHealthResponse> {
   if (!projectRef) throw new Error('Project ref is required')
@@ -42,8 +55,6 @@ export async function getServiceHealth(
         iso_timestamp_start: startDate,
         iso_timestamp_end: endDate,
         granularity,
-        lql,
-        sql,
       },
     },
     signal,
@@ -64,16 +75,16 @@ export type ServiceHealthError = unknown
 export type ServiceHealthData = Awaited<ReturnType<typeof getServiceHealth>>
 
 export const useServiceHealthQuery = <TData = ServiceHealthData>(
-  { projectRef, startDate, endDate, granularity, lql, sql }: ServiceHealthVariables,
+  { projectRef, startDate, endDate, granularity }: ServiceHealthVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ServiceHealthData, ServiceHealthError, TData> = {}
 ) =>
   useQuery<ServiceHealthData, ServiceHealthError, TData>({
-    queryKey: analyticsKeys.serviceHealth(projectRef, { startDate, endDate, granularity, lql }),
+    queryKey: analyticsKeys.serviceHealth(projectRef, { startDate, endDate, granularity }),
     queryFn: ({ signal }) =>
-      getServiceHealth({ projectRef, startDate, endDate, granularity, lql, sql }, signal),
+      getServiceHealth({ projectRef, startDate, endDate, granularity }, signal),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
