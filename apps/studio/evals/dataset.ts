@@ -70,17 +70,34 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
-        "Create a public Storage bucket named avatars for profile pictures. It only needs public read access; users shouldn't need signed URLs to view images.",
+        'Create a Storage bucket named marketing-assets for our public website. The marketing team will use it for logos, product screenshots, and campaign images that visitors should be able to load directly.',
     },
     expected: {
       requiredTools: ['execute_sql'],
       correctAnswer:
-        'Create the avatars Storage bucket as public, such as by setting storage.buckets.public = true or using a Storage API call with public: true. Do not add a broad SELECT policy on storage.objects for public read access, because public buckets already allow object URL reads and broad SELECT policies can make bucket contents listable.',
+        'The marketing-assets bucket is public, such as storage.buckets.public = true or a Storage API call with public: true. The answer does not add a broad SELECT or ALL policy on storage.objects for public read access, because public buckets already allow object URL reads and broad SELECT policies can make bucket contents listable.',
     },
     metadata: {
       category: ['rls_policies'],
       description:
-        'Verifies the assistant does not add a Storage SELECT policy for public read access on a public bucket.',
+        'Verifies the assistant infers a public bucket for public website assets without adding a broad Storage SELECT policy.',
+    },
+  },
+  {
+    input: {
+      prompt:
+        'Create a Storage bucket named avatars for user profile pictures. Users should be able to view known avatar images in the app with the public anon key, but clients should not be able to list all uploaded avatars. Users should only be able to upload or update their own avatar.',
+    },
+    expected: {
+      requiredTools: ['execute_sql'],
+      requiredKnowledge: ['rls'],
+      correctAnswer:
+        "The avatars bucket is private rather than public. The SELECT policy on storage.objects is restrictive and allows only object retrieval/info operations for known avatar paths, such as by checking bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']). The answer does not use a broad SELECT policy like using (bucket_id = 'avatars') by itself, because that can allow clients to list all uploaded avatars. Upload and update policies are scoped to authenticated users and constrain users to their own avatar, using owner or path checks.",
+    },
+    metadata: {
+      category: ['rls_policies'],
+      description:
+        'Verifies the assistant uses operation-scoped Storage RLS for readable avatars without enabling broad object listing.',
     },
   },
   {
