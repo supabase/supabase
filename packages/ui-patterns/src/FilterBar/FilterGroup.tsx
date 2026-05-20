@@ -21,7 +21,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     filterProperties,
     activeInput,
     freeformText,
-    isLoading,
     supportsOperators,
     actions,
     variant,
@@ -176,7 +175,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
             </React.Fragment>
           )
         })}
-        <Popover open={isActive && !isLoading && items.length > 0 && !highlightedConditionPath}>
+        <Popover open={isActive && items.length > 0 && !highlightedConditionPath}>
           <PopoverAnchor asChild>
             {isRootGroup ? (
               <Input
@@ -191,7 +190,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 placeholder={
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
-                disabled={isLoading}
                 data-testid="filter-bar-freeform-input"
                 autoComplete="off"
                 data-1p-ignore
@@ -210,7 +208,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   onKeyDown={handleFreeformKeyDown}
                   className="h-full border-none bg-transparent py-0 text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0 px-2"
                   placeholder="+ Add filter"
-                  disabled={isLoading}
                   autoComplete="off"
                   data-1p-ignore
                   data-lpignore="true"

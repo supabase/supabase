@@ -7,6 +7,7 @@ import { Fragment, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
+import AlertError from '../AlertError'
 import { formatCompactNumber } from './DataTable.utils'
 import { useDataTable } from './providers/DataTableProvider'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table'
@@ -44,7 +45,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   setColumnVisibility,
   searchParamsParser,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
-  const { table, isLoading, isFetching } = useDataTable()
+  const { table, error, isError, isLoading, isFetching } = useDataTable()
   const tableRef = useRef<HTMLTableElement>(null)
 
   const headerGroups = table.getHeaderGroups()
@@ -144,6 +145,20 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                 ))}
               </TableRow>
             ))}
+          </Fragment>
+        ) : isError ? (
+          <Fragment>
+            <TableRow className="hover:bg-transparent h-full">
+              <TableCell colSpan={columns.length} className="text-center">
+                <div className="flex flex-col items-start justify-start h-full gap-3 px-4 pt-4">
+                  <AlertError
+                    error={error}
+                    className="text-left"
+                    subject="Failed to retrieve logs"
+                  />
+                </div>
+              </TableCell>
+            </TableRow>
           </Fragment>
         ) : (
           <Fragment>
