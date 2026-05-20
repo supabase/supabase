@@ -1658,7 +1658,7 @@ export const functions: NavMenuConstant = {
         },
         {
           name: 'Worker timeouts and WebSocket drops',
-          url: '/docs/troubleshooting/edge-functions-worker-timeouts-and-websocket-drops' as `/${string}`,
+          url: '/troubleshooting/edge-functions-worker-timeouts-and-websocket-drops' as `/${string}`,
         },
       ],
     },

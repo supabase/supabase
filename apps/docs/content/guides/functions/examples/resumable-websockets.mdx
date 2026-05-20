@@ -112,20 +112,42 @@ Deno.serve(async (req) => {
     const msg = JSON.parse(event.data)
 
     if (msg.type === 'user_message') {
-      await admin.from('ws_idempotency_keys').insert({
-        session_id: sessionId,
-        idempotency_key: msg.idempotency_key,
-      })
+      const { error: idempotencyError } = await admin
+        .from('ws_idempotency_keys')
+        .upsert(
+          {
+            session_id: sessionId,
+            idempotency_key: msg.idempotency_key,
+          },
+          { onConflict: 'session_id,idempotency_key', ignoreDuplicates: true }
+        )
 
-      const { data: userEvent } = await admin
-        .from('ws_events')
-        .insert({
-          session_id: sessionId,
-          event_type: 'user_message',
-          payload: { content: msg.content },
-        })
-        .select()
-        .single()
+      let userEvent
+
+      if (idempotencyError) {
+        // Conflict detected - this is a retry, fetch the existing event
+        const { data: existingEvent } = await admin
+          .from('ws_events')
+          .select()
+          .eq('session_id', sessionId)
+          .eq('idempotency_key', msg.idempotency_key)
+          .single()
+
+        userEvent = existingEvent
+      } else {
+        // New idempotency key - insert the event
+        const { data: newEvent } = await admin
+          .from('ws_events')
+          .insert({
+            session_id: sessionId,
+            event_type: 'user_message',
+            payload: { content: msg.content },
+          })
+          .select()
+          .single()
+
+        userEvent = newEvent
+      }
 
       send(socket, {
         type: 'user_message',
