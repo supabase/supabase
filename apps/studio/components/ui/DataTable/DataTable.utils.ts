@@ -63,8 +63,8 @@ export function getLevelColor(
     case 'success':
       return {
         text: 'text-muted',
-        bg: 'bg-muted',
-        border: 'border-muted',
+        bg: 'bg-muted group-data-[state=selected]/row:bg-foreground-lighter',
+        border: 'border-muted group-data-[state=selected]/row:border-foreground-lighter',
       }
     case 'warning':
       return {
