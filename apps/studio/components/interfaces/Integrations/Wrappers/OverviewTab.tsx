@@ -155,10 +155,9 @@ const AddNewWrapperCTA = () => {
   )
 }
 
-export const WrapperOverviewTab = () => {
+export const WrapperContent = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const { data: integrations = [] } = useAvailableIntegrations()
   const integration = integrations.find((i) => i.id === id)
@@ -183,24 +182,26 @@ export const WrapperOverviewTab = () => {
     )
   }
 
+  return (
+    <>
+      <AddNewWrapperCTA />
+      {isInstalled && <WrapperOverviewContent />}
+    </>
+  )
+}
+
+export const WrapperOverviewTab = () => {
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
+
   if (isMarketplaceEnabled) {
-    return (
-      <IntegrationOverviewTabV2>
-        {isInstalled && (
-          <>
-            <AddNewWrapperCTA />
-            <WrapperOverviewContent />
-          </>
-        )}
-      </IntegrationOverviewTabV2>
-    )
-  } else {
-    return (
-      <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>
-        <div className="mx-10">
-          <WrapperOverviewContent />
-        </div>
-      </IntegrationOverviewTab>
-    )
+    return <WrapperContent />
   }
+
+  return (
+    <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>
+      <div className="mx-10">
+        <WrapperOverviewContent />
+      </div>
+    </IntegrationOverviewTab>
+  )
 }

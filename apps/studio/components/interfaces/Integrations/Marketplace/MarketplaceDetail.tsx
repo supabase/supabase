@@ -78,12 +78,15 @@ export const MarketplaceDetail = () => {
     return <InstallIntegrationSheet integration={integration} />
   }
 
+  // For overview route, get the integration-specific overview component if available
+  const OverviewComponent = activeRoute === 'overview' ? Component : null
   const CustomPageComponent = activeRoute !== 'overview' && isKnownRoute ? Component : null
 
   return (
     <>
       <MarketplaceDetailTopBar
         title={integration.name}
+        integration={integration}
         isInstalled={isInstalled}
         actions={
           <>
@@ -114,7 +117,9 @@ export const MarketplaceDetail = () => {
 
       {activeRoute === 'overview' ? (
         <div className={centeredContentClass}>
-          <OverviewTab integration={integration} isInstalled={isInstalled} />
+          <OverviewTab integration={integration} isInstalled={isInstalled}>
+            {OverviewComponent && <OverviewComponent />}
+          </OverviewTab>
         </div>
       ) : CustomPageComponent ? (
         layout === 'constrained' ? (

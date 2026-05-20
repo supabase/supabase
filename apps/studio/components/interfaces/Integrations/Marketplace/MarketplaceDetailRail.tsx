@@ -26,7 +26,7 @@ const RailRow = ({ label, value, href, mono }: RailRowProps) => {
   )
   return (
     <div className="flex flex-col gap-1">
-      <div className="text-xs text-foreground-lighter">{label}</div>
+      <div className="font-mono text-xs uppercase text-foreground-lighter">{label}</div>
       {href ? (
         <a href={href} target="_blank" rel="noreferrer" className={valueCls}>
           {content}
@@ -45,9 +45,7 @@ interface RailGroupProps {
 
 const RailGroup = ({ title, children }: RailGroupProps) => (
   <div className="flex flex-col gap-3 border-b pb-4 last:border-b-0">
-    <div className="font-mono text-[10px] uppercase tracking-widest text-foreground-lighter">
-      {title}
-    </div>
+    <div className="text-sm text-foreground">{title}</div>
     <div className="flex flex-col gap-3">{children}</div>
   </div>
 )

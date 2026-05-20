@@ -4,7 +4,6 @@ import { Alert, AlertTitle, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
-import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DataApiEnableSwitch } from '@/components/interfaces/Settings/API/DataApiEnableSwitch'
 import { DataApiProjectUrlCard } from '@/components/interfaces/Settings/API/DataApiProjectUrlCard'
@@ -12,7 +11,7 @@ import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 
-const DataApiOverview = () => {
+export const DataApiOverview = () => {
   const { ref: projectRef } = useParams()
   const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
   const { isEnabled, isPending: isConfigLoading } = useIsDataApiEnabled({ projectRef })
@@ -52,19 +51,17 @@ const DataApiOverview = () => {
 export const DataApiOverviewTab = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
+  // For marketplace, return just the content — the marketplace overview wrapper will handle layout
   if (isMarketplaceEnabled) {
-    return (
-      <IntegrationOverviewTabV2>
-        <DataApiOverview />
-      </IntegrationOverviewTabV2>
-    )
-  } else {
-    return (
-      <IntegrationOverviewTab>
-        <div className="px-10">
-          <DataApiOverview />
-        </div>
-      </IntegrationOverviewTab>
-    )
+    return <DataApiOverview />
   }
+
+  // For legacy, wrap with the legacy overview tab
+  return (
+    <IntegrationOverviewTab>
+      <div className="px-10">
+        <DataApiOverview />
+      </div>
+    </IntegrationOverviewTab>
+  )
 }
