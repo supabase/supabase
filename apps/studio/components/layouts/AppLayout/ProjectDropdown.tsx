@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { ComponentProps } from 'react'
 import { useState } from 'react'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
+import { Button, CommandGroup, CommandItem } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
@@ -55,8 +55,8 @@ function ProjectDropdownNewProjectActions({
   }
 
   return (
-    <CommandGroup_Shadcn_>
-      <CommandItem_Shadcn_
+    <CommandGroup>
+      <CommandItem
         className="cursor-pointer w-full"
         onSelect={() => {
           onClose()
@@ -68,8 +68,8 @@ function ProjectDropdownNewProjectActions({
           <Plus size={14} strokeWidth={1.5} />
           <p>New project</p>
         </Link>
-      </CommandItem_Shadcn_>
-    </CommandGroup_Shadcn_>
+      </CommandItem>
+    </CommandGroup>
   )
 }
 

@@ -4,11 +4,17 @@
 // during the migration. This file should be deleted once the flag is
 // removed.
 
-import { literal } from '@supabase/pg-meta/src/pg-format'
 import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import {
+  bqIdent,
+  joinSqlFragments,
+  analyticsLiteral as lit,
+  safeSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
 
 // Pagination and control parameters
 const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
@@ -19,55 +25,77 @@ const SPECIAL_FILTER_PARAMS = ['date'] as const
 // Combined list of all parameters to exclude from standard filtering
 const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
 
-// Strips `literal()`'s surrounding quotes so the value can be concatenated
-// inside a `LIKE '%...%'` clause without re-escaping; quotes and back-
-// slashes are already escaped by literal().
-const likeValue = (value: unknown): string =>
-  literal(String(value)).replace(/^E?'/, '').replace(/'$/, '')
-
 /**
- * Builds query conditions from search parameters and returns WHERE clause
- * @param search SearchParamsType object containing query parameters
- * @returns Object with whereConditions array and formatted WHERE clause
+ * Builds WHERE-clause fragments from a search-param map. Identifier-position
+ * keys are validated via `bqIdent()` (regex allowlist) and value-position
+ * inputs via `analyticsLiteral` — both throw on disallowed input, in which
+ * case we drop the predicate rather than emit unsafe SQL.
+ *
+ * @param search Search params (URL-derived filter values)
+ * @param excludeKey Optional key to skip — used by facet-count branches that
+ *                   need every filter applied *except* the one being faceted
+ * @returns Array of SafeLogSqlFragment predicates ready to be AND-joined
  */
-const buildQueryConditions = (search: QuerySearchParamsType) => {
-  const whereConditions: string[] = []
+const buildConditions = (
+  search: QuerySearchParamsType,
+  excludeKey?: string
+): SafeLogSqlFragment[] => {
+  const conditions: SafeLogSqlFragment[] = []
 
-  // Process all search parameters for filtering
   Object.entries(search).forEach(([key, value]) => {
-    // Skip pagination/control parameters
-    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) {
-      return
-    }
+    if (key === excludeKey) return
+    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return
 
-    // Handle array filters (IN clause)
-    if (Array.isArray(value) && value.length > 0) {
-      whereConditions.push(`${key} IN (${value.map((v) => literal(String(v))).join(',')})`)
-      return
-    }
+    try {
+      // `key` is interpolated as a column identifier. `bqIdent()` rejects
+      // anything outside `[A-Za-z_][A-Za-z0-9_]*` (notably no spaces, so a
+      // crafted URL key like `level OR id IS NOT NULL` is dropped rather
+      // than emitted into the WHERE clause).
+      const col = bqIdent(key)
 
-    // Handle scalar values
-    if (value !== null && value !== undefined) {
-      if (['host', 'pathname'].includes(key)) {
-        whereConditions.push(`${key} LIKE '%${likeValue(value)}%'`)
-      } else {
-        whereConditions.push(`${key} = ${literal(String(value))}`)
+      if (Array.isArray(value) && value.length > 0) {
+        const inList = joinSqlFragments(
+          value.map((v) => lit(String(v))),
+          ','
+        )
+        conditions.push(safeSql`${col} IN (${inList})`)
+        return
       }
+
+      if (value !== null && value !== undefined) {
+        if (key === 'host' || key === 'pathname') {
+          conditions.push(safeSql`${col} LIKE ${lit('%' + String(value) + '%')}`)
+        } else {
+          conditions.push(safeSql`${col} = ${lit(String(value))}`)
+        }
+      }
+    } catch {
+      // bqIdent() or analyticsLiteral() rejected the input — drop the predicate.
     }
   })
 
-  // Create final WHERE clause
-  const finalWhere = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
-
-  return { whereConditions, finalWhere }
+  return conditions
 }
+
+const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
+  conditions.length > 0 ? safeSql`WHERE ${joinSqlFragments(conditions, ' AND ')}` : safeSql``
 
 /**
  * Calculates how much the chart start datetime should be offset given the current datetime filter params
  * and determines the appropriate bucketing level (minute, hour, day)
  * Ported from the older implementation (apps/studio/components/interfaces/Settings/Logs/Logs.utils.ts)
  */
-const calculateChartBucketing = (search: SearchParamsType | Record<string, unknown>): string => {
+type TruncationLevel = 'MINUTE' | 'HOUR' | 'DAY'
+
+const TRUNCATION_LEVEL_SQL: Record<TruncationLevel, SafeLogSqlFragment> = {
+  MINUTE: safeSql`MINUTE`,
+  HOUR: safeSql`HOUR`,
+  DAY: safeSql`DAY`,
+}
+
+const calculateChartBucketing = (
+  search: SearchParamsType | Record<string, unknown>
+): TruncationLevel => {
   // Extract start and end times from the date array if available
   const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
 
@@ -101,21 +129,12 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, unkno
   const startTime = dayjs(startMillis)
   const endTime = dayjs(endMillis)
 
-  let truncationLevel = 'MINUTE'
-
   const hourDiff = endTime.diff(startTime, 'hour')
   const dayDiff = endTime.diff(startTime, 'day')
 
-  // Adjust bucketing based on time range
-  if (dayDiff >= 2) {
-    truncationLevel = 'DAY'
-  } else if (hourDiff >= 12) {
-    truncationLevel = 'HOUR'
-  } else {
-    truncationLevel = 'MINUTE'
-  }
-
-  return truncationLevel
+  if (dayDiff >= 2) return 'DAY'
+  if (hourDiff >= 12) return 'HOUR'
+  return 'MINUTE'
 }
 
 /**
@@ -123,8 +142,7 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, unkno
  *
  * excludes `/rest/` in the path
  */
-const getEdgeLogsQuery = () => {
-  return `
+const getEdgeLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -150,15 +168,10 @@ const getEdgeLogsQuery = () => {
     -- ONLY include logs where the path does not include /rest/
     WHERE edge_logs_request.path NOT LIKE '%/rest/%'
     AND edge_logs_request.path NOT LIKE '%/storage/%'
-    
   `
-}
 
-// Postgrest logs
-
-// WHERE pathname includes `/rest/`
-const getPostgrestLogsQuery = () => {
-  return `
+// Postgrest logs — WHERE pathname includes `/rest/`
+const getPostgrestLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -184,13 +197,11 @@ const getPostgrestLogsQuery = () => {
     -- ONLY include logs where the path includes /rest/
     WHERE edge_logs_request.path LIKE '%/rest/%'
   `
-}
 
 /**
  * Postgres logs query fragment
  */
-const getPostgresLogsQuery = () => {
-  return `
+const getPostgresLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -213,13 +224,11 @@ const getPostgresLogsQuery = () => {
     cross join unnest(pgl.metadata) as pgl_metadata
     cross join unnest(pgl_metadata.parsed) as pgl_parsed
   `
-}
 
 /**
  * Edge function logs query fragment
  */
-const getEdgeFunctionLogsQuery = () => {
-  return `
+const getEdgeFunctionLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -252,13 +261,11 @@ const getEdgeFunctionLogsQuery = () => {
     GROUP BY fl_metadata.request_id
     ) as function_logs_agg on fel_metadata.request_id = function_logs_agg.request_id
   `
-}
 
 /**
  * Auth logs query fragment
  */
-const getAuthLogsQuery = () => {
-  return `
+const getAuthLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       el_in_al.id as id,
       al.id as source_id,
@@ -277,24 +284,22 @@ const getAuthLogsQuery = () => {
       null as log_count,
       null as logs
     from auth_logs as al
-    cross join unnest(metadata) as al_metadata 
+    cross join unnest(metadata) as al_metadata
     left join (
     edge_logs as el_in_al
-        cross join unnest (metadata) as el_in_al_metadata 
-        cross join unnest (el_in_al_metadata.response) as el_in_al_response 
-        cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
+        cross join unnest (metadata) as el_in_al_metadata
+        cross join unnest (el_in_al_metadata.response) as el_in_al_response
+        cross join unnest (el_in_al_response.headers) as el_in_al_response_headers
         cross join unnest (el_in_al_metadata.request) as el_in_al_request
     )
     on al_metadata.request_id = el_in_al_response_headers.cf_ray
     WHERE al_metadata.request_id is not null
   `
-}
 
 /**
  * Supabase storage logs query fragment
  */
-const getSupabaseStorageLogsQuery = () => {
-  return `
+const getSupabaseStorageLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -319,9 +324,8 @@ const getSupabaseStorageLogsQuery = () => {
     -- ONLY include logs where the path includes /storage/
     WHERE edge_logs_request.path LIKE '%/storage/%'
   `
-}
 
-const LOG_TYPE_QUERIES: Record<string, () => string> = {
+const LOG_TYPE_QUERIES: Record<string, () => SafeLogSqlFragment> = {
   edge: getEdgeLogsQuery,
   postgrest: getPostgrestLogsQuery,
   postgres: getPostgresLogsQuery,
@@ -334,17 +338,19 @@ const LOG_TYPE_QUERIES: Record<string, () => string> = {
  * Combine the requested log sources to create the unified logs CTE.
  * Defaults to postgres + postgrest on first load to reduce query cost.
  */
-export const getUnifiedLogsCTE = (logTypes: string[] = [...DEFAULT_LOG_TYPES]) => {
+export const getUnifiedLogsCTE = (
+  logTypes: string[] = [...DEFAULT_LOG_TYPES]
+): SafeLogSqlFragment => {
   const queries = logTypes
     .filter((type) => type in LOG_TYPE_QUERIES)
     .map((type) => LOG_TYPE_QUERIES[type]())
 
-  const effectiveQueries =
-    queries.length > 0 ? queries : DEFAULT_LOG_TYPES.map((type) => LOG_TYPE_QUERIES[type]())
+  const effective =
+    queries.length > 0 ? queries : DEFAULT_LOG_TYPES.map((t) => LOG_TYPE_QUERIES[t]())
 
-  return `
+  return safeSql`
 WITH unified_logs AS (
-    ${effectiveQueries.join('\n    union all\n    ')}
+    ${joinSqlFragments(effective, ' union all ')}
 )
   `
 }
@@ -352,11 +358,11 @@ WITH unified_logs AS (
 /**
  * Unified logs SQL query
  */
-export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
-  const { finalWhere } = buildQueryConditions(search)
+export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
+  const conditions = buildConditions(search)
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
 
-  const sql = `
+  return safeSql`
 ${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
     id,
@@ -371,42 +377,8 @@ SELECT
     log_count,
     logs
 FROM unified_logs
-${finalWhere}
+${whereClause(conditions)}
 `
-
-  return sql
-}
-
-/**
- * Get a count query for the total logs within the timeframe
- * Uses proper faceted search behavior where facets show "what would I get if I selected ONLY this option"
- */
-
-// Helper function to build WHERE clause excluding a specific field
-const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): string => {
-  const conditions: string[] = []
-
-  Object.entries(search).forEach(([key, value]) => {
-    if (key === excludeField) return // Skip the field we're getting facets for
-    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return // Skip pagination and special params
-
-    // Handle array filters (IN clause)
-    if (Array.isArray(value) && value.length > 0) {
-      conditions.push(`${key} IN (${value.map((v) => literal(String(v))).join(',')})`)
-      return
-    }
-
-    // Handle scalar values
-    if (value !== null && value !== undefined) {
-      if (['host', 'pathname'].includes(key)) {
-        conditions.push(`${key} LIKE '%${likeValue(value)}%'`)
-      } else {
-        conditions.push(`${key} = ${literal(String(value))}`)
-      }
-    }
-  })
-
-  return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 }
 
 export const getFacetCountCTE = ({
@@ -417,24 +389,36 @@ export const getFacetCountCTE = ({
   search: QuerySearchParamsType
   facet: string
   facetSearch?: string
-}) => {
+}): SafeLogSqlFragment => {
   const MAX_FACETS_QUANTITY = 20
 
-  return `
-${facet}_count AS (
-  SELECT '${facet}' as dimension, ${facet} as value, COUNT(*) as count
+  // `facet` is used both as a column reference and to derive a CTE name;
+  // quote each appropriately with bqIdent() to reject non-identifier inputs.
+  const facetCol = bqIdent(facet)
+  const facetCte = bqIdent(facet + '_count')
+  const baseConditions = buildConditions(search, facet)
+  const facetSearchClause = facetSearch
+    ? safeSql`AND ${facetCol} LIKE ${lit('%' + facetSearch + '%')}`
+    : safeSql``
+
+  const where =
+    baseConditions.length > 0
+      ? safeSql`WHERE ${joinSqlFragments(baseConditions, ' AND ')} AND ${facetCol} IS NOT NULL`
+      : safeSql`WHERE ${facetCol} IS NOT NULL`
+
+  return safeSql`
+${facetCte} AS (
+  SELECT ${lit(facet)} as dimension, ${facetCol} as value, COUNT(*) as count
   FROM unified_logs
-  ${buildFacetWhere(search, `${facet}`) || `WHERE ${facet} IS NOT NULL`}
-  ${buildFacetWhere(search, `${facet}`) ? ` AND ${facet} IS NOT NULL` : ''}
-  ${!!facetSearch ? `AND ${facet} LIKE '%${likeValue(facetSearch)}%'` : ''}
-  GROUP BY ${facet}
-  LIMIT ${MAX_FACETS_QUANTITY}
+  ${where}
+  ${facetSearchClause}
+  GROUP BY ${facetCol}
+  LIMIT ${lit(MAX_FACETS_QUANTITY)}
 )
-`.trim()
+`
 }
 
-export const getUnifiedLogsCountCTE = () => {
-  return `
+export const getUnifiedLogsCountCTE = (): SafeLogSqlFragment => safeSql`
 WITH unified_logs AS (
     -- Single scan of edge_logs covering edge gateway, postgrest, and storage
     select
@@ -526,14 +510,21 @@ WITH unified_logs AS (
     WHERE al_metadata.request_id is not null
 )
   `
-}
 
-export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
+export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
-  const logTypeWhere = buildFacetWhere(search, 'log_type') || 'WHERE log_type IS NOT NULL'
-  const levelWhere = buildFacetWhere(search, 'level') || 'WHERE level IS NOT NULL'
+  const logTypeConditions = buildConditions(search, 'log_type')
+  const levelConditions = buildConditions(search, 'level')
+  const logTypeWhere: SafeLogSqlFragment =
+    logTypeConditions.length > 0
+      ? safeSql`WHERE ${joinSqlFragments(logTypeConditions, ' AND ')}`
+      : safeSql`WHERE log_type IS NOT NULL`
+  const levelWhere: SafeLogSqlFragment =
+    levelConditions.length > 0
+      ? safeSql`WHERE ${joinSqlFragments(levelConditions, ' AND ')}`
+      : safeSql`WHERE level IS NOT NULL`
 
-  const sql = `
+  return safeSql`
 ${getUnifiedLogsCTE(effectiveLogTypes)},
 
 -- Single COUNTIF pass for all log_type buckets + total (no GROUP BY / sort needed)
@@ -579,29 +570,27 @@ UNION ALL SELECT dimension, value, count FROM method_count
 UNION ALL SELECT dimension, value, count FROM status_count
 UNION ALL SELECT dimension, value, count FROM pathname_count
 `
-
-  return sql
 }
 
 /**
  * Enhanced logs chart query with dynamic bucketing based on time range
  * Incorporates dynamic bucketing from the older implementation
  */
-export const getLogsChartQuery = (search: QuerySearchParamsType): string => {
-  const { finalWhere } = buildQueryConditions(search)
+export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
+  const conditions = buildConditions(search)
   const truncationLevel = calculateChartBucketing(search)
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
 
-  return `
+  return safeSql`
 ${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
-  TIMESTAMP_TRUNC(timestamp, ${truncationLevel}) as time_bucket,
+  TIMESTAMP_TRUNC(timestamp, ${TRUNCATION_LEVEL_SQL[truncationLevel]}) as time_bucket,
   COUNTIF(level = 'success') as success,
   COUNTIF(level = 'warning') as warning,
   COUNTIF(level = 'error') as error,
   COUNT(*) as total_per_bucket
 FROM unified_logs
-${finalWhere}
+${whereClause(conditions)}
 GROUP BY time_bucket
 ORDER BY time_bucket ASC
 `

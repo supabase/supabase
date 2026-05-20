@@ -4,9 +4,9 @@ import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   CriticalIcon,
@@ -234,31 +234,29 @@ const PITRSidePanel = () => {
           </div>
 
           {selectedCategory === 'off' && subscriptionPitr !== undefined && isBranchingEnabled && (
-            <Alert_Shadcn_ variant="warning">
+            <Alert variant="warning">
               <CriticalIcon />
-              <AlertTitle_Shadcn_>
-                Are you sure you want to disable this while using Branching?
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Are you sure you want to disable this while using Branching?</AlertTitle>
+              <AlertDescription>
                 Without PITR, you might not be able to recover lost data if you accidentally merge a
                 branch that deletes a column or user data. We don't recommend this.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
 
           {blockDowngradeDueToHipaa ? (
-            <Alert_Shadcn_>
-              <AlertTitle_Shadcn_>PITR cannot be disabled on HIPAA projects</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+            <Alert>
+              <AlertTitle>PITR cannot be disabled on HIPAA projects</AlertTitle>
+              <AlertDescription>
                 PITR is enabled by default for all HIPAA projects and cannot be turned off. Contact
                 support for further assistance.
-              </AlertDescription_Shadcn_>
+              </AlertDescription>
               <div className="mt-4">
                 <Button type="default" asChild>
                   <SupportLink>Contact support</SupportLink>
                 </Button>
               </div>
-            </Alert_Shadcn_>
+            </Alert>
           ) : null}
 
           {selectedCategory === 'on' && (

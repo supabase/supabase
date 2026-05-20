@@ -1,8 +1,8 @@
 'use client'
 
-import React, { FC, Fragment, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import React, { FC, Fragment, useEffect, useState } from 'react'
 import {
   Badge,
   cn,
@@ -170,7 +170,7 @@ export const MenuItem = React.forwardRef<
       ref={ref}
       className={cn(
         'group/menu-item flex items-center gap-2',
-        'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline outline-hidden! focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground',
+        'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md py-2 leading-none no-underline outline-hidden! focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground',
         className
       )}
       {...props}

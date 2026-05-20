@@ -1,4 +1,4 @@
-import type { PGSchema, PGTable } from '@supabase/pg-meta'
+import type { PGSchema } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Background,
@@ -64,6 +64,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { tablesToSQL } from '@/lib/helpers'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -75,7 +76,7 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [selectedTable, setSelectedTable] = useState<PGTable | null>(null)
+  const [selectedTable, setSelectedTable] = useState<SafePostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
   const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 

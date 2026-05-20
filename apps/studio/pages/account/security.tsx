@@ -1,11 +1,5 @@
 import { Smartphone } from 'lucide-react'
-import {
-  Badge,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
+import { Badge, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -59,8 +53,8 @@ const Security: NextPageWithLayout = () => {
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
-        <Collapsible_Shadcn_ className={cn('mt-8', collapsibleClasses)}>
-          <CollapsibleTrigger_Shadcn_ asChild>
+        <Collapsible className={cn('mt-8', collapsibleClasses)}>
+          <CollapsibleTrigger asChild>
             <button
               type="button"
               className="group flex w-full items-center justify-between rounded-sm py-3 px-4 md:px-6 text-foreground"
@@ -76,11 +70,11 @@ const Security: NextPageWithLayout = () => {
                 </Badge>
               ) : null}
             </button>
-          </CollapsibleTrigger_Shadcn_>
-          <CollapsibleContent_Shadcn_ className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+          </CollapsibleTrigger>
+          <CollapsibleContent className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
             <TOTPFactors />
-          </CollapsibleContent_Shadcn_>
-        </Collapsible_Shadcn_>
+          </CollapsibleContent>
+        </Collapsible>
       </PageContainer>
     </>
   )

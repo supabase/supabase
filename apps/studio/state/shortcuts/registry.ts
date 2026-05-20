@@ -2,7 +2,24 @@ import { SHORTCUT_REFERENCE_GROUPS } from './referenceGroups'
 import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
 import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
 import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
+import { FUNCTIONS_DETAIL_SHORTCUT_IDS, functionsDetailRegistry } from './registry/functions-detail'
+import {
+  FUNCTIONS_DETAIL_NAV_SHORTCUT_IDS,
+  functionsDetailNavRegistry,
+} from './registry/functions-detail-nav'
+import { FUNCTIONS_LIST_SHORTCUT_IDS, functionsListRegistry } from './registry/functions-list'
+import { FUNCTIONS_NAV_SHORTCUT_IDS, functionsNavRegistry } from './registry/functions-nav'
+import {
+  FUNCTIONS_OVERVIEW_SHORTCUT_IDS,
+  functionsOverviewRegistry,
+} from './registry/functions-overview'
 import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
+import { LOGS_PREVIEW_SHORTCUT_IDS, logsPreviewRegistry } from './registry/logs-preview'
+import {
+  REALTIME_INSPECTOR_SHORTCUT_IDS,
+  realtimeInspectorRegistry,
+} from './registry/realtime-inspector'
+import { REALTIME_NAV_SHORTCUT_IDS, realtimeNavRegistry } from './registry/realtime-nav'
 import {
   SCHEMA_VISUALIZER_SHORTCUT_IDS,
   schemaVisualizerRegistry,
@@ -86,6 +103,25 @@ export const SHORTCUT_IDS = {
   ...STORAGE_BUCKETS_SHORTCUT_IDS,
   // Storage Explorer (file browser) shortcuts
   ...STORAGE_EXPLORER_SHORTCUT_IDS,
+
+  // Edge Functions sub-page navigation chords
+  ...FUNCTIONS_NAV_SHORTCUT_IDS,
+  // Edge Functions overview (list) page shortcuts
+  ...FUNCTIONS_LIST_SHORTCUT_IDS,
+  // Per-function detail layout shortcuts (header actions + test submit)
+  ...FUNCTIONS_DETAIL_SHORTCUT_IDS,
+  // Per-function detail tab navigation (digits)
+  ...FUNCTIONS_DETAIL_NAV_SHORTCUT_IDS,
+  // Per-function Overview tab shortcuts (intervals, refresh, open logs)
+  ...FUNCTIONS_OVERVIEW_SHORTCUT_IDS,
+
+  // Realtime sub-page navigation chords
+  ...REALTIME_NAV_SHORTCUT_IDS,
+  // Realtime Inspector page shortcuts
+  ...REALTIME_INSPECTOR_SHORTCUT_IDS,
+
+  // LogsPreviewer shortcuts (Function Logs, Function Invocations, Logs Explorer)
+  ...LOGS_PREVIEW_SHORTCUT_IDS,
 } as const
 
 /**
@@ -377,4 +413,23 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   ...storageBucketsRegistry,
   // Storage Explorer (file browser) shortcut registration
   ...storageExplorerRegistry,
+
+  // Edge Functions sub-page navigation chord registration
+  ...functionsNavRegistry,
+  // Edge Functions overview (list) page shortcut registration
+  ...functionsListRegistry,
+  // Per-function detail layout shortcut registration
+  ...functionsDetailRegistry,
+  // Per-function detail tab navigation registration
+  ...functionsDetailNavRegistry,
+  // Per-function Overview tab shortcut registration
+  ...functionsOverviewRegistry,
+
+  // Realtime sub-page navigation chord registration
+  ...realtimeNavRegistry,
+  // Realtime Inspector page shortcut registration
+  ...realtimeInspectorRegistry,
+
+  // LogsPreviewer shortcut registration
+  ...logsPreviewRegistry,
 }

@@ -6,11 +6,11 @@ import {
   cn,
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Skeleton,
   Tooltip,
   TooltipContent,
@@ -46,7 +46,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
       control={control}
       render={({ field }) => (
         <FormItemLayout layout="horizontal" label="Storage type">
-          <Select_Shadcn_
+          <Select
             {...field}
             onValueChange={async (e: DiskType) => {
               field.onChange(e)
@@ -91,19 +91,19 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
               />
             ) : (
               <FormControl>
-                <SelectTrigger_Shadcn_ className="h-14 max-w-[420px]">
-                  <SelectValue_Shadcn_ />
-                </SelectTrigger_Shadcn_>
+                <SelectTrigger className="h-14 max-w-[420px]">
+                  <SelectValue />
+                </SelectTrigger>
               </FormControl>
             )}
-            <SelectContent_Shadcn_>
+            <SelectContent>
               <>
                 {DISK_TYPE_OPTIONS.map((item) => {
                   const disableIo2 = item.type === 'io2' && !isIo2Supported
                   return (
                     <Tooltip key={item.type}>
                       <TooltipTrigger asChild>
-                        <SelectItem_Shadcn_
+                        <SelectItem
                           key={item.type}
                           disabled={disableInput || disableIo2}
                           value={item.type}
@@ -118,7 +118,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                             </div>
                             <p className="text-foreground-light">{item.description}</p>
                           </div>
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       </TooltipTrigger>
                       {disableIo2 && (
                         <TooltipContent side="right" className="w-64">
@@ -134,8 +134,8 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                   )
                 })}
               </>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+            </SelectContent>
+          </Select>
           {error && <FormMessage type="error" message={error.message} />}
         </FormItemLayout>
       )}

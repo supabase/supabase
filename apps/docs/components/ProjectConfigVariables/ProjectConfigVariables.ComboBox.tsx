@@ -1,21 +1,21 @@
+import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 import { noop } from 'lodash-es'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button_Shadcn_ as Button,
   cn,
-  Command_Shadcn_ as Command,
-  CommandGroup_Shadcn_ as CommandGroup,
-  CommandInput_Shadcn_ as CommandInput,
-  CommandItem_Shadcn_ as CommandItem,
-  CommandList_Shadcn_ as CommandList,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Command,
+  CommandGroup as CommandGroup,
+  CommandInput,
+  CommandItem as CommandItem,
+  CommandList as CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
 
 export interface ComboBoxOption {
   id: string

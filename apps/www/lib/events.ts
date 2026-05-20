@@ -239,8 +239,8 @@ export const getMdxEvents = (): SupabaseEvent[] => {
         const isExternalCta = /^https?:\/\//i.test(rawCtaUrl)
         const safeExternalCta = isExternalCta && isSafeHttpUrl(rawCtaUrl) ? rawCtaUrl : ''
         const internalPath = `/events/${slug}`
-        const href = safeExternalCta || internalPath
-        const target = safeExternalCta ? '_blank' : '_self'
+        const href = data.disable_page_build ? safeExternalCta || internalPath : internalPath
+        const target = data.disable_page_build && safeExternalCta ? '_blank' : '_self'
 
         return {
           slug,

@@ -10,11 +10,11 @@ import {
   FormField,
   RadioGroup,
   RadioGroupItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetContent,
@@ -222,36 +222,36 @@ export const Page = () => {
                     description="This is your public display name."
                     layout="horizontal"
                   >
-                    <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl className="w-full">
-                        <SelectTrigger_Shadcn_ className="w-full">
-                          <SelectValue_Shadcn_
+                        <SelectTrigger className="w-full">
+                          <SelectValue
                             placeholder="Select a verified email"
                             className="flex gap-2"
                           />
-                        </SelectTrigger_Shadcn_>
+                        </SelectTrigger>
                       </FormControl>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@example.com">
+                      <SelectContent>
+                        <SelectItem value="m@example.com">
                           <div className="flex gap-2 items-center">
                             <UserIcon />
                             <span>m@example.com</span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@google.com" className="flex gap-2">
+                        </SelectItem>
+                        <SelectItem value="m@google.com" className="flex gap-2">
                           <div className="flex gap-2 items-center">
                             <UserIcon />
                             UserIconm@google.com
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@support.com" className="flex gap-2">
+                        </SelectItem>
+                        <SelectItem value="m@support.com" className="flex gap-2">
                           <div className="flex gap-2 items-center">
                             <UserIcon />
                             m@support.com
                           </div>
-                        </SelectItem_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormItemLayout>
                 )}
               />

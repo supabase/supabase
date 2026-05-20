@@ -260,6 +260,11 @@ export const PostgrestConfig = () => {
     name: 'functionNamesToRemove',
   })
 
+  const missingExposedSchema = useMemo(
+    () => watchedDbSchema.filter((schema) => !allSchemas.some((s) => s.name === schema)),
+    [allSchemas, watchedDbSchema]
+  )
+
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
@@ -272,7 +277,7 @@ export const PostgrestConfig = () => {
                 </CardContent>
               ) : isError ? (
                 <CardContent>
-                  <Admonition type="destructive" title="Failed to retrieve API settings" />
+                  <Admonition type="destructive" description="Failed to retrieve API settings." />
                 </CardContent>
               ) : (
                 <>
@@ -282,6 +287,9 @@ export const PostgrestConfig = () => {
                       layout="flex-row-reverse"
                       label="Exposed schemas"
                       description="Select schemas to include in the Data API. Schemas must be included before tables can be exposed."
+                      error={
+                        missingExposedSchema.length > 0 ? 'Some exposed schemas are missing' : null
+                      }
                     >
                       <ExposedSchemaSelector
                         selectedSchemas={watchedDbSchema}
