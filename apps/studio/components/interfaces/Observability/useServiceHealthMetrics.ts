@@ -39,7 +39,10 @@ const INTERVAL_TO_GRANULARITY: Record<'1hr' | '1day' | '7day', ServiceHealthGran
 }
 
 /** Maps our service keys to the field names returned by the service-health endpoint */
-const SERVICE_RESPONSE_KEY: Record<ServiceKey, keyof ServiceHealthResultRow> = {
+const SERVICE_RESPONSE_KEY: Record<
+  ServiceKey,
+  Exclude<keyof ServiceHealthResultRow, 'timestamp'>
+> = {
   db: 'postgres_logs',
   auth: 'auth_logs',
   functions: 'function_edge_logs',
@@ -48,19 +51,19 @@ const SERVICE_RESPONSE_KEY: Record<ServiceKey, keyof ServiceHealthResultRow> = {
   postgrest: 'postgrest_logs',
 }
 
-/** Extracts a single service's rows from the shared service-health response */
-function extractServiceRows(
+/** Extracts a single service's timeseries rows from the shared service-health response */
+export function extractServiceRows(
   rows: ServiceHealthResultRow[],
   serviceKey: ServiceKey
 ): RawChartData[] {
   const responseKey = SERVICE_RESPONSE_KEY[serviceKey]
   return rows.map((row) => {
-    const svc = row[responseKey] as { ok: number; warning: number; error: number }
+    const svc = row[responseKey]
     return {
       timestamp: row.timestamp,
-      ok_count: svc?.ok ?? 0,
-      warning_count: svc?.warning ?? 0,
-      error_count: svc?.error ?? 0,
+      ok_count: svc.ok,
+      warning_count: svc.warning,
+      error_count: svc.error,
     }
   })
 }
@@ -94,13 +97,12 @@ const useServiceHealthQuery = ({
 
   const rawRows = useMemo(
     () => extractServiceRows(queryResult.data?.result ?? [], serviceKey),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [queryResult.data, serviceKey]
   )
 
   // Fill gaps in timeseries
   const { data: filledData } = useFillTimeseriesSorted({
-    data: rawRows as any,
+    data: rawRows,
     timestampKey: 'timestamp',
     valueKey: 'ok_count',
     defaultValue: 0,

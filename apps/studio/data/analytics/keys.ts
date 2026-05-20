@@ -162,15 +162,12 @@ export const analyticsKeys = {
       startDate,
       endDate,
       granularity,
-      lql,
     }: {
       startDate?: string
       endDate?: string
       granularity?: string
-      lql?: string
     }
-  ) =>
-    ['projects', projectRef, 'service-health', { startDate, endDate, granularity, lql }] as const,
+  ) => ['projects', projectRef, 'service-health', { startDate, endDate, granularity }] as const,
 }
 
 function isoDateStringToDate(isoDateString: string | undefined): string | undefined {
