@@ -1,5 +1,4 @@
-import { posthogClient } from 'common'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { usePHFlag } from '../ui/useFlag'
 import { IS_TEST_ENV } from '@/lib/constants'
@@ -25,53 +24,51 @@ export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
 }
 
 type DefaultPrivilegesExposureOptions =
-  | { surface: 'main'; dataApiEnabled: boolean }
-  | { surface: 'vercel' }
+  | {
+      surface: 'main'
+      dataApiDefaultPrivileges: boolean
+      hasUserModified: boolean
+    }
+  | {
+      surface: 'vercel'
+      orgSlug: string | undefined
+      dataApiDefaultPrivileges: boolean
+      hasUserModified: boolean
+    }
 
 /**
- * Fires `project_creation_default_privileges_exposed` once per mount after both
- * the `dataApiRevokeOnCreateDefault` flag resolves AND the `org_count` person
- * property has been set on the PostHog SDK. Waiting for both signals avoids
- * locking in the variant on the initial /flags/ response, which races the
- * org_count identify for brand-new signups — the exposure must reflect the
- * targeting-aware flag value. Deduplicated via ref so re-renders and mid-session
- * flag flips don't re-fire.
+ * Fires `project_creation_default_privileges_exposed` once per mount, once the
+ * flag has resolved AND the form value is consistent with the flag's expected
+ * default. The convergence gate avoids a render-ordering race: caller-side
+ * sync effects (in /new/[slug] and the Vercel deploy flow) update the form
+ * value when the flag resolves late, but child effects fire before parent
+ * effects in the same commit, so without the gate the exposure would capture
+ * the stale pre-sync value. If the user has dirtied the field, fire
+ * immediately with their explicit value. Deduplicated via ref.
  */
 export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExposureOptions) => {
   const track = useTrack()
   const flag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
   const hasTracked = useRef(false)
-  const [orgCountReady, setOrgCountReady] = useState(
-    () => posthogClient.getPersonProperty('org_count') !== undefined
-  )
 
-  const { surface } = options
-  const dataApiEnabled = options.surface === 'main' ? options.dataApiEnabled : null
-
-  // Mark ready once org_count appears on the SDK person. A /flags/ response
-  // received after our identify will have included org_count in the evaluation,
-  // so subscribing via onFeatureFlags is the right signal that the flag store
-  // reflects the targeting-aware value.
-  useEffect(() => {
-    if (orgCountReady) return
-    const check = () => {
-      if (posthogClient.getPersonProperty('org_count') !== undefined) {
-        setOrgCountReady(true)
-      }
-    }
-    check()
-    return posthogClient.onFeatureFlags(check)
-  }, [orgCountReady])
+  const { surface, dataApiDefaultPrivileges, hasUserModified } = options
+  const orgSlug = options.surface === 'vercel' ? options.orgSlug : undefined
 
   useEffect(() => {
     if (hasTracked.current) return
     if (flag === undefined) return
-    if (!orgCountReady) return
+    if (surface === 'vercel' && !orgSlug) return
+    // Gate on form-flag convergence unless the user explicitly dirtied the field.
+    if (!hasUserModified && dataApiDefaultPrivileges !== !flag) return
     hasTracked.current = true
-    track('project_creation_default_privileges_exposed', {
-      surface,
-      ...(dataApiEnabled !== null && { dataApiEnabled }),
-      dataApiRevokeOnCreateDefaultEnabled: flag,
-    })
-  }, [flag, orgCountReady, track, surface, dataApiEnabled])
+    track(
+      'project_creation_default_privileges_exposed',
+      {
+        surface,
+        dataApiDefaultPrivileges,
+        dataApiRevokeOnCreateDefaultEnabled: flag,
+      },
+      surface === 'vercel' ? { organization: orgSlug } : undefined
+    )
+  }, [flag, track, surface, dataApiDefaultPrivileges, hasUserModified, orgSlug])
 }

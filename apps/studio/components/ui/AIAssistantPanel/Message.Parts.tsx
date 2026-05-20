@@ -123,16 +123,14 @@ function MessagePartExecuteSql({
     return <ToolDisplayExecuteSqlFailure />
   }
 
-  if (state === 'approval-responded') {
-    return <ToolDisplayExecuteSqlLoading label="Running SQL..." />
-  }
-
   const { data: chart, success } = parseExecuteSqlChartResult(input)
   if (!success) return null
 
   if (
     state === 'input-available' ||
     state === 'approval-requested' ||
+    state === 'approval-responded' ||
+    state === 'output-denied' ||
     state === 'output-available'
   ) {
     const approvalId = state === 'approval-requested' ? toolPart.approval?.id : undefined
@@ -151,6 +149,7 @@ function MessagePartExecuteSql({
           }}
           initialResults={output}
           toolState={state}
+          toolApprovalRespondedApproved={toolPart.approval?.approved}
           isLastPart={isLastPart}
           isLastMessage={isLastMessage}
           onApprove={
@@ -175,6 +174,7 @@ const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set([
   'input-available',
   'approval-requested',
   'approval-responded',
+  'output-denied',
   'output-available',
 ])
 
@@ -212,7 +212,7 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
       code={parsedInput.data.code}
       functionName={parsedInput.data.functionName}
       showConfirmFooter={state === 'approval-requested'}
-      isDeploying={state === 'approval-responded'}
+      isDeploying={state === 'approval-responded' && toolPart.approval?.approved !== false}
       initialIsDeployed={isInitiallyDeployed}
       onApprove={
         approvalId ? () => addToolApprovalResponse?.({ id: approvalId, approved: true }) : undefined

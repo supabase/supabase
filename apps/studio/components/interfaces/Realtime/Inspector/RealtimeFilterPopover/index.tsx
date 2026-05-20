@@ -21,19 +21,40 @@ import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-interface RealtimeFilterPopoverProps {
+type ControlledOpenProps =
+  | { open: boolean; onOpenChange: (open: boolean) => void }
+  | { open?: undefined; onOpenChange?: undefined }
+
+type RealtimeFilterPopoverProps = {
   config: RealtimeConfig
   onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
-}
+} & ControlledOpenProps
 
-export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilterPopoverProps) => {
-  const [open, setOpen] = useState(false)
+export const RealtimeFilterPopover = ({
+  config,
+  onChangeConfig,
+  open: controlledOpen,
+  onOpenChange,
+}: RealtimeFilterPopoverProps) => {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+
+  const setOpen = (v: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(v)
+    } else {
+      setInternalOpen(v)
+    }
+  }
   const [applyConfigOpen, setApplyConfigOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
 
@@ -66,27 +87,36 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
   // [Joshen] Restricting the schemas to only public as any other schema won’t work out of the box due to missing permissions
   // Consequently, SchemaSelector here will also be disabled
   const isFiltered = config.table !== '*'
+  const filterPopoverTrigger = (
+    <PopoverTrigger asChild>
+      <Button
+        icon={<PlusCircle size="16" />}
+        type={isFiltered ? 'primary' : 'dashed'}
+        className={cn('rounded-full px-1 text-xs h-[26px]')}
+        size="small"
+      >
+        {isFiltered ? (
+          <>
+            <span className="mr-1">Filtered by </span>
+            <Badge variant="success">table: {config.table}</Badge>
+          </>
+        ) : (
+          <span className="mr-1">Filter messages</span>
+        )}
+      </Button>
+    </PopoverTrigger>
+  )
 
   return (
     <>
       <Popover open={open} onOpenChange={onOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            icon={<PlusCircle size="16" />}
-            type={isFiltered ? 'primary' : 'dashed'}
-            className={cn('rounded-full px-1 text-xs h-[26px]')}
-            size="small"
-          >
-            {isFiltered ? (
-              <>
-                <span className="mr-1">Filtered by </span>
-                <Badge variant="success">table: {config.table}</Badge>
-              </>
-            ) : (
-              <span className="mr-1">Filter messages</span>
-            )}
-          </Button>
-        </PopoverTrigger>
+        {!open && config.channelName.length > 0 ? (
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_TOGGLE_FILTERS} side="bottom">
+            {filterPopoverTrigger}
+          </ShortcutTooltip>
+        ) : (
+          filterPopoverTrigger
+        )}
         <PopoverContent className="p-0 w-[365px]" align="start">
           <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
             Listen to event types

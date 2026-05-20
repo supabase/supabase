@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFeatureFlags, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { Menu, Separator } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { ProjectLayout } from '@/components/layouts/ProjectLayout'
 import AlertError from '@/components/ui/AlertError'
@@ -46,7 +47,7 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const router = useRouter()
   const { ref } = useParams()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const urlParams = new URLSearchParams(router.asPath.split('?')[1] || '')
   const categoryParam = urlParams.get('category')
