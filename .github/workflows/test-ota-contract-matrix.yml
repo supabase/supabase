@@ -180,16 +180,10 @@ jobs:
         timeout-minutes: 12
         shell: pwsh
         run: |
-          & ota clean . *> $null
-          try {
-            & ota proof runtime --workflow instant --json . | Out-File -Encoding utf8 ota-proof-instant.json
-            Get-Content ota-proof-instant.json
-            if ($LASTEXITCODE -ne 0) {
-              exit $LASTEXITCODE
-            }
-          }
-          finally {
-            & ota clean . *> $null
+          & ota proof runtime --workflow instant --json . | Out-File -Encoding utf8 ota-proof-instant.json
+          Get-Content ota-proof-instant.json
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
           }
 
       - name: Proof app workflow [bash]
@@ -208,16 +202,10 @@ jobs:
         timeout-minutes: 12
         shell: pwsh
         run: |
-          & ota clean . *> $null
-          try {
-            & ota proof runtime --workflow app --json . | Out-File -Encoding utf8 ota-proof-app.json
-            Get-Content ota-proof-app.json
-            if ($LASTEXITCODE -ne 0) {
-              exit $LASTEXITCODE
-            }
-          }
-          finally {
-            & ota clean . *> $null
+          & ota proof runtime --workflow app --json . | Out-File -Encoding utf8 ota-proof-app.json
+          Get-Content ota-proof-app.json
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
           }
 
       - name: Ota matrix summary + annotations
