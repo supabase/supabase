@@ -81,7 +81,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
     <ChartContainer
       config={chartConfig}
       className={cn(
-        'aspect-auto h-[60px] w-full',
+        'aspect-auto h-[60px] w-full px-2',
         '[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted/50', // otherwise same color as 200
         'select-none', // disable text selection
         className
@@ -103,7 +103,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
           tickLine={false}
           minTickGap={32}
           axisLine={false}
-          // interval="preserveStartEnd"
+          interval="preserveStartEnd"
           tickFormatter={(value) => {
             const date = new Date(value)
             if (isNaN(date.getTime())) return 'N/A'
