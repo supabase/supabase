@@ -73,8 +73,12 @@ interface BySlugMarkdown {
 
 type BySlugEntry = BySlugFunction | BySlugCategory | BySlugMarkdown
 
+/** A bySlug entry that may additionally carry nested children — used by sections.json. */
+type SectionEntry = BySlugEntry & { items?: SectionEntry[] }
+
 interface VersionConfig {
   excludeCategories?: string[]
+  excludeDefinitions?: string[]
   categoryOrder?: string[]
   partialsOrder?: string[]
 }
@@ -228,24 +232,31 @@ async function readPartials(versionDir: string): Promise<PartialEntry[]> {
 }
 
 /**
- * Assembles the final bySlug map for a version: partials first, then each
- * category (filtered by `excludeCategories`, ordered by `categoryOrder`)
- * followed by its category-only functions and any subcategories with their
- * own functions.
+ * Builds bySlug (a flat slug→entry map) and sections (the same data shaped as a
+ * nested tree: partials, then each category containing its functions and
+ * subcategories) in a single pass. Categories are filtered by `excludeCategories`
+ * and ordered by `categoryOrder`; individual declarations are filtered by
+ * `excludeDefinitions` (matched on the source name, case-sensitive).
  */
 function buildBySlug(
   functions: FunctionEntry[],
   partials: PartialEntry[],
   config: VersionConfig
-): Record<string, BySlugEntry> {
+): { bySlug: Record<string, BySlugEntry>; sections: SectionEntry[] } {
   const bySlug: Record<string, BySlugEntry> = {}
+  const sections: SectionEntry[] = []
 
   for (const p of reorder(partials, config.partialsOrder, (x) => x.name)) {
-    bySlug[p.name] = partialEntry(p)
+    const entry = partialEntry(p)
+    bySlug[p.name] = entry
+    sections.push(entry)
   }
 
-  const excludeSet = new Set(config.excludeCategories ?? [])
-  const filtered = functions.filter(({ category }) => !excludeSet.has(category))
+  const excludeCats = new Set(config.excludeCategories ?? [])
+  const excludeDefs = new Set(config.excludeDefinitions ?? [])
+  const filtered = functions.filter(
+    ({ name, category }) => !excludeCats.has(category) && !excludeDefs.has(name)
+  )
 
   type CategoryGroup = {
     title: string
@@ -271,34 +282,46 @@ function buildBySlug(
 
   const orderedCategories = reorder(Array.from(groups.keys()), config.categoryOrder, (c) => c)
 
-  const writeFunction = (fn: FunctionEntry, product: string) => {
+  const writeFunction = (fn: FunctionEntry, product: string, items: SectionEntry[]) => {
     const entry = functionEntry(fn, product)
+    // Spec files can re-declare same-named methods on different classes; the
+    // slug collides, so only emit each unique slug once (first wins).
+    if (entry.slug in bySlug) return
     bySlug[entry.slug] = entry
+    items.push(entry)
   }
 
   for (const category of orderedCategories) {
     const group = groups.get(category)!
     const product = slugifyTag(category)
 
-    bySlug[product] = categoryEntry(group.title)
+    const cat = categoryEntry(group.title)
+    const catItems: SectionEntry[] = []
+    bySlug[product] = cat
+    sections.push({ ...cat, items: catItems })
 
-    for (const fn of group.withoutSub) writeFunction(fn, product)
+    for (const fn of group.withoutSub) writeFunction(fn, product, catItems)
 
     for (const [subcategory, fns] of group.bySub) {
       const subSlug = `${product}-${slugifyTag(subcategory)}`
-      bySlug[subSlug] = subcategoryEntry(subSlug, subcategory, product)
-      for (const fn of fns) writeFunction(fn, product)
+      const sub = subcategoryEntry(subSlug, subcategory, product)
+      const subItems: SectionEntry[] = []
+      bySlug[subSlug] = sub
+      catItems.push({ ...sub, items: subItems })
+
+      for (const fn of fns) writeFunction(fn, product, subItems)
     }
   }
 
-  return bySlug
+  return { bySlug, sections }
 }
 
 /**
  * Processes one `[library]/[version]` directory: reads spec files, partials,
- * and config, then writes `bySlug.json` and `flat.json` to the output
- * directory in parallel. `flat.json` is `Object.values(bySlug)` — the same
- * entries in iteration order, used both for counting and as the array output.
+ * and config, then writes `bySlug.json`, `flat.json`, and `sections.json` to
+ * the output directory in parallel. `flat.json` is `Object.values(bySlug)`
+ * (used both for counting and the array output); `sections.json` is the same
+ * data nested as a tree, built alongside bySlug in a single pass.
  */
 async function processVersion(library: string, version: string): Promise<void> {
   const versionDir = join(SPEC_DIR, library, version)
@@ -316,7 +339,7 @@ async function processVersion(library: string, version: string): Promise<void> {
     collectFunctions(spec, functions)
   }
 
-  const bySlug = buildBySlug(functions, partials, config)
+  const { bySlug, sections } = buildBySlug(functions, partials, config)
   const flat = Object.values(bySlug)
 
   const counts = { markdown: 0, function: 0, subcategory: 0, category: 0 }
@@ -332,10 +355,11 @@ async function processVersion(library: string, version: string): Promise<void> {
   await Promise.all([
     writeFile(join(outputDir, 'bySlug.json'), JSON.stringify(bySlug)),
     writeFile(join(outputDir, 'flat.json'), JSON.stringify(flat)),
+    writeFile(join(outputDir, 'sections.json'), JSON.stringify(sections)),
   ])
 
   console.log(
-    `[${library}/${version}] wrote bySlug.json + flat.json — ${functions.length} declarations scanned, ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories`
+    `[${library}/${version}] wrote bySlug.json + flat.json + sections.json — ${functions.length} declarations scanned, ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories`
   )
 }
 
