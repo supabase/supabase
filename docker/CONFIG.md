@@ -2,12 +2,14 @@ Last updated: 2026-05-19
 
 # Self-hosted Supabase configuration reference
 
-This document is the aggregated reference for environment variables relevant to a self-hosted Supabase deployment. It aims to be comprehensive for the self-hosted use case rather than literally exhaustive - variables that only apply on the hosted platform (billing, multi-tenant orchestration, internal tooling) are typically omitted or marked as such. For the complete set a given service can read, refer to its upstream repository linked in the [service version matrix](#service-version-matrix) below.
+This document is the aggregated reference for environment variables relevant to a self-hosted Supabase deployment. It aims to be comprehensive for the self-hosted use case rather than literally exhaustive - variables that only apply on the hosted platform are typically omitted or marked as such. For the complete set a given service can read, refer to its [upstream repositories](#upstream-repositories) below.
 
-> **A note on accuracy.** This reference is compiled from each service's source code and upstream docs as a self-hosting overview - it is not maintained by the individual product teams and shouldn't be treated as canonical. Within each row:
+The default self-hosted setup already includes explicit values for all required variables, and the remaining configuration inherits sensible defaults from the services themselves. Otherwise, it serves as a reference for advanced customization or educational purposes. For more guidance on the essential keys and secrets, see [Configuring Secrets](https://supabase.com/docs/guides/self-hosting/docker#configuring-secrets) in the self-hosting guide.
+
+> **A note on accuracy.** This reference is compiled from each service's source code and upstream docs as a self-hosting overview - it is **not** maintained by the individual product teams and shouldn't be treated as canonical. Within each row:
 >
 > - **Type, defaults, formats, and where the variable is read** are derived directly from code (parse sites in Go / TypeScript / Elixir / Rust) and are usually reliable. The `Type` cell uses a closed vocabulary with embedded unit hints (e.g. `integer (seconds)`, `integer (ms)`, `string (duration)`) to surface unit conventions that vary across services.
-> - The **prose description of what the variable is *for*** is more interpretive. It captures the immediate mechanical effect well, but the underlying *intent* - why the variable exists, when you should change it, how it interacts with other variables - is partly synthesized and can be subtly off.
+> - The **prose description of what the variable is *for*** is more interpretive. It captures the immediate mechanical effect well, but the underlying *intent* - why the variable exists, when you should change it, how it interacts with other variables - is partly synthesized by an LLM and can be subtly off.
 >
 > When the *what* matters operationally, trust the row. When the *why* matters, defer to the upstream service's own documentation or source.
 
@@ -15,14 +17,14 @@ This document is the aggregated reference for environment variables relevant to 
 
 The Type column was derived from each service's parse-site code (Go struct fields, TypeScript conversions, Elixir parse calls, Rust `clap` declarations). The Description column is best-effort and was cross-checked against upstream prose where a fresh, trusted source exists:
 
-- **Auth** - against [supabase/auth](https://github.com/supabase/auth) `README.md` (which documents ~50 vars; the rest are documented from code reads)
-- **PostgREST** - against [postgrest.org/en/stable](https://postgrest.org/en/stable)
-- **Realtime** - against [supabase/realtime](https://github.com/supabase/realtime) `ENVS.md`
-- **Storage** - against the Supabase docs YAML spec at `apps/docs/spec/storage_v0_config.yaml` for the 18 vars it covers; otherwise from code reads
-- **Analytics (Logflare)** - against the Supabase docs YAML spec at `apps/docs/spec/analytics_v0_config.yaml` (6 vars) and [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/) for the rest, with [logflare/logflare](https://github.com/logflare/logflare) `config/runtime.exs` and `config/config.exs` used as tiebreakers
-- **Supavisor** - against [supabase/supavisor](https://github.com/supabase/supavisor) `docs/configuration/env.md`
+- **Auth** - against [supabase/auth/README.md](https://github.com/supabase/auth/blob/master/README.md)
+- **PostgREST** - against [postgrest.org/en/stable](https://docs.postgrest.org/en/stable/references/configuration.html)
+- **Realtime** - against [supabase/realtime/ENVS.md](https://github.com/supabase/realtime/blob/main/ENVS.md)
+- **Storage** - against the Supabase docs [YAML spec](https://github.com/supabase/supabase/blob/master/apps/docs/spec/storage_v0_config.yaml) for the 18 vars it covers; otherwise from code reads
+- **Analytics (Logflare)** - against the Supabase docs [YAML spec](https://github.com/supabase/supabase/blob/master/apps/docs/spec/analytics_v0_config.yaml) (6 vars) and [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/) for the rest, with [logflare/config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs) and [logflare/config/config.exs](https://github.com/Logflare/logflare/blob/main/config/config.exs) used as tiebreakers
+- **Supavisor** - against [supabase/supavisor/docs/configuration/env.md](https://github.com/supabase/supavisor/blob/main/docs/configuration/env.md)
 
-Other sections (Studio, Edge Functions, Postgres) appeared to have no comparable upstream prose documentation and were documented from code reads alone. Corrections welcome via PR.
+Other sections (Studio, Edge Functions, Postgres) appeared to have no comparable upstream prose documentation and were documented by reading the source repos. Corrections welcome via PR.
 
 ## How to read this document
 
@@ -32,7 +34,7 @@ Each table has five columns:
 |---|---|
 | **Variable** | Exact env var name as the service's code reads it. Names are case-sensitive. |
 | **Type** | Closed vocabulary: `string`, `integer`, `number`, `boolean`, `JSON`, `enum`, `URL`, `path`, `JWT`, `JWKS`. Numeric forms carry a unit hint where one applies - e.g. `integer (seconds)`, `integer (ms)`, `integer (bytes)`, `integer (MB)`, `integer (count)`, `number (ratio)`. String forms with a semantic hint: `string (duration)` (Go `time.Duration` strings like `10s`, `5m`, distinct from `integer (seconds)`), `string (regex)`, `string (CSV)`. |
-| **Set by** | `Both` if the variable is set inside the corresponding container when you run `supabase start` (see the [Local development & CLI](https://supabase.com/docs/guides/local-development)) *and* in `docker/docker-compose.yml` / `docker/.env.example`. `Self-hosted` if only in the self-hosted compose/.env (including inside commented-out lines). `CLI` if only in the CLI runtime env. Blank if neither - the variable is documented because the service's code reads it, but no Supabase-side config pre-wires it. |
+| **Set by (CLI, Self-hosted)** | `Both` if the variable is set inside the corresponding container when you run `supabase start` (see the [Local development & CLI](https://supabase.com/docs/guides/local-development)) *and* in `docker/docker-compose.yml` / `docker/.env.example`. `Self-hosted` if only in the self-hosted compose/.env (including inside commented-out lines). `CLI` if only in the CLI runtime env. Blank if neither - the variable is documented because the service's code reads it, but no Supabase-side config pre-wires it. |
 | **Description** | What the variable controls. |
 | **Notes** | Default value, requirement, deprecation, alias, or scope. |
 
@@ -43,13 +45,13 @@ A few caveats:
 - **The CLI does not run Supavisor** as part of `supabase start`, so every Supavisor variable's `Set by` is either `Self-hosted` or blank - never `Both` or `CLI`.
 - **Auth/gotrue env vars are programmatically derived** from a Go config struct (envconfig), so most fields are reachable via two names: a prefixed form (`GOTRUE_API_API_EXTERNAL_URL`) and a bare-name alias (`API_EXTERNAL_URL`). Both are documented.
 
-## Service version matrix
+## Upstream repositories
 
 The image tags below are pinned in `docker-compose.yml` at the time of this document; check that file for the current versions.
 
 | Service | Image | Source repo |
 |---|---|---|
-| Studio (Dashboard) | `supabase/studio` | [supabase/supabase – apps/studio](https://github.com/supabase/supabase/tree/master/apps/studio) |
+| Studio (Dashboard) | `supabase/studio` | [supabase/supabase/apps/studio](https://github.com/supabase/supabase/tree/master/apps/studio) |
 | Auth | `supabase/gotrue` | [supabase/auth](https://github.com/supabase/auth) |
 | PostgREST | `postgrest/postgrest` | [PostgREST/postgrest](https://github.com/PostgREST/postgrest) |
 | Realtime | `supabase/realtime` | [supabase/realtime](https://github.com/supabase/realtime) |
@@ -166,7 +168,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 
 > Auth (gotrue) uses Go's [envconfig](https://github.com/kelseyhightower/envconfig) library - the env var names are programmatically derived from the `Configuration` struct in `internal/conf/configuration.go` by combining the `GOTRUE_` prefix with each nested struct's path. Aliased fields are reachable via two names: the prefixed form (`GOTRUE_API_API_EXTERNAL_URL`) and a bare-name fallback (`API_EXTERNAL_URL`).
 
-> Auth's upstream `README.md` documents many of these variables with additional prose context - operator/Netlify history, default email-template bodies, OAuth provider examples, glob-matching syntax. The rows below stay reference-style; for prose backstory and template defaults, see [supabase/auth README.md](https://github.com/supabase/auth/blob/master/README.md).
+> Auth's upstream `README.md` documents many of these variables with additional prose context - operator/Netlify history, default email-template bodies, OAuth provider examples, glob-matching syntax. The rows below stay reference-style; for prose backstory and template defaults, see [supabase/auth/README.md](https://github.com/supabase/auth/blob/master/README.md).
 
 ### API
 
@@ -214,7 +216,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | `GOTRUE_JWT_EXP` | integer (seconds) | Both | Access token lifetime in seconds. | Default: `3600` |
 | `GOTRUE_JWT_ISSUER` | string | Both | `iss` claim for issued JWTs. |  |
 | `GOTRUE_JWT_KEY_ID` | string |  | Key ID assigned to the symmetric secret key. |  |
-| `GOTRUE_JWT_KEYS` | JWKS | Both | JSON array of JWKs used for signing/verification. | Commented out in compose |
+| `GOTRUE_JWT_KEYS` | JWKS | Both | JSON array of JWKs used for signing/verification. | Required when using the new API keys and new auth. |
 | `GOTRUE_JWT_SECRET` | string | Both | Symmetric HS256 signing secret. | Required |
 | `GOTRUE_JWT_VALID_METHODS` | string (CSV) | CLI | Allowed JWT signing methods (e.g. `HS256,RS256`). |  |
 | `GOTRUE_JWT_VALIDMETHODS` | string (CSV) | CLI | Alternate spelling seen in CLI; same field. | Alias artifact; prefer `GOTRUE_JWT_VALID_METHODS` |
@@ -654,6 +656,25 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_RATE_LIMIT_VERIFY` | number | CLI | Rate limit for the verify endpoint. | Default: `30` per hour |
 | `GOTRUE_RATE_LIMIT_WEB3` | number | CLI | Rate limit for Web3 sign-in. | Default: `30` per hour |
 
+### Sessions
+
+| Variable | Type | Set by | Description | Notes |
+|---|---|---|---|---|
+| `GOTRUE_SESSIONS_ALLOW_LOW_AAL` | string (duration) |  | Time during which a low-AAL session is still accepted. |  |
+| `GOTRUE_SESSIONS_INACTIVITY_TIMEOUT` | string (duration) |  | Session inactivity timeout. |  |
+| `GOTRUE_SESSIONS_SINGLE_PER_USER` | boolean |  | Allow only one active session per user. |  |
+| `GOTRUE_SESSIONS_TAGS` | string (CSV) |  | Tags attached to created sessions. |  |
+| `GOTRUE_SESSIONS_TIMEBOX` | string (duration) |  | Absolute session lifetime. |  |
+
+### Web3
+
+| Variable | Type | Set by | Description | Notes |
+|---|---|---|---|---|
+| `GOTRUE_EXTERNAL_WEB3_ETHEREUM_ENABLED` | boolean | CLI | Enable Ethereum sign-in (Sign-in with Ethereum). | Default: `false` |
+| `GOTRUE_EXTERNAL_WEB3_ETHEREUM_MAXIMUM_VALIDITY_DURATION` | string (duration) |  | Max validity of an Ethereum signed message. | Default: `10m` |
+| `GOTRUE_EXTERNAL_WEB3_SOLANA_ENABLED` | boolean | CLI | Enable Solana sign-in. | Default: `false` |
+| `GOTRUE_EXTERNAL_WEB3_SOLANA_MAXIMUM_VALIDITY_DURATION` | string (duration) |  | Max validity of a Solana signed message. | Default: `10m` |
+
 ### Security
 
 | Variable | Type | Set by | Description | Notes |
@@ -693,25 +714,6 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `GOTRUE_PASSWORD_HIBP_USER_AGENT` | string |  | User-Agent sent to the HIBP API. | Default: `https://github.com/supabase/gotrue` |
 | `GOTRUE_PASSWORD_MIN_LENGTH` | integer (count) | CLI | Minimum password length. | Default: `6` |
 | `GOTRUE_PASSWORD_REQUIRED_CHARACTERS` | string | CLI | Colon-separated character classes; a password must contain at least one character from each set. Escape a literal `:` with `\`. |  |
-
-### Sessions
-
-| Variable | Type | Set by | Description | Notes |
-|---|---|---|---|---|
-| `GOTRUE_SESSIONS_ALLOW_LOW_AAL` | string (duration) |  | Time during which a low-AAL session is still accepted. |  |
-| `GOTRUE_SESSIONS_INACTIVITY_TIMEOUT` | string (duration) |  | Session inactivity timeout. |  |
-| `GOTRUE_SESSIONS_SINGLE_PER_USER` | boolean |  | Allow only one active session per user. |  |
-| `GOTRUE_SESSIONS_TAGS` | string (CSV) |  | Tags attached to created sessions. |  |
-| `GOTRUE_SESSIONS_TIMEBOX` | string (duration) |  | Absolute session lifetime. |  |
-
-### Web3
-
-| Variable | Type | Set by | Description | Notes |
-|---|---|---|---|---|
-| `GOTRUE_EXTERNAL_WEB3_ETHEREUM_ENABLED` | boolean | CLI | Enable Ethereum sign-in (Sign-in with Ethereum). | Default: `false` |
-| `GOTRUE_EXTERNAL_WEB3_ETHEREUM_MAXIMUM_VALIDITY_DURATION` | string (duration) |  | Max validity of an Ethereum signed message. | Default: `10m` |
-| `GOTRUE_EXTERNAL_WEB3_SOLANA_ENABLED` | boolean | CLI | Enable Solana sign-in. | Default: `false` |
-| `GOTRUE_EXTERNAL_WEB3_SOLANA_MAXIMUM_VALIDITY_DURATION` | string (duration) |  | Max validity of a Solana signed message. | Default: `10m` |
 
 ### CORS / Audit log
 
@@ -848,7 +850,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `API_JWT_JWKS` | JWT | Both | JWKS JSON used to verify tenant JWTs during self-host seeding. Read by `priv/repo/seeds.exs` and `priv/repo/dev_seeds.exs`. | Used only by the seed script (`SEED_SELF_HOST=true`). Commented out in the default docker-compose. |
+| `API_JWT_JWKS` | JWT | Both | JWKS JSON used to verify tenant JWTs during self-host seeding. Read by `priv/repo/seeds.exs` and `priv/repo/dev_seeds.exs`. | Used only by the seed script (`SEED_SELF_HOST=true`). Required when using the new API keys and new auth. |
 | `API_JWT_SECRET` | string | Both | Symmetric HS256 secret used to sign tokens for the tenant management API and the default self-host tenant. | Required for the tenant management API in production. |
 | `API_TOKEN_BLOCKLIST` | string (CSV) | Self-hosted | Comma-separated list of tokens blocked from tenant management API access. | Default: empty list. |
 | `APP_NAME` | string | Both | Application/node name. Used to build the Phoenix endpoint URL host, libcluster DNS basename, and Erlang `RELEASE_NODE`. | Required - raises `APP_NAME not available` if empty. Default: empty (build) / `realtime` (Erlang release script). |
@@ -1007,7 +1009,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `AUTH_JWT_ALGORITHM` | enum |  | JWT algorithm used to verify tokens. | Default: `HS256` |
 | `AUTH_JWT_SECRET` | string | Both | HS256 secret used to verify the legacy `ANON_KEY` / `SERVICE_KEY`. | Required (single-tenant) |
 | `JWT_CACHING_ENABLED` | boolean |  | Cache decoded JWTs in memory to reduce verification cost. | Default: `false` |
-| `JWT_JWKS` | JWKS | Both | JSON Web Key Set used to verify asymmetric JWTs (e.g. ES256). | Optional |
+| `JWT_JWKS` | JWKS | Both | JSON Web Key Set used to verify asymmetric JWTs (e.g. ES256). | Required when using the new API keys and new auth. |
 | `PGRST_JWT_ALGORITHM` | enum |  | Legacy alias for `AUTH_JWT_ALGORITHM`. | Default: `HS256` |
 | `PGRST_JWT_SECRET` | string |  | JWT secret used by Storage to verify Postgres-issued tokens; legacy alias for `AUTH_JWT_SECRET`. | Required (single-tenant) |
 
@@ -1221,7 +1223,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `SUPABASE_INTERNAL_JWT_SECRET` | JWT | CLI | HS256 secret used by the CLI's bundled main service to verify JWTs from the local stack. | Set by CLI |
 | `SUPABASE_INTERNAL_PUBLISHABLE_KEY` | string | CLI | Opaque API key (publishable) used internally by the CLI's bundled main service. | Set by CLI |
 | `SUPABASE_INTERNAL_SECRET_KEY` | string | CLI | Opaque API key (secret) used internally by the CLI's bundled main service. | Set by CLI |
-| `SUPABASE_JWKS` | JWKS | CLI | JSON Web Key Set (asymmetric + legacy symmetric) used by the bundled main service to verify user JWTs. | Self-hosted derives this from `SUPABASE_URL`'s `/auth/v1/.well-known/jwks.json` instead |
+| `SUPABASE_JWKS` | JWKS | CLI | JSON Web Key Set (asymmetric + legacy symmetric) used by the bundled main service to verify user JWTs. | Self-hosted can derive this from `SUPABASE_URL`'s `/auth/v1/.well-known/jwks.json`. |
 | `SUPABASE_PUBLIC_URL` | URL | Self-hosted | External/public URL of the Supabase project. Injected for user functions. | Injected for user functions |
 | `SUPABASE_PUBLISHABLE_KEYS` | JSON | Self-hosted | JSON map of opaque publishable API keys (new asymmetric-key format). | Injected for user functions |
 | `SUPABASE_SECRET_KEYS` | JSON | Self-hosted | JSON map of opaque secret API keys (new asymmetric-key format). Never expose to client code. | Injected for user functions |
@@ -1234,9 +1236,11 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ## Analytics
 
-> The `analytics` container runs `supabase/logflare`, an Elixir/Phoenix application. Almost all runtime env reads live in `config/runtime.exs`. Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.yml`. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
+> The `analytics` container runs [logflare/logflare](github.com/Logflare/logflare), an Elixir/Phoenix application. Almost all runtime env reads live in [config/runtime.exs](https://github.com/Logflare/logflare/blob/main/config/runtime.exs). Self-hosted Supabase runs it in single-tenant Supabase mode with the Postgres backend; BigQuery support is available but commented out in `docker-compose.yml`. The container is the consumer of `LOGFLARE_PUBLIC_ACCESS_TOKEN`/`LOGFLARE_PRIVATE_ACCESS_TOKEN`.
 
-> **Heads-up - always-on admin UI:** Logflare's admin pages under `/admin/*` (sources, accounts, cluster view) are reachable by default. `LOGFLARE_SUPABASE_MODE=true` provisions an auto-admin user, and the `/admin/*` routes are gated by an auth pipeline rather than an env var - there is no flag to disable them. If the `analytics` container is exposed beyond your private Docker network, **block** `/admin/*` at the reverse proxy or API gateway level.
+> **Heads-up - always-on admin UI:** Logflare's admin pages under `/admin/*` (sources, accounts, cluster view) **are reachable by default**. `LOGFLARE_SUPABASE_MODE=true` provisions an auto-admin user, and the `/admin/*` routes are gated by an auth pipeline rather than an env var - there is no flag to disable them.
+>
+> If the `analytics` container is exposed beyond your private Docker network, **block** `/admin/*` at the reverse proxy or API gateway level.
 
 > Analytics (Logflare) upstream self-hosting docs: [docs.logflare.app/self-hosting](https://docs.logflare.app/self-hosting/).
 
@@ -1278,7 +1282,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ### BigQuery backend (log storage)
 
-> Disabled in the default self-hosted compose. To use BigQuery, comment out `POSTGRES_BACKEND_URL` / `POSTGRES_BACKEND_SCHEMA` / `LOGFLARE_FEATURE_FLAG_OVERRIDE` in `docker-compose.yml`, mount a `gcloud.json` service-account key, and set the variables below.
+> Disabled in the default self-hosted compose. To use BigQuery, comment out `POSTGRES_BACKEND_URL` / `POSTGRES_BACKEND_SCHEMA` / `LOGFLARE_FEATURE_FLAG_OVERRIDE` in `docker-compose.yml`, mount a `gcloud.json` service-account key, and set `GOOGLE_PROJECT_ID` and `GOOGLE_PROJECT_NUMBER` in the `.env` file.
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
@@ -1383,7 +1387,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 ## Supavisor
 
-> Supavisor's upstream env-var reference is at [supabase/supavisor docs/configuration/env.md](https://github.com/supabase/supavisor/blob/main/docs/configuration/env.md).
+> Supavisor's upstream env-var reference is at [supabase/supavisor/docs/configuration/env.md](https://github.com/supabase/supavisor/blob/main/docs/configuration/env.md).
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
