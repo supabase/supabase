@@ -3043,18 +3043,6 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
- * User clicked the "Upgrade to Pro" CTA in the dashboard header.
- * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
- *
- * @group Events
- * @source studio
- */
-export interface HeaderUpgradeCtaClickedEvent {
-  action: 'header_upgrade_cta_clicked'
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3453,7 +3441,6 @@ export type TelemetryEvent =
   | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
-  | HeaderUpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent

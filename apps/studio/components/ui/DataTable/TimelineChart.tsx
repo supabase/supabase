@@ -92,7 +92,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
       <ChartContainer
         config={chartConfig}
         className={cn(
-          'aspect-auto h-[60px] w-full',
+          'aspect-auto h-[60px] w-full px-2',
           '[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted/50', // otherwise same color as 200
           'select-none', // disable text selection
           className

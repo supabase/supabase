@@ -41,7 +41,7 @@ function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) 
   return combinedRef
 }
 
-const CommandInput = forwardRef<
+const CommandMenuInput = forwardRef<
   React.ElementRef<typeof CommandInput_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof CommandInput_Shadcn_>
 >(({ className, ...props }, ref) => {
@@ -135,6 +135,6 @@ const CommandInput = forwardRef<
   )
 })
 
-CommandInput.displayName = CommandInput_Shadcn_.displayName
+CommandMenuInput.displayName = 'CommandMenuInput'
 
-export { CommandInput }
+export { CommandMenuInput }
