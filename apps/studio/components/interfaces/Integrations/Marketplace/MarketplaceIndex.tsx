@@ -89,16 +89,40 @@ export const MarketplaceIndex = () => {
 
   const { data: marketplaceCategories = [] } = useQuery(marketplaceCategoriesQueryOptions())
 
-  const categoryOptions = useMemo(
-    () =>
-      marketplaceCategories
-        .filter(
-          (c): c is { slug: string; name: string } & typeof c =>
-            !!c.slug && !!c.name && !EXCLUDED_CATEGORY_SLUGS.has(c.slug)
-        )
-        .map((c) => ({ slug: c.slug, name: c.name })),
-    [marketplaceCategories]
-  )
+  const categoryOptions = useMemo(() => {
+    // Start with marketplace DB categories
+    const fromDb = marketplaceCategories
+      .filter(
+        (c): c is { slug: string; name: string } & typeof c =>
+          !!c.slug && !!c.name && !EXCLUDED_CATEGORY_SLUGS.has(c.slug)
+      )
+      .map((c) => ({ slug: c.slug, name: c.name }))
+
+    // Extract unique categories from static integrations
+    const staticCategories = new Set<string>()
+    const all = availableIntegrations ?? []
+    for (const integration of all) {
+      if (integration.categories) {
+        for (const cat of integration.categories) {
+          staticCategories.add(cat)
+        }
+      }
+    }
+
+    // Create options for static categories (use slug as name if not in marketplace DB)
+    const dbSlugs = new Set(fromDb.map((c) => c.slug))
+    const fromStatic = Array.from(staticCategories)
+      .filter((slug) => !dbSlugs.has(slug) && slug !== 'wrappers') // exclude 'wrappers' (it's a dedicated integration type)
+      .map((slug) => ({
+        slug,
+        name: slug
+          .split(/[-_]/)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' '),
+      }))
+
+    return [...fromDb, ...fromStatic]
+  }, [marketplaceCategories, availableIntegrations])
 
   const typeCounts = useMemo(() => {
     const all = availableIntegrations ?? []
