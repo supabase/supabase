@@ -23,10 +23,12 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     getRowClassName?: (row: Row<TData>) => string
+    [key: string]: unknown
   }
   interface ColumnMeta<TData extends RowData, TValue> {
     headerClassName?: string
     cellClassName?: string
+    [key: string]: unknown
   }
 }
 
