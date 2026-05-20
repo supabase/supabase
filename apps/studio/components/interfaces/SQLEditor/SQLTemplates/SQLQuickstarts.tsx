@@ -8,11 +8,10 @@ import { cn, SQL_ICON } from 'ui'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import { SQL_TEMPLATES } from '@/components/interfaces/SQLEditor/SQLEditor.queries'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 const SQLQuickstarts = () => {
@@ -20,10 +19,10 @@ const SQLQuickstarts = () => {
   const { ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const [, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const track = useTrack()
 
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -33,8 +32,6 @@ const SQLQuickstarts = () => {
       subject: { id: profile?.id },
     }
   )
-
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const handleNewQuery = async (sql: string, name: string) => {
     if (!ref) return console.error('Project ref is required')
@@ -82,11 +79,7 @@ const SQLQuickstarts = () => {
               // sql={x.sql}
               onClick={() => {
                 handleNewQuery(x.sql, x.title)
-                sendEvent({
-                  action: 'sql_editor_quickstart_clicked',
-                  properties: { quickstartName: x.title },
-                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                })
+                track('sql_editor_quickstart_clicked', { quickstartName: x.title })
               }}
             />
           ))}

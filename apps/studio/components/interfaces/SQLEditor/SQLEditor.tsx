@@ -72,10 +72,8 @@ import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { isError } from '@/data/utils/error-check'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { BASE_PATH } from '@/lib/constants'
@@ -83,6 +81,7 @@ import { formatSql } from '@/lib/formatSql'
 import { detectOS } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import {
@@ -109,7 +108,6 @@ export const SQLEditor = () => {
 
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
 
   const queryClient = useQueryClient()
   const tabs = useTabsStateSnapshot()
@@ -217,7 +215,7 @@ export const SQLEditor = () => {
 
   /* React query mutations */
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
       if (id) {
@@ -431,10 +429,7 @@ export const SQLEditor = () => {
         },
       })
 
-      sendEvent({
-        action: 'sql_editor_query_run_button_clicked',
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('sql_editor_query_run_button_clicked')
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -638,11 +633,7 @@ export const SQLEditor = () => {
         ])
       }
 
-      sendEvent({
-        action: 'assistant_sql_diff_handler_evaluated',
-        properties: { handlerAccepted: true },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('assistant_sql_diff_handler_evaluated', { handlerAccepted: true })
 
       setSelectedDiffType(DiffType.Modification)
       resetPrompt()
@@ -654,14 +645,10 @@ export const SQLEditor = () => {
   }, [sourceSqlDiff, selectedDiffType, handleNewQuery, generateSqlTitle, router, id, snapV2])
 
   const discardAiHandler = useCallback(() => {
-    sendEvent({
-      action: 'assistant_sql_diff_handler_evaluated',
-      properties: { handlerAccepted: false },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('assistant_sql_diff_handler_evaluated', { handlerAccepted: false })
     resetPrompt()
     closeDiff()
-  }, [closeDiff, resetPrompt, sendEvent])
+  }, [closeDiff, resetPrompt, track])
 
   const [isCompletionLoading, setIsCompletionLoading] = useState<boolean>(false)
 
