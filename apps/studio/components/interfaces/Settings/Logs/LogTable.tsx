@@ -442,6 +442,21 @@ export const LogTable = ({
     })
   }
 
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_JSON, () => handleCopySelectedRows('json'), {
+    enabled: selectedRowsData.length > 0,
+    conflictBehavior: 'allow',
+  })
+
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, () => handleCopySelectedRows('markdown'), {
+    enabled: selectedRowsData.length > 0,
+    conflictBehavior: 'allow',
+  })
+
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_CSV, () => handleCopySelectedRows('csv'), {
+    enabled: selectedRowsData.length > 0,
+    conflictBehavior: 'allow',
+  })
+
   const logsExplorerTableHeader = (
     <div
       className={cn(
@@ -456,6 +471,7 @@ export const LogTable = ({
           text={`Results ${data && data.length ? `(${data.length})` : ''}`}
           results={data}
           fileName={`supabase-logs-${ref}.csv`}
+          enableCopyShortcuts={selectedRowsData.length === 0}
         />
       </div>
 
