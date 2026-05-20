@@ -2,6 +2,12 @@ name: 'Test: Ota contract matrix'
 
 on:
   workflow_dispatch:
+    inputs:
+      ota_ref:
+        description: 'Ota git branch/tag/sha for --from-git install'
+        required: false
+        default: 'bobai/tool-chain-and-providers'
+        type: string
   pull_request:
     paths:
       - 'ota.yaml'
@@ -20,7 +26,7 @@ permissions:
 
 env:
   OTA_NO_UPDATE_CHECK: '1'
-  OTA_GIT_BRANCH: bobai/tool-chain-and-providers
+  OTA_GIT_BRANCH: ${{ github.event.inputs.ota_ref || 'bobai/tool-chain-and-providers' }}
 
 jobs:
   native:
