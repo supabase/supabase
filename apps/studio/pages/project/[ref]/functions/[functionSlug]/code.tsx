@@ -17,18 +17,18 @@ import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndE
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
   const { can: canDeployFunction } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
@@ -121,23 +121,11 @@ const CodePage = () => {
   const handleDeployClick = () => {
     if (files.length === 0 || isLoadingFiles) return
     setShowDeployWarning(true)
-    sendEvent({
-      action: 'edge_function_deploy_updates_button_clicked',
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('edge_function_deploy_updates_button_clicked')
   }
 
   const handleDeployConfirm = () => {
-    sendEvent({
-      action: 'edge_function_deploy_updates_confirm_clicked',
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('edge_function_deploy_updates_confirm_clicked')
     onUpdate()
   }
 

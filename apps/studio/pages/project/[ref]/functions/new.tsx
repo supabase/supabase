@@ -40,11 +40,11 @@ import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dial
 import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -116,7 +116,7 @@ const NewFunctionPage = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const { openSidebar } = useSidebarManagerSnapshot()
 
@@ -171,11 +171,7 @@ const NewFunctionPage = () => {
       files: files.map(({ name, content }) => ({ name, content })),
     })
 
-    sendEvent({
-      action: 'edge_function_deploy_button_clicked',
-      properties: { origin: 'functions_editor' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('edge_function_deploy_button_clicked', { origin: 'functions_editor' })
   }
 
   const handleChat = () => {
@@ -209,11 +205,7 @@ const NewFunctionPage = () => {
         ],
       },
     })
-    sendEvent({
-      action: 'edge_function_ai_assistant_button_clicked',
-      properties: { origin: 'functions_editor_chat' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('edge_function_ai_assistant_button_clicked', { origin: 'functions_editor_chat' })
   }
 
   const onSelectTemplate = (templateValue: string) => {
@@ -225,10 +217,9 @@ const NewFunctionPage = () => {
         )
       )
       setOpen(false)
-      sendEvent({
-        action: 'edge_function_template_clicked',
-        properties: { templateName: template.name, origin: 'editor_page' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      track('edge_function_template_clicked', {
+        templateName: template.name,
+        origin: 'editor_page',
       })
     }
     setIsPreviewingTemplate(false)
