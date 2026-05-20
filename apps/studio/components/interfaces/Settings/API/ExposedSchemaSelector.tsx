@@ -116,7 +116,7 @@ export const ExposedSchemaSelector = ({
                   </CommandEmpty>
                   <ScrollArea className={schemas.length > 7 ? 'h-[210px]' : ''}>
                     {missingExposedSchema.map((schema) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={schema}
                         value={schema}
                         className="cursor-pointer w-full"
@@ -133,7 +133,7 @@ export const ExposedSchemaSelector = ({
                             This schema does not exist
                           </span>
                         </div>
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
                     {schemas.map((schema) => {
                       const isExposed = selectedSet.has(schema.name)
