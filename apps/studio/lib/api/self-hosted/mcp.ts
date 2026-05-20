@@ -1,4 +1,5 @@
 import {
+  ApiKey,
   ApiKeyType,
   ApplyMigrationOptions,
   DatabaseOperations,
@@ -74,13 +75,14 @@ export function getDevelopmentOperations({
     },
     async getPublishableKeys(_projectRef) {
       if (process.env.SUPABASE_PUBLISHABLE_KEY) {
-        return [
+        const keys: ApiKey[] = [
           {
             api_key: process.env.SUPABASE_PUBLISHABLE_KEY,
             name: 'publishable',
             type: 'publishable' as ApiKeyType,
           },
         ]
+        return keys
       }
 
       const settings = getProjectSettings()
@@ -90,13 +92,14 @@ export function getDevelopmentOperations({
         throw new Error('Anon key not found in project settings')
       }
 
-      return [
+      const keys: ApiKey[] = [
         {
           api_key: anonKey.api_key,
           name: anonKey.name,
           type: 'legacy' as ApiKeyType,
         },
       ]
+      return keys
     },
     async generateTypescriptTypes(_projectRef) {
       const response = await generateTypescriptTypes({ headers })
