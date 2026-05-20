@@ -54,6 +54,8 @@ export type Base<TData> = {
   commandDisabled?: boolean
   hasDynamicOptions?: boolean
   hasAsyncSearch?: boolean
+  /** Defines if the filter should be present in the filter nav */
+  hidden?: boolean
 }
 
 export type DataTableCheckboxFilterField<TData> = Base<TData> & Checkbox

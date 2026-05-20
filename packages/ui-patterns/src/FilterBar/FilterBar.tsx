@@ -24,6 +24,14 @@ export type FilterBarProps = {
   supportsOperators?: boolean
   variant?: FilterBarVariant
   icon?: React.ReactNode
+  /**
+   * Name of the property to use when the user commits free text from the root input. Must match
+   * a `name` in `filterProperties`. When set, the dropdown shows a "Search <propertyLabel>: \"...\""
+   * item as the first option while the user is typing. Selecting it (Enter) creates a filter
+   * `{ propertyName, operator: '=', value: typedText }`. If the property has no `=` operator,
+   * the first operator in its list is used instead.
+   */
+  freeformDefaultProperty?: string
   onFilterChange: (filters: FilterGroupType) => void
   /**
    * Fires only on commit boundaries: menu item selected, operator/property/logical-operator
@@ -135,6 +143,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
     supportsOperators = false,
     variant = 'default',
     icon,
+    freeformDefaultProperty,
   },
   ref
 ) {
@@ -152,6 +161,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
       supportsOperators={supportsOperators}
       variant={variant}
       icon={icon}
+      freeformDefaultProperty={freeformDefaultProperty}
     >
       <FilterBarContent className={className} />
     </FilterBarRoot>
