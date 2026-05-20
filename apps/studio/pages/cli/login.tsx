@@ -18,6 +18,7 @@ import CopyButton from '@/components/ui/CopyButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { createCliLoginSession } from '@/data/cli/login'
 import { withAuth } from '@/hooks/misc/withAuth'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfile } from '@/lib/profile'
 import type { NextPageWithLayout } from '@/types'
@@ -99,7 +100,7 @@ export const CliLoginScreen = ({
   publicKey,
   tokenName,
   deviceCode,
-  navigate,
+  navigate: navigateProp,
 }: {
   isLoggedIn: boolean
   routerReady: boolean
@@ -114,8 +115,7 @@ export const CliLoginScreen = ({
   const startedForSessionIdRef = useRef<string | undefined>(undefined)
   // Keep navigate in a ref so changing the prop never re-triggers the effect
   // or cancels an in-flight POST via the isActive cleanup.
-  const navigateRef = useRef(navigate)
-  navigateRef.current = navigate
+  const navigate = useStaticEffectEvent(navigateProp)
   const displayName = profile?.primary_email ?? profile?.username
 
   useEffect(() => {
@@ -152,7 +152,7 @@ export const CliLoginScreen = ({
         if (!isActive) return
 
         if (nonce) {
-          navigateRef.current(`/cli/login?device_code=${nonce.substring(0, 8)}`)
+          navigate(`/cli/login?device_code=${nonce.substring(0, 8)}`)
         } else {
           setStatus({ _tag: 'error', message: 'The CLI sign-in session did not return a code.' })
         }
@@ -167,7 +167,7 @@ export const CliLoginScreen = ({
     return () => {
       isActive = false
     }
-  }, [deviceCode, isLoggedIn, publicKey, routerReady, sessionId, tokenName])
+  }, [deviceCode, isLoggedIn, publicKey, routerReady, sessionId, tokenName, navigate])
 
   if (status._tag === 'loading') {
     return (
@@ -178,7 +178,7 @@ export const CliLoginScreen = ({
         <div className="flex flex-col gap-5">
           <Card className="shadow-none">
             <CardContent className="flex items-center gap-3 border-none px-4 py-3">
-              <ShimmeringLoader className="size-8 flex-shrink-0 rounded-full py-0" />
+              <ShimmeringLoader className="size-8 shrink-0 rounded-full py-0" />
               <div className="min-w-0 flex-1 space-y-2">
                 <ShimmeringLoader className="h-3 w-20 py-0" />
                 <ShimmeringLoader className="h-4 w-40 max-w-full py-0" />
