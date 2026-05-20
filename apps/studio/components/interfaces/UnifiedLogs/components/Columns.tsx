@@ -3,9 +3,9 @@ import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
+import { parseAuthLogEventMessage } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
-import { TextWithTooltip } from './TextWithTooltip'
 import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
@@ -205,7 +205,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       header: 'Pathname',
       cell: ({ row }) => {
         const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
-        return <TextWithTooltip text={value} />
+        return value
       },
       enableSorting: false,
       enableResizing: false,
@@ -223,7 +223,9 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       header: 'Event message',
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
+        const logType = row.original.log_type
         const logCount = row.original.log_count
+        const displayMessage = logType === 'auth' ? parseAuthLogEventMessage(value) : value
 
         return (
           <div className="flex flex-row gap-2 items-center">
@@ -239,11 +241,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
                 </TooltipContent>
               </Tooltip>
             )}
-            {value && (
-              <span className="text-muted-foreground">
-                <TextWithTooltip text={value} />
-              </span>
-            )}
+            {displayMessage && <span className="text-muted-foreground">{displayMessage}</span>}
           </div>
         )
       },
