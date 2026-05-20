@@ -171,6 +171,19 @@ const CompactMetricRow = ({
   )
 }
 
+const SkeletonMetricRow = ({ label }: { label: string }) => (
+  <div className="flex items-center justify-between gap-2">
+    <div className="flex items-center gap-2 min-w-0">
+      <div
+        className="w-4 h-4 rounded-full border-2 border-foreground-muted/40 shrink-0"
+        aria-hidden
+      />
+      <span className="text-xs text-foreground-light truncate">{label}</span>
+    </div>
+    <div className="h-3 w-16 rounded bg-surface-200 animate-pulse" aria-hidden />
+  </div>
+)
+
 /**
  * Renders the upgrade CTA's plan-usage sections. The parent is responsible for gating
  * on the experiment variant + free plan — this component only renders the visual
@@ -179,37 +192,45 @@ const CompactMetricRow = ({
 export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCardProps) => {
   const track = useTrack()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: usage, isSuccess } = useOrgUsageQuery({ orgSlug: organization?.slug })
+  const { data: usage, isSuccess, isError } = useOrgUsageQuery({ orgSlug: organization?.slug })
 
-  if (!isSuccess) return null
-
-  const visibleRows = METRICS.map((config) => {
-    const usageItem = usage.usages.find((u) => u.metric === config.key)
-    if (!usageItem) return null
-    if (!usageItem.available_in_plan) return null
-    if (!usageItem.pricing_free_units || usageItem.pricing_free_units <= 0) return null
-    return { config, usageItem }
-  }).filter((row): row is { config: MetricConfig; usageItem: OrgMetricsUsage } => row !== null)
-
-  if (visibleRows.length === 0) return null
+  const visibleRows = isSuccess
+    ? METRICS.map((config) => {
+        const usageItem = usage.usages.find((u) => u.metric === config.key)
+        if (!usageItem) return null
+        if (!usageItem.available_in_plan) return null
+        if (!usageItem.pricing_free_units || usageItem.pricing_free_units <= 0) return null
+        return { config, usageItem }
+      }).filter((row): row is { config: MetricConfig; usageItem: OrgMetricsUsage } => row !== null)
+    : []
 
   if (asProjectCard) {
+    // Hide entirely on hard error or when the org has zero applicable metrics — both
+    // are extreme edge cases. Otherwise always render the card shell so the layout is
+    // reserved from first paint and the usage rows fade in once the query resolves.
+    if (isError) return null
+    if (isSuccess && visibleRows.length === 0) return null
+
     return (
       <li className="list-none h-min">
         <div
           className={cn(
             'group relative bg-surface-100 border border-surface rounded-md',
-            'h-44 px-5 pt-5 pb-3 flex flex-col gap-y-3 overflow-hidden'
+            'min-h-44 p-4 flex flex-col gap-y-2.5'
           )}
         >
           <div className="flex flex-col gap-y-0.5">
             <h5 className="text-sm text-foreground">Free plan usage</h5>
             <p className="text-xs text-foreground-lighter">Current billing cycle</p>
           </div>
-          <div className="flex-1 flex flex-col gap-y-1.5">
-            {visibleRows.map(({ config, usageItem }) => (
-              <CompactMetricRow key={config.key} usageItem={usageItem} config={config} />
-            ))}
+          <div className="flex-1 flex flex-col gap-y-2 justify-center">
+            {isSuccess
+              ? visibleRows.map(({ config, usageItem }) => (
+                  <CompactMetricRow key={config.key} usageItem={usageItem} config={config} />
+                ))
+              : METRICS.map((config) => (
+                  <SkeletonMetricRow key={config.key} label={config.label} />
+                ))}
           </div>
           <div className="flex items-center justify-between gap-2 mt-auto">
             <Link
@@ -229,6 +250,10 @@ export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCar
       </li>
     )
   }
+
+  // Embedded fragment (Primary Database card on project home). Caller decides when to mount.
+  if (!isSuccess) return null
+  if (visibleRows.length === 0) return null
 
   return (
     <>
