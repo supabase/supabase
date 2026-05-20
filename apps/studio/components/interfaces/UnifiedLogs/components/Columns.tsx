@@ -6,7 +6,6 @@ import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { parseAuthLogEventMessage } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
-import { TextWithTooltip } from './TextWithTooltip'
 import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
@@ -180,7 +179,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       header: 'Pathname',
       cell: ({ row }) => {
         const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
-        return <TextWithTooltip text={value} />
+        return value
       },
       enableSorting: false,
       enableResizing: false,
@@ -216,11 +215,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
                 </TooltipContent>
               </Tooltip>
             )}
-            {displayMessage && (
-              <span className="text-muted-foreground">
-                <TextWithTooltip text={displayMessage ?? ''} />
-              </span>
-            )}
+            {displayMessage && <span className="text-muted-foreground">{displayMessage}</span>}
           </div>
         )
       },
