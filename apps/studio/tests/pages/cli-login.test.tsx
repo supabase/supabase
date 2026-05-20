@@ -158,4 +158,55 @@ describe('CliLoginScreen', () => {
 
     expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
   })
+
+  test('still navigates after parent re-renders during an in-flight POST', async () => {
+    // Resolve manually so we can inject a re-render while the POST is in flight.
+    let resolveSession: (value: { nonce: string }) => void = () => {}
+    createCliLoginSessionMock.mockImplementation(
+      () =>
+        new Promise<{ nonce: string }>((resolve) => {
+          resolveSession = resolve
+        })
+    )
+
+    const initialNavigate = vi.fn()
+    const { rerender } = customRender(
+      <CliLoginScreen
+        isLoggedIn
+        routerReady
+        sessionId="session-test"
+        publicKey="public-key-test"
+        tokenName="local-dev"
+        navigate={initialNavigate}
+      />,
+      { profileContext: DEFAULT_PROFILE_CONTEXT }
+    )
+
+    await waitFor(() => {
+      expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
+    })
+
+    // Parent re-renders mid-POST with a brand-new navigate ref. This was the
+    // production hang: the cleanup would invalidate the success handler and
+    // the ref guard would skip the retry, leaving the screen on the loader.
+    const laterNavigate = vi.fn()
+    rerender(
+      <CliLoginScreen
+        isLoggedIn
+        routerReady
+        sessionId="session-test"
+        publicKey="public-key-test"
+        tokenName="local-dev"
+        navigate={laterNavigate}
+      />
+    )
+
+    resolveSession({ nonce: 'ABCDEFGH12345678' })
+
+    await waitFor(() => {
+      expect(laterNavigate).toHaveBeenCalledWith('/cli/login?device_code=ABCDEFGH')
+    })
+    expect(initialNavigate).not.toHaveBeenCalled()
+    expect(createCliLoginSessionMock).toHaveBeenCalledTimes(1)
+  })
 })

@@ -18,6 +18,7 @@ import CopyButton from '@/components/ui/CopyButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { createCliLoginSession } from '@/data/cli/login'
 import { withAuth } from '@/hooks/misc/withAuth'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfile } from '@/lib/profile'
 import type { NextPageWithLayout } from '@/types'
@@ -114,6 +115,12 @@ export const CliLoginScreen = ({
   const startedForSessionIdRef = useRef<string | undefined>(undefined)
   const displayName = profile?.primary_email ?? profile?.username
 
+  // Keep `navigate` stable across parent re-renders so the effect below isn't
+  // re-run mid-POST. Otherwise a stray re-render during the in-flight request
+  // would tear down the success handler (via cleanup) and the ref guard would
+  // prevent the retry — leaving the page stuck on the loading state forever.
+  const stableNavigate = useStaticEffectEvent(navigate)
+
   useEffect(() => {
     if (!isLoggedIn || !routerReady) return
     if (deviceCode) {
@@ -131,39 +138,26 @@ export const CliLoginScreen = ({
       return
     }
 
-    // Guard against re-render loops triggered by unstable deps (e.g. a new
-    // `navigate` reference on each parent render) firing the POST more than
-    // once per session_id. Without this, the dashboard creates several
-    // identical access tokens before navigating to the device_code view.
+    // Guard against re-render loops firing the POST more than once per
+    // session_id. Without this, the dashboard creates several identical
+    // access tokens before navigating to the device_code view.
     if (startedForSessionIdRef.current === sessionId) return
     startedForSessionIdRef.current = sessionId
 
-    let isActive = true
     setStatus({ _tag: 'loading' })
 
-    async function createSession() {
-      try {
-        const { nonce } = await createCliLoginSession(sessionId!, publicKey!, tokenName)
-
-        if (!isActive) return
-
+    createCliLoginSession(sessionId!, publicKey!, tokenName)
+      .then(({ nonce }) => {
         if (nonce) {
-          navigate(`/cli/login?device_code=${nonce.substring(0, 8)}`)
+          stableNavigate(`/cli/login?device_code=${nonce.substring(0, 8)}`)
         } else {
           setStatus({ _tag: 'error', message: 'The CLI sign-in session did not return a code.' })
         }
-      } catch (error: unknown) {
-        if (!isActive) return
+      })
+      .catch((error: unknown) => {
         setStatus({ _tag: 'error', message: getErrorMessage(error) })
-      }
-    }
-
-    createSession()
-
-    return () => {
-      isActive = false
-    }
-  }, [deviceCode, isLoggedIn, navigate, publicKey, routerReady, sessionId, tokenName])
+      })
+  }, [deviceCode, isLoggedIn, publicKey, routerReady, sessionId, stableNavigate, tokenName])
 
   if (status._tag === 'loading') {
     return (
