@@ -75,14 +75,14 @@ export function getDevelopmentOperations({
     },
     async getPublishableKeys(_projectRef) {
       if (process.env.SUPABASE_PUBLISHABLE_KEY) {
-        const keys: ApiKey[] = [
+        const publishableKeysArray: ApiKey[] = [
           {
             api_key: process.env.SUPABASE_PUBLISHABLE_KEY,
             name: 'publishable',
             type: 'publishable' as ApiKeyType,
           },
         ]
-        return keys
+        return publishableKeysArray
       }
 
       const settings = getProjectSettings()
@@ -92,14 +92,14 @@ export function getDevelopmentOperations({
         throw new Error('Anon key not found in project settings')
       }
 
-      const keys: ApiKey[] = [
+      const publishableKeysArray: ApiKey[] = [
         {
           api_key: anonKey.api_key,
           name: anonKey.name,
           type: 'legacy' as ApiKeyType,
         },
       ]
-      return keys
+      return publishableKeysArray
     },
     async generateTypescriptTypes(_projectRef) {
       const response = await generateTypescriptTypes({ headers })
