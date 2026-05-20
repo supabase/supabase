@@ -62,13 +62,11 @@ export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) =
                 : `Upgrade to Pro to use ${type} buckets for your project`
             }
           >
-            <div className="flex items-center gap-x-2">
-              <UpgradePlanButton
-                source={`${type}Buckets`}
-                featureProposition={`use ${type} buckets`}
-                addon={requiresComputeUpgrade ? 'computeSize' : undefined}
-              />
-            </div>
+            <UpgradePlanButton
+              source={`${type}Buckets`}
+              featureProposition={`use ${type} buckets`}
+              addon={requiresComputeUpgrade ? 'computeSize' : undefined}
+            />
           </EmptyStatePresentational>
         </PageSectionContent>
       </PageSection>
