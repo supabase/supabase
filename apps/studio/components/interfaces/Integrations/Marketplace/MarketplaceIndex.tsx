@@ -218,7 +218,7 @@ export const MarketplaceIndex = () => {
           <>
             {featured.length > 0 && (
               <MarketplaceFeaturedHero
-                integrations={[...featured, ...featured.slice(0, 1)]}
+                integrations={featured}
                 installedIds={installedIds}
                 categoryOptions={categoryOptions}
               />
