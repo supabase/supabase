@@ -1,8 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, Copy, X } from 'lucide-react'
+import { Copy, X } from 'lucide-react'
 import { toast } from 'sonner'
 import {
-  Button,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
