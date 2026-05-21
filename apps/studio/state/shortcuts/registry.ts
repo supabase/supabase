@@ -14,6 +14,12 @@ import {
   functionsOverviewRegistry,
 } from './registry/functions-overview'
 import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
+import { LOGS_PREVIEW_SHORTCUT_IDS, logsPreviewRegistry } from './registry/logs-preview'
+import {
+  REALTIME_INSPECTOR_SHORTCUT_IDS,
+  realtimeInspectorRegistry,
+} from './registry/realtime-inspector'
+import { REALTIME_NAV_SHORTCUT_IDS, realtimeNavRegistry } from './registry/realtime-nav'
 import {
   SCHEMA_VISUALIZER_SHORTCUT_IDS,
   schemaVisualizerRegistry,
@@ -108,6 +114,14 @@ export const SHORTCUT_IDS = {
   ...FUNCTIONS_DETAIL_NAV_SHORTCUT_IDS,
   // Per-function Overview tab shortcuts (intervals, refresh, open logs)
   ...FUNCTIONS_OVERVIEW_SHORTCUT_IDS,
+
+  // Realtime sub-page navigation chords
+  ...REALTIME_NAV_SHORTCUT_IDS,
+  // Realtime Inspector page shortcuts
+  ...REALTIME_INSPECTOR_SHORTCUT_IDS,
+
+  // LogsPreviewer shortcuts (Function Logs, Function Invocations, Logs Explorer)
+  ...LOGS_PREVIEW_SHORTCUT_IDS,
 } as const
 
 /**
@@ -410,4 +424,12 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   ...functionsDetailNavRegistry,
   // Per-function Overview tab shortcut registration
   ...functionsOverviewRegistry,
+
+  // Realtime sub-page navigation chord registration
+  ...realtimeNavRegistry,
+  // Realtime Inspector page shortcut registration
+  ...realtimeInspectorRegistry,
+
+  // LogsPreviewer shortcut registration
+  ...logsPreviewRegistry,
 }

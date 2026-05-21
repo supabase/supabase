@@ -18,6 +18,7 @@ interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   showDottedGrid?: boolean
   wide?: boolean
   hideCode?: boolean
+  padded?: boolean
 }
 
 export function ComponentPreview({
@@ -32,6 +33,7 @@ export function ComponentPreview({
   showDottedGrid = true,
   wide = false,
   hideCode = false,
+  padded = true,
   ...props
 }: ComponentPreviewProps) {
   const [config] = useConfig()
@@ -41,6 +43,7 @@ export function ComponentPreview({
   const Code = Codes[index]
 
   const [expand, setExpandState] = React.useState(false)
+  const previewClassName = className
 
   const Preview = React.useMemo(() => {
     const Component = Index[config.style][name]?.component
@@ -64,11 +67,16 @@ export function ComponentPreview({
     return (
       <>
         <div
-          className={cn('preview flex min-h-[256px] w-full justify-center p-10', {
-            'items-center': align === 'center',
-            'items-start': align === 'start',
-            'items-end': align === 'end',
-          })}
+          className={cn(
+            'preview flex min-h-[256px] w-full justify-center',
+            padded && 'p-10',
+            {
+              'items-center': align === 'center',
+              'items-start': align === 'start',
+              'items-end': align === 'end',
+            },
+            previewClassName
+          )}
         >
           <React.Suspense
             fallback={
@@ -80,7 +88,7 @@ export function ComponentPreview({
         </div>
       </>
     )
-  }, [Preview, align])
+  }, [Preview, align, padded, previewClassName])
 
   const wideClasses = wide ? '2xl:-ml-20 2xl:-mr-20' : ''
 

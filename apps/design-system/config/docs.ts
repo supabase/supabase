@@ -143,6 +143,16 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Page Breadcrumbs',
+          href: '/docs/fragments/page-breadcrumbs',
+          items: [],
+        },
+        {
+          title: 'Page Nav',
+          href: '/docs/fragments/page-nav',
+          items: [],
+        },
+        {
           title: 'Page Header',
           href: '/docs/fragments/page-header',
           items: [],

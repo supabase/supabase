@@ -58,6 +58,24 @@ export const generateTableFieldFromPGTable = (
   }
 }
 
+// Merges only foreign-key metadata from a freshly server-derived TableField into
+// the existing (possibly user-edited) one. Preserves user-added columns and any
+// edits to existing columns; only injects `foreignKey` onto matching server-
+// originated columns. Used when foreignKeyMeta resolves after the user has
+// already started editing the panel.
+export const mergeForeignKeyMeta = (existing: TableField, fromServer: TableField): TableField => {
+  const serverColumnsById = new Map(fromServer.columns.map((col) => [col.id, col]))
+  return {
+    ...existing,
+    columns: existing.columns.map((col) => {
+      if (col.isNewColumn) return col
+      const serverCol = serverColumnsById.get(col.id)
+      if (!serverCol) return col
+      return { ...col, foreignKey: serverCol.foreignKey }
+    }),
+  }
+}
+
 export const formatImportedContentToColumnFields = (importContent: ImportContent) => {
   const { headers, selectedHeaders, columnTypeMap } = importContent
   const columnFields = headers

@@ -52,7 +52,7 @@ This approach ensures that when new headers are added to the Supabase SDK, your 
 
 #### For versions before 2.95.0
 
-If you're using `@supabase/supabase-js` before v2.95.0, you'll need to hardcode the CORS headers. Add a `cors.ts` file within a [`_shared` folder](/docs/guides/functions/quickstart#organizing-your-edge-functions):
+If you're using `@supabase/supabase-js` before v2.95.0, you'll need to hardcode the CORS headers. Add a `cors.ts` file within a [`_shared` folder](/docs/guides/functions/development-environment#recommended-project-structure):
 
 ```ts _shared/cors.ts
 export const corsHeaders = {

@@ -16,6 +16,7 @@ import {
   checkForWithClause,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import { get } from '@/data/fetchers'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -75,10 +76,7 @@ export const useLogsQuery = (
   } = useQuery({
     queryKey: ['projects', projectRef, 'logs', params, { otel: useOtel }],
     queryFn: async ({ signal }) => {
-      const endpoint = useOtel
-        ? (`/platform/projects/{ref}/analytics/endpoints/logs.all.otel` as const)
-        : (`/platform/projects/{ref}/analytics/endpoints/logs.all` as const)
-      const { data, error } = await get(endpoint, {
+      const { data, error } = await get(logsAllEndpointUrl(useOtel), {
         params: {
           path: { ref: projectRef },
           query: params,

@@ -27,6 +27,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
   UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
   UI_PREVIEW_RLS_TESTER: 'supabase-ui-rls-tester',
+  UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
@@ -53,6 +54,8 @@ export const LOCAL_STORAGE_KEYS = {
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
+  GRAPHQL_INTROSPECTION_NOTICE_COLLAPSED: (ref: string) =>
+    `graphql-introspection-notice-collapsed-${ref}`,
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
   CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
@@ -157,6 +160,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
