@@ -8,9 +8,7 @@ const iconProps = {
   className: 'text-foreground-light',
 }
 
-// 'elastic' is missing from the backend OpenAPI spec but exists in the form schema;
-// keep it in the type until the spec is updated.
-export type LogDrainType = components['schemas']['CreateBackendParamsOpenapi']['type'] | 'elastic'
+export type LogDrainType = components['schemas']['CreateBackendParamsOpenapi']['type']
 
 export const LOG_DRAIN_TYPES = [
   {
