@@ -1,4 +1,7 @@
-import { useStatusPageBannerVisibility } from './useStatusPageBannerVisibility'
+import {
+  useStatusPageBannerVisibility,
+  type UseStatusPageBannerVisibilityOptions,
+} from './useStatusPageBannerVisibility'
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from '@/components/ui/InlineLink'
 
@@ -11,8 +14,10 @@ const BANNER_DESCRIPTION = (
 /**
  * Used to display ongoing incidents
  */
-export const StatusPageBanner = () => {
-  const banner = useStatusPageBannerVisibility()
+export const StatusPageBanner = ({
+  assumeNoProjects,
+}: UseStatusPageBannerVisibilityOptions = {}) => {
+  const banner = useStatusPageBannerVisibility({ assumeNoProjects })
 
   if (!banner) return null
 

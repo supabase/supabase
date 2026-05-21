@@ -14,7 +14,18 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 export type StatusPageBannerData = { title: string; dismiss?: () => void }
 
-export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
+export type UseStatusPageBannerVisibilityOptions = {
+  /**
+   * Skip the org/projects queries (which require an authenticated session) and
+   * evaluate the smart targeting as if the viewer has no projects. Use on
+   * signed-out surfaces like the sign-in page.
+   */
+  assumeNoProjects?: boolean
+}
+
+export function useStatusPageBannerVisibility({
+  assumeNoProjects = false,
+}: UseStatusPageBannerVisibilityOptions = {}): StatusPageBannerData | null {
   const showIncidentBannerOverride =
     useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true'
 
@@ -24,8 +35,11 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
   const incidents = bannerItems.map((i) => ({ id: i.id, cache: i.metadata }))
   const hasActiveIncidents = incidents.length > 0
 
+  const shouldFetchUserContext =
+    !assumeNoProjects && !showIncidentBannerOverride && hasActiveIncidents
+
   const { data: organizations } = useOrganizationsQuery({
-    enabled: !showIncidentBannerOverride && hasActiveIncidents,
+    enabled: shouldFetchUserContext,
   })
 
   const orgProjectsQueries = useQueries({
@@ -33,26 +47,31 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
       queryKey: projectKeys.bannerProjectsByOrg(org.slug),
       queryFn: () => getOrganizationProjects({ slug: org.slug, limit: 100 }),
       staleTime: 5 * 60 * 1000,
-      enabled: !showIncidentBannerOverride && hasActiveIncidents,
+      enabled: shouldFetchUserContext,
     })),
   })
 
   const isProjectsFetched =
-    organizations !== undefined &&
-    (organizations.length === 0 || orgProjectsQueries.every((q) => q.isFetched))
+    assumeNoProjects ||
+    (organizations !== undefined &&
+      (organizations.length === 0 || orgProjectsQueries.every((q) => q.isFetched)))
 
   const allProjects = orgProjectsQueries.flatMap((q) => q.data?.projects ?? [])
-  const hasProjects = allProjects.length > 0
+  const hasProjects = !assumeNoProjects && allProjects.length > 0
   const userRegions = useMemo(
     () =>
-      new Set(
-        allProjects.flatMap((project: OrgProject) => project.databases.map((db) => db.region))
-      ),
-    [allProjects]
+      assumeNoProjects
+        ? new Set<string>()
+        : new Set(
+            allProjects.flatMap((project: OrgProject) => project.databases.map((db) => db.region))
+          ),
+    [allProjects, assumeNoProjects]
   )
-  const hasUnknownRegions = orgProjectsQueries.some(
-    (q) => q.isError || (q.data !== undefined && q.data.pagination.count > q.data.projects.length)
-  )
+  const hasUnknownRegions =
+    !assumeNoProjects &&
+    orgProjectsQueries.some(
+      (q) => q.isError || (q.data !== undefined && q.data.pagination.count > q.data.projects.length)
+    )
 
   const [dismissedIds, setDismissedIds, { isSuccess: isDismissedLoaded }] = useLocalStorageQuery<
     Array<string>

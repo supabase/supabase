@@ -1,11 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { getAccessToken, useFlag } from 'common'
+import { getAccessToken } from 'common'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 
+import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
+import { useStatusPageBannerVisibility } from '@/components/layouts/AppLayout/useStatusPageBannerVisibility'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
@@ -28,7 +30,8 @@ const SignInLayout = ({
   const router = useRouter()
   const queryClient = useQueryClient()
   const { resolvedTheme } = useTheme()
-  const ongoingIncident = useFlag('ongoingIncident')
+  const incidentBanner = useStatusPageBannerVisibility({ assumeNoProjects: true })
+  const showIncidentBanner = incidentBanner !== null
 
   const {
     dashboardAuthShowTestimonial: showTestimonial,
@@ -109,9 +112,10 @@ const SignInLayout = ({
   return (
     <>
       <div className="relative flex flex-col bg-alternative min-h-screen">
+        <StatusPageBanner assumeNoProjects />
         <div
           className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
-            ongoingIncident ? 'mt-14' : 'mt-6'
+            showIncidentBanner ? 'mt-14' : 'mt-6'
           }`}
         >
           <nav className="relative flex items-center justify-between sm:h-10">
