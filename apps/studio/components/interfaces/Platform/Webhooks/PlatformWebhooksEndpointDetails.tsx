@@ -8,7 +8,7 @@ import {
   type PaginationState,
   type SortingState,
 } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight, RotateCcw, Search } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Copy, RotateCcw, Search } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import {
   Badge,
@@ -32,6 +32,8 @@ import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface DetailItemProps {
   label: string
@@ -50,6 +52,7 @@ interface PlatformWebhooksEndpointDetailsProps {
   deliverySearch: string
   filteredDeliveries: WebhookDelivery[]
   selectedEndpoint: WebhookEndpoint
+  onCopyUrl: () => void
   onDeliverySearchChange: (value: string) => void
   onOpenDelivery: (deliveryId: string) => void
   onRetryDelivery: (deliveryId: string) => void
@@ -150,6 +153,7 @@ export const PlatformWebhooksEndpointDetails = ({
   deliverySearch,
   filteredDeliveries,
   selectedEndpoint,
+  onCopyUrl,
   onDeliverySearchChange,
   onOpenDelivery,
   onRetryDelivery,
@@ -198,8 +202,21 @@ export const PlatformWebhooksEndpointDetails = ({
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
               {hasName && <DetailItem label="Name">{selectedEndpoint.name}</DetailItem>}
 
-              <DetailItem label="URL" ddClassName="text-sm break-all">
-                {selectedEndpoint.url}
+              <DetailItem label="URL" ddClassName="flex items-start gap-2 text-sm">
+                <span className="break-all">{selectedEndpoint.url}</span>
+                <ShortcutTooltip
+                  shortcutId={SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_ENDPOINT_URL}
+                  label="Copy endpoint URL"
+                >
+                  <Button
+                    type="text"
+                    size="tiny"
+                    className="mt-0.5 shrink-0 h-5 w-5 p-0"
+                    icon={<Copy size={12} />}
+                    aria-label="Copy endpoint URL"
+                    onClick={onCopyUrl}
+                  />
+                </ShortcutTooltip>
               </DetailItem>
 
               {hasDescription && (
