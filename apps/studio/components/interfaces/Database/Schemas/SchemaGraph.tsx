@@ -187,14 +187,17 @@ export const SchemaGraph = () => {
       }
 
       const selectedNodeIds = new Set(params.nodes.map((n) => n.id))
-      reactFlowInstance.setEdges(
-        reactFlowInstance.getEdges().map((edge) => ({
-          ...edge,
-          animated:
-            selectedNodeIds.size > 0 &&
-            (selectedNodeIds.has(edge.source) || selectedNodeIds.has(edge.target)),
-        }))
-      )
+      const currentEdges = reactFlowInstance.getEdges()
+      let hasChanges = false
+      const nextEdges = currentEdges.map((edge) => {
+        const shouldAnimate =
+          selectedNodeIds.size > 0 &&
+          (selectedNodeIds.has(edge.source) || selectedNodeIds.has(edge.target))
+        if (edge.animated === shouldAnimate) return edge
+        hasChanges = true
+        return { ...edge, animated: shouldAnimate }
+      })
+      if (hasChanges) reactFlowInstance.setEdges(nextEdges)
     }
   )
 
@@ -253,16 +256,7 @@ export const SchemaGraph = () => {
         }
       })
     }
-  }, [
-    isSuccessTables,
-    isSuccessSchemas,
-    tables,
-    reactFlowInstance,
-    ref,
-    resolvedTheme,
-    schemas,
-    selectedSchema,
-  ])
+  }, [isSuccessTables, isSuccessSchemas, tables, reactFlowInstance, ref, schemas, selectedSchema])
 
   const schemaGraphContext = useMemo<SchemaGraphContextType>(
     () => ({
@@ -470,6 +464,7 @@ export const SchemaGraph = () => {
                   fitView
                   minZoom={0.8}
                   maxZoom={1.8}
+                  onlyRenderVisibleElements
                   proOptions={{ hideAttribution: true }}
                   onNodeDragStop={saveNodePositions}
                   onSelectionChange={handleSelectionChange}
