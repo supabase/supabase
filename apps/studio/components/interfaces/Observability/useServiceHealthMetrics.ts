@@ -3,8 +3,6 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useMemo } from 'react'
 
-dayjs.extend(utc)
-
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import {
   calculateAggregatedMetrics,
@@ -20,6 +18,8 @@ import {
   type ServiceHealthResultRow,
 } from '@/data/analytics/service-health-query'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+
+dayjs.extend(utc)
 
 export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'
 
