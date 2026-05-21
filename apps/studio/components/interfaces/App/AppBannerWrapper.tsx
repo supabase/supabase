@@ -10,7 +10,7 @@ import { BannerTOSUpdate } from '@/components/ui/BannerStack/Banners/BannerTOSUp
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
-const TOSUpdateExpiry = new Date('2026-06-01T00:00:00Z')
+const TOSUpdateExpiry = new Date('2026-07-04T00:00:00Z')
 
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
