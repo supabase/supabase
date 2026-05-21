@@ -50,6 +50,12 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     clientRouterFilter: false,
+    // Diagnostic: disable Turbopack optimizations one-by-one to identify which
+    // one is hanging the Vercel production build at "Creating an optimized
+    // production build". Remove once the trigger is identified.
+    turbopackScopeHoisting: false,
+    turbopackClientSideNestedAsyncChunking: false,
+    turbopackRemoveUnusedExports: false,
   },
   async rewrites() {
     return [
