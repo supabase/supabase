@@ -155,7 +155,7 @@ const stateOfStartupsData = {
       title: 'One Company Swept the Tooling Layer',
       shortTitle: 'Anthropic generation',
       description:
-        'Claude Code became the most-named must-have dev tool. Claude paid subscriptions nearly doubled. Anthropic overtook OpenAI on the model-provider question. The Anthropic Agent SDK leads SDK adoption. This is the largest single-year re-ordering in any category in the survey.',
+        'Claude Code became the most-named must-have dev tool. Claude paid subscriptions nearly doubled. Anthropic overtook OpenAI on the model-provider question. The Anthropic Agent SDK leads SDK adoption.',
       pullQuote: undefined,
       sections: [
         {
@@ -348,7 +348,7 @@ const stateOfStartupsData = {
       title: 'The Stack Consolidated',
       shortTitle: 'Tech Stack',
       description:
-        'Supabase gained ground as a primary database, landed strong in its first year as an auth provider, and overtook AWS in hosting. Every hyperscaler lost share. A quieter story: the frontend layer is diversifying fast.',
+        'Supabase gained ground as a primary database, and combined with Postgres, it’s clear what platform startups are betting on. Hyperscalers lost share. And the frontend layer is diversifying fast.',
       pullQuote: {
         quote:
           'We’re building an end-to-end system for wedding planners, all running as one SvelteKit / Supabase instance.',
