@@ -480,7 +480,6 @@ export function LogDrainDestinationSheetForm({
                       </SelectTrigger>
                       <SelectContent>
                         {LOG_DRAIN_TYPES.filter((t) => {
-                          if ('hidden' in t && t.hidden) return false
                           if (t.value === 'sentry') return sentryEnabled
                           if (t.value === 's3') return s3Enabled
                           if (t.value === 'axiom') return axiomEnabled

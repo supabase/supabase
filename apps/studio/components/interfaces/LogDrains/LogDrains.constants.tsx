@@ -68,14 +68,6 @@ export const LOG_DRAIN_TYPES = [
     description: 'Forward logs to a remote Syslog receiver using TCP or TLS, adhering to RFC 5424',
     icon: <Server {...iconProps} />,
   },
-  // elastic is supported by the backend but not yet exposed in the UI
-  {
-    value: 'elastic',
-    name: 'Elastic',
-    description: 'Elastic is a search and observability platform',
-    icon: <BracesIcon {...iconProps} />,
-    hidden: true as const,
-  },
 ] as const
 
 export const LOG_DRAIN_SOURCE_VALUES = LOG_DRAIN_TYPES.map((source) => source.value)
