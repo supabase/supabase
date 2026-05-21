@@ -96,10 +96,7 @@ export const AdvisorPanel = () => {
     return notificationsData?.pages.flatMap((page) => page) ?? []
   }, [notificationsData?.pages])
 
-  const { data: projectsData } = useProjectsInfiniteQuery(
-    {},
-    { enabled: shouldLoadNotifications }
-  )
+  const { data: projectsData } = useProjectsInfiniteQuery({}, { enabled: shouldLoadNotifications })
 
   const projectNameByRef = useMemo(() => {
     const map = new Map<string, string>()
