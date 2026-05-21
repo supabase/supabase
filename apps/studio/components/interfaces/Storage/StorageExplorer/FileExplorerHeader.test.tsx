@@ -83,7 +83,30 @@ describe('FileExplorerHeader', () => {
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
   })
 
-  it('renders full breadcrumbs in column view and places Navigate before Reload', () => {
+  it('does not render folder breadcrumbs in column view and places Navigate before Reload', () => {
+    render(
+      <FileExplorerHeader
+        itemSearchString=""
+        setItemSearchString={vi.fn()}
+        onFilesUpload={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByRole('button', { name: 'my-bucket' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'images' })).not.toBeInTheDocument()
+    expect(screen.queryByText('2024')).not.toBeInTheDocument()
+
+    const navigateButton = screen.getByRole('button', { name: 'Navigate' })
+    const reloadButton = screen.getByRole('button', { name: 'Reload' })
+
+    expect(
+      navigateButton.compareDocumentPosition(reloadButton) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+  })
+
+  it('renders text-xs breadcrumbs in a row above the search bar in list view', () => {
+    mockUseStoragePreference.mockReturnValue(createPreference(STORAGE_VIEWS.LIST))
+
     render(
       <FileExplorerHeader
         itemSearchString=""
@@ -96,25 +119,18 @@ describe('FileExplorerHeader', () => {
     const inactiveBreadcrumb = screen.getByRole('button', { name: 'images' })
     const activeBreadcrumb = screen.getByText('2024')
 
-    expect(rootBreadcrumb).toBeInTheDocument()
-    expect(inactiveBreadcrumb).toBeInTheDocument()
-    expect(activeBreadcrumb).toBeInTheDocument()
-    expect(inactiveBreadcrumb).toHaveClass('text-foreground-lighter')
-    expect(activeBreadcrumb).toHaveClass('text-foreground')
+    expect(rootBreadcrumb).toHaveClass('text-xs')
+    expect(inactiveBreadcrumb).toHaveClass('text-xs', 'text-foreground-lighter')
+    expect(activeBreadcrumb).toHaveClass('text-xs', 'text-foreground')
     expect(activeBreadcrumb).not.toHaveClass('text-foreground-lighter')
     expect(screen.queryByRole('button', { name: '2024' })).not.toBeInTheDocument()
-
-    const navigateButton = screen.getByRole('button', { name: 'Navigate' })
-    const reloadButton = screen.getByRole('button', { name: 'Reload' })
-
-    expect(
-      navigateButton.compareDocumentPosition(reloadButton) & Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy()
+    expect(screen.getByPlaceholderText('Search in 2024...')).toBeInTheDocument()
   })
 
   it('uses breadcrumb buttons to navigate back to a previous folder level with keyboard input', async () => {
     const snapshot = createSnapshot()
     mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+    mockUseStoragePreference.mockReturnValue(createPreference(STORAGE_VIEWS.LIST))
 
     render(
       <FileExplorerHeader

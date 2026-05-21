@@ -45,6 +45,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { pageChromeRowClassName } from './storageExplorerChrome'
 import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
 import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -161,12 +162,12 @@ const HeaderBreadcrumbs = ({
           )
 
   return loading.isLoading ? (
-    <div className="ml-2 flex items-center">
-      <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
-      <p className="ml-3 text-sm">{loading.message}</p>
+    <div className="ml-1 flex items-center">
+      <LoaderCircle size={14} strokeWidth={1.5} className="animate-spin text-foreground-lighter" />
+      <p className="ml-3 text-xs">{loading.message}</p>
     </div>
   ) : (
-    <div className="ml-3 flex min-w-0 flex-1 items-center overflow-hidden">
+    <div className="ml-1 flex min-w-0 flex-1 items-center overflow-hidden">
       {formattedBreadcrumbs.map((crumb, idx: number) => {
         const isEllipsis = crumb.name === ellipsis
         const isActive = crumb.index === breadcrumbs.length - 1
@@ -174,16 +175,16 @@ const HeaderBreadcrumbs = ({
         return (
           <div className="flex shrink-0 items-center" key={`${crumb.index}-${crumb.name}`}>
             {idx !== 0 && (
-              <ChevronRight size={14} strokeWidth={2} className="text-foreground-muted mx-1" />
+              <ChevronRight size={14} strokeWidth={1.5} className="text-foreground-muted mx-1" />
             )}
             {isEllipsis ? (
-              <span className="max-w-24 truncate text-sm text-foreground-light">{crumb.name}</span>
+              <span className="max-w-24 truncate text-xs text-foreground-light">{crumb.name}</span>
             ) : isActive ? (
-              <span className="max-w-24 truncate text-sm text-foreground">{crumb.name}</span>
+              <span className="max-w-24 truncate text-xs text-foreground">{crumb.name}</span>
             ) : (
               <button
                 type="button"
-                className="max-w-24 truncate border-0 bg-transparent p-0 text-left text-sm text-foreground-lighter transition-colors hover:text-foreground focus-visible:text-foreground"
+                className="max-w-24 truncate border-0 bg-transparent p-0 text-left text-xs text-foreground-lighter transition-colors hover:text-foreground focus-visible:text-foreground"
                 onClick={() => selectBreadcrumb(crumb.index)}
               >
                 {crumb.name}
@@ -245,6 +246,13 @@ export const FileExplorerHeader = ({
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
+  const isListView = view === STORAGE_VIEWS.LIST
+  const showFolderBreadcrumbs = breadcrumbs.length > 1
+  const isBucketRoot = breadcrumbs.length <= 1
+  const currentFolderName = breadcrumbs[breadcrumbs.length - 1]
+  const searchPlaceholder = isBucketRoot
+    ? 'Search in root directory...'
+    : `Search in ${currentFolderName}...`
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useFileExplorerHeaderShortcuts({
@@ -337,14 +345,15 @@ export const FileExplorerHeader = ({
   /** Methods for searching */
   // Search is currently within local scope when the view is set to list
   // Searching for column view requires much more thinking
-  const toggleSearch = () => {
-    setIsPathDialogOpen(false)
-    snap.setIsSearching(true)
-  }
-
   const onCancelSearch = () => {
     snap.setIsSearching(false)
     setItemSearchString('')
+  }
+
+  const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setItemSearchString(value)
+    snap.setIsSearching(value.length > 0)
   }
 
   /** Methods for breadcrumbs */
@@ -364,76 +373,100 @@ export const FileExplorerHeader = ({
   }
 
   return (
-    <div className="rounded-t-md border-b border-overlay bg-surface-100">
+    <div className="border-b border-overlay bg-surface-100">
+      {isListView && showFolderBreadcrumbs && (
+        <div className="overflow-x-auto overflow-y-hidden border-b border-overlay">
+          <div className="flex min-h-8 w-max min-w-full items-center px-4 py-1.5 xl:px-4">
+            <Button
+              icon={<ArrowLeft size={14} strokeWidth={1.5} />}
+              size="tiny"
+              type="text"
+              className="shrink-0 px-1"
+              disabled={backDisabled}
+              onClick={() => {
+                setIsPathDialogOpen(false)
+                onSelectBack()
+              }}
+            />
+            <HeaderBreadcrumbs
+              loading={loading}
+              breadcrumbs={breadcrumbs}
+              selectBreadcrumb={selectBreadcrumb}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto overflow-y-hidden">
-        <div className="flex min-h-[40px] w-max min-w-full items-center justify-between">
-          {/* Navigation */}
-          <div className="flex min-w-0 flex-1 items-center overflow-hidden pl-2 py-[7px]">
-            {breadcrumbs.length > 1 && (
-              <>
-                <Button
-                  icon={<ArrowLeft size={16} strokeWidth={2} />}
-                  size="tiny"
-                  type="text"
-                  className="shrink-0 px-1"
-                  disabled={backDisabled}
-                  onClick={() => {
-                    setIsPathDialogOpen(false)
-                    onSelectBack()
-                  }}
-                />
-                <div className="mx-1 h-5 shrink-0 border-r border-strong" />
-              </>
-            )}
-            {breadcrumbs.length > 1 ? (
-              <HeaderBreadcrumbs
-                loading={loading}
-                breadcrumbs={breadcrumbs}
-                selectBreadcrumb={selectBreadcrumb}
-              />
-            ) : null}
+        <div className={pageChromeRowClassName}>
+          <div className="flex min-w-0 flex-1 items-center overflow-hidden">
+            <Input
+              ref={searchInputRef}
+              size="tiny"
+              className="w-52"
+              icon={<Search strokeWidth={1.5} />}
+              actions={
+                itemSearchString.length > 0
+                  ? [
+                      <Button
+                        key="cancel"
+                        size="tiny"
+                        type="text"
+                        icon={<X strokeWidth={1.5} />}
+                        onClick={onCancelSearch}
+                        className="p-0 h-5 w-5"
+                      />,
+                    ]
+                  : undefined
+              }
+              placeholder={searchPlaceholder}
+              type="text"
+              value={itemSearchString}
+              onChange={onSearchChange}
+              onFocus={() => setIsPathDialogOpen(false)}
+            />
           </div>
 
-          {/* Actions */}
-          <div className="flex shrink-0 items-center whitespace-nowrap py-[7px]">
-            <div className="flex shrink-0 items-center space-x-1 px-2">
+          <div className="flex shrink-0 items-center gap-2 whitespace-nowrap">
+            <div className="flex shrink-0 items-center gap-1">
               {view === STORAGE_VIEWS.COLUMNS && (
                 <Button
                   size="tiny"
-                  icon={<Edit2 />}
-                  type="text"
+                  icon={<Edit2 strokeWidth={1.5} />}
+                  type="outline"
+                  aria-label="Navigate"
+                  className="w-7 px-1"
                   disabled={isPathDialogOpen || loading.isLoading}
                   onClick={onOpenNavigate}
-                >
-                  Navigate
-                </Button>
+                />
               )}
               <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH} side="bottom">
                 <Button
                   size="tiny"
-                  icon={<RefreshCw />}
-                  type="text"
+                  icon={<RefreshCw strokeWidth={1.5} />}
+                  type="outline"
+                  aria-label="Reload"
+                  className="w-7 px-1"
                   loading={isRefreshing}
                   onClick={refreshData}
-                >
-                  Reload
-                </Button>
+                />
               </ShortcutTooltip>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    type="outline"
+                    size="tiny"
+                    aria-label="View options"
+                    className="w-7 px-1"
                     icon={
                       view === 'LIST' ? (
-                        <List size={16} strokeWidth={2} />
+                        <List size={16} strokeWidth={1.5} />
                       ) : (
-                        <Columns size={16} strokeWidth={2} />
+                        <Columns size={16} strokeWidth={1.5} />
                       )
                     }
-                  >
-                    View
-                  </Button>
+                  />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40 min-w-0">
                   {VIEW_OPTIONS.map((option) => (
@@ -441,7 +474,7 @@ export const FileExplorerHeader = ({
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
                         {view === option.key && (
-                          <Check size={16} className="text-brand" strokeWidth={2} />
+                          <Check size={16} className="text-brand" strokeWidth={1.5} />
                         )}
                       </div>
                     </DropdownMenuItem>
@@ -455,7 +488,7 @@ export const FileExplorerHeader = ({
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortBy === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
+                              <Check size={16} className="text-brand" strokeWidth={1.5} />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -473,7 +506,7 @@ export const FileExplorerHeader = ({
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortByOrder === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
+                              <Check size={16} className="text-brand" strokeWidth={1.5} />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -484,41 +517,18 @@ export const FileExplorerHeader = ({
               </DropdownMenu>
             </div>
 
-            <div className="h-6 shrink-0 border-r border-control" />
-            <div className="flex shrink-0 items-center space-x-1 px-2">
+            <div className="flex shrink-0 items-center gap-1">
               <div className="hidden">
                 <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
               </div>
-              <ShortcutTooltip
-                shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_UPLOAD}
-                side="bottom"
-                open={!canUpdateStorage ? false : undefined}
-              >
-                <ButtonTooltip
-                  icon={<Upload size={16} strokeWidth={2} />}
-                  type="text"
-                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                  onClick={onSelectUpload}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canUpdateStorage
-                        ? 'You need additional permissions to upload files'
-                        : undefined,
-                    },
-                  }}
-                >
-                  Upload files
-                </ButtonTooltip>
-              </ShortcutTooltip>
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_NEW_FOLDER}
                 side="bottom"
                 open={!canUpdateStorage ? false : undefined}
               >
                 <ButtonTooltip
-                  icon={<FolderPlus size={16} strokeWidth={2} />}
-                  type="text"
+                  icon={<FolderPlus size={16} strokeWidth={1.5} />}
+                  type="outline"
                   disabled={!canUpdateStorage || breadcrumbs.length === 0}
                   onClick={() => addNewFolderPlaceholder(-1)}
                   tooltip={{
@@ -533,47 +543,28 @@ export const FileExplorerHeader = ({
                   Create folder
                 </ButtonTooltip>
               </ShortcutTooltip>
-            </div>
-
-            <div className="h-6 shrink-0 border-r border-control" />
-            <div className="flex shrink-0 items-center px-2">
-              {snap.isSearching ? (
-                <Input
-                  ref={searchInputRef}
-                  size="tiny"
-                  autoFocus
-                  className="w-52"
-                  icon={<Search />}
-                  actions={[
-                    <Button
-                      key="cancel"
-                      size="tiny"
-                      type="text"
-                      icon={<X />}
-                      onClick={onCancelSearch}
-                      className="p-0 h-5 w-5"
-                    />,
-                  ]}
-                  placeholder="Search for a file or folder"
-                  type="text"
-                  value={itemSearchString}
-                  onChange={(event) => setItemSearchString(event.target.value)}
-                />
-              ) : (
-                <ShortcutTooltip
-                  shortcutId={SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH}
-                  label="Search files"
-                  side="bottom"
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_UPLOAD}
+                side="bottom"
+                open={!canUpdateStorage ? false : undefined}
+              >
+                <ButtonTooltip
+                  icon={<Upload size={16} strokeWidth={1.5} />}
+                  type="primary"
+                  disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                  onClick={onSelectUpload}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canUpdateStorage
+                        ? 'You need additional permissions to upload files'
+                        : undefined,
+                    },
+                  }}
                 >
-                  <Button
-                    icon={<Search />}
-                    size="tiny"
-                    type="text"
-                    className="px-1"
-                    onClick={toggleSearch}
-                  />
-                </ShortcutTooltip>
-              )}
+                  Upload files
+                </ButtonTooltip>
+              </ShortcutTooltip>
             </div>
           </div>
         </div>

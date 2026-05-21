@@ -64,31 +64,31 @@ export const RowIcon = ({
 }) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
     return (
-      <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
+      <LoaderCircle size={14} strokeWidth={1.5} className="animate-spin text-foreground-lighter" />
     )
   }
 
   if (fileType === STORAGE_ROW_TYPES.FOLDER) {
     return isOpened ? (
-      <FolderOpen size={16} strokeWidth={2} className="text-foreground-lighter" />
+      <FolderOpen size={16} strokeWidth={1.5} className="text-foreground-lighter" />
     ) : (
-      <FilesBucketIcon size={16} strokeWidth={2} className="text-foreground-lighter" />
+      <FilesBucketIcon size={16} strokeWidth={1.5} className="text-foreground-lighter" />
     )
   }
 
   if (mimeType?.includes('image')) {
-    return <Image size={16} className="text-foreground-lighter" />
+    return <Image size={16} strokeWidth={1.5} className="text-foreground-lighter" />
   }
 
   if (mimeType?.includes('audio')) {
-    return <Music size={16} strokeWidth={2} className="text-foreground-lighter" />
+    return <Music size={16} strokeWidth={1.5} className="text-foreground-lighter" />
   }
 
   if (mimeType?.includes('video')) {
-    return <Film size={16} strokeWidth={2} className="text-foreground-lighter" />
+    return <Film size={16} strokeWidth={1.5} className="text-foreground-lighter" />
   }
 
-  return <File size={16} strokeWidth={2} className="text-foreground-lighter" />
+  return <File size={16} strokeWidth={1.5} className="text-foreground-lighter" />
 }
 
 interface FileExplorerRowProps {
@@ -167,19 +167,19 @@ export const FileExplorerRow = ({
             ? [
                 {
                   name: 'Rename',
-                  icon: <Edit size={12} className="text-foreground-light" />,
+                  icon: <Edit size={12} strokeWidth={1.5} className="text-foreground-light" />,
                   onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
               ]
             : []),
           {
             name: 'Download',
-            icon: <Download size={12} className="text-foreground-light" />,
+            icon: <Download size={12} strokeWidth={1.5} className="text-foreground-light" />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
           {
             name: 'Copy path to folder',
-            icon: <Copy size={12} className="text-foreground-light" />,
+            icon: <Copy size={12} strokeWidth={1.5} className="text-foreground-light" />,
             onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
           },
           ...(canUpdateFiles
@@ -187,7 +187,7 @@ export const FileExplorerRow = ({
                 { name: 'Separator', icon: undefined, onClick: undefined },
                 {
                   name: 'Delete',
-                  icon: <Trash2 size={12} className="text-foreground-light" />,
+                  icon: <Trash2 size={12} strokeWidth={1.5} className="text-foreground-light" />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -200,7 +200,9 @@ export const FileExplorerRow = ({
                   ? [
                       {
                         name: 'Get URL',
-                        icon: <Copy size={12} className="text-foreground-light" />,
+                        icon: (
+                          <Copy size={12} strokeWidth={1.5} className="text-foreground-light" />
+                        ),
                         onClick: () => {
                           onCopyUrl(itemWithColumnIndex.path!)
                         },
@@ -209,7 +211,9 @@ export const FileExplorerRow = ({
                   : [
                       {
                         name: 'Get URL',
-                        icon: <Copy size={12} className="text-foreground-light" />,
+                        icon: (
+                          <Copy size={12} strokeWidth={1.5} className="text-foreground-light" />
+                        ),
                         children: [
                           {
                             name: 'Expire in 1 week',
@@ -235,19 +239,23 @@ export const FileExplorerRow = ({
                     ]),
                 {
                   name: 'Download',
-                  icon: <Download size={12} className="text-foreground-light" />,
+                  icon: <Download size={12} strokeWidth={1.5} className="text-foreground-light" />,
                   onClick: () => downloadFile(itemWithColumnIndex),
                 },
                 ...(canUpdateFiles
                   ? [
                       {
                         name: 'Rename',
-                        icon: <Edit size={12} className="text-foreground-light" />,
+                        icon: (
+                          <Edit size={12} strokeWidth={1.5} className="text-foreground-light" />
+                        ),
                         onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                       },
                       {
                         name: 'Move',
-                        icon: <Move size={12} className="text-foreground-light" />,
+                        icon: (
+                          <Move size={12} strokeWidth={1.5} className="text-foreground-light" />
+                        ),
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
@@ -259,7 +267,7 @@ export const FileExplorerRow = ({
             ? [
                 {
                   name: 'Delete',
-                  icon: <Trash2 size={12} className="text-foreground-light" />,
+                  icon: <Trash2 size={12} strokeWidth={1.5} className="text-foreground-light" />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -350,7 +358,7 @@ export const FileExplorerRow = ({
           {item.isCorrupted && (
             <Tooltip>
               <TooltipTrigger>
-                <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
+                <AlertCircle size={18} strokeWidth={1.5} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 File is corrupted, please delete and reupload again.
@@ -381,13 +389,13 @@ export const FileExplorerRow = ({
             <LoaderCircle
               className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
               size={14}
-              strokeWidth={2}
+              strokeWidth={1.5}
             />
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <div className="storage-row-menu opacity-0">
-                  <MoreVertical size={16} strokeWidth={2} />
+                  <MoreVertical size={16} strokeWidth={1.5} />
                   <span className="sr-only">{item.name} actions</span>
                 </div>
               </DropdownMenuTrigger>

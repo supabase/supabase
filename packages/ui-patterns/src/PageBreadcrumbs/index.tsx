@@ -54,7 +54,7 @@ const PageBreadcrumbs = ({
       <PageContainer
         size="full"
         className={cn(
-          'flex min-h-12 items-center justify-between gap-4 py-2',
+          'flex min-h-(--header-height) items-center justify-between gap-4 py-2',
           pageChromeClassName,
           containerClassName
         )}

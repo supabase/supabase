@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download, Move, Trash2, X } from 'lucide-react'
 import { Button } from 'ui'
 
+import { bulkActionBarClassName } from './storageExplorerChrome'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -20,22 +21,20 @@ export const FileExplorerHeaderSelection = () => {
     setSelectedItemsToMove,
   } = useStorageExplorerStateSnapshot()
 
+  const count = selectedItems.length
+
   return (
-    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow-sm in-data-[theme*=dark]:bg-brand-500">
-      <Button
-        icon={<X size={16} strokeWidth={2} />}
-        type="text"
-        onClick={() => clearSelectedItems()}
-      />
-      <div className="ml-1 flex items-center space-x-3">
-        <p className="mb-0 text-sm text-foreground">
-          <span style={{ fontVariantNumeric: 'tabular-nums' }}>{selectedItems.length}</span> items
-          selected
-        </p>
+    <div className={bulkActionBarClassName}>
+      <span className="font-mono text-xs text-foreground-light">
+        <span className="tabular-nums">{count}</span> item{count !== 1 ? 's' : ''} selected
+      </span>
+
+      <div className="ml-auto flex items-center gap-1">
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_DOWNLOAD_SELECTED} side="bottom">
           <Button
-            icon={<Download size={16} strokeWidth={2} />}
-            type="primary"
+            type="default"
+            size="tiny"
+            icon={<Download size={12} strokeWidth={1.5} />}
             onClick={async () => {
               if (selectedItems.length === 1) {
                 await downloadFile(selectedItems[0])
@@ -47,7 +46,6 @@ export const FileExplorerHeaderSelection = () => {
             Download
           </Button>
         </ShortcutTooltip>
-        <div className="border-r border-green-900 py-3 opacity-50" />
 
         <ShortcutTooltip
           shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_DELETE_SELECTED}
@@ -55,8 +53,9 @@ export const FileExplorerHeaderSelection = () => {
           open={!canUpdateFiles ? false : undefined}
         >
           <ButtonTooltip
-            icon={<Trash2 size={16} strokeWidth={2} />}
-            type="primary"
+            type="default"
+            size="tiny"
+            icon={<Trash2 size={12} strokeWidth={1.5} />}
             disabled={!canUpdateFiles}
             onClick={() => setSelectedItemsToDelete(selectedItems)}
             tooltip={{
@@ -78,8 +77,9 @@ export const FileExplorerHeaderSelection = () => {
           open={!canUpdateFiles ? false : undefined}
         >
           <ButtonTooltip
-            icon={<Move size={16} strokeWidth={2} />}
-            type="primary"
+            type="default"
+            size="tiny"
+            icon={<Move size={12} strokeWidth={1.5} />}
             disabled={!canUpdateFiles}
             onClick={() => setSelectedItemsToMove(selectedItems)}
             tooltip={{
@@ -92,6 +92,15 @@ export const FileExplorerHeaderSelection = () => {
             Move
           </ButtonTooltip>
         </ShortcutTooltip>
+
+        <Button
+          type="text"
+          size="tiny"
+          icon={<X size={12} strokeWidth={1.5} />}
+          title="Clear selection"
+          className="px-1.5 text-foreground-lighter hover:text-foreground"
+          onClick={() => clearSelectedItems()}
+        />
       </div>
     </div>
   )
