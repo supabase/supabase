@@ -44,7 +44,7 @@ export async function getServiceHealth(
   if (!startDate) throw new Error('Start date is required')
   if (!endDate) throw new Error('End date is required')
 
-  const { data, error } = await get('/platform/projects/{ref}/analytics/endpoints/service-health', {
+  const { data, error } = await get('/platform/projects/{ref}/analytics/endpoints/service-health' as any, {
     params: {
       path: { ref: projectRef },
       query: {
