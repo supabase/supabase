@@ -3,13 +3,13 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Input,
   Popover,
   PopoverContent,
@@ -97,15 +97,15 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[250px] p-0" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ className="text-xs" placeholder="Search chats..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+        <Command>
+          <CommandInput className="text-xs" placeholder="Search chats..." />
+          <CommandList>
+            <CommandEmpty>No chats found.</CommandEmpty>
+            <CommandGroup>
               <ScrollArea className={chats.length > 4 ? 'h-40' : ''}>
                 {/* @ts-ignore */}
                 {chats.map(([id, chat]) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={id}
                     value={id}
                     onSelect={() => handleSelectChat(id)}
@@ -161,9 +161,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                               snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
                             )}
                           />
-                          <span className="truncate flex-1 min-w-0 overflow-hidden">
-                            {chat.name}
-                          </span>
+                          <span className="truncate flex-1 w-0">{chat.name}</span>
                         </>
                       )}
                     </div>
@@ -187,13 +185,13 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                         )}
                       </div>
                     )}
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
-            <CommandSeparator_Shadcn_ />
-            <CommandGroup_Shadcn_>
-              <CommandItem_Shadcn_
+            </CommandGroup>
+            <CommandSeparator />
+            <CommandGroup>
+              <CommandItem
                 className="cursor-pointer w-full gap-x-2"
                 onSelect={() => {
                   snap.newChat()
@@ -207,10 +205,10 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
               >
                 <Plus size={14} strokeWidth={1.5} />
                 <span>Start a new chat</span>
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   )

@@ -86,13 +86,13 @@
       "import": "./src/CommandMenu/api/CommandHeader.tsx",
       "types": "./src/CommandMenu/api/CommandHeader.tsx"
     },
-    "./CommandMenu/api/CommandInput": {
-      "import": "./src/CommandMenu/api/CommandInput.tsx",
-      "types": "./src/CommandMenu/api/CommandInput.tsx"
+    "./CommandMenu/api/CommandMenuInput": {
+      "import": "./src/CommandMenu/api/CommandMenuInput.tsx",
+      "types": "./src/CommandMenu/api/CommandMenuInput.tsx"
     },
-    "./CommandMenu/api/CommandList": {
-      "import": "./src/CommandMenu/api/CommandList.tsx",
-      "types": "./src/CommandMenu/api/CommandList.tsx"
+    "./CommandMenu/api/CommandMenuList": {
+      "import": "./src/CommandMenu/api/CommandMenuList.tsx",
+      "types": "./src/CommandMenu/api/CommandMenuList.tsx"
     },
     "./CommandMenu/api/CommandMenu": {
       "import": "./src/CommandMenu/api/CommandMenu.tsx",
@@ -162,17 +162,17 @@
       "import": "./src/CommandMenu/index.tsx",
       "types": "./src/CommandMenu/index.tsx"
     },
-    "./CommandMenu/internal/Command": {
-      "import": "./src/CommandMenu/internal/Command.tsx",
-      "types": "./src/CommandMenu/internal/Command.tsx"
+    "./CommandMenu/internal/CommandMenuItem": {
+      "import": "./src/CommandMenu/internal/CommandMenuItem.tsx",
+      "types": "./src/CommandMenu/internal/CommandMenuItem.tsx"
     },
-    "./CommandMenu/internal/CommandEmpty": {
-      "import": "./src/CommandMenu/internal/CommandEmpty.tsx",
-      "types": "./src/CommandMenu/internal/CommandEmpty.tsx"
+    "./CommandMenu/internal/CommandMenuEmpty": {
+      "import": "./src/CommandMenu/internal/CommandMenuEmpty.tsx",
+      "types": "./src/CommandMenu/internal/CommandMenuEmpty.tsx"
     },
-    "./CommandMenu/internal/CommandGroup": {
-      "import": "./src/CommandMenu/internal/CommandGroup.tsx",
-      "types": "./src/CommandMenu/internal/CommandGroup.tsx"
+    "./CommandMenu/internal/CommandMenuGroup": {
+      "import": "./src/CommandMenu/internal/CommandMenuGroup.tsx",
+      "types": "./src/CommandMenu/internal/CommandMenuGroup.tsx"
     },
     "./CommandMenu/internal/CommandSection": {
       "import": "./src/CommandMenu/internal/CommandSection.tsx",
@@ -557,6 +557,14 @@
     "./PageHeader": {
       "import": "./src/PageHeader/index.tsx",
       "types": "./src/PageHeader/index.tsx"
+    },
+    "./PageBreadcrumbs": {
+      "import": "./src/PageBreadcrumbs/index.tsx",
+      "types": "./src/PageBreadcrumbs/index.tsx"
+    },
+    "./PageNav": {
+      "import": "./src/PageNav/index.tsx",
+      "types": "./src/PageNav/index.tsx"
     },
     "./PageSection": {
       "import": "./src/PageSection/index.tsx",

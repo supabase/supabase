@@ -3,12 +3,12 @@ import { Path, PathValue } from 'react-hook-form'
 import {
   Button,
   Checkbox,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -46,19 +46,19 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align={align}>
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search resources..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No resources found.</CommandEmpty_Shadcn_>
+        <Command>
+          <CommandInput placeholder="Search resources..." />
+          <CommandList>
+            <CommandEmpty>No resources found.</CommandEmpty>
 
-            <CommandGroup_Shadcn_ className="[&>div]:text-left">
+            <CommandGroup className="[&>div]:text-left">
               <div className="max-h-[210px] overflow-y-auto">
                 {ACCESS_TOKEN_RESOURCES.map((resource) => {
                   const isChecked = permissionRows.some(
                     (row: PermissionRow) => row.resource === resource.resource
                   )
                   return (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       key={resource.resource}
                       value={`${resource.resource} ${resource.title}`}
                       onSelect={() => handleToggleResource(resource)}
@@ -77,13 +77,13 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
                           </span>
                         </div>
                       </div>
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   )
                 })}
               </div>
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   )

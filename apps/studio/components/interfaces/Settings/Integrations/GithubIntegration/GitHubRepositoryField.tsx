@@ -3,13 +3,13 @@ import { useMemo, useState, type ComponentProps, type ReactNode } from 'react'
 import type { FieldValues, Path, UseFormReturn } from 'react-hook-form'
 import {
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   FormControl,
   FormField,
   Popover,
@@ -174,14 +174,14 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Search repositories..." />
-                  <CommandList_Shadcn_ className="!max-h-[220px]">
-                    <CommandEmpty_Shadcn_>No repositories found.</CommandEmpty_Shadcn_>
+                <Command>
+                  <CommandInput placeholder="Search repositories..." />
+                  <CommandList className="!max-h-[220px]">
+                    <CommandEmpty>No repositories found.</CommandEmpty>
                     {repositories.length > 0 ? (
-                      <CommandGroup_Shadcn_>
+                      <CommandGroup>
                         {repositories.map((repo) => (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             key={repo.id}
                             value={`${repo.name.replaceAll('"', '')}-${repo.id}`}
                             className="flex gap-2 items-center"
@@ -208,12 +208,12 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                             <span className="truncate" title={repo.name}>
                               {repo.name}
                             </span>
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         ))}
-                      </CommandGroup_Shadcn_>
+                      </CommandGroup>
                     ) : null}
-                    <CommandGroup_Shadcn_>
-                      <CommandItem_Shadcn_
+                    <CommandGroup>
+                      <CommandItem
                         className="flex gap-2 items-center cursor-pointer"
                         onSelect={() => {
                           setIsRepoSelectorOpen(false)
@@ -222,13 +222,13 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                       >
                         <PlusIcon size={16} />
                         Add GitHub Repositories
-                      </CommandItem_Shadcn_>
-                    </CommandGroup_Shadcn_>
+                      </CommandItem>
+                    </CommandGroup>
                     {hasPartialResponseDueToSSO && (
                       <>
-                        <CommandSeparator_Shadcn_ />
-                        <CommandGroup_Shadcn_>
-                          <CommandItem_Shadcn_
+                        <CommandSeparator />
+                        <CommandGroup>
+                          <CommandItem
                             className="flex gap-2 items-start cursor-pointer"
                             onSelect={() => {
                               setIsRepoSelectorOpen(false)
@@ -239,12 +239,12 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                             <div className="text-xs text-foreground-light">
                               Re-authorize GitHub with SSO to show all repositories
                             </div>
-                          </CommandItem_Shadcn_>
-                        </CommandGroup_Shadcn_>
+                          </CommandItem>
+                        </CommandGroup>
                       </>
                     )}
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
+                  </CommandList>
+                </Command>
               </PopoverContent>
             </Popover>
           )}
