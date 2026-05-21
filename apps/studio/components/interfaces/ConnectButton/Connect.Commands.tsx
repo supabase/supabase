@@ -9,10 +9,8 @@ import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/C
 import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { useAppStateSnapshot } from '@/state/app-state'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const ConnectShortcutBadge = () => (
   <div className="flex items-center gap-1">
@@ -28,22 +26,11 @@ const ConnectShortcutBadge = () => (
 export function useConnectCommands() {
   const setIsOpen = useSetCommandMenuOpen()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const { setConnectSheetSource } = useAppStateSnapshot()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const enabled = !!selectedProject && isActiveHealthy
 
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
   const [, setConnectTab] = useQueryState('connectTab', parseAsString)
-
-  useShortcut(
-    SHORTCUT_IDS.CONNECT_OPEN_SHEET,
-    () => {
-      setConnectSheetSource('keyboard_shortcut')
-      setShowConnect(true)
-      setIsOpen(false)
-    },
-    { enabled }
-  )
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.ACTIONS,

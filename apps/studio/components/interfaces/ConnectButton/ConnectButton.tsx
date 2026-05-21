@@ -4,12 +4,10 @@ import { ComponentProps } from 'react'
 import { Button, cn } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface ConnectButtonProps {
   buttonType?: ComponentProps<typeof Button>['type']
@@ -29,27 +27,21 @@ export const ConnectButton = ({
 
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const button = (
-    <Button
-      type={buttonType}
-      disabled={!isActiveHealthy}
-      className={cn('rounded-full', className)}
-      icon={<Plug className="rotate-90" />}
-      onClick={() => {
-        track('header_connect_button_clicked')
-        setConnectSheetSource('header_button')
-        setShowConnect(true)
-      }}
-    >
-      <span className={cn({ 'sr-only': iconOnly })}>Connect</span>
-    </Button>
-  )
-
   if (isActiveHealthy) {
     return (
-      <ShortcutTooltip shortcutId={SHORTCUT_IDS.CONNECT_OPEN_SHEET} side="bottom">
-        {button}
-      </ShortcutTooltip>
+      <Button
+        type={buttonType}
+        disabled={!isActiveHealthy}
+        className={cn('rounded-full', className)}
+        icon={<Plug className="rotate-90" />}
+        onClick={() => {
+          track('header_connect_button_clicked')
+          setConnectSheetSource('header_button')
+          setShowConnect(true)
+        }}
+      >
+        <span className={cn({ 'sr-only': iconOnly })}>Connect</span>
+      </Button>
     )
   }
 
