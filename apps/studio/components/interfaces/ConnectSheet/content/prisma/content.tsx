@@ -5,47 +5,47 @@ import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Conn
 const ContentFile = ({ connectionStringPooler, deploymentMode }: StepContentProps) => {
   const envCode = deploymentMode.isCli
     ? `
-# Connect to Supabase via direct connection
+# Connect to Postgres via the direct connection
 DATABASE_URL="${connectionStringPooler.direct}"
 
-# Direct connection to the database. Used for migrations
+# Used for migrations
 DIRECT_URL="${connectionStringPooler.direct}"
 `
     : deploymentMode.isSelfHosted
       ? `
-# Connect to self-hosted Supabase via transaction pooler.
+# Connect to Postgres via the self-hosted transaction-mode pooler
 DATABASE_URL="${connectionStringPooler.transactionShared}?pgbouncer=true"
 
-# Connect to self-hosted Supabase via session pooler. Used for migrations.
+# Connect to Postgres via the self-hosted session-mode pooler (used for migrations)
 DIRECT_URL="${connectionStringPooler.sessionShared}"
 `
-      : connectionStringPooler.ipv4SupportedForDedicatedPooler &&
-          connectionStringPooler.transactionDedicated
+      : connectionStringPooler.transactionDedicated &&
+          connectionStringPooler.ipv4SupportedForDedicatedPooler
         ? `
-# Connect to Supabase via connection pooling.
+# Connect to Postgres via the dedicated transaction-mode pooler (IPv4/IPv6)
 DATABASE_URL="${connectionStringPooler.transactionDedicated}?pgbouncer=true"
 
-# Direct connection to the database. Used for migrations.
+# Connect to Postgres via the dedicated session-mode pooler (used for migrations)
 DIRECT_URL="${connectionStringPooler.sessionDedicated}"
         `
         : connectionStringPooler.transactionDedicated &&
             !connectionStringPooler.ipv4SupportedForDedicatedPooler
           ? `
-# Connect to Supabase via Shared Connection Pooler
+# Connect to Postgres via the shared transaction-mode pooler (IPv4/IPv6)
 DATABASE_URL="${connectionStringPooler.transactionShared}?pgbouncer=true"
 
-# Direct connection to the database through Shared Pooler (supports IPv4/IPv6). Used for migrations.
+# Connect to Postgres via the shared session-mode pooler (used for migrations)
 DIRECT_URL="${connectionStringPooler.sessionShared}"
 
-# If your network supports IPv6 or you purchased IPv4 addon, use dedicated pooler
+# If your network supports IPv6 or you purchased IPv4 add-on, use the dedicated pooler
 # DATABASE_URL="${connectionStringPooler.transactionDedicated}?pgbouncer=true"
 # DIRECT_URL="${connectionStringPooler.sessionDedicated}"
  `
           : `
-# Connect to Supabase via connection pooling
+# Connect to Postgres via the shared transaction-mode pooler (IPv4/IPv6)
 DATABASE_URL="${connectionStringPooler.transactionShared}?pgbouncer=true"
 
-# Direct connection to the database through Shared Pooler. Used for migrations.
+# Connect to Postgres via the shared session-mode pooler (used for migrations)
 DIRECT_URL="${connectionStringPooler.sessionShared}"
 `
 
