@@ -161,11 +161,13 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.AI_ASSISTANT_TOGGLE,
     label: 'Toggle AI Assistant panel',
     sequence: ['Mod+I'],
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
   },
   [SHORTCUT_IDS.INLINE_EDITOR_TOGGLE]: {
     id: SHORTCUT_IDS.INLINE_EDITOR_TOGGLE,
     label: 'Toggle inline SQL editor',
     sequence: ['Mod+E'],
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
   },
   [SHORTCUT_IDS.RESULTS_COPY_MARKDOWN]: {
     id: SHORTCUT_IDS.RESULTS_COPY_MARKDOWN,
