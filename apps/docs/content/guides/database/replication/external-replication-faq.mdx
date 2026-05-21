@@ -18,6 +18,10 @@ External replication currently supports **BigQuery** as the managed destination.
 
 We are working on new destinations. Availability may continue to vary based on the planned roll-out strategy.
 
+## Which plans support external replication?
+
+External replication is available on the Pro, Team, and Enterprise plans.
+
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## What happened to Analytics Buckets replication?
@@ -152,6 +156,16 @@ You can manage your pipeline using the actions menu in the destinations list. Se
 Stopping replication causes changes to queue up in the WAL.
 
 </Admonition>
+
+## What happens if a project becomes inactive?
+
+If your project becomes inactive, external replication stops any running pipelines and does not automatically resume them after the project is restarted.
+
+After restarting the project, restart each replication pipeline manually from the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard.
+
+## What happens after a downgrade to the free plan?
+
+When a project is downgraded to the Free Plan, all external replication pipelines for that project are deleted.
 
 ## What happens if a table is deleted at the destination?
 
