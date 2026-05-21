@@ -135,7 +135,7 @@ export function EventsProvider({
 
   const toggleCategory = (category: string) => {
     if (category === 'on-demand') {
-      setSelectedCategories(['on-demand'])
+      setSelectedCategories((prev) => (prev.includes('on-demand') ? ['all'] : ['on-demand']))
       return
     }
 

@@ -257,23 +257,27 @@ function mdxFileToEvent(filename: string): SupabaseEvent | null {
   }
 }
 
+let parsedMdxEventsCache: SupabaseEvent[] | null = null
+
+/** Parse every `_events/*.mdx` file once per process and reuse the result. */
+function getAllParsedMdxEvents(): SupabaseEvent[] {
+  if (parsedMdxEventsCache) return parsedMdxEventsCache
+  parsedMdxEventsCache = readMdxEventFilenames()
+    .map(mdxFileToEvent)
+    .filter((e): e is SupabaseEvent => e !== null)
+  return parsedMdxEventsCache
+}
+
 /**
  * Read all events under `_events/` and return today-and-future events.
  * Past events are excluded (by end_date when present, otherwise start date).
  */
 export const getMdxEvents = (): SupabaseEvent[] => {
   const today = startOfTodayUtc()
-
-  return readMdxEventFilenames()
-    .map(mdxFileToEvent)
-    .filter((e): e is SupabaseEvent => e !== null)
-    .filter((event) => new Date(event.end_date ?? event.date) >= today)
+  return getAllParsedMdxEvents().filter((event) => new Date(event.end_date ?? event.date) >= today)
 }
 
 /** All MDX events with `onDemand: true`, including past recordings. */
 export const getOnDemandMdxEvents = (): SupabaseEvent[] => {
-  return readMdxEventFilenames()
-    .map(mdxFileToEvent)
-    .filter((e): e is SupabaseEvent => e !== null && e.onDemand === true)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  return getAllParsedMdxEvents().filter((event) => event.onDemand === true)
 }
