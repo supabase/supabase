@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { toast } from 'sonner'
 import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import NoPermission from '@/components/ui/NoPermission'
 import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
@@ -17,7 +18,7 @@ export const WebhooksOverviewTab = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const {
     data: schemas,

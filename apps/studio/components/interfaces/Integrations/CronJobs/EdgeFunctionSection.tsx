@@ -6,12 +6,12 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   FormControl,
   FormField,
   FormItem,
@@ -152,15 +152,15 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
-                    <Command_Shadcn_>
-                      <CommandInput_Shadcn_ placeholder="Search edge functions..." />
-                      <CommandList_Shadcn_>
-                        <CommandEmpty_Shadcn_>No edge function found.</CommandEmpty_Shadcn_>
-                        <CommandGroup_Shadcn_>
+                    <Command>
+                      <CommandInput placeholder="Search edge functions..." />
+                      <CommandList>
+                        <CommandEmpty>No edge function found.</CommandEmpty>
+                        <CommandGroup>
                           <ScrollArea className={edgeFunctions.length > 7 ? 'h-[210px]' : ''}>
                             {edgeFunctions.map((fn) => {
                               return (
-                                <CommandItem_Shadcn_
+                                <CommandItem
                                   value={fn.name}
                                   key={fn.id}
                                   onSelect={() => {
@@ -175,13 +175,13 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                                     )}
                                   />
                                   {fn.name}
-                                </CommandItem_Shadcn_>
+                                </CommandItem>
                               )
                             })}
                           </ScrollArea>
-                        </CommandGroup_Shadcn_>
-                      </CommandList_Shadcn_>
-                    </Command_Shadcn_>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
                   </PopoverContent>
                 </Popover>
                 <FormMessage />

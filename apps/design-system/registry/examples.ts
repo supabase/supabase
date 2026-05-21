@@ -1318,9 +1318,31 @@ export const examples: Registry = [
     files: ['example/page-container-demo.tsx'],
   },
   {
+    name: 'page-breadcrumbs-demo',
+    type: 'components:example',
+    files: ['example/page-breadcrumbs-demo.tsx'],
+  },
+  {
+    name: 'page-nav-demo',
+    type: 'components:example',
+    files: ['example/page-nav-demo.tsx'],
+  },
+  {
     name: 'page-layout-detail',
     type: 'components:example',
     files: ['example/page-layout-detail.tsx'],
+  },
+  {
+    name: 'page-layout-edge-function',
+    type: 'components:example',
+    registryDependencies: ['filter-bar'],
+    files: ['example/page-layout-edge-function.tsx', 'example/page-layout-logs-content.tsx'],
+  },
+  {
+    name: 'page-layout-full-width',
+    type: 'components:example',
+    registryDependencies: ['filter-bar'],
+    files: ['example/page-layout-full-width.tsx', 'example/page-layout-logs-content.tsx'],
   },
   {
     name: 'page-layout-list',
@@ -1336,6 +1358,11 @@ export const examples: Registry = [
     name: 'page-layout-settings',
     type: 'components:example',
     files: ['example/page-layout-settings.tsx'],
+  },
+  {
+    name: 'page-layout-auth-emails',
+    type: 'components:example',
+    files: ['example/page-layout-auth-emails.tsx'],
   },
   {
     name: 'page-header-demo',
