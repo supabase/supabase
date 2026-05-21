@@ -116,7 +116,10 @@ const INVITE: AuthTemplate = {
     MAILER_TEMPLATES_INVITE_CONTENT: { title: 'Body', type: 'code' },
   },
   variables: [
-    TemplateVariables.ConfirmationURL,
+    {
+      ...TemplateVariables.ConfirmationURL,
+      description: 'URL to accept the invitation for creating an account',
+    },
     TemplateVariables.Token,
     TemplateVariables.TokenHash,
     TemplateVariables.SiteURL,
@@ -171,7 +174,10 @@ const EMAIL_CHANGE: AuthTemplate = {
     MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: { title: 'Body', type: 'code' },
   },
   variables: [
-    TemplateVariables.ConfirmationURL,
+    {
+      ...TemplateVariables.ConfirmationURL,
+      description: 'URL to confirm the change of email address',
+    },
     TemplateVariables.Token,
     TemplateVariables.TokenHash,
     TemplateVariables.SiteURL,
@@ -198,7 +204,10 @@ const RECOVERY: AuthTemplate = {
     MAILER_TEMPLATES_RECOVERY_CONTENT: { title: 'Body', type: 'code' },
   },
   variables: [
-    TemplateVariables.ConfirmationURL,
+    {
+      ...TemplateVariables.ConfirmationURL,
+      description: 'URL for resetting the account password',
+    },
     TemplateVariables.Token,
     TemplateVariables.TokenHash,
     TemplateVariables.SiteURL,
