@@ -82,6 +82,24 @@ describe('PaymentMethods', () => {
     expect(screen.getByText('No payment methods')).toBeInTheDocument()
   })
 
+  it('uses Stripe Projects guidance instead of support for invoice-based Stripe orgs', () => {
+    mockSubscription.mockReturnValue({
+      payment_method_type: 'invoice',
+      plan: { id: 'pro', name: 'Pro' },
+    })
+
+    render(<PaymentMethods />)
+
+    expect(screen.getByText('Payment is currently by invoice')).toBeInTheDocument()
+    expect(screen.getByText(/Manage payment methods through Stripe Projects/)).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', {
+        name: 'View Stripe Projects docs',
+      })
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Contact support')).not.toBeInTheDocument()
+  })
+
   it('still shows the partner-managed fallback for billing partners', () => {
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
@@ -94,5 +112,85 @@ describe('PaymentMethods', () => {
     render(<PaymentMethods />)
 
     expect(screen.getByTestId('partner-managed-resource')).toBeInTheDocument()
+  })
+
+  it('keeps the standard card row copy for non-Stripe payment methods', () => {
+    mockSelectedOrganization.mockReturnValue(
+      createMockOrganization({
+        slug: 'self-serve-org',
+        billing_partner: null,
+        integration_source: null,
+        managed_by: MANAGED_BY.SUPABASE,
+      })
+    )
+    mockPaymentMethodsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 'pm_123',
+            type: 'card',
+            is_default: true,
+            has_address: true,
+            created: 1_776_700_000,
+            card: {
+              brand: 'visa',
+              exp_month: 12,
+              exp_year: 2028,
+              last4: '4242',
+            },
+            shared_payment_token: null,
+          },
+        ],
+      },
+      error: null,
+      isPending: false,
+      isError: false,
+      isSuccess: true,
+    })
+
+    render(<PaymentMethods />)
+
+    expect(screen.getByText('Expires: 12/2028')).toBeInTheDocument()
+    expect(screen.queryByText(/Managed via Stripe Projects/i)).not.toBeInTheDocument()
+  })
+
+  it('shows Stripe Projects payment method details separately from the underlying card', () => {
+    mockPaymentMethodsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 'spt._1T0w6VJDPojXS6LNK3clVOLZ',
+            type: 'shared_payment_token',
+            is_default: true,
+            has_address: true,
+            created: 1_776_700_000,
+            card: {
+              brand: 'visa',
+              exp_month: 12,
+              exp_year: 2028,
+              last4: '4242',
+            },
+            shared_payment_token: {
+              last4: 'VOLZ',
+              expires_at: 1_860_883_200,
+              is_expired: false,
+            },
+          },
+        ],
+      },
+      error: null,
+      isPending: false,
+      isError: false,
+      isSuccess: true,
+    })
+
+    render(<PaymentMethods />)
+
+    expect(screen.getByText('**** **** **** 4242')).toBeInTheDocument()
+    expect(screen.getByText('Expires: 12/2028')).toBeInTheDocument()
+    expect(screen.getByText(/Managed via Stripe Projects/i)).toBeInTheDocument()
+    expect(screen.getByText('VOLZ')).toBeInTheDocument()
+    expect(screen.getByText(/Expires 12\/2028/i, { selector: 'span' })).toBeInTheDocument()
+    expect(screen.getByText('Active')).toBeInTheDocument()
   })
 })

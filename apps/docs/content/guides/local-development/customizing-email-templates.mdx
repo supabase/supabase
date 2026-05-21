@@ -6,6 +6,12 @@ subtitle: 'Customize local email templates via the config file.'
 
 You can customize the email templates for local development by [editing the `config.toml` file](/docs/guides/local-development/cli/config#auth-config).
 
+<Admonition type="note">
+
+For configuring a self-hosted Supabase instance, see [Custom Email Templates](/docs/guides/self-hosting/custom-email-templates)
+
+</Admonition>
+
 ## Configuring templates
 
 You should provide a relative URL to the `content_path` parameter, pointing to an HTML file which contains the template. For example:
@@ -205,6 +211,28 @@ Contains your application's Site URL. This can be configured in your project's [
 
 ```html
 <p>Visit <a href="{{ .SiteURL }}">here</a> to log in.</p>
+```
+
+### `RedirectTo`
+
+Contains the redirect URL passed as the `redirectTo` option in the auth method call.
+
+**Usage**
+
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}">
+  Confirm your email
+</a>
+```
+
+### `Data`
+
+Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.
+
+**Usage**
+
+```html
+<p>Hello {{ .Data.first_name }}, please confirm your signup.</p>
 ```
 
 ### `Email`

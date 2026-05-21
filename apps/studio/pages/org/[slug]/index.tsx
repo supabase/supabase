@@ -19,7 +19,7 @@ const ProjectsPage: NextPageWithLayout = () => {
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
   return (
-    <ScaffoldContainer className="flex-grow flex">
+    <ScaffoldContainer className="grow flex">
       <ScaffoldSection isFullWidth className="pb-0">
         {disableAccessMfa ? (
           <Admonition

@@ -16,12 +16,12 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -189,7 +189,7 @@ export const NewTokenDialog = ({
                 render={({ field }) => (
                   <FormItemLayout name="tokenName" label="Name">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="tokenName"
                         {...field}
                         placeholder="Provide a name for your token"
@@ -205,21 +205,21 @@ export const NewTokenDialog = ({
                 render={({ field }) => (
                   <FormItemLayout name="expiresAt" label="Expires in">
                     <div className="flex gap-2">
-                      <FormControl className="flex-grow">
-                        <Select_Shadcn_ value={field.value} onValueChange={handleExpiryChange}>
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Expires at" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                      <FormControl className="grow">
+                        <Select value={field.value} onValueChange={handleExpiryChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Expires at" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {Object.values(EXPIRES_AT_OPTIONS).map(
                               (option: { value: string; label: string }) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               )
                             )}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       {isCustomExpiry && (
                         <DatePicker

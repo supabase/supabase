@@ -58,7 +58,7 @@ const ResourceContent = ({ selectedLanguage, snippet, codeSnippets }: ResourceCo
         <div key={codeSnippet.key} className="px-4 space-y-2">
           <p className="text-sm text-foreground-light">{codeSnippet.title}</p>
           <div className="codeblock-container">
-            <div className="bg rounded p-2">
+            <div className="bg rounded-sm p-2">
               <SimpleCodeBlock
                 className={selectedLanguage}
                 onCopy={() => handleCopy(codeSnippet.title)}

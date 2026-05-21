@@ -78,11 +78,11 @@ const LogsFilterPopover = ({
             setOpen(false)
           }}
         >
-          {options.options.map((x, i: number) => (
+          {options.options.map((x) => (
             <Label
               key={x.key}
               htmlFor={`${options.key}.${x.key}`}
-              className="flex items-start hover:bg-overlay-hover overflow-hidden p-2 m-1 rounded-sm gap-3 transition-all duration-150 ease-in-out"
+              className="flex items-start hover:bg-overlay-hover overflow-hidden p-2 m-1 rounded-xs gap-3 transition-all duration-150 ease-in-out"
             >
               <div>
                 <Checkbox

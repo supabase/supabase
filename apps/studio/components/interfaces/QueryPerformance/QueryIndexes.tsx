@@ -2,17 +2,17 @@ import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -81,7 +81,7 @@ export const QueryIndexes = ({
     query: selectedRow?.['query'],
   })
 
-  const { data: extensions, isPending: isLoadingExtensions } = useDatabaseExtensionsQuery({
+  const { isPending: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -175,7 +175,7 @@ export const QueryIndexes = ({
     return (
       <QueryPanelContainer className="h-full">
         <QueryPanelSection className="pt-2">
-          <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
+          <div className="border rounded-sm border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
             <p className="text-sm text-foreground-light">Enable Index Advisor</p>
             <p className="text-center text-xs text-foreground-lighter mb-2">
               Recommends indexes to improve query performance.
@@ -212,7 +212,7 @@ export const QueryIndexes = ({
                   language="sql"
                   className={cn(
                     'max-w-full max-h-[200px]',
-                    '!py-2 !px-2.5 prose dark:prose-dark',
+                    'py-2! px-2.5! prose dark:prose-dark',
                     '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                   )}
                 />
@@ -241,7 +241,7 @@ export const QueryIndexes = ({
         {isSuccess && (
           <div>
             {usedIndexes.length === 0 && (
-              <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
+              <div className="border rounded-sm border-dashed flex flex-col items-center justify-center py-4 px-12 gap-y-1 text-center">
                 <p className="text-sm text-foreground-light">
                   No indexes are involved in this query
                 </p>
@@ -299,32 +299,32 @@ export const QueryIndexes = ({
                       description="Index advisor could not analyze this query. This can happen if the query references tables, functions, or extensions that no longer exist or were deleted."
                     />
                   ) : (index_statements ?? []).length === 0 ? (
-                    <Alert_Shadcn_ className="[&>svg]:rounded-full">
+                    <Alert className="[&>svg]:rounded-full">
                       <Check />
-                      <AlertTitle_Shadcn_>This query is optimized</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
+                      <AlertTitle>This query is optimized</AlertTitle>
+                      <AlertDescription>
                         Recommendations for indexes will show here
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
+                      </AlertDescription>
+                    </Alert>
                   ) : (
                     <>
                       {isLinterWarning ? (
-                        <Alert_Shadcn_
+                        <Alert
                           variant="default"
                           className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand my-3"
                         >
                           <Lightbulb />
-                          <AlertTitle_Shadcn_>
+                          <AlertTitle>
                             We have {index_statements.length} index recommendation
                             {index_statements.length > 1 ? 's' : ''}
-                          </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
+                          </AlertTitle>
+                          <AlertDescription>
                             You can improve this query's performance by{' '}
                             <span className="text-brand">{totalImprovement.toFixed(2)}%</span> by
                             adding the following suggested{' '}
                             {index_statements.length > 1 ? 'indexes' : 'index'}
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
+                          </AlertDescription>
+                        </Alert>
                       ) : (
                         <IndexImprovementText
                           indexStatements={index_statements}
@@ -339,7 +339,7 @@ export const QueryIndexes = ({
                         language="sql"
                         className={cn(
                           'max-w-full max-h-[310px]',
-                          '!py-3 !px-3.5 prose dark:prose-dark transition',
+                          'py-3! px-3.5! prose dark:prose-dark transition',
                           '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                         )}
                       />
@@ -368,8 +368,8 @@ export const QueryIndexes = ({
                   before={total_cost_before}
                   after={total_cost_after}
                 />
-                <Collapsible_Shadcn_ open={showStartupCosts} onOpenChange={setShowStartupCosts}>
-                  <CollapsibleContent_Shadcn_ asChild className="pb-3">
+                <Collapsible open={showStartupCosts} onOpenChange={setShowStartupCosts}>
+                  <CollapsibleContent asChild className="pb-3">
                     <QueryPanelScoreSection
                       hideArrowMarkers
                       className="border-t"
@@ -378,33 +378,33 @@ export const QueryIndexes = ({
                       before={startup_cost_before}
                       after={startup_cost_after}
                     />
-                  </CollapsibleContent_Shadcn_>
-                  <CollapsibleTrigger_Shadcn_ className="text-xs py-1.5 border-t text-foreground-light bg-studio w-full rounded-b-md">
+                  </CollapsibleContent>
+                  <CollapsibleTrigger className="text-xs py-1.5 border-t text-foreground-light bg-studio w-full rounded-b-md">
                     View {showStartupCosts ? 'less' : 'more'}
-                  </CollapsibleTrigger_Shadcn_>
-                </Collapsible_Shadcn_>
+                  </CollapsibleTrigger>
+                </Collapsible>
               </div>
             </div>
           </QueryPanelSection>
           <QueryPanelSection className="py-6 border-t">
             <div className="flex flex-col gap-y-2">
               <h4 className="mb-2">FAQ</h4>
-              <Accordion_Shadcn_ collapsible type="single" className="border rounded-md">
-                <AccordionItem_Shadcn_ value="1">
-                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
+              <Accordion collapsible type="single" className="border rounded-md">
+                <AccordionItem value="1">
+                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition data-open:text-foreground">
                     What units are cost in?
                   </AccordionTrigger>
-                  <AccordionContent_Shadcn_ className="px-4 text-foreground-light">
+                  <AccordionContent className="px-4 text-foreground-light">
                     Costs are in an arbitrary unit, and do not represent a unit of time. The units
                     are anchored (by default) to a single sequential page read costing 1.0 units.
                     They do, however, serve as a predictor of higher execution times.
-                  </AccordionContent_Shadcn_>
-                </AccordionItem_Shadcn_>
-                <AccordionItem_Shadcn_ value="2" className="border-b-0">
-                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="2" className="border-b-0">
+                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition data-open:text-foreground">
                     How should I prioritize start up and total cost?
                   </AccordionTrigger>
-                  <AccordionContent_Shadcn_ className="px-4 text-foreground-light [&>div]:space-y-2">
+                  <AccordionContent className="px-4 text-foreground-light [&>div]:space-y-2">
                     <p>This depends on the expected size of the result set from the query.</p>
                     <p>
                       For queries that return a small number or rows, the startup cost is more
@@ -416,9 +416,9 @@ export const QueryIndexes = ({
                       important, and optimizing it will help in efficiently using resources and
                       reducing overall query execution time.
                     </p>
-                  </AccordionContent_Shadcn_>
-                </AccordionItem_Shadcn_>
-              </Accordion_Shadcn_>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </QueryPanelSection>
         </>

@@ -1,4 +1,3 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
@@ -39,7 +38,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
   const watchedComputeSize = watch('computeSize')
   const throughput_mbps = formState.defaultValues?.throughput
 
-  const { isPending: isLoading, error } = useDiskAttributesQuery({ projectRef })
+  useDiskAttributesQuery({ projectRef })
 
   const throughputPrice = calculateThroughputPrice({
     storageType: form.getValues('storageType') as DiskType,

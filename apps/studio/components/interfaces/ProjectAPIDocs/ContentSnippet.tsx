@@ -70,7 +70,7 @@ const ContentSnippet = ({
       {children}
       {codeSnippet !== undefined && (
         <div className="px-4 codeblock-container">
-          <div className="bg rounded p-2">
+          <div className="bg rounded-sm p-2">
             <SimpleCodeBlock className={selectedLanguage} onCopy={handleCopy}>
               {codeSnippet}
             </SimpleCodeBlock>

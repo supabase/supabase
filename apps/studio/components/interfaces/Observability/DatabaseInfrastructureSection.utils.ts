@@ -1,7 +1,4 @@
-import type {
-  InfraMonitoringMultiResponse,
-  InfraMonitoringResponse,
-} from '@/data/analytics/infra-monitoring-query'
+import type { InfraMonitoringResponse } from '@/data/analytics/infra-monitoring-query'
 
 type NumericValue = string | number | undefined
 

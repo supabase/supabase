@@ -1,24 +1,34 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Archive, Database, GitBranch } from 'lucide-react'
+import { Archive, Cpu, Database, GitBranch, Github } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
+import { HighAvailabilityBadge } from './HighAvailabilityBadge'
 import { ServiceStatus } from './ServiceStatus'
+import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import { SingleStat } from '@/components/ui/SingleStat'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 import { EMPTY_ARR } from '@/lib/void'
 
 export const ActivityStats = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ slug: organization?.slug })
+  const projectResourceWarnings = resourceWarnings?.find((warning) => warning.project === ref)
+  const parentProjectRef = project?.parent_project_ref ?? project?.ref
 
   const { data: branchesData, isPending: isLoadingBranches } = useBranchesQuery({
-    projectRef: project?.parent_project_ref ?? project?.ref,
+    projectRef: parentProjectRef,
   })
   const isDefaultProject = project?.parent_project_ref === undefined
   const currentBranch = useMemo(
@@ -61,10 +71,99 @@ export const ActivityStats = () => {
       .sort((a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf())[0]
   }, [backupsData])
 
+  const { data: githubConnections, isPending: isLoadingGithubConnections } =
+    useGitHubConnectionsQuery({ organizationId: organization?.id }, { enabled: !!organization?.id })
+  const githubConnection = githubConnections?.find(
+    (connection) => connection.project.ref === parentProjectRef
+  )
+  const isProjectComingUp = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.UNKNOWN].includes(
+    project?.status ?? PROJECT_STATUS.UNKNOWN
+  )
+  const githubLabelText = githubConnection?.repository.name
+    ? githubConnection.repository.name
+    : isProjectComingUp
+      ? 'Waiting for project...'
+      : 'No repository connected'
+  const integrationsPath = parentProjectRef
+    ? `/project/${parentProjectRef}/settings/integrations`
+    : undefined
+
   return (
     <div className="@container">
       <div className="grid grid-cols-1 @md:grid-cols-2 gap-2 @md:gap-6 flex-wrap">
         <ServiceStatus />
+
+        <SingleStat
+          icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground" />}
+          label={<span>Compute</span>}
+          value={
+            <div className="flex items-center gap-2 flex-wrap">
+              {project?.infra_compute_size ? (
+                <ComputeBadgeWrapper
+                  projectRef={project?.ref}
+                  slug={organization?.slug}
+                  cloudProvider={project?.cloud_provider}
+                  computeSize={project.infra_compute_size}
+                  resourceWarnings={projectResourceWarnings}
+                />
+              ) : (
+                <p className="text-foreground-lighter">Unknown</p>
+              )}
+              {project?.high_availability && <HighAvailabilityBadge />}
+            </div>
+          }
+        />
+
+        <SingleStat
+          href={integrationsPath}
+          icon={<Github size={18} strokeWidth={1.5} className="text-foreground" />}
+          label={<span>GitHub</span>}
+          value={
+            isLoadingGithubConnections ? (
+              <Skeleton className="h-6 w-24" />
+            ) : (
+              <p
+                className={cn('truncate', !githubConnection && 'text-foreground-lighter')}
+                title={githubLabelText}
+              >
+                {githubLabelText}
+              </p>
+            )
+          }
+        />
+
+        <SingleStat
+          href={`/project/${ref}/branches`}
+          icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
+          label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
+          trackingProperties={{
+            stat_type: 'branches',
+            stat_value: branchesData?.length ?? 0,
+          }}
+          value={
+            isLoadingBranches ? (
+              <Skeleton className="h-6 w-24" />
+            ) : isDefaultProject ? (
+              <p
+                className={cn(
+                  'truncate',
+                  !latestNonDefaultBranch && 'text-foreground-lighter truncate'
+                )}
+                title={latestNonDefaultBranch?.name ?? 'No branches'}
+              >
+                {latestNonDefaultBranch?.name ?? 'No branches'}
+              </p>
+            ) : currentBranch?.created_at ? (
+              <TimestampInfo
+                className="text-base"
+                label={dayjs(currentBranch.created_at).fromNow()}
+                utcTimestamp={currentBranch.created_at}
+              />
+            ) : (
+              <p className="text-foreground-lighter">Unknown</p>
+            )
+          }
+        />
 
         <SingleStat
           href={`/project/${ref}/database/migrations`}
@@ -107,39 +206,6 @@ export const ActivityStats = () => {
               />
             ) : (
               <p className="text-foreground-lighter">No backups</p>
-            )
-          }
-        />
-
-        <SingleStat
-          href={`/project/${ref}/branches`}
-          icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
-          label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
-          trackingProperties={{
-            stat_type: 'branches',
-            stat_value: branchesData?.length ?? 0,
-          }}
-          value={
-            isLoadingBranches ? (
-              <Skeleton className="h-6 w-24" />
-            ) : isDefaultProject ? (
-              <p
-                className={cn(
-                  'truncate',
-                  !latestNonDefaultBranch && 'text-foreground-lighter truncate'
-                )}
-                title={latestNonDefaultBranch?.name ?? 'No branches'}
-              >
-                {latestNonDefaultBranch?.name ?? 'No branches'}
-              </p>
-            ) : currentBranch?.created_at ? (
-              <TimestampInfo
-                className="text-base"
-                label={dayjs(currentBranch.created_at).fromNow()}
-                utcTimestamp={currentBranch.created_at}
-              />
-            ) : (
-              <p className="text-foreground-lighter">Unknown</p>
             )
           }
         />

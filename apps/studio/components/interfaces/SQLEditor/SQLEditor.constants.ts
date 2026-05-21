@@ -1,3 +1,4 @@
+import { untrustedSql } from '@supabase/pg-meta'
 import { IS_PLATFORM } from 'common'
 
 import type { SqlSnippets, UserContent } from '@/types'
@@ -13,7 +14,7 @@ export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
   content: {
     schema_version: SQL_SNIPPET_SCHEMA_VERSION,
     content_id: '',
-    sql: 'this is a test',
+    unchecked_sql: untrustedSql(''),
   },
 }
 

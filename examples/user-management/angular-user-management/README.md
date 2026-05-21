@@ -56,13 +56,13 @@ create policy "Anyone can upload an avatar." on storage.objects
 
 ### 3. Configure environment variables
 
-Update the `src/environments/environment.ts` file with your Supabase project URL and anon key:
+Update the `src/environments/environment.ts` file with your Supabase project URL and publishable key:
 
 ```typescript
 export const environment = {
   production: false,
   supabaseUrl: 'YOUR_SUPABASE_URL',
-  supabaseKey: 'YOUR_SUPABASE_ANON_KEY',
+  supabasePublishableKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
 }
 ```
 

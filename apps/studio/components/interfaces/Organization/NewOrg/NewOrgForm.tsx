@@ -14,22 +14,23 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
 import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
+import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
 import {
@@ -49,7 +50,6 @@ import { useConfirmPendingSubscriptionCreateMutation } from '@/data/subscription
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
-import { formatCurrency } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 
 const ORG_KIND_TYPES = {
@@ -407,7 +407,7 @@ export const NewOrgForm = ({
                 htmlType="submit"
                 type="primary"
                 loading={newOrgLoading}
-                disabled={newOrgLoading}
+                disabled={newOrgLoading || creationPreviewIsFetching}
               >
                 Create organization
               </Button>
@@ -431,7 +431,7 @@ export const NewOrgForm = ({
                     description="What's the name of your company or team? You can change this later."
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         autoFocus
                         type="text"
                         placeholder="Organization name"
@@ -457,19 +457,19 @@ export const NewOrgForm = ({
                     description="What best describes your organization?"
                   >
                     <FormControl>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_ className="w-full">
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
 
-                        <SelectContent_Shadcn_>
+                        <SelectContent>
                           {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
-                            <SelectItem_Shadcn_ key={k} value={k}>
+                            <SelectItem key={k} value={k}>
                               {v}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -488,19 +488,19 @@ export const NewOrgForm = ({
                       description="How many people are in your company?"
                     >
                       <FormControl>
-                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_ className="w-full">
-                            <SelectValue_Shadcn_ />
-                          </SelectTrigger_Shadcn_>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
 
-                          <SelectContent_Shadcn_>
+                          <SelectContent>
                             {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                              <SelectItem_Shadcn_ key={k} value={k}>
+                              <SelectItem key={k} value={k}>
                                 {v}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -525,25 +525,25 @@ export const NewOrgForm = ({
                       }
                     >
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
                             field.onChange(value)
                             onPlanSelected(value)
                           }}
                         >
-                          <SelectTrigger_Shadcn_ className="w-full">
-                            <SelectValue_Shadcn_ />
-                          </SelectTrigger_Shadcn_>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
 
-                          <SelectContent_Shadcn_>
+                          <SelectContent>
                             {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
-                              <SelectItem_Shadcn_ key={k} value={k} translate="no">
+                              <SelectItem key={k} value={k} translate="no">
                                 {v}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -605,49 +605,31 @@ export const NewOrgForm = ({
                   />
                 </Elements>
 
+                {!!billingAddress && !creationPreviewInitialized && (
+                  <div className="space-y-2 mt-4">
+                    <ShimmeringLoader />
+                    <ShimmeringLoader className="w-3/4" />
+                    <ShimmeringLoader className="w-1/2" />
+                  </div>
+                )}
+
                 {creationPreviewInitialized && !!billingAddress && (
-                  <div
-                    className={cn(
-                      'text-foreground-light text-sm transition-opacity mt-4',
-                      creationPreviewIsFetching && 'opacity-50'
-                    )}
-                  >
-                    {creationPreview.total !== creationPreview.plan_price && (
-                      <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
-                        <div className="py-2">Plan price</div>
-                        <div className="py-2 text-right tabular-nums" translate="no">
-                          {formatCurrency(creationPreview.plan_price)}
-                        </div>
-                      </div>
-                    )}
-
-                    {creationPreview.tax_status === 'calculated' &&
-                      creationPreview.tax &&
-                      creationPreview.tax.tax_amount > 0 && (
-                        <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
-                          <div className="py-2">
-                            Tax ({creationPreview.tax.tax_rate_percentage}%)
-                          </div>
-                          <div className="py-2 text-right tabular-nums" translate="no">
-                            {formatCurrency(creationPreview.tax.tax_amount)}
-                          </div>
-                        </div>
-                      )}
-
-                    {creationPreview.tax_status === 'failed' && (
-                      <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
-                        <div className="py-2 text-foreground-lighter">
-                          Tax could not be estimated and may be applied separately
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between gap-2 text-foreground text-base">
-                      <div className="py-2">Total due today</div>
-                      <div className="py-2 text-right tabular-nums" translate="no">
-                        {formatCurrency(creationPreview.total)}
-                      </div>
-                    </div>
+                  <div className="mt-4">
+                    <ChargeBreakdown
+                      subtotal={creationPreview.plan_price}
+                      subtotalLabel="Plan price"
+                      total={creationPreview.total}
+                      tax={
+                        creationPreview.tax
+                          ? {
+                              amount: creationPreview.tax.tax_amount,
+                              percentage: creationPreview.tax.tax_rate_percentage,
+                            }
+                          : undefined
+                      }
+                      taxStatus={creationPreview.tax_status}
+                      isFetching={creationPreviewIsFetching}
+                    />
                   </div>
                 )}
               </Panel.Content>

@@ -44,7 +44,7 @@ export const AlphaNotice = ({
           alt="Supabase Grafana"
           className="w-full h-full object-cover object-right dark:hidden"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-background-alternative to-transparent" />
       </div>
 
       {/* Content */}

@@ -55,7 +55,7 @@ export default function InnerSideMenuEmpty() {
                   <Heart className="text-light" size={13} />
                 </div>
                 <Pointer
-                  className="absolute -right-[6px] -bottom-2 text-lighter"
+                  className="absolute right-[-6px] -bottom-2 text-lighter"
                   strokeWidth={1.5}
                   size={16}
                 />

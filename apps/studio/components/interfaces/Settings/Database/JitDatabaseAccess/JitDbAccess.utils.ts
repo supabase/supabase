@@ -3,6 +3,7 @@ import { IPv4CidrRange, IPv6CidrRange } from 'ip-num'
 
 import type {
   JitExpiryMode,
+  JitIpRangeDraft,
   JitMemberOption,
   JitRoleGrantDraft,
   JitRoleOption,
@@ -33,16 +34,28 @@ export function createEmptyGrant(roleId: string): JitRoleGrantDraft {
   return {
     roleId,
     enabled: false,
+    branchesOnly: false,
     expiryMode: '1h',
     hasExpiry: true,
     expiry: getRelativeDatetimeByMode('1h'),
-    hasIpRestriction: false,
-    ipRanges: '',
+    ipRanges: [createEmptyIpRange()],
   }
 }
 
+export function createEmptyIpRange(): JitIpRangeDraft {
+  return { value: '' }
+}
+
+function parseIpRangeRows(value: JitIpRangeDraft[]) {
+  return value.map((item) => item.value.trim()).filter((item) => item.length > 0)
+}
+
+function cloneIpRanges(ipRanges: JitIpRangeDraft[]) {
+  return ipRanges.map((ipRange) => ({ ...ipRange }))
+}
+
 function cloneGrants(grants: JitRoleGrantDraft[]) {
-  return grants.map((grant) => ({ ...grant }))
+  return grants.map((grant) => ({ ...grant, ipRanges: cloneIpRanges(grant.ipRanges) }))
 }
 
 export function createDraft(roleIds: string[]): JitUserRuleDraft {
@@ -80,6 +93,7 @@ export function draftFromRule(rule: JitUserRule, baseRoleIds: string[]): JitUser
       return {
         ...nextGrant,
         expiryMode: inferExpiryMode(nextGrant),
+        ipRanges: cloneIpRanges(nextGrant.ipRanges),
       }
     }),
   }
@@ -94,7 +108,7 @@ export function computeStatusFromGrants(grants: JitRoleGrantDraft[]): JitStatus 
   let expiredIp = 0
 
   enabledGrants.forEach((grant) => {
-    const hasIp = grant.hasIpRestriction && grant.ipRanges.trim().length > 0
+    const hasIp = parseIpRangeRows(grant.ipRanges).length > 0
 
     if (!grant.hasExpiry || !grant.expiry) {
       active += 1
@@ -151,13 +165,6 @@ function toUnixSeconds(datetimeIso: string) {
   return value.unix()
 }
 
-export function parseCommaSeparatedCidrs(value: string) {
-  return value
-    .split(',')
-    .map((item) => item.trim())
-    .filter((item) => item.length > 0)
-}
-
 function isValidCidr(value: string) {
   try {
     if (value.includes(':')) {
@@ -172,8 +179,8 @@ function isValidCidr(value: string) {
   }
 }
 
-export function getInvalidCidrs(value: string) {
-  return parseCommaSeparatedCidrs(value).filter((cidr) => !isValidCidr(cidr))
+export function getInvalidIpRangeRows(value: JitIpRangeDraft[]) {
+  return parseIpRangeRows(value).filter((cidr) => !isValidCidr(cidr))
 }
 
 function isAssignableJitRole(role: PgRole) {
@@ -253,6 +260,7 @@ export function mapJitMembersToUserRules(
   return (jitMembers ?? []).map((item) => {
     const mappedMember = memberMap.get(item.user_id)
     const assignedRoles: JitRoleGrantDraft[] = (item.user_roles ?? []).map((roleObj) => {
+      const roleWithBranchRestriction = roleObj as typeof roleObj & { branches_only?: boolean }
       const expiresAt = typeof roleObj.expires_at === 'number' ? roleObj.expires_at : undefined
       const hasExpiry = typeof expiresAt === 'number'
       const allowedNetworks = serializeAllowedNetworks(roleObj)
@@ -261,11 +269,14 @@ export function mapJitMembersToUserRules(
         ...createEmptyGrant(roleObj.role),
         roleId: roleObj.role,
         enabled: true,
+        branchesOnly: roleWithBranchRestriction.branches_only ?? false,
         hasExpiry,
         expiryMode: hasExpiry ? 'custom' : 'never',
         expiry: hasExpiry ? new Date(expiresAt * 1000).toISOString() : '',
-        hasIpRestriction: allowedNetworks.length > 0,
-        ipRanges: allowedNetworks.join(', '),
+        ipRanges:
+          allowedNetworks.length > 0
+            ? allowedNetworks.map((cidr) => ({ value: cidr }))
+            : [createEmptyIpRange()],
       }
     })
 
@@ -295,14 +306,12 @@ export function mapJitMembersToUserRules(
 }
 
 export function serializeDraftRolesForGrantMutation(draft: JitUserRuleDraft) {
-  const serializeAllowedNetworks = (value: string) => {
-    const cidrs = parseCommaSeparatedCidrs(value)
+  const serializeAllowedNetworks = (value: JitIpRangeDraft[]) => {
+    const cidrs = parseIpRangeRows(value)
     if (cidrs.length === 0) return undefined
 
     const allowed_cidrs = cidrs.filter((cidr) => !cidr.includes(':')).map((cidr) => ({ cidr }))
     const allowed_cidrs_v6 = cidrs.filter((cidr) => cidr.includes(':')).map((cidr) => ({ cidr }))
-
-    if (allowed_cidrs.length === 0 && allowed_cidrs_v6.length === 0) return undefined
 
     return {
       ...(allowed_cidrs.length > 0 ? { allowed_cidrs } : {}),
@@ -317,6 +326,7 @@ export function serializeDraftRolesForGrantMutation(draft: JitUserRuleDraft) {
       const allowed_networks = serializeAllowedNetworks(grant.ipRanges)
       return {
         role: grant.roleId,
+        ...(grant.branchesOnly ? { branches_only: true } : {}),
         ...(typeof expires_at === 'number' ? { expires_at } : {}),
         ...(allowed_networks ? { allowed_networks } : {}),
       }

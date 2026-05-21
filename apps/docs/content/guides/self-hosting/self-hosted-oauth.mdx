@@ -32,7 +32,7 @@ You will have to register this URL with each OAuth provider.
 When a user signs in with an OAuth provider, the following flow occurs:
 
 1. Your app calls `supabase.auth.signInWithOAuth()` and the browser redirects to the Auth service
-2. API gateway (Kong) routes the request to the Auth container (`/auth/v1/authorize`)
+2. The API gateway routes the request to the Auth container (`/auth/v1/authorize`)
 3. Auth redirects the user to the OAuth provider (e.g., Google) for consent
 4. The provider redirects back to `https://<your-domain>/auth/v1/callback`
 5. Auth exchanges the authorization code for tokens and redirects the user to your `SITE_URL` or an allowed redirect URL

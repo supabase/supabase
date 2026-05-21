@@ -4,6 +4,7 @@ import { formatCurrency } from '@/lib/helpers'
 
 export interface ChargeBreakdownProps {
   subtotal: number
+  subtotalLabel?: string
   total: number
   tax?: { amount: number; percentage: number }
   taxStatus?: 'calculated' | 'failed' | 'not_applicable'
@@ -12,6 +13,7 @@ export interface ChargeBreakdownProps {
 
 export const ChargeBreakdown = ({
   subtotal,
+  subtotalLabel = 'Subtotal',
   total,
   tax,
   taxStatus,
@@ -23,7 +25,7 @@ export const ChargeBreakdown = ({
     >
       {total !== subtotal && (
         <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
-          <div className="py-2">Subtotal</div>
+          <div className="py-2">{subtotalLabel}</div>
           <div className="py-2 text-right tabular-nums" translate="no">
             {formatCurrency(subtotal)}
           </div>

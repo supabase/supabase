@@ -9,7 +9,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Modal,
   Tooltip,
   TooltipContent,
@@ -172,13 +172,13 @@ const AddRestrictionModal = ({
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label={`${type} address`}>
                     <FormControl>
-                      <Input_Shadcn_ {...field} placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'} />
+                      <Input {...field} placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'} />
                     </FormControl>
                   </FormItemLayout>
                 )}
               />
             </div>
-            <div className="flex-grow">
+            <div className="grow">
               <FormField
                 control={form.control}
                 name="cidrBlockSize"
@@ -204,7 +204,7 @@ const AddRestrictionModal = ({
                     }
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         type="number"
                         min={0}

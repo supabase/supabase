@@ -8,8 +8,8 @@ import logConstants from 'shared-data/log-constants'
 
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
+import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
-import type { PlanId } from '@/data/subscriptions/types'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -744,6 +744,10 @@ export function role(metadata: any) {
 
 export function formatLogsAsJson(rows: LogData[]): string {
   return JSON.stringify(rows, null, 2)
+}
+
+export function formatLogsAsCsv(rows: LogData[]): string {
+  return convertResultsToCSV(rows as unknown as Record<string, unknown>[]) ?? ''
 }
 
 export function formatLogsAsMarkdown(rows: LogData[]): string {

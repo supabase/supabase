@@ -9,6 +9,7 @@ import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const MergeRequestButton = () => {
   const { ref } = useParams()
@@ -21,6 +22,7 @@ export const MergeRequestButton = () => {
   const { data: branches } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
 
   const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
@@ -37,6 +39,7 @@ export const MergeRequestButton = () => {
   const buttonLabel = hasReviewRequested ? 'Review merge request' : 'Open merge request'
 
   const handleClick = () => {
+    track('header_merge_request_button_clicked', { hasReviewRequested })
     if (hasReviewRequested) {
       router.push(`/project/${selectedBranch.project_ref}/merge`)
     } else {

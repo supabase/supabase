@@ -26,7 +26,7 @@ export const DOCS_CONTENT = {
     category: API_DOCS_CATEGORIES.INTRODUCTION,
     title: `Connect to your project`,
     description: `Projects have a RESTful endpoint that you can use with your project's API key to query and manage your database. Put these keys in your .env file.`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, endpoint?: string) => `
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = '${endpoint}'
@@ -45,7 +45,7 @@ In this documentation, we will refer to the key using the name \`SUPABASE_KEY\`.
 const SUPABASE_KEY = '${apikey}'
 const SUPABASE_URL = '${endpoint}'
 const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
-    bash: (apikey?: string, endpoint?: string) => `${apikey}`,
+    bash: (apikey?: string, _endpoint?: string) => `${apikey}`,
   },
   serviceApiKeys: {
     key: 'service-keys',
@@ -58,7 +58,7 @@ In this documentation, we refer to the key using the name \`SERVICE_KEY\`. You c
 const SUPABASE_KEY = '${apikey}'
 const SUPABASE_URL = 'https://${endpoint}'
 const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
-    bash: (apikey?: string, endpoint?: string) => `${apikey}`,
+    bash: (apikey?: string, _endpoint?: string) => `${apikey}`,
   },
   // User Management
   userManagement: {
@@ -80,7 +80,7 @@ const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_KEY);`,
     description: `Allow your users to sign up and create a new account
 
   After they have signed up, all interactions using the Supabase client will be performed as "that user".`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.signUp({
   email: 'someone@email.com',
   password: 'some-secure-password'
@@ -102,7 +102,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
 If an account is created, users can login to your app.
 
 After they have logged in, all interactions using the Supabase JS client will be performed as "that user".`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.signInWithPassword({
   email: 'someone@email.com',
   password: 'some-secure-password'
@@ -126,7 +126,7 @@ curl -X POST '${endpoint}/auth/v1/token?grant_type=password' \\
 Send a user a passwordless link which they can use to redeem an access_token.
 
 After they have clicked the link, all interactions using the Supabase JS client will be performed as "that user".`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.signInWithOtp({
   email: 'someone@email.com'
 })
@@ -150,7 +150,7 @@ A phone number can be used instead of an email as a primary account confirmation
 The user will receive a mobile OTP via sms with which they can verify that they control the phone number.
 
 You must enter your own twilio credentials on the auth settings page to enable sms confirmations.`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.signUp({
   phone: '+13334445555',
   password: 'some-password'
@@ -174,7 +174,7 @@ curl -X POST '${endpoint}/auth/v1/signup' \\
 SMS OTPs work like magic links, except you have to provide an interface for the user to verify the 6 digit number they receive.
 
 You must enter your own twilio credentials on the auth settings page to enable SMS-based Logins.`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555'
 })
@@ -196,7 +196,7 @@ curl -X POST '${endpoint}/auth/v1/otp' \\
 Once the user has received the OTP, have them enter it in a form and send it for verification
 
 You must enter your own twilio credentials on the auth settings page to enable SMS-based OTP verification.`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
@@ -226,19 +226,19 @@ View all the available [Third Party OAuth providers](https://supabase.com).
 After they have logged in, all interactions using the Supabase JS client will be performed as "that user".
 
 Generate your Client ID and secret from: [Google](https://console.developers.google.com/apis/credentials), [Github](https://github.com/settings/applications/new), [Gitlab](https://gitlab.com/oauth/applications), [Facebook](https://developers.facebook.com/apps), and [Bitbucket](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud).`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'github'
 })
     `,
-    bash: (apikey?: string, endpoint?: string) => `No available command`,
+    bash: (_apikey?: string, _endpoint?: string) => `No available command`,
   },
   user: {
     key: 'get-user',
     category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Get user`,
     description: `Get the JSON object for the logged in user.`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data: { user } } = await supabase.auth.getUser()
     `,
     bash: (apikey?: string, endpoint?: string) => `
@@ -252,7 +252,7 @@ curl -X GET '${endpoint}/auth/v1/user' \\
     category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Forgot password / email`,
     description: `Sends the user a log in link via email. Once logged in you should direct the user to a new password form. And use "Update User" below to save the new password.`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.resetPasswordForEmail(email)
     `,
     bash: (apikey?: string, endpoint?: string) => `
@@ -269,7 +269,7 @@ curl -X POST '${endpoint}/auth/v1/recover' \\
     category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Update User`,
     description: `Update the user with a new email or password. Each key (email, password, and data) is optional.`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.updateUser({
   email: "new@email.com",
   password: "new-password",
@@ -295,7 +295,7 @@ curl -X PUT '${endpoint}/auth/v1/user' \\
     category: API_DOCS_CATEGORIES.USER_MANAGEMENT,
     title: `Log out`,
     description: `After calling log out, all interactions using the Supabase JS client will be "anonymous".`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { error } = await supabase.auth.signOut()
     `,
     bash: (apikey?: string, endpoint?: string) => `
@@ -315,7 +315,7 @@ Send a user a passwordless link which they can use to sign up and log in.
 After they have clicked the link, all interactions using the Supabase JS client will be performed as "that user".
 
 This endpoint requires you use the \`service_role_key\` when initializing the client, and should only be invoked from the server, never from the client.`,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 const { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.com')
     `,
     bash: (apikey?: string, endpoint?: string) => `
@@ -424,7 +424,7 @@ If you have a GraphQL background, you might be wondering if you can fetch your d
 Still want GraphQL?
 If you still want to use GraphQL, you can. Supabase provides you with a full Postgres database, so as long as your middleware can connect to the database then you can still use the tools you love. You can find the database connection details [in the settings](/project/[ref]/database/settings).
 `,
-    js: (apikey?: string, endpoint?: string) => `
+    js: (_apikey?: string, _endpoint?: string) => `
 // With Apollo GraphQL
 const { loading, error, data } = useQuery(gql\`
   query GetDogs {
@@ -447,7 +447,7 @@ const { data, error } = await supabase
       owner (id, name)
   \`)
 `,
-    bash: (apikey?: string, endpoint?: string) => `
+    bash: (_apikey?: string, _endpoint?: string) => `
 // With Apollo GraphQL
 const { loading, error, data } = useQuery(gql\`
   query GetDogs {
@@ -1207,7 +1207,15 @@ RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: none
 `,
-    code: ({ name, apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
+    code: ({
+      name,
+      apikey: _apikey,
+      endpoint,
+    }: {
+      name: string
+      apikey: string
+      endpoint: string
+    }) => [
       {
         key: 'storage-retrieve-public-url',
         title: undefined,

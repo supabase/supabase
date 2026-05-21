@@ -23,7 +23,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
   <button
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-all ${
-      isActive ? 'flex-[2] text-foreground' : 'flex-[1] text-foreground-light'
+      isActive ? 'flex-2 text-foreground' : 'flex-1 text-foreground-light'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -170,7 +170,7 @@ const TimedTabsSection = ({
           </Swiper>
           <OpenInColab
             colabUrl={tabs[activeTab]?.colabUrl}
-            className="flex md:hidden !relative !top-0 !right-0 mt-8 w-full justify-center"
+            className="flex md:hidden relative! top-0! right-0! mt-8 w-full justify-center"
           />
         </div>
       </div>

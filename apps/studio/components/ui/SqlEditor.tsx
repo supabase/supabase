@@ -28,7 +28,7 @@ const SqlEditor = ({
   onInputChange = noop,
 }: SqlEditorProps) => {
   const monaco = useMonaco()
-  const editorRef = useRef<any>()
+  const editorRef = useRef<any>(null)
 
   useEffect(() => {
     if (monaco) {
@@ -65,7 +65,7 @@ const SqlEditor = ({
     }
   }, [queryId])
 
-  const onMount = (editor: any, monaco: any) => {
+  const onMount = (editor: any, _monaco: any) => {
     editorRef.current = editor
 
     // Add margin above first line
@@ -77,8 +77,6 @@ const SqlEditor = ({
       })
     })
   }
-
-  const Loading = () => <h4 className="text-lg">Loading</h4>
 
   return (
     <Editor

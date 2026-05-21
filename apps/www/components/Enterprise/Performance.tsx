@@ -20,8 +20,8 @@ const Performance: FC<Props> = (props) => {
       <div className="relative z-10 flex flex-col gap-4 md:gap-8 pb-20">
         <div className="flex flex-col gap-2 max-w-xl">
           {/* <span className="label">{props.label}</span> */}
-          <h2 className="h2 !m-0">{props.heading}</h2>
-          <p className="p !text-foreground-lighter">{props.subheading}</p>
+          <h2 className="h2 m-0!">{props.heading}</h2>
+          <p className="p text-foreground-lighter!">{props.subheading}</p>
         </div>
         <div className="flex flex-wrap gap-4 md:gap-12">
           {props.highlights.map((highlight) => (

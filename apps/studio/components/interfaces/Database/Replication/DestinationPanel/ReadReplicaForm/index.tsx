@@ -5,11 +5,11 @@ import { toast } from 'sonner'
 import {
   Button,
   InfoIcon,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SheetFooter,
   SheetSection,
 } from 'ui'
@@ -74,7 +74,7 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
         </SheetSection>
       )}
 
-      <SheetSection className="flex-grow overflow-auto px-0 py-0">
+      <SheetSection className="grow overflow-auto px-0 py-0">
         <FormItemLayout
           isReactForm={false}
           layout="horizontal"
@@ -82,21 +82,21 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
           label="Region"
           labelOptional="Select a region to deploy your replica in"
         >
-          <Select_Shadcn_
+          <Select
             value={selectedRegion}
             onValueChange={setSelectedRegion}
             disabled={!canDeployReplica}
           >
-            <SelectTrigger_Shadcn_>
-              <SelectValue_Shadcn_ placeholder="Select a region" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a region" />
+            </SelectTrigger>
+            <SelectContent>
               {availableRegions.map((region) => (
-                <SelectItem_Shadcn_ key={region.key} value={region.key}>
+                <SelectItem key={region.key} value={region.key}>
                   <div className="flex gap-x-3 items-center">
                     <img
                       alt="region icon"
-                      className="w-5 rounded-sm"
+                      className="w-5 rounded-xs"
                       src={`${BASE_PATH}/img/regions/${region.region}.svg`}
                     />
                     <p className="flex items-center gap-x-2">
@@ -106,13 +106,13 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
                       </span>
                     </p>
                   </div>
-                </SelectItem_Shadcn_>
+                </SelectItem>
               ))}
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       </SheetSection>
-      <SheetFooter className="!justify-between">
+      <SheetFooter className="justify-between!">
         <div className="flex items-center gap-x-4">
           <InfoIcon className="h-5 w-5" />
           <p className="text-sm">

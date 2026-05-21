@@ -1,7 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
-import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
-
 export type FeaturePreview = {
   key: string
   name: string
@@ -17,20 +15,26 @@ export type FeaturePreview = {
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const { isEligible: isEnterpriseOrSupabaseOrg } = useIsEnterpriseOrSupabaseOrg()
-
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
-  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
 
   return [
     {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER,
+      name: 'RLS Tester',
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/45233',
+      enabled: true,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: false,
+    },
+    {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
-      name: 'New Logs interface',
+      name: 'Updated Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-      enabled: isUnifiedLogsPreviewAvailable && isEnterpriseOrSupabaseOrg,
-      isNew: false,
+      enabled: isUnifiedLogsPreviewAvailable,
+      isNew: true,
       isPlatformOnly: true,
       isDefaultOptIn: false,
     },
@@ -48,7 +52,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF,
       name: 'PG Delta Diff',
       discussionsUrl: undefined,
-      isNew: true,
+      isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: true,
       enabled: pgDeltaDiffEnabled,
@@ -64,7 +68,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
-      name: 'JIT database access',
+      name: 'Temporary access',
       discussionsUrl: undefined,
       isNew: true,
       isPlatformOnly: true,
@@ -81,10 +85,10 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isDefaultOptIn: false,
     },
     {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR,
-      name: 'Floating Mobile Toolbar',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/43721',
-      enabled: showFloatingMobileToolbar,
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
+      name: 'Marketplace',
+      discussionsUrl: undefined,
+      enabled: true,
       isNew: true,
       isPlatformOnly: false,
       isDefaultOptIn: true,

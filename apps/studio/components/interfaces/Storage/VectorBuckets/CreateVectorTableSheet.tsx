@@ -11,7 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -233,7 +233,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           <form
             id={formId}
             onSubmit={form.handleSubmit(onSubmit)}
-            className="overflow-auto flex-grow px-0"
+            className="overflow-auto grow px-0"
           >
             <SheetSection className="flex flex-col gap-y-4">
               <FormField
@@ -248,7 +248,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                     layout="horizontal"
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="name"
                         data-1p-ignore
                         data-lpignore="true"
@@ -276,7 +276,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                     layout="horizontal"
                   >
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="dimension"
                         type="number"
                         placeholder="Enter a numeric value"
@@ -353,7 +353,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                             layout="vertical"
                           >
                             <FormControl>
-                              <Input_Shadcn_
+                              <Input
                                 {...field}
                                 value={field.value}
                                 size="small"
@@ -379,7 +379,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                   </div>
                 ))}
               </div>
-              <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
+              <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
                 <Button type="default" size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>

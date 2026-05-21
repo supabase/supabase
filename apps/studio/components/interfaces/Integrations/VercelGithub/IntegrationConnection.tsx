@@ -29,7 +29,7 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 }
 
 export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
-  ({ disabled, onDeleteConnection, ...props }, ref) => {
+  ({ disabled, onDeleteConnection, ...props }, _ref) => {
     const router = useRouter()
     const { data: org } = useSelectedOrganizationQuery()
 

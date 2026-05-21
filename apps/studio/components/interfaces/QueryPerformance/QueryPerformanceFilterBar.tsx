@@ -95,7 +95,7 @@ export const QueryPerformanceFilterBar = ({
   }
 
   return (
-    <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
+    <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full shrink-0">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
           <FilterInput value={inputValue} onChange={setInputValue} />

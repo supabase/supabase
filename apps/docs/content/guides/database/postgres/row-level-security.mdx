@@ -15,9 +15,13 @@ Supabase allows convenient and secure data access from the browser, as long as y
 
 RLS _must_ always be enabled on any tables stored in an exposed schema. By default, this is the `public` schema.
 
-RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself:
+RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself and grant only the permissions each Postgres role needs.
 
 ```sql
+GRANT SELECT ON <schema_name>.<table_name> TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO service_role;
+
 alter table <schema_name>.<table_name>
 enable row level security;
 ```
@@ -103,7 +107,7 @@ EXECUTE FUNCTION rls_auto_enable();
 
 Note that this applies to tables created after the trigger is installed. Existing tables still need RLS enabled manually.
 
-<Admonition type="caution" label="`auth.uid()` Returns `null` When Unauthenticated">
+<Admonition type="caution" title="`auth.uid()` Returns `null` When Unauthenticated">
 
 When a request is made without an authenticated user (e.g., no access token is provided or the session has expired), `auth.uid()` returns `null`.
 
@@ -152,7 +156,7 @@ to authenticated
 using ( true );
 ```
 
-<Admonition type="note" label="Anonymous user vs the anon key">
+<Admonition type="note" title="Anonymous user vs the anon key">
 
 Using the `anon` Postgres role is different from an [anonymous user](/docs/guides/auth/auth-anonymous) in Supabase Auth. An anonymous user assumes the `authenticated` role to access the database and can be differentiated from a permanent user by checking the `is_anonymous` claim in the JWT.
 

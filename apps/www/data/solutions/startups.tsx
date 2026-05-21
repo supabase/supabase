@@ -215,9 +215,9 @@ const data: () => {
             </>
           ),
           className:
-            'flex-col lg:flex-row [&>div:first-child]:lg:!max-w-none [&>div:first-child]:lg:!mr-0 lg:!gap-0',
+            'flex-col lg:flex-row [&>div:first-child]:lg:max-w-none! [&>div:first-child]:lg:mr-0! lg:gap-0!',
           image: (
-            <div className="relative w-full lg:w-1/3 shrink-1 pt-8 px-4 lg:pr-0">
+            <div className="relative w-full lg:w-1/3 shrink pt-8 px-4 lg:pr-0">
               <div className="w-full h-full rounded-t-lg lg:rounded-tr-none overflow-hidden border-t border-l border-r lg:border-r-0 bg-surface-75">
                 <table className="min-w-full m-0">
                   <thead className="p-0">
@@ -284,8 +284,8 @@ const data: () => {
               magic links, OAuth (Google, GitHub, Twitter, etc.), SAML, SSO, and phone/SMS OTP.
             </>
           ),
-          className: '!border-l-0 sm:!border-l sm:!border-t-0',
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          className: 'border-l-0! sm:border-l! sm:border-t-0!',
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'storage',
@@ -297,7 +297,7 @@ const data: () => {
               managing files, images, and videos.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -327,7 +327,7 @@ const data: () => {
               deployed globally for low-latency execution.
             </>
           ),
-          className: '!border-l-0 sm:!border-l lg:!border-l-0',
+          className: 'border-l-0! sm:border-l! lg:border-l-0!',
           image: <FunctionsVisual className="" />,
         },
         {
@@ -340,7 +340,7 @@ const data: () => {
               for AI/ML applications, enabling fast semantic search and embedding storage.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -366,7 +366,7 @@ const data: () => {
               applications.
             </>
           ),
-          className: '!border-l-0 sm:!border-l',
+          className: 'border-l-0! sm:border-l!',
           image: (
             <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
           ),
@@ -375,7 +375,7 @@ const data: () => {
     },
     developerExperience: {
       id: 'developer-experience',
-      className: '[&_h2]:!max-w-sm',
+      className: '[&_h2]:max-w-sm!',
       title: (
         <>
           Developers can <span className="text-foreground">build faster</span> with Supabase
@@ -564,7 +564,7 @@ const data: () => {
             <RealtimeLogs
               isActive={false}
               isInView={true}
-              className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:!bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]"
+              className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]!"
             />
           ),
         },

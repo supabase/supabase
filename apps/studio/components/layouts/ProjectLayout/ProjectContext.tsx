@@ -2,7 +2,6 @@ import { PropsWithChildren } from 'react'
 
 import { DatabaseSelectorStateContextProvider } from '@/state/database-selector'
 import { RoleImpersonationStateContextProvider } from '@/state/role-impersonation-state'
-import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import { TableEditorStateContextProvider } from '@/state/table-editor'
 import { TabsStateContextProvider } from '@/state/tabs'
 

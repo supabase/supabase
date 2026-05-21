@@ -1,4 +1,3 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { noop } from 'lodash'
 import { forwardRef, type CSSProperties } from 'react'
@@ -20,6 +19,7 @@ import {
 } from 'ui'
 
 import { PolicyRow } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import { Bucket } from '@/data/storage/buckets-query'
 
@@ -27,11 +27,11 @@ interface StoragePoliciesBucketRowProps {
   table: string
   label: string
   bucket?: Bucket
-  policies: PostgresPolicy[]
+  policies: Policy[]
   style?: CSSProperties
   onSelectPolicyAdd: (bucketName: string | undefined, table: string) => void
-  onSelectPolicyEdit: (policy: PostgresPolicy, bucketName: string, table: string) => void
-  onSelectPolicyDelete: (policy: PostgresPolicy) => void
+  onSelectPolicyEdit: (policy: Policy, bucketName: string, table: string) => void
+  onSelectPolicyDelete: (policy: Policy) => void
 }
 
 export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePoliciesBucketRowProps>(

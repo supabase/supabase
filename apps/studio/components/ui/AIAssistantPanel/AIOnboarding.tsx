@@ -29,7 +29,7 @@ export const AIOnboarding = ({
     ? suggestions.prompts.map((suggestion) => ({
         title: suggestion.label,
         prompt: suggestion.description,
-        icon: <FileText strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
+        icon: <FileText strokeWidth={1.25} size={14} className="w-4! h-4!" />,
       }))
     : sqlSnippets && sqlSnippets.length > 0
       ? codeSnippetPrompts

@@ -21,7 +21,7 @@ const LinkAwsMarketplaceLayout = ({
       <Head>
         <title>AWS Marketplace Setup | {appTitle || 'Supabase'}</title>
       </Head>
-      <main className="flex flex-col flex-grow w-full h-full overflow-y-auto">
+      <main className="flex flex-col grow w-full h-full overflow-y-auto">
         <div>
           <div className="mx-auto px-4 sm:px-6">
             <div className="max-w-xl flex justify-between items-center py-4">
@@ -44,7 +44,7 @@ const LinkAwsMarketplaceLayout = ({
           </div>
         </div>
         <Separator />
-        <div className="flex flex-col justify-center flex-grow mx-auto w-[90vw] space-y-4">
+        <div className="flex flex-col justify-center grow mx-auto w-[90vw] space-y-4">
           {children}
         </div>
       </main>

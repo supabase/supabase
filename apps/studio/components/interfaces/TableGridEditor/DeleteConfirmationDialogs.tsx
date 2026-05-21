@@ -1,13 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  Checkbox_Shadcn_ as Checkbox,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
@@ -241,15 +235,15 @@ const DeleteConfirmationDialogs = ({
             </div>
           </div>
           {isDeleteWithCascade && (
-            <Alert_Shadcn_
+            <Alert
               variant="warning"
               title="Warning: Dropping with cascade may result in unintended consequences"
             >
-              <AlertTitle_Shadcn_>
+              <AlertTitle>
                 All dependent objects will be removed, as will any objects that depend on them,
                 recursively.
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertTitle>
+              <AlertDescription>
                 <Button asChild size="tiny" type="default" icon={<ExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
@@ -259,8 +253,8 @@ const DeleteConfirmationDialogs = ({
                     About dependency tracking
                   </Link>
                 </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
         </div>
       </ConfirmationModal>
@@ -270,7 +264,7 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'table'}
         title={
-          <span className="break-words">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
+          <span className="wrap-break-word">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
         }
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
@@ -302,15 +296,15 @@ const DeleteConfirmationDialogs = ({
             </div>
           </div>
           {isDeleteWithCascade && (
-            <Alert_Shadcn_ variant="warning">
-              <AlertTitle_Shadcn_>
+            <Alert variant="warning">
+              <AlertTitle>
                 Warning: Dropping with cascade may result in unintended consequences
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertTitle>
+              <AlertDescription>
                 All dependent objects will be removed, as will any objects that depend on them,
                 recursively.
-              </AlertDescription_Shadcn_>
-              <AlertDescription_Shadcn_ className="mt-4">
+              </AlertDescription>
+              <AlertDescription className="mt-4">
                 <Button asChild size="tiny" type="default" icon={<ExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
@@ -320,8 +314,8 @@ const DeleteConfirmationDialogs = ({
                     About dependency tracking
                   </Link>
                 </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
         </div>
       </ConfirmationModal>
@@ -331,7 +325,7 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'row'}
         title={
-          <p className="break-words">
+          <p className="wrap-break-word">
             <span>Confirm to delete the selected row</span>
             <span>{numRows > 1 && 's'}</span>
           </p>

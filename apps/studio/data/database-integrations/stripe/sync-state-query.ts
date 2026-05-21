@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
@@ -30,7 +31,7 @@ export async function getStripeSyncState(
     {
       projectRef,
       connectionString,
-      sql: `
+      sql: safeSql`
        SELECT started_at, closed_at, status FROM stripe.sync_runs WHERE status != 'pending' ORDER BY started_at DESC LIMIT 1;
       `,
       queryKey: stripeSyncKeys.syncState(projectRef),

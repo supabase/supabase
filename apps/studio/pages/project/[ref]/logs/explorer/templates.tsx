@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { CodeIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button, cn, Popover } from 'ui'
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 import { TEMPLATES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
@@ -58,7 +58,7 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
       icon={
         <div
           className={cn(
-            'duration-400 flex h-6 w-6 items-center justify-center rounded transition-colors',
+            'duration-400 flex h-6 w-6 items-center justify-center rounded-sm transition-colors',
             'border bg-background-200',
             'group-hover:bg-brand-300 group-hover:text-brand-600 group-hover:border-brand-500',
             'dark:border-background-selection dark:bg-background-200 dark:text-foreground',
@@ -75,27 +75,24 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
       description={template.description}
       footer={
         <div className="flex flex-row justify-end">
-          <Popover
-            onOpenChange={setShowPreview}
-            open={showPreview}
-            className="rounded-lg bg-alternative"
-            size="content"
-            overlay={
-              <pre className="whitespace-pre-line break-words rounded-lg bg-alternative p-4 text-sm">
+          <Popover onOpenChange={setShowPreview} open={showPreview}>
+            <PopoverTrigger asChild>
+              <Button
+                asChild
+                type="default"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setShowPreview(!showPreview)
+                }}
+              >
+                <span>Preview</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="rounded-lg bg-alternative p-0">
+              <pre className="whitespace-pre-line wrap-break-word rounded-lg bg-alternative p-4 text-sm">
                 {template.searchString}
               </pre>
-            }
-          >
-            <Button
-              asChild
-              type="default"
-              onClick={(e) => {
-                e.preventDefault()
-                setShowPreview(!showPreview)
-              }}
-            >
-              <span>Preview</span>
-            </Button>
+            </PopoverContent>
           </Popover>
         </div>
       }

@@ -1,9 +1,8 @@
 import { noop } from 'lodash'
 import { Edit, ExternalLink, FlaskConical, Grid } from 'lucide-react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, Modal } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, Modal } from 'ui'
 
 import CardButton from '@/components/ui/CardButton'
-import { useAppStateSnapshot } from '@/state/app-state'
 
 interface PolicySelectionProps {
   description: string
@@ -20,8 +19,6 @@ const PolicySelection = ({
   onViewEditor = noop,
   onToggleFeaturePreviewModal,
 }: PolicySelectionProps) => {
-  const snap = useAppStateSnapshot()
-
   return (
     <Modal.Content className="space-y-4 py-4">
       <div className="flex flex-col gap-y-2">
@@ -36,7 +33,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background
+                  rounded-sm bg-foreground text-background
                 "
                 >
                   <Grid size={14} strokeWidth={2} />
@@ -54,7 +51,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background
+                  rounded-sm bg-foreground text-background
                 "
                 >
                   <Edit size={14} strokeWidth={2} />
@@ -67,12 +64,12 @@ const PolicySelection = ({
       </div>
 
       {showAssistantPreview && onToggleFeaturePreviewModal !== undefined && (
-        <Alert_Shadcn_>
+        <Alert>
           <FlaskConical />
-          <AlertTitle_Shadcn_>Try the new Supabase Assistant for RLS policies</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Try the new Supabase Assistant for RLS policies</AlertTitle>
+          <AlertDescription>
             Create RLS policies for your tables with the help of AI
-          </AlertDescription_Shadcn_>
+          </AlertDescription>
           <div className="flex items-center gap-x-2 mt-3">
             <Button type="default" onClick={onToggleFeaturePreviewModal}>
               Toggle feature preview
@@ -87,7 +84,7 @@ const PolicySelection = ({
               </a>
             </Button>
           </div>
-        </Alert_Shadcn_>
+        </Alert>
       )}
     </Modal.Content>
   )

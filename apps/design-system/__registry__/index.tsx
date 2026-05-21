@@ -60,6 +60,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "PageBreadcrumbs": {
+      name: "PageBreadcrumbs",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/PageBreadcrumbs")),
+      source: "",
+      files: ["registry/default//PageBreadcrumbs/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "PageNav": {
+      name: "PageNav",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/PageNav")),
+      source: "",
+      files: ["registry/default//PageNav/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "PageSection": {
       name: "PageSection",
       type: "components:fragment",
@@ -126,6 +148,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-description-only": {
+      name: "admonition-description-only",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-description-only")),
+      source: "",
+      files: ["registry/default/example/admonition-description-only.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "admonition-warning": {
       name: "admonition-warning",
       type: "components:example",
@@ -133,6 +166,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/admonition-warning")),
       source: "",
       files: ["registry/default/example/admonition-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "admonition-success": {
+      name: "admonition-success",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-success")),
+      source: "",
+      files: ["registry/default/example/admonition-success.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -170,13 +214,13 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "alert-collapsible-demo": {
-      name: "alert-collapsible-demo",
+    "collapsible-alert-demo": {
+      name: "collapsible-alert-demo",
       type: "components:example",
-      registryDependencies: ["alert","collapsible","button"],
-      component: React.lazy(() => import("@/registry/default/example/alert-collapsible-demo")),
+      registryDependencies: ["collapsible-alert"],
+      component: React.lazy(() => import("@/registry/default/example/collapsible-alert-demo")),
       source: "",
-      files: ["registry/default/example/alert-collapsible-demo.tsx"],
+      files: ["registry/default/example/collapsible-alert-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2293,6 +2337,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "page-breadcrumbs-demo": {
+      name: "page-breadcrumbs-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-breadcrumbs-demo")),
+      source: "",
+      files: ["registry/default/example/page-breadcrumbs-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-nav-demo": {
+      name: "page-nav-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-nav-demo")),
+      source: "",
+      files: ["registry/default/example/page-nav-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "page-layout-detail": {
       name: "page-layout-detail",
       type: "components:example",
@@ -2300,6 +2366,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/page-layout-detail")),
       source: "",
       files: ["registry/default/example/page-layout-detail.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-edge-function": {
+      name: "page-layout-edge-function",
+      type: "components:example",
+      registryDependencies: ["filter-bar"],
+      component: React.lazy(() => import("@/registry/default/example/page-layout-edge-function")),
+      source: "",
+      files: ["registry/default/example/page-layout-edge-function.tsx","registry/default/example/page-layout-logs-content.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-full-width": {
+      name: "page-layout-full-width",
+      type: "components:example",
+      registryDependencies: ["filter-bar"],
+      component: React.lazy(() => import("@/registry/default/example/page-layout-full-width")),
+      source: "",
+      files: ["registry/default/example/page-layout-full-width.tsx","registry/default/example/page-layout-logs-content.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2333,6 +2421,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/page-layout-settings")),
       source: "",
       files: ["registry/default/example/page-layout-settings.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-auth-emails": {
+      name: "page-layout-auth-emails",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-layout-auth-emails")),
+      source: "",
+      files: ["registry/default/example/page-layout-auth-emails.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2564,6 +2663,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/multi-select-inline-search-input")),
       source: "",
       files: ["registry/default/example/multi-select-inline-search-input.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-in-dialog": {
+      name: "multi-select-in-dialog",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-in-dialog")),
+      source: "",
+      files: ["registry/default/example/multi-select-in-dialog.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

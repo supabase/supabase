@@ -123,7 +123,7 @@ export const AdvisorPanelBody = ({
                     <SeverityIcon
                       size={16}
                       strokeWidth={1.5}
-                      className={cn('flex-shrink-0', severityClass)}
+                      className={cn('shrink-0', severityClass)}
                     />
                     <div className="text-left flex flex-col gap-0.5 truncate flex-1 min-w-0">
                       <div className="truncate">{primaryText}</div>
@@ -138,7 +138,7 @@ export const AdvisorPanelBody = ({
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-2 shrink-0">
                     {item.severity === 'critical' && (
                       <Badge variant={severityBadgeVariants[item.severity]}>
                         {severityLabels[item.severity]}
@@ -147,7 +147,7 @@ export const AdvisorPanelBody = ({
                     <ChevronRight
                       size={16}
                       strokeWidth={1.5}
-                      className="flex-shrink-0 text-foreground-lighter"
+                      className="shrink-0 text-foreground-lighter"
                     />
                   </div>
                 </div>

@@ -8,13 +8,13 @@ import {
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_ } from 'ui'
+import { Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
   Breadcrumb,
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   escapeAttributeSelector,
   generateCommandClassNames,
@@ -55,7 +55,7 @@ const IconContainer = (
   <div
     className={cn(
       'w-6 h-6',
-      'bg-surface-100 border rounded',
+      'bg-surface-100 border rounded-sm',
       'flex items-center justify-center',
       'text-foreground-muted',
       'group-aria-selected:bg-surface-200 group-aria-selected:text-foreground-lighter group-aria-selected:[&_svg]:scale-[103%]',
@@ -191,20 +191,20 @@ const DocsSearchPage = () => {
     <CommandWrapper>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput placeholder="Search..." ref={inputRef} />
+        <CommandMenuInput placeholder="Search..." ref={inputRef} />
       </CommandHeader>
-      <CommandList_Shadcn_ className="max-h-[initial]">
+      <CommandList className="max-h-[initial]">
         {hasResults &&
           ('results' in state ? state.results : state.staleResults).map((page, i) => {
             return (
-              <CommandGroup_Shadcn_
+              <CommandGroup
                 heading=""
                 key={`${page.path}-group`}
                 value={`${escapeAttributeSelector(page.title)}-group-index-${i}`}
                 forceMount={true}
-                className="overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
+                className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
               >
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={`${page.path}-item`}
                   value={`${escapeAttributeSelector(page.title)}-item-index-${i}`}
                   onSelect={() => {
@@ -227,11 +227,11 @@ const DocsSearchPage = () => {
                   </div>
 
                   <ChevronArrow />
-                </CommandItem_Shadcn_>
+                </CommandItem>
                 {page.sections.length > 0 && (
                   <div className="border-l border-muted ml-3 pt-3">
                     {page.sections.map((section, i) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         className={cn(
                           generateCommandClassNames(true),
                           'border border-overlay/90',
@@ -262,19 +262,19 @@ const DocsSearchPage = () => {
                           </div>
                         </div>
                         <ChevronArrow />
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
                   </div>
                 )}
-              </CommandGroup_Shadcn_>
+              </CommandGroup>
             )
           })}
         {state.status === 'initial' && (
-          <CommandGroup_Shadcn_ className="overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
+          <CommandGroup className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
               return (
-                <CommandItem_Shadcn_
+                <CommandItem
                   className={generateCommandClassNames(false)}
                   disabled={hasResults}
                   onSelect={() => {
@@ -287,10 +287,10 @@ const DocsSearchPage = () => {
                 >
                   <Search />
                   {question}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               )
             })}
-          </CommandGroup_Shadcn_>
+          </CommandGroup>
         )}
         {state.status === 'loading' && state.staleResults.length === 0 && (
           <div className="flex items-center gap-3 my-4 justify-center">
@@ -319,7 +319,7 @@ const DocsSearchPage = () => {
             </Button>
           </div>
         )}
-      </CommandList_Shadcn_>
+      </CommandList>
     </CommandWrapper>
   )
 }
@@ -346,9 +346,9 @@ export function getPageIcon(page: Page) {
     case PageType.Reference:
     case PageType.Integration:
     case PageType.Troubleshooting:
-      return <Book strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -360,9 +360,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Reference:
     case PageType.Integration:
     case PageType.Troubleshooting:
-      return <Hash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <MessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

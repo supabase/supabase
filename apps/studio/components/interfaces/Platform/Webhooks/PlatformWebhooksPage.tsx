@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -19,7 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label_Shadcn_,
+  Label,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -316,6 +316,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       <PlatformWebhooksHeader
         hasSelectedEndpoint={!!selectedEndpoint}
         headerTitle={headerTitle}
+        featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS}
         headerDescription={headerDescription}
         endpointStatus={
           selectedEndpoint ? (selectedEndpoint.enabled ? 'enabled' : 'disabled') : undefined
@@ -482,7 +483,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
           {/* Content */}
           <div className="space-y-4 mx-5 pb-5">
             <div className="space-y-1">
-              <Label_Shadcn_>Signing secret</Label_Shadcn_>
+              <Label>Signing secret</Label>
               <Input
                 copy
                 readOnly

@@ -9,11 +9,11 @@ import {
   Button,
   cn,
   LoadingLine,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -105,21 +105,21 @@ export const SecretsManagement = () => {
                 ]}
               />
 
-              <Select_Shadcn_ value={selectedSort} onValueChange={(v) => setSelectedSort(v as any)}>
-                <SelectTrigger_Shadcn_ size="tiny" className="w-44">
-                  <SelectValue_Shadcn_ asChild>
+              <Select value={selectedSort} onValueChange={(v) => setSelectedSort(v as any)}>
+                <SelectTrigger size="tiny" className="w-44">
+                  <SelectValue asChild>
                     <>Sort by {selectedSort}</>
-                  </SelectValue_Shadcn_>
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="updated_at" className="text-xs">
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="updated_at" className="text-xs">
                     Updated at
-                  </SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="name" className="text-xs">
+                  </SelectItem>
+                  <SelectItem value="name" className="text-xs">
                     Name
-                  </SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex items-center gap-x-2">
@@ -153,12 +153,12 @@ export const SecretsManagement = () => {
           <LoadingLine loading={isLoading || isRefetching} />
 
           {isError ? (
-            <div className="flex-grow p-4">
+            <div className="grow p-4">
               <AlertError error={error} subject="Failed to load secrets" />
             </div>
           ) : (
             <DataGrid
-              className="flex-grow border-t-0"
+              className="grow border-t-0"
               rowHeight={52}
               headerRowHeight={36}
               columns={columns}
@@ -167,7 +167,7 @@ export const SecretsManagement = () => {
               rowClass={() => {
                 return cn(
                   'cursor-pointer',
-                  '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                  '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                   '[&>.rdg-cell:first-child>div]:pl-8'
                 )
               }}

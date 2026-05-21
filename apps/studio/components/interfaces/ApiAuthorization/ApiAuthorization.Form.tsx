@@ -3,9 +3,9 @@ import Link from 'next/link'
 import { useMemo, type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -15,12 +15,11 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormMessage,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
@@ -134,26 +133,26 @@ function FormShell({ title, children }: FormShellProps): ReactNode {
 
 function McpNotice(): ReactNode {
   return (
-    <Alert_Shadcn_ variant="warning">
+    <Alert variant="warning">
       <WarningIcon />
-      <AlertTitle_Shadcn_>MCP Client Connection</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
+      <AlertTitle>MCP Client Connection</AlertTitle>
+      <AlertDescription>
         This is an MCP (Model Context Protocol) client designed to connect with AI applications.
         Please ensure you trust this application before granting access to your organization's data.
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }
 
 function ExpiredNotice(): ReactNode {
   return (
-    <Alert_Shadcn_ variant="warning">
+    <Alert variant="warning">
       <WarningIcon />
-      <AlertTitle_Shadcn_>This authorization request is expired</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
+      <AlertTitle>This authorization request is expired</AlertTitle>
+      <AlertDescription>
         Please retry your authorization request from the requesting app
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }
 
@@ -172,40 +171,40 @@ interface OrganizationsErrorNoticeProps {
 
 function OrganizationsErrorNotice({ error }: OrganizationsErrorNoticeProps): ReactNode {
   return (
-    <Alert_Shadcn_ variant="warning">
+    <Alert variant="warning">
       <WarningIcon />
-      <AlertTitle_Shadcn_>There was an error loading your organizations</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
+      <AlertTitle>There was an error loading your organizations</AlertTitle>
+      <AlertDescription>
         Please try again. If the problem persists, contact support.
         {error && <p className="mt-2">Error: {error.message}</p>}
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }
 
 function OrganizationsEmptyState(): ReactNode {
   return (
-    <Alert_Shadcn_ variant="warning">
+    <Alert variant="warning">
       <WarningIcon />
-      <AlertTitle_Shadcn_>Organization is needed for installing an integration</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
+      <AlertTitle>Organization is needed for installing an integration</AlertTitle>
+      <AlertDescription>
         Your account isn't associated with any organizations. To use this integration, it must be
         installed within an organization. You'll be redirected to create an organization first.
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }
 
 function NotMemberOfOrganizationNotice(): ReactNode {
   return (
-    <Alert_Shadcn_ variant="warning">
+    <Alert variant="warning">
       <WarningIcon />
-      <AlertTitle_Shadcn_>Organization is needed for installing an integration</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
+      <AlertTitle>Organization is needed for installing an integration</AlertTitle>
+      <AlertDescription>
         Your account is not a member of the pre-selected organization. To use this integration, it
         must be installed within an organization your account is associated with.
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }
 
@@ -241,26 +240,26 @@ function OrganizationSelector({
               isReactForm
             >
               <FormControl>
-                <Select_Shadcn_
+                <Select
                   value={field.value || undefined}
                   disabled={disabled}
                   onValueChange={field.onChange}
                 >
-                  <SelectTrigger_Shadcn_ size="small">
-                    <SelectValue_Shadcn_ placeholder="Select an organization" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
+                  <SelectTrigger size="small">
+                    <SelectValue placeholder="Select an organization" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {organizations.map((organization) => (
-                      <SelectItem_Shadcn_
+                      <SelectItem
                         key={organization.slug}
                         value={organization.slug}
                         className="text-xs"
                       >
                         {organization.name}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormControl>
             </FormLayout>
           </FormItem>

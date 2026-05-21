@@ -1,8 +1,6 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  cn,
   FormControl,
   FormField,
   FormInputGroupInput,
@@ -30,7 +28,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
   } = form
   const { totalSize, growthPercent, maxSizeGb, minIncrementGb } = form.watch()
 
-  const { error, isPending: isLoading, isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
+  const { isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
 
   const _growthPercent = growthPercent ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
   const _minIncrementGb = minIncrementGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize

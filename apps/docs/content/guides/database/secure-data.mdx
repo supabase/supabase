@@ -19,7 +19,7 @@ Put custom server-side logic between your client and database with [Edge Functio
 
 ### Direct database connections
 
-Connect to Postgres with a connection string from trusted servers, workers, or tools. Keep database credentials secret and use the right [connection method](/docs/guides/database/connecting-to-postgres) for your environment. You can [disable the Data API](/docs/guides/database/data-api#disable-the-data-api-completely) if your app only uses direct connections.
+Connect to Postgres with a connection string from trusted servers, workers, or tools. Keep database credentials secret and use the right [connection method](/docs/guides/database/connecting-to-postgres) for your environment. You can [disable the Data API](/docs/guides/api/securing-your-api#disable-the-data-api) if your app only uses direct connections.
 
 ## Frontend access
 
@@ -32,7 +32,7 @@ Your publishable key is safe to expose with RLS enabled, because row access perm
 
 Older projects may also show an `anon` key. Treat it like a publishable key: it can identify your project, but it is not a secret and must be paired with RLS and least-privilege grants.
 
-<Admonition type="danger" label="Never expose your service role or secret keys on the frontend">
+<Admonition type="danger" title="Never expose your service role or secret keys on the frontend">
 
 Unlike your publishable key, your secret and service role keys are **never** safe to expose because they bypass RLS. Only use your secret and service role keys on the backend. Treat them as secrets (for example, import them as sensitive environment variables instead of hardcoding them).
 
@@ -44,6 +44,6 @@ Supabase and Postgres provide you with multiple ways to manage security, includi
 
 - [Row Level Security](/docs/guides/database/postgres/row-level-security)
 - [Column Level Security](/docs/guides/database/postgres/column-level-security)
-- [Data API](/docs/guides/database/data-api)
+- [Securing your API](/docs/guides/api/securing-your-api)
 - [Managing Postgres roles](/docs/guides/database/postgres/roles)
 - [Managing secrets with Vault](/docs/guides/database/vault)

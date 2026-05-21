@@ -247,7 +247,7 @@ export const NewScopedTokenSheet = ({
       <SheetContent
         showClose={false}
         size="default"
-        className="!min-w-[600px] flex flex-col h-full gap-0"
+        className="min-w-[600px]! flex flex-col h-full gap-0"
       >
         <SheetHeader>
           <SheetTitle>
@@ -312,7 +312,7 @@ export const NewScopedTokenSheet = ({
             </Form>
           </div>
         </ScrollArea>
-        <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
+        <SheetFooter className="justify-end! w-full mt-auto py-4 border-t">
           <div className="flex gap-2">
             <Button type="default" disabled={isPending} onClick={handleClose}>
               Cancel

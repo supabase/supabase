@@ -16,6 +16,7 @@ import {
   checkForWithClause,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import { get } from '@/data/fetchers'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -34,8 +35,10 @@ export interface LogsQueryHook {
 export const useLogsQuery = (
   projectRef: string,
   initialParams: Partial<LogsEndpointParams> = {},
-  enabled = true
+  enabled = true,
+  options: { useOtel?: boolean } = {}
 ): LogsQueryHook => {
+  const { useOtel = false } = options
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',
@@ -71,9 +74,9 @@ export const useLogsQuery = (
     isRefetching,
     refetch,
   } = useQuery({
-    queryKey: ['projects', projectRef, 'logs', params],
+    queryKey: ['projects', projectRef, 'logs', params, { otel: useOtel }],
     queryFn: async ({ signal }) => {
-      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+      const { data, error } = await get(logsAllEndpointUrl(useOtel), {
         params: {
           path: { ref: projectRef },
           query: params,
@@ -96,7 +99,9 @@ export const useLogsQuery = (
     error = data?.error
   }
 
-  if (IS_PLATFORM) {
+  // BigQuery-specific parser limitations don't apply to the ClickHouse-backed
+  // OTEL endpoint, so skip these warnings when querying it.
+  if (IS_PLATFORM && !useOtel) {
     if (usesWith) {
       error = {
         message: 'The parser does not yet support WITH and subquery statements.',

@@ -727,11 +727,6 @@ export const createErrorsReportConfig = ({
         tooltip: AUTH_ERROR_CODE_LIST.find((e) => e.key === c)?.description,
       }))
 
-      const data = rawData.result.map((point: any) => ({
-        ...point,
-        timestamp: point.timestamp,
-      }))
-
       const pivoted = transformCategoricalCountData(rawData.result, 'error_code', distinct)
 
       return { data: pivoted, attributes, query: sql }

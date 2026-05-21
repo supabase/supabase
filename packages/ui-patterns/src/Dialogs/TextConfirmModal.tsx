@@ -2,10 +2,13 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Copy } from 'lucide-react'
+// Required to avoid issue:
+// The inferred type of ConfirmationModal cannot be named without a reference to DialogProps
+import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
   cn,
   copyToClipboard,
@@ -21,7 +24,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
@@ -40,13 +43,13 @@ export interface TextConfirmModalProps {
   text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
-  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
-    base?: React.ComponentProps<typeof Alert_Shadcn_>
+    base?: React.ComponentProps<typeof Alert>
     title?: string
     description?: string | ReactNode
   }
-  input?: React.ComponentProps<typeof Input_Shadcn_>
+  input?: React.ComponentProps<typeof Input>
   label?: React.ComponentProps<typeof FormLabel>
   formMessage?: React.ComponentProps<typeof FormMessage>
   description?: React.ComponentProps<typeof FormDescription>
@@ -109,7 +112,7 @@ export const TextConfirmModal = forwardRef<
     const isFormValid = form.formState.isValid
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    function onSubmit(_values: z.infer<typeof formSchema>) {
       // Do something with the form values.
       // ✅ This will be type-safe and validated.
       onConfirm()
@@ -125,6 +128,9 @@ export const TextConfirmModal = forwardRef<
       return () => clearTimeout(timer)
     }, [showCopied])
 
+    const { title: _alertBaseTitle, children: _alertBaseChildren, ...alertBase } = alert?.base ?? {}
+    const alertTitleProps = alert?.title ? { label: alert.title } : {}
+
     return (
       <Dialog
         open={visible}
@@ -135,17 +141,17 @@ export const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
+        <DialogContent ref={ref} className="p-0 gap-0 pb-5 block!" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle className="">{title}</DialogTitle>
           </DialogHeader>
           {alert && (
             <Admonition
               type={variant as 'default' | 'destructive' | 'warning'}
-              label={alert.title}
               description={alert.description}
+              {...alertTitleProps}
               className="border-x-0 rounded-none -mt-px"
-              {...alert?.base}
+              {...alertBase}
             />
           )}
           {children && (
@@ -198,7 +204,7 @@ export const TextConfirmModal = forwardRef<
                       to confirm.
                     </FormLabel>
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         autoComplete="off"
                         placeholder={confirmPlaceholder}
                         {...input}

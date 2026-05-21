@@ -29,15 +29,21 @@ function getSources(): Source[] {
   ]
 }
 
+// Editorial ordering for the product overview list (mirrors the homepage
+// products section); not derived from MD_PAGES because the order is
+// intentional. When dropping a new content/md/<slug>.md file, add a matching
+// entry here too — otherwise the page ships but won't be linked from /llms.txt.
 const PRODUCT_OVERVIEW_LINKS = [
-  '- [Supabase Overview](https://supabase.com/llms/homepage.txt)',
-  '- [Supabase Database](https://supabase.com/llms/database.txt)',
-  '- [Supabase Auth](https://supabase.com/llms/auth.txt)',
-  '- [Supabase Storage](https://supabase.com/llms/storage.txt)',
-  '- [Supabase Edge Functions](https://supabase.com/llms/edge-functions.txt)',
-  '- [Supabase Realtime](https://supabase.com/llms/realtime.txt)',
-  '- [Supabase Vector](https://supabase.com/llms/vector.txt)',
-  '- [Supabase Pricing](https://supabase.com/llms/pricing.txt)',
+  '- [Supabase Overview](https://supabase.com/homepage.md)',
+  '- [Supabase Database](https://supabase.com/database.md)',
+  '- [Supabase Auth](https://supabase.com/auth.md)',
+  '- [Supabase Storage](https://supabase.com/storage.md)',
+  '- [Supabase Edge Functions](https://supabase.com/edge-functions.md)',
+  '- [Supabase Realtime](https://supabase.com/realtime.md)',
+  '- [Supabase Vector](https://supabase.com/vector.md)',
+  '- [Supabase Cron](https://supabase.com/modules/cron.md)',
+  '- [Supabase Queues](https://supabase.com/modules/queues.md)',
+  '- [Supabase Pricing](https://supabase.com/pricing.md)',
 ].join('\n')
 
 export async function GET() {

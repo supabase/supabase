@@ -19,7 +19,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import * as z from 'zod'
@@ -110,7 +110,7 @@ export const DeleteAccountButton = () => {
           Request to delete account
         </Button>
       </DialogTrigger>
-      <DialogContent className="!w-[500px]">
+      <DialogContent className="w-[500px]!">
         <DialogHeader>
           {(organizations ?? []).length > 0 ? (
             <>
@@ -167,7 +167,7 @@ export const DeleteAccountButton = () => {
                             confirm
                           </FormLabel>
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               autoFocus
                               {...field}
                               autoComplete="off"

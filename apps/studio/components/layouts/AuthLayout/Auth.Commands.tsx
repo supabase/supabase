@@ -59,7 +59,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
       ...(authenticationThirdPartyAuth
         ? [
             {
-              id: 'nav-auth-providers',
+              id: 'nav-auth-providers-third-party',
               name: 'Providers (Third Party)',
               value: 'Auth: Providers (Third Party)',
               route: `/project/${ref}/auth/third-party`,

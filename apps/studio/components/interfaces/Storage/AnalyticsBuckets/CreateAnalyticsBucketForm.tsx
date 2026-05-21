@@ -10,7 +10,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   SheetFooter,
   SheetSection,
 } from 'ui'
@@ -193,7 +193,7 @@ export const CreateAnalyticsBucketForm = ({
 
   return (
     <>
-      <Section className="flex flex-col !p-0 flex-grow">
+      <Section className="flex flex-col p-0! grow">
         <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
@@ -209,7 +209,7 @@ export const CreateAnalyticsBucketForm = ({
                   description="Must be between 3 – 63 characters. Only lowercase letters, numbers, and hyphens are allowed."
                 >
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       id="name"
                       data-1p-ignore
                       data-lpignore="true"
@@ -229,7 +229,7 @@ export const CreateAnalyticsBucketForm = ({
                 className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
                 title="Wrappers extension must be updated for Iceberg Wrapper support"
               >
-                <p className="prose max-w-full text-sm !leading-normal">
+                <p className="prose max-w-full text-sm leading-normal!">
                   Update the <code className="text-code-inline">wrappers</code> extension by
                   upgrading your project from your{' '}
                   <InlineLink href={`/project/${ref}/settings/infrastructure`}>
@@ -247,7 +247,7 @@ export const CreateAnalyticsBucketForm = ({
                 type="default"
                 className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
               >
-                <p className="!leading-normal">
+                <p className="leading-normal!">
                   Supabase will install the{' '}
                   {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
                   Iceberg Wrapper integration on your behalf.{' '}

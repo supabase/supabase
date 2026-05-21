@@ -12,6 +12,7 @@ Alaister Young
 Alan De Los Santos
 Aleksi Immonen
 Alex Hall
+Alex Hsu
 Alexander Korotkov
 Ali Waseem
 Allan S
@@ -29,13 +30,17 @@ Ariuna K
 Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
+Aziz Quadri
 Barco Fourie
 Beng Eu
 Benjamin Coenen
 Bo Lu
 Bobbie Soedirgo
+Brad Gyger
 Brendan Stephens
 Brent Newson
+Brian Cullen
+Brent Schroeter
 Carel de Waal
 Cameron Blackwood
 Cameron Michie
@@ -46,11 +51,14 @@ Chase Cresgy
 Chase Granberry
 Chris Caruso
 Chris Chandler
+Chris Chapman (Chappie)
 Chris Copplestone
 Chris Gwilliams
 Chris Martin
 Chris Stockton
 Chris Ward
+Christian Funkhouser
+Claudiu Dragalina-Paraipan
 Clayton Kast
 Colin Goodheart-Smithe
 Colin Murray
@@ -58,6 +66,7 @@ Colum Ferry
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Mitterdorfer
 Daniel Velázquez Lara
 Danny White
 Dave Wilson
@@ -66,6 +75,7 @@ David Alvarez
 David Birdsong
 David Camacho Cateura
 David Weitzman
+David Whittington
 Davide Pellegatta
 Deepthi Sigireddi
 Deji I
@@ -76,7 +86,6 @@ Divit D
 Douglas Hunley
 Dustin Keib
 Eduardo Gurgel
-Egor Romanov
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
@@ -105,6 +114,7 @@ Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
+Harold Giménez
 Haydn Maley
 Hieu Pham
 Hunter Luckow
@@ -119,7 +129,9 @@ Jean-Paul Argudo
 Jeff Smick
 Jenny Kibiri
 Jeremias Menichelli
+Jess Fink
 Jess Shears
+Jesse White
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
@@ -138,7 +150,9 @@ Jordan McQueen
 Jordi Enric
 José Luis Ledesma
 Joshen Lim
+Julian Domke
 Julien Goux
+Kai M
 Kalleby Santos
 Kanishk Dudeja
 Kamil Ogórek
@@ -146,6 +160,8 @@ Kang Ming Tay
 Karan S
 Karlo Ison
 Katerina Skroumpelou
+Keith Resar
+Keith Fiske
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
@@ -161,22 +177,23 @@ Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
-Long Hoang
 Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
+Manuel Mendez
 Manan Gupta
 Marcus Weiner
-Margarita Sandomirskaia
+Marija Milicevic
 Mark Burggraf
 Matthew Hambright
+Matt Hudson
 Matt Johnston
 Matt Rossman
 Matthias Luft
 Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
-Miles Thomas
+Michelle Jubrey
 Monica Khoury
 Mykhailo Mischa Lieibenson
 Natalie Roberge
@@ -187,6 +204,7 @@ Nicolas Nosenzo
 Nyannyacha
 Oli R
 Pamela Chia
+Patricia Szasz
 Patrick Crane
 Paul Caselton
 Paul Cioanca
@@ -197,11 +215,13 @@ Paweł Gulbinowicz
 Pedro Rodrigues
 Peter Lyn
 Peter Soderberg
+Pierre Ducroquet
 Qiao Han
 Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Richard Kasprzak
 Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
@@ -209,6 +229,7 @@ Roman Hernandez
 Ronan Lehane
 Rory Wilding
 Ryan Goulet
+Ryan Senior
 Ruan Maia
 Saba Pochkhua
 Sam Meech-Ward
@@ -216,6 +237,7 @@ Sam Rome
 Sam Rose
 Samir Ketema
 Sana Cordeaux
+Sasi Kanumuri
 Sara Read
 Sean Oliver
 Sean Romberg
@@ -248,7 +270,9 @@ Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Utkarash Singh
 Victor Farazdagi
+Warwick Mitchell
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova

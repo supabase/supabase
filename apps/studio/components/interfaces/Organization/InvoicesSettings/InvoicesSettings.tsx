@@ -149,7 +149,7 @@ export const InvoicesSettings = () => {
             <TableRow className="rounded-b">
               <TableCell
                 colSpan={invoices.length > 0 ? 6 : 5}
-                className="!p-0 !rounded-b overflow-hidden"
+                className="p-0! rounded-b! overflow-hidden"
               >
                 <AlertError
                   className="border-0 rounded-none"

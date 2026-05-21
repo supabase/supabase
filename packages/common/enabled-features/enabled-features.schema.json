@@ -266,6 +266,10 @@
       "description": "Enable read replicas management"
     },
 
+    "logs:all": {
+      "type": "boolean",
+      "description": "Enable the logs pages and navigation. Disable to hide all logs pages, for example when Logflare is not configured."
+    },
     "logs:templates": {
       "type": "boolean",
       "description": "Enable the logs templates page"
@@ -488,6 +492,7 @@
     "profile:show_information",
     "profile:show_analytics_and_marketing",
     "profile:show_account_deletion",
+    "logs:all",
     "logs:templates",
     "logs:collections",
     "logs:metadata",

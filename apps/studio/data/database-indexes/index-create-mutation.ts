@@ -1,4 +1,4 @@
-import { ident } from '@supabase/pg-meta/src/pg-format'
+import { ident, joinSqlFragments, keyword, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -24,11 +24,11 @@ export async function createDatabaseIndex({
 }: DatabaseIndexCreateVariables) {
   const { schema, entity, type, columns } = payload
 
-  const sql = `
-  CREATE INDEX ON ${ident(schema)}.${ident(entity)} USING ${type} (${columns
-    .map((column) => ident(column))
-    .join(', ')});
-  `.trim()
+  const columnList = joinSqlFragments(
+    columns.map((column) => ident(column)),
+    ', '
+  )
+  const sql = safeSql`CREATE INDEX ON ${ident(schema)}.${ident(entity)} USING ${keyword(type)} (${columnList});`
 
   const { result } = await executeSql({
     projectRef,

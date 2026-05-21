@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { toast } from 'sonner'
@@ -26,10 +27,8 @@ export async function createAndExposeApiSchema({
   connectionString,
   existingPostgrestConfig,
 }: CreateAndExposeAPISchemaVariables) {
-  const sql = `
-create schema if not exists api;
-grant usage on schema api to anon, authenticated;
-  `.trim()
+  const sql = safeSql`create schema if not exists api;
+grant usage on schema api to anon, authenticated;`
 
   await executeSql({ projectRef, connectionString, sql })
 

@@ -16,7 +16,7 @@ export interface SortRowProps {
   onDrag: (dragIndex: number, hoverIndex: number) => void
 }
 
-const SortRow = ({ index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
+const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) => {
   const snap = useTableEditorTableStateSnapshot()
   const column = snap.table.columns.find((x) => x.name === columnName)
 

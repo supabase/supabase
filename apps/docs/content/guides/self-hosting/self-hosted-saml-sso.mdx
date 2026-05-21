@@ -561,7 +561,7 @@ base64 -w 0 -i pk_rsa1.der
 ### IdP cannot reach the ACS endpoint
 
 - Verify `API_EXTERNAL_URL` is set to a URL the IdP can reach (not `localhost` unless testing locally)
-- Check that the Kong routes for `/sso/saml/acs` and `/sso/saml/metadata` are configured as open (no `key-auth` plugin).
+- Check that the API gateway routes for `/sso/saml/acs` and `/sso/saml/metadata` are configured as open (no `key-auth` plugin).
 - Check the Auth container logs: `docker compose logs auth`
 
 ### "No SSO provider found for this domain"

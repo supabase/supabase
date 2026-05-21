@@ -4,17 +4,17 @@ import { useForm } from 'react-hook-form'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Form,
   FormControl,
   FormField,
-  RadioGroup_Shadcn_,
-  RadioGroupItem_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  RadioGroup,
+  RadioGroupItem,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetContent,
@@ -222,36 +222,36 @@ export const Page = () => {
                     description="This is your public display name."
                     layout="horizontal"
                   >
-                    <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl className="w-full">
-                        <SelectTrigger_Shadcn_ className="w-full">
-                          <SelectValue_Shadcn_
+                        <SelectTrigger className="w-full">
+                          <SelectValue
                             placeholder="Select a verified email"
                             className="flex gap-2"
                           />
-                        </SelectTrigger_Shadcn_>
+                        </SelectTrigger>
                       </FormControl>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@example.com">
+                      <SelectContent>
+                        <SelectItem value="m@example.com">
                           <div className="flex gap-2 items-center">
                             <UserIcon />
                             <span>m@example.com</span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@google.com" className="flex gap-2">
+                        </SelectItem>
+                        <SelectItem value="m@google.com" className="flex gap-2">
                           <div className="flex gap-2 items-center">
                             <UserIcon />
                             UserIconm@google.com
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@support.com" className="flex gap-2">
+                        </SelectItem>
+                        <SelectItem value="m@support.com" className="flex gap-2">
                           <div className="flex gap-2 items-center">
                             <UserIcon />
                             m@support.com
                           </div>
-                        </SelectItem_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormItemLayout>
                 )}
               />
@@ -302,7 +302,7 @@ export const Page = () => {
                     layout="flex"
                   >
                     <FormControl>
-                      <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -343,7 +343,7 @@ export const Page = () => {
                               hideMessage
                             >
                               <FormControl>
-                                <Checkbox_Shadcn_
+                                <Checkbox
                                   checked={field.value?.includes(item.id)}
                                   onCheckedChange={(checked) => {
                                     return checked
@@ -377,7 +377,7 @@ export const Page = () => {
                     layout="horizontal"
                   >
                     <FormControl>
-                      <RadioGroup_Shadcn_
+                      <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         className="flex flex-col space-y-1"
@@ -389,7 +389,7 @@ export const Page = () => {
                           hideMessage
                         >
                           <FormControl>
-                            <RadioGroupItem_Shadcn_ value="all" />
+                            <RadioGroupItem value="all" />
                           </FormControl>
                         </FormItemLayout>
                         <FormItemLayout
@@ -399,7 +399,7 @@ export const Page = () => {
                           hideMessage
                         >
                           <FormControl>
-                            <RadioGroupItem_Shadcn_ value="mentions" />
+                            <RadioGroupItem value="mentions" />
                           </FormControl>
                         </FormItemLayout>
                         <FormItemLayout
@@ -409,10 +409,10 @@ export const Page = () => {
                           hideMessage
                         >
                           <FormControl>
-                            <RadioGroupItem_Shadcn_ value="none" />
+                            <RadioGroupItem value="none" />
                           </FormControl>
                         </FormItemLayout>
-                      </RadioGroup_Shadcn_>
+                      </RadioGroup>
                     </FormControl>
                   </FormItemLayout>
                 )}

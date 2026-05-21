@@ -1,4 +1,4 @@
-import { literal } from '@supabase/pg-meta/src/pg-format'
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { storageKeys } from './keys'
@@ -36,7 +36,7 @@ async function getPublicBucketsWithSelectPolicies({
   const { result } = await executeSql<PublicBucketSelectPolicy[]>({
     projectRef,
     connectionString,
-    sql: `
+    sql: safeSql`
       SELECT b.id AS bucket_id, b.name AS bucket_name, p.policyname
       FROM storage.buckets b
       JOIN pg_policies p

@@ -116,7 +116,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
         </div>
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         {viewMode && setViewMode && (
           <ToggleGroup
             type="single"

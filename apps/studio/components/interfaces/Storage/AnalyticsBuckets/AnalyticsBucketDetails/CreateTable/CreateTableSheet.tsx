@@ -11,15 +11,15 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -146,7 +146,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
               <SheetTitle>Create a new table</SheetTitle>
             </SheetHeader>
 
-            <SheetSection className="overflow-auto flex-grow p-0">
+            <SheetSection className="overflow-auto grow p-0">
               <div className="flex flex-col gap-y-4 py-4 px-5">
                 <FormField
                   name="namespace"
@@ -157,31 +157,31 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                       label="Select a namespace to create your table in"
                     >
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
                             field.onChange(value)
                             form.resetField('newNamespace')
                           }}
                         >
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select a namespace" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a namespace" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {namespaces.map((x) => (
-                              <SelectItem_Shadcn_ key={x} value={x}>
+                              <SelectItem key={x} value={x}>
                                 {x}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                            {namespaces.length > 0 && <SelectSeparator_Shadcn_ />}
-                            <SelectItem_Shadcn_ value={NEW_NAMESPACE_MARKER}>
+                            {namespaces.length > 0 && <SelectSeparator />}
+                            <SelectItem value={NEW_NAMESPACE_MARKER}>
                               <div className="flex items-center gap-x-2">
                                 <Plus size={14} />
                                 <p>Create a new namespace</p>
                               </div>
-                            </SelectItem_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -193,10 +193,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     render={({ field }) => (
                       <FormItemLayout name="newNamespace" label="Name of new namespace">
                         <FormControl>
-                          <Input_Shadcn_
-                            {...field}
-                            placeholder="Provide a name for your new namespace"
-                          />
+                          <Input {...field} placeholder="Provide a name for your new namespace" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -214,10 +211,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     render={({ field }) => (
                       <FormItemLayout name="name" label="Name of table">
                         <FormControl>
-                          <Input_Shadcn_
-                            {...field}
-                            placeholder="Provide a name for your new table"
-                          />
+                          <Input {...field} placeholder="Provide a name for your new table" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -235,12 +229,12 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                       </Button>
                     </div>
                     {columns.length === 0 ? (
-                      <div className="flex items-center justify-center rounded border border-strong border-dashed py-4 text-foreground-lighter text-sm">
+                      <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-4 text-foreground-lighter text-sm">
                         Add a column to your table
                       </div>
                     ) : (
                       <>
-                        <div className="grid grid-cols-[1fr,1fr,32px]">
+                        <div className="grid grid-cols-[1fr_1fr_32px]">
                           <p className="text-xs text-foreground-lighter">Name</p>
                           <p className="text-xs text-foreground-lighter">Type</p>
                         </div>
@@ -251,14 +245,14 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
 
                           return (
                             <Fragment key={`column-${idx}`}>
-                              <div className="grid grid-cols-[1fr,1fr,32px] gap-x-1">
+                              <div className="grid grid-cols-[1fr_1fr_32px] gap-x-1">
                                 <FormField
                                   control={form.control}
                                   name={`columns.${idx}.name`}
                                   render={({ field }) => (
                                     <FormItemLayout>
                                       <FormControl>
-                                        <Input_Shadcn_
+                                        <Input
                                           {...field}
                                           placeholder="Provide a column name"
                                           disabled={isCreating}
@@ -273,21 +267,18 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                   name={`columns.${idx}.type`}
                                   render={({ field }) => (
                                     <FormControl>
-                                      <Select_Shadcn_
-                                        value={field.value}
-                                        onValueChange={field.onChange}
-                                      >
-                                        <SelectTrigger_Shadcn_ className="h-auto">
-                                          <SelectValue_Shadcn_ placeholder="Select a type" />
-                                        </SelectTrigger_Shadcn_>
-                                        <SelectContent_Shadcn_>
+                                      <Select value={field.value} onValueChange={field.onChange}>
+                                        <SelectTrigger className="h-auto">
+                                          <SelectValue placeholder="Select a type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
                                           {COLUMN_TYPES.map((x) => (
-                                            <SelectItem_Shadcn_ key={x} value={x}>
+                                            <SelectItem key={x} value={x}>
                                               {x}
-                                            </SelectItem_Shadcn_>
+                                            </SelectItem>
                                           ))}
-                                        </SelectContent_Shadcn_>
-                                      </Select_Shadcn_>
+                                        </SelectContent>
+                                      </Select>
                                     </FormControl>
                                   )}
                                 />

@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -18,7 +18,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import * as z from 'zod'
 
@@ -87,7 +87,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}
                       />
-                      <Input_Shadcn_
+                      <Input
                         autoFocus
                         {...field}
                         autoComplete="off"
@@ -117,7 +117,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}
                       />
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         autoComplete="new-password"
                         type="password"
@@ -139,12 +139,12 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
               render={({ field }) => (
                 <FormItem className="flex items-center gap-x-2">
                   <FormControl>
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       checked={field.value}
                       onCheckedChange={(value) => field.onChange(value)}
                     />
                   </FormControl>
-                  <FormLabel>Auto Confirm User?</FormLabel>
+                  <FormLabel>Auto confirm user?</FormLabel>
                 </FormItem>
               )}
             />

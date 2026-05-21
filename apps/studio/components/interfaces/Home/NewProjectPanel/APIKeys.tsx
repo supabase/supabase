@@ -184,7 +184,7 @@ export const APIKeys = () => {
 
           <CardContent className="relative overflow-hidden">
             <div
-              className="absolute inset-0 rounded-md -mt-[1px]"
+              className="absolute inset-0 rounded-md -mt-px"
               style={{
                 backgroundImage: `
                   linear-gradient(to top, hsl(var(--background-surface-100)/1) 0%, hsl(var(--background-surface-100)/1) 30%, hsl(var(--background-surface-75)/0) 100%),

@@ -11,7 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -193,8 +193,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
       }
     }
 
-    const command = `$$${values.snippet}$$`
-    const query = buildCronQuery(name, schedule, command)
+    const query = buildCronQuery(name, schedule, values.snippet)
 
     upsertCronJob(
       {
@@ -296,11 +295,11 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
               </SheetTitle>
             </SheetHeader>
 
-            <div className="overflow-auto flex-grow">
+            <div className="overflow-auto grow">
               <Form {...form}>
                 <form
                   id={FORM_ID}
-                  className="flex-grow overflow-auto"
+                  className="grow overflow-auto"
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
                   <SheetSection>
@@ -310,7 +309,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                       render={({ field }) => (
                         <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
                           <FormControl>
-                            <Input_Shadcn_ {...field} disabled={isEditing} />
+                            <Input {...field} disabled={isEditing} />
                           </FormControl>
                           <span className="text-foreground-lighter text-xs absolute top-0 right-0">
                             Cron jobs cannot be renamed once created

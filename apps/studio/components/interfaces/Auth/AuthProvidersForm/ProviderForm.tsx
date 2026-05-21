@@ -220,7 +220,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             <form
               id={formId}
               name={formId}
-              className="overflow-y-auto flex-grow px-0"
+              className="overflow-y-auto grow px-0"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <AuthAlert

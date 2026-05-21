@@ -1,4 +1,3 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -36,7 +35,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
   const watchedComputeSize = watch('computeSize')
   const watchedIOPS = watch('provisionedIOPS') ?? 0
 
-  const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
+  const { isError } = useDiskAttributesQuery({ projectRef })
 
   const iopsPrice = calculateIOPSPrice({
     oldStorageType: formState.defaultValues?.storageType as DiskType,

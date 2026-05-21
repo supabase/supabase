@@ -2,12 +2,7 @@
 
 import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
-import {
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
-  Button,
-} from 'ui'
+import { AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
 
 import { RestartProjectDialog } from './RestartProjectDialog'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
@@ -22,7 +17,7 @@ function StepTrigger({ number, title }: StepTriggerProps) {
   return (
     <AccordionTrigger className="py-3 hover:no-underline">
       <div className="flex items-center gap-2.5">
-        <span className="flex-shrink-0 w-6 h-6 border border-button-hover text-foreground font-mono tabular-nums bg-button rounded-md text-xs font-medium flex items-center justify-center">
+        <span className="shrink-0 w-6 h-6 border border-button-hover text-foreground font-mono tabular-nums bg-button rounded-md text-xs font-medium flex items-center justify-center">
           {number}
         </span>
         <span className="text-sm font-medium text-foreground text-left">{title}</span>

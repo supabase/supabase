@@ -5,7 +5,9 @@ import { databaseCronJobsKeys } from './keys'
 import { COST_THRESHOLD_ERROR, executeSql } from '@/data/sql/execute-sql-query'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
-export const CRON_JOBS_PAGE_LIMIT = 20
+// The value is intentionally high because the data grid needs to overflow so that `onScroll` event work and trigger
+// the infinite loading. If the value is too low, there won't be enough items to overflow and trigger the event.
+export const CRON_JOBS_PAGE_LIMIT = 40
 
 export type DatabaseCronJobRunsVariables = {
   projectRef?: string

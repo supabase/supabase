@@ -1,3 +1,4 @@
+import { ident } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -20,7 +21,7 @@ export function getCellValueSql({
 }: Pick<GetCellValueVariables, 'table' | 'column' | 'pkMatch'>) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .select(`"${column}"`)
+    .select(ident(column))
     .match(pkMatch)
     .toSql()
 }

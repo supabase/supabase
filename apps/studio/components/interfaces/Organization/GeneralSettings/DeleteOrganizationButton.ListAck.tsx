@@ -1,4 +1,4 @@
-import { Checkbox_Shadcn_ } from 'ui'
+import { Checkbox } from 'ui'
 
 import { getComputeSize } from '@/data/projects/org-projects-infinite-query'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
@@ -32,7 +32,7 @@ export const DeleteOrganizationButtonListAck = ({
               }`}
               onClick={() => toggleProject(project.ref, !isChecked)}
             >
-              <Checkbox_Shadcn_
+              <Checkbox
                 className="mt-[2px]"
                 checked={isChecked}
                 onCheckedChange={(nextChecked) => toggleProject(project.ref, nextChecked)}

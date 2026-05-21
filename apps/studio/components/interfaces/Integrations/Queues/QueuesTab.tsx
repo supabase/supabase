@@ -102,7 +102,7 @@ export const QueuesTab = () => {
           <LoadingLine loading={isLoading || isRefetching} />
 
           <DataGrid
-            className="flex-grow border-t-0"
+            className="grow border-t-0"
             rowHeight={44}
             headerRowHeight={36}
             columns={columns}
@@ -111,7 +111,7 @@ export const QueuesTab = () => {
             rowClass={() => {
               return cn(
                 'cursor-pointer',
-                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                 '[&>.rdg-cell:first-child>div]:ml-8'
               )
             }}

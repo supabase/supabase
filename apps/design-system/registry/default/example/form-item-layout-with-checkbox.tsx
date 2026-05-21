@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Badge, Button, Checkbox_Shadcn_, Form, FormControl, FormField } from 'ui'
+import { Badge, Button, Checkbox, Form, FormControl, FormField } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -34,7 +34,7 @@ export default function FormItemLayoutDemo() {
               layout="flex"
             >
               <FormControl>
-                <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
             </FormItemLayout>
           )}

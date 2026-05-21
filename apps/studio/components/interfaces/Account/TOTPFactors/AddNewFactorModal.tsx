@@ -4,7 +4,8 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, Input, Input_Shadcn_ } from 'ui'
+import { Form, FormControl, FormField, Input } from 'ui'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -59,7 +60,7 @@ interface FirstStepProps {
   onClose: () => void
 }
 
-const FirstStep = ({ visible, isEnrolling, reset, enroll, onClose }: FirstStepProps) => {
+const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) => {
   const FormSchema = z.object({
     name: z.string().min(1, 'Please provide a name to identify this app'),
   })
@@ -108,7 +109,7 @@ const FirstStep = ({ visible, isEnrolling, reset, enroll, onClose }: FirstStepPr
                 description="A string will be randomly generated if a name is not provided"
               >
                 <FormControl>
-                  <Input_Shadcn_ id="name" {...field} />
+                  <Input id="name" {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -217,7 +218,7 @@ const SecondStep = ({
       {factor && (
         <div className="flex flex-col gap-y-4">
           <div className="flex justify-center py-6">
-            <div className="h-48 w-48 bg-white rounded">
+            <div className="h-48 w-48 bg-white rounded-sm">
               <img width={190} height={190} src={factor.totp.qr_code} alt={factor.totp.uri} />
             </div>
           </div>
@@ -225,14 +226,12 @@ const SecondStep = ({
           <InformationBox
             title="Unable to scan?"
             description={
-              <Input
-                copy
-                disabled
-                id="ref"
-                size="small"
+              <FormItemLayout
+                isReactForm={false}
                 label="You can also enter this secret key into your authenticator app"
-                value={factor.totp.secret}
-              />
+              >
+                <PasswordInput copy disabled id="ref" size="small" value={factor.totp.secret} />
+              </FormItemLayout>
             }
           />
 
@@ -249,7 +248,7 @@ const SecondStep = ({
                 render={({ field }) => (
                   <FormItemLayout name="code" label="Authentication code">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="code"
                         autoFocus
                         {...field}

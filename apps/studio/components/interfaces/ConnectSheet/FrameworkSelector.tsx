@@ -3,15 +3,15 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { ConnectionType } from '@/components/interfaces/ConnectSheet/Connect.constants'
@@ -42,9 +42,9 @@ export const FrameworkSelector = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <div className={cn('flex', className)}>
-        <PopoverTrigger_Shadcn_ asChild>
+        <PopoverTrigger asChild>
           <Button
             size={size}
             type="default"
@@ -56,21 +56,21 @@ export const FrameworkSelector = ({
               {selectedItem?.label}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
+        </PopoverTrigger>
       </div>
-      <PopoverContent_Shadcn_
-        className="p-0 w-[var(--radix-popover-trigger-width)] min-w-48"
+      <PopoverContent
+        className="p-0 w-radix-popover-trigger-width min-w-48"
         side="bottom"
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+        <Command>
+          <CommandInput placeholder="Search..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup>
               {items.map((item) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={item.key}
                   value={item.key}
                   onSelect={() => handleSelect(item.key)}
@@ -82,12 +82,12 @@ export const FrameworkSelector = ({
                     size={15}
                     className={cn('ml-auto', item.key === value ? 'opacity-100' : 'opacity-0')}
                   />
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

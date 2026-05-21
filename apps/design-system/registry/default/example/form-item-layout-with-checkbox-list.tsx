@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button, Checkbox_Shadcn_, Form, FormControl, FormField } from 'ui'
+import { Button, Checkbox, Form, FormControl, FormField } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -77,7 +77,7 @@ export default function FormItemLayoutDemo() {
                         hideMessage
                       >
                         <FormControl>
-                          <Checkbox_Shadcn_
+                          <Checkbox
                             checked={field.value?.includes(item.id)}
                             onCheckedChange={(checked) => {
                               return checked

@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -81,7 +81,7 @@ export const SignInSSOForm = () => {
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
