@@ -652,16 +652,17 @@ jobs:
 
           cleanup_state
           run_warmup_install "warmup-install-native" ota run --native install .
-          cleanup_state
-          run_warmup_install "warmup-install-container" ota run --container install .
 
           run_e2e_cmd "run-native" 3000 360s ota run --native dev:www .
           run_e2e_cmd "run-native-stream" 3000 360s ota run --native --stream dev:www .
-          run_e2e_cmd "run-container" 3000 360s ota run --container dev:www .
-          run_e2e_cmd "run-container-stream" 3000 360s ota run --container --stream dev:www .
-
           run_e2e_cmd "up-native" 3000 360s ota up --native .
           run_e2e_cmd "up-native-stream" 3000 360s ota up --native --stream .
+
+          cleanup_state
+          run_warmup_install "warmup-install-container" ota run --container install .
+
+          run_e2e_cmd "run-container" 3000 360s ota run --container dev:www .
+          run_e2e_cmd "run-container-stream" 3000 360s ota run --container --stream dev:www .
           run_e2e_cmd "up-container" 3000 360s ota up --container .
           run_e2e_cmd "up-container-stream" 3000 360s ota up --container --stream .
 
