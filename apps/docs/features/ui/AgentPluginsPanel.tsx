@@ -44,7 +44,8 @@ const PLUGIN_CLIENTS: PluginClient[] = [
   {
     key: 'github-copilot',
     label: 'GitHub Copilot',
-    icon: 'github-copilot',
+    icon: 'copilot',
+    hasDistinctDarkIcon: true,
     repoUrl: 'https://github.com/supabase-community/supabase-plugin',
     docsUrl:
       'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing',
