@@ -51,12 +51,6 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const [sidebarLocalStorage, setSidebarLocalStorage, { isSuccess: isLoadedLocalStorage }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.LAST_OPENED_SIDE_BAR(project?.ref ?? ''), '')
 
-  const supportLinkQueryParams = getSupportLinkQueryParams(
-    project,
-    org,
-    router.query.ref as string | undefined
-  )
-
   const sidebarURLParamRef = useLatest(sidebarURLParam)
   const sidebarLocalStorageRef = useLatest(sidebarLocalStorage)
 
@@ -69,7 +63,11 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
       <HelpPanel
         onClose={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
         projectRef={project?.ref}
-        supportLinkQueryParams={supportLinkQueryParams}
+        supportLinkQueryParams={getSupportLinkQueryParams(
+          project,
+          org,
+          router.query.ref as string | undefined
+        )}
       />
     ),
     {},
