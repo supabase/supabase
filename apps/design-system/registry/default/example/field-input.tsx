@@ -1,4 +1,4 @@
-import { Input_Shadcn_ as Input } from 'ui'
+import { Input } from 'ui'
 import {
   Field,
   FieldDescription,

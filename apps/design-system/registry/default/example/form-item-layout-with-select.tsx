@@ -5,11 +5,11 @@ import {
   Form,
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -47,18 +47,18 @@ export default function FormItemLayoutDemo() {
               description="Choose preferred email"
               labelOptional="Optional"
             >
-              <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="Select a verified email to display" />
-                  </SelectTrigger_Shadcn_>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a verified email to display" />
+                  </SelectTrigger>
                 </FormControl>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="m@example.com">m@example.com</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="m@google.com">m@google.com</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="m@support.com">m@support.com</SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                <SelectContent>
+                  <SelectItem value="m@example.com">m@example.com</SelectItem>
+                  <SelectItem value="m@google.com">m@google.com</SelectItem>
+                  <SelectItem value="m@support.com">m@support.com</SelectItem>
+                </SelectContent>
+              </Select>
             </FormItemLayout>
           )}
         />

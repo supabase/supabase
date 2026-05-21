@@ -5,12 +5,12 @@ import {
   cn,
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -90,31 +90,27 @@ function CategorySelector({ form }: CategorySelectorProps) {
         return (
           <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
             <FormControl>
-              <Select_Shadcn_
-                {...fieldWithoutRef}
-                defaultValue={field.value}
-                onValueChange={onValueChange}
-              >
-                <SelectTrigger_Shadcn_ aria-label="Select an issue" className="w-full">
-                  <SelectValue_Shadcn_ placeholder="Select an issue">
+              <Select {...fieldWithoutRef} defaultValue={field.value} onValueChange={onValueChange}>
+                <SelectTrigger aria-label="Select an issue" className="w-full">
+                  <SelectValue placeholder="Select an issue">
                     {field.value
                       ? CATEGORY_OPTIONS.find((o) => o.value === field.value)?.label
                       : null}
-                  </SelectValue_Shadcn_>
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
                     {CATEGORY_OPTIONS.map((option) => (
-                      <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                      <SelectItem key={option.value} value={option.value}>
                         {option.label}
                         <span className="block text-xs text-foreground-lighter">
                           {option.description}
                         </span>
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </FormControl>
           </FormItemLayout>
         )
@@ -137,29 +133,27 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
         return (
           <FormItemLayout hideMessage layout="vertical" label="Severity">
             <FormControl>
-              <Select_Shadcn_
+              <Select
                 {...fieldWithoutRef}
                 defaultValue={field.value}
                 onValueChange={field.onChange}
               >
-                <SelectTrigger_Shadcn_ aria-label="Select a severity" className="w-full">
-                  <SelectValue_Shadcn_ placeholder="Select a severity">
-                    {field.value}
-                  </SelectValue_Shadcn_>
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+                <SelectTrigger aria-label="Select a severity" className="w-full">
+                  <SelectValue placeholder="Select a severity">{field.value}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
                     {SEVERITY_OPTIONS.map((option) => (
-                      <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                      <SelectItem key={option.value} value={option.value}>
                         {option.label}
                         <span className="block text-xs text-foreground-lighter">
                           {option.description}
                         </span>
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </FormControl>
           </FormItemLayout>
         )

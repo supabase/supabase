@@ -9,7 +9,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   SheetFooter,
@@ -286,7 +286,7 @@ export const CreateIcebergWrapperSheet = ({
                             }
                           >
                             <FormControl>
-                              <Input_Shadcn_ {...field} />
+                              <Input {...field} />
                             </FormControl>
                           </FormItemLayout>
                         )}

@@ -52,8 +52,9 @@ export function FilterSideBar({
   return (
     <ResizablePanel
       panelRef={panelRef}
-      maxSize={512}
       minSize={256}
+      defaultSize={265}
+      maxSize={512}
       id="panel-left"
       collapsible
       onResize={(size) => {

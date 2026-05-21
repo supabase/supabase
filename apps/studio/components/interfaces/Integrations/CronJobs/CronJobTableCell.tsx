@@ -8,11 +8,11 @@ import {
   Badge,
   Button,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   copyToClipboard,
   Dialog,
   DialogContent,
@@ -243,8 +243,8 @@ export const CronJobTableCell = ({
   }
 
   return (
-    <ContextMenu_Shadcn_>
-      <ContextMenuTrigger_Shadcn_ asChild>
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
         <div className={cn('w-full flex items-center text-xs')}>
           {['latest_run', 'next_run'].includes(col.id) ? (
             !hasValue ? (
@@ -304,18 +304,18 @@ export const CronJobTableCell = ({
             </Badge>
           )}
         </div>
-      </ContextMenuTrigger_Shadcn_>
-      <ContextMenuContent_Shadcn_ onClick={(e) => e.stopPropagation()}>
-        <ContextMenuItem_Shadcn_
+      </ContextMenuTrigger>
+      <ContextMenuContent onClick={(e) => e.stopPropagation()}>
+        <ContextMenuItem
           className="gap-x-2"
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => copyToClipboard(formattedValue)}
         >
           <Copy size={12} />
           <span>Copy {col.name.toLowerCase()}</span>
-        </ContextMenuItem_Shadcn_>
+        </ContextMenuItem>
 
-        <ContextMenuItem_Shadcn_
+        <ContextMenuItem
           disabled={!jobname}
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => onSelectEdit(row)}
@@ -334,19 +334,19 @@ export const CronJobTableCell = ({
               </TooltipContent>
             )}
           </Tooltip>
-        </ContextMenuItem_Shadcn_>
+        </ContextMenuItem>
 
-        <ContextMenuSeparator_Shadcn_ />
+        <ContextMenuSeparator />
 
-        <ContextMenuItem_Shadcn_
+        <ContextMenuItem
           className="gap-x-2"
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => onSelectDelete(row)}
         >
           <Trash size={12} />
           <span>Delete job</span>
-        </ContextMenuItem_Shadcn_>
-      </ContextMenuContent_Shadcn_>
-    </ContextMenu_Shadcn_>
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }

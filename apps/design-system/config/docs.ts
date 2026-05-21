@@ -118,6 +118,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Collapsible Alert',
+          href: '/docs/fragments/collapsible-alert',
+          items: [],
+        },
+        {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
           items: [],
@@ -135,6 +140,16 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Page Container',
           href: '/docs/fragments/page-container',
+          items: [],
+        },
+        {
+          title: 'Page Breadcrumbs',
+          href: '/docs/fragments/page-breadcrumbs',
+          items: [],
+        },
+        {
+          title: 'Page Nav',
+          href: '/docs/fragments/page-nav',
           items: [],
         },
         {

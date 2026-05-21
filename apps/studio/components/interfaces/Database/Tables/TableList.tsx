@@ -1,4 +1,3 @@
-import type { PGTable } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -16,10 +15,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Table,
   TableBody,
   TableCell,
@@ -55,14 +54,15 @@ import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface TableListProps {
   onAddTable: () => void
-  onEditTable: (table: PGTable) => void
-  onDeleteTable: (table: PGTable) => void
-  onDuplicateTable: (table: PGTable) => void
+  onEditTable: (table: SafePostgresTable) => void
+  onDeleteTable: (table: SafePostgresTable) => void
+  onDuplicateTable: (table: SafePostgresTable) => void
 }
 
 export const TableList = ({
@@ -247,16 +247,16 @@ export const TableList = ({
               onOpenChange={setSchemaSelectorOpen}
             />
           </Shortcut>
-          <Popover_Shadcn_>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover>
+            <PopoverTrigger asChild>
               <Button
                 size="tiny"
                 type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
                 className="px-1"
                 icon={<Filter />}
               />
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+            </PopoverTrigger>
+            <PopoverContent className="p-0 w-56" side="bottom" align="center">
               <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
                 <p className="text-xs">Show entity types</p>
                 <div className="flex flex-col">
@@ -275,9 +275,9 @@ export const TableList = ({
                             }
                           }}
                         />
-                        <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
+                        <Label htmlFor={key} className="capitalize text-xs">
                           {key.toLowerCase().replace('_', ' ')}
-                        </Label_Shadcn_>
+                        </Label>
                       </div>
                       <Button
                         size="tiny"
@@ -291,8 +291,8 @@ export const TableList = ({
                   ))}
                 </div>
               </div>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="flex grow justify-between gap-2 items-center">
           <Input
