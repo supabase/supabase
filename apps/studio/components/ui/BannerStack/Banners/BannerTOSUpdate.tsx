@@ -35,7 +35,7 @@ export const BannerTOSUpdate = () => {
     <BannerCard
       onDismiss={() => {
         setTOSUpdateAcknowledged(true)
-        dismissBanner('rls-tester-banner')
+        dismissBanner('tos-update-banner')
       }}
     >
       <div className="flex flex-col gap-y-2">

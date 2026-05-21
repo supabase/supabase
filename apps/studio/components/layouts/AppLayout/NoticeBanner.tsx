@@ -9,7 +9,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 // Update this whenever the banner content below changes so old client bundles
 // stop displaying outdated notices after the relevant date passes.
-const BANNER_EXPIRES_AT = new Date('2026-06-01T00:00:00Z')
+const BANNER_EXPIRES_AT = new Date('2026-06-01T15:00:00Z')
 
 const SUPAVISOR_UPDATE_REGIONS = {
   'eu-central-1': {
