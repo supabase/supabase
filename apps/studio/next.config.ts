@@ -55,7 +55,10 @@ const nextConfig = {
     // production build". Remove once the trigger is identified.
     turbopackScopeHoisting: false,
     turbopackClientSideNestedAsyncChunking: false,
+    // turbopackRemoveUnusedImports defaults to true and requires
+    // turbopackRemoveUnusedExports, so we have to disable both together
     turbopackRemoveUnusedExports: false,
+    turbopackRemoveUnusedImports: false,
   },
   async rewrites() {
     return [
