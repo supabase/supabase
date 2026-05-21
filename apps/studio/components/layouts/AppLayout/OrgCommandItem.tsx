@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react'
 import Link from 'next/link'
-import { cn, CommandItem_Shadcn_ } from 'ui'
+import { cn, CommandItem } from 'ui'
 
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { Organization } from '@/types'
@@ -25,7 +25,7 @@ export function OrgCommandItem({
   const href = hasRouteSlug ? routePathname.replace('[slug]', org.slug) : `/org/${org.slug}`
 
   return (
-    <CommandItem_Shadcn_
+    <CommandItem
       key={org.slug}
       value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
       className="cursor-pointer w-full"
@@ -44,6 +44,6 @@ export function OrgCommandItem({
         </div>
         {org.slug === selectedSlug && <Check size={16} />}
       </Link>
-    </CommandItem_Shadcn_>
+    </CommandItem>
   )
 }

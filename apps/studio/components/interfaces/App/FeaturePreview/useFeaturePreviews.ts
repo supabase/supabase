@@ -1,7 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
-import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
-
 export type FeaturePreview = {
   key: string
   name: string
@@ -17,8 +15,6 @@ export type FeaturePreview = {
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const { isEligible: isEnterpriseOrSupabaseOrg } = useIsEnterpriseOrSupabaseOrg()
-
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
@@ -35,10 +31,10 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
-      name: 'New Logs interface',
+      name: 'Updated Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-      enabled: isUnifiedLogsPreviewAvailable || isEnterpriseOrSupabaseOrg,
-      isNew: false,
+      enabled: isUnifiedLogsPreviewAvailable,
+      isNew: true,
       isPlatformOnly: true,
       isDefaultOptIn: false,
     },
@@ -87,6 +83,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: false,
       isPlatformOnly: false,
       isDefaultOptIn: false,
+    },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
+      name: 'Marketplace',
+      discussionsUrl: undefined,
+      enabled: true,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: true,
     },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

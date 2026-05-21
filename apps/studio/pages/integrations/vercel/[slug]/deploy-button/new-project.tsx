@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import {
@@ -86,16 +86,28 @@ const CreateProject = () => {
   const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
     !isDataApiRevokeOnCreateDefault
   )
+  const hasUserModifiedDataApiDefaultPrivileges = useRef(false)
 
-  useTrackDefaultPrivilegesExposure({ surface: 'vercel' })
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (hasUserModifiedDataApiDefaultPrivileges.current) return
+    setDataApiDefaultPrivileges(!dataApiRevokeOnCreateDefaultFlag)
+  }, [dataApiRevokeOnCreateDefaultFlag])
+
+  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
+
+  useTrackDefaultPrivilegesExposure({
+    surface: 'vercel',
+    orgSlug: slug,
+    dataApiDefaultPrivileges,
+    hasUserModified: hasUserModifiedDataApiDefaultPrivileges.current,
+  })
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
     setPasswordStrengthMessage(message)
   }
-
-  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
   const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
 
@@ -362,7 +374,10 @@ const CreateProject = () => {
             id="dataApiDefaultPrivileges"
             name="dataApiDefaultPrivileges"
             checked={dataApiDefaultPrivileges}
-            onCheckedChange={(checked) => setDataApiDefaultPrivileges(!!checked)}
+            onCheckedChange={(checked) => {
+              hasUserModifiedDataApiDefaultPrivileges.current = true
+              setDataApiDefaultPrivileges(!!checked)
+            }}
           />
           <div className="grid gap-1.5 leading-none">
             <label

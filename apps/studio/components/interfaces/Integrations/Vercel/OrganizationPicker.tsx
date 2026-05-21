@@ -4,12 +4,12 @@ import {
   Badge,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -85,14 +85,14 @@ const OrganizationPicker = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 w-full" side="bottom" align="center" sameWidthAsTrigger>
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Search organizations..." />
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-              <CommandGroup_Shadcn_>
+          <Command>
+            <CommandInput placeholder="Search organizations..." />
+            <CommandList>
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup>
                 {organizationsData?.map((org) => {
                   return (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       value={org.slug}
                       key={org.slug}
                       className="flex gap-2 items-center"
@@ -112,12 +112,12 @@ const OrganizationPicker = ({
                       {configurationId && installed[org.slug] && (
                         <Badge className="flex-none!">Integration Installed</Badge>
                       )}
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   )
                 })}
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
+              </CommandGroup>
+            </CommandList>
+          </Command>
         </PopoverContent>
       </Popover>
     </>

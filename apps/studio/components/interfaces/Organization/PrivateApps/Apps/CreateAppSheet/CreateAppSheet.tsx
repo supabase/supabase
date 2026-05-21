@@ -5,12 +5,12 @@ import { toast } from 'sonner'
 import {
   Button,
   Checkbox,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Input,
   Popover,
   PopoverContent,
@@ -206,14 +206,14 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[400px] p-0" align="end">
-                          <Command_Shadcn_>
-                            <CommandInput_Shadcn_ placeholder="Search permissions..." />
-                            <CommandList_Shadcn_>
-                              <CommandEmpty_Shadcn_>No permissions found.</CommandEmpty_Shadcn_>
-                              <CommandGroup_Shadcn_ className="[&>div]:text-left">
+                          <Command>
+                            <CommandInput placeholder="Search permissions..." />
+                            <CommandList>
+                              <CommandEmpty>No permissions found.</CommandEmpty>
+                              <CommandGroup className="[&>div]:text-left">
                                 <div className="max-h-[210px] overflow-y-auto">
                                   {PERMISSIONS.map((perm) => (
-                                    <CommandItem_Shadcn_
+                                    <CommandItem
                                       key={perm.id}
                                       value={`${perm.id} ${perm.label}`}
                                       onSelect={() => toggle(perm.id)}
@@ -230,12 +230,12 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                                           {perm.label}
                                         </span>
                                       </div>
-                                    </CommandItem_Shadcn_>
+                                    </CommandItem>
                                   ))}
                                 </div>
-                              </CommandGroup_Shadcn_>
-                            </CommandList_Shadcn_>
-                          </Command_Shadcn_>
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
                         </PopoverContent>
                       </Popover>
                     </div>
