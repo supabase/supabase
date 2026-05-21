@@ -58,9 +58,9 @@ export function extractServiceRows(rows: ServiceHealthResultRow[], serviceKey: S
     const svc = row[responseKey]
     return {
       timestamp: row.timestamp,
-      ok_count: svc.ok,
-      warning_count: svc.warning,
-      error_count: svc.error,
+      ok_count: svc?.ok ?? 0,
+      warning_count: svc?.warning ?? 0,
+      error_count: svc?.error ?? 0,
     }
   })
 }

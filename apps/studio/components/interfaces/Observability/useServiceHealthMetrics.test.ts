@@ -67,4 +67,18 @@ describe('extractServiceRows', () => {
     expect(result[0]).toMatchObject({ ok_count: 100, warning_count: 0, error_count: 0 })
     expect(result[1]).toMatchObject({ ok_count: 50, warning_count: 5, error_count: 10 })
   })
+
+  it('defaults to 0 when the service field is missing from the row', () => {
+    const row = makeRow()
+    // Simulate a backend response that omits a service field
+    const partial = { ...row } as Partial<ServiceHealthResultRow> & { timestamp: string }
+    delete (partial as any).realtime_logs
+    const result = extractServiceRows([partial as ServiceHealthResultRow], 'realtime')
+    expect(result[0]).toEqual({
+      timestamp: row.timestamp,
+      ok_count: 0,
+      warning_count: 0,
+      error_count: 0,
+    })
+  })
 })
