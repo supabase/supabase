@@ -29,7 +29,7 @@ DATABASE_URL="${connectionStringPooler.transactionShared}"
 # DATABASE_URL="${connectionStringPooler.transactionDedicated}"
         `
           : `
-# Connect to Postgres via the shared transaction-mode pooler (IPv4-only
+# Connect to Postgres via the shared transaction-mode pooler (IPv4-only)
 DATABASE_URL="${connectionStringPooler.transactionShared}"
 `
 
