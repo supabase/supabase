@@ -65,14 +65,6 @@ import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 import type { AppPropsWithLayout } from '@/types'
 
-const UpdateBillingAddressModal = IS_PLATFORM
-  ? dynamic(() =>
-      import('@/components/interfaces/App/UpdateBillingAddressModal').then((m) => ({
-        default: m.UpdateBillingAddressModal,
-      }))
-    )
-  : () => null
-
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
