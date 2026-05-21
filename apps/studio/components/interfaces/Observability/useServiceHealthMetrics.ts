@@ -1,5 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { useMemo } from 'react'
+
+dayjs.extend(utc)
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import {
@@ -97,14 +101,20 @@ const useServiceHealthQuery = ({
     [queryResult.data, serviceKey]
   )
 
+  // Snap start/end to the granularity boundary so fillTimeseries iterates
+  // in sync with the API's bucketed timestamps (e.g. midnight for 'day').
+  const granularityUnit = granularity === 'day' ? 'day' : granularity === 'hour' ? 'hour' : 'minute'
+  const fillStart = dayjs.utc(startDate).startOf(granularityUnit).toISOString()
+  const fillEnd = dayjs.utc(endDate).startOf(granularityUnit).toISOString()
+
   // Fill gaps in timeseries
   const { data: filledData } = useFillTimeseriesSorted({
     data: rawRows,
     timestampKey: 'timestamp',
-    valueKey: 'ok_count',
+    valueKey: ['ok_count', 'warning_count', 'error_count'],
     defaultValue: 0,
-    startDate,
-    endDate,
+    startDate: fillStart,
+    endDate: fillEnd,
   })
 
   const eventChartData: LogsBarChartDatum[] = useMemo(
