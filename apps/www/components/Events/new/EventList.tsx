@@ -17,7 +17,8 @@ const CATEGORIES_FILTERS = [
 ]
 
 export function EventList() {
-  const { isLoading, filteredEvents } = useEvents()
+  const { isLoading, filteredEvents, selectedCategories } = useEvents()
+  const isOnDemandView = selectedCategories.includes('on-demand')
 
   const getCategoryLabel = (value: string) => {
     const category = CATEGORIES_FILTERS.find((cat) => cat.value === value)
@@ -50,10 +51,14 @@ export function EventList() {
   )
 
   const hasEvents = Object.keys(eventsByDate).length > 0
+  const sortedDateGroups = Object.entries(eventsByDate).sort(([, eventsA], [, eventsB]) => {
+    if (!isOnDemandView) return 0
+    return new Date(eventsB[0].date).getTime() - new Date(eventsA[0].date).getTime()
+  })
 
   return (
     <div className="flex flex-col gap-y-8 min-h-72">
-      {Object.entries(eventsByDate).map(([date, events], index) => (
+      {sortedDateGroups.map(([date, events], index) => (
         <div key={`group-${date}`} className="flex flex-col gap-y-2 relative">
           <div
             className={cn(
@@ -81,16 +86,9 @@ export function EventList() {
                   />
                 )}
 
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 min-w-0 flex-1">
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <h3 className="leading-snug">{event.title}</h3>
-                      {event.isSpeaking && (
-                        <Badge variant="success" className="flex items-center gap-1">
-                          Speaking
-                        </Badge>
-                      )}
-                    </div>
+                    <h3 className="leading-snug">{event.title}</h3>
 
                     {event.end_date && (
                       <p className="text-xs text-foreground-light">
@@ -124,7 +122,7 @@ export function EventList() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 relative z-10">
+                <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 relative z-10">
                   {event.meetingLink && (
                     <Button size="tiny" type="secondary" asChild>
                       <Link href={event.meetingLink} target="_blank" rel="noopener noreferrer">
@@ -132,6 +130,8 @@ export function EventList() {
                       </Link>
                     </Button>
                   )}
+                  {event.onDemand && !isOnDemandView && <Badge variant="default">On-demand</Badge>}
+                  {event.isSpeaking && <Badge variant="success">Speaking</Badge>}
                   {event.categories.slice(0, 3).map((tag, idx) => (
                     <Badge key={`tag-${idx}`}>{getCategoryLabel(tag)}</Badge>
                   ))}
@@ -150,7 +150,9 @@ export function EventList() {
       {!hasEvents && (
         <div className="self-center text-muted my-auto flex flex-col items-center gap-y-4">
           <Rows3Icon className="size-8" />
-          <p className="">Oops! No events found.</p>
+          <p className="">
+            {isOnDemandView ? 'No on-demand events found.' : 'Oops! No events found.'}
+          </p>
         </div>
       )}
     </div>
