@@ -2,13 +2,10 @@
 
 /**
  * Fetches the latest agent-skills index.json from supabase/agent-skills and
- * writes it to public/.well-known/agent-skills/index.json with skill URLs
- * rewritten to absolute GitHub Release URLs.
+ * writes it to public/.well-known/agent-skills/index.json.
  *
- * Tarballs are NOT downloaded or hosted here — the index points directly to
- * GitHub Release assets. The digest in each skill entry is the trust anchor:
- * clients verify SHA-256 after downloading from GitHub, same pattern as SRI
- * on the web. The URL is just a location hint; the digest is the guarantee.
+ * Skill URLs in the published index.json are absolute GitHub Release asset
+ * URLs — no rewriting needed on this side.
  *
  * Spec: https://github.com/agentskills/agentskills/pull/254
  * Runs unauthenticated — public repo, build-time only.
@@ -37,21 +34,8 @@ async function main() {
 
   const index = await fetchJson(indexAsset.browser_download_url)
 
-  // skill.url values in the published index.json are relative (e.g. "supabase.tar.gz").
-  // Rewrite them to absolute GitHub Release URLs so supabase.com only needs to
-  // serve index.json — tarballs are fetched directly from GitHub by clients.
-  const assetUrls = Object.fromEntries(release.assets.map((a) => [a.name, a.browser_download_url]))
-
-  const rewritten = {
-    ...index,
-    skills: (index.skills ?? []).map((skill) => ({
-      ...skill,
-      url: assetUrls[skill.url] ?? skill.url,
-    })),
-  }
-
   await fs.mkdir(OUT_DIR, { recursive: true })
-  await fs.writeFile(join(OUT_DIR, 'index.json'), JSON.stringify(rewritten, null, 2) + '\n')
+  await fs.writeFile(join(OUT_DIR, 'index.json'), JSON.stringify(index, null, 2) + '\n')
 
   for (const skill of index.skills ?? []) {
     console.log(`  ${skill.name}`)
