@@ -1,6 +1,5 @@
 import type { ComponentProps } from 'react'
 import { useMemo } from 'react'
-import { Button } from 'ui'
 import {
   Chart,
   ChartActions,
@@ -21,18 +20,11 @@ import {
 
 import { EdgeFunctionChartEmptyState } from './EdgeFunctionChartEmptyState'
 import { EdgeFunctionInvocationsChart } from './EdgeFunctionInvocationsChart'
-import {
-  EDGE_FUNCTION_CHART_INTERVALS,
-  formatRate,
-  getChartEmptyStateCopy,
-  getSegmentedButtonClassName,
-} from './EdgeFunctionOverview.utils'
+import { formatRate, getChartEmptyStateCopy } from './EdgeFunctionOverview.utils'
 import type { InvocationChartDatum, InvocationUpdateAnnotation } from './EdgeFunctionOverview.utils'
 import type { ChartIntervals } from '@/types'
 
 interface EdgeFunctionInvocationsSectionProps {
-  interval: string
-  onIntervalChange: (interval: string) => void
   selectedInterval: ChartIntervals
   actions?: ComponentProps<typeof ChartActions>['actions']
   totalInvocationCount: number
@@ -47,8 +39,6 @@ interface EdgeFunctionInvocationsSectionProps {
 }
 
 export const EdgeFunctionInvocationsSection = ({
-  interval,
-  onIntervalChange,
   selectedInterval,
   actions,
   totalInvocationCount,
@@ -71,26 +61,16 @@ export const EdgeFunctionInvocationsSection = ({
     : `${totalInvocationCount.toLocaleString('en-US')} total invocations`
 
   return (
-    <PageSection className="pt-0">
+    <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>{invocationTitle}</PageSectionTitle>
         </PageSectionSummary>
-        <PageSectionAside className="flex-wrap @xl:self-center">
-          <div className="flex items-center">
-            {EDGE_FUNCTION_CHART_INTERVALS.map((item, index) => (
-              <Button
-                key={`function-filter-${item.key}`}
-                type={interval === item.key ? 'secondary' : 'default'}
-                onClick={() => onIntervalChange(item.key)}
-                className={getSegmentedButtonClassName(index, EDGE_FUNCTION_CHART_INTERVALS.length)}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </div>
-          {actions && actions.length > 0 ? <ChartActions actions={actions} /> : null}
-        </PageSectionAside>
+        {actions && actions.length > 0 ? (
+          <PageSectionAside className="flex-wrap @xl:self-center">
+            <ChartActions actions={actions} />
+          </PageSectionAside>
+        ) : null}
       </PageSectionMeta>
       <PageSectionContent>
         <Chart isLoading={isLoadingChart}>

@@ -186,11 +186,9 @@ export const EdgeFunctionOverview = () => {
 
   return (
     <>
-      <EdgeFunctionOverviewHeader />
+      <EdgeFunctionOverviewHeader interval={interval} onIntervalChange={setInterval} />
       <PageContainer size="default">
         <EdgeFunctionInvocationsSection
-          interval={interval}
-          onIntervalChange={setInterval}
           selectedInterval={selectedInterval}
           actions={invocationActions}
           totalInvocationCount={totalInvocationCount}

@@ -3,17 +3,22 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Clock } from 'lucide-react'
 import { useState } from 'react'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import {
   PageHeader,
+  PageHeaderAside,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
-import { formatShortFromNow } from './EdgeFunctionOverview.utils'
+import {
+  EDGE_FUNCTION_CHART_INTERVALS,
+  formatShortFromNow,
+  getSegmentedButtonClassName,
+} from './EdgeFunctionOverview.utils'
 import CopyButton from '@/components/ui/CopyButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
@@ -22,7 +27,15 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 dayjs.extend(relativeTime)
 
-export const EdgeFunctionOverviewHeader = () => {
+interface EdgeFunctionOverviewHeaderProps {
+  interval: string
+  onIntervalChange: (interval: string) => void
+}
+
+export const EdgeFunctionOverviewHeader = ({
+  interval,
+  onIntervalChange,
+}: EdgeFunctionOverviewHeaderProps) => {
   const { ref: projectRef, functionSlug } = useParams()
   const [isTimestampHoverCardOpen, setIsTimestampHoverCardOpen] = useState(false)
 
@@ -46,7 +59,7 @@ export const EdgeFunctionOverviewHeader = () => {
     : undefined
 
   return (
-    <PageHeader size="small" className="pb-12">
+    <PageHeader size="default">
       <PageHeaderMeta>
         <PageHeaderSummary>
           <PageHeaderTitle>{name || functionSlug}</PageHeaderTitle>
@@ -109,6 +122,20 @@ export const EdgeFunctionOverviewHeader = () => {
             </HoverCard>
           </PageHeaderDescription>
         </PageHeaderSummary>
+        <PageHeaderAside className="flex-wrap @xl:self-center">
+          <div className="flex items-center">
+            {EDGE_FUNCTION_CHART_INTERVALS.map((item, index) => (
+              <Button
+                key={`function-filter-${item.key}`}
+                type={interval === item.key ? 'secondary' : 'default'}
+                onClick={() => onIntervalChange(item.key)}
+                className={getSegmentedButtonClassName(index, EDGE_FUNCTION_CHART_INTERVALS.length)}
+              >
+                {item.label}
+              </Button>
+            ))}
+          </div>
+        </PageHeaderAside>
       </PageHeaderMeta>
     </PageHeader>
   )
