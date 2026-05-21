@@ -6,10 +6,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
+import { getEdgeFunctionDetailsPageLayout } from './layout'
 import { DeployEdgeFunctionWarningModal } from '@/components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
-import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
@@ -241,12 +240,6 @@ const CodePage = () => {
   )
 }
 
-CodePage.getLayout = (page: React.ReactNode) => {
-  return (
-    <DefaultLayout>
-      <EdgeFunctionDetailsLayout title="Code">{page}</EdgeFunctionDetailsLayout>
-    </DefaultLayout>
-  )
-}
+CodePage.getLayout = getEdgeFunctionDetailsPageLayout
 
 export default CodePage

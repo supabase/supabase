@@ -10,11 +10,10 @@ import { Alert, AlertDescription, AlertTitle, Button, LogoLoader, WarningIcon } 
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
+import { getEdgeFunctionDetailsPageLayout } from './layout'
 import { EdgeFunctionOverview } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview'
 import { EdgeFunctionRecentInvocations } from '@/components/interfaces/Functions/EdgeFunctionRecentInvocations'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
-import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import AreaChart from '@/components/ui/Charts/AreaChart'
 import StackedBarChart from '@/components/ui/Charts/StackedBarChart'
 import NoPermission from '@/components/ui/NoPermission'
@@ -172,7 +171,7 @@ const LegacyEdgeFunctionOverview = () => {
             </span>
           </div>
           <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-2 lg:gap-8">
+            <div className="flex flex-col gap-8">
               <ReportWidget
                 title="Execution time"
                 tooltip="Average execution time of function invocations"
@@ -440,10 +439,6 @@ const PageLayout: NextPageWithLayout = () => {
   return <LegacyEdgeFunctionOverview />
 }
 
-PageLayout.getLayout = (page) => (
-  <DefaultLayout>
-    <EdgeFunctionDetailsLayout title="Overview">{page}</EdgeFunctionDetailsLayout>
-  </DefaultLayout>
-)
+PageLayout.getLayout = getEdgeFunctionDetailsPageLayout
 
 export default PageLayout

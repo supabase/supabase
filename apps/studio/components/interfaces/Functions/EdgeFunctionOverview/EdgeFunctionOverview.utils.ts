@@ -278,6 +278,32 @@ export const formatMetric = (value?: number, unit?: string) => {
   return unit ? `${formatted}${unit}` : formatted
 }
 
+export const formatShortFromNow = (input: string | number | Date): string => {
+  const then = dayjs(input)
+  if (!then.isValid()) return ''
+
+  const seconds = Math.max(0, dayjs().diff(then, 'second'))
+  if (seconds < 60) return `${seconds}s ago`
+
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes}m ago`
+
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `${days}d ago`
+
+  const weeks = Math.floor(days / 7)
+  if (weeks < 5) return `${weeks}w ago`
+
+  const months = Math.floor(days / 30)
+  if (months < 12) return `${months}mo ago`
+
+  const years = Math.floor(days / 365)
+  return `${years}y ago`
+}
+
 export const formatRate = (count: number, total: number) =>
   new Intl.NumberFormat('en-US', {
     style: 'percent',

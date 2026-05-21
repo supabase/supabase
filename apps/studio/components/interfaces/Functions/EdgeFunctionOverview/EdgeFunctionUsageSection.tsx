@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { ChartMetric } from 'ui-patterns/Chart'
-import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
   PageSectionContent,
@@ -90,68 +89,63 @@ export const EdgeFunctionUsageSection = ({
 
   return (
     <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Usage</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
       <PageSectionContent>
-        <PageContainer size="full">
-          <div className="flex flex-col gap-6">
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Usage</PageSectionTitle>
-              </PageSectionSummary>
-            </PageSectionMeta>
+        <div className="flex flex-col gap-6">
+          <EdgeFunctionTimeSeriesChartCard
+            data={data}
+            dateTimeFormat={dateTimeFormat}
+            isLoading={isLoading}
+            isError={isError}
+            emptyTitle={cpuEmptyStateCopy.title}
+            emptyDescription={cpuEmptyStateCopy.description}
+            metrics={cpuMetrics}
+            dataKey="max_cpu_time_used"
+            config={CPU_TIME_CHART_CONFIG}
+            tooltipDetails={cpuTooltipDetails}
+            referenceLines={[
+              {
+                y: averageCpuTime,
+                label: 'average',
+                stroke: 'hsl(var(--foreground-default))',
+                strokeWidth: 1.5,
+              },
+            ]}
+            yAxisProps={{
+              width: 64,
+              tickFormatter: (value: number) => `${Math.round(value)}ms`,
+            }}
+          />
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <EdgeFunctionTimeSeriesChartCard
-                data={data}
-                dateTimeFormat={dateTimeFormat}
-                isLoading={isLoading}
-                isError={isError}
-                emptyTitle={cpuEmptyStateCopy.title}
-                emptyDescription={cpuEmptyStateCopy.description}
-                metrics={cpuMetrics}
-                dataKey="max_cpu_time_used"
-                config={CPU_TIME_CHART_CONFIG}
-                tooltipDetails={cpuTooltipDetails}
-                referenceLines={[
-                  {
-                    y: averageCpuTime,
-                    label: 'average',
-                    stroke: 'hsl(var(--foreground-default))',
-                    strokeWidth: 1.5,
-                  },
-                ]}
-                yAxisProps={{
-                  width: 64,
-                  tickFormatter: (value: number) => `${Math.round(value)}ms`,
-                }}
-              />
-
-              <EdgeFunctionTimeSeriesChartCard
-                data={data}
-                dateTimeFormat={dateTimeFormat}
-                isLoading={isLoading}
-                isError={isError}
-                emptyTitle={memoryEmptyStateCopy.title}
-                emptyDescription={memoryEmptyStateCopy.description}
-                metrics={memoryMetrics}
-                dataKey="avg_memory_used"
-                config={MEMORY_CHART_CONFIG}
-                tooltipDetails={memoryTooltipDetails}
-                referenceLines={[
-                  {
-                    y: averageMemoryUsage,
-                    label: 'average',
-                    stroke: 'hsl(var(--foreground-default))',
-                    strokeWidth: 1.5,
-                  },
-                ]}
-                yAxisProps={{
-                  width: 64,
-                  tickFormatter: (value: number) => `${Number(value).toFixed(1)}MB`,
-                }}
-              />
-            </div>
-          </div>
-        </PageContainer>
+          <EdgeFunctionTimeSeriesChartCard
+            data={data}
+            dateTimeFormat={dateTimeFormat}
+            isLoading={isLoading}
+            isError={isError}
+            emptyTitle={memoryEmptyStateCopy.title}
+            emptyDescription={memoryEmptyStateCopy.description}
+            metrics={memoryMetrics}
+            dataKey="avg_memory_used"
+            config={MEMORY_CHART_CONFIG}
+            tooltipDetails={memoryTooltipDetails}
+            referenceLines={[
+              {
+                y: averageMemoryUsage,
+                label: 'average',
+                stroke: 'hsl(var(--foreground-default))',
+                strokeWidth: 1.5,
+              },
+            ]}
+            yAxisProps={{
+              width: 64,
+              tickFormatter: (value: number) => `${Number(value).toFixed(1)}MB`,
+            }}
+          />
+        </div>
       </PageSectionContent>
     </PageSection>
   )
