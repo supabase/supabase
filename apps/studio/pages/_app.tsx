@@ -221,7 +221,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />
                                       <FeaturePreviewModal />
-                                      <UpdateBillingAddressModal />
                                     </FeaturePreviewContextProvider>
                                   </BannerStackProvider>
                                   <Toaster />
