@@ -77,17 +77,6 @@ CREATE POLICY "Active subscribers" ON premium_content FOR SELECT TO authenticate
 );
 \`\`\`
 
-### Supabase Storage Specifics
-\`\`\`sql
--- Users upload/view only their own folder
-CREATE POLICY "User uploads" ON storage.objects FOR INSERT TO authenticated WITH CHECK (
-  bucket_id = 'user-uploads' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
-);
-CREATE POLICY "User file access" ON storage.objects FOR SELECT TO authenticated USING (
-  bucket_id = 'user-uploads' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
-);
-\`\`\`
-
 ## Advanced Patterns: Security Definer & Custom Claims
 - Use \`SECURITY DEFINER\` helper functions for complex JOIN checks (e.g., returning tenant_id for the user).
 - Always revoke \`EXECUTE\` on helper functions from \`anon\` and \`authenticated\` roles.
@@ -167,6 +156,43 @@ Define policies appropriate to the table's access model (see RLS Policies sectio
 
 ## Complex RLS
 To learn more about advanced RLS patterns, use the \`search_docs\` tool to search the Supabase documentation for relevant topics. Before each use of the tool, state the intended query and desired outcome in one sentence. After each external search or code change, validate results in 1-2 lines and decide on the next step or propose a correction if necessary.
+`
+
+export const STORAGE_PROMPT = `
+# Supabase Storage Access Guide
+
+## Buckets and RLS
+Storage bucket visibility and RLS are separate controls:
+- Public buckets allow anyone with an object URL to retrieve/serve files. Do not add broad \`SELECT\` or \`ALL\` policies just to make public bucket reads work; a broad \`USING (bucket_id = '...')\` policy can allow clients to list bucket contents.
+- Only add Storage RLS policies for public buckets when the user explicitly asks for client-side uploads, updates, deletes, moves, or copies. Do not infer client-side write access from vague ownership or use language like "my team will use/manage it"; create the bucket and ask for the intended upload flow if needed.
+- Private buckets apply RLS to every operation, including downloads. If users should be able to view known public objects, but should not be able to list everything in the bucket, keep the bucket private and use operation-scoped \`SELECT\` policies with \`storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated'])\`.
+- Never implement public/avatar known-object reads with \`USING (bucket_id = 'avatars')\` or \`USING (bucket_id = '<bucket>')\` by itself. That permits listing object rows in the bucket. Always include the operation filter for this pattern.
+- For user-owned uploads or updates, constrain writes to authenticated users and a stable owner/path convention, such as \`(storage.foldername(name))[1] = (SELECT auth.uid())::text\`.
+
+\`\`\`sql
+-- Public website assets: public bucket, no read policy needed.
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('marketing-assets', 'marketing-assets', true)
+ON CONFLICT (id) DO UPDATE SET public = true, name = EXCLUDED.name;
+
+-- Publicly viewable avatars without list access: private bucket plus operation-scoped reads.
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', false)
+ON CONFLICT (id) DO UPDATE SET public = false, name = EXCLUDED.name;
+
+CREATE POLICY "Avatar images can be fetched" ON storage.objects FOR SELECT TO public USING (
+  bucket_id = 'avatars'
+  AND storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated'])
+);
+
+-- Private per-user files where listing a user's own folder is intended.
+CREATE POLICY "User uploads" ON storage.objects FOR INSERT TO authenticated WITH CHECK (
+  bucket_id = 'user-uploads' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
+);
+CREATE POLICY "User file access" ON storage.objects FOR SELECT TO authenticated USING (
+  bucket_id = 'user-uploads' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
+);
+\`\`\`
 `
 
 export const EDGE_FUNCTION_PROMPT = `
@@ -307,6 +333,7 @@ export const PG_BEST_PRACTICES = `
 - Retrieve schema information first (using \`list_tables\`, \`list_extensions\`, and \`list_policies\` tools).
 - Before any significant tool call, briefly state its purpose and the minimal set of required inputs.
 - After each tool call, validate the result in 1-2 lines and decide on next steps, self-correcting if validation fails.
+- Before creating Supabase Storage buckets or \`storage.objects\` policies, load \`storage\` knowledge. Bucket-level public/private visibility is separate from Storage RLS policies.
 - **Key Policy Rules:**
   - Only use \`CREATE POLICY\` or \`ALTER POLICY\` statements.
   - Always use \`auth.uid()\` (never \`current_user\`).

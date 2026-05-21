@@ -74,6 +74,7 @@ export const dataset: AssistantEvalCase[] = [
     },
     expected: {
       requiredTools: ['execute_sql'],
+      requiredKnowledge: ['storage'],
       correctAnswer:
         'Assistant creates a marketing-assets bucket with storage.buckets.public = true. The Assistant must not add RLS policies to the public bucket.',
     },
@@ -90,7 +91,7 @@ export const dataset: AssistantEvalCase[] = [
     },
     expected: {
       requiredTools: ['execute_sql'],
-      requiredKnowledge: ['rls'],
+      requiredKnowledge: ['storage'],
       correctAnswer:
         "The avatars bucket is private rather than public. The SELECT policy on storage.objects is restrictive and allows only object retrieval/info operations for known avatar paths, such as by checking bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']). The answer does not use a broad SELECT policy like using (bucket_id = 'avatars') by itself, because that can allow clients to list all uploaded avatars. Upload and update policies are scoped to authenticated users and constrain users to their own avatar, using owner or path checks.",
     },
