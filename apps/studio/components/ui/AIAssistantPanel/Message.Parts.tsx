@@ -13,9 +13,15 @@ import {
   parseExecuteSqlChartResult,
 } from './Message.utils'
 import { MessageMarkdown } from './MessageMarkdown'
+import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
+  const supportRequest = isUserMessage ? parseSupportRequestMessage(textPart.text) : null
+
+  if (supportRequest) {
+    return <SupportRequestMessage request={supportRequest} />
+  }
 
   return (
     <MessageMarkdown
