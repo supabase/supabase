@@ -131,9 +131,9 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
               </span>
             )}
           </>
-        ) : (
+        ) : !data.isLoading ? (
           <span>No requests in this period</span>
-        )}
+        ) : null}
       </div>
     </Link>
   )
