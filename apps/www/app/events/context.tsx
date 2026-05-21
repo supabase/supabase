@@ -6,6 +6,7 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 interface EventsContextValue {
   allEvents: SupabaseEvent[]
   filteredEvents: SupabaseEvent[]
+  pastWebinars: SupabaseEvent[]
   featuredEvent: SupabaseEvent | undefined
   isLoading: boolean
   searchQuery: string
@@ -96,22 +97,44 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
     fetchLumaEvents()
   }, [])
 
-  // Merge Notion (server) + mdx (server) + Luma (client) events, showing only today and future.
-  const allEvents = useMemo(() => {
+  // Merge Notion (server) + mdx (server) + Luma (client) events.
+  const allEvents = useMemo(
+    () => [...notionEvents, ...mdxEvents, ...lumaEvents],
+    [notionEvents, mdxEvents, lumaEvents]
+  )
+
+  const startOfToday = useMemo(() => {
     const now = new Date()
-    const startOfToday = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-    )
-    return [...notionEvents, ...mdxEvents, ...lumaEvents].filter((event) => {
-      const eventDate = new Date(event.end_date || event.date)
-      return eventDate >= startOfToday
-    })
-  }, [notionEvents, mdxEvents, lumaEvents])
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  }, [])
+
+  // Today-or-future events drive the main listing, filters, and hero.
+  const upcomingEvents = useMemo(
+    () =>
+      allEvents.filter((event) => {
+        const eventDate = new Date(event.end_date || event.date)
+        return eventDate >= startOfToday
+      }),
+    [allEvents, startOfToday]
+  )
+
+  // Past webinars become on-demand content. Sort newest first.
+  const pastWebinars = useMemo(
+    () =>
+      allEvents
+        .filter((event) => {
+          const eventDate = new Date(event.end_date || event.date)
+          if (eventDate >= startOfToday) return false
+          return event.type === 'webinar' || event.categories?.includes('webinar')
+        })
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [allEvents, startOfToday]
+  )
 
   const categories = useMemo(() => {
     const counts: { [key: string]: number } = { all: 0 }
 
-    allEvents.forEach((event) => {
+    upcomingEvents.forEach((event) => {
       counts.all += 1
       event.categories?.forEach((category) => {
         counts[category] = (counts[category] || 0) + 1
@@ -119,7 +142,7 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
     })
 
     return counts
-  }, [allEvents])
+  }, [upcomingEvents])
 
   const toggleCategory = (category: string) => {
     if (category === 'all') {
@@ -140,7 +163,7 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
   }
 
   const filteredEvents = useMemo(() => {
-    let filtered = allEvents
+    let filtered = upcomingEvents
 
     if (!selectedCategories.includes('all')) {
       filtered = filtered.filter((event) =>
@@ -165,17 +188,20 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
       const dateB = new Date(b.date).getTime()
       return dateA - dateB
     })
-  }, [allEvents, selectedCategories, searchQuery])
+  }, [upcomingEvents, selectedCategories, searchQuery])
 
   const featuredEvent = useMemo(() => {
-    if (allEvents.length === 0) return undefined
+    if (upcomingEvents.length === 0) return undefined
 
-    return [...allEvents].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0]
-  }, [allEvents])
+    return [...upcomingEvents].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    )[0]
+  }, [upcomingEvents])
 
   const value: EventsContextValue = {
     allEvents,
     filteredEvents,
+    pastWebinars,
     featuredEvent,
     isLoading,
     searchQuery,

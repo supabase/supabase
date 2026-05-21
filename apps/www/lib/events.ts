@@ -202,8 +202,8 @@ function startOfTodayUtc(): Date {
 }
 
 /**
- * Read all events under `_events/` and return today-and-future events.
- * Past events are excluded (by end_date when present, otherwise start date).
+ * Read all events under `_events/` and return today-and-future events,
+ * plus past webinars (which remain useful as on-demand content).
  */
 export const getMdxEvents = (): SupabaseEvent[] => {
   const postDirectory = path.join(process.cwd(), EVENTS_DIRECTORY)
@@ -228,13 +228,15 @@ export const getMdxEvents = (): SupabaseEvent[] => {
 
         if (!data.title || !data.date) return null
 
-        const eventEnd = new Date(data.end_date ?? data.date)
-        if (eventEnd < today) return null
-
         const slug = mdxSlugFromFilename(filename)
         const categories = data.categories ?? (data.type ? [data.type] : [])
         // Webinars don't show a "Hosted by" line — drop hosts entirely.
         const isWebinar = data.type === 'webinar' || categories.includes('webinar')
+
+        const eventEnd = new Date(data.end_date ?? data.date)
+        // Past non-webinars are dropped; past webinars stay so they can be
+        // listed in the on-demand section.
+        if (eventEnd < today && !isWebinar) return null
         const rawCtaUrl = data.main_cta?.url ?? ''
         const isExternalCta = /^https?:\/\//i.test(rawCtaUrl)
         const safeExternalCta = isExternalCta && isSafeHttpUrl(rawCtaUrl) ? rawCtaUrl : ''

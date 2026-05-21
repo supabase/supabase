@@ -15,13 +15,40 @@ export function EventBanner() {
 
   if (!featuredEvent) return null
 
+  const isWebinar =
+    featuredEvent.type === 'webinar' || featuredEvent.categories?.includes('webinar')
+  const internalPath = featuredEvent.path
+  const hasInternalLanding = !!internalPath
+  const externalLink = featuredEvent.link
+  const externalIsRegistration = !!externalLink && externalLink.href !== internalPath
+  const showDualWebinarCtas = isWebinar && hasInternalLanding && externalIsRegistration
+
+  // Title link: prefer internal landing page, otherwise external link.
+  const titleHref = internalPath || externalLink?.href
+  const titleTarget: '_blank' | '_self' | undefined = internalPath ? '_self' : externalLink?.target
+
+  const TitleHeading = (
+    <h2 className="text-2xl font-medium lg:line-clamp-2">{featuredEvent.title}</h2>
+  )
+
   return (
     <section className="flex flex-col gap-6 rounded-lg py-6">
       <article className="flex flex-col md:flex-row md:items-stretch gap-8 lg:py-2">
         <div className="flex flex-col gap-6 flex-1">
           <div className="flex flex-col">
             <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-medium lg:line-clamp-2">{featuredEvent.title}</h2>
+              {titleHref ? (
+                <Link
+                  href={titleHref}
+                  target={titleTarget}
+                  rel={titleTarget === '_blank' ? 'noopener noreferrer' : undefined}
+                  className="hover:text-foreground-light transition-colors"
+                >
+                  {TitleHeading}
+                </Link>
+              ) : (
+                TitleHeading
+              )}
               {featuredEvent.isSpeaking && (
                 <Badge variant="success" className="flex items-center gap-1 shrink-0">
                   Speaking
@@ -49,7 +76,7 @@ export function EventBanner() {
             <LocationWidget location={featuredEvent.location} />
           </div>
 
-          <div className="flex items-center md:justify-end gap-2">
+          <div className="flex items-center md:justify-end gap-2 flex-wrap">
             {featuredEvent.meetingLink && (
               <Button type="secondary" size="medium" asChild>
                 <Link href={featuredEvent.meetingLink} target="_blank" rel="noopener noreferrer">
@@ -57,16 +84,33 @@ export function EventBanner() {
                 </Link>
               </Button>
             )}
-            {featuredEvent.link && (
-              <Button size="medium" asChild iconRight={<ArrowRightIcon size={14} />}>
-                <Link
-                  href={featuredEvent.link.href}
-                  target={featuredEvent.link.target}
-                  rel="noopener noreferrer"
-                >
-                  Register
-                </Link>
-              </Button>
+            {showDualWebinarCtas ? (
+              <>
+                <Button type="secondary" size="medium" asChild>
+                  <Link href={internalPath}>Learn more</Link>
+                </Button>
+                <Button size="medium" asChild iconRight={<ArrowRightIcon size={14} />}>
+                  <Link
+                    href={externalLink!.href}
+                    target={externalLink!.target}
+                    rel="noopener noreferrer"
+                  >
+                    {externalLink!.label || 'Register now'}
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              externalLink && (
+                <Button size="medium" asChild iconRight={<ArrowRightIcon size={14} />}>
+                  <Link
+                    href={externalLink.href}
+                    target={externalLink.target}
+                    rel="noopener noreferrer"
+                  >
+                    {externalLink.label || (isWebinar ? 'Register' : 'Learn more')}
+                  </Link>
+                </Button>
+              )
             )}
           </div>
         </div>
