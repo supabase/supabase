@@ -32,6 +32,13 @@ const ACTIVE_DATABASE_SHORTCUT_IDS = [
   SHORTCUT_IDS.NAV_DATABASE_TABLES,
 ] satisfies ShortcutId[]
 
+const ACTIVE_GLOBAL_ACTION_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.AI_ASSISTANT_TOGGLE,
+  SHORTCUT_IDS.INLINE_EDITOR_TOGGLE,
+  SHORTCUT_IDS.CONNECT_OPEN_SHEET,
+] satisfies ShortcutId[]
+
 const ACTIVE_AUTH_SHORTCUT_IDS = [
   ...ACTIVE_SHORTCUT_IDS,
   SHORTCUT_IDS.NAV_AUTH_USERS,
@@ -161,6 +168,20 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Database Navigation')).toBeInTheDocument()
     expect(screen.queryByText(/^Navigation$/)).not.toBeInTheDocument()
     expect(screen.getByText('Go to Tables')).toBeInTheDocument()
+  })
+
+  it('shows the global actions section when global action shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_GLOBAL_ACTION_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Global Actions')).toBeInTheDocument()
+    expect(screen.getByText('Toggle AI Assistant panel')).toBeInTheDocument()
+    expect(screen.getByText('Toggle inline SQL editor')).toBeInTheDocument()
+    expect(screen.getByText('Open Connect sheet')).toBeInTheDocument()
+    expect(screen.getByText('O')).toBeInTheDocument()
+    expect(screen.getAllByText('then').length).toBeGreaterThan(0)
+    expect(screen.getByText('C')).toBeInTheDocument()
+    expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument()
+    expect(screen.queryByText('Inline Editor')).not.toBeInTheDocument()
   })
 
   it('shows the auth navigation section when auth shortcuts are active', async () => {

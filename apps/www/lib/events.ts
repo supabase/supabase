@@ -201,72 +201,83 @@ function startOfTodayUtc(): Date {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
 }
 
+function readMdxEventFilenames(): string[] {
+  const postDirectory = path.join(process.cwd(), EVENTS_DIRECTORY)
+  try {
+    return fs.readdirSync(postDirectory).filter((filename) => filename.endsWith('.mdx'))
+  } catch (error) {
+    console.error('Error reading _events directory:', error)
+    return []
+  }
+}
+
+function mdxFileToEvent(filename: string): SupabaseEvent | null {
+  try {
+    const fullPath = path.join(process.cwd(), EVENTS_DIRECTORY, filename)
+    const fileContents = fs.readFileSync(fullPath, 'utf8')
+    const { data } = matter(fileContents) as unknown as { data: MdxFrontmatter }
+
+    if (!data.title || !data.date) return null
+
+    const slug = mdxSlugFromFilename(filename)
+    const categories = data.categories ?? (data.type ? [data.type] : [])
+    // Webinars don't show a "Hosted by" line — drop hosts entirely.
+    const isWebinar = data.type === 'webinar' || categories.includes('webinar')
+    const rawCtaUrl = data.main_cta?.url ?? ''
+    const isExternalCta = /^https?:\/\//i.test(rawCtaUrl)
+    const safeExternalCta = isExternalCta && isSafeHttpUrl(rawCtaUrl) ? rawCtaUrl : ''
+    const internalPath = `/events/${slug}`
+    const href = data.disable_page_build ? safeExternalCta || internalPath : internalPath
+    const target = data.disable_page_build && safeExternalCta ? '_blank' : '_self'
+
+    return {
+      slug,
+      type: data.type ?? 'event',
+      title: data.title,
+      date: data.date,
+      end_date: data.end_date,
+      description: data.meta_description ?? data.description ?? data.subtitle ?? '',
+      thumb: '',
+      cover_url: '',
+      path: internalPath,
+      url: href,
+      tags: data.tags ?? categories,
+      categories,
+      timezone: data.timezone ?? '',
+      location: '',
+      hosts: isWebinar ? [] : mdxHostsToEventHosts(data.hosts),
+      source: 'mdx',
+      onDemand: data.onDemand,
+      disable_page_build: data.disable_page_build,
+      link: { href, target, label: data.main_cta?.label },
+    }
+  } catch (error) {
+    console.error(`Error parsing mdx event ${filename}:`, error)
+    return null
+  }
+}
+
+let parsedMdxEventsCache: SupabaseEvent[] | null = null
+
+/** Parse every `_events/*.mdx` file once per process and reuse the result. */
+function getAllParsedMdxEvents(): SupabaseEvent[] {
+  if (parsedMdxEventsCache) return parsedMdxEventsCache
+  parsedMdxEventsCache = readMdxEventFilenames()
+    .map(mdxFileToEvent)
+    .filter((e): e is SupabaseEvent => e !== null)
+  return parsedMdxEventsCache
+}
+
 /**
  * Read all events under `_events/` and return today-and-future events.
  * Past events are excluded (by end_date when present, otherwise start date).
  */
 export const getMdxEvents = (): SupabaseEvent[] => {
-  const postDirectory = path.join(process.cwd(), EVENTS_DIRECTORY)
-
-  let fileNames: string[]
-  try {
-    fileNames = fs.readdirSync(postDirectory)
-  } catch (error) {
-    console.error('Error reading _events directory:', error)
-    return []
-  }
-
   const today = startOfTodayUtc()
+  return getAllParsedMdxEvents().filter((event) => new Date(event.end_date ?? event.date) >= today)
+}
 
-  return fileNames
-    .filter((filename) => filename.endsWith('.mdx'))
-    .map((filename): SupabaseEvent | null => {
-      try {
-        const fullPath = path.join(postDirectory, filename)
-        const fileContents = fs.readFileSync(fullPath, 'utf8')
-        const { data } = matter(fileContents) as unknown as { data: MdxFrontmatter }
-
-        if (!data.title || !data.date) return null
-
-        const eventEnd = new Date(data.end_date ?? data.date)
-        if (eventEnd < today) return null
-
-        const slug = mdxSlugFromFilename(filename)
-        const categories = data.categories ?? (data.type ? [data.type] : [])
-        // Webinars don't show a "Hosted by" line — drop hosts entirely.
-        const isWebinar = data.type === 'webinar' || categories.includes('webinar')
-        const rawCtaUrl = data.main_cta?.url ?? ''
-        const isExternalCta = /^https?:\/\//i.test(rawCtaUrl)
-        const safeExternalCta = isExternalCta && isSafeHttpUrl(rawCtaUrl) ? rawCtaUrl : ''
-        const internalPath = `/events/${slug}`
-        const href = data.disable_page_build ? safeExternalCta || internalPath : internalPath
-        const target = data.disable_page_build && safeExternalCta ? '_blank' : '_self'
-
-        return {
-          slug,
-          type: data.type ?? 'event',
-          title: data.title,
-          date: data.date,
-          end_date: data.end_date,
-          description: data.meta_description ?? data.description ?? data.subtitle ?? '',
-          thumb: '',
-          cover_url: '',
-          path: internalPath,
-          url: href,
-          tags: data.tags ?? categories,
-          categories,
-          timezone: data.timezone ?? '',
-          location: '',
-          hosts: isWebinar ? [] : mdxHostsToEventHosts(data.hosts),
-          source: 'mdx',
-          onDemand: data.onDemand,
-          disable_page_build: data.disable_page_build,
-          link: { href, target, label: data.main_cta?.label },
-        }
-      } catch (error) {
-        console.error(`Error parsing mdx event ${filename}:`, error)
-        return null
-      }
-    })
-    .filter((e): e is SupabaseEvent => e !== null)
+/** All MDX events with `onDemand: true`, including past recordings. */
+export const getOnDemandMdxEvents = (): SupabaseEvent[] => {
+  return getAllParsedMdxEvents().filter((event) => event.onDemand === true)
 }

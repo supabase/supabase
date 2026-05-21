@@ -1892,6 +1892,9 @@ importers:
 
   blocks/vue:
     dependencies:
+      '@supabase/postgrest-js':
+        specifier: 'catalog:'
+        version: 2.106.0
       '@supabase/ssr':
         specifier: 'catalog:'
         version: 0.10.2(@supabase/supabase-js@2.106.0)

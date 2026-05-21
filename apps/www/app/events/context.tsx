@@ -21,9 +21,15 @@ interface EventsProviderProps {
   children: ReactNode
   notionEvents: SupabaseEvent[]
   mdxEvents: SupabaseEvent[]
+  onDemandMdxEvents: SupabaseEvent[]
 }
 
-export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProviderProps) {
+export function EventsProvider({
+  children,
+  notionEvents,
+  mdxEvents,
+  onDemandMdxEvents,
+}: EventsProviderProps) {
   const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -108,6 +114,8 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
     })
   }, [notionEvents, mdxEvents, lumaEvents])
 
+  const isOnDemandView = selectedCategories.includes('on-demand')
+
   const categories = useMemo(() => {
     const counts: { [key: string]: number } = { all: 0 }
 
@@ -118,17 +126,26 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
       })
     })
 
+    if (onDemandMdxEvents.length > 0) {
+      counts['on-demand'] = onDemandMdxEvents.length
+    }
+
     return counts
-  }, [allEvents])
+  }, [allEvents, onDemandMdxEvents.length])
 
   const toggleCategory = (category: string) => {
+    if (category === 'on-demand') {
+      setSelectedCategories((prev) => (prev.includes('on-demand') ? ['all'] : ['on-demand']))
+      return
+    }
+
     if (category === 'all') {
       setSelectedCategories(['all'])
       return
     }
 
     setSelectedCategories((prev) => {
-      const withoutAll = prev.filter((c) => c !== 'all')
+      const withoutAll = prev.filter((c) => c !== 'all' && c !== 'on-demand')
 
       if (withoutAll.includes(category)) {
         const updated = withoutAll.filter((c) => c !== category)
@@ -140,9 +157,9 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
   }
 
   const filteredEvents = useMemo(() => {
-    let filtered = allEvents
+    let filtered = isOnDemandView ? onDemandMdxEvents : allEvents
 
-    if (!selectedCategories.includes('all')) {
+    if (!isOnDemandView && !selectedCategories.includes('all')) {
       filtered = filtered.filter((event) =>
         event.categories?.some((cat) => selectedCategories.includes(cat))
       )
@@ -163,9 +180,9 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
     return [...filtered].sort((a, b) => {
       const dateA = new Date(a.date).getTime()
       const dateB = new Date(b.date).getTime()
-      return dateA - dateB
+      return isOnDemandView ? dateB - dateA : dateA - dateB
     })
-  }, [allEvents, selectedCategories, searchQuery])
+  }, [allEvents, onDemandMdxEvents, isOnDemandView, selectedCategories, searchQuery])
 
   const featuredEvent = useMemo(() => {
     if (allEvents.length === 0) return undefined
