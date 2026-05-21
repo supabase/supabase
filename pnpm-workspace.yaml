@@ -7,7 +7,7 @@ packages:
 blockExoticSubdeps: true
 
 catalog:
-  '@sentry/nextjs': ^10.26.0
+  '@sentry/nextjs': ^10.53.1
   '@supabase/auth-js': 2.106.0
   '@supabase/postgrest-js': 2.106.0
   '@supabase/realtime-js': 2.106.0
