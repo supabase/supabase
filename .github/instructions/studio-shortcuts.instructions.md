@@ -27,4 +27,4 @@ When Studio UI changes introduce or materially alter repeated user actions, cons
 - Surface visible actions with `ShortcutTooltip` or `ShortcutBadge`.
 - Prefer scoped, mnemonic sequential chords over global modifier chords.
 
-Canonical standard: `.claude/skills/studio-shortcuts/SKILL.md`
+Canonical implementation context: `apps/studio/state/shortcuts/registry.ts`, `apps/studio/state/shortcuts/useShortcut.tsx`, and `apps/studio/components/ui/Shortcut*.tsx`
