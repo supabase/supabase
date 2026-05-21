@@ -1,4 +1,4 @@
-import { IS_PLATFORM, useFlag } from 'common'
+import { useFlag } from 'common'
 import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -129,7 +129,7 @@ const LogsQueryPanel = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {IS_PLATFORM && logsTemplates && (
+            {logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>
