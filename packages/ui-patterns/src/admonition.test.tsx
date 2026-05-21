@@ -101,5 +101,4 @@ describe('Admonition', () => {
     expect(alert).toHaveTextContent('Deletion blocked')
     expect(alert.querySelector('svg')).not.toBeInTheDocument()
   })
-
 })
