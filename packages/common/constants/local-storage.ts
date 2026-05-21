@@ -83,6 +83,9 @@ export const LOCAL_STORAGE_KEYS = {
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
 
+  // Connect sheet: remember last-used tab/framework/method etc. across opens
+  CONNECT_SHEET_PREFS: 'supabase-connect-sheet-prefs',
+
   // Shortcut preferences
   SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
 
