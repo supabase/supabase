@@ -2,6 +2,11 @@ name: 'Test: Ota contract matrix'
 
 on:
   workflow_dispatch:
+    inputs:
+      ota_ref:
+        description: Ota git ref (branch/tag/SHA) to build from source for this run.
+        required: false
+        default: ''
   pull_request:
     paths:
       - 'ota.yaml'
@@ -73,7 +78,20 @@ jobs:
           pnpm --version
 
       - name: Setup ota
+        if: ${{ github.event.inputs.ota_ref == '' }}
         uses: ota-run/setup@v1
+
+      - name: Setup Rust toolchain (ota_ref)
+        if: ${{ github.event.inputs.ota_ref != '' }}
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build ota from source (ota_ref)
+        if: ${{ github.event.inputs.ota_ref != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${HOME}/.cargo/bin" >> "$GITHUB_PATH"
+          cargo install --locked --force --git https://github.com/ota-run/ota --branch "${{ github.event.inputs.ota_ref }}" ota
 
       - name: Verify ota install [bash]
         if: matrix.run_shell == 'bash'
@@ -398,7 +416,20 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup ota
+        if: ${{ github.event.inputs.ota_ref == '' }}
         uses: ota-run/setup@v1
+
+      - name: Setup Rust toolchain (ota_ref)
+        if: ${{ github.event.inputs.ota_ref != '' }}
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build ota from source (ota_ref)
+        if: ${{ github.event.inputs.ota_ref != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${HOME}/.cargo/bin" >> "$GITHUB_PATH"
+          cargo install --locked --force --git https://github.com/ota-run/ota --branch "${{ github.event.inputs.ota_ref }}" ota
 
       - name: Verify ota install
         shell: bash
@@ -578,7 +609,20 @@ jobs:
           pnpm --version
 
       - name: Setup ota
+        if: ${{ github.event.inputs.ota_ref == '' }}
         uses: ota-run/setup@v1
+
+      - name: Setup Rust toolchain (ota_ref)
+        if: ${{ github.event.inputs.ota_ref != '' }}
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build ota from source (ota_ref)
+        if: ${{ github.event.inputs.ota_ref != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${HOME}/.cargo/bin" >> "$GITHUB_PATH"
+          cargo install --locked --force --git https://github.com/ota-run/ota --branch "${{ github.event.inputs.ota_ref }}" ota
 
       - name: Verify ota install
         shell: bash
