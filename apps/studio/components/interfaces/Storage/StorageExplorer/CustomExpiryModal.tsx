@@ -146,7 +146,6 @@ export const CustomExpiryModal = () => {
               </p>
             )}
           </DialogSection>
-          <DialogSectionSeparator />
           <DialogFooter>
             <Button type="default" onClick={handleClose}>
               Cancel
