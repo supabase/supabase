@@ -642,11 +642,14 @@ export default process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VER
       // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
       // Upload a larger set of source maps for prettier stack traces (increases build time)
-      widenClientFileUpload: true,
+      // Disabled: builds were OOMing on Vercel; re-enable once we lift the build memory ceiling.
+      widenClientFileUpload: false,
 
       // Automatically annotate React components to show their full name in breadcrumbs and session replay
+      // Disabled: this walks every component AST at build time and was the primary contributor to
+      // OOMs on Vercel. Re-enable once we lift the build memory ceiling.
       reactComponentAnnotation: {
-        enabled: true,
+        enabled: false,
       },
 
       // Automatically tree-shake Sentry logger statements to reduce bundle size
