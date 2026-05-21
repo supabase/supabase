@@ -682,7 +682,7 @@ test.describe('Database', () => {
 
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
-      await page.getByRole('button', { name: 'Choose a table' }).click()
+      await page.getByRole('button', { name: 'Select a table' }).click()
 
       const columnsWait = waitForApiResponse(
         page,
