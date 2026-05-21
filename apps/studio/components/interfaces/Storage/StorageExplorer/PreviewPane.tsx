@@ -42,7 +42,11 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
   if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
-        <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
+        <LoaderCircle
+          size={14}
+          strokeWidth={1.5}
+          className="animate-spin text-foreground-lighter"
+        />
       </div>
     )
   }
@@ -145,7 +149,7 @@ export const PreviewPane = () => {
         <X
           className="cursor-pointer"
           size={14}
-          strokeWidth={2}
+          strokeWidth={1.5}
           onClick={() => setSelectedFilePreview(undefined)}
         />
       </div>
@@ -163,7 +167,7 @@ export const PreviewPane = () => {
           <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
           {file.isCorrupted && (
             <div className="flex items-center space-x-2">
-              <AlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
+              <AlertCircle size={14} strokeWidth={1.5} className="text-foreground-light" />
               <p className="text-sm text-foreground-light">
                 File is corrupted, please delete and reupload this file again
               </p>
@@ -193,7 +197,7 @@ export const PreviewPane = () => {
         <div className="flex space-x-2 border-b border-overlay pb-4">
           <Button
             type="default"
-            icon={<Download />}
+            icon={<Download strokeWidth={1.5} />}
             disabled={file.isCorrupted}
             onClick={() => downloadFile(file)}
           >
@@ -202,7 +206,7 @@ export const PreviewPane = () => {
           {selectedBucket.public ? (
             <Button
               type="outline"
-              icon={<Copy />}
+              icon={<Copy strokeWidth={1.5} />}
               onClick={() => onCopyUrl(file.path!)}
               disabled={file.isCorrupted}
             >
@@ -213,8 +217,8 @@ export const PreviewPane = () => {
               <DropdownMenuTrigger asChild>
                 <Button
                   type="outline"
-                  icon={<Copy />}
-                  iconRight={<ChevronDown />}
+                  icon={<Copy strokeWidth={1.5} />}
+                  iconRight={<ChevronDown strokeWidth={1.5} />}
                   disabled={file.isCorrupted}
                 >
                   Get URL
@@ -253,7 +257,7 @@ export const PreviewPane = () => {
           type="outline"
           disabled={!canUpdateFiles}
           size="tiny"
-          icon={<Trash2 strokeWidth={2} />}
+          icon={<Trash2 strokeWidth={1.5} />}
           onClick={() => setSelectedItemsToDelete([file])}
           tooltip={{
             content: {
