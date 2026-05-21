@@ -379,7 +379,7 @@ const stateOfStartupsData = {
           title: 'Auth and Identity',
           newInYear: 2026,
           description:
-            'Three in four respondents who answered the auth question picked Supabase Auth. The firm migration floor is the ~25% who picked no Supabase option at all.',
+            'Three in four respondents who answered the auth question picked Supabase Auth.',
           stats: [
             {
               percent: 72,
@@ -439,7 +439,7 @@ const stateOfStartupsData = {
         {
           title: 'Frontend Diversifies',
           description:
-            'React and Next.js both grew. But the quieter story is that four tools went from effectively zero to real share in 12 months: Expo 10%, TanStack 8%, HTMX 4%, Astro 3%. Native mobile also picked up 3 points. The React-Next monoculture cracked.',
+            'React and Next.js both grew. But the quieter story is that four tools went from effectively zero to real share in 12 months: Expo 10%, TanStack 8%, HTMX 4%, Astro 3%. Native mobile also picked up 3 points.',
           stats: [
             {
               percent: 10,
@@ -476,7 +476,7 @@ const stateOfStartupsData = {
         {
           title: 'Who’s Building Agents',
           description:
-            'Agent-building share is statistically flat year over year. The “not sure” cohort shrank, which means undecided builders are making up their minds and shipping. What they automate has shifted: workflow and data analysis climbed; customer support fell off the top spot.',
+            'Agent-building share is statistically flat year over year. The “not sure” cohort shrank, which means undecided builders are making up their minds and shipping. What they automate has shifted: workflow and data analysis climbed; customer support (chat bots) fell off the top spot.',
           stats: [
             {
               percent: 52,
@@ -552,7 +552,7 @@ const stateOfStartupsData = {
           title: 'The Operational Gap',
           newInYear: 2026,
           description:
-            'Prompt management, evaluation, and AI observability all paint the same picture: most teams ship agents without the operator stack underneath them. Whoever builds the operator tools for the next 500k AI startups has an open market.',
+            'Prompt management, evaluation, and AI observability all paint the same picture: most teams ship agents without the operator stack underneath them.',
           stats: [],
           charts: [],
           wordCloud: undefined,
@@ -563,7 +563,7 @@ const stateOfStartupsData = {
           title: 'MCP Adoption',
           newInYear: 2026,
           description:
-            'A year after the protocol launched, 57% of respondents have hands on it. Only 14% say they are unfamiliar. The speed of the on-ramp is what stands out.',
+            'A year after the protocol launched, 57% of respondents have already adopted it. Only 14% say they are unfamiliar.',
           stats: [
             { percent: 57, label: 'Respondents with hands on MCP servers or tools' },
             { percent: 14, label: 'Respondents unfamiliar with MCP' },
@@ -836,19 +836,31 @@ const stateOfStartupsData = {
             'The largest year-over-year shift in any single category. Three new challenge options came online: burn out, AI competition, runway anxiety. Together they absorb roughly the same share that used to pick technical complexity. Among 1–10 person teams, burn out has already overtaken technical complexity as the second-biggest challenge.',
           stats: [
             {
+              percent: 30,
+              label: 'Startups whose biggest challenge is customer acquisition',
+              source: {
+                column: 'biggest_challenge',
+                aggregation: 'single',
+                target: 'Customer acquisition',
+              },
+            },
+            {
+              percent: 20,
+              label: 'Startups whose biggest challenge is product-market fit',
+              source: {
+                column: 'biggest_challenge',
+                aggregation: 'single',
+                target: 'Product-market fit',
+              },
+            },
+            {
               percent: 11,
-              label: 'Startups naming technical complexity their biggest challenge',
+              label: 'Startups whose biggest challenge is technical complexity',
               source: {
                 column: 'biggest_challenge',
                 aggregation: 'single',
                 target: 'Technical complexity',
               },
-            },
-            { percent: 82, label: 'Founders that evaluate tools via hands-on experience' },
-            {
-              percent: 45,
-              label:
-                'Startups with over 250 employees whose biggest challenge is getting customers',
             },
           ],
           charts: ['BiggestChallengeChart'],
