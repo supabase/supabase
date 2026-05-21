@@ -47,11 +47,11 @@ import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGrap
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { EdgeData, TableNodeData } from './Schemas.constants'
 import {
+  getEnumsAsMarkdown,
   getGraphDataFromTables,
   getLayoutedElementsViaDagre,
-  getSchemaAsMarkdown,
-  getEnumsAsMarkdown,
   getPoliciesAsMarkdown,
+  getSchemaAsMarkdown,
 } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
 import { useExportSchemaToImage } from './useExportSchemaToImage'
@@ -59,10 +59,10 @@ import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
-import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
+import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'

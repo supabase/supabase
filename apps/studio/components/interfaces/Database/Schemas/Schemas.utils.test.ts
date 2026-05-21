@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  getSchemaAsMarkdown,
-  getTableDefinitionAsMarkdown,
   getEnumsAsMarkdown,
   getPoliciesAsMarkdown,
+  getSchemaAsMarkdown,
+  getTableDefinitionAsMarkdown,
 } from './Schemas.utils'
 
 describe('Schemas.utils', () => {
