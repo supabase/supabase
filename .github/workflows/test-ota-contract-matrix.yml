@@ -655,8 +655,19 @@ jobs:
               return 0
             fi
 
+            if kill -0 "${cmd_pid}" >/dev/null 2>&1; then
+              kill -TERM "${cmd_pid}" >/dev/null 2>&1 || true
+              sleep 1
+              kill -KILL "${cmd_pid}" >/dev/null 2>&1 || true
+            fi
+
             wait "${cmd_pid}" >/dev/null 2>&1 || true
             cat "${logfile}"
+            if [ "${elapsed}" -ge "${limit_seconds%?}" ]; then
+              echo "::error title=${label} timed out before readiness::See ${logfile}"
+              exit 124
+            fi
+
             echo "::error title=${label} failed before readiness::See ${logfile}"
             exit 1
 
