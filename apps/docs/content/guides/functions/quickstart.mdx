@@ -215,6 +215,12 @@ curl --request POST 'https://[YOUR_PROJECT_ID].supabase.co/functions/v1/hello-wo
 
 Now that your function is deployed, you can invoke it from within an app:
 
+<Admonition type="note" label="Calling from the browser?">
+
+Make sure your function can handle [CORS](/docs/guides/functions/cors) (Cross-Origin Resource Sharing) requests by configuring its headers correctly.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"

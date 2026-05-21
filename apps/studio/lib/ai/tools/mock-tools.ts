@@ -65,6 +65,7 @@ export const MOCK_TABLES_DATA = [
 const MOCK_EXTENSIONS_DATA = [
   { name: 'pgcrypto', schema: 'extensions', installed_version: '1.3' },
   { name: 'uuid-ossp', schema: 'extensions', installed_version: '1.1' },
+  { name: 'pg_cron', schema: 'pg_catalog', installed_version: '1.6.4' },
 ]
 
 const MOCK_EDGE_FUNCTIONS_DATA = [

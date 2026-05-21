@@ -113,7 +113,8 @@ export const EdgeFunctionRenderer = ({
           <ConfirmFooter
             message="Assistant wants to deploy this Edge Function"
             cancelLabel="Skip"
-            confirmLabel={isDeploying ? 'Deploying...' : 'Deploy'}
+            confirmLabel="Deploy"
+            confirmLabelLoading="Deploying..."
             isLoading={isDeploying}
             onCancel={() => onDeny?.()}
             onConfirm={handleDeploy}

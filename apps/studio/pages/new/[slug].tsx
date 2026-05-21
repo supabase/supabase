@@ -163,6 +163,22 @@ const Wizard: NextPageWithLayout = () => {
     highAvailability,
   } = useWatch({ control: form.control })
 
+  // Read dirty state during render rather than depending on form.formState in the
+  // effect — form.formState is a Proxy that gets a new reference every render, which
+  // would re-fire this effect after each setValue and trigger an infinite loop.
+  const isDataApiDefaultPrivilegesDirty = getFieldState(
+    'dataApiDefaultPrivileges',
+    form.formState
+  ).isDirty
+
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (isDataApiDefaultPrivilegesDirty) return
+    setValue('dataApiDefaultPrivileges', !dataApiRevokeOnCreateDefaultFlag, {
+      shouldDirty: false,
+    })
+  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
+
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
   // an in-between render, but watchedInstanceSize is still undefined from the

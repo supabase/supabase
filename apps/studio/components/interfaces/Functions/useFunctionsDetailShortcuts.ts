@@ -6,6 +6,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 interface UseFunctionsDetailShortcutsParams {
   projectRef: string | undefined
   functionSlug: string | undefined
+  canReadFunctions: boolean
   isPlatform: boolean
   onOpenTest: () => void
   onOpenDownload: () => void
@@ -24,6 +25,7 @@ interface UseFunctionsDetailShortcutsParams {
 export function useFunctionsDetailShortcuts({
   projectRef,
   functionSlug,
+  canReadFunctions,
   isPlatform,
   onOpenTest,
   onOpenDownload,
@@ -32,33 +34,40 @@ export function useFunctionsDetailShortcuts({
   const router = useRouter()
 
   const ready = Boolean(projectRef && functionSlug)
+  const shortcutsEnabled = ready && canReadFunctions
   const base = `/project/${projectRef}/functions/${functionSlug}`
 
   useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW, () => router.push(base), {
-    enabled: ready && isPlatform,
+    enabled: shortcutsEnabled && isPlatform,
   })
 
   useShortcut(
     SHORTCUT_IDS.NAV_FUNCTION_DETAIL_INVOCATIONS,
     () => router.push(`${base}/invocations`),
-    { enabled: ready && isPlatform }
+    { enabled: shortcutsEnabled && isPlatform }
   )
 
   useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_LOGS, () => router.push(`${base}/logs`), {
-    enabled: ready && isPlatform,
+    enabled: shortcutsEnabled && isPlatform,
   })
 
   useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_CODE, () => router.push(`${base}/code`), {
-    enabled: ready,
+    enabled: shortcutsEnabled,
   })
 
   useShortcut(SHORTCUT_IDS.NAV_FUNCTION_DETAIL_SETTINGS, () => router.push(`${base}/details`), {
-    enabled: ready,
+    enabled: shortcutsEnabled,
   })
 
-  useShortcut(SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST, onOpenTest, { enabled: ready })
+  useShortcut(SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST, onOpenTest, {
+    enabled: shortcutsEnabled,
+  })
 
-  useShortcut(SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_DOWNLOAD, onOpenDownload, { enabled: ready })
+  useShortcut(SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_DOWNLOAD, onOpenDownload, {
+    enabled: shortcutsEnabled,
+  })
 
-  useShortcut(SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL, onCopyUrl, { enabled: ready })
+  useShortcut(SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL, onCopyUrl, {
+    enabled: shortcutsEnabled,
+  })
 }

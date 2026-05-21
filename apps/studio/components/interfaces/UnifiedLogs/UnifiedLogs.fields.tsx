@@ -134,6 +134,23 @@ export const filterFields = [
       )
     },
   },
+  {
+    label: 'Event message',
+    value: 'event_message',
+    type: 'checkbox',
+    defaultOpen: false,
+    options: [],
+    hasDynamicOptions: false,
+    hasAsyncSearch: false,
+    hidden: true,
+    component: (props: Option) => {
+      return (
+        <span className="truncate block w-full text-[0.75rem]" title={props.value as string}>
+          {props.value}
+        </span>
+      )
+    },
+  },
 ] satisfies DataTableFilterField<ColumnSchema>[]
 
 export const sheetFields = [

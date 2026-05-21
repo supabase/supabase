@@ -42,12 +42,26 @@ const ACTIVE_FUNCTION_DETAIL_NAV_SHORTCUT_IDS = [
   SHORTCUT_IDS.NAV_FUNCTION_DETAIL_OVERVIEW,
 ] satisfies ShortcutId[]
 
+const ACTIVE_REALTIME_NAV_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.NAV_REALTIME_INSPECTOR,
+] satisfies ShortcutId[]
+
+const ACTIVE_REALTIME_INSPECTOR_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.INSPECTOR_JOIN_CHANNEL,
+  SHORTCUT_IDS.INSPECTOR_TOGGLE_LISTENING,
+  SHORTCUT_IDS.INSPECTOR_BROADCAST,
+  SHORTCUT_IDS.INSPECTOR_COPY_MESSAGE,
+] satisfies ShortcutId[]
+
 const ACTIVE_SURFACE_SHORTCUT_IDS = [
   ...ACTIVE_SHORTCUT_IDS,
   SHORTCUT_IDS.AUTH_USERS_REFRESH,
   SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST,
   SHORTCUT_IDS.FUNCTION_OVERVIEW_INTERVAL_15MIN,
   SHORTCUT_IDS.FUNCTIONS_LIST_REFRESH,
+  SHORTCUT_IDS.LOGS_PREVIEW_REFRESH,
   SHORTCUT_IDS.SQL_EDITOR_FORMAT,
   SHORTCUT_IDS.STORAGE_BUCKETS_REFRESH,
   SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
@@ -167,6 +181,25 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Go to Overview')).toBeInTheDocument()
   })
 
+  it('shows the realtime navigation section when realtime shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_REALTIME_NAV_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Global Navigation')).toBeInTheDocument()
+    expect(screen.getByText('Realtime Navigation')).toBeInTheDocument()
+    expect(screen.getByText('Go to Inspector')).toBeInTheDocument()
+  })
+
+  it('uses human labels for realtime inspector shortcut groups', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_REALTIME_INSPECTOR_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Realtime Inspector')).toBeInTheDocument()
+    expect(screen.getByText('Join a channel')).toBeInTheDocument()
+    expect(screen.getByText('Start/Stop listening')).toBeInTheDocument()
+    expect(screen.getByText('Broadcast a message')).toBeInTheDocument()
+    expect(screen.getByText('Copy selected message')).toBeInTheDocument()
+    expect(screen.queryByText('realtime-inspector')).not.toBeInTheDocument()
+  })
+
   it('uses human labels for active surface shortcut groups', async () => {
     renderShortcutsReferenceSheet(ACTIVE_SURFACE_SHORTCUT_IDS)
 
@@ -174,6 +207,7 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Edge Function Actions')).toBeInTheDocument()
     expect(screen.getByText('Edge Function Overview')).toBeInTheDocument()
     expect(screen.getByText('Edge Functions')).toBeInTheDocument()
+    expect(screen.getByText('Logs Explorer')).toBeInTheDocument()
     expect(screen.getByText('SQL Editor')).toBeInTheDocument()
     expect(screen.getByText('Storage Buckets')).toBeInTheDocument()
     expect(screen.getByText('Storage File Explorer')).toBeInTheDocument()
@@ -181,6 +215,7 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.queryByText('functions-detail')).not.toBeInTheDocument()
     expect(screen.queryByText('functions-list')).not.toBeInTheDocument()
     expect(screen.queryByText('functions-overview')).not.toBeInTheDocument()
+    expect(screen.queryByText('logs-preview')).not.toBeInTheDocument()
     expect(screen.queryByText('sql-editor')).not.toBeInTheDocument()
     expect(screen.queryByText('storage-buckets')).not.toBeInTheDocument()
     expect(screen.queryByText('storage-explorer')).not.toBeInTheDocument()

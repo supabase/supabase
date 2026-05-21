@@ -19,12 +19,12 @@ import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
@@ -330,23 +330,23 @@ export const EditorPanel = () => {
               ></ButtonTooltip>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-[300px] p-0">
-              <Command_Shadcn_ shouldFilter={false}>
-                <CommandInput_Shadcn_
+              <Command shouldFilter={false}>
+                <CommandInput
                   placeholder="Search snippets..."
                   value={snippetSearch}
                   onValueChange={setSnippetSearch}
                 />
-                <CommandList_Shadcn_>
+                <CommandList>
                   {isLoadingSnippets ? (
                     <div className="py-6 text-center text-sm text-foreground-light">
                       Loading snippets...
                     </div>
                   ) : (
-                    <CommandEmpty_Shadcn_>No snippets found.</CommandEmpty_Shadcn_>
+                    <CommandEmpty>No snippets found.</CommandEmpty>
                   )}
-                  <CommandGroup_Shadcn_>
+                  <CommandGroup>
                     {(snippetsData?.content ?? []).map((snippet) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={snippet.id}
                         value={snippet.id}
                         className="cursor-pointer"
@@ -357,11 +357,11 @@ export const EditorPanel = () => {
                         }}
                       >
                         {snippet.name}
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
             </PopoverContent>
           </Popover>
           {templates.length > 0 && (
@@ -379,15 +379,15 @@ export const EditorPanel = () => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-[300px] p-0">
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Search templates..." />
-                  <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
+                <Command>
+                  <CommandInput placeholder="Search templates..." />
+                  <CommandList>
+                    <CommandEmpty>No templates found.</CommandEmpty>
+                    <CommandGroup>
                       {templates.map((template) => (
                         <HoverCard key={template.name}>
                           <HoverCardTrigger asChild>
-                            <CommandItem_Shadcn_
+                            <CommandItem
                               value={template.name}
                               onSelect={() => onSelectTemplate(template.content)}
                               className="cursor-pointer"
@@ -406,7 +406,7 @@ export const EditorPanel = () => {
                                   </p>
                                 </div>
                               </div>
-                            </CommandItem_Shadcn_>
+                            </CommandItem>
                           </HoverCardTrigger>
                           <HoverCardContent side="left" className="w-[500px] p-0">
                             <CodeBlock
@@ -418,9 +418,9 @@ export const EditorPanel = () => {
                           </HoverCardContent>
                         </HoverCard>
                       ))}
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
               </PopoverContent>
             </Popover>
           )}
