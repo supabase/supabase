@@ -4740,10 +4740,17 @@ export interface components {
     ProjectServiceHealthResponse: {
       error?: string
       result?: {
-        timestamp: string | number
-        ok_count: number
-        warning_count: number
-        error_count: number
+        timestamp: string
+        postgres_logs: { ok: number; warning: number; error: number; total: number }
+        auth_logs: { ok: number; warning: number; error: number; total: number }
+        function_edge_logs: { ok: number; warning: number; error: number; total: number }
+        storage_logs: { ok: number; warning: number; error: number; total: number }
+        realtime_logs: { ok: number; warning: number; error: number; total: number }
+        postgrest_logs: { ok: number; warning: number; error: number; total: number }
+        edge_logs: { ok: number; warning: number; error: number; total: number }
+        supavisor_logs: { ok: number; warning: number; error: number; total: number }
+        function_logs: { ok: number; warning: number; error: number; total: number }
+        etl_replication_logs: { ok: number; warning: number; error: number; total: number }
       }[]
     }
     AnalyticsResponse: {

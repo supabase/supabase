@@ -1,8 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
-
 import { analyticsKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import { UseCustomQueryOptions } from '@/types'
 
 export type ServiceHealthGranularity = 'day' | 'hour' | 'minute'
 
@@ -70,26 +67,3 @@ export async function getServiceHealth(
 
   return result
 }
-
-export type ServiceHealthError = unknown
-export type ServiceHealthData = Awaited<ReturnType<typeof getServiceHealth>>
-
-export const useServiceHealthQuery = <TData = ServiceHealthData>(
-  { projectRef, startDate, endDate, granularity }: ServiceHealthVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<ServiceHealthData, ServiceHealthError, TData> = {}
-) =>
-  useQuery<ServiceHealthData, ServiceHealthError, TData>({
-    queryKey: analyticsKeys.serviceHealth(projectRef, { startDate, endDate, granularity }),
-    queryFn: ({ signal }) =>
-      getServiceHealth({ projectRef, startDate, endDate, granularity }, signal),
-    enabled:
-      enabled &&
-      typeof projectRef !== 'undefined' &&
-      typeof startDate !== 'undefined' &&
-      typeof endDate !== 'undefined',
-    staleTime: 1000 * 60,
-    ...options,
-  })

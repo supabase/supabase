@@ -103,9 +103,8 @@ const useServiceHealthQuery = ({
 
   // Snap start/end to the granularity boundary so fillTimeseries iterates
   // in sync with the API's bucketed timestamps (e.g. midnight for 'day').
-  const granularityUnit = granularity === 'day' ? 'day' : granularity === 'hour' ? 'hour' : 'minute'
-  const fillStart = dayjs.utc(startDate).startOf(granularityUnit).toISOString()
-  const fillEnd = dayjs.utc(endDate).startOf(granularityUnit).toISOString()
+  const fillStart = dayjs.utc(startDate).startOf(granularity).toISOString()
+  const fillEnd = dayjs.utc(endDate).startOf(granularity).toISOString()
 
   // Fill gaps in timeseries
   const { data: filledData } = useFillTimeseriesSorted({
