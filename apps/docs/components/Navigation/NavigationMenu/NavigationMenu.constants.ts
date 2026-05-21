@@ -2860,6 +2860,10 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/log-drains' as `/${string}`,
         },
         {
+          name: 'Tracing with the JS SDK',
+          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
+        },
+        {
           name: 'Reports',
           url: '/guides/telemetry/reports' as `/${string}`,
         },
