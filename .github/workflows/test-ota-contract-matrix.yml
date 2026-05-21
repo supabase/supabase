@@ -723,6 +723,7 @@ jobs:
           docker info
 
           cleanup_state
+          run_warmup_install "warmup-env-native" ota run --native setup:env-www .
           run_warmup_install "warmup-install-native" ota run --native install .
 
           run_e2e_cmd "run-native" 3000 360s ota run --native dev:www .
@@ -731,6 +732,7 @@ jobs:
           run_e2e_cmd "up-native-stream" 3000 360s ota up --native --stream .
 
           cleanup_state
+          run_warmup_install "warmup-env-container" ota run --native setup:env-www .
           run_warmup_install "warmup-install-container" ota run --container install .
 
           run_e2e_cmd "run-container" 3000 360s ota run --container dev:www .
