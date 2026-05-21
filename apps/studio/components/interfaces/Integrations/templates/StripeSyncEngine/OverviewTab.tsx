@@ -24,10 +24,9 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
-import { IntegrationOverviewTabV2 } from '../../Integration/IntegrationOverviewTabV2'
+import { RequiredExtensionsSection } from '../../Integration/RequiredExtensionsSection'
 import { InstallationError } from './InstallationError'
 import { IntegrationInstalledActions, IntegrationNotInstalledActions } from './IntegrationActions'
-import { StatusDisplay } from './StatusDisplay'
 import {
   canInstall as checkCanInstall,
   hasInstallError,
@@ -373,7 +372,12 @@ export const StripeSyncEngineOverviewTab = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   if (isMarketplaceEnabled) {
-    return <StripeSyncContent />
+    return (
+      <>
+        <RequiredExtensionsSection />
+        <StripeSyncContent />
+      </>
+    )
   }
 
   return (

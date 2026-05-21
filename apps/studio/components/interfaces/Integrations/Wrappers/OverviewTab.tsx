@@ -7,7 +7,7 @@ import { Button, Sheet, SheetContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
-import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
+import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
 import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
@@ -184,6 +184,7 @@ export const WrapperContent = () => {
 
   return (
     <>
+      <RequiredExtensionsSection />
       <AddNewWrapperCTA />
       {isInstalled && <WrapperOverviewContent />}
     </>
@@ -193,9 +194,7 @@ export const WrapperContent = () => {
 export const WrapperOverviewTab = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
-  if (isMarketplaceEnabled) {
-    return <WrapperContent />
-  }
+  if (isMarketplaceEnabled) return <WrapperContent />
 
   return (
     <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>

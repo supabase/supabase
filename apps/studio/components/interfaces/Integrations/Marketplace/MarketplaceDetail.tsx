@@ -86,7 +86,6 @@ export const MarketplaceDetail = () => {
     <>
       <MarketplaceDetailTopBar
         title={integration.name}
-        integration={integration}
         isInstalled={isInstalled}
         actions={
           <>
