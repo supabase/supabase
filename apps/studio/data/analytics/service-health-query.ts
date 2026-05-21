@@ -1,4 +1,3 @@
-import { analyticsKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 
 export type ServiceHealthGranularity = 'day' | 'hour' | 'minute'
