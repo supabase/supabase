@@ -4,12 +4,12 @@ import { Plus } from 'lucide-react'
 import * as React from 'react'
 import {
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Drawer,
   DrawerContent,
   DrawerTrigger,
@@ -97,13 +97,13 @@ function StatusList({
   setSelectedStatus: (status: Status | null) => void
 }) {
   return (
-    <Command_Shadcn_>
-      <CommandInput_Shadcn_ placeholder="Filter status..." />
-      <CommandList_Shadcn_>
-        <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-        <CommandGroup_Shadcn_>
+    <Command>
+      <CommandInput placeholder="Filter status..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup>
           {statuses.map((status) => (
-            <CommandItem_Shadcn_
+            <CommandItem
               key={status.value}
               value={status.value}
               onSelect={(value) => {
@@ -112,10 +112,10 @@ function StatusList({
               }}
             >
               {status.label}
-            </CommandItem_Shadcn_>
+            </CommandItem>
           ))}
-        </CommandGroup_Shadcn_>
-      </CommandList_Shadcn_>
-    </Command_Shadcn_>
+        </CommandGroup>
+      </CommandList>
+    </Command>
   )
 }

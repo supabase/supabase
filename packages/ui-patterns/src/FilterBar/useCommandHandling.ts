@@ -146,6 +146,35 @@ export function useCommandHandling({
         return
       }
 
+      if (item.isFreeformSearch && item.freeformPropertyName) {
+        if (!activeInput || activeInput.type !== 'group') return
+        const property = filterProperties.find((p) => p.name === item.freeformPropertyName)
+        if (!property) return
+
+        const currentPath = activeInput.path
+        const group = findGroupByPath(activeFilters, currentPath)
+        if (!group) return
+
+        const operators = property.operators ?? ['=']
+        const defaultOperator =
+          operators.find((op) => (isFilterOperatorObject(op) ? op.value : op) === '=') ??
+          operators[0]
+        const operatorValue = isFilterOperatorObject(defaultOperator)
+          ? defaultOperator.value
+          : defaultOperator
+
+        let updatedFilters = addFilterToGroup(activeFilters, currentPath, property)
+        const newPath = [...currentPath, group.conditions.length]
+        updatedFilters = updateNestedOperator(updatedFilters, newPath, operatorValue)
+        updatedFilters = updateNestedValue(updatedFilters, newPath, item.freeformValue ?? '')
+        commitFilters(updatedFilters)
+        onFreeformTextChange('')
+        setTimeout(() => {
+          setActiveInput({ type: 'group', path: currentPath })
+        }, 0)
+        return
+      }
+
       if (item.value === 'group') {
         handleGroupCommand()
         return
@@ -174,6 +203,8 @@ export function useCommandHandling({
       activeInput,
       activeFilters,
       freeformText,
+      filterProperties,
+      onFreeformTextChange,
       setActiveInput,
       handleGroupCommand,
       handleValueCommand,

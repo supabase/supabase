@@ -3,12 +3,12 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -73,13 +73,13 @@ export const ConnectDropdown = ({
         </PopoverTrigger>
       </div>
       <PopoverContent className="p-0 max-w-48" side="bottom" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+        <Command>
+          <CommandInput placeholder="Search..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup>
               {items.map((item) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={item.key}
                   value={item.key}
                   onSelect={() => {
@@ -102,11 +102,11 @@ export const ConnectDropdown = ({
                     size={15}
                     className={cn('ml-auto  ', item.key === state ? 'opacity-100' : 'opacity-0')}
                   />
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   )
