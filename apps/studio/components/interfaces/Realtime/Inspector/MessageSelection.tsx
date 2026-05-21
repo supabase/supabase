@@ -1,13 +1,17 @@
 import { useParams } from 'common'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
-import { Button, cn } from 'ui'
+import { toast } from 'sonner'
+import { Button, cn, copyToClipboard } from 'ui'
 
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
 import CopyButton from '@/components/ui/CopyButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export interface MessageSelectionProps {
   log: LogData | null
@@ -22,6 +26,32 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const handleCopy = () => {
+    if (!log) return
+    copyToClipboard(selectionText)
+    toast.success('Message copied to clipboard')
+  }
+
+  useShortcut(SHORTCUT_IDS.INSPECTOR_COPY_MESSAGE, handleCopy, {
+    enabled: !!log,
+    ignoreInputs: true,
+    registerInCommandMenu: true,
+  })
+
+  const copyButton = (
+    <CopyButton
+      text={selectionText}
+      type="default"
+      title="Copy log to clipboard"
+      onClick={() => {
+        sendEvent({
+          action: 'realtime_inspector_copy_message_clicked',
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
+      }}
+    />
+  )
 
   return (
     <div className={cn('relative flex h-full grow flex-col border-l overflow-y-scroll bg-200')}>
@@ -68,17 +98,13 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
         <div className="pt-4 flex flex-col gap-4">
           <div className="px-4 flex flex-row justify-between items-center">
             <div className="transition">
-              <CopyButton
-                text={selectionText}
-                type="default"
-                title="Copy log to clipboard"
-                onClick={() => {
-                  sendEvent({
-                    action: 'realtime_inspector_copy_message_clicked',
-                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                  })
-                }}
-              />
+              {log ? (
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_COPY_MESSAGE} side="bottom">
+                  {copyButton}
+                </ShortcutTooltip>
+              ) : (
+                copyButton
+              )}
             </div>
             <Button
               type="text"

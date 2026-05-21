@@ -15,7 +15,11 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import { ASSISTANT_ERRORS } from './AiAssistant.constants'
 import type { SqlSnippet } from './AIAssistant.types'
-import { onErrorChat } from './AIAssistant.utils'
+import {
+  hasPendingToolApproval,
+  onErrorChat,
+  resolvePendingToolApprovalsAsDenied,
+} from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
 import { AssistantChatForm } from './AssistantChatForm'
@@ -171,6 +175,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
+  const hasPendingApproval = hasPendingToolApproval(chatMessages)
+  const isChatInputDisabled = !isApiKeySet || disablePrompts || isLoadingOrganization
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -326,6 +332,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
     snap.clearSqlSnippets()
     lastUserMessageRef.current = payload
+    if (hasPendingApproval && !editingMessageId) {
+      setMessages(resolvePendingToolApprovalsAsDenied(chatMessages))
+    }
     sendMessage(payload, {
       body: {
         schema: currentSchema,
@@ -556,7 +565,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
-            disabled={!isApiKeySet || disablePrompts || isLoadingOrganization}
+            disabled={isChatInputDisabled}
             placeholder={
               hasMessages
                 ? 'Ask a follow up question...'

@@ -5,12 +5,12 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -195,20 +195,20 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_
+                <Command>
+                  <CommandInput
                     placeholder="Find schema..."
                     value={schemaSearchTerm}
                     onValueChange={setSchemaSearchTerm}
                   />
-                  <CommandList_Shadcn_
+                  <CommandList
                     className={cn((schemas ?? []).length > 7 && 'max-h-[210px]! overflow-y-auto')}
                     onWheel={(event) => event.stopPropagation()}
                   >
-                    <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
+                    <CommandEmpty>No schemas found</CommandEmpty>
+                    <CommandGroup>
                       {(schemas ?? []).map((schema) => (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={schema.name}
                           className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                           onSelect={() => {
@@ -222,11 +222,11 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                           {selectedSchema === schema.name && (
                             <Check className="text-brand" strokeWidth={2} size={16} />
                           )}
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       ))}
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
               </PopoverContent>
             </Popover>
           </FormItemLayout>
@@ -264,17 +264,17 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
                 {/* [Terry] shouldFilter context:
                 https://github.com/pacocoursey/cmdk/issues/267#issuecomment-2252717107 */}
-                <Command_Shadcn_ shouldFilter={false}>
-                  <CommandInput_Shadcn_
+                <Command shouldFilter={false}>
+                  <CommandInput
                     placeholder="Find table..."
                     value={searchTerm}
                     onValueChange={handleSearchChange}
                   />
-                  <CommandList_Shadcn_
+                  <CommandList
                     className={cn(entityTypes.length > 7 && 'max-h-[210px]! overflow-y-auto')}
                     onWheel={(event) => event.stopPropagation()}
                   >
-                    <CommandEmpty_Shadcn_>
+                    <CommandEmpty>
                       {isLoadingEntities ? (
                         <div className="flex items-center gap-2 text-center justify-center">
                           <Loader2 size={12} className="animate-spin" />
@@ -283,10 +283,10 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                       ) : (
                         'No tables found'
                       )}
-                    </CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
+                    </CommandEmpty>
+                    <CommandGroup>
                       {entityTypes.map((entity) => (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={entity.name}
                           className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                           onSelect={() => {
@@ -302,11 +302,11 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                           {selectedEntity === entity.name && (
                             <Check className="text-brand" strokeWidth={2} size={16} />
                           )}
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       ))}
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
               </PopoverContent>
             </Popover>
           </FormItemLayout>

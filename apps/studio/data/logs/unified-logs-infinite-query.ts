@@ -116,6 +116,7 @@ export async function getUnifiedLogs(
   })
 
   if (error) handleError(error)
+  if (data.error) handleError(new Error(data.error as string))
 
   const resultData = data?.result ?? []
 
