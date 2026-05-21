@@ -1,7 +1,7 @@
 version: 1
 project:
   name: supabase
-  description: Supabase monorepo for web, docs, studio, and shared packages
+  description: Supabase monorepo readiness slice focused on www/docs workflows
   type: application
 execution:
   default_context: host
@@ -10,7 +10,7 @@ execution:
       backend: native
       requirements:
         runtimes:
-          node: ">=22"
+          node: "^22.12.0"
         tools:
           pnpm: "10.24.0"
     app:
@@ -18,7 +18,7 @@ execution:
       lifecycle: persistent
       requirements:
         runtimes:
-          node: ">=22"
+          node: "^22.12.0"
       attachments:
         isolated_paths:
           - node_modules
@@ -34,7 +34,7 @@ execution:
 toolchains:
   node:
     provider: corepack
-    version: ">=22"
+    version: "^22.12.0"
     package_managers:
       pnpm: "10.24.0"
 surfaces:
@@ -44,16 +44,38 @@ surfaces:
     path: /
     readiness:
       kind: http
+      method: GET
       path: /
-      timeout: 10s
+      headers:
+        Accept: text/html
+      success:
+        status:
+          - 200
+      body:
+        contains: "<!DOCTYPE html>"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
   docs:
     kind: http
     port: 3001
     path: /docs
     readiness:
       kind: http
+      method: GET
       path: /docs
-      timeout: 10s
+      headers:
+        Accept: text/html
+      success:
+        status:
+          - 200
+      body:
+        contains: "<!DOCTYPE html>"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
 tasks:
   setup:env-www:
     context: host
@@ -74,27 +96,19 @@ tasks:
       This is the canonical dependency hydration step for all workflows.
       Run this first on fresh clones and after lockfile changes.
     category: setup
-    run: pnpm install
+    run: corepack pnpm install --frozen-lockfile
+    execution:
+      default_mode: native
+      modes:
+        native:
+          context: host
+          run: corepack pnpm install --frozen-lockfile
+        container:
+          context: app
+          run: corepack pnpm install --frozen-lockfile
     requirements:
       toolchains:
         - node
-    depends_on:
-      - setup:env-www
-    safe_for_agent: true
-  install:app:
-    context: app
-    description: Install monorepo dependencies in the container context
-    notes: |
-      Container-scoped dependency hydration for container-backed workflows.
-      Keeps package manager and runtime resolution anchored to the declared image.
-      Uses Corepack to activate the contract-pinned pnpm version inside the container path.
-    category: setup
-    run: corepack prepare pnpm@10.24.0 --activate && corepack pnpm install
-    requirements:
-      toolchains:
-        - node
-    depends_on:
-      - setup:env-www
     safe_for_agent: true
   build:
     context: host
@@ -102,7 +116,37 @@ tasks:
     notes: |
       Use this for cross-workspace verification before CI-facing changes.
     category: build
-    run: pnpm build
+    run: corepack pnpm build
+    requirements:
+      toolchains:
+        - node
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: true
+  typecheck:
+    context: host
+    description: Run repository type checks
+    notes: |
+      Bounded verification task for code safety before CI-facing changes.
+    category: test
+    run: corepack pnpm typecheck
+    requirements:
+      toolchains:
+        - node
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: true
+  format:check:
+    context: host
+    description: Verify repository formatting with prettier
+    notes: |
+      Bounded formatting verification task aligned with upstream checks.
+    category: test
+    run: corepack pnpm test:prettier
     requirements:
       toolchains:
         - node
@@ -116,8 +160,33 @@ tasks:
     description: Run the main site development server
     notes: |
       Canonical local site frontend run task (`www` surface on port 3000).
+      Container mode publishes the service on an automatically selected host port to avoid local port collisions.
     category: dev
-    run: pnpm dev:www
+    run: corepack pnpm dev:www
+    execution:
+      default_mode: native
+      modes:
+        native:
+          context: host
+          run: corepack pnpm dev:www
+          runtime:
+            kind: service
+            surfaces:
+              - www
+        container:
+          context: app
+          run: corepack pnpm dev:www
+          runtime:
+            kind: service
+            surfaces:
+              www:
+                bind:
+                  address: 0.0.0.0
+                project:
+                  host:
+                    port:
+                      mode: auto
+                    primary: true
     requirements:
       toolchains:
         - node
@@ -125,7 +194,7 @@ tasks:
         - workspace-dependencies-installed
     depends_on:
       - install
-    safe_for_agent: true
+    safe_for_agent: false
     runtime:
       kind: service
       surfaces:
@@ -136,8 +205,33 @@ tasks:
     notes: |
       Focused docs run task (`docs` surface on port 3001).
       Prefer this for docs-only edits to keep iteration tight.
+      Container mode publishes the service on an automatically selected host port to avoid local port collisions.
     category: dev
-    run: pnpm dev:docs
+    run: corepack pnpm dev:docs
+    execution:
+      default_mode: native
+      modes:
+        native:
+          context: host
+          run: corepack pnpm dev:docs
+          runtime:
+            kind: service
+            surfaces:
+              - docs
+        container:
+          context: app
+          run: corepack pnpm dev:docs
+          runtime:
+            kind: service
+            surfaces:
+              docs:
+                bind:
+                  address: 0.0.0.0
+                project:
+                  host:
+                    port:
+                      mode: auto
+                    primary: true
     requirements:
       toolchains:
         - node
@@ -145,59 +239,11 @@ tasks:
         - workspace-dependencies-installed
     depends_on:
       - install
-    safe_for_agent: true
+    safe_for_agent: false
     runtime:
       kind: service
       surfaces:
         - docs
-  dev:www:app:
-    context: app
-    description: Run the main site development server in the container context
-    notes: |
-      Container-backed variant of `dev:www` for deterministic runtime parity in CI and local container workflows.
-    category: dev
-    run: corepack prepare pnpm@10.24.0 --activate && corepack pnpm dev:www
-    requirements:
-      toolchains:
-        - node
-      checks:
-        - workspace-dependencies-installed
-    depends_on:
-      - install:app
-    safe_for_agent: true
-    runtime:
-      kind: service
-      surfaces:
-        www:
-          bind:
-            address: 0.0.0.0
-          project:
-            host:
-              primary: true
-  dev:docs:app:
-    context: app
-    description: Run docs development server in the container context
-    notes: |
-      Container-backed variant of `dev:docs` for docs-focused container execution paths.
-    category: dev
-    run: corepack prepare pnpm@10.24.0 --activate && corepack pnpm dev:docs
-    requirements:
-      toolchains:
-        - node
-      checks:
-        - workspace-dependencies-installed
-    depends_on:
-      - install:app
-    safe_for_agent: true
-    runtime:
-      kind: service
-      surfaces:
-        docs:
-          bind:
-            address: 0.0.0.0
-          project:
-            host:
-              primary: true
 workflows:
   default: app
   app:
@@ -253,9 +299,9 @@ workflows:
     prepare:
       task: setup:env-www
     setup:
-      task: install:app
+      task: install
     run:
-      task: dev:www:app
+      task: dev:www
     readiness:
       surfaces:
         - www
@@ -267,9 +313,9 @@ workflows:
     notes: |
       Use this for docs-focused container runs when host-native execution is not desired.
     setup:
-      task: install:app
+      task: install
     run:
-      task: dev:docs:app
+      task: dev:docs
     readiness:
       surfaces:
         - docs
@@ -281,7 +327,7 @@ workflows:
     notes: |
       Optimized container quickstart path for runtime proof and smoke verification.
     run:
-      task: dev:www:app
+      task: dev:www
     readiness:
       surfaces:
         - www
@@ -291,22 +337,21 @@ checks:
   - name: workspace-dependencies-installed
     kind: file
     severity: error
-    path: node_modules
-    expect: directory
+    path: node_modules/.modules.yaml
+    expect: file
     timeout: 10000
 agent:
   entrypoint: install
-  default_task: dev:www
+  default_task: build
   safe_tasks:
     - setup:env-www
     - install
-    - install:app
     - build
-    - dev:www
-    - dev:docs
-    - dev:www:app
-    - dev:docs:app
+    - typecheck
+    - format:check
   verify_after_changes:
+    - format:check
+    - typecheck
     - build
   writable_paths:
     - apps
@@ -316,18 +361,25 @@ agent:
     - i18n
     - scripts
     - package.json
-    - pnpm-lock.yaml
-    - turbo.jsonc
     - apps/www/.env.local.example
   protected_paths:
     - ota.yaml
+    - .github/workflows
+    - .env
+    - .env.local
+    - apps/www/.env.local
+    - pnpm-lock.yaml
+    - pnpm-workspace.yaml
+    - turbo.jsonc
   bootstrap:
     ota:
       note: Install ota when missing so contributors and agents can run the readiness workflows declared in this contract.
       sh: curl -fsSL https://dist.ota.run/install.sh | sh
       powershell: irm https://dist.ota.run/install.ps1 | iex
   notes: |
-    Supabase is a large pnpm monorepo.
+    This contract intentionally scopes to www/docs workflows for readiness pressure-testing.
     Use `app` for the canonical site development loop and `docs` for docs-only changes.
     Use `instant` for fast readiness/smoke validation when a full workflow path is unnecessary.
-    Use `app:container` / `docs:container` / `instant:container` for container-backed execution paths.
+    Use `--mode container` when you want the same workflows to run through the declared container context.
+    `apps/www/.env.local` remains protected for direct edits; only `setup:env-www` may create it via
+    idempotent `copy_if_missing`.
