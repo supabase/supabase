@@ -221,8 +221,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />
                                       <FeaturePreviewModal />
-                                      {/* Disabled until reintroduced or removed altogether. */}
-                                      {/* <UpdateBillingAddressModal /> */}
                                     </FeaturePreviewContextProvider>
                                   </BannerStackProvider>
                                   <Toaster />
