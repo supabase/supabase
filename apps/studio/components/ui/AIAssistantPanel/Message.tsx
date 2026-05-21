@@ -113,7 +113,6 @@ export function Message(props: MessageProps) {
     isLoading: props.isLoading,
     readOnly: props.readOnly,
     variant: props.variant,
-    isUserMessage,
     state: props.isBeingEdited
       ? 'editing'
       : props.isAfterEditedMessage
