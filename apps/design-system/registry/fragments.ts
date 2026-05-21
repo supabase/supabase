@@ -32,6 +32,18 @@ export const fragments: Registry = [
     optionalPath: '/PageHeader',
   },
   {
+    name: 'PageBreadcrumbs',
+    type: 'components:fragment',
+    files: ['/PageBreadcrumbs/index.tsx'],
+    optionalPath: '/PageBreadcrumbs',
+  },
+  {
+    name: 'PageNav',
+    type: 'components:fragment',
+    files: ['/PageNav/index.tsx'],
+    optionalPath: '/PageNav',
+  },
+  {
     name: 'PageSection',
     type: 'components:fragment',
     files: ['/PageSection/index.tsx'],

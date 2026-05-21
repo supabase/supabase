@@ -133,13 +133,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Modal',
-          href: '/docs/fragments/modal',
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
           items: [],
         },
         {
-          title: 'Page Container',
-          href: '/docs/fragments/page-container',
+          title: 'Page Breadcrumbs',
+          href: '/docs/fragments/page-breadcrumbs',
+          items: [],
+        },
+        {
+          title: 'Page Nav',
+          href: '/docs/fragments/page-nav',
           items: [],
         },
         {
