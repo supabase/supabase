@@ -51,12 +51,8 @@ export const DataApiOverview = () => {
 export const DataApiOverviewTab = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
-  // For marketplace, return just the content — the marketplace overview wrapper will handle layout
-  if (isMarketplaceEnabled) {
-    return <DataApiOverview />
-  }
+  if (isMarketplaceEnabled) return <DataApiOverview />
 
-  // For legacy, wrap with the legacy overview tab
   return (
     <IntegrationOverviewTab>
       <div className="px-10">

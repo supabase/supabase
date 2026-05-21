@@ -45,7 +45,7 @@ interface RailGroupProps {
 
 const RailGroup = ({ title, children }: RailGroupProps) => (
   <div className="flex flex-col gap-3 border-b pb-4 last:border-b-0">
-    <div className="text-sm text-foreground">{title}</div>
+    <div className="font-mono text-xs uppercase text-foreground">{title}</div>
     <div className="flex flex-col gap-3">{children}</div>
   </div>
 )
