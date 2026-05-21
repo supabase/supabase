@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { useFlag } from 'common'
 import { Loader2 } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useCallback, useReducer } from 'react'
 import { toast } from 'sonner'
@@ -9,7 +10,6 @@ import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
-import { SupportAssistantSuccessCard } from './SupportAssistantSuccessCard'
 import { createInitialSupportFormState, supportFormReducer } from './SupportForm.state'
 import { NO_PROJECT_MARKER, type SupportFormUrlKeys } from './SupportForm.utils'
 import { SupportFormV3 } from './SupportFormV3'
@@ -17,6 +17,10 @@ import { useSupportForm } from './useSupportForm'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
+
+const SupportAssistantSuccessCard = dynamic(() =>
+  import('./SupportAssistantSuccessCard').then((m) => m.SupportAssistantSuccessCard)
+)
 
 function useSupportFormTelemetry() {
   const { mutate: sendEvent } = useSendEventMutation()
