@@ -70,13 +70,12 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
-        'Create a Storage bucket named marketing-assets for our public website. The marketing team will use it for logos, product screenshots, and campaign images that visitors should be able to load directly.',
+        "I'm adding a place to store logos, product screenshots, and campaign images for our public marketing website. Visitors should be able to load those images directly on the site. How should I set that up in Supabase Storage?",
     },
     expected: {
-      requiredTools: ['execute_sql'],
       requiredKnowledge: ['storage'],
       correctAnswer:
-        'Assistant creates a marketing-assets bucket with storage.buckets.public = true. The Assistant must not add RLS policies to the public bucket.',
+        'Assistant recommends using a public Storage bucket for public website assets, such as marketing-assets. Public reads should be served through the bucket public setting, so the Assistant must not suggest adding broad storage.objects SELECT/RLS policies for public reads. Only discuss write policies if client-side uploads or updates are needed.',
     },
     metadata: {
       category: ['rls_policies'],
@@ -87,10 +86,9 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
-        "Create a Storage bucket named avatars for user profile pictures. Users can view other users' avatars but should only be able to add or update their own avatar.",
+        "I'm adding profile pictures to my app. People should be able to see each other's avatars, but each user should only be able to upload or replace their own picture. How should I set that up in Supabase Storage?",
     },
     expected: {
-      requiredTools: ['execute_sql'],
       requiredKnowledge: ['storage'],
       correctAnswer:
         "The avatars bucket is private rather than public. The SELECT policy on storage.objects is restrictive and allows only object retrieval/info operations for known avatar paths, such as by checking bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']). The answer does not use a broad SELECT policy like using (bucket_id = 'avatars') by itself, because that can allow clients to list all uploaded avatars. Upload and update policies are scoped to authenticated users and constrain users to their own avatar, using owner or path checks.",
