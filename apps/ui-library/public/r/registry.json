@@ -2438,7 +2438,8 @@
         }
       ],
       "dependencies": [
-        "@supabase/supabase-js@latest"
+        "@supabase/supabase-js@latest",
+        "lucide-vue-next@latest"
       ]
     },
     {
@@ -2473,7 +2474,8 @@
         }
       ],
       "dependencies": [
-        "@supabase/supabase-js@latest"
+        "@supabase/supabase-js@latest",
+        "lucide-vue-next@latest"
       ]
     },
     {
