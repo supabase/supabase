@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
 import { useMemo } from 'react'
+import { Skeleton } from 'ui'
 import {
   Chart,
   ChartActions,
@@ -56,15 +57,23 @@ export const EdgeFunctionInvocationsSection = ({
     () => getChartEmptyStateCopy('invocations', isErrorChart, chartErrorMessage),
     [chartErrorMessage, isErrorChart]
   )
-  const invocationTitle = isLoadingChart
-    ? 'Invocations'
-    : `${totalInvocationCount.toLocaleString('en-US')} total invocations`
-
   return (
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>{invocationTitle}</PageSectionTitle>
+          <PageSectionTitle>
+            {isLoadingChart ? (
+              <>
+                <Skeleton className="inline-block h-7 w-20 align-middle" />{' '}
+                <span className="text-foreground-light">Total Invocations</span>
+              </>
+            ) : (
+              <>
+                {totalInvocationCount.toLocaleString('en-US')}{' '}
+                <span className="text-foreground-light">Total Invocations</span>
+              </>
+            )}
+          </PageSectionTitle>
         </PageSectionSummary>
         {actions && actions.length > 0 ? (
           <PageSectionAside className="flex-wrap @xl:self-center">
