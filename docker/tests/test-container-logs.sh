@@ -25,13 +25,6 @@ pass_msg() {
     echo "  PASS: $1"
 }
 
-# The `docker ps` fallback in the helpers below exists because the script
-# doesn't know which compose `-f` flags the user ran `up` with. `docker compose
-# ps` only sees services defined in the currently loaded compose files, but
-# compose stamps `com.docker.compose.{project,service}` labels at `up` time -
-# so a label-based lookup finds the container regardless of which override
-# files are active in this shell.
-
 is_service_running() {
     service="$1"
     if docker compose ps --services --status running 2>/dev/null | grep -q "^$service$"; then
@@ -111,12 +104,8 @@ check_logs db \
 check_logs auth \
     'db worker started'
 
-check_logs_if_running kong \
+check_logs kong \
     'init.lua.*declarative config loaded'
-
-check_logs_if_running api-gw \
-     'Envoy configuration generated successfully' \
-     'Starting Envoy...'
 
 check_logs rest \
     'Schema cache loaded in.*milliseconds'
