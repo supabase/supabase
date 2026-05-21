@@ -75,7 +75,7 @@ export const dataset: AssistantEvalCase[] = [
     expected: {
       requiredTools: ['execute_sql'],
       correctAnswer:
-        'The marketing-assets bucket is public, such as storage.buckets.public = true or a Storage API call with public: true. The answer does not add a broad SELECT or ALL policy on storage.objects for public read access, because public buckets already allow object URL reads and broad SELECT policies can make bucket contents listable.',
+        'Assistant creates a marketing-assets bucket with storage.buckets.public = true. The Assistant must not add RLS policies to the public bucket.',
     },
     metadata: {
       category: ['rls_policies'],
@@ -86,7 +86,7 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
-        'Create a Storage bucket named avatars for user profile pictures. Users should be able to view known avatar images in the app with the public anon key, but clients should not be able to list all uploaded avatars. Users should only be able to upload or update their own avatar.',
+        "Create a Storage bucket named avatars for user profile pictures. Users can view other users' avatars but should only be able to add or update their own avatar.",
     },
     expected: {
       requiredTools: ['execute_sql'],
