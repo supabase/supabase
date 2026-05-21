@@ -10,7 +10,6 @@ import { CommandMenuTriggerInput } from 'ui-patterns'
 
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
-import { HeaderUpgradeButton } from './HeaderUpgradeButton'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
@@ -253,7 +252,6 @@ export const LayoutHeader = ({
                     )}
                   </AnimatePresence>
                 </div>
-                <HeaderUpgradeButton className="hidden md:flex" />
                 <UserDropdown triggerClassName="hidden md:flex" />
               </>
             ) : (

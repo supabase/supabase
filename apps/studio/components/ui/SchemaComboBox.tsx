@@ -5,12 +5,12 @@ import {
   AlertDescription,
   AlertTitle,
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -108,14 +108,14 @@ export const SchemaComboBox = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="p-0 w-56" side="bottom" align="start">
-            <Command_Shadcn_>
-              <CommandInput_Shadcn_ placeholder="Find schema..." />
-              <CommandList_Shadcn_>
-                <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
-                <CommandGroup_Shadcn_>
+            <Command>
+              <CommandInput placeholder="Find schema..." />
+              <CommandList>
+                <CommandEmpty>No schemas found</CommandEmpty>
+                <CommandGroup>
                   <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
                     {schemas?.map((schema) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={schema.id}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                         onSelect={() => toggleSchema(schema.name)}
@@ -125,12 +125,12 @@ export const SchemaComboBox = ({
                         {selectedSchemas.includes(schema.name) && (
                           <Check className="text-brand" strokeWidth={2} size={16} />
                         )}
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
                   </ScrollArea>
-                </CommandGroup_Shadcn_>
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
+                </CommandGroup>
+              </CommandList>
+            </Command>
           </PopoverContent>
         </Popover>
       )}
