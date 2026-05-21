@@ -16,6 +16,14 @@ import {
 import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
 import { LOGS_PREVIEW_SHORTCUT_IDS, logsPreviewRegistry } from './registry/logs-preview'
 import {
+  OBSERVABILITY_NAV_SHORTCUT_IDS,
+  observabilityNavRegistry,
+} from './registry/observability-nav'
+import {
+  OBSERVABILITY_PAGE_SHORTCUT_IDS,
+  observabilityPageRegistry,
+} from './registry/observability-page'
+import {
   REALTIME_INSPECTOR_SHORTCUT_IDS,
   realtimeInspectorRegistry,
 } from './registry/realtime-inspector'
@@ -120,6 +128,11 @@ export const SHORTCUT_IDS = {
   ...REALTIME_NAV_SHORTCUT_IDS,
   // Realtime Inspector page shortcuts
   ...REALTIME_INSPECTOR_SHORTCUT_IDS,
+
+  // Observability sub-page navigation chords
+  ...OBSERVABILITY_NAV_SHORTCUT_IDS,
+  // Observability shared page-action shortcuts
+  ...OBSERVABILITY_PAGE_SHORTCUT_IDS,
 
   // LogsPreviewer shortcuts (Function Logs, Function Invocations, Logs Explorer)
   ...LOGS_PREVIEW_SHORTCUT_IDS,
@@ -440,6 +453,11 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   ...realtimeNavRegistry,
   // Realtime Inspector page shortcut registration
   ...realtimeInspectorRegistry,
+
+  // Observability sub-page navigation chord registration
+  ...observabilityNavRegistry,
+  // Observability shared page-action shortcut registration
+  ...observabilityPageRegistry,
 
   // LogsPreviewer shortcut registration
   ...logsPreviewRegistry,

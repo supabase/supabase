@@ -17,6 +17,8 @@ import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
@@ -72,6 +74,14 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     minTotalTime,
     filterIndexAdvisor: indexAdvisor === 'true',
   })
+
+  useShortcut(
+    SHORTCUT_IDS.OBSERVABILITY_REFRESH,
+    () => {
+      queryPerformanceQuery.refetch()
+    },
+    { enabled: !queryPerformanceQuery.isRefetching }
+  )
 
   if (!isLoadingProject && !project) {
     return (

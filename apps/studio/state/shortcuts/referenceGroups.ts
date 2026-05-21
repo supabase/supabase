@@ -7,6 +7,7 @@ export const SHORTCUT_REFERENCE_GROUPS = {
   NAVIGATION_FUNCTIONS: 'navigation.functions',
   NAVIGATION_FUNCTION_DETAIL: 'navigation.function-detail',
   NAVIGATION_REALTIME: 'navigation.realtime',
+  NAVIGATION_OBSERVABILITY: 'navigation.observability',
 } as const
 
 export const SHORTCUT_REFERENCE_GROUP_LABELS: Record<string, string> = {
@@ -18,6 +19,7 @@ export const SHORTCUT_REFERENCE_GROUP_LABELS: Record<string, string> = {
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_FUNCTIONS]: 'Edge Functions Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_FUNCTION_DETAIL]: 'Edge Function Tabs',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_REALTIME]: 'Realtime Navigation',
+  [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_OBSERVABILITY]: 'Observability Navigation',
 }
 
 export const SHORTCUT_REFERENCE_GROUP_ORDER = [
@@ -38,6 +40,8 @@ export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   'functions-overview',
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_REALTIME,
   'realtime-inspector',
+  SHORTCUT_REFERENCE_GROUPS.NAVIGATION_OBSERVABILITY,
+  'observability-page',
   'logs-preview',
   'nav',
   'ai-assistant',
