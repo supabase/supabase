@@ -556,3 +556,99 @@ jobs:
             ota-proof-instant-container.json
             .ota/
           retention-days: 7
+
+  strict-e2e-ubuntu:
+    name: Ota Contract Matrix (Strict E2E - ubuntu-bash)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: 22
+
+      - name: Activate pnpm via Corepack
+        shell: bash
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.24.0 --activate
+          pnpm --version
+
+      - name: Setup ota
+        uses: ota-run/setup@v1
+
+      - name: Verify ota install
+        shell: bash
+        run: ota --version
+
+      - name: Strict run/up parity (native + container)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cleanup_state() {
+            ota clean . >/dev/null 2>&1 || true
+            if command -v lsof >/dev/null 2>&1; then
+              lsof -tiTCP:3000 -sTCP:LISTEN | xargs -r kill -9 || true
+            fi
+          }
+
+          assert_ready() {
+            local port="$1"
+            curl -fsS --max-time 5 "http://127.0.0.1:${port}/" >/dev/null
+          }
+
+          run_e2e_cmd() {
+            local label="$1"
+            local port="$2"
+            shift 2
+            local logfile="strict-${label}.log"
+
+            cleanup_state
+            echo "::group::${label}"
+            set +e
+            timeout --kill-after=15s 240s "$@" >"${logfile}" 2>&1
+            local rc=$?
+            set -e
+            cat "${logfile}"
+
+            if [ "${rc}" -eq 124 ] || [ "${rc}" -eq 137 ]; then
+              if ! assert_ready "${port}"; then
+                echo "::error title=${label} timed out before readiness::See ${logfile}"
+                exit 124
+              fi
+            elif [ "${rc}" -ne 0 ]; then
+              echo "::error title=${label} failed::See ${logfile}"
+              exit "${rc}"
+            fi
+
+            echo "::endgroup::"
+            cleanup_state
+          }
+
+          docker --version
+          docker info
+
+          run_e2e_cmd "run-native" 3000 ota run --native dev:www .
+          run_e2e_cmd "run-native-stream" 3000 ota run --native --stream dev:www .
+          run_e2e_cmd "run-container" 3000 ota run --container dev:www .
+          run_e2e_cmd "run-container-stream" 3000 ota run --container --stream dev:www .
+
+          run_e2e_cmd "up-native" 3000 ota up --native .
+          run_e2e_cmd "up-native-stream" 3000 ota up --native --stream .
+          run_e2e_cmd "up-container" 3000 ota up --container .
+          run_e2e_cmd "up-container-stream" 3000 ota up --container --stream .
+
+      - name: Upload strict e2e artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: ota-contract-matrix-strict-e2e-ubuntu
+          include-hidden-files: true
+          path: |
+            strict-*.log
+            .ota/
+          retention-days: 7

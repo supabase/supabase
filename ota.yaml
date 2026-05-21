@@ -22,6 +22,8 @@ execution:
       attachments:
         isolated_paths:
           - node_modules
+          - apps/www/.next
+          - apps/docs/.next
       container:
         image: node:22-bookworm
         engines:
