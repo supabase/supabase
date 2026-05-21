@@ -36,6 +36,7 @@ export const StoragePolicyEditorModalTitle = ({
             )}
           >
             <ChevronLeft strokeWidth={2} size={14} />
+            <span className="sr-only">Back</span>
           </button>
           <span>Select a template to use for your new policy</span>
         </div>
