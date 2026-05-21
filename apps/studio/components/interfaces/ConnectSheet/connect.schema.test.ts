@@ -330,7 +330,6 @@ describe('connect.schema:steps resolution', () => {
       const steps = resolveSteps(connectSchema, state)
 
       expect(steps.find((s) => s.id === 'codex-add-server')).toBeDefined()
-      expect(steps.find((s) => s.id === 'codex-enable-remote')).toBeDefined()
       expect(steps.find((s) => s.id === 'codex-authenticate')).toBeDefined()
       expect(steps.find((s) => s.id === 'codex-verify')).toBeDefined()
     })
@@ -446,9 +445,6 @@ describe('connect.schema:step content paths', () => {
 
     expect(steps.find((s) => s.id === 'codex-add-server')?.content).toBe(
       'steps/mcp/codex/add-server'
-    )
-    expect(steps.find((s) => s.id === 'codex-enable-remote')?.content).toBe(
-      'steps/mcp/codex/enable-remote'
     )
     expect(steps.find((s) => s.id === 'codex-authenticate')?.content).toBe(
       'steps/mcp/codex/authenticate'
