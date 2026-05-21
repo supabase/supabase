@@ -242,6 +242,7 @@ const stateOfStartupsData = {
       sections: [
         {
           title: 'Share of Codebase',
+          newInYear: 2026,
           description:
             'Among non-technical founders, the 76-to-100% share rises to 54%. Among 50-to-59-year-olds it rises to 80%. AI code generation is a median practice, not a fringe one.',
           stats: [
@@ -327,6 +328,7 @@ const stateOfStartupsData = {
         },
         {
           title: 'Auth and Identity',
+          newInYear: 2026,
           description:
             'Three in four respondents who answered the auth question picked Supabase Auth. The firm migration floor is the ~25% who picked no Supabase option at all.',
           stats: [
@@ -460,6 +462,7 @@ const stateOfStartupsData = {
         },
         {
           title: 'Multi-agent Systems',
+          newInYear: 2026,
           description:
             'Three in four agent-builders are already doing multi-agent work. 25% say it is in production. 21% in development. 36% are planning. Only 16% said no.',
           stats: [
@@ -498,6 +501,7 @@ const stateOfStartupsData = {
         },
         {
           title: 'The Operational Gap',
+          newInYear: 2026,
           description:
             'Prompt management, evaluation, and AI observability all paint the same picture: most teams ship agents without the operator stack underneath them. Whoever builds the operator tools for the next 500k AI startups has an open market.',
           stats: [],
@@ -508,6 +512,7 @@ const stateOfStartupsData = {
         },
         {
           title: 'MCP Adoption',
+          newInYear: 2026,
           description:
             'A year after the protocol launched, 57% of respondents have hands on it. Only 14% say they are unfamiliar. The speed of the on-ramp is what stands out.',
           stats: [

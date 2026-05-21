@@ -274,6 +274,7 @@ export default function StateOfStartups2026Content({
                   wordCloud={section.wordCloud}
                   summarizedAnswer={section.summarizedAnswer}
                   rankedAnswersPair={section.rankedAnswersPair}
+                  newInYear={(section as { newInYear?: 2025 | 2026 }).newInYear}
                 />
               ))}
             </SurveyChapter>

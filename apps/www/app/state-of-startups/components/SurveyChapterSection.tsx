@@ -25,6 +25,7 @@ import { SurveySectionBreak } from './SurveySectionBreak'
 import { SurveyStatCard, type SurveyStatSource } from './SurveyStatCard'
 import { SurveySummarizedAnswer } from './SurveySummarizedAnswer'
 import { SurveyWordCloud } from './SurveyWordCloud'
+import { useYear, type SurveyYear } from './year-context'
 
 interface SurveyChapterSectionProps {
   title: string
@@ -41,6 +42,13 @@ interface SurveyChapterSectionProps {
     answers: string[]
   }
   rankedAnswersPair?: Array<{ label: string; answers: string[] }>
+  /**
+   * Set when an entire section's data first appeared in a given survey year.
+   * If the user toggles the page to an earlier year, the section body is
+   * replaced with a "Not available in <prior year>" placeholder while the
+   * title and description still render.
+   */
+  newInYear?: SurveyYear
   children?: React.ReactNode
 }
 
@@ -52,9 +60,12 @@ export function SurveyChapterSection({
   wordCloud,
   summarizedAnswer,
   rankedAnswersPair,
+  newInYear,
   children,
 }: SurveyChapterSectionProps) {
   const accent = useAccent()
+  const { year } = useYear()
+  const isAvailableForYear = !newInYear || year >= newInYear
 
   const eyebrowColor = 'text-brand-link dark:text-brand'
 
@@ -94,36 +105,48 @@ export function SurveyChapterSection({
           </p>
         </header>
 
-        {stats && (
-          <aside className="border-t border-muted flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
-            {stats.map((stat, index) => (
-              <SurveyStatCard
-                key={index}
-                percent={stat.percent}
-                label={stat.label}
-                source={stat.source}
+        {isAvailableForYear ? (
+          <>
+            {stats && (
+              <aside className="border-t border-muted flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
+                {stats.map((stat, index) => (
+                  <SurveyStatCard
+                    key={index}
+                    percent={stat.percent}
+                    label={stat.label}
+                    source={stat.source}
+                  />
+                ))}
+              </aside>
+            )}
+
+            {charts?.map((chartName, index) => {
+              const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
+              return ChartComponent ? <ChartComponent key={index} /> : null
+            })}
+
+            {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
+
+            {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
+
+            {summarizedAnswer && (
+              <SurveySummarizedAnswer
+                label={summarizedAnswer.label}
+                answers={summarizedAnswer.answers}
               />
-            ))}
-          </aside>
+            )}
+
+            {children}
+          </>
+        ) : (
+          <div className="border-t border-muted px-8 py-16 flex flex-col items-center justify-center gap-2 text-center">
+            <p className="text-foreground-light text-balance">Not available in {year}.</p>
+            <p className="text-foreground-lighter text-sm text-balance">
+              This question was added to the {newInYear} survey. Switch the year toggle to{' '}
+              {newInYear} to view.
+            </p>
+          </div>
         )}
-
-        {charts?.map((chartName, index) => {
-          const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
-          return ChartComponent ? <ChartComponent key={index} /> : null
-        })}
-
-        {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
-
-        {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
-
-        {summarizedAnswer && (
-          <SurveySummarizedAnswer
-            label={summarizedAnswer.label}
-            answers={summarizedAnswer.answers}
-          />
-        )}
-
-        {children}
       </div>
 
       <SurveySectionBreak />
