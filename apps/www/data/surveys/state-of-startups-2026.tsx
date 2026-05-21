@@ -31,24 +31,69 @@ const stateOfStartupsData = {
       },
       sections: [
         {
-          title: 'Roles and Experience',
+          title: 'Solo Founders',
           description:
-            'Solo founders are 61% of respondents — the largest group on the page. 78% of founders are technical. Every age band above 40 has grown by a statistically significant margin.',
+            'Solo founders are 61% of respondents — the largest group on the page. Cofounder pairs slipped. The one-person startup is the dominant shape and is still growing.',
           stats: [
             {
               percent: 61,
-              label: 'Startups with a single founder',
+              label: 'One-founder startups',
               source: { column: 'founder_count', aggregation: 'single', target: '1' },
             },
             {
-              percent: 22,
-              label: 'Startups founded by non-technical founders',
+              percent: 25,
+              label: 'Two-founder startups',
+              source: { column: 'founder_count', aggregation: 'single', target: '2' },
+            },
+            {
+              percent: 14,
+              label: 'Three or more founders',
+              source: {
+                column: 'founder_count',
+                aggregation: 'single',
+                target: ['3', '4+'],
+              },
+            },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+        {
+          title: 'Non-Technical Founders',
+          description:
+            '78% of founders are technical. The 22% who aren’t lean harder on AI code generation than anyone else.',
+          stats: [
+            {
+              percent: 78,
+              label: 'Startups whose founders are technical',
               source: {
                 column: 'founders_are_technical',
                 aggregation: 'boolean',
-                target: 'FALSE',
+                target: 'TRUE',
               },
             },
+            {
+              percent: 47,
+              label: 'Founders who had previously started a company',
+              source: {
+                column: 'previous_company',
+                aggregation: 'boolean',
+                target: 'TRUE',
+              },
+            },
+          ],
+          charts: [],
+          wordCloud: undefined,
+          summarizedAnswer: undefined,
+          rankedAnswersPair: undefined,
+        },
+        {
+          title: 'Older Founders',
+          description:
+            'Every age band above 40 has grown by a statistically significant margin. The 22 to 29 cohort shrank by 5%. Seasoned operators are filling the gap, often with AI doing the typing.',
+          stats: [
             {
               percent: 26,
               label: 'Founders aged 40 or older',
@@ -58,26 +103,22 @@ const stateOfStartupsData = {
                 target: ['40–49', '50–59', '60+'],
               },
             },
-          ],
-          charts: ['RoleChart'],
-          wordCloud: undefined,
-          summarizedAnswer: undefined,
-          rankedAnswersPair: undefined,
-        },
-        {
-          title: 'Team Size and Funding',
-          description:
-            'Startups are mostly bootstrapped or at early stages of funding. They are small teams, and usually less than a year old.',
-          stats: [
             {
-              percent: 91,
-              label: 'Startups with 10 or fewer employees',
-              source: { column: 'team_size', aggregation: 'single', target: '1–10' },
+              percent: 35,
+              label: 'Founders aged 22 to 29',
+              source: { column: 'person_age', aggregation: 'single', target: '22–29' },
             },
-            { percent: 66, label: 'Startups under one year old' },
-            { percent: 6, label: 'Startups over 5 years old' },
+            {
+              percent: 10,
+              label: 'Founders aged 50 or older',
+              source: {
+                column: 'person_age',
+                aggregation: 'single',
+                target: ['50–59', '60+'],
+              },
+            },
           ],
-          charts: ['FundingStageChart'],
+          charts: [],
           wordCloud: undefined,
           summarizedAnswer: undefined,
           rankedAnswersPair: undefined,
@@ -89,11 +130,19 @@ const stateOfStartupsData = {
           stats: [
             {
               percent: 25,
-              label: 'Global startups based in Europe',
+              label: 'Startups headquartered in Europe',
               source: { column: 'location', aggregation: 'single', target: 'Europe' },
             },
-            { percent: 19, label: 'North American startups based in San Francisco' },
-            { percent: 9, label: 'North American startups based in New York City' },
+            {
+              percent: 50,
+              label: 'Startups headquartered in North America',
+              source: { column: 'location', aggregation: 'single', target: 'North America' },
+            },
+            {
+              percent: 14,
+              label: 'Startups headquartered in Asia',
+              source: { column: 'location', aggregation: 'single', target: 'Asia' },
+            },
           ],
           charts: ['LocationChart'],
           wordCloud: undefined,

@@ -77,6 +77,7 @@ const STAT_PRELOAD_QUERIES: Array<{ column: string; aggregation: StatAggregation
   { column: 'events', aggregation: 'multi' },
   // boolean
   { column: 'founders_are_technical', aggregation: 'boolean' },
+  { column: 'previous_company', aggregation: 'boolean' },
 ]
 
 const STAT_YEARS = [2025, 2026] as const
