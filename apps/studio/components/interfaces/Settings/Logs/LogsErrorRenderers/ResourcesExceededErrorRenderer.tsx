@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   copyToClipboard,
   InputGroup,
   InputGroupAddon,
@@ -27,10 +27,10 @@ const ResourcesExceededErrorRenderer: React.FC<ErrorRendererProps> = ({ error, i
         </p>
         {!isCustomQuery && <p>Please contact support if this error persists.</p>}
       </div>
-      <Accordion_Shadcn_ className="text-sm" type="single">
-        <AccordionItem_Shadcn_ value="1">
-          <AccordionTrigger_Shadcn_>Full error message</AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_>
+      <Accordion className="text-sm" type="single">
+        <AccordionItem value="1">
+          <AccordionTrigger>Full error message</AccordionTrigger>
+          <AccordionContent>
             <InputGroup>
               <InputGroupTextarea value={errorAsJson} className="font-mono" rows={5} />
               <InputGroupAddon align="block-end">
@@ -50,9 +50,9 @@ const ResourcesExceededErrorRenderer: React.FC<ErrorRendererProps> = ({ error, i
                 </InputGroupButton>
               </InputGroupAddon>
             </InputGroup>
-          </AccordionContent_Shadcn_>
-        </AccordionItem_Shadcn_>
-      </Accordion_Shadcn_>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   )
 }

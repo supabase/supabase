@@ -9,13 +9,13 @@ import {
   Button,
   ButtonProps,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Dialog,
   DialogClose,
   DialogContent,
@@ -81,13 +81,13 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[300px] p-0">
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ placeholder="Select organization..." />
-                <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No organizations found.</CommandEmpty_Shadcn_>
-                  <CommandGroup_Shadcn_>
+              <Command>
+                <CommandInput placeholder="Select organization..." />
+                <CommandList>
+                  <CommandEmpty>No organizations found.</CommandEmpty>
+                  <CommandGroup>
                     {organizations.map((organization) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={organization.slug}
                         value={organization.slug}
                         onSelect={(currentValue) => {
@@ -103,12 +103,12 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
                           )}
                         />
                         {organization.name}
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
-                  </CommandGroup_Shadcn_>
-                  <CommandSeparator_Shadcn_ />
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
+                  </CommandGroup>
+                  <CommandSeparator />
+                  <CommandGroup>
+                    <CommandItem
                       value="new-organization"
                       onSelect={(currentValue) => {
                         setValue(currentValue === value ? '' : currentValue)
@@ -123,10 +123,10 @@ const UpgradePlan = ({ organizations = [], onClick, size = 'large', planId }: Up
                         )}
                       />
                       <Plus className="h-4 w-4 mr-2" /> Create a new organization
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
             </PopoverContent>
           </Popover>
         </DialogSection>

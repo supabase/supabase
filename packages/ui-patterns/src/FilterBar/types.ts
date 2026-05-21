@@ -99,6 +99,9 @@ export type MenuItem = {
   operatorSymbol?: string
   isDefaultOperator?: boolean
   defaultValue?: string
+  isFreeformSearch?: boolean
+  freeformPropertyName?: string
+  freeformValue?: string
 }
 
 export type GroupedMenuItem = {

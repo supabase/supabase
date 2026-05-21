@@ -3,12 +3,7 @@
 import pricingFaq from '~/data/PricingFAQ.json'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 
 const PricingFAQs = () => {
   return (
@@ -16,24 +11,24 @@ const PricingFAQs = () => {
       <div className="sm:py-18 mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
         <h2 className="h3 text-center">Frequently asked questions</h2>
         <div className="my-16">
-          <Accordion_Shadcn_ type="multiple" className="text-foreground-light">
+          <Accordion type="multiple" className="text-foreground-light">
             {pricingFaq.map((faq, i) => {
               return (
                 <div className="border-b py-2" key={i}>
-                  <AccordionItem_Shadcn_ value={`faq--${i.toString()}`} className="border-none">
-                    <AccordionTrigger_Shadcn_>
+                  <AccordionItem value={`faq--${i.toString()}`} className="border-none">
+                    <AccordionTrigger>
                       <span className="text-foreground">{faq.question}</span>
-                    </AccordionTrigger_Shadcn_>
-                    <AccordionContent_Shadcn_>
+                    </AccordionTrigger>
+                    <AccordionContent>
                       <div className="prose text-foreground-lighter">
                         <ReactMarkdown>{faq.answer}</ReactMarkdown>
                       </div>
-                    </AccordionContent_Shadcn_>
-                  </AccordionItem_Shadcn_>
+                    </AccordionContent>
+                  </AccordionItem>
                 </div>
               )
             })}
-          </Accordion_Shadcn_>
+          </Accordion>
         </div>
         <p className="p text-center">
           Can&apos;t find the answer to your question?{' '}

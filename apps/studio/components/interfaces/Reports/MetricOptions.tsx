@@ -3,11 +3,11 @@ import { useParams } from 'common'
 import { Home, Plus } from 'lucide-react'
 import { useState } from 'react'
 import {
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   DropdownMenuCheckboxItem,
   DropdownMenuPortal,
   DropdownMenuSub,
@@ -118,14 +118,14 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
         </DropdownMenuSubTrigger>
         <DropdownMenuPortal>
           <DropdownMenuSubContent className="p-0">
-            <Command_Shadcn_ shouldFilter={false}>
-              <CommandInput_Shadcn_
+            <Command shouldFilter={false}>
+              <CommandInput
                 autoFocus
                 placeholder="Search snippets..."
                 value={search}
                 onValueChange={setSearch}
               />
-              <CommandList_Shadcn_>
+              <CommandList>
                 {isLoading ? (
                   <div className="flex flex-col p-1 gap-y-1">
                     <ShimmeringLoader />
@@ -136,9 +136,9 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                     No snippets found
                   </p>
                 ) : null}
-                <CommandGroup_Shadcn_>
+                <CommandGroup>
                   {snippets?.map((snippet) => (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       key={snippet.id}
                       value={snippet.id}
                       className="cursor-pointer"
@@ -163,15 +163,15 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                       }}
                     >
                       {snippet.name}
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   ))}
-                </CommandGroup_Shadcn_>
-              </CommandList_Shadcn_>
+                </CommandGroup>
+              </CommandList>
 
               <div className="h-px bg-border-overlay -mx-1" />
 
-              <CommandGroup_Shadcn_>
-                <CommandItem_Shadcn_
+              <CommandGroup>
+                <CommandItem
                   className="cursor-pointer w-full"
                   onSelect={() => {
                     editorPanelState.openAsNew()
@@ -182,9 +182,9 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                     <Plus size={14} strokeWidth={1.5} />
                     <p>Create snippet</p>
                   </div>
-                </CommandItem_Shadcn_>
-              </CommandGroup_Shadcn_>
-            </Command_Shadcn_>
+                </CommandItem>
+              </CommandGroup>
+            </Command>
           </DropdownMenuSubContent>
         </DropdownMenuPortal>
       </DropdownMenuSub>

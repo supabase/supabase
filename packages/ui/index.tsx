@@ -63,17 +63,7 @@ export * from './src/components/shadcn/ui/toggle-group'
 export * from './src/components/shadcn/ui/toggle'
 export * from './src/components/shadcn/ui/card'
 
-export {
-  Command as Command_Shadcn_,
-  CommandDialog as CommandDialog,
-  CommandInput as CommandInput_Shadcn_,
-  CommandList as CommandList_Shadcn_,
-  CommandEmpty as CommandEmpty_Shadcn_,
-  CommandGroup as CommandGroup_Shadcn_,
-  CommandItem as CommandItem_Shadcn_,
-  CommandShortcut as CommandShortcut_Shadcn_,
-  CommandSeparator as CommandSeparator_Shadcn_,
-} from './src/components/shadcn/ui/command'
+export * from './src/components/shadcn/ui/command'
 
 export * from './src/components/shadcn/ui/context-menu'
 
@@ -87,12 +77,7 @@ export * from './src/components/shadcn/ui/form'
 
 export * from './src/components/shadcn/ui/popover'
 
-export {
-  Accordion as Accordion_Shadcn_,
-  AccordionItem as AccordionItem_Shadcn_,
-  AccordionTrigger as AccordionTrigger_Shadcn_,
-  AccordionContent as AccordionContent_Shadcn_,
-} from './src/components/shadcn/ui/accordion'
+export * from './src/components/shadcn/ui/accordion'
 
 export * from './src/components/shadcn/ui/select'
 

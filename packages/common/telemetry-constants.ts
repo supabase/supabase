@@ -310,10 +310,13 @@ export interface ProjectCreationDefaultPrivilegesExposedEvent {
     /** Where the checkbox was shown. */
     surface: 'main' | 'vercel'
     /**
-     * State of the "Enable Data API" toggle at exposure time. Main flow only —
-     * the Vercel surface has no such toggle, so this is omitted there.
+     * Current state of the "Automatically expose new tables" checkbox
+     * (`dataApiDefaultPrivileges` form field) at exposure time. This is the
+     * field the experiment actually controls.
+     * true = default privileges granted (legacy behaviour)
+     * false = revoke SQL runs on create (new behaviour, treatment default)
      */
-    dataApiEnabled?: boolean
+    dataApiDefaultPrivileges: boolean
     /**
      * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
      * true = revoke cohort (checkbox defaulted to unchecked)
@@ -1454,6 +1457,21 @@ export interface SupportTicketSubmittedEvent {
  */
 export interface AiAssistantInSupportFormClickedEvent {
   action: 'ai_assistant_in_support_form_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the Assistant follow-up card after submitting a support ticket.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface SupportAssistantFollowUpCardClickedEvent {
+  action: 'support_assistant_follow_up_card_clicked'
+  properties: {
+    ticketCategory: string
+  }
   groups: Partial<TelemetryGroups>
 }
 
@@ -3040,18 +3058,6 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
- * User clicked the "Upgrade to Pro" CTA in the dashboard header.
- * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
- *
- * @group Events
- * @source studio
- */
-export interface HeaderUpgradeCtaClickedEvent {
-  action: 'header_upgrade_cta_clicked'
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3379,6 +3385,7 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
+  | SupportAssistantFollowUpCardClickedEvent
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
@@ -3450,7 +3457,6 @@ export type TelemetryEvent =
   | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
-  | HeaderUpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent

@@ -8,10 +8,10 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -228,26 +228,26 @@ const result = await index.putVectors({
               </div>
             </PopoverTrigger>
             <PopoverContent className="p-0 w-32" side="bottom" align="end">
-              <Command_Shadcn_>
-                <CommandList_Shadcn_>
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
+              <Command>
+                <CommandList>
+                  <CommandGroup>
+                    <CommandItem
                       className="cursor-pointer"
                       onSelect={() => onLanguageChange('sql')}
                       onClick={() => onLanguageChange('sql')}
                     >
                       <p>SQL</p>
-                    </CommandItem_Shadcn_>
-                    <CommandItem_Shadcn_
+                    </CommandItem>
+                    <CommandItem
                       className="cursor-pointer"
                       onSelect={() => onLanguageChange('javascript')}
                       onClick={() => onLanguageChange('javascript')}
                     >
                       <p>JavaScript</p>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
             </PopoverContent>
           </Popover>
 

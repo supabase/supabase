@@ -6,13 +6,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
-  Button,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import MenuItem from './MenuItem'
@@ -57,7 +51,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
   }, [setOpen])
 
   const AccordionMenuItem = ({ menuItem }: any) => (
-    <AccordionContent_Shadcn_ className="p-0">
+    <AccordionContent className="p-0">
       {menuItem.title === 'Product' ? (
         <>
           {Object.values(menuItem.subMenu)?.map((component: any) => (
@@ -171,24 +165,20 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
           ))}
         </div>
       ) : null}
-    </AccordionContent_Shadcn_>
+    </AccordionContent>
   )
 
   const Menu = () => (
-    <Accordion_Shadcn_ type="multiple" className="px-0">
+    <Accordion type="multiple" className="px-0">
       {menu.primaryNav.map((menuItem: any) => (
         <m.div variants={listItem} className="border-b [&>div]:rounded-none!">
           {menuItem.hasDropdown ? (
-            <AccordionItem_Shadcn_
-              id={menuItem.title}
-              value={menuItem.title}
-              className="border-none"
-            >
-              <AccordionTrigger_Shadcn_ className="py-2 pl-2 pr-4 text-base font-medium text-foreground hover:bg-surface-200">
+            <AccordionItem id={menuItem.title} value={menuItem.title} className="border-none">
+              <AccordionTrigger className="py-2 pl-2 pr-4 text-base font-medium text-foreground hover:bg-surface-200">
                 {menuItem.title}
-              </AccordionTrigger_Shadcn_>
+              </AccordionTrigger>
               <AccordionMenuItem menuItem={menuItem} />
-            </AccordionItem_Shadcn_>
+            </AccordionItem>
           ) : (
             <Link
               href={menuItem.url}
@@ -199,7 +189,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
           )}
         </m.div>
       ))}
-    </Accordion_Shadcn_>
+    </Accordion>
   )
 
   return (

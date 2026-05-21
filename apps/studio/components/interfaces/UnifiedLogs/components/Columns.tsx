@@ -1,11 +1,11 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
+import { parseAuthLogEventMessage } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
-import { TextWithTooltip } from './TextWithTooltip'
 import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
@@ -30,7 +30,7 @@ function shouldHideColumn(data: ColumnSchema[], columnKey: keyof ColumnSchema): 
 }
 
 // Generate dynamic columns based on data
-export function generateDynamicColumns(data: ColumnSchema[]): {
+export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
   columns: ColumnDef<ColumnSchema>[]
   columnVisibility: Record<string, boolean>
 } {
@@ -39,6 +39,32 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
   const hideEventMessage = shouldHideColumn(data, 'event_message')
 
   const columns: ColumnDef<ColumnSchema>[] = [
+    {
+      accessorKey: 'select',
+      header: '',
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center justify-center">
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )
+      },
+      enableHiding: false,
+      enableResizing: false,
+      enableSorting: false,
+      filterFn: (_row, _columnId, _filterValue) => true,
+      size: 48,
+      minSize: 48,
+      maxSize: 48,
+      meta: {
+        cellClassName: 'w-[32px]',
+        headerClassName: 'w-[32px]',
+      },
+    },
     // Level column - always visible
     {
       accessorKey: 'level',
@@ -179,7 +205,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       header: 'Pathname',
       cell: ({ row }) => {
         const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
-        return <TextWithTooltip text={value} />
+        return value
       },
       enableSorting: false,
       enableResizing: false,
@@ -197,7 +223,9 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       header: 'Event message',
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
+        const logType = row.original.log_type
         const logCount = row.original.log_count
+        const displayMessage = logType === 'auth' ? parseAuthLogEventMessage(value) : value
 
         return (
           <div className="flex flex-row gap-2 items-center">
@@ -213,11 +241,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
                 </TooltipContent>
               </Tooltip>
             )}
-            {value && (
-              <span className="text-muted-foreground">
-                <TextWithTooltip text={value} />
-              </span>
-            )}
+            {displayMessage && <span className="text-muted-foreground">{displayMessage}</span>}
           </div>
         )
       },
@@ -243,4 +267,6 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
 }
 
 // Static fallback columns
-export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns([]).columns
+export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns({
+  data: [],
+}).columns
