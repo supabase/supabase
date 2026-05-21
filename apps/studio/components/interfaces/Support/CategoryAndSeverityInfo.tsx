@@ -88,7 +88,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
           field.onChange(v)
         }
         return (
-          <FormItemLayout hideMessage layout="vertical" label="What issue are you having?">
+          <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
             <FormControl>
               <Select {...fieldWithoutRef} defaultValue={field.value} onValueChange={onValueChange}>
                 <SelectTrigger aria-label="Select an issue" className="w-full">

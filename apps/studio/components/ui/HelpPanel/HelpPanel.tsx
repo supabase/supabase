@@ -66,7 +66,12 @@ export const HelpPanel = ({
       </div>
       <div className="flex-1 overflow-hidden">
         {isSupportView ? (
-          <SupportForm initialParams={supportLinkQueryParams} />
+          <SupportForm
+            initialParams={supportLinkQueryParams}
+            onFinish={() => {
+              setView('home')
+            }}
+          />
         ) : (
           <div className="flex h-full flex-col overflow-y-auto pb-5">
             <HelpSection
