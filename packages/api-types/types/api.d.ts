@@ -1205,6 +1205,27 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/database/backups/schedule': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the backup schedule for a project */
+    get: operations['v1-get-backup-schedule']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * Updates the backup schedule time for a project
+     * @description Sets the time at which the daily backup runs. The change takes effect on the next backup window that includes the new time. If the new time has already passed for today, the first backup at the new time will occur the following day. It can only be updated 3 times per 24 hours.
+     */
+    patch: operations['v1-update-backup-schedule']
+    trace?: never
+  }
   '/v1/projects/{ref}/database/backups/undo': {
     parameters: {
       query?: never
@@ -2503,7 +2524,11 @@ export interface components {
       project_ref: string
       /** Format: date-time */
       review_requested_at?: string
-      /** @enum {string} */
+      /**
+       * @deprecated
+       * @description This field is deprecated. List action runs to get branch status instead.
+       * @enum {string}
+       */
       status:
         | 'CREATING_PROJECT'
         | 'RUNNING_MIGRATIONS'
@@ -3750,6 +3775,10 @@ export interface components {
           }
         | {
             /** @enum {string} */
+            type: 'x86_architecture'
+          }
+        | {
+            /** @enum {string} */
             type: 'project_hibernating'
           }
       )[]
@@ -4694,6 +4723,19 @@ export interface components {
       release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       target_version: string
     }
+    V1BackupScheduleResponse: {
+      /**
+       * @description Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.
+       * @example 04:00:00
+       */
+      schedule_for: string
+      /**
+       * Format: date-time
+       * @description Timestamp of when the backup schedule was last updated.
+       * @example 2026-05-04T14:40:44+00:00
+       */
+      updated_at: string
+    }
     V1BackupsResponse: {
       backups: {
         id: number
@@ -4949,6 +4991,7 @@ export interface components {
             | 'ipv4'
             | 'pitr.available_variants'
             | 'log_drains'
+            | 'audit_log_drains'
             | 'branching_limit'
             | 'branching_persistent'
             | 'auth.mfa_phone'
@@ -4966,6 +5009,7 @@ export interface components {
             | 'auth.custom_oauth.max_providers'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
+            | 'backup.schedule'
             | 'function.max_count'
             | 'function.size_limit_mb'
             | 'realtime.max_concurrent_users'
@@ -5301,6 +5345,16 @@ export interface components {
      *     } */
     V1UndoBody: {
       name: string
+    }
+    /** @example {
+     *       "schedule_for": "04:00:00"
+     *     } */
+    V1UpdateBackupScheduleBody: {
+      /**
+       * @description Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.
+       * @example 04:00:00
+       */
+      schedule_for: string
     }
     /** @example {
      *       "name": "Hello World",
@@ -9824,6 +9878,145 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-backup-schedule': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1BackupScheduleResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Feature requires a higher plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project or backup schedule not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve backup schedule */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-update-backup-schedule': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1UpdateBackupScheduleBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1BackupScheduleResponse']
+        }
+      }
+      /** @description Invalid schedule_for format */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Feature requires a higher plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project or backup schedule not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update backup schedule */
+      500: {
         headers: {
           [name: string]: unknown
         }
