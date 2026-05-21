@@ -10,6 +10,8 @@ import { BannerTOSUpdate } from '@/components/ui/BannerStack/Banners/BannerTOSUp
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
+const TOSUpdateExpiry = new Date('2026-06-01T00:00:00Z')
+
 export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
@@ -22,6 +24,8 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   )
 
   useEffect(() => {
+    if (Date.now() >= TOSUpdateExpiry.getTime()) return
+
     if (isSuccess && !TOSUpdateAcknowledged) {
       addBanner({
         id: 'tos-update-banner',

@@ -19,6 +19,11 @@ import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
+/**
+ * [Joshen] TOS update takes place from 6th June onwards, can remove from 4th July onwards as
+ * previously stated in the NoticeBanner
+ */
+
 export const BannerTOSUpdate = () => {
   const { dismissBanner } = useBannerStack()
   const [, setTOSUpdateAcknowledged] = useLocalStorageQuery(
