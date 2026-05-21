@@ -10,26 +10,26 @@ DATABASE_URL="${connectionStringPooler.direct}"
 `
     : deploymentMode.isSelfHosted
       ? `
-# Connect to Postgres via the self-hosted transaction-mode pooler
+# Connect to Postgres via the self-hosted transaction-mode Supavisor
 DATABASE_URL="${connectionStringPooler.transactionShared}"
 `
       : connectionStringPooler.transactionDedicated &&
           connectionStringPooler.ipv4SupportedForDedicatedPooler
         ? `
-# Connect to Postgres via the dedicated transaction-mode pooler (IPv4/IPv6)
+# Connect to Postgres via the dedicated transaction-mode PgBouncer (IPv4 or IPv6)
 DATABASE_URL="${connectionStringPooler.transactionDedicated}"
         `
         : connectionStringPooler.transactionDedicated &&
             !connectionStringPooler.ipv4SupportedForDedicatedPooler
           ? `
-# Connect to Postgres via the shared transaction-mode pooler (IPv4/IPv6)
+# Connect to Postgres via the shared transaction-mode pooler (IPv4-only)
 DATABASE_URL="${connectionStringPooler.transactionShared}"
 
-# If your network supports IPv6 or you purchased IPv4 add-on, use the dedicated transaction-mode pooler
+# For a paid project, if your network supports IPv6, or you purchased IPv4 add-on, use the dedicated transaction-mode PgBouncer as an alternative
 # DATABASE_URL="${connectionStringPooler.transactionDedicated}"
         `
           : `
-# Connect to Postgres via the shared transaction-mode pooler (IPv4/IPv6)
+# Connect to Postgres via the shared transaction-mode pooler (IPv4-only
 DATABASE_URL="${connectionStringPooler.transactionShared}"
 `
 
