@@ -14,8 +14,6 @@ info:
 functions:
   - id: initializing
     $ref: '@supabase/supabase-js.SupabaseClient.constructor'
-  - id: trace-propagation
-    $ref: '@supabase/supabase-js.TracePropagationOptions'
   - id: auth-api
     title: Overview
     notes: |
