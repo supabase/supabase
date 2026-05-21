@@ -2,29 +2,40 @@ import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-const ContentFile = ({ connectionStringPooler }: StepContentProps) => {
-  const files = [
-    {
-      name: '.env',
-      language: 'bash',
-      code:
-        connectionStringPooler.ipv4SupportedForDedicatedPooler &&
-        connectionStringPooler.transactionDedicated
-          ? `
+const ContentFile = ({ connectionStringPooler, deploymentMode }: StepContentProps) => {
+  const envCode = deploymentMode.isCli
+    ? `
+# Connect to Supabase via direct connection
+DATABASE_URL="${connectionStringPooler.direct}"
+`
+    : deploymentMode.isSelfHosted
+      ? `
+# Connect to self-hosted Supabase via transaction pooler.
+DATABASE_URL="${connectionStringPooler.transactionShared}"
+`
+      : connectionStringPooler.ipv4SupportedForDedicatedPooler &&
+          connectionStringPooler.transactionDedicated
+        ? `
 DATABASE_URL="${connectionStringPooler.transactionDedicated}"
         `
-          : connectionStringPooler.transactionDedicated &&
-              !connectionStringPooler.ipv4SupportedForDedicatedPooler
-            ? `
+        : connectionStringPooler.transactionDedicated &&
+            !connectionStringPooler.ipv4SupportedForDedicatedPooler
+          ? `
 # Use Shared connection pooler (supports both IPv4/IPv6)
 DATABASE_URL="${connectionStringPooler.transactionShared}"
 
 # If your network supports IPv6 or you purchased IPv4 addon, use dedicated pooler
 # DATABASE_URL="${connectionStringPooler.transactionDedicated}"
         `
-            : `
+          : `
 DATABASE_URL="${connectionStringPooler.transactionShared}"
-`,
+`
+
+  const files = [
+    {
+      name: '.env',
+      language: 'bash',
+      code: envCode,
     },
     {
       name: 'drizzle/schema.ts',

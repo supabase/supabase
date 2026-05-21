@@ -1,3 +1,5 @@
+import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
+
 // ============================================================================
 // Project Keys (existing)
 // ============================================================================
@@ -154,4 +156,5 @@ export interface StepContentProps {
   state: ConnectState
   projectKeys: ProjectKeys
   connectionStringPooler: ConnectionStringPooler
+  deploymentMode: DeploymentMode
 }

@@ -9,13 +9,14 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type {
   ConnectionStringPooler,
   ConnectState,
+  DeploymentMode,
   ProjectKeys,
   ResolvedStep,
   StepContentProps,
 } from './Connect.types'
 import { ConnectSheetStep } from './ConnectSheetStep'
 import { CopyPromptAdmonition } from './CopyPromptAdmonition'
-import { getConnectionStrings } from './DatabaseSettings.utils'
+import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
@@ -23,6 +24,7 @@ import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -55,7 +57,7 @@ function resolveContentPath(template: string, state: ConnectState): string {
 /**
  * Hook to fetch and prepare connection strings for step content.
  */
-function useConnectionStringPooler(): ConnectionStringPooler {
+function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionStringPooler {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
 
@@ -99,15 +101,15 @@ function useConnectionStringPooler(): ConnectionStringPooler {
       : undefined
 
   return useMemo(
-    () => ({
-      transactionShared: connectionStringsShared.pooler.uri,
-      sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
-      transactionDedicated: connectionStringsDedicated?.pooler.uri,
-      sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
-      ipv4SupportedForDedicatedPooler: !!ipv4Addon,
-      direct: connectionStringsShared.direct.uri,
-    }),
-    [connectionStringsShared, connectionStringsDedicated, ipv4Addon]
+    () =>
+      buildConnectionStringPooler({
+        deploymentMode,
+        connectionInfo,
+        connectionStringsShared,
+        connectionStringsDedicated,
+        ipv4Addon: !!ipv4Addon,
+      }),
+    [deploymentMode, connectionInfo, connectionStringsShared, connectionStringsDedicated, ipv4Addon]
   )
 }
 
@@ -120,11 +122,13 @@ function StepContent({
   state,
   projectKeys,
   connectionStringPooler,
+  deploymentMode,
 }: {
   contentId: string
   state: ConnectState
   projectKeys: ProjectKeys
   connectionStringPooler: ConnectionStringPooler
+  deploymentMode: DeploymentMode
 }) {
   // Resolve any template placeholders in the content path
   const filePath = useMemo(() => resolveContentPath(contentId, state), [contentId, state])
@@ -145,6 +149,7 @@ function StepContent({
       state={state}
       projectKeys={projectKeys}
       connectionStringPooler={connectionStringPooler}
+      deploymentMode={deploymentMode}
     />
   )
 }
@@ -152,7 +157,8 @@ function StepContent({
 export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsSectionProps) {
   const { ref } = useParams()
   const stepsContainerRef = useRef<HTMLDivElement | null>(null)
-  const connectionStringPooler = useConnectionStringPooler()
+  const deploymentMode = useDeploymentMode()
+  const connectionStringPooler = useConnectionStringPooler(deploymentMode)
 
   const { data: ipv4Addon } = useProjectAddonsQuery(
     { projectRef: ref },
@@ -164,10 +170,13 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     }
   )
   const showIpv4AddonNotice =
+    deploymentMode.isPlatform &&
     state.mode === 'direct' &&
     !ipv4Addon &&
     (state.connectionMethod === 'direct' ||
       (state.connectionMethod === 'transaction' && !state.useSharedPooler))
+
+  const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
 
   if (steps.length === 0) return null
 
@@ -192,6 +201,20 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
           />
         )}
 
+        {showSelfHostedMcpNotice && (
+          <Admonition
+            type="default"
+            title="MCP for self-hosted Supabase requires extra setup"
+            description="The configuration below points at the hosted Supabase MCP server. To use MCP against your self-hosted instance, follow the self-hosted MCP guide."
+            actions={[
+              <DocsButton
+                key="docs"
+                href="https://supabase.com/docs/guides/self-hosting/enable-mcp"
+              />,
+            ]}
+          />
+        )}
+
         <div className="mt-6" ref={stepsContainerRef}>
           {steps.map((step, index) => (
             <ConnectSheetStep
@@ -205,6 +228,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
                 state={state}
                 projectKeys={projectKeys}
                 connectionStringPooler={connectionStringPooler}
+                deploymentMode={deploymentMode}
               />
             </ConnectSheetStep>
           ))}

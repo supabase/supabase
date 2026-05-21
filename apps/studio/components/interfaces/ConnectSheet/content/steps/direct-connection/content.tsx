@@ -4,7 +4,7 @@ import { Badge } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getConnectionStrings } from '../../../DatabaseSettings.utils'
+import { buildConnectionStringPooler, getConnectionStrings } from '../../../DatabaseSettings.utils'
 import { IPv4StatusPanel, type IPv4Status } from './IPv4StatusPanel'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import {
@@ -16,6 +16,7 @@ import {
 } from '@/components/interfaces/ConnectSheet/Connect.constants'
 import type {
   ConnectionStringPooler,
+  DeploymentMode,
   StepContentProps,
 } from '@/components/interfaces/ConnectSheet/Connect.types'
 import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/ConnectionParameters'
@@ -48,7 +49,7 @@ const buildJdbcString = (params: { host: string; port: string; database: string;
  * We can however, consider to shift this logic into ConnectStepsSection, such that we can consider read replicas for
  * the other tabs like "Framework" and "ORM" too. However, leaving them out for now and only updating "Direct"
  */
-const useConnectionStringDatabases = () => {
+const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
 
@@ -101,14 +102,13 @@ const useConnectionStringDatabases = () => {
 
       return [
         db.identifier,
-        {
-          transactionShared: connectionStringsShared.pooler.uri,
-          sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
-          transactionDedicated: connectionStringsDedicated?.pooler.uri,
-          sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
-          ipv4SupportedForDedicatedPooler: !!ipv4Addon,
-          direct: connectionStringsShared.direct.uri,
-        },
+        buildConnectionStringPooler({
+          deploymentMode,
+          connectionInfo,
+          connectionStringsShared,
+          connectionStringsDedicated,
+          ipv4Addon: !!ipv4Addon,
+        }),
       ]
     })
   )
@@ -127,7 +127,7 @@ const CONNECTION_METHOD_TO_TELEMETRY: Record<
  * Step component for direct database connections.
  * Uses state to determine which connection string to show.
  */
-function DirectConnectionContent({ state }: StepContentProps) {
+function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const track = useTrack()
   const { ref: projectRef } = useParams()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
@@ -138,7 +138,7 @@ function DirectConnectionContent({ state }: StepContentProps) {
   const connectionMethod = (state.connectionMethod as ConnectionStringMethod) ?? 'direct'
   const useSharedPooler = Boolean(state.useSharedPooler)
 
-  const connectionStrings = useConnectionStringDatabases()
+  const connectionStrings = useConnectionStringDatabases(deploymentMode)
   const connectionStringPooler: ConnectionStringPooler | undefined =
     connectionStrings[connectionSource as keyof typeof connectionStrings]
   const hasIPv4Addon = connectionStringPooler?.ipv4SupportedForDedicatedPooler ?? false
@@ -257,9 +257,11 @@ function DirectConnectionContent({ state }: StepContentProps) {
         ? 'Shared Pooler'
         : null
 
+  const showSelfHostedDirectNotice = deploymentMode.isSelfHosted && connectionMethod === 'direct'
+
   return (
     <div className="flex flex-col gap-2">
-      {poolerBadge && !isHighAvailability && (
+      {deploymentMode.isPlatform && poolerBadge && !isHighAvailability && (
         <div className="flex items-center gap-x-2">
           <Badge>{poolerBadge}</Badge>
         </div>
@@ -274,7 +276,21 @@ function DirectConnectionContent({ state }: StepContentProps) {
       >
         {connectionString}
       </CodeBlock>
-      {projectRef && !isHighAvailability && (
+      {showSelfHostedDirectNotice && (
+        <p className="text-sm text-foreground-light">
+          Manually{' '}
+          <a
+            href="https://supabase.com/docs/guides/self-hosting/docker#exposing-your-postgres-database"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-foreground"
+          >
+            configurable
+          </a>{' '}
+          for self-hosted Supabase.
+        </p>
+      )}
+      {deploymentMode.isPlatform && projectRef && !isHighAvailability && (
         <div className="mt-2">
           <IPv4StatusPanel
             method={connectionMethod}

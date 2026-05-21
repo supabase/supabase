@@ -1,26 +1,36 @@
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
-import { IS_PLATFORM } from '@/lib/constants'
 
-const ContentFile = ({ connectionStringPooler }: StepContentProps) => {
-  const files = [
-    {
-      name: '.env.local',
-      language: 'bash',
-      code:
-        connectionStringPooler.ipv4SupportedForDedicatedPooler &&
-        connectionStringPooler.transactionDedicated
-          ? `
+const ContentFile = ({ connectionStringPooler, deploymentMode }: StepContentProps) => {
+  const envCode = deploymentMode.isCli
+    ? `
+# Connect to Supabase via direct connection
+DATABASE_URL="${connectionStringPooler.direct}"
+
+# Direct connection to the database. Used for migrations
+DIRECT_URL="${connectionStringPooler.direct}"
+`
+    : deploymentMode.isSelfHosted
+      ? `
+# Connect to self-hosted Supabase via transaction pooler.
+DATABASE_URL="${connectionStringPooler.transactionShared}?pgbouncer=true"
+
+# Connect to self-hosted Supabase via session pooler. Used for migrations.
+DIRECT_URL="${connectionStringPooler.sessionShared}"
+`
+      : connectionStringPooler.ipv4SupportedForDedicatedPooler &&
+          connectionStringPooler.transactionDedicated
+        ? `
 # Connect to Supabase via connection pooling.
 DATABASE_URL="${connectionStringPooler.transactionDedicated}?pgbouncer=true"
 
 # Direct connection to the database. Used for migrations.
 DIRECT_URL="${connectionStringPooler.sessionDedicated}"
         `
-          : connectionStringPooler.transactionDedicated &&
-              !connectionStringPooler.ipv4SupportedForDedicatedPooler
-            ? `
+        : connectionStringPooler.transactionDedicated &&
+            !connectionStringPooler.ipv4SupportedForDedicatedPooler
+          ? `
 # Connect to Supabase via Shared Connection Pooler
 DATABASE_URL="${connectionStringPooler.transactionShared}?pgbouncer=true"
 
@@ -31,13 +41,19 @@ DIRECT_URL="${connectionStringPooler.sessionShared}"
 # DATABASE_URL="${connectionStringPooler.transactionDedicated}?pgbouncer=true"
 # DIRECT_URL="${connectionStringPooler.sessionDedicated}"
  `
-            : `
-# Connect to Supabase ${IS_PLATFORM ? 'via connection pooling' : ''}
-DATABASE_URL="${IS_PLATFORM ? `${connectionStringPooler.transactionShared}?pgbouncer=true` : connectionStringPooler.direct}"
+          : `
+# Connect to Supabase via connection pooling
+DATABASE_URL="${connectionStringPooler.transactionShared}?pgbouncer=true"
 
-# Direct connection to the database. Used for migrations
-DIRECT_URL="${IS_PLATFORM ? connectionStringPooler.sessionShared : connectionStringPooler.direct}"
-`,
+# Direct connection to the database through Shared Pooler. Used for migrations.
+DIRECT_URL="${connectionStringPooler.sessionShared}"
+`
+
+  const files = [
+    {
+      name: '.env.local',
+      language: 'bash',
+      code: envCode,
     },
     {
       name: 'prisma/schema.prisma',

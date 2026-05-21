@@ -265,7 +265,8 @@ export const connectSchema: ConnectSchema = {
       type: 'radio-list',
       label: 'Connection Method',
       options: { source: 'connectionMethods' },
-      defaultValue: 'direct',
+      // Default is set per deployment mode by useConnectState.setMode('direct'):
+      // platform/CLI → 'direct', self-hosted → 'session'.
     },
     useSharedPooler: {
       id: 'useSharedPooler',
