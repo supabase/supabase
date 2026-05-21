@@ -1,6 +1,6 @@
-import { reactive, watch, onMounted, computed, toRefs } from 'vue'
 import { PostgrestQueryBuilder, type PostgrestClientOptions } from '@supabase/postgrest-js'
 import { type SupabaseClient } from '@supabase/supabase-js'
+import { computed, onMounted, reactive, toRefs, watch } from 'vue'
 
 // @ts-ignore
 import { createClient } from '@/lib/supabase/client'
@@ -34,8 +34,7 @@ type Database =
 
 type DatabaseSchema = Database['public']
 type SupabaseTableName = keyof DatabaseSchema['Tables']
-type SupabaseTableData<T extends SupabaseTableName> =
-  DatabaseSchema['Tables'][T]['Row']
+type SupabaseTableData<T extends SupabaseTableName> = DatabaseSchema['Tables'][T]['Row']
 
 type DefaultClientOptions = PostgrestClientOptions
 
@@ -76,7 +75,7 @@ interface State<TData> {
 
 export function useInfiniteQuery<
   TData extends SupabaseTableData<T>,
-  T extends SupabaseTableName = SupabaseTableName
+  T extends SupabaseTableName = SupabaseTableName,
 >(props: UseInfiniteQueryProps<T>) {
   const state = reactive<State<TData>>({
     data: [],
@@ -96,10 +95,7 @@ export function useInfiniteQuery<
     // Capture the current request token to validate this request later
     const requestToken = state.requestCounter
 
-    if (
-      state.hasInitialFetch &&
-      (state.isFetching || state.data.length >= state.count)
-    ) {
+    if (state.hasInitialFetch && (state.isFetching || state.data.length >= state.count)) {
       return
     }
 
@@ -118,10 +114,7 @@ export function useInfiniteQuery<
       query = props.trailingQuery(query)
     }
 
-    const { data, count, error } = await query.range(
-      skip,
-      skip + pageSize.value - 1
-    )
+    const { data, count, error } = await query.range(skip, skip + pageSize.value - 1)
 
     // Verify that this request is still valid before mutating state
     if (requestToken !== state.requestCounter) {
@@ -183,9 +176,7 @@ export function useInfiniteQuery<
     }
   })
 
-  const hasMore = computed(
-    () => state.count > state.data.length
-  )
+  const hasMore = computed(() => state.count > state.data.length)
 
   return {
     ...toRefs(state),

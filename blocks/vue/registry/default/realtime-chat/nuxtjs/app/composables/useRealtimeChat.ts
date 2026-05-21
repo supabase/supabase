@@ -1,6 +1,7 @@
-import { ref, watch, onUnmounted } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
+
 // @ts-ignore
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from '@/lib/supabase/client'
 
 interface UseRealtimeChatProps {
   roomName: string

@@ -89,6 +89,7 @@ This example will filter based on a search param like `example.com/?q=hello`.
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+
 import { useInfiniteQuery } from '@/hooks/use-infinite-query'
 
 const route = useRoute()
@@ -125,7 +126,8 @@ The following component abstracts the composable into a component. It includes f
 
 ```vue
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+
 import {
   SupabaseQueryHandler,
   SupabaseTableData,
@@ -148,13 +150,7 @@ interface InfiniteListProps<TableName extends SupabaseTableName> {
 
 const props = defineProps<InfiniteListProps<any>>()
 
-const {
-  data,
-  isFetching,
-  hasMore,
-  fetchNextPage,
-  isSuccess,
-} = useInfiniteQuery({
+const { data, isFetching, hasMore, fetchNextPage, isSuccess } = useInfiniteQuery({
   tableName: props.tableName,
   columns: props.columns,
   pageSize: props.pageSize,
@@ -211,9 +207,7 @@ onBeforeUnmount(() => {
 
       <template v-if="!hasMore && data.length > 0">
         <slot name="end">
-          <div class="text-center text-muted-foreground py-4 text-sm">
-            You've reached the end.
-          </div>
+          <div class="text-center text-muted-foreground py-4 text-sm">You've reached the end.</div>
         </slot>
       </template>
     </div>

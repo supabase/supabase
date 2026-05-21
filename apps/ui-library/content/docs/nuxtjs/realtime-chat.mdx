@@ -41,14 +41,11 @@ This design keeps latency extremely low, but it means you should use the `onMess
 
 ```html
 <script setup lang="ts">
-import RealtimeChat from '@/components/realtime-chat.vue'
+  import RealtimeChat from '@/components/realtime-chat.vue'
 </script>
 
 <template>
-  <RealtimeChat
-    roomName="my-chat-room"
-    username="john_doe"
-  />
+  <RealtimeChat roomName="my-chat-room" username="john_doe" />
 </template>
 ```
 
@@ -56,18 +53,14 @@ import RealtimeChat from '@/components/realtime-chat.vue'
 
 ```html
 <script setup lang="ts">
-import RealtimeChat from '@/components/realtime-chat.vue'
-import { useMessagesQuery } from '@/composables/use-messages-query'
+  import RealtimeChat from '@/components/realtime-chat.vue'
+  import { useMessagesQuery } from '@/composables/use-messages-query'
 
-const { data } = useMessagesQuery()
+  const { data } = useMessagesQuery()
 </script>
 
 <template>
-  <RealtimeChat
-    roomName="my-chat-room"
-    username="john_doe"
-    :messages="data ?? []"
-  />
+  <RealtimeChat roomName="my-chat-room" username="john_doe" :messages="data ?? []" />
 </template>
 ```
 
@@ -75,17 +68,17 @@ const { data } = useMessagesQuery()
 
 ```html
 <script setup lang="ts">
-import RealtimeChat from '@/components/realtime-chat.vue'
-import { useMessagesQuery } from '@/composables/use-messages-query'
-import { storeMessages } from '@/lib/store-messages'
-import type { ChatMessage } from '@/types'
+  import RealtimeChat from '@/components/realtime-chat.vue'
+  import { useMessagesQuery } from '@/composables/use-messages-query'
+  import { storeMessages } from '@/lib/store-messages'
+  import type { ChatMessage } from '@/types'
 
-const { data } = useMessagesQuery()
+  const { data } = useMessagesQuery()
 
-// Callback function for new messages
-const handleMessage = async (messages: ChatMessage[]) => {
-  await storeMessages(messages)
-}
+  // Callback function for new messages
+  const handleMessage = async (messages: ChatMessage[]) => {
+    await storeMessages(messages)
+  }
 </script>
 
 <template>
