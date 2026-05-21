@@ -624,24 +624,41 @@ jobs:
             local limit_seconds="$3"
             shift 3
             local logfile="strict-${label}.log"
+            local ready=0
 
             cleanup_state
             echo "::group::${label}"
-            set +e
-            timeout --kill-after=15s "${limit_seconds}" "$@" >"${logfile}" 2>&1
-            local rc=$?
-            set -e
-            cat "${logfile}"
+            "$@" >"${logfile}" 2>&1 &
+            local cmd_pid=$!
+            local elapsed=0
 
-            if [ "${rc}" -eq 124 ] || [ "${rc}" -eq 137 ]; then
-              if ! assert_ready "${port}"; then
-                echo "::error title=${label} timed out before readiness::See ${logfile}"
-                exit 124
+            while [ "${elapsed}" -lt "${limit_seconds%?}" ]; do
+              if assert_ready "${port}"; then
+                ready=1
+                break
               fi
-            elif [ "${rc}" -ne 0 ]; then
-              echo "::error title=${label} failed::See ${logfile}"
-              exit "${rc}"
+              if ! kill -0 "${cmd_pid}" >/dev/null 2>&1; then
+                break
+              fi
+              sleep 2
+              elapsed=$((elapsed + 2))
+            done
+
+            if [ "${ready}" -eq 1 ]; then
+              kill -TERM "${cmd_pid}" >/dev/null 2>&1 || true
+              sleep 1
+              kill -KILL "${cmd_pid}" >/dev/null 2>&1 || true
+              wait "${cmd_pid}" >/dev/null 2>&1 || true
+              cat "${logfile}"
+              echo "::endgroup::"
+              cleanup_state
+              return 0
             fi
+
+            wait "${cmd_pid}" >/dev/null 2>&1 || true
+            cat "${logfile}"
+            echo "::error title=${label} failed before readiness::See ${logfile}"
+            exit 1
 
             echo "::endgroup::"
             cleanup_state
