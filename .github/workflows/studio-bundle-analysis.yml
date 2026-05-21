@@ -1,0 +1,136 @@
+name: Studio Bundle Analysis
+
+# Catches regressions where a PR balloons the per-page or shared First Load JS
+# bundle. Reads thresholds from apps/studio/package.json#nextBundleAnalysis.
+# Background: a PR in May 2026 pulled the AI Assistant graph into the global
+# HelpPanel chunk, blowing up every route and OOM-ing Vercel builds. This
+# workflow exists to make that class of regression visible (and blocking)
+# pre-merge.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'apps/studio/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  analyze:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            relevant:
+              - 'apps/studio/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        if: steps.filter.outputs.relevant == 'true'
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        if: steps.filter.outputs.relevant == 'true'
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install deps
+        if: steps.filter.outputs.relevant == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build studio with analyzer
+        if: steps.filter.outputs.relevant == 'true'
+        env:
+          ANALYZE: 'true'
+          SKIP_ASSET_UPLOAD: '1'
+          NEXT_PUBLIC_IS_PLATFORM: 'true'
+          NEXT_PUBLIC_STUDIO_AUTH_MODE: supabase
+          NODE_OPTIONS: '--max_old_space_size=6144'
+        run: pnpm --filter studio build
+
+      - name: Generate bundle analysis report
+        if: steps.filter.outputs.relevant == 'true'
+        run: npx --yes -p nextjs-bundle-analysis@0.6.0 report
+        working-directory: ./apps/studio
+
+      # On PRs: pull the base branch's stats so we can diff against them.
+      # On master pushes: this step is skipped; the build below will be saved
+      # as the new base.
+      - name: Restore base branch bundle stats
+        if: steps.filter.outputs.relevant == 'true' && github.event_name == 'pull_request'
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ./apps/studio/.next/analyze/base
+          key: bundle-analysis-${{ github.event.pull_request.base.sha }}
+
+      - name: Compare against base
+        if: steps.filter.outputs.relevant == 'true' && github.event_name == 'pull_request'
+        run: |
+          if [ ! -f ./.next/analyze/base/bundle/__bundle_analysis.json ]; then
+            echo "No base stats cached for ${{ github.event.pull_request.base.sha }} — skipping diff."
+            echo "skip_comment=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          npx --yes -p nextjs-bundle-analysis@0.6.0 compare
+        id: compare
+        working-directory: ./apps/studio
+
+      - name: Comment on PR
+        if: steps.filter.outputs.relevant == 'true' && github.event_name == 'pull_request' && steps.compare.outputs.skip_comment != 'true'
+        uses: marocchino/sticky-pull-request-comment@52423e01640425a022ef5fd42c6fb5f633a02728 # v2.9.1
+        with:
+          header: studio-bundle-analysis
+          path: ./apps/studio/.next/analyze/__bundle_analysis_comment.txt
+
+      - name: Fail if any page exceeds budget
+        if: steps.filter.outputs.relevant == 'true' && github.event_name == 'pull_request' && steps.compare.outputs.skip_comment != 'true'
+        run: |
+          if grep -q '🔴' ./.next/analyze/__bundle_analysis_comment.txt; then
+            echo "::error::Bundle budget exceeded. See PR comment for per-route deltas."
+            exit 1
+          fi
+        working-directory: ./apps/studio
+
+      # On master pushes only: stage the just-built stats into the layout
+      # that `compare` expects (base/bundle/) and save under the commit SHA so
+      # future PRs whose base is this SHA can diff against it.
+      - name: Stage stats as new base
+        if: steps.filter.outputs.relevant == 'true' && github.event_name == 'push'
+        run: |
+          mkdir -p ./.next/analyze/base/bundle
+          cp ./.next/analyze/__bundle_analysis.json ./.next/analyze/base/bundle/__bundle_analysis.json
+        working-directory: ./apps/studio
+
+      - name: Save base branch bundle stats
+        if: steps.filter.outputs.relevant == 'true' && github.event_name == 'push'
+        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ./apps/studio/.next/analyze/base
+          key: bundle-analysis-${{ github.sha }}
+
+      - name: Upload analyzer artifacts
+        if: steps.filter.outputs.relevant == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: studio-bundle-analysis
+          path: ./apps/studio/.next/analyze
+          retention-days: 7

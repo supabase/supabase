@@ -204,5 +204,11 @@
     "vite": "catalog:",
     "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
+  },
+  "nextBundleAnalysis": {
+    "budget": 358400,
+    "budgetPercentIncreaseRed": 10,
+    "minimumChangeThreshold": 1024,
+    "showDetails": true
   }
 }
