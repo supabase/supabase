@@ -3,7 +3,7 @@ import { Mail } from 'lucide-react'
 import {
   parseSupportAssistantPrompt,
   type ParsedSupportAssistantPrompt,
-} from '@/components/interfaces/Support/SupportAssistant.utils'
+} from './SupportRequestMessage.utils'
 
 export function parseSupportRequestMessage(text: string) {
   return parseSupportAssistantPrompt(text)

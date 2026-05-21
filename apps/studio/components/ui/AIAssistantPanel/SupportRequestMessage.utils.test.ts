@@ -1,8 +1,11 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { describe, expect, it } from 'vitest'
 
-import { buildSupportAssistantPrompt, parseSupportAssistantPrompt } from './SupportAssistant.utils'
-import type { SubmittedSupportRequest } from './SupportForm.state'
+import {
+  buildSupportAssistantPrompt,
+  parseSupportAssistantPrompt,
+} from './SupportRequestMessage.utils'
+import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
 
 const supportRequest: SubmittedSupportRequest = {
   organizationSlug: 'org-1',

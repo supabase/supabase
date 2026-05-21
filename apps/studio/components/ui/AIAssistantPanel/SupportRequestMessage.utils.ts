@@ -1,4 +1,4 @@
-import type { SubmittedSupportRequest } from './SupportForm.state'
+import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
 
 const SUPPORT_ASSISTANT_FIELD_LABELS = {
   assistant_context: 'Assistant context',

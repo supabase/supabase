@@ -13,11 +13,11 @@ import {
   Skeleton,
 } from 'ui'
 
-import { buildSupportAssistantPrompt } from './SupportAssistant.utils'
 import type { SubmittedSupportRequest } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Message } from '@/components/ui/AIAssistantPanel/Message'
+import { buildSupportAssistantPrompt } from '@/components/ui/AIAssistantPanel/SupportRequestMessage.utils'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot, type AiAssistantState } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
