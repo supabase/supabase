@@ -76,6 +76,7 @@ export const SHORTCUT_IDS = {
   NAV_ORG_BILLING: 'nav.org-billing',
   NAV_ORG_SETTINGS: 'nav.org-settings',
   SHORTCUTS_OPEN_REFERENCE: 'shortcuts.open-reference',
+  CONNECT_OPEN_SHEET: 'connect.open-sheet',
 
   // Table editor shortcuts
   ...TABLE_EDITOR_SHORTCUT_IDS,
@@ -160,11 +161,13 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.AI_ASSISTANT_TOGGLE,
     label: 'Toggle AI Assistant panel',
     sequence: ['Mod+I'],
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
   },
   [SHORTCUT_IDS.INLINE_EDITOR_TOGGLE]: {
     id: SHORTCUT_IDS.INLINE_EDITOR_TOGGLE,
     label: 'Toggle inline SQL editor',
     sequence: ['Mod+E'],
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
   },
   [SHORTCUT_IDS.RESULTS_COPY_MARKDOWN]: {
     id: SHORTCUT_IDS.RESULTS_COPY_MARKDOWN,
@@ -384,6 +387,14 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     label: 'Show all keyboard shortcuts',
     sequence: ['Mod+/'],
     showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [SHORTCUT_IDS.CONNECT_OPEN_SHEET]: {
+    id: SHORTCUT_IDS.CONNECT_OPEN_SHEET,
+    label: 'Open Connect sheet',
+    sequence: ['O', 'C'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
     options: { ignoreInputs: true },
   },
 
