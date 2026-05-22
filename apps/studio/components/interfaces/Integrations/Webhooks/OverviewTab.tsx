@@ -14,7 +14,7 @@ import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-const WebhooksCustomContent = () => {
+const WebhooksContent = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -88,23 +88,12 @@ const WebhooksCustomContent = () => {
   )
 }
 
-export const WebhooksContent = () => {
-  return (
-    <>
-      <RequiredExtensionsSection />
-      <WebhooksCustomContent />
-    </>
-  )
-}
-
 export const WebhooksOverviewTab = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   if (isMarketplaceEnabled) {
-    return <WebhooksContent />
+    return <RequiredExtensionsSection />
   }
 
-  return (
-    <IntegrationOverviewTab hideRequiredExtensionsSection actions={<WebhooksCustomContent />} />
-  )
+  return <IntegrationOverviewTab hideRequiredExtensionsSection actions={<WebhooksContent />} />
 }

@@ -70,7 +70,7 @@ export const MarketplaceDetail = () => {
     }
     if (isInstalled) {
       return (
-        <Button type="outline" disabled icon={<Settings size={13} />}>
+        <Button type="outline" disabled>
           Installed
         </Button>
       )
