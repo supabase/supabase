@@ -114,6 +114,7 @@ const ReportFilterBar = ({
   ]
   const [showAdder, setShowAdder] = useState(false)
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const [showProductFilter, setShowProductFilter] = useState(false)
   const [currentProductFilter, setCurrentProductFilter] = useState<
     null | (typeof PRODUCT_FILTERS)[number]
   >(null)
@@ -192,6 +193,13 @@ const ReportFilterBar = ({
   useShortcut(SHORTCUT_IDS.OBSERVABILITY_RESET_FILTERS, handleClearFilters, {
     enabled: customFilters.length > 0,
   })
+  useShortcut(
+    SHORTCUT_IDS.OBSERVABILITY_FILTER_REQUESTS,
+    () => {
+      setShowProductFilter((open) => !open)
+    },
+    { enabled: !selectedProduct }
+  )
 
   const getInitialDatePickerValue = () => {
     if (initialDatePickerValue) {
@@ -244,18 +252,24 @@ const ReportFilterBar = ({
           />
         )}
         {!selectedProduct && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                className="inline-flex flex-row gap-2"
-                iconRight={<ChevronDown size={14} />}
-              >
-                <span>
-                  {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
+          <DropdownMenu open={showProductFilter} onOpenChange={setShowProductFilter}>
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_FILTER_REQUESTS}
+              side="bottom"
+              open={showProductFilter ? false : undefined}
+            >
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="default"
+                  className="inline-flex flex-row gap-2"
+                  iconRight={<ChevronDown size={14} />}
+                >
+                  <span>
+                    {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+            </ShortcutTooltip>
             <DropdownMenuContent side="bottom" align="start">
               <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
                 <Network size={14} strokeWidth={1.5} className="mr-2" />

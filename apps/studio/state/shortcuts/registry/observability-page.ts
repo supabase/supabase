@@ -14,6 +14,7 @@ export const OBSERVABILITY_PAGE_SHORTCUT_IDS = {
   OBSERVABILITY_RESET_FILTERS: 'observability.reset-filters',
   OBSERVABILITY_NEW_REPORT: 'observability.new-report',
   OBSERVABILITY_RESET_REPORT: 'observability.reset-report',
+  OBSERVABILITY_FILTER_REQUESTS: 'observability.filter-requests',
 }
 
 export type ObservabilityPageShortcutId =
@@ -59,6 +60,13 @@ export const observabilityPageRegistry: RegistryDefinations<ObservabilityPageSho
     id: OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_RESET_REPORT,
     label: 'Reset report',
     sequence: ['R', 'C'],
+    showInSettings: false,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
+  },
+  [OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_FILTER_REQUESTS]: {
+    id: OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_FILTER_REQUESTS,
+    label: 'Filter requests',
+    sequence: ['Shift+S'],
     showInSettings: false,
     options: { ignoreInputs: true, registerInCommandMenu: true },
   },
