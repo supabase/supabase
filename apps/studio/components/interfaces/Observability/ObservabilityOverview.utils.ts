@@ -34,6 +34,8 @@ export type OverviewData = {
     overallSuccessRate: number
   }
   isLoading: boolean
+  startDate: string
+  endDate: string
 }
 
 export const calculateErrorRate = (data: LogsBarChartDatum[]): number => {

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -37,6 +38,8 @@ export type ServiceHealthTableProps = {
   serviceData: Record<string, ServiceData>
   onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
   datetimeFormat: string
+  startDate: string
+  endDate: string
 }
 
 const colorClassMap: Record<string, string> = {
@@ -59,7 +62,6 @@ const formatPercent = (value: number) =>
   value >= 1 ? `${value.toFixed(1)}%` : `${value.toFixed(2)}%`
 
 const getSubtitle = (data: ServiceData) => {
-  if (data.isLoading) return ''
   if (data.total === 0) return 'No traffic'
 
   const errorRate = data.errorRate
@@ -70,78 +72,112 @@ const getSubtitle = (data: ServiceData) => {
   return `${data.total.toLocaleString()} requests`
 }
 
-type ServiceRowProps = {
+type ServiceCellProps = {
   service: ServiceConfig
   data: ServiceData
   onBarClick: (datum: LogsBarChartDatum) => void
   datetimeFormat: string
+  startDate: string
+  endDate: string
+  className?: string
 }
 
-const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowProps) => {
+const EmptyChartPlaceholder = ({
+  startDate,
+  endDate,
+  datetimeFormat,
+}: {
+  startDate: string
+  endDate: string
+  datetimeFormat: string
+}) => (
+  <div className="flex flex-col h-full justify-end">
+    <div className="h-px w-full bg-border" />
+    <div className="text-foreground-lighter mt-1 flex items-center justify-between text-[10px] font-mono">
+      <span>{dayjs(startDate).format(datetimeFormat)}</span>
+      <span>{dayjs(endDate).format(datetimeFormat)}</span>
+    </div>
+  </div>
+)
+
+const ServiceCell = ({
+  service,
+  data,
+  onBarClick,
+  datetimeFormat,
+  startDate,
+  endDate,
+  className,
+}: ServiceCellProps) => {
   const reportUrl = service.reportUrl || service.logsUrl
   const { color } = getHealthStatus(data.errorRate, data.total)
-  const subtitle = getSubtitle(data)
   const description = SERVICE_DESCRIPTIONS[service.key] || service.description
 
   return (
     <Link
       href={reportUrl}
-      className="group flex items-center gap-4 px-card py-3 border-b border-default last:border-b-0 hover:bg-surface-200 transition-colors"
+      className={cn('group block px-card py-4 hover:bg-surface-200 transition-colors', className)}
     >
-      <div className="flex items-center gap-3 w-48 shrink-0 min-w-0">
-        <div
-          className={cn('w-1.5 h-1.5 rounded-full shrink-0', colorClassMap[color] || 'bg-muted')}
-        />
-        <div className="flex flex-col min-w-0">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-foreground text-sm font-medium truncate">{service.name}</span>
-            {description && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={(e) => e.preventDefault()}
-                    className="text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
-                    aria-label={`About ${service.name}`}
-                  >
-                    <HelpCircle size={12} />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs">
-                  <p>{description}</p>
-                </TooltipContent>
-              </Tooltip>
+      <div className="flex items-start justify-between mb-3 gap-2">
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className={cn('w-1.5 h-1.5 rounded-full shrink-0', colorClassMap[color] || 'bg-muted')}
+          />
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="text-foreground text-sm font-medium truncate">{service.name}</span>
+              {description && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => e.preventDefault()}
+                      className="text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
+                      aria-label={`About ${service.name}`}
+                    >
+                      <HelpCircle size={12} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    <p>{description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+            {data.isLoading ? (
+              <Skeleton className="h-3 w-20 mt-0.5" />
+            ) : (
+              <span className="text-foreground-lighter text-xs truncate">{getSubtitle(data)}</span>
             )}
           </div>
-          {data.isLoading ? (
-            <Skeleton className="h-3 w-20 mt-0.5" />
-          ) : (
-            <span className="text-foreground-lighter text-xs truncate">{subtitle}</span>
-          )}
         </div>
+        <ChevronRight
+          size={14}
+          className="text-foreground-lighter opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
+        />
       </div>
 
-      <div className="flex-1 h-12 min-w-0" onClick={(e) => e.preventDefault()}>
+      <div className="h-24" onClick={(e) => e.preventDefault()}>
         <Loading isFullHeight active={data.isLoading}>
           {data.isLoading ? (
             <div className="h-full" />
           ) : (
             <LogsBarChart
               isFullHeight
-              hideDateRange
-              data={data.total === 0 ? [] : data.eventChartData}
+              data={data.eventChartData}
               DateTimeFormat={datetimeFormat}
               onBarClick={onBarClick}
-              EmptyState={null}
+              EmptyState={
+                <EmptyChartPlaceholder
+                  startDate={startDate}
+                  endDate={endDate}
+                  datetimeFormat={datetimeFormat}
+                />
+              }
             />
           )}
         </Loading>
       </div>
-
-      <ChevronRight
-        size={14}
-        className="text-foreground-lighter group-hover:text-foreground transition-colors shrink-0"
-      />
     </Link>
   )
 }
@@ -151,26 +187,44 @@ export const ServiceHealthTable = ({
   serviceData,
   onBarClick,
   datetimeFormat,
+  startDate,
+  endDate,
 }: ServiceHealthTableProps) => {
+  const total = services.length
+
   return (
     <div>
       <h2 className="heading-section mb-4">Service Health</h2>
       <Card>
         <CardContent className="p-0">
-          {services.map((service) => {
-            const data = serviceData[service.key]
-            if (!data) return null
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            {services.map((service, index) => {
+              const data = serviceData[service.key]
+              if (!data) return null
 
-            return (
-              <ServiceRow
-                key={service.key}
-                service={service}
-                data={data}
-                onBarClick={onBarClick(service.logsUrl)}
-                datetimeFormat={datetimeFormat}
-              />
-            )
-          })}
+              const isLeftColumn = index % 2 === 0
+              const isLastMobileRow = index === total - 1
+              const isLastDesktopRow = index >= total - 2
+
+              return (
+                <ServiceCell
+                  key={service.key}
+                  service={service}
+                  data={data}
+                  onBarClick={onBarClick(service.logsUrl)}
+                  datetimeFormat={datetimeFormat}
+                  startDate={startDate}
+                  endDate={endDate}
+                  className={cn(
+                    'border-default',
+                    !isLastMobileRow && 'border-b',
+                    isLastDesktopRow && 'md:border-b-0',
+                    isLeftColumn && 'md:border-r'
+                  )}
+                />
+              )
+            })}
+          </div>
         </CardContent>
       </Card>
     </div>
