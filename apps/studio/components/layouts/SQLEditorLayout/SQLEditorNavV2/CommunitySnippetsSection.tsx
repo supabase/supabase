@@ -11,7 +11,7 @@ import { InnerSideMenuDataItem } from 'ui-patterns/InnerSideMenu'
 import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 
-const OPTIONS = ['templates', 'quickstarts'] as const
+const OPTIONS = ['templates', 'examples'] as const
 
 export function CommunitySnippetsSection() {
   const { ref } = useParams()
@@ -38,14 +38,14 @@ export function CommunitySnippetsSection() {
         })
       }}
     >
-      <InnerSideMenuCollapsibleTrigger title="Community" />
+      <InnerSideMenuCollapsibleTrigger title="Reference" />
       <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
         {OPTIONS.map((pageId) => {
           const active = isPageActive(pageId)
           return (
             <InnerSideMenuDataItem
               key={pageId}
-              title={pageId === 'templates' ? 'Templates' : 'Quickstarts'}
+              title={pageId === 'templates' ? 'Templates' : 'Examples'}
               isActive={active}
               isOpened={false}
               href={`/project/${ref}/sql/${pageId}`}

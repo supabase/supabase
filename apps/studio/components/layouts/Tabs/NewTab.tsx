@@ -184,7 +184,7 @@ export function NewTab() {
           <Tabs_Shadcn_ defaultValue="templates">
             <TabsList_Shadcn_ className="mx-auto justify-center gap-5">
               <TabsTrigger_Shadcn_ value="templates">Templates</TabsTrigger_Shadcn_>
-              <TabsTrigger_Shadcn_ value="quickstarts">Quickstarts</TabsTrigger_Shadcn_>
+              <TabsTrigger_Shadcn_ value="examples">Examples</TabsTrigger_Shadcn_>
             </TabsList_Shadcn_>
             <TabsContent_Shadcn_ value="templates" className="max-w-5xl mx-auto py-5">
               <div className="grid grid-cols-3 gap-4 px-8">
@@ -213,7 +213,7 @@ export function NewTab() {
                 </Button>
               </div>
             </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_ value="quickstarts" className="max-w-5xl mx-auto py-5">
+            <TabsContent_Shadcn_ value="examples" className="max-w-5xl mx-auto py-5">
               <div className="grid grid-cols-3 gap-4 px-8">
                 {quickstarts.map((item, i) => (
                   <ActionCard
@@ -236,7 +236,7 @@ export function NewTab() {
               </div>
               <div className="flex justify-center mt-5">
                 <Button asChild type="default">
-                  <Link href={`/project/${ref}/sql/quickstarts`}>View more templates</Link>
+                  <Link href={`/project/${ref}/sql/examples`}>View more examples</Link>
                 </Button>
               </div>
             </TabsContent_Shadcn_>
