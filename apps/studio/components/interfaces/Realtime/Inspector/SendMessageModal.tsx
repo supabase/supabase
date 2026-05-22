@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Input, Modal } from 'ui'
+import { Input } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
@@ -32,12 +33,8 @@ export const SendMessageModal = ({
   }, [visible])
 
   return (
-    <Modal
-      size="medium"
-      alignFooter="right"
-      header="Broadcast a message to all clients"
+    <ConfirmationModal
       visible={visible}
-      loading={false}
       onCancel={onSelectCancel}
       onConfirm={() => {
         const payload = tryParseJson(values.payload)
@@ -47,8 +44,9 @@ export const SendMessageModal = ({
           onSelectConfirm({ ...values, payload })
         }
       }}
+      title="Broadcast a message to all clients"
     >
-      <Modal.Content className="flex flex-col gap-y-4">
+      <div className="flex flex-col gap-y-4">
         <FormItemLayout label="Message name" layout="vertical" isReactForm={false}>
           <Input
             size="small"
@@ -72,7 +70,7 @@ export const SendMessageModal = ({
             {error !== undefined && <p className="text-sm text-red-900">{error}</p>}
           </FormItemLayout>
         </div>
-      </Modal.Content>
-    </Modal>
+      </div>
+    </ConfirmationModal>
   )
 }
