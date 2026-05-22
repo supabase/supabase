@@ -3,12 +3,10 @@ import { compact, isEqual, noop } from 'lodash'
 import {
   ArrowLeft,
   Check,
-  ChevronRight,
   Columns,
   Edit2,
   FolderPlus,
   List,
-  LoaderCircle,
   RefreshCw,
   Search,
   Upload,
@@ -132,71 +130,6 @@ const NavigateDialog = ({
   )
 }
 
-const HeaderBreadcrumbs = ({
-  loading,
-  breadcrumbs,
-  selectBreadcrumb,
-}: {
-  loading: { isLoading: boolean; message: string }
-  breadcrumbs: string[]
-  selectBreadcrumb: (i: number) => void
-}) => {
-  // Max 5 crumbs, otherwise replace middle segment with ellipsis and only
-  // have the first 2 and last 2 crumbs visible
-  const ellipsis = '...'
-  const breadcrumbsWithIndexes = breadcrumbs.map((name: string, index: number) => {
-    return { name, index }
-  })
-
-  const formattedBreadcrumbs =
-    breadcrumbsWithIndexes.length <= 5
-      ? breadcrumbsWithIndexes
-      : breadcrumbsWithIndexes
-          .slice(0, 2)
-          .concat([{ name: ellipsis, index: -1 }])
-          .concat(
-            breadcrumbsWithIndexes.slice(
-              breadcrumbsWithIndexes.length - 2,
-              breadcrumbsWithIndexes.length
-            )
-          )
-
-  return loading.isLoading ? (
-    <div className="ml-1 flex items-center">
-      <LoaderCircle size={14} strokeWidth={1.5} className="animate-spin text-foreground-lighter" />
-      <p className="ml-3 text-xs">{loading.message}</p>
-    </div>
-  ) : (
-    <div className="ml-1 flex min-w-0 flex-1 items-center overflow-hidden">
-      {formattedBreadcrumbs.map((crumb, idx: number) => {
-        const isEllipsis = crumb.name === ellipsis
-        const isActive = crumb.index === breadcrumbs.length - 1
-
-        return (
-          <div className="flex shrink-0 items-center" key={`${crumb.index}-${crumb.name}`}>
-            {idx !== 0 && (
-              <ChevronRight size={14} strokeWidth={1.5} className="text-foreground-muted mx-1" />
-            )}
-            {isEllipsis ? (
-              <span className="max-w-24 truncate text-xs text-foreground-light">{crumb.name}</span>
-            ) : isActive ? (
-              <span className="max-w-24 truncate text-xs text-foreground">{crumb.name}</span>
-            ) : (
-              <button
-                type="button"
-                className="max-w-24 truncate border-0 bg-transparent p-0 text-left text-xs text-foreground-lighter transition-colors hover:text-foreground focus-visible:text-foreground"
-                onClick={() => selectBreadcrumb(crumb.index)}
-              >
-                {crumb.name}
-              </button>
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 interface FileExplorerHeader {
   itemSearchString: string
   setItemSearchString: (value: string) => void
@@ -226,7 +159,6 @@ export const FileExplorerHeader = ({
     popColumn,
     popColumnAtIndex,
     popOpenedFolders,
-    popOpenedFoldersAtIndex,
     fetchFoldersByPath,
     refetchAllOpenedFolders,
     refreshAll,
@@ -245,9 +177,7 @@ export const FileExplorerHeader = ({
   } = useStoragePreference(projectRef)
 
   const breadcrumbs = columns.map((column) => column.name)
-  const backDisabled = columns.length <= 1
   const isListView = view === STORAGE_VIEWS.LIST
-  const showFolderBreadcrumbs = breadcrumbs.length > 1
   const isBucketRoot = breadcrumbs.length <= 1
   const currentFolderName = breadcrumbs[breadcrumbs.length - 1]
   const searchPlaceholder = isBucketRoot
@@ -356,13 +286,6 @@ export const FileExplorerHeader = ({
     snap.setIsSearching(value.length > 0)
   }
 
-  /** Methods for breadcrumbs */
-
-  const selectBreadcrumb = (columnIndex: number) => {
-    popColumnAtIndex(columnIndex)
-    popOpenedFoldersAtIndex(columnIndex - 1)
-  }
-
   const refreshData = async () => {
     await refreshAll()
   }
@@ -374,32 +297,22 @@ export const FileExplorerHeader = ({
 
   return (
     <div className="border-b border-overlay bg-surface-100">
-      {isListView && showFolderBreadcrumbs && (
-        <div className="overflow-x-auto overflow-y-hidden border-b border-overlay">
-          <div className="flex min-h-8 w-max min-w-full items-center px-4 py-1.5 xl:px-4">
-            <Button
-              icon={<ArrowLeft size={14} strokeWidth={1.5} />}
-              size="tiny"
-              type="text"
-              className="shrink-0 px-1"
-              disabled={backDisabled}
-              onClick={() => {
-                setIsPathDialogOpen(false)
-                onSelectBack()
-              }}
-            />
-            <HeaderBreadcrumbs
-              loading={loading}
-              breadcrumbs={breadcrumbs}
-              selectBreadcrumb={selectBreadcrumb}
-            />
-          </div>
-        </div>
-      )}
-
-      <div className="overflow-x-auto overflow-y-hidden">
+      <div className="overflow-x-auto">
         <div className={pageChromeRowClassName}>
-          <div className="flex min-w-0 flex-1 items-center overflow-hidden">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            {isListView && !isBucketRoot && (
+              <Button
+                size="tiny"
+                type="outline"
+                aria-label="Go up one level"
+                className="w-7 shrink-0 px-1"
+                icon={<ArrowLeft size={14} strokeWidth={1.5} />}
+                onClick={() => {
+                  setIsPathDialogOpen(false)
+                  onSelectBack()
+                }}
+              />
+            )}
             <Input
               ref={searchInputRef}
               size="tiny"
