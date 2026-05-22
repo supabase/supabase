@@ -1923,13 +1923,15 @@ export interface HomeConnectActionClickedEvent {
  * @source studio
  * @page /project/{ref}
  */
+export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
+
 export interface ConnectSheetOpenedEvent {
   action: 'connect_sheet_opened'
   properties: {
     /**
      * Where the sheet was opened from
      */
-    source: 'header_button' | 'connect_section' | 'keyboard_shortcut'
+    source: ConnectSheetSource
   }
   groups: TelemetryGroups
 }
