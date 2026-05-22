@@ -110,6 +110,8 @@ If a user is already a member of the organization under a non-SSO account, they 
 
 Each user account verified using an SSO identity provider will not be legible for [identity linking](/docs/guides/auth/auth-identity-linking) to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 
+Users will need to ensure they are logged in with the correct account when accessing organizations/projects.
+
 </Admonition>
 
 ## Disabling SSO for an organization
