@@ -91,13 +91,13 @@ const DowngradeModal = ({
         <div className="space-y-2">
           <Admonition
             type="warning"
-            title="Downgrading to the Free Plan will lead to reductions in your organization's quota"
-            description="If you're already past the limits of the Free Plan, your projects could become
+            title="Your organization's quota will be reduced"
+            description="If you're already past the limits of the Free plan, your projects could become
               unresponsive or enter read only mode."
           />
 
           {((previousProjectAddons.length ?? 0) > 0 || hasInstancesOnMicro) && (
-            <Admonition type="warning" title="Projects affected by the downgrade">
+            <Admonition type="warning" title="Your projects will be affected">
               <ul className="space-y-1 max-h-[100px] overflow-y-auto">
                 {previousProjectAddons.map((project) => (
                   <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
@@ -118,6 +118,13 @@ const DowngradeModal = ({
             </Admonition>
           )}
         </div>
+
+        <Admonition
+          type="warning"
+          className="mt-2"
+          title="Any custom email templates will be reset"
+          description="Downgrading will reset your custom email templates to their defaults. You won’t be able to edit them unless you set up custom SMTP after downgrading."
+        />
 
         <ul className="mt-4 space-y-5 text-sm">
           <li className="flex items-center gap-3">
