@@ -1,5 +1,5 @@
 import { useParams } from 'common/hooks'
-import { Button, Modal } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
 
@@ -25,28 +25,19 @@ const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   }
 
   return (
-    <Modal
-      hideFooter
+    <ConfirmationModal
       size="small"
       visible={visible}
       onCancel={onClose}
-      header="Allow access from all IP addresses"
+      onConfirm={onSubmit}
+      loading={isApplying}
+      title="Allow access from all IP addresses"
+      confirmLabel="Confirm"
     >
-      <Modal.Content className="space-y-4">
-        <p className="text-sm text-foreground-light">
-          This will allow any IP address to access your project's database. Are you sure?
-        </p>
-      </Modal.Content>
-      <Modal.Separator />
-      <Modal.Content className="flex items-center justify-end space-x-2">
-        <Button type="default" disabled={isApplying} onClick={() => onClose()}>
-          Cancel
-        </Button>
-        <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
-          Confirm
-        </Button>
-      </Modal.Content>
-    </Modal>
+      <p className="text-sm text-foreground-light">
+        This will allow any IP address to access your project's database. Are you sure?
+      </p>
+    </ConfirmationModal>
   )
 }
 
