@@ -392,11 +392,7 @@ export const StripeSyncEngineOverviewTab = () => {
   }
 
   return (
-    <IntegrationOverviewTab
-      alert={undefined} // moved into StripeSyncContent via hasError state
-      status={undefined} // moved into StripeSyncContent
-      actions={undefined} // moved into StripeSyncContent
-    >
+    <IntegrationOverviewTab>
       <StripeSyncContent />
     </IntegrationOverviewTab>
   )
