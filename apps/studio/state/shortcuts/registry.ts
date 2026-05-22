@@ -392,7 +392,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   [SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE]: {
     id: SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
     label: 'Show all keyboard shortcuts',
-    sequence: ['Mod+/'],
+    sequence: ['Shift+?'],
     showInSettings: false,
     options: { ignoreInputs: true },
   },
