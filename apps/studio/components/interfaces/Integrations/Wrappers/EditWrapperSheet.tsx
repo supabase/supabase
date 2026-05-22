@@ -7,12 +7,11 @@ import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form
 import { toast } from 'sonner'
 import {
   Button,
-  Card,
-  CardContent,
   Form,
   FormControl,
   FormField,
   Input,
+  Separator,
   SheetFooter,
   SheetHeader,
   SheetSection,
@@ -213,62 +212,57 @@ export const EditWrapperSheet = ({
                   </PageSectionSummary>
                 </PageSectionMeta>
                 <PageSectionContent>
-                  <Card>
-                    <CardContent>
-                      <FormField
-                        control={form.control}
-                        name="wrapper_name"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="vertical"
-                            label="Wrapper Name"
-                            description={
-                              wrapper_name !== initialValues.wrapper_name ? (
-                                <>
-                                  Your wrapper's server name will be updated to{' '}
-                                  <code className="text-code-inline">{wrapper_name}_server</code>
-                                </>
-                              ) : (
-                                <>
-                                  Your wrapper's server name is{' '}
-                                  <code className="text-code-inline">{wrapper_name}_server</code>
-                                </>
-                              )
-                            }
-                          >
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
+                  <FormField
+                    control={form.control}
+                    name="wrapper_name"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="vertical"
+                        label="Wrapper Name"
+                        description={
+                          wrapper_name !== initialValues.wrapper_name ? (
+                            <>
+                              Your wrapper's server name will be updated to{' '}
+                              <code className="text-code-inline">{wrapper_name}_server</code>
+                            </>
+                          ) : (
+                            <>
+                              Your wrapper's server name is{' '}
+                              <code className="text-code-inline">{wrapper_name}_server</code>
+                            </>
+                          )
+                        }
+                      >
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
                 </PageSectionContent>
               </PageSection>
               <PageSection>
+                <Separator />
                 <PageSectionMeta>
                   <PageSectionSummary>
                     <PageSectionTitle>{wrapperMeta.label} Configuration</PageSectionTitle>
                   </PageSectionSummary>
                 </PageSectionMeta>
-                <PageSectionContent>
-                  <Card>
-                    {wrapperMeta.server.options
-                      .filter((option) => !option.hidden)
-                      .map((option) => (
-                        <CardContent key={option.name}>
-                          <InputField
-                            option={option}
-                            control={form.control}
-                            loading={option.secureEntry ? isLoadingSecrets : undefined}
-                          />
-                        </CardContent>
-                      ))}
-                  </Card>
+                <PageSectionContent className="flex flex-col gap-2">
+                  {wrapperMeta.server.options
+                    .filter((option) => !option.hidden)
+                    .map((option) => (
+                      <InputField
+                        key={option.name}
+                        option={option}
+                        control={form.control}
+                        loading={option.secureEntry ? isLoadingSecrets : undefined}
+                      />
+                    ))}
                 </PageSectionContent>
               </PageSection>
               <PageSection>
+                <Separator />
                 <PageSectionMeta>
                   <PageSectionSummary>
                     <PageSectionTitle>Foreign Tables</PageSectionTitle>
