@@ -15,12 +15,14 @@ Optional: if you use [Ota](https://ota.run), this repository includes an `ota.ya
 Useful Ota commands (optional):
 
 -   Native readiness:
+    -   `ota tasks --workflow instant .`
     -   `ota validate .`
-    -   `ota doctor --workflow instant --mode native .`
-    -   `ota up --workflow instant --mode native --dry-run .`
+    -   `ota doctor --workflow instant --native .`
+    -   `ota up --workflow instant --native --dry-run .`
 -   Container readiness:
-    -   `ota doctor --workflow instant:container --mode container .`
-    -   `ota up --workflow instant:container --mode container --dry-run .`
+    -   `ota tasks --workflow instant:container .`
+    -   `ota doctor --workflow instant:container --container .`
+    -   `ota up --workflow instant:container --container --dry-run .`
 
 ## Issues
 
