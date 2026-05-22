@@ -265,7 +265,7 @@ export const PostgrestConfig = () => {
     [allSchemas, watchedDbSchema]
   )
   const protectedSchemasExposed = useMemo(
-    () => watchedDbSchema.filter((schema) => internalSchemasCannotExpose.includes(schema)),
+    () => watchedDbSchema.filter((schema) => internalSchemasCannotExpose.has(schema)),
     [watchedDbSchema]
   )
 

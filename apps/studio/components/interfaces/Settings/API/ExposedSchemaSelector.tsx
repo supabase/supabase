@@ -25,7 +25,9 @@ import { pluralize } from '@/lib/helpers'
  * [Joshen] This would only affect graphql_public and pgmq_public, given that they're intended
  * to be public, we can let users expose them via the API, but not let them adjust the schema via the dashboard
  * */
-export const internalSchemasCannotExpose = INTERNAL_SCHEMAS.filter((x) => !x.endsWith('_public'))
+export const internalSchemasCannotExpose = new Set(
+  INTERNAL_SCHEMAS.filter((x) => !x.endsWith('_public'))
+)
 
 interface ExposedSchemaSelectorProps {
   disabled?: boolean
@@ -55,7 +57,7 @@ export const ExposedSchemaSelector = ({
   const schemas = useMemo(
     () =>
       (allSchemas ?? [])
-        .filter((s) => !internalSchemasCannotExpose.includes(s.name))
+        .filter((s) => !internalSchemasCannotExpose.has(s.name))
         .sort((a, b) => a.name.localeCompare(b.name)),
     [allSchemas]
   )
@@ -132,7 +134,7 @@ export const ExposedSchemaSelector = ({
                             <Check size={16} className="text-brand shrink-0" />
                             <span className="truncate">{schema}</span>
                           </div>
-                          {internalSchemasCannotExpose.includes(schema) ? (
+                          {internalSchemasCannotExpose.has(schema) ? (
                             <span className="pl-6 text-warning text-xs tracking-tight">
                               This schema is protected and should not be exposed
                             </span>
