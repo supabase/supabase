@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
@@ -9,6 +9,7 @@ import type {
   CloudMarketplaceContractLinkingEligibility,
   CloudMarketplaceOnboardingInfo,
 } from '@/components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
+import { CREATE_AWS_MANAGED_ORG_FORM_ID } from '@/components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrgForm'
 import { API_URL } from '@/lib/constants'
 import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganization } from '@/tests/helpers'
@@ -165,6 +166,44 @@ describe('AwsMarketplaceOnboardingScreen', () => {
       })
     })
     await screen.findByText('Organization linked')
+  })
+
+  test('creates an AWS-managed organization with buyerId and returns to linked state', async () => {
+    const user = userEvent.setup()
+    let createRequest: unknown
+
+    mockAwsEndpoints({
+      organizations: [],
+      onboardingInfo: createOnboardingInfo({ organizations: [] }),
+    })
+    mswServer.use(
+      http.post(`${API_URL}/platform/organizations/cloud-marketplace`, async ({ request }) => {
+        createRequest = await request.json()
+        return HttpResponse.json(
+          createMockOrganization({
+            id: 3,
+            name: 'Mock Marketplace Org',
+            slug: 'mock-marketplace-org',
+            billing_partner: 'aws_marketplace',
+          })
+        )
+      })
+    )
+
+    renderScreen()
+
+    await user.click(await screen.findByRole('button', { name: 'Create organization' }))
+    await user.type(screen.getByPlaceholderText('Organization name'), 'Mock Marketplace Org')
+    fireEvent.submit(document.getElementById(CREATE_AWS_MANAGED_ORG_FORM_ID)!)
+
+    await waitFor(() => {
+      expect(createRequest).toEqual({
+        name: 'Mock Marketplace Org',
+        kind: 'PERSONAL',
+        buyer_id: 'buyer-test',
+      })
+    })
+    expect(await screen.findByText('Organization linked')).toBeInTheDocument()
   })
 
   test('renders setup unavailable when the buyer ID is missing', async () => {
