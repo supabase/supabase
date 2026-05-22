@@ -58,6 +58,7 @@ const StripeSyncContent = () => {
 
   const [showUninstallModal, setShowUninstallModal] = useState(false)
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
+  // These flags bridge the gap between mutation success and schema update
   const [isInstallInitiated, setIsInstallInitiated] = useState(false)
   const [isUninstallInitiated, setIsUninstallInitiated] = useState(false)
 
@@ -75,6 +76,7 @@ const StripeSyncContent = () => {
     timedOut,
   } = useStripeSyncStatus()
 
+  // Check permissions for managing function secrets
   const { can: canManageSecrets } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_SECRET_WRITE,
     '*'
@@ -88,12 +90,15 @@ const StripeSyncContent = () => {
   const installDone = isInstallDone(installationStatus)
   const uninstallDone = isUninstallDone(installationStatus)
 
+  // Detect if this is an upgrade (both old and new versions present)
   let oldVersion
   let newVersion
   if (installed) {
+    // when installed we compare the installed version against the latest available
     oldVersion = schemaComment?.newVersion
     newVersion = latestAvailableVersion
   } else {
+    // otherwise compare the old and new versions from the schema
     oldVersion = schemaComment?.oldVersion
     newVersion = schemaComment?.newVersion
   }
@@ -126,6 +131,7 @@ const StripeSyncContent = () => {
       },
     })
 
+  // Combine schema status with mutation/initiated states for UI
   const installing = (installInProgress || isInstallRequested || isInstallInitiated) && !timedOut
   const uninstalling =
     (uninstallInProgress || isUninstallRequested || isUninstallInitiated) && !timedOut
@@ -133,6 +139,7 @@ const StripeSyncContent = () => {
 
   const hasError = (uninstallError || installError) && ((!uninstalling && !installing) || timedOut)
 
+  // Poll for schema changes during transitions
   useSchemasQuery(
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { refetchInterval: installing || uninstalling ? 5000 : false }
@@ -162,6 +169,7 @@ const StripeSyncContent = () => {
     }
   }
 
+  // Track install failures
   useEffect(() => {
     if (!installError) {
       hasTrackedInstallFailed.current = false
@@ -176,12 +184,15 @@ const StripeSyncContent = () => {
     }
   }, [installError, track])
 
+  // Clear install initiated flag once schema reflects successful completion
+  // For errors, the flag is cleared when user manually retries (handleOpenInstallSheet)
   useEffect(() => {
     if (isInstallInitiated && installDone && upgradeDone && !installError) {
       setIsInstallInitiated(false)
     }
   }, [isInstallInitiated, installDone, upgradeDone, installError])
 
+  // Clear uninstall initiated flag once schema is removed or error
   useEffect(() => {
     if (isUninstallInitiated && uninstallDone) {
       setIsUninstallInitiated(false)
@@ -382,18 +393,9 @@ export const StripeSyncEngineOverviewTab = () => {
 
   return (
     <IntegrationOverviewTab
-      alert={
-        /* moved into StripeSyncContent via hasError state */
-        undefined
-      }
-      status={
-        /* moved into StripeSyncContent */
-        undefined
-      }
-      actions={
-        /* moved into StripeSyncContent */
-        undefined
-      }
+      alert={undefined} // moved into StripeSyncContent via hasError state
+      status={undefined} // moved into StripeSyncContent
+      actions={undefined} // moved into StripeSyncContent
     >
       <StripeSyncContent />
     </IntegrationOverviewTab>
