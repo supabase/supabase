@@ -25,6 +25,12 @@ vi.mock('ai', () => ({
   lastAssistantMessageIsCompleteWithToolCalls: vi.fn(),
 }))
 
+vi.mock('streamdown', () => ({
+  Streamdown: ({ children }: { children: string }) => (
+    <div data-testid="assistant-preview-message">{children}</div>
+  ),
+}))
+
 vi.mock('@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider', () => ({
   SIDEBAR_KEYS: {
     AI_ASSISTANT: 'ai-assistant',
@@ -47,17 +53,6 @@ vi.mock('@/state/sidebar-manager-state', () => ({
 
 vi.mock('@/lib/telemetry/track', () => ({
   useTrack: () => mockTrack,
-}))
-
-vi.mock('@/components/ui/AIAssistantPanel/Message', () => ({
-  Message: ({ message }: { message: { parts?: Array<{ type: string; text?: string }> } }) => (
-    <div data-testid="assistant-preview-message">
-      {message.parts
-        ?.filter((part) => part.type === 'text')
-        .map((part) => part.text)
-        .join('')}
-    </div>
-  ),
 }))
 
 const supportRequest: SubmittedSupportRequest = {
@@ -118,7 +113,7 @@ describe('SupportAssistantSuccessCard', () => {
     expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
   })
 
-  it('renders a truncated assistant response preview', async () => {
+  it('renders the full assistant response preview inside the clipped content area', async () => {
     const longResponse = 'A'.repeat(500)
     mockUseChat.mockReturnValue({
       messages: [
@@ -134,8 +129,8 @@ describe('SupportAssistantSuccessCard', () => {
     render(<SupportAssistantSuccessCard request={supportRequest} />)
 
     const preview = await screen.findByTestId('assistant-preview-message')
-    expect(preview).toHaveTextContent(`${'A'.repeat(420)}...`)
-    expect(preview).not.toHaveTextContent('A'.repeat(421))
+    expect(preview).toHaveTextContent(longResponse)
+    expect(preview.closest('[class*="max-h-48"]')).toHaveClass('overflow-hidden')
   })
 
   it('opens the generated assistant chat when the action is clicked', async () => {

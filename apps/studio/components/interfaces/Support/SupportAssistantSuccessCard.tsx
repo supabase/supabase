@@ -1,7 +1,10 @@
 import { useChat, type UIMessage as MessageType } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
 import { ArrowUpRight } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type { JSX } from 'react'
+import type { StreamdownProps } from 'streamdown'
 import {
   AiIconAnimation,
   Card,
@@ -17,13 +20,16 @@ import { buildSupportAssistantPrompt } from './SupportAssistant.utils'
 import type { SubmittedSupportRequest } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { Message } from '@/components/ui/AIAssistantPanel/Message'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot, type AiAssistantState } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-const SUPPORT_ASSISTANT_PREVIEW_MAX_CHARACTERS = 420
 type SupportAssistantPreviewChat = AiAssistantState['chatInstances'][string]
+
+const Streamdown = dynamic<StreamdownProps>(
+  () => import('streamdown').then((mod) => mod.Streamdown),
+  { ssr: false }
+)
 
 interface SupportAssistantSuccessCardProps {
   request: SubmittedSupportRequest
@@ -42,7 +48,7 @@ export function SupportAssistantSuccessCard({
   const aiAssistant = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const track = useTrack()
-  const createdChatIdRef = useRef<string>()
+  const createdChatIdRef = useRef<string | null>(null)
   const [chatId, setChatId] = useState<string>()
   const chat = chatId ? aiAssistant.chatInstances[chatId] : undefined
 
@@ -117,7 +123,6 @@ export function SupportAssistantSuccessCard({
         <SupportAssistantResponsePreview
           chatId={chatId}
           chat={chat as SupportAssistantPreviewChat}
-          maxCharacters={SUPPORT_ASSISTANT_PREVIEW_MAX_CHARACTERS}
         />
       ) : (
         <CardContent>
@@ -128,50 +133,28 @@ export function SupportAssistantSuccessCard({
   )
 }
 
-function truncateAssistantMessage(message: MessageType, maxCharacters: number) {
-  let remainingCharacters = maxCharacters
-  let wasTruncated = false
-
-  const truncatedParts = message.parts?.flatMap((part) => {
-    if (part.type !== 'text') return []
-
-    if (remainingCharacters <= 0) {
-      wasTruncated = true
-      return []
-    }
-
-    const text = part.text.slice(0, remainingCharacters)
-    remainingCharacters -= text.length
-
-    if (text.length < part.text.length) {
-      wasTruncated = true
-    }
-
-    return [{ ...part, text: wasTruncated ? `${text.trimEnd()}...` : text }]
-  })
-
-  return {
-    message: { ...message, parts: truncatedParts },
-    wasTruncated,
-  }
+function getAssistantMessageText(message: MessageType) {
+  return (
+    message.parts
+      ?.filter((part) => part.type === 'text')
+      .map((part) => part.text)
+      .join('') ?? ''
+  )
 }
 
 function SupportAssistantResponsePreview({
   chatId,
   chat,
-  maxCharacters,
 }: {
   chatId: string
   chat: SupportAssistantPreviewChat
-  maxCharacters: number
 }) {
-  const { messages, status } = useChat({
+  const { messages } = useChat({
     id: chatId,
     chat,
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
   })
 
-  const isChatLoading = status === 'submitted' || status === 'streaming'
   const latestAssistantMessage = [...messages]
     .reverse()
     .find((message) => message.role === 'assistant')
@@ -184,28 +167,27 @@ function SupportAssistantResponsePreview({
     )
   }
 
-  const { message: previewMessage, wasTruncated } = truncateAssistantMessage(
-    latestAssistantMessage,
-    maxCharacters
-  )
+  const previewText = getAssistantMessageText(latestAssistantMessage)
 
   return (
     <CardContent className="relative max-h-48 overflow-hidden">
-      <Message
-        id={previewMessage.id}
-        message={previewMessage}
-        isLoading={isChatLoading}
-        readOnly
-        onDelete={() => {}}
-        onEdit={() => {}}
-        onCancelEdit={() => {}}
-        isAfterEditedMessage={false}
-        isBeingEdited={false}
-      />
-      {wasTruncated && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-muted to-transparent" />
-      )}
+      <SupportAssistantPreviewMarkdown>{previewText}</SupportAssistantPreviewMarkdown>
     </CardContent>
+  )
+}
+
+function SupportAssistantPreviewMarkdown({ children }: { children: string }) {
+  return (
+    <Streamdown
+      className="prose prose-sm dark:prose-dark max-w-none space-y-3 text-sm text-foreground-light prose-p:my-0 prose-strong:font-medium prose-strong:text-foreground prose-code:text-xs prose-li:my-0 prose-ul:my-0 prose-ol:my-0"
+      components={{
+        img: ({ src }: JSX.IntrinsicElements['img']) => (
+          <span className="font-mono text-foreground-lighter">[Image: {src?.toString()}]</span>
+        ),
+      }}
+    >
+      {children}
+    </Streamdown>
   )
 }
 
