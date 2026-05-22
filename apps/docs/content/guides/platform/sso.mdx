@@ -100,17 +100,15 @@ When SSO is enabled for an organization:
 6. Thoroughly test using our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide
 7. Invite users to the organization or let them auto-join on login
 
-<Admonition type="note" title="Account linking">
+<Admonition type="note" title="Non-SSO Accounts">
 
 If a user is already a member of the organization under a non-SSO account, they will need to be removed and invited again with an SSO-required invitation to join under their SSO account. SSO and non-SSO accounts with the same email are treated as separate accounts.
 
 </Admonition>
 
-<Admonition type="note" title="No automatic linking">
+<Admonition type="note" title="No identity linking">
 
-Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
-
-Users will need to ensure they are logged in with the correct account when accepting invites or accessing organizations/projects.
+Each user account verified using an SSO identity provider will not be legible for [identity linking](/docs/guides/auth/auth-identity-linking) to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 
 </Admonition>
 
