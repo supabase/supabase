@@ -5,7 +5,7 @@ import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePrev
 export const DataApiOverviewTab = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
-  if (isMarketplaceEnabled) return null
+  if (isMarketplaceEnabled) return <DataApiURLSettings />
 
   return (
     <IntegrationOverviewTab>
