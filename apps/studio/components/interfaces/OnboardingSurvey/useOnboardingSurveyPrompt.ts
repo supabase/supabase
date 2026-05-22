@@ -83,7 +83,7 @@ export function useOnboardingSurveyPrompt({ surface }: { surface: OnboardingSurv
   const shouldShowPrompt =
     isPromptStateLoaded &&
     !!orgSlug &&
-    !!projectRef &&
+    (surface !== 'project_home' || !!projectRef) &&
     !!profileId &&
     promptState === null &&
     variantMatchesSurface(variant, surface)
