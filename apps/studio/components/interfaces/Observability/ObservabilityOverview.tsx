@@ -28,7 +28,7 @@ export const ObservabilityOverview = () => {
   const queryClient = useQueryClient()
 
   const { projectStorageAll: storageSupported } = useIsFeatureEnabled(['project_storage:all'])
-  const { isEnabled: isDataApiEnabled } = useIsDataApiEnabled(projectRef)
+  const { isEnabled: isDataApiEnabled } = useIsDataApiEnabled({ projectRef })
 
   const DEFAULT_INTERVAL: ChartIntervalKey = '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
