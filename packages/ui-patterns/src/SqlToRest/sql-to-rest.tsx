@@ -28,7 +28,7 @@ import {
 } from 'react'
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { Alert_Shadcn_ as Alert, cn, Collapsible, Tabs } from 'ui'
+import { Alert, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Tabs } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { assumptions } from './assumptions'
@@ -431,7 +431,7 @@ export default function SqlToRest({
                   key={faq.id}
                   className="flex flex-col items-stretch justify-start bg-surface-100 rounded-sm border border-default px-4"
                 >
-                  <Collapsible.Trigger asChild>
+                  <CollapsibleTrigger asChild>
                     <button
                       type="button"
                       className="flex justify-between items-center p-3 text-sm text-left"
@@ -445,8 +445,8 @@ export default function SqlToRest({
                       </Markdown>
                       <ChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
                     </button>
-                  </Collapsible.Trigger>
-                  <Collapsible.Content>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
                     <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4 text-sm">
                       <Markdown
                         components={{
@@ -456,7 +456,7 @@ export default function SqlToRest({
                         {faq.answer}
                       </Markdown>
                     </div>
-                  </Collapsible.Content>
+                  </CollapsibleContent>
                 </Collapsible>
               ))}
             </>

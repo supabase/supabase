@@ -9,6 +9,7 @@ import { CONNECT_MODES } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
+import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
@@ -35,6 +36,8 @@ function mapConnectTabToMode(tab: string | null): ConnectMode | null {
 
 export const ConnectSheet = () => {
   const { ref: projectRef } = useParams()
+
+  useConnectSheetShortcut()
 
   const availableModeIds = useAvailableConnectModes()
 

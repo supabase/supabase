@@ -19,3 +19,5 @@ If you are observing a `RateLimitError: "Rate limit exceeded for trace ..."` err
 - **Consolidate Logic:** Refactor the logic into a shared library or move it directly into the calling function to eliminate the need for cross-function network calls.
 
 You can monitor these errors by visiting the [logs explorer](/dashboard/project/_/logs/explorer) to identify which executions are exceeding their trace budget.
+
+For more details on how recursive invocations and per-trace rate limiting work, see the recursive functions guide: [Recursive Functions — What gets rate limited](/docs/guides/functions/recursive-functions#what-gets-rate-limited).

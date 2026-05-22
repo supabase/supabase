@@ -33,6 +33,8 @@ pnpm typecheck                        # typecheck all packages
 
 **Language** — Use U.S. English everywhere.
 
+**Studio shortcuts** — when adding or changing repeated Studio UI actions, use the shared shortcut registry and primitives in `apps/studio/state/shortcuts/` and `apps/studio/components/ui/Shortcut*.tsx`. Prefer registered, discoverable shortcuts over one-off keyboard listeners; keep `G then ...` chords for navigation.
+
 ## Studio
 
 Pages router. Co-locate sub-components with parent. Avoid barrel re-export files.

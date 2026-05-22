@@ -7,6 +7,7 @@ import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { ForeignKeyRow } from '../TableEditor/ForeignKeysManagement/ForeignKeyRow'
 import { checkIfRelationChanged } from '../TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
+import { normalizeFormatSchema } from './ColumnEditor.utils'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -17,7 +18,11 @@ interface ColumnForeignKeyProps {
   relations: ForeignKey[]
   closePanel: () => void
   onOpenChange?: (open: boolean) => void
-  onUpdateColumnType: (type: string) => void
+  onUpdateColumnType: (selection: {
+    format: string
+    formatSchema?: string
+    isArray: boolean
+  }) => void
   onUpdateFkRelations: (fks: ForeignKey[]) => void
 }
 
@@ -52,6 +57,8 @@ const ColumnForeignKey = ({
       id: c.id,
       name: c.name,
       format: c.format || column.format,
+      formatSchema: normalizeFormatSchema(c.format_schema),
+      isArray: c.data_type === 'ARRAY',
       isNewColumn: false,
     }
   })
@@ -126,7 +133,14 @@ const ColumnForeignKey = ({
             name: table.name,
             columns:
               column.isNewColumn && column.name
-                ? formattedColumnsForFkSelector.concat(column)
+                ? formattedColumnsForFkSelector.concat({
+                    id: column.id,
+                    name: column.name,
+                    format: column.format,
+                    formatSchema: column.formatSchema,
+                    isArray: column.isArray,
+                    isNewColumn: column.isNewColumn,
+                  })
                 : formattedColumnsForFkSelector.map((c) => {
                     if (c.id === column.id) return { ...c, name: column.name }
                     else return c
@@ -149,8 +163,14 @@ const ColumnForeignKey = ({
             } else {
               onUpdateFkRelations(relations.concat([fk]))
             }
-            const targetType = fk.columns.find((col) => col.source === column.name)?.targetType
-            if (targetType) onUpdateColumnType(targetType)
+            const matched = fk.columns.find((col) => col.source === column.name)
+            if (matched?.targetType) {
+              onUpdateColumnType({
+                format: matched.targetType,
+                formatSchema: matched.targetTypeSchema,
+                isArray: matched.targetIsArray ?? false,
+              })
+            }
           }}
         />
       )}

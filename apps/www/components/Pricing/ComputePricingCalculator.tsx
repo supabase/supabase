@@ -2,7 +2,7 @@ import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { plans as allPlans } from 'shared-data/plans'
-import { Button, cn, Slider_Shadcn_ } from 'ui'
+import { Button, cn, Slider } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
@@ -193,7 +193,7 @@ const ComputePricingCalculator = ({
                     Drag to adjust
                   </label>
                 )}
-                <Slider_Shadcn_
+                <Slider
                   onValueChange={(value) => handleUpdateInstance(activeInstance.position, value)}
                   value={findSliderComputeValue(activeInstance)}
                   min={1}

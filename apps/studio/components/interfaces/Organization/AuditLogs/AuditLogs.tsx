@@ -6,13 +6,7 @@ import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useEffect, useMemo, useState } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { filterByProjects, filterByUsers, sortAuditLogs } from './AuditLogs.utils'
@@ -258,14 +252,14 @@ export const AuditLogs = () => {
 
             {isError &&
               (isRangeExceededError ? (
-                <Alert_Shadcn_ variant="destructive" title="Date range too large">
+                <Alert variant="destructive" title="Date range too large">
                   <WarningIcon />
-                  <AlertTitle_Shadcn_>Date range too large</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>Date range too large</AlertTitle>
+                  <AlertDescription>
                     The selected date range exceeds the maximum allowed period. Please select a
                     smaller time range.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertDescription>
+                </Alert>
               ) : (
                 <AlertError error={error} subject="Failed to retrieve audit logs" />
               ))}

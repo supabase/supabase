@@ -3,7 +3,18 @@ import { DatabaseZap, Plus, Search } from 'lucide-react'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Button,
+  Card,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -181,16 +192,19 @@ export const EventTriggersList = () => {
     <div className="space-y-4">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
         <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
-          <Input
-            inputRef={searchInputRef}
-            placeholder="Search for an event trigger"
-            size="tiny"
-            icon={<Search />}
-            value={filterString}
-            className="w-full lg:w-64"
-            onChange={(e) => setFilterString(e.target.value)}
-            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
-          />
+          <InputGroup className="w-full lg:w-52">
+            <InputGroupInput
+              ref={searchInputRef}
+              size="tiny"
+              placeholder="Search for a trigger"
+              value={filterString}
+              onChange={(e) => setFilterString(e.target.value)}
+              onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+          </InputGroup>
           <ReportsSelectFilter
             label="Owner"
             options={ownerOptions.map((owner) => ({

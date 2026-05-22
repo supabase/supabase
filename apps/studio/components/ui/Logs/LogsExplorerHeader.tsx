@@ -1,12 +1,21 @@
-import { BookOpen, Check, Copy, ExternalLink, List, X } from 'lucide-react'
+import { BookOpen, Check, ChevronsUpDown, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Button,
+  cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   copyToClipboard,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SidePanel,
-  Tabs,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -23,6 +32,8 @@ export interface LogsExplorerHeaderProps {
 
 const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
   const [showReference, setShowReference] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [selectedSchema, setSelectedSchema] = useState(logConstants.schemas[0])
 
   return (
     <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
@@ -89,38 +100,63 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             </div>
           </SidePanel.Content>
           <SidePanel.Separator />
-          <Tabs
-            scrollable
-            size="small"
-            type="underlined"
-            defaultActiveId="edge_logs"
-            listClassNames="px-2"
-          >
-            {logConstants.schemas.map((schema) => (
-              <Tabs.Panel
-                key={schema.reference}
-                id={schema.reference}
-                label={schema.name}
-                className="px-4 pb-4"
-              >
-                <Table
-                  head={[
-                    <Table.th className="text-xs p-2!" key="path">
-                      Path
-                    </Table.th>,
-                    <Table.th key="type" className="text-xs p-2!">
-                      Type
-                    </Table.th>,
-                  ]}
-                  body={schema.fields
-                    .sort((a: any, b: any) => a.path - b.path)
-                    .map((field) => (
-                      <Field key={field.path} field={field} />
-                    ))}
-                />
-              </Tabs.Panel>
-            ))}
-          </Tabs>
+          <div className="px-4 pb-4 flex flex-col gap-4">
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  type="default"
+                  role="combobox"
+                  size={'small'}
+                  aria-expanded={open}
+                  className="w-full justify-between"
+                  iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                >
+                  {selectedSchema?.name ?? 'Select source...'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" sameWidthAsTrigger>
+                <Command>
+                  <CommandInput placeholder="Search source..." />
+                  <CommandList>
+                    <CommandEmpty>No source found.</CommandEmpty>
+                    <CommandGroup>
+                      {logConstants.schemas.map((schema) => (
+                        <CommandItem
+                          key={schema.reference}
+                          value={schema.reference}
+                          onSelect={() => {
+                            setSelectedSchema(schema)
+                            setOpen(false)
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              selectedSchema === schema ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          {schema.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            <Table
+              head={[
+                <Table.th className="text-xs p-2!" key="path">
+                  Path
+                </Table.th>,
+                <Table.th key="type" className="text-xs p-2!">
+                  Type
+                </Table.th>,
+              ]}
+              body={selectedSchema.fields.map((field) => (
+                <Field key={field.path} field={field} />
+              ))}
+            />
+          </div>
         </SidePanel>
       </div>
     </div>

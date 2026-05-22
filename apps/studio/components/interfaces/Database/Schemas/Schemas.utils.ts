@@ -1,5 +1,5 @@
 import dagre from '@dagrejs/dagre'
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PGSchema, PGTable } from '@supabase/pg-meta'
 import { Edge, Node, Position } from '@xyflow/react'
 import { uniqBy } from 'lodash'
 
@@ -16,8 +16,8 @@ const RANK_SEP = 50
 
 export async function getGraphDataFromTables(
   ref?: string,
-  schema?: PostgresSchema,
-  tables?: PostgresTable[]
+  schema?: PGSchema,
+  tables?: PGTable[]
 ): Promise<{
   nodes: Node<TableNodeData>[]
   edges: Edge[]
@@ -66,6 +66,25 @@ export async function getGraphDataFromTables(
     'id'
   )
 
+  // Precompute name → { tableId, columnsByName } lookup so each relationship
+  // resolves its source/target handles in O(1) instead of scanning every table+column.
+  const tablesByName = new Map<string, { tableId: number; columnsByName: Map<string, string> }>()
+  for (const table of tables) {
+    const columnsByName = new Map<string, string>()
+    for (const column of table.columns || []) {
+      columnsByName.set(column.name, column.id)
+    }
+    tablesByName.set(table.name, { tableId: table.id, columnsByName })
+  }
+
+  const findHandleIds = (tableName: string, columnName: string): [string?, string?] => {
+    const entry = tablesByName.get(tableName)
+    if (!entry) return []
+    const columnId = entry.columnsByName.get(columnName)
+    if (columnId === undefined) return []
+    return [String(entry.tableId), columnId]
+  }
+
   for (const rel of uniqueRelationships) {
     // TODO: Support [external->this] relationship?
     if (rel.source_schema !== currentSchema) {
@@ -96,11 +115,7 @@ export async function getGraphDataFromTables(
         })
       }
 
-      const [source, sourceHandle] = findTablesHandleIds(
-        tables,
-        rel.source_table_name,
-        rel.source_column_name
-      )
+      const [source, sourceHandle] = findHandleIds(rel.source_table_name, rel.source_column_name)
 
       if (source) {
         edges.push({
@@ -124,16 +139,8 @@ export async function getGraphDataFromTables(
       continue
     }
 
-    const [source, sourceHandle] = findTablesHandleIds(
-      tables,
-      rel.source_table_name,
-      rel.source_column_name
-    )
-    const [target, targetHandle] = findTablesHandleIds(
-      tables,
-      rel.target_table_name,
-      rel.target_column_name
-    )
+    const [source, sourceHandle] = findHandleIds(rel.source_table_name, rel.source_column_name)
+    const [target, targetHandle] = findHandleIds(rel.target_table_name, rel.target_column_name)
 
     // We do not support [external->this] flow currently.
     if (source && target) {
@@ -163,24 +170,6 @@ export async function getGraphDataFromTables(
   return !!savedPositions
     ? getLayoutedElementsViaLocalStorage(nodes, edges, savedPositions)
     : getLayoutedElementsViaDagre(nodes, edges)
-}
-
-function findTablesHandleIds(
-  tables: PostgresTable[],
-  table_name: string,
-  column_name: string
-): [string?, string?] {
-  for (const table of tables) {
-    if (table_name !== table.name) continue
-
-    for (const column of table.columns || []) {
-      if (column_name !== column.name) continue
-
-      return [String(table.id), column.id]
-    }
-  }
-
-  return []
 }
 
 export const getLayoutedElementsViaDagre = (nodes: Node<TableNodeData>[], edges: Edge[]) => {

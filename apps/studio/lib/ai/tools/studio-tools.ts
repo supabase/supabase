@@ -1,3 +1,4 @@
+import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
@@ -38,7 +39,7 @@ export const executeSqlInputSchema = z.object({
     .boolean()
     .default(false)
     .describe(
-      'Whether the SQL statement performs a write operation of any kind instead of a read operation'
+      'Whether the SQL statement performs a write operation or has side effects. Set true for INSERT/UPDATE/DELETE/DDL and for SELECT statements that call side-effecting functions, such as select cron.schedule(...), cron.unschedule(...), or functions that create, modify, schedule, enqueue, notify, or trigger work.'
     ),
 })
 
@@ -68,12 +69,20 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
       inputSchema: executeSqlInputSchema,
       needsApproval: true,
       execute: async ({ sql }) => {
+        // The `needsApproval: true` gate on this tool means the user has
+        // explicitly approved this AI-generated SQL before execute runs —
+        // that approval is the user gesture that promotes untrusted to safe.
         const { result } = await executeSql(
-          { projectRef, connectionString, sql },
+          { projectRef, connectionString, sql: acceptUntrustedSql(untrustedSql(sql)) },
           undefined,
           authHeaders
         )
-        return aiOptInLevel === 'schema_and_log_and_data' ? result : NO_DATA_PERMISSIONS
+        return result
+      },
+      toModelOutput: ({ output }) => {
+        return aiOptInLevel === 'schema_and_log_and_data'
+          ? { type: 'json', value: output }
+          : { type: 'text', value: NO_DATA_PERMISSIONS }
       },
     }),
     deploy_edge_function: tool({

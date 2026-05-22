@@ -2,14 +2,16 @@ import dayjs from 'dayjs'
 import { Edit } from 'lucide-react'
 import { ReactNode } from 'react'
 import {
-  Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { getColumnType } from './DateTimeInput.utils'
 
@@ -40,11 +42,11 @@ export const DateTimeInput = ({
   const inputType = getColumnType(format)
 
   return (
-    <Input
+    <FormItemLayout
       layout="horizontal"
-      className={cn('w-full [&>div>div>div>input]:pr-10')}
       label={name}
-      descriptionText={
+      labelOptional={format}
+      description={
         <div className="space-y-1">
           {description}
           {format.includes('tz') && (
@@ -52,42 +54,47 @@ export const DateTimeInput = ({
           )}
         </div>
       }
-      labelOptional={format}
-      size="small"
-      value={value}
-      type={inputType}
-      step={inputType == 'datetime-local' || inputType == 'time' ? '1' : undefined}
-      actions={
-        !disabled && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button type="default" icon={<Edit />} className="px-1.5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-28 pointer-events-auto">
-              {isNullable && (
-                <DropdownMenuItem onClick={() => onChange(null)}>Set to NULL</DropdownMenuItem>
-              )}
-              <DropdownMenuItem
-                onClick={() =>
-                  onChange(
-                    dayjs().format(
-                      format === 'date'
-                        ? 'YYYY-MM-DD'
-                        : ['time', 'timetz'].includes(format)
-                          ? 'HH:mm:ss'
-                          : 'YYYY-MM-DDTHH:mm:ss'
+      isReactForm={false}
+    >
+      <InputGroup>
+        <InputGroupInput
+          size="small"
+          value={value}
+          type={inputType}
+          step={inputType == 'datetime-local' || inputType == 'time' ? '1' : undefined}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
+        />
+        <InputGroupAddon align="inline-end">
+          {!disabled && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <InputGroupButton type="default" icon={<Edit />} className="px-1.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-28 pointer-events-auto">
+                {isNullable && (
+                  <DropdownMenuItem onClick={() => onChange(null)}>Set to NULL</DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  onClick={() =>
+                    onChange(
+                      dayjs().format(
+                        format === 'date'
+                          ? 'YYYY-MM-DD'
+                          : ['time', 'timetz'].includes(format)
+                            ? 'HH:mm:ss'
+                            : 'YYYY-MM-DDTHH:mm:ss'
+                      )
                     )
-                  )
-                }
-              >
-                Set to now
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      }
-      onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-    />
+                  }
+                >
+                  Set to now
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </InputGroupAddon>
+      </InputGroup>
+    </FormItemLayout>
   )
 }
