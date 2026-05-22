@@ -18,7 +18,7 @@ export const CREATE_AWS_MANAGED_ORG_FORM_ID = 'create-aws-managed-org-form'
 
 export type NewMarketplaceOrgForm = OrganizationDetailsFormValues
 
-const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
+export const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
   const form = useForm<NewMarketplaceOrgForm>({
     resolver: zodResolver(organizationDetailsSchema),
     defaultValues: {
@@ -40,5 +40,3 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
     </Form>
   )
 }
-
-export default NewAwsMarketplaceOrgForm

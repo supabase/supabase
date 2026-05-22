@@ -12,8 +12,9 @@ import { SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 
-import NewAwsMarketplaceOrgForm, {
+import {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
+  NewAwsMarketplaceOrgForm,
   type NewMarketplaceOrgForm,
 } from './NewAwsMarketplaceOrgForm'
 import { useAwsManagedOrganizationCreateMutation } from '@/data/organizations/organization-create-mutation'
