@@ -1,0 +1,76 @@
+diff --git a/src/GoTrueClient.ts b/src/GoTrueClient.ts
+index abc123..def456 100644
+--- a/src/GoTrueClient.ts
++++ b/src/GoTrueClient.ts
+@@ -4980,7 +4980,7 @@ export class GoTrueClient {
+   private async _autoRefreshTokenTick() {
+     // ... existing code ...
+     try {
+-      await this._acquireLock(0, async () => {
++      await this._acquireLock(this.lockAcquireTimeout, async () => {
+         // ... refresh logic ...
+       })
+     } catch (e) {
+@@ -4995,6 +4995,14 @@ export class GoTrueClient {
+   private async _callRefreshToken(refreshToken: string): Promise<CallRefreshTokenResult> {
+     // refreshing is already in progress
+     if (this.refreshingDeferred) {
++      // Double-check inside the lock to avoid race condition where
++      // two callers pass the `refreshingDeferred === null` check
++      // before either one sets it. This can happen when _callRefreshToken
++      // is invoked from both __loadSession (inside lock) and
++      // _autoRefreshTokenTick (outside lock).
++      const result = await this.refreshingDeferred.promise
++      if (result) return result
++
+       return this.refreshingDeferred.promise
+     }
+ 
+diff --git a/src/lib/locks.ts b/src/lib/locks.ts
+index ghi789..jkl012 100644
+--- a/src/lib/locks.ts
++++ b/src/lib/locks.ts
+@@ -42,6 +42,13 @@ export async function navigatorLock<R>(
+ 
+   const abortController = new globalThis.AbortController()
+ 
++  // Track the lock promise so we can return it instead of throwing
++  // AbortError when the timeout fires. This prevents the
++  // "signal is aborted without reason" AbortError that propagates
++  // to callers of onAuthStateChange / getUser / refreshSession.
++  let lockPromise: Promise<Lock | null> | null = null
++  let lockResolved = false
++
+   if (acquireTimeout > 0) {
+     acquireTimeoutTimer = setTimeout(() => {
+       abortController.abort()
+@@ -52,22 +59,28 @@ export async function navigatorLock<R>(
+       // - there is a suspended lock that is freed gradually (e.g. lock queue)
+       // - the lock is stolen after a failed acquire
+       // In these cases, steal the lock to prevent hanging indefinitely
++      if (!lockResolved) {
++        abortController.abort()
++      }
+       try {
+         lock = await globalThis.navigator.locks.request(
+           name,
+           {
+             mode: 'exclusive',
+             steal: true,
++            signal: abortController.signal,
+           },
+           async () => {}
+         )
+-        // if we successfully steal the lock, continue with the original function
++        if (lock) {
++          lockResolved = true
++        }
+       } catch (stealError) {
+         // if steal fails, throw the original error
+         throw error
+       }
+     }
++    lockResolved = true
+   }
+ 
+   try {
