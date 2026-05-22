@@ -11,15 +11,8 @@ Because the headers follow the W3C standard, any compliant tracing SDK (OpenTele
 ## Requirements
 
 - `@supabase/supabase-js` version `2.106.0` or later
-- `@opentelemetry/api` resolvable at runtime (installed directly, or as a transitive
-  dependency of your tracing SDK — e.g., Sentry v8+ and Datadog already include it)
-- A tracing SDK that registers a W3C-compliant propagator with the OpenTelemetry API.
-
-  <Admonition type="note">
-
-  Vendor SDKs that wrap OTel (Sentry, Datadog, Honeycomb, etc.) work — but some require additional configuration to inject the standard `traceparent` header alongside their proprietary headers. Check your vendor's OTel integration docs.
-
-  </Admonition>
+- `@opentelemetry/api` available at runtime — either installed directly or pulled in as a transitive dependency of your tracing SDK
+- A tracing SDK that registers a W3C-compliant propagator with the OpenTelemetry API
 
 If `@opentelemetry/api` is not installed, or there is no active trace context at request time, the SDK silently no-ops.
 
@@ -34,8 +27,8 @@ The Supabase SDK only takes care of propagating the trace context that's already
 Trace propagation is opt-in. Pass `tracePropagation: true` when creating the client:
 
 ```ts
-import { createClient } from '@supabase/supabase-js'
 import { trace } from '@opentelemetry/api'
+import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   tracePropagation: true,
@@ -81,6 +74,10 @@ Once trace context is flowing through, the `trace_id` appears in:
 - **Edge Function logs** — invocations and any structured logs emitted from within the function
 
 If you forward Supabase logs to a third-party backend via [Log Drains](/guides/telemetry/log-drains), you can join Supabase logs to your own client and server traces using the shared `trace_id`. This is especially useful for self-hosted setups where you already operate your own OpenTelemetry collector — Supabase logs become first-class citizens in your existing tracing UI.
+
+## Using a vendor tracing SDK
+
+Many tracing SDKs are built on top of OpenTelemetry. They work with this guide as long as a W3C-compliant propagator is registered — but propagator behavior varies. Some vendor SDKs inject only their proprietary headers by default and need extra configuration to also emit the standard `traceparent` header. Check your vendor's OTel integration docs for the exact setup.
 
 ## Troubleshooting
 
