@@ -772,8 +772,8 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
       <DownloadSnippetModal
         id={selectedSnippetToDownload?.id ?? ''}
-        visible={selectedSnippetToDownload !== undefined}
-        onCancel={() => setSelectedSnippetToDownload(undefined)}
+        open={selectedSnippetToDownload !== undefined}
+        onOpenChange={() => setSelectedSnippetToDownload(undefined)}
       />
 
       <ShareSnippetModal

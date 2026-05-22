@@ -4,7 +4,22 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { AiIconAnimation, Button, Form, FormControl, FormField, Input, Modal, Textarea } from 'ui'
+import {
+  AiIconAnimation,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Textarea,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -163,77 +178,85 @@ export const RenameQueryModal = ({
   }
 
   return (
-    <Modal visible={visible} onCancel={handleCancel} hideFooter header="Rename" size="small">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-          <Modal.Content className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItemLayout name="name" layout="vertical" label="Name">
-                  <FormControl>
-                    <Input {...field} id="name" />
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
-            <div className="flex w-full justify-end mt-2">
-              {!hasHipaaAddon && (
-                <ButtonTooltip
-                  type="default"
-                  onClick={() => generateTitle()}
-                  size="tiny"
-                  disabled={isTitleGenerationLoading || !isApiKeySet}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: isApiKeySet
-                        ? undefined
-                        : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
-                    },
-                  }}
-                >
-                  <div className="flex items-center gap-1">
-                    <div className="scale-75">
-                      <AiIconAnimation loading={isTitleGenerationLoading} />
+    <Dialog open={visible} onOpenChange={handleCancel}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Rename</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+            <DialogSection className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout name="name" layout="vertical" label="Name">
+                    <FormControl>
+                      <Input {...field} id="name" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+              <div className="flex w-full justify-end mt-2">
+                {!hasHipaaAddon && (
+                  <ButtonTooltip
+                    type="default"
+                    onClick={() => generateTitle()}
+                    size="tiny"
+                    disabled={isTitleGenerationLoading || !isApiKeySet}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: isApiKeySet
+                          ? undefined
+                          : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                      },
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      <div className="scale-75">
+                        <AiIconAnimation loading={isTitleGenerationLoading} />
+                      </div>
+                      <span>Rename with Supabase AI</span>
                     </div>
-                    <span>Rename with Supabase AI</span>
-                  </div>
-                </ButtonTooltip>
-              )}
-            </div>
-          </Modal.Content>
-          <Modal.Content>
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItemLayout name="description" layout="vertical" label="Description">
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      id="description"
-                      rows={4}
-                      placeholder="Describe query"
-                      className="resize-none"
-                    />
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content className="flex items-center justify-end gap-2">
-            <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isSubmitting}>
-              Cancel
-            </Button>
-            <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
-              Rename query
-            </Button>
-          </Modal.Content>
-        </form>
-      </Form>
-    </Modal>
+                  </ButtonTooltip>
+                )}
+              </div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItemLayout name="description" layout="vertical" label="Description">
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        id="description"
+                        rows={4}
+                        placeholder="Describe query"
+                        className="resize-none"
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogFooter>
+              <Button
+                htmlType="reset"
+                type="default"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
+                Rename query
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

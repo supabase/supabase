@@ -161,8 +161,8 @@ export const SearchList = ({ search }: SearchListProps) => {
 
       <DownloadSnippetModal
         id={selectedSnippetToDownload?.id ?? ''}
-        visible={selectedSnippetToDownload !== undefined}
-        onCancel={() => setSelectedSnippetToDownload(undefined)}
+        open={selectedSnippetToDownload !== undefined}
+        onOpenChange={() => setSelectedSnippetToDownload(undefined)}
       />
 
       <RenameQueryModal
