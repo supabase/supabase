@@ -97,7 +97,7 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
             <div />
           ) : (
             <LogsBarChart
-              data={data.eventChartData}
+              data={data.total === 0 ? [] : data.eventChartData}
               DateTimeFormat={datetimeFormat}
               onBarClick={onBarClick}
               EmptyState={
@@ -110,28 +110,32 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
         </Loading>
       </div>
 
-      {data.total > 0 && (
-        <div className="flex items-center justify-center mt-2 text-xs text-foreground-lighter gap-4 font-mono tabular-nums tracking-tight">
-          {errorRate > 0 && (
-            <span className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
-              {errorRate.toFixed(2)}% errors
-            </span>
-          )}
-          {warningRate > 0 && (
-            <span className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-warning" />
-              {warningRate.toFixed(2)}% warnings
-            </span>
-          )}
-          {errorRate === 0 && warningRate === 0 && (
-            <span className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-brand" />
-              0% errors
-            </span>
-          )}
-        </div>
-      )}
+      <div className="flex items-center justify-center mt-2 text-xs text-foreground-lighter gap-4 font-mono tabular-nums tracking-tight">
+        {data.total > 0 ? (
+          <>
+            {errorRate > 0 && (
+              <span className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                {errorRate.toFixed(2)}% errors
+              </span>
+            )}
+            {warningRate > 0 && (
+              <span className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-warning" />
+                {warningRate.toFixed(2)}% warnings
+              </span>
+            )}
+            {errorRate === 0 && warningRate === 0 && (
+              <span className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-brand" />
+                0% errors
+              </span>
+            )}
+          </>
+        ) : !data.isLoading ? (
+          <span>No requests in this period</span>
+        ) : null}
+      </div>
     </Link>
   )
 }

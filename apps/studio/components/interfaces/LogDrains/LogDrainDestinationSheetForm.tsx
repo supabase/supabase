@@ -109,10 +109,6 @@ const lokiSubmitSchema = z.object({
   headers: headerRecordSchema,
 })
 
-const elasticSchema = z.object({
-  type: z.literal('elastic'),
-})
-
 const postgresSchema = z.object({
   type: z.literal('postgres'),
 })
@@ -199,8 +195,6 @@ const formUnion = z.discriminatedUnion('type', [
   webhookFormSchema,
   datadogSchema,
   lokiFormSchema,
-  // [Joshen] To fix API types, not supported in the UI
-  elasticSchema,
   postgresSchema,
   bigquerySchema,
   clickhouseSchema,
@@ -216,7 +210,6 @@ const submitUnion = z.discriminatedUnion('type', [
   webhookSubmitSchema,
   datadogSchema,
   lokiSubmitSchema,
-  elasticSchema,
   postgresSchema,
   bigquerySchema,
   clickhouseSchema,

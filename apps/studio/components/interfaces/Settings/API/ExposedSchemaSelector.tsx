@@ -21,6 +21,14 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { pluralize } from '@/lib/helpers'
 
+/**
+ * [Joshen] This would only affect graphql_public and pgmq_public, given that they're intended
+ * to be public, we can let users expose them via the API, but not let them adjust the schema via the dashboard
+ * */
+export const internalSchemasCannotExpose = new Set(
+  INTERNAL_SCHEMAS.filter((x) => !x.endsWith('_public'))
+)
+
 interface ExposedSchemaSelectorProps {
   disabled?: boolean
   selectedSchemas: string[]
@@ -49,10 +57,7 @@ export const ExposedSchemaSelector = ({
   const schemas = useMemo(
     () =>
       (allSchemas ?? [])
-        .filter((s) => {
-          if (s.name === 'graphql_public') return true
-          return !INTERNAL_SCHEMAS.includes(s.name)
-        })
+        .filter((s) => !internalSchemasCannotExpose.has(s.name))
         .sort((a, b) => a.name.localeCompare(b.name)),
     [allSchemas]
   )
@@ -129,9 +134,15 @@ export const ExposedSchemaSelector = ({
                             <Check size={16} className="text-brand shrink-0" />
                             <span className="truncate">{schema}</span>
                           </div>
-                          <span className="pl-6 text-destructive text-[11px]">
-                            This schema does not exist
-                          </span>
+                          {internalSchemasCannotExpose.has(schema) ? (
+                            <span className="pl-6 text-warning text-xs tracking-tight">
+                              This schema is protected and should not be exposed
+                            </span>
+                          ) : (
+                            <span className="pl-6 text-foreground-lighter text-xs tracking-tight">
+                              This schema does not exist and can be safely removed
+                            </span>
+                          )}
                         </div>
                       </CommandItem>
                     ))}
