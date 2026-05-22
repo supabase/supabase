@@ -99,8 +99,7 @@ export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
-  const { mutateAsync: resetAuthTemplate, isPending: isResettingTemplates } =
-    useAuthTemplateResetMutation()
+  const { mutateAsync: resetAuthTemplate } = useAuthTemplateResetMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
   const [showDisableConfirmation, setShowDisableConfirmation] = useState(false)
@@ -218,11 +217,12 @@ export const SmtpForm = () => {
     if (!pendingValues || !projectRef) return
 
     doUpdate(pendingValues, () => {
-      Promise.allSettled(
-        AUTH_TEMPLATE_RESET_TYPES.map((template) => resetAuthTemplate({ projectRef, template }))
-      )
       setShowDisableConfirmation(false)
       setPendingValues(null)
+      // Reset templates as best-effort background work after SMTP is disabled
+      for (const template of AUTH_TEMPLATE_RESET_TYPES) {
+        resetAuthTemplate({ projectRef, template })
+      }
     })
   }
 
@@ -501,7 +501,7 @@ export const SmtpForm = () => {
                   <Button
                     type="primary"
                     htmlType="submit"
-                    loading={isUpdatingConfig || isResettingTemplates}
+                    loading={isUpdatingConfig}
                     disabled={!canUpdateConfig || !isDirty}
                   >
                     Save changes
@@ -516,7 +516,7 @@ export const SmtpForm = () => {
         open={showDisableConfirmation}
         onOpenChange={setShowDisableConfirmation}
         onConfirm={handleConfirmDisable}
-        isLoading={isUpdatingConfig || isResettingTemplates}
+        isLoading={isUpdatingConfig}
       />
     </PageSection>
   )

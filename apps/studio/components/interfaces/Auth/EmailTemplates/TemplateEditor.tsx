@@ -205,11 +205,13 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
       authConfig?.MAILER_SUBJECTS_CUSTOM_CONTENTS?.[subjectSlug] === true)
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
   const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
-  const saveChangesTooltip = !canEdit
-    ? 'Set up custom SMTP to edit and save templates'
-    : !hasChanges
-      ? 'Make a change before saving'
-      : undefined
+  const saveChangesTooltip = !canUpdateConfig
+    ? 'You need additional permissions to edit templates'
+    : isReadOnly
+      ? 'Set up custom SMTP to edit and save templates'
+      : !hasChanges
+        ? 'Make a change before saving'
+        : undefined
 
   // Function to insert text at cursor position
   const insertTextAtCursor = (text: string) => {
@@ -329,7 +331,11 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   }}
                   borderOverride="border-muted"
                   disabledOptions={!canEdit ? ['source'] : []}
-                  disabledOptionTooltip="Set up custom SMTP to edit the source"
+                  disabledOptionTooltip={
+                    !canUpdateConfig
+                      ? 'You need additional permissions to edit templates'
+                      : 'Set up custom SMTP to edit the source'
+                  }
                 />
               </div>
               {activeView === 'source' ? (
