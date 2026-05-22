@@ -18,7 +18,7 @@ If `@opentelemetry/api` is not installed, or there is no active trace context at
 
 ## Set up OpenTelemetry first
 
-The SDK reads from whatever `TracerProvider` is registered globally — it doesn't configure one for you. If you haven't instrumented your app yet, follow the [OpenTelemetry JavaScript getting started guide](https://opentelemetry.io/docs/languages/js/getting-started/) to install an SDK (`@opentelemetry/sdk-trace-node` for Node, `@opentelemetry/sdk-trace-web` for browsers) and an exporter for your backend (OTLP, Jaeger, Zipkin, or a vendor-specific one).
+The SDK reads from whatever `TracerProvider` you register globally — it doesn't configure one for you. If you haven't instrumented your app yet, follow the [OpenTelemetry JavaScript getting started guide](https://opentelemetry.io/docs/languages/js/getting-started/) to install an SDK (`@opentelemetry/sdk-trace-node` for Node, `@opentelemetry/sdk-trace-web` for browsers) and an exporter for your backend (OTLP, Jaeger, Zipkin, or a vendor-specific one).
 
 The Supabase SDK only takes care of propagating the trace context that's already active when a request is made.
 
