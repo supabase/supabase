@@ -316,22 +316,23 @@ export const NewOrgForm = ({
           { surface: 'org_form', reason: 'org_form_blank' },
           groupOverrides
         )
-        return
+      } else {
+        track(
+          'onboarding_survey_submit_button_clicked',
+          { surface: 'org_form', hasHeardFrom, hasBuilding },
+          groupOverrides
+        )
       }
 
-      track(
-        'onboarding_survey_submit_button_clicked',
-        { surface: 'org_form', hasHeardFrom, hasBuilding },
-        groupOverrides
-      )
-
+      // Always persist kind/size: omitKindFromOrgCreation removes them from the
+      // org creation payload for survey variants, so this is the only save path.
       try {
         await submitOnboardingSurvey({
           slug,
           kind,
           size,
-          heard_from: heardFrom,
-          building,
+          heard_from: heardFrom || undefined,
+          building: building || undefined,
         })
       } catch {
         track(
