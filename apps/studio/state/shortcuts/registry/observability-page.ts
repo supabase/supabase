@@ -13,6 +13,7 @@ export const OBSERVABILITY_PAGE_SHORTCUT_IDS = {
   OBSERVABILITY_FOCUS_FILTER: 'observability.focus-filter',
   OBSERVABILITY_RESET_FILTERS: 'observability.reset-filters',
   OBSERVABILITY_NEW_REPORT: 'observability.new-report',
+  OBSERVABILITY_RESET_REPORT: 'observability.reset-report',
 }
 
 export type ObservabilityPageShortcutId =
@@ -28,7 +29,7 @@ export const observabilityPageRegistry: RegistryDefinations<ObservabilityPageSho
   },
   [OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER]: {
     id: OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER,
-    label: 'Open time range picker',
+    label: 'Open time picker',
     sequence: ['Shift+P'],
     showInSettings: false,
     options: { ignoreInputs: true, registerInCommandMenu: true },
@@ -51,6 +52,13 @@ export const observabilityPageRegistry: RegistryDefinations<ObservabilityPageSho
     id: OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_NEW_REPORT,
     label: 'New custom report',
     sequence: ['Shift+N'],
+    showInSettings: false,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
+  },
+  [OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_RESET_REPORT]: {
+    id: OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_RESET_REPORT,
+    label: 'Reset report',
+    sequence: ['R', 'C'],
     showInSettings: false,
     options: { ignoreInputs: true, registerInCommandMenu: true },
   },

@@ -240,6 +240,7 @@ const ReportFilterBar = ({
             helpers={datepickerHelpers}
             open={showDatePicker}
             onOpenChange={setShowDatePicker}
+            shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
           />
         )}
         {!selectedProduct && (
