@@ -123,6 +123,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Collapsible Card Section',
+          href: '/docs/fragments/collapsible-card-section',
+          items: [],
+        },
+        {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
           items: [],
@@ -130,11 +135,6 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Empty State Presentational',
           href: '/docs/fragments/empty-state-presentational',
-          items: [],
-        },
-        {
-          title: 'Modal',
-          href: '/docs/fragments/modal',
           items: [],
         },
         {

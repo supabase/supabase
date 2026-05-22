@@ -104,24 +104,26 @@ export const MarketplaceFilterBar = ({
               All categories
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {categoryOptions.map((c) => {
-              const Icon = getCategoryIcon(c.slug)
-              return (
-                <DropdownMenuItem
-                  key={c.slug}
-                  onClick={() => onCategoryChange(c.slug)}
-                  className="flex items-center gap-2"
-                >
-                  <Icon size={13} className="text-foreground-lighter" />
-                  <span className="flex-1">{c.name}</span>
-                  {categoryCounts?.[c.slug] !== undefined && (
-                    <span className="font-mono text-xs text-foreground-lighter">
-                      {categoryCounts[c.slug]}
-                    </span>
-                  )}
-                </DropdownMenuItem>
-              )
-            })}
+            {categoryOptions
+              .filter((c) => !categoryCounts || categoryCounts[c.slug] > 0)
+              .map((c) => {
+                const Icon = getCategoryIcon(c.slug)
+                return (
+                  <DropdownMenuItem
+                    key={c.slug}
+                    onClick={() => onCategoryChange(c.slug)}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon size={13} className="text-foreground-lighter" />
+                    <span className="flex-1">{c.name}</span>
+                    {categoryCounts?.[c.slug] !== undefined && (
+                      <span className="font-mono text-xs text-foreground-lighter">
+                        {categoryCounts[c.slug]}
+                      </span>
+                    )}
+                  </DropdownMenuItem>
+                )
+              })}
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>

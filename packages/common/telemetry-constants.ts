@@ -1929,7 +1929,7 @@ export interface ConnectSheetOpenedEvent {
     /**
      * Where the sheet was opened from
      */
-    source: 'header_button' | 'connect_section'
+    source: 'header_button' | 'connect_section' | 'keyboard_shortcut'
   }
   groups: TelemetryGroups
 }
