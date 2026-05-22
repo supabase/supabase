@@ -36,6 +36,7 @@ allow_list = [
     "[Bb]uilt-ins?",
 	"[Cc]atalogs?",
     "[Cc]hangelogs?",
+    "CircleCI",
     "[Cc]odebases?",
     "[Cc]odepaths?",
     "[Cc]onfigs?",
