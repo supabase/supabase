@@ -76,15 +76,27 @@ export function parseConnectionsData(
   infraData: InfraMonitoringResponse | undefined,
   maxConnectionsData: MaxConnectionsData | undefined
 ): ConnectionsData {
-  if (!infraData) {
-    return { current: 0, max: 0 }
+  const max = maxConnectionsData?.maxConnections || 0
+
+  if (!infraData || !('series' in infraData)) {
+    return { current: 0, max }
   }
 
-  const series = 'series' in infraData ? infraData.series : {}
+  // Read the most recent data point rather than the window's totalAverage so the
+  // overview matches the details chart, which shows the latest value. Using the
+  // average makes the count vary with bucket granularity (e.g. 1h vs 1m) and
+  // skews towards older samples in the window.
+  const points = infraData.data ?? []
+  let currentVal: string | number | undefined
+  for (let i = points.length - 1; i >= 0; i--) {
+    const v = points[i]?.values?.pg_stat_database_num_backends
+    if (v !== undefined && v !== null && v !== '') {
+      currentVal = v
+      break
+    }
+  }
 
-  const currentVal = series.pg_stat_database_num_backends?.totalAverage
   const current = Math.round(parseNumericValue(currentVal))
-  const max = maxConnectionsData?.maxConnections || 0
 
   return { current, max }
 }
