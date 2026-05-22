@@ -55,7 +55,7 @@ You can view Logs Ingest usage on the [organization's usage page](/dashboard/org
 
 ## Optimize usage
 
-Logs are generated automatically by every service in your Supabase project — you don't write them directly. Log volume scales with your application's traffic and behavior. To reduce ingest volume:
+Every service in your Supabase project automatically generates Logs — you don't write them directly. Log volume scales with your application's traffic and behavior. To reduce ingest volume:
 
 - **Reduce log-level verbosity** in your Edge Functions and server-side code (for example, `info` → `warn` in production).
 - **Audit verbose logging in your application code.** Application-level logs forwarded to Supabase services count toward ingest.
