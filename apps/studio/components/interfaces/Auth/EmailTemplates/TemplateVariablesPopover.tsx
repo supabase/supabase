@@ -34,7 +34,11 @@ export const TemplateVariablesPopover = ({ template }: TemplateVariablesPopoverP
           Template variables
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 space-y-3 p-4">
+      <PopoverContent
+        align="end"
+        className="w-80 space-y-3 p-4"
+        onOpenAutoFocus={(event) => event.preventDefault()}
+      >
         <div className="flex flex-col gap-1">
           <p className="text-sm text-foreground">Template variables</p>
           <p className="text-sm text-foreground-lighter">
