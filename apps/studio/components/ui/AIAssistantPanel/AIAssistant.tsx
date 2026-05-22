@@ -29,6 +29,7 @@ import {
   ConversationScrollButton,
 } from './elements/Conversation'
 import { Message } from './Message'
+import { SupportAssistantFollowUpHeader } from './SupportAssistantFollowUpHeader'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
@@ -414,6 +415,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
             <ConversationContent className="w-full px-7 py-8 mb-10">
+              {snap.pendingSupportFollowUp &&
+                snap.pendingSupportFollowUp.chatId === snap.activeChatId && (
+                  <SupportAssistantFollowUpHeader request={snap.pendingSupportFollowUp.request} />
+                )}
               {renderedMessages}
               {error && (
                 <>

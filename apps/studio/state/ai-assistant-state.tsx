@@ -7,6 +7,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
+import type { SubmittedSupportRequest } from '@/components/interfaces/Support/SupportForm.state'
 import { constructHeaders } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
@@ -315,9 +316,16 @@ export const createAiAssistantState = (): AiAssistantState => {
     chatInstances: {},
     pendingSpanIds: {},
     messageSpanIds: {},
+    pendingSupportFollowUp: undefined,
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
+    },
+
+    setPendingSupportFollowUp: (
+      payload: { request: SubmittedSupportRequest; chatId: string } | undefined
+    ) => {
+      state.pendingSupportFollowUp = payload
     },
 
     resetAiAssistantPanel: () => {
@@ -538,7 +546,11 @@ export type AiAssistantState = AiAssistantData & {
   chatInstances: Record<string, Chat<MessageType>>
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
+  pendingSupportFollowUp: { request: SubmittedSupportRequest; chatId: string } | undefined
   setContext: (context: Partial<AiAssistantContext>) => void
+  setPendingSupportFollowUp: (
+    payload: { request: SubmittedSupportRequest; chatId: string } | undefined
+  ) => void
   setModel: (model: AssistantModel) => void
   newChat: (
     options?: { name?: string; initialMessage?: string } & Partial<

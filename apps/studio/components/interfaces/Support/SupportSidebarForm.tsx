@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { useFlag } from 'common'
 import { Loader2 } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useCallback, useReducer } from 'react'
 import { toast } from 'sonner'
@@ -14,13 +13,13 @@ import { createInitialSupportFormState, supportFormReducer } from './SupportForm
 import { NO_PROJECT_MARKER, type SupportFormUrlKeys } from './SupportForm.utils'
 import { SupportFormV3 } from './SupportFormV3'
 import { useSupportForm } from './useSupportForm'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { buildSupportAssistantPrompt } from '@/components/ui/AIAssistantPanel/SupportRequestMessage.utils'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
-
-const SupportAssistantSuccessCard = dynamic(() =>
-  import('./SupportAssistantSuccessCard').then((m) => m.SupportAssistantSuccessCard)
-)
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 function useSupportFormTelemetry() {
   const { mutate: sendEvent } = useSendEventMutation()
@@ -57,6 +56,8 @@ export function SupportForm({ initialParams }: SupportFormProps) {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
   const { form, initialError, projectRef } = useSupportForm(dispatch, initialParams)
   const showSupportAssistantFollowUp = useFlag('supportAssistantFollowUp') === true
+  const aiAssistant = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
   const {
     data: allStatusPageEvents,
@@ -75,6 +76,21 @@ export function SupportForm({ initialParams }: SupportFormProps) {
       orgSlug: curr.sentOrgSlug,
       category: curr.sentCategory,
     })
+
+    const hasProjectScopedRequest =
+      curr.submittedRequest.projectRef !== undefined &&
+      curr.submittedRequest.projectRef !== NO_PROJECT_MARKER
+    if (showSupportAssistantFollowUp && hasProjectScopedRequest) {
+      const chatId = aiAssistant.newChat({
+        name: 'Support request',
+        initialMessage: buildSupportAssistantPrompt(curr.submittedRequest),
+      })
+      aiAssistant.setPendingSupportFollowUp({
+        request: curr.submittedRequest,
+        chatId,
+      })
+      openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    }
   })
 
   useStateTransition(state, 'submitting', 'error', (_, curr) => {
@@ -84,11 +100,6 @@ export function SupportForm({ initialParams }: SupportFormProps) {
   })
 
   const successState = state.type === 'success' ? state : null
-  const showAssistantSuccessCard =
-    showSupportAssistantFollowUp &&
-    successState !== null &&
-    successState.submittedRequest.projectRef !== undefined &&
-    successState.submittedRequest.projectRef !== NO_PROJECT_MARKER
 
   return (
     <div className="relative h-full overflow-y-auto overflow-x-hidden">
@@ -109,9 +120,6 @@ export function SupportForm({ initialParams }: SupportFormProps) {
                 sentCategory={successState.sentCategory}
                 showFinishAction={false}
               />
-              {showAssistantSuccessCard && (
-                <SupportAssistantSuccessCard request={successState.submittedRequest} />
-              )}
             </div>
           ) : (
             <SupportFormV3
