@@ -250,6 +250,7 @@ const DatabaseUsage = () => {
                 helpers={datePickerHelpers}
                 open={showDatePicker}
                 onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
               />
               <UpgradePrompt
                 show={showUpgradePrompt}

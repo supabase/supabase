@@ -183,10 +183,13 @@ const ReportFilterBar = ({
     },
     { enabled: Boolean(onRefresh) && !isLoading }
   )
-  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
-    if (hideDatepicker) return
-    setShowDatePicker((open) => !open)
-  })
+  useShortcut(
+    SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER,
+    () => {
+      setShowDatePicker((open) => !open)
+    },
+    { enabled: !hideDatepicker }
+  )
   useShortcut(SHORTCUT_IDS.OBSERVABILITY_FOCUS_FILTER, () => {
     setShowAdder(true)
   })

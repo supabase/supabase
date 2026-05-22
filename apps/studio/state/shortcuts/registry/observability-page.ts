@@ -26,14 +26,14 @@ export const observabilityPageRegistry: RegistryDefinations<ObservabilityPageSho
     label: 'Refresh report',
     sequence: ['Shift+R'],
     showInSettings: false,
-    options: { ignoreInputs: true, registerInCommandMenu: true },
+    options: { ignoreInputs: true, registerInCommandMenu: true, conflictBehavior: 'allow' },
   },
   [OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER]: {
     id: OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER,
     label: 'Open time picker',
     sequence: ['Shift+P'],
     showInSettings: false,
-    options: { ignoreInputs: true, registerInCommandMenu: true },
+    options: { ignoreInputs: true, registerInCommandMenu: true, conflictBehavior: 'allow' },
   },
   [OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_FOCUS_FILTER]: {
     id: OBSERVABILITY_PAGE_SHORTCUT_IDS.OBSERVABILITY_FOCUS_FILTER,
