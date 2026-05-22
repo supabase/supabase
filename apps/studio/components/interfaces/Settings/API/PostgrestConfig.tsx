@@ -287,9 +287,6 @@ export const PostgrestConfig = () => {
                       layout="flex-row-reverse"
                       label="Exposed schemas"
                       description="Select schemas to include in the Data API. Schemas must be included before tables can be exposed."
-                      error={
-                        missingExposedSchema.length > 0 ? 'Some exposed schemas are missing' : null
-                      }
                     >
                       <ExposedSchemaSelector
                         selectedSchemas={watchedDbSchema}
@@ -309,6 +306,13 @@ export const PostgrestConfig = () => {
                           }
                         }}
                       />
+                      {missingExposedSchema.length > 0 ? (
+                        <p className="mt-1 text-sm text-foreground-lighter">
+                          {missingExposedSchema.length} exposed schema
+                          {missingExposedSchema.length > 1 ? 's' : ''} does not exist — safe to
+                          remove
+                        </p>
+                      ) : null}
                     </FormItemLayout>
 
                     <FormItemLayout
