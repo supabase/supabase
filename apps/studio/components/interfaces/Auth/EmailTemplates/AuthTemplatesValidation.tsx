@@ -51,12 +51,12 @@ const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
   Provider: {
     name: 'Provider',
     value: '{{ .Provider }}',
-    description: 'Provider of newly linked/unlinked identity',
+    description: 'Provider of the sign-in method',
   },
   FactorType: {
     name: 'FactorType',
     value: '{{ .FactorType }}',
-    description: 'Type of newly enrolled/unenrolled MFA factor',
+    description: 'Type of verification method',
   },
   Data: {
     name: 'Data',
@@ -110,13 +110,16 @@ const INVITE: AuthTemplate = {
   id: 'INVITE',
   type: 'object',
   title: 'Invite user',
-  purpose: "Invite users who don't yet have an account to sign up",
+  purpose: 'Invite someone to create an account',
   properties: {
     MAILER_SUBJECTS_INVITE: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_INVITE_CONTENT: { title: 'Body', type: 'code' },
   },
   variables: [
-    TemplateVariables.ConfirmationURL,
+    {
+      ...TemplateVariables.ConfirmationURL,
+      description: 'URL to accept the invitation for creating an account',
+    },
     TemplateVariables.Token,
     TemplateVariables.TokenHash,
     TemplateVariables.SiteURL,
@@ -142,7 +145,10 @@ const MAGIC_LINK: AuthTemplate = {
     MAILER_TEMPLATES_MAGIC_LINK_CONTENT: { title: 'Body', type: 'code' },
   },
   variables: [
-    TemplateVariables.ConfirmationURL,
+    {
+      ...TemplateVariables.ConfirmationURL,
+      description: "URL for a one-time sign-in to the user's account",
+    },
     TemplateVariables.Token,
     TemplateVariables.TokenHash,
     TemplateVariables.SiteURL,
@@ -168,7 +174,10 @@ const EMAIL_CHANGE: AuthTemplate = {
     MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: { title: 'Body', type: 'code' },
   },
   variables: [
-    TemplateVariables.ConfirmationURL,
+    {
+      ...TemplateVariables.ConfirmationURL,
+      description: 'URL to confirm the change of email address',
+    },
     TemplateVariables.Token,
     TemplateVariables.TokenHash,
     TemplateVariables.SiteURL,
@@ -189,13 +198,16 @@ const RECOVERY: AuthTemplate = {
   id: 'RECOVERY',
   type: 'object',
   title: 'Reset password',
-  purpose: 'Allow users to reset their password if they forget it',
+  purpose: 'Send a password reset link or code',
   properties: {
     MAILER_SUBJECTS_RECOVERY: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_RECOVERY_CONTENT: { title: 'Body', type: 'code' },
   },
   variables: [
-    TemplateVariables.ConfirmationURL,
+    {
+      ...TemplateVariables.ConfirmationURL,
+      description: 'URL for resetting the account password',
+    },
     TemplateVariables.Token,
     TemplateVariables.TokenHash,
     TemplateVariables.SiteURL,
@@ -215,7 +227,7 @@ const REAUTHENTICATION: AuthTemplate = {
   id: 'REAUTHENTICATION',
   type: 'object',
   title: 'Reauthentication',
-  purpose: 'Ask users to re-authenticate before performing a sensitive action',
+  purpose: 'Ask users to verify their identity before a sensitive operation',
   properties: {
     MAILER_SUBJECTS_REAUTHENTICATION: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: { title: 'Body', type: 'code' },
@@ -297,8 +309,8 @@ const PHONE_CHANGED_NOTIFICATION: AuthTemplate = {
 const IDENTITY_LINKED_NOTIFICATION: AuthTemplate = {
   id: 'IDENTITY_LINKED_NOTIFICATION',
   type: 'object',
-  title: 'Identity linked',
-  purpose: 'Notify users when a new identity has been linked to their account',
+  title: 'Sign-in method linked',
+  purpose: 'Notify users when a sign-in method has been linked to their account',
   properties: {
     MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_IDENTITY_LINKED_NOTIFICATION_CONTENT: { title: 'Body', type: 'code' },
@@ -315,8 +327,8 @@ const IDENTITY_LINKED_NOTIFICATION: AuthTemplate = {
 const IDENTITY_UNLINKED_NOTIFICATION: AuthTemplate = {
   id: 'IDENTITY_UNLINKED_NOTIFICATION',
   type: 'object',
-  title: 'Identity unlinked',
-  purpose: 'Notify users when an identity has been unlinked from their account',
+  title: 'Sign-in method removed',
+  purpose: 'Notify users when a sign-in method has been removed from their account',
   properties: {
     MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_IDENTITY_UNLINKED_NOTIFICATION_CONTENT: { title: 'Body', type: 'code' },
