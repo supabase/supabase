@@ -15,7 +15,14 @@ import { get } from '@/data/fetchers'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from '@/hooks/analytics/useTimeseriesUnixToIso'
 
-export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'
+export type ServiceKey =
+  | 'db'
+  | 'functions'
+  | 'auth'
+  | 'storage'
+  | 'realtime'
+  | 'data_api'
+  | 'postgrest'
 
 export type ServiceHealthData = {
   total: number
@@ -41,6 +48,7 @@ const SERVICE_CONFIG: Record<ServiceKey, ServiceConfig> = {
   functions: { table: LogsTableName.FN_EDGE, enabled: true },
   storage: { table: LogsTableName.STORAGE, enabled: true },
   realtime: { table: LogsTableName.REALTIME, enabled: true },
+  data_api: { table: LogsTableName.EDGE, enabled: true },
   postgrest: { table: LogsTableName.POSTGREST, enabled: true },
 }
 
@@ -192,6 +200,13 @@ export const useServiceHealthMetrics = (
     endDate,
     enabled,
   })
+  const data_api = useServiceHealthQuery({
+    projectRef,
+    serviceKey: 'data_api',
+    startDate,
+    endDate,
+    enabled,
+  })
   const postgrest = useServiceHealthQuery({
     projectRef,
     serviceKey: 'postgrest',
@@ -207,9 +222,10 @@ export const useServiceHealthMetrics = (
       functions,
       storage,
       realtime,
+      data_api,
       postgrest,
     }),
-    [db, auth, functions, storage, realtime, postgrest]
+    [db, auth, functions, storage, realtime, data_api, postgrest]
   )
 
   // Calculate aggregated metrics
