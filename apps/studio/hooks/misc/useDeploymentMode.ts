@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import { useDeploymentModeQuery } from '@/data/config/deployment-mode-query'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -19,10 +21,13 @@ export type DeploymentMode = {
  * CLI vs self-hosted is resolved server-side by /platform/deployment-mode
  * (reading `CURRENT_CLI_VERSION`). The underlying query is disabled on
  * platform builds, so the hook is a no-op there.
+ *
+ * The return is memoized on the primitive flags so consumers can safely list
+ * the whole `DeploymentMode` object in their `useMemo`/`useCallback` deps.
  */
 export function useDeploymentMode(): DeploymentMode {
   const { data } = useDeploymentModeQuery()
   const isCli = !IS_PLATFORM && (data?.is_cli_mode ?? false)
   const isSelfHosted = !IS_PLATFORM && !isCli
-  return { isPlatform: IS_PLATFORM, isCli, isSelfHosted }
+  return useMemo(() => ({ isPlatform: IS_PLATFORM, isCli, isSelfHosted }), [isCli, isSelfHosted])
 }

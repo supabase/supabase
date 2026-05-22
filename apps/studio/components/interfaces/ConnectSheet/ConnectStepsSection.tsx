@@ -67,38 +67,53 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
-  const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
-  const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
-  const connectionInfo = pluckObjectFields(settings || emptyState, DB_FIELDS)
+  // Each intermediate derived value is memoized so its reference stays stable
+  // across renders while the upstream query data is unchanged. Without this,
+  // pluckObjectFields / getConnectionStrings would mint fresh objects every
+  // render and invalidate the final useMemo on each tick (and ripple through
+  // every consumer that lists ConnectionStringPooler in their own deps).
+  const connectionInfo = useMemo(() => {
+    const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
+    const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
+    return pluckObjectFields(settings || emptyState, DB_FIELDS)
+  }, [settings])
+
   const poolingConfigurationShared = supavisorConfig?.find((x) => x.database_type === 'PRIMARY')
   const poolingConfigurationDedicated = allowPgBouncerSelection ? pgbouncerConfig : undefined
 
-  const connectionStringsShared = getConnectionStrings({
-    connectionInfo,
-    poolingInfo: {
-      connectionString: poolingConfigurationShared?.connection_string ?? '',
-      db_host: poolingConfigurationShared?.db_host ?? '',
-      db_name: poolingConfigurationShared?.db_name ?? '',
-      db_port: poolingConfigurationShared?.db_port ?? 0,
-      db_user: poolingConfigurationShared?.db_user ?? '',
-    },
-    metadata: { projectRef },
-  })
+  const connectionStringsShared = useMemo(
+    () =>
+      getConnectionStrings({
+        connectionInfo,
+        poolingInfo: {
+          connectionString: poolingConfigurationShared?.connection_string ?? '',
+          db_host: poolingConfigurationShared?.db_host ?? '',
+          db_name: poolingConfigurationShared?.db_name ?? '',
+          db_port: poolingConfigurationShared?.db_port ?? 0,
+          db_user: poolingConfigurationShared?.db_user ?? '',
+        },
+        metadata: { projectRef },
+      }),
+    [connectionInfo, poolingConfigurationShared, projectRef]
+  )
 
-  const connectionStringsDedicated =
-    poolingConfigurationDedicated !== undefined
-      ? getConnectionStrings({
-          connectionInfo,
-          poolingInfo: {
-            connectionString: poolingConfigurationDedicated.connection_string,
-            db_host: poolingConfigurationDedicated.db_host,
-            db_name: poolingConfigurationDedicated.db_name,
-            db_port: poolingConfigurationDedicated.db_port,
-            db_user: poolingConfigurationDedicated.db_user,
-          },
-          metadata: { projectRef },
-        })
-      : undefined
+  const connectionStringsDedicated = useMemo(
+    () =>
+      poolingConfigurationDedicated !== undefined
+        ? getConnectionStrings({
+            connectionInfo,
+            poolingInfo: {
+              connectionString: poolingConfigurationDedicated.connection_string,
+              db_host: poolingConfigurationDedicated.db_host,
+              db_name: poolingConfigurationDedicated.db_name,
+              db_port: poolingConfigurationDedicated.db_port,
+              db_user: poolingConfigurationDedicated.db_user,
+            },
+            metadata: { projectRef },
+          })
+        : undefined,
+    [connectionInfo, poolingConfigurationDedicated, projectRef]
+  )
 
   return useMemo(
     () =>

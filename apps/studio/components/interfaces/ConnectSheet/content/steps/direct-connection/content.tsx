@@ -59,59 +59,73 @@ const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
-  const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
-  const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
+  // Memoized so the per-database pooler bag (consumed by resolveConnectionString
+  // downstream) keeps a stable identity across renders. Without this the inner
+  // pluckObjectFields/getConnectionStrings calls would mint fresh objects every
+  // render and ripple through the resolveConnectionString useMemo below.
+  return useMemo(() => {
+    const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
+    const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
 
-  return Object.fromEntries(
-    databases.map((db) => {
-      const connectionInfo = pluckObjectFields(db || emptyState, DB_FIELDS)
-      const poolingConfigurationShared = supavisorConfig?.find(
-        (x) => x.identifier === db.identifier
-      )
-      const poolingConfigurationDedicated = allowPgBouncerSelection ? pgbouncerConfig : undefined
+    return Object.fromEntries(
+      databases.map((db) => {
+        const connectionInfo = pluckObjectFields(db || emptyState, DB_FIELDS)
+        const poolingConfigurationShared = supavisorConfig?.find(
+          (x) => x.identifier === db.identifier
+        )
+        const poolingConfigurationDedicated = allowPgBouncerSelection ? pgbouncerConfig : undefined
 
-      const connectionStringsShared = getConnectionStrings({
-        connectionInfo,
-        poolingInfo: {
-          connectionString: poolingConfigurationShared?.connection_string ?? '',
-          db_host: poolingConfigurationShared?.db_host ?? '',
-          db_name: poolingConfigurationShared?.db_name ?? '',
-          db_port: poolingConfigurationShared?.db_port ?? 0,
-          db_user: poolingConfigurationShared?.db_user ?? '',
-        },
-        metadata: { projectRef: db.identifier },
-      })
-
-      const connectionStringsDedicated =
-        poolingConfigurationDedicated !== undefined
-          ? getConnectionStrings({
-              connectionInfo,
-              poolingInfo: {
-                connectionString: poolingConfigurationDedicated.connection_string.replace(
-                  projectRef ?? '_',
-                  db.identifier
-                ),
-                db_host: poolingConfigurationDedicated.db_host,
-                db_name: poolingConfigurationDedicated.db_name,
-                db_port: poolingConfigurationDedicated.db_port,
-                db_user: poolingConfigurationDedicated.db_user,
-              },
-              metadata: { projectRef: db.identifier },
-            })
-          : undefined
-
-      return [
-        db.identifier,
-        buildConnectionStringPooler({
-          deploymentMode,
+        const connectionStringsShared = getConnectionStrings({
           connectionInfo,
-          connectionStringsShared,
-          connectionStringsDedicated,
-          ipv4Addon: !!ipv4Addon,
-        }),
-      ]
-    })
-  )
+          poolingInfo: {
+            connectionString: poolingConfigurationShared?.connection_string ?? '',
+            db_host: poolingConfigurationShared?.db_host ?? '',
+            db_name: poolingConfigurationShared?.db_name ?? '',
+            db_port: poolingConfigurationShared?.db_port ?? 0,
+            db_user: poolingConfigurationShared?.db_user ?? '',
+          },
+          metadata: { projectRef: db.identifier },
+        })
+
+        const connectionStringsDedicated =
+          poolingConfigurationDedicated !== undefined
+            ? getConnectionStrings({
+                connectionInfo,
+                poolingInfo: {
+                  connectionString: poolingConfigurationDedicated.connection_string.replace(
+                    projectRef ?? '_',
+                    db.identifier
+                  ),
+                  db_host: poolingConfigurationDedicated.db_host,
+                  db_name: poolingConfigurationDedicated.db_name,
+                  db_port: poolingConfigurationDedicated.db_port,
+                  db_user: poolingConfigurationDedicated.db_user,
+                },
+                metadata: { projectRef: db.identifier },
+              })
+            : undefined
+
+        return [
+          db.identifier,
+          buildConnectionStringPooler({
+            deploymentMode,
+            connectionInfo,
+            connectionStringsShared,
+            connectionStringsDedicated,
+            ipv4Addon: !!ipv4Addon,
+          }),
+        ]
+      })
+    )
+  }, [
+    databases,
+    pgbouncerConfig,
+    supavisorConfig,
+    allowPgBouncerSelection,
+    ipv4Addon,
+    projectRef,
+    deploymentMode,
+  ])
 }
 
 const CONNECTION_METHOD_TO_TELEMETRY: Record<
