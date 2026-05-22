@@ -1916,6 +1916,8 @@ export interface HomeConnectActionClickedEvent {
   groups: TelemetryGroups
 }
 
+export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
+
 /**
  * User opened the ConnectSheet panel.
  *
@@ -1923,8 +1925,6 @@ export interface HomeConnectActionClickedEvent {
  * @source studio
  * @page /project/{ref}
  */
-export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
-
 export interface ConnectSheetOpenedEvent {
   action: 'connect_sheet_opened'
   properties: {
