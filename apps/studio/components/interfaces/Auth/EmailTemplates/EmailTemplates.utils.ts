@@ -1,4 +1,5 @@
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
+import { type AuthTemplateType, type KebabCase } from './EmailTemplates.types'
 import type { components } from '@/data/api'
 import type { Organization } from '@/types'
 
@@ -13,6 +14,10 @@ export const slugifyTitle = (title: string) => {
   return title.trim().replace(/\s+/g, '-').toLowerCase()
 }
 
+/* Convert upper camel case to lower kebab case  */
+export const getAuthTemplateType = <T extends AuthTemplateType>(id: T) =>
+  id.toLowerCase().replace(/_/g, '-') as KebabCase<T>
+
 export const hasCustomEmailSender = (config?: Partial<AuthConfig>) => {
   const hasSendEmailHook = !!config?.HOOK_SEND_EMAIL_ENABLED && !!config?.HOOK_SEND_EMAIL_URI
 
@@ -21,19 +26,25 @@ export const hasCustomEmailSender = (config?: Partial<AuthConfig>) => {
 
 export const isCustomEmailTemplateRestrictionStatusKnown = ({
   authConfig,
+  organization,
 }: {
   authConfig?: Partial<AuthConfig>
   organization?: Organization
 }) => {
-  return authConfig !== undefined
+  return authConfig !== undefined && organization !== undefined
 }
 
 export const isCustomEmailTemplateEditingRestricted = ({
   authConfig,
+  organization,
 }: {
   authConfig?: Partial<AuthConfig>
   organization?: Organization
 }) => {
-  // Temporary Studio-only paygate while Platform/Auth own the exact eligibility cohort.
+  const isPaidPlan = organization?.plan?.id !== undefined && organization.plan.id !== 'free'
+
+  if (isPaidPlan) return false
+
+  // Temporary Studio-side paygate while Platform/Auth own the exact eligibility cohort.
   return !hasCustomEmailSender(authConfig)
 }

@@ -1,8 +1,8 @@
 import { Button } from '@ui/components/shadcn/ui/button'
 import {
-  CommandInput,
-  CommandList,
   CommandMenu,
+  CommandMenuInput,
+  CommandMenuList,
   CommandMenuTrigger as CommandMenuTriggerPrimitive,
   CommandProvider,
   useRegisterCommands,
@@ -52,8 +52,8 @@ export default function CommandMenuDemo() {
     <CommandProvider openKey="">
       <Commands />
       <CommandMenu trigger={<CommandMenuTrigger />}>
-        <CommandInput />
-        <CommandList />
+        <CommandMenuInput />
+        <CommandMenuList />
       </CommandMenu>
     </CommandProvider>
   )

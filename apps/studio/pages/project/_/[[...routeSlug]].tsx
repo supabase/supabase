@@ -4,14 +4,14 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
@@ -92,21 +92,21 @@ const GenericProjectPage: NextPage = () => {
               {isLoadingOrganizations ? (
                 <ShimmeringLoader className="w-60 py-0 h-[26px]" />
               ) : (
-                <Select_Shadcn_ value={selectedSlug} onValueChange={setSlug}>
-                  <SelectTrigger_Shadcn_ size="tiny" className="w-60 truncate">
+                <Select value={selectedSlug} onValueChange={setSlug}>
+                  <SelectTrigger size="tiny" className="w-60 truncate">
                     <div className="flex items-center gap-x-2">
                       <p className="text-xs text-foreground-light">Organization:</p>
-                      <SelectValue_Shadcn_ placeholder="Select an organization" />
+                      <SelectValue placeholder="Select an organization" />
                     </div>
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_ className="col-span-8">
+                  </SelectTrigger>
+                  <SelectContent className="col-span-8">
                     {organizations.map((org) => (
-                      <SelectItem_Shadcn_ key={org.slug} value={org.slug} className="text-xs">
+                      <SelectItem key={org.slug} value={org.slug} className="text-xs">
                         {org.name}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               )}
               <HomePageActions hideNewProject />
             </div>
@@ -115,11 +115,11 @@ const GenericProjectPage: NextPage = () => {
             {isLoadingOrganizations ? (
               <LoadingCardView />
             ) : isErrorOrganizations ? (
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <AlertTriangleIcon />
-                <AlertTitle_Shadcn_>Failed to load your Supabase organizations</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>Try refreshing the page</AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                <AlertTitle>Failed to load your Supabase organizations</AlertTitle>
+                <AlertDescription>Try refreshing the page</AlertDescription>
+              </Alert>
             ) : organizations.length === 0 ? (
               <NoOrganizationsState />
             ) : !!selectedOrganization ? (

@@ -1,0 +1,14 @@
+{
+  "name": "infinite-query-composable",
+  "type": "registry:component",
+  "title": "Infinite Query for Vue and Supabase",
+  "description": "Vue Composable for infinite lists, fetching data from Supabase.",
+  "files": [
+    {
+      "path": "registry/default/infinite-query/vue/composables/useInfiniteQuery.ts",
+      "type": "registry:component",
+      "target": "composables/useInfiniteQuery.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest", "@supabase/postgrest-js@*"]
+}

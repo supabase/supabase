@@ -2,7 +2,14 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, keyword, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import {
+  ident,
+  joinSqlFragments,
+  keyword,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from './pg-format'
 import { TRIGGERS_SQL } from './sql/triggers'
 
 type TriggerIdentifier = Pick<PGTrigger, 'id'> | Pick<PGTrigger, 'name' | 'schema' | 'table'>
@@ -103,7 +110,13 @@ export const pgTriggerCreateZod = z.object({
   condition: z.string().optional(),
 })
 
-export type PGTriggerCreate = z.infer<typeof pgTriggerCreateZod>
+// Zod validates `condition` as a runtime string; the SafeSqlFragment brand is a
+// separate compile-time trust check. A parsed string is not automatically safe —
+// callers must promote untrusted input via acceptUntrustedSql/rawSql before it can
+// satisfy this type.
+export type PGTriggerCreate = Omit<z.infer<typeof pgTriggerCreateZod>, 'condition'> & {
+  condition?: SafeSqlFragment
+}
 
 export function create({
   name,
@@ -117,19 +130,18 @@ export function create({
   orientation,
   condition,
 }: PGTriggerCreate): {
-  sql: string
+  sql: SafeSqlFragment
   zod: z.ZodType<void>
 } {
-  const qualifiedTableName = `${ident(schema)}.${ident(table)}`
-  const qualifiedFunctionName = `${ident(function_schema)}.${ident(function_name)}`
-  const triggerEvents = events.join(' or ')
-  const triggerOrientation = orientation ? `for each ${orientation}` : ''
-  const triggerCondition = condition ? `when (${condition})` : ''
-  const functionArgsStr = function_args.map(literal).join(',')
+  const qualifiedTableName = safeSql`${ident(schema)}.${ident(table)}`
+  const qualifiedFunctionName = safeSql`${ident(function_schema)}.${ident(function_name)}`
+  const triggerEvents = joinSqlFragments(events.map(keyword), ' or ')
+  const triggerOrientation = orientation ? safeSql`for each ${keyword(orientation)}` : safeSql``
+  const triggerCondition = condition ? safeSql`when (${condition})` : safeSql``
+  const functionArgsFragment =
+    function_args.length > 0 ? joinSqlFragments(function_args.map(literal), ',') : safeSql``
 
-  const sql = `create trigger ${ident(
-    name
-  )} ${activation} ${triggerEvents} on ${qualifiedTableName} ${triggerOrientation} ${triggerCondition} execute function ${qualifiedFunctionName}(${functionArgsStr});`
+  const sql = safeSql`create trigger ${ident(name)} ${keyword(activation)} ${triggerEvents} on ${qualifiedTableName} ${triggerOrientation} ${triggerCondition} execute function ${qualifiedFunctionName}(${functionArgsFragment});`
 
   return {
     sql,

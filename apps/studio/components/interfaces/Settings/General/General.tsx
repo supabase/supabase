@@ -2,18 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -121,7 +112,7 @@ export const General = () => {
                           className="[&>div]:md:w-1/2"
                         >
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
                               disabled={isBranch || !canUpdateProject}
                               autoComplete="off"
@@ -140,7 +131,7 @@ export const General = () => {
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
                       <FormControl>
-                        <Input copy readOnly size="small" value={project.ref} />
+                        <PasswordInput copy readOnly size="small" value={project.ref} />
                       </FormControl>
                     </FormItemLayout>
                   </CardContent>
@@ -153,7 +144,7 @@ export const General = () => {
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
                       <FormControl>
-                        <Input copy readOnly size="small" value={project.region} />
+                        <PasswordInput copy readOnly size="small" value={project.region} />
                       </FormControl>
                     </FormItemLayout>
                   </CardContent>

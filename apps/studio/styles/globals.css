@@ -46,6 +46,7 @@
   --animate-badge-pulse: badge-pulse 3s ease-in-out infinite;
   --animate-chevron-up: chevron-up 2s ease-in-out infinite;
   --animate-sway: sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-marketplace-featured-progress: marketplace-featured-progress linear forwards;
 }
 
 @keyframes shimmer {
@@ -105,6 +106,15 @@
   }
   50% {
     transform: rotate(10deg) scale(1.5) translateY(2rem);
+  }
+}
+
+@keyframes marketplace-featured-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 

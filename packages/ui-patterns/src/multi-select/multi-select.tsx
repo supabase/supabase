@@ -4,22 +4,20 @@ import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 // @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
 import type { Popover as PopoverPrimitive } from 'radix-ui'
-import React, { useEffect } from 'react'
+import React, { isValidElement, ReactElement, useEffect } from 'react'
 import {
   Badge,
   cn,
-  Popover_Shadcn_ as Popover,
-  PopoverAnchor_Shadcn_ as PopoverAnchor,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverContentProps_Shadcn_ as PopoverContentProps,
+  Command as Command,
+  CommandEmpty as CommandEmpty,
+  CommandInput as CommandInput,
+  CommandItem as CommandItem,
+  CommandList as CommandList,
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverContentProps,
 } from 'ui'
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from 'ui/src/components/shadcn/ui/command'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {
@@ -511,7 +509,9 @@ const MultiSelectorList = React.forwardRef<
   const options = !!children
     ? Array.isArray(children)
       ? (children as React.ReactNode[])
-      : typeof children === 'object' && 'props' in children
+      : typeof children === 'object' &&
+          'props' in children &&
+          isValidElement<{ children: ReactElement[] }>(children)
         ? children.props.children
         : []
     : []

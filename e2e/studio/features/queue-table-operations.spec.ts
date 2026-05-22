@@ -28,7 +28,15 @@ test.describe('Queue Table Operations', () => {
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await loadPromise
     await enableQueueOperations(page)
-    await page.reload({ waitUntil: 'networkidle' })
+    // Wait on the table-list refetch that follows the reload rather than
+    // `networkidle` — studio keeps long-lived polling/SSE connections open
+    // (PostHog, Sentry, realtime) so `networkidle` never resolves and the
+    // beforeEach hits its 120 s test timeout. The reload's goal is "wait
+    // until the editor is loaded again with the new toggle applied" and
+    // the entity-types query is a precise signal for that.
+    const reloadWait = waitForTableToLoad(page, ref)
+    await page.reload()
+    await reloadWait
   })
 
   test('cell edits are queued and can be saved', async ({ page, ref }) => {

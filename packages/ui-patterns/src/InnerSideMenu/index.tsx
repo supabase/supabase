@@ -7,15 +7,15 @@ import { Collapsible as _RadixCollapsible, DropdownMenu as _RadixDropdownMenu } 
 import { ElementRef, forwardRef } from 'react'
 import {
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  Input_Shadcn_,
+  Input,
   Skeleton,
   Tooltip,
   TooltipContent,
@@ -42,24 +42,18 @@ const InnerSideBarTitle = forwardRef<HTMLSpanElement, React.ComponentPropsWithou
 )
 
 const InnerSideMenuCollapsible = forwardRef<
-  ElementRef<typeof Collapsible_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof Collapsible_Shadcn_>
+  ElementRef<typeof Collapsible>,
+  React.ComponentPropsWithoutRef<typeof Collapsible>
 >(({ ...props }, ref) => {
-  return (
-    <Collapsible_Shadcn_
-      ref={ref}
-      {...props}
-      className={cn('w-full px-2 group', props.className)}
-    />
-  )
+  return <Collapsible ref={ref} {...props} className={cn('w-full px-2 group', props.className)} />
 })
 
 const InnerSideMenuCollapsibleTrigger = forwardRef<
-  ElementRef<typeof CollapsibleTrigger_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof CollapsibleTrigger_Shadcn_>
+  ElementRef<typeof CollapsibleTrigger>,
+  React.ComponentPropsWithoutRef<typeof CollapsibleTrigger>
 >(({ ...props }, ref) => {
   return (
-    <CollapsibleTrigger_Shadcn_
+    <CollapsibleTrigger
       ref={ref}
       {...props}
       className={cn(
@@ -73,16 +67,16 @@ const InnerSideMenuCollapsibleTrigger = forwardRef<
         strokeWidth={1.5}
       />
       <span className="group-hover:not-disabled:text-foreground">{props.title}</span>
-    </CollapsibleTrigger_Shadcn_>
+    </CollapsibleTrigger>
   )
 })
 
 const InnerSideMenuCollapsibleContent = forwardRef<
-  ElementRef<typeof CollapsibleContent_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof CollapsibleContent_Shadcn_>
+  ElementRef<typeof CollapsibleContent>,
+  React.ComponentPropsWithoutRef<typeof CollapsibleContent>
 >(({ ...props }, ref) => {
   return (
-    <CollapsibleContent_Shadcn_
+    <CollapsibleContent
       ref={ref}
       {...props}
       className={cn('w-full flex flex-col gap-0', props.className)}
@@ -173,7 +167,7 @@ const InnerSideBarFilters = forwardRef<HTMLDivElement, React.ComponentPropsWitho
 
 const InnerSideBarFilterSearchInput = forwardRef<
   HTMLInputElement,
-  React.ComponentPropsWithoutRef<typeof Input_Shadcn_> & {
+  React.ComponentPropsWithoutRef<typeof Input> & {
     'aria-labelledby': string
     name: string
     isLoading?: boolean
@@ -182,7 +176,7 @@ const InnerSideBarFilterSearchInput = forwardRef<
   return (
     <label htmlFor={props.name} className="relative w-full">
       <span className="sr-only">{props['aria-labelledby']}</span>
-      <Input_Shadcn_
+      <Input
         ref={ref}
         type="text"
         className={cn(

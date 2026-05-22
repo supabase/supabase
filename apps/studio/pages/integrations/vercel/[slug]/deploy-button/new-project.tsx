@@ -1,16 +1,16 @@
 import { useParams } from 'common'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import {
   Button,
   Checkbox,
-  Input_Shadcn_ as Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
@@ -86,16 +86,28 @@ const CreateProject = () => {
   const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
     !isDataApiRevokeOnCreateDefault
   )
+  const hasUserModifiedDataApiDefaultPrivileges = useRef(false)
 
-  useTrackDefaultPrivilegesExposure({ surface: 'vercel' })
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (hasUserModifiedDataApiDefaultPrivileges.current) return
+    setDataApiDefaultPrivileges(!dataApiRevokeOnCreateDefaultFlag)
+  }, [dataApiRevokeOnCreateDefaultFlag])
+
+  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
+
+  useTrackDefaultPrivilegesExposure({
+    surface: 'vercel',
+    orgSlug: slug,
+    dataApiDefaultPrivileges,
+    hasUserModified: hasUserModifiedDataApiDefaultPrivileges.current,
+  })
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
     setPasswordStrengthMessage(message)
   }
-
-  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
   const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
 
@@ -309,15 +321,15 @@ const CreateProject = () => {
             className="gap-[2px]"
             size="tiny"
           >
-            <Select_Shadcn_ value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
-              <SelectTrigger_Shadcn_ id="region">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
+            <Select value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
+              <SelectTrigger id="region">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {Object.keys(AWS_REGIONS).map((option: string, i) => {
                   const label = Object.values(AWS_REGIONS)[i].displayName
                   return (
-                    <SelectItem_Shadcn_ key={option} value={label}>
+                    <SelectItem key={option} value={label}>
                       <div className="flex gap-2">
                         <img
                           alt="region icon"
@@ -326,11 +338,11 @@ const CreateProject = () => {
                         />
                         <span>{label}</span>
                       </div>
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   )
                 })}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </FormItemLayout>
         </div>
       </div>
@@ -362,7 +374,10 @@ const CreateProject = () => {
             id="dataApiDefaultPrivileges"
             name="dataApiDefaultPrivileges"
             checked={dataApiDefaultPrivileges}
-            onCheckedChange={(checked) => setDataApiDefaultPrivileges(!!checked)}
+            onCheckedChange={(checked) => {
+              hasUserModifiedDataApiDefaultPrivileges.current = true
+              setDataApiDefaultPrivileges(!!checked)
+            }}
           />
           <div className="grid gap-1.5 leading-none">
             <label

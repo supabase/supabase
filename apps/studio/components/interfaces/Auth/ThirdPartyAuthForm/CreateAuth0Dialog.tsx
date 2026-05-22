@@ -15,7 +15,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -140,10 +140,7 @@ export const CreateAuth0IntegrationDialog = ({
                         https://
                       </Button>
                       <FormControl>
-                        <Input_Shadcn_
-                          className="border-l-0 rounded-none border-r-0 z-50"
-                          {...field}
-                        />
+                        <Input className="border-l-0 rounded-none border-r-0 z-50" {...field} />
                       </FormControl>
                       <Button
                         type="default"

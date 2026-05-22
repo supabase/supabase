@@ -10,21 +10,21 @@ import {
   AiIconAnimation,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Form,
   FormControl,
   FormField,
   FormItem,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -299,8 +299,8 @@ const NewFunctionPage = () => {
       ]}
       primaryActions={
         <>
-          <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
               <Button
                 size="tiny"
                 type="default"
@@ -311,15 +311,15 @@ const NewFunctionPage = () => {
               >
                 Templates
               </Button>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ id={templatesListboxId} className="w-[300px] p-0" align="end">
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ placeholder="Search templates..." />
-                <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
-                  <CommandGroup_Shadcn_>
+            </PopoverTrigger>
+            <PopoverContent id={templatesListboxId} className="w-[300px] p-0" align="end">
+              <Command>
+                <CommandInput placeholder="Search templates..." />
+                <CommandList>
+                  <CommandEmpty>No templates found.</CommandEmpty>
+                  <CommandGroup>
                     {templates.map((template) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={template.value}
                         value={template.value}
                         onSelect={onSelectTemplate}
@@ -343,13 +343,13 @@ const NewFunctionPage = () => {
                             {template.description}
                           </span>
                         </div>
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <Button
             size="tiny"
             type="default"
@@ -380,7 +380,7 @@ const NewFunctionPage = () => {
           className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 gap-3"
         >
           <div className="flex items-center gap-3">
-            <Label_Shadcn_ htmlFor="functionName">Function name</Label_Shadcn_>
+            <Label htmlFor="functionName">Function name</Label>
             <FormField
               control={form.control}
               name="functionName"
@@ -388,7 +388,7 @@ const NewFunctionPage = () => {
                 <FormItem className="flex flex-col gap-0 m-0">
                   <div className="flex items-center">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="functionName"
                         type="text"
                         size={'large'}

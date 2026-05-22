@@ -32,6 +32,7 @@ export const CustomEmailTemplateRestrictionAdmonition = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 type="default"
+                aria-label="More email template editing options"
                 className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
                 icon={<ChevronDown />}
               />

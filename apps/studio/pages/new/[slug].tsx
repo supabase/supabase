@@ -8,25 +8,20 @@ import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Form, FormField, useWatch } from 'ui'
+import { Button, Form, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { AdvancedConfiguration } from '@/components/interfaces/ProjectCreation/AdvancedConfiguration'
-import { CloudProviderSelector } from '@/components/interfaces/ProjectCreation/CloudProviderSelector'
 import { ComputeSizeSelector } from '@/components/interfaces/ProjectCreation/ComputeSizeSelector'
 import { DatabasePasswordInput } from '@/components/interfaces/ProjectCreation/DatabasePasswordInput'
 import { DisabledWarningDueToIncident } from '@/components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from '@/components/interfaces/ProjectCreation/FreeProjectLimitWarning'
-import { HighAvailabilityInput } from '@/components/interfaces/ProjectCreation/HighAvailabilityInput'
 import { InternalOnlyConfiguration } from '@/components/interfaces/ProjectCreation/InternalOnlyConfiguration'
 import { OrganizationSelector } from '@/components/interfaces/ProjectCreation/OrganizationSelector'
-import {
-  extractPostgresVersionDetails,
-  PostgresVersionSelector,
-} from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { sizes } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { FormSchema } from '@/components/interfaces/ProjectCreation/ProjectCreation.schema'
 import {
@@ -109,8 +104,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
-  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -118,7 +112,6 @@ const Wizard: NextPageWithLayout = () => {
   const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
 
-  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
@@ -169,6 +162,22 @@ const Wizard: NextPageWithLayout = () => {
     projectName: watchedProjectName,
     highAvailability,
   } = useWatch({ control: form.control })
+
+  // Read dirty state during render rather than depending on form.formState in the
+  // effect — form.formState is a Proxy that gets a new reference every render, which
+  // would re-fire this effect after each setValue and trigger an infinite loop.
+  const isDataApiDefaultPrivilegesDirty = getFieldState(
+    'dataApiDefaultPrivileges',
+    form.formState
+  ).isDirty
+
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (isDataApiDefaultPrivilegesDirty) return
+    setValue('dataApiDefaultPrivileges', !dataApiRevokeOnCreateDefaultFlag, {
+      shouldDirty: false,
+    })
+  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -550,11 +559,6 @@ const Wizard: NextPageWithLayout = () => {
                         </Panel.Content>
                       )}
                       <ProjectNameInput form={form} />
-                      <HighAvailabilityInput form={form} />
-
-                      {cloudProviderEnabled && showNonProdFields && (
-                        <CloudProviderSelector form={form} />
-                      )}
 
                       {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
@@ -565,31 +569,13 @@ const Wizard: NextPageWithLayout = () => {
                         instanceSize={instanceSize as DesiredInstanceSize}
                       />
 
-                      {showPostgresVersionSelector && (
-                        <Panel.Content>
-                          <FormField
-                            control={form.control}
-                            name="postgresVersionSelection"
-                            render={({ field }) => (
-                              <PostgresVersionSelector
-                                field={field}
-                                form={form}
-                                cloudProvider={form.getValues('cloudProvider') as CloudProvider}
-                                organizationSlug={slug}
-                                dbRegion={form.getValues('dbRegion')}
-                              />
-                            )}
-                          />
-                        </Panel.Content>
-                      )}
-
                       <SecurityOptions form={form} />
+
+                      {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
                       {showAdvancedConfig && !!availableOrioleVersion && (
                         <AdvancedConfiguration form={form} />
                       )}
-
-                      {showNonProdFields && <InternalOnlyConfiguration form={form} />}
 
                       {shouldShowFreeProjectInfo ? (
                         <Admonition

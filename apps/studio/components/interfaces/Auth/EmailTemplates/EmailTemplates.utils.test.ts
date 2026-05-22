@@ -25,22 +25,31 @@ describe('EmailTemplates.utils', () => {
         organization: freeOrganization,
       })
     ).toBe(false)
+
+    expect(
+      isCustomEmailTemplateRestrictionStatusKnown({
+        authConfig: {},
+        organization: undefined,
+      })
+    ).toBe(false)
   })
 
-  it('restricts projects that use the built-in email sender', () => {
+  it('restricts free projects that use the built-in email sender', () => {
     expect(
       isCustomEmailTemplateEditingRestricted({
         authConfig: {},
         organization: freeOrganization,
       })
     ).toBe(true)
+  })
 
+  it('allows paid projects that use the built-in email sender', () => {
     expect(
       isCustomEmailTemplateEditingRestricted({
         authConfig: {},
         organization: proOrganization,
       })
-    ).toBe(true)
+    ).toBe(false)
   })
 
   it('allows projects with custom SMTP configured', () => {

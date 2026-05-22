@@ -12,12 +12,12 @@ import {
   Form,
   FormField,
   FormMessage,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -154,57 +154,57 @@ export default function OptOutPage() {
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout label="Choose reason for reporting" labelOptional="Optional">
-                  <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger_Shadcn_ size="medium">
-                      <SelectValue_Shadcn_ placeholder="Select a reason (optional)">
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger size="medium">
+                      <SelectValue placeholder="Select a reason (optional)">
                         {field.value}
-                      </SelectValue_Shadcn_>
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_ value="phishing">
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="phishing">
                           <div className={SelectItemContainerClasses}>
                             <span>Phishing</span>
                             <span className="text-foreground-light text-xs">
                               Attempt to obtain sensitive information
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="advertisement">
+                        </SelectItem>
+                        <SelectItem value="advertisement">
                           <div className={SelectItemContainerClasses}>
                             <span>Advertisement</span>
                             <span className="text-foreground-light text-xs">
                               Unwanted promotional content
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="malware">
+                        </SelectItem>
+                        <SelectItem value="malware">
                           <div className={SelectItemContainerClasses}>
                             <span>Malware</span>
                             <span className="text-foreground-light text-xs">
                               Contains harmful software
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="scam">
+                        </SelectItem>
+                        <SelectItem value="scam">
                           <div className={SelectItemContainerClasses}>
                             <span>Scam</span>
                             <span className="text-foreground-light text-xs">
                               Fraudulent or deceptive content
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="other">
+                        </SelectItem>
+                        <SelectItem value="other">
                           <div className={SelectItemContainerClasses}>
                             <span>Other</span>
                             <span className="text-foreground-light text-xs">
                               Any other type of spam
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormItemLayout>
               )}
             />
