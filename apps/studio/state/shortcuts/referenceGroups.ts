@@ -48,6 +48,7 @@ export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   'table-editor',
   'schema-visualizer',
   'list-page',
+  'platform-webhooks',
   'action-bar',
   'operation-queue',
   'unified-logs',
