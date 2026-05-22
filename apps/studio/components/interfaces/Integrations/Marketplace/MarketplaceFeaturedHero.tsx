@@ -28,6 +28,7 @@ export const MarketplaceFeaturedHero = ({
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [progressKey, setProgressKey] = useState(0)
   const hoveringRef = useRef(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -62,6 +63,8 @@ export const MarketplaceFeaturedHero = ({
 
   if (integrations.length === 0) return null
 
+  const coverColSpan = integrations.length >= 6 ? 2 : 1
+
   const active = integrations[Math.min(activeIndex, integrations.length - 1)]
   const activeCategorySlug = active.categories?.[0]
   const activeCategoryName = activeCategorySlug
@@ -86,13 +89,28 @@ export const MarketplaceFeaturedHero = ({
           size="tiny"
           className="px-1.5"
           icon={isPaused ? <Play size={10} /> : <Pause size={10} />}
-          onClick={() => setIsPaused((p) => !p)}
+          onClick={() =>
+            setIsPaused((p) => {
+              // When resuming, reset the progress animation so it starts from
+              // zero and stays in sync with the fresh JS interval.
+              if (p) setProgressKey((k) => k + 1)
+              return !p
+            })
+          }
         />
       </div>
-      <div ref={cardRef} className="overflow-hidden rounded-lg border bg-surface-100">
+      <div
+        ref={cardRef}
+        className="overflow-hidden rounded-lg border bg-surface-100"
+        style={
+          {
+            '--cover-width': `calc(${coverColSpan * 100}% / ${integrations.length})`,
+          } as React.CSSProperties
+        }
+      >
         <Link
           href={`/project/${project?.ref}/integrations/${active.id}/overview`}
-          className="grid gap-0 @3xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)] hover:bg-selection/20 transition-colors"
+          className="grid gap-0 @3xl:grid-cols-[var(--cover-width)_minmax(0,1fr)] hover:bg-selection/20 transition-colors"
         >
           <div className="relative hidden @3xl:block">
             <FeaturedCover integration={active} categoryLabel={activeCategoryName} />
@@ -178,7 +196,7 @@ export const MarketplaceFeaturedHero = ({
                 </div>
                 {isActive && (
                   <span
-                    key={activeIndex}
+                    key={`${activeIndex}-${progressKey}`}
                     aria-hidden
                     className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 origin-left animate-marketplace-featured-progress bg-brand"
                     style={{
@@ -201,9 +219,6 @@ interface FeaturedCoverProps {
   categoryLabel: string | null
 }
 
-// Decorative cover panel on the left of the hero. Uses a subtle dotted
-// gradient and renders the integration's own icon at a large scale so each
-// partner stays visually distinct without bespoke artwork per listing.
 const FeaturedCover = ({ integration, categoryLabel }: FeaturedCoverProps) => (
   <div
     key={integration.id}
