@@ -37,7 +37,7 @@ DATABASE_URL="${connectionStringPooler.transactionShared}?pgbouncer=true"
 # Connect to Postgres via the shared session-mode pooler (used for migrations)
 DIRECT_URL="${connectionStringPooler.sessionShared}"
 
-# For a paid project, if your network supports IPv6, or you purchased IPv4 add-on, use the dedicated pooler as an alternative
+# For paid projects, if your network supports IPv6, or you purchased the IPv4 add-on, use the dedicated pooler as an alternative
 # DATABASE_URL="${connectionStringPooler.transactionDedicated}?pgbouncer=true"
 # DIRECT_URL="${connectionStringPooler.sessionDedicated}"
  `
