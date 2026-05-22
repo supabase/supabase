@@ -11,7 +11,8 @@ Because the headers follow the W3C standard, any compliant tracing SDK (OpenTele
 ## Requirements
 
 - `@supabase/supabase-js` version `2.106.0` or later
-- `@opentelemetry/api` installed in your application
+- `@opentelemetry/api` resolvable at runtime (installed directly, or as a transitive
+  dependency of your tracing SDK — e.g., Sentry v8+ and Datadog already include it)
 - Any tracing SDK that emits W3C-compliant `traceparent` headers
 
 If `@opentelemetry/api` is not installed, or there is no active trace context at request time, the SDK silently no-ops.
