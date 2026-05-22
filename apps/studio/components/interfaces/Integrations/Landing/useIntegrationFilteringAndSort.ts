@@ -5,20 +5,12 @@ import type { IntegrationDefinition } from './Integrations.constants'
 interface UseIntegrationFilteringAndSortOptions {
   featuredIds: readonly string[]
   hasActiveFilter: boolean
-  // For legacy: include integrations with integration.featured flag in featured list
   includeFeaturedFlag?: boolean
 }
 
-/**
- * Common filtering and sorting logic for integrations.
- *
- * Handles:
- * - Sorting by installation status (installed first) then alphabetically
- * - Featured integrations logic (only shown when no filters active)
- *
- * The caller is responsible for the initial filtering (category, type, source, search).
- * This hook applies common post-filtering operations.
- */
+// Filters all available integrations first by category,
+// then by the search term and sorts them first by
+// installation status and then alphabetically
 export const useIntegrationFilteringAndSort = (
   filteredIntegrations: readonly IntegrationDefinition[],
   availableIntegrations: readonly IntegrationDefinition[],
@@ -34,26 +26,26 @@ export const useIntegrationFilteringAndSort = (
 
     const byId = new Map(availableIntegrations.map((i) => [i.id, i]))
 
-    // Get featured from hardcoded IDs
-    const result = options.featuredIds
+    // Pinned IDs preserve their explicit order
+    const pinnedResult = options.featuredIds
       .map((id) => byId.get(id))
       .filter((i): i is IntegrationDefinition => !!i)
 
-    // For legacy: also include integrations with featured flag
+    // For legacy: also include integrations with featured flag, sorted among themselves
     if (options.includeFeaturedFlag) {
       const flaggedFeatured = availableIntegrations.filter(
         (i) => i.featured && !options.featuredIds.includes(i.id)
       )
-      result.push(...flaggedFeatured)
+      pinnedResult.push(...sortByInstalledThenName(flaggedFeatured, installedIds))
     }
 
-    return sortByInstalledThenName(result, installedIds)
+    return pinnedResult
   }, [
     availableIntegrations,
-    installedIds,
     options.hasActiveFilter,
     options.featuredIds,
     options.includeFeaturedFlag,
+    installedIds,
   ])
 
   return { sorted, featured }

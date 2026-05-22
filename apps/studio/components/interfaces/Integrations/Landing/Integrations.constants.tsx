@@ -641,9 +641,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
   },
 ]
 
-// Assign categories to static integrations to match marketplace taxonomy
 const INTEGRATIONS_WITH_CATEGORIES = [
-  // Wrappers already have specific categories from Wrappers.constants.ts
   ...WRAPPER_INTEGRATIONS,
   ...SUPABASE_INTEGRATIONS.map((integration) => {
     const categoryMap: Record<string, string[]> = {
