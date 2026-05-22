@@ -1,12 +1,10 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, cn, Loading } from 'ui'
+import { Card, CardContent, cn, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
-
-type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 type ServiceConfig = {
   key: ServiceKey
@@ -30,7 +28,6 @@ export type ServiceHealthTableProps = {
   serviceData: Record<string, ServiceData>
   onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
   datetimeFormat: string
-  interval: ChartIntervalKey
 }
 
 const colorClassMap: Record<string, string> = {
@@ -40,10 +37,13 @@ const colorClassMap: Record<string, string> = {
   brand: 'bg-brand',
 }
 
-const INTERVAL_LABEL: Record<ChartIntervalKey, string> = {
-  '1hr': '1h',
-  '1day': '24h',
-  '7day': '7d',
+const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
+  db: 'PostgreSQL database health and performance',
+  auth: 'Authentication and user management',
+  functions: 'Serverless Edge Functions execution',
+  storage: 'Object storage for files and assets',
+  realtime: 'WebSocket connections and broadcasts',
+  postgrest: 'Auto-generated REST API for your database',
 }
 
 const formatPercent = (value: number) =>
@@ -66,14 +66,13 @@ type ServiceRowProps = {
   data: ServiceData
   onBarClick: (datum: LogsBarChartDatum) => void
   datetimeFormat: string
-  interval: ChartIntervalKey
 }
 
-const ServiceRow = ({ service, data, onBarClick, datetimeFormat, interval }: ServiceRowProps) => {
+const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowProps) => {
   const reportUrl = service.reportUrl || service.logsUrl
   const { color } = getHealthStatus(data.errorRate, data.total)
   const subtitle = getSubtitle(data)
-  const intervalLabel = data.total > 0 ? INTERVAL_LABEL[interval] : '—'
+  const description = SERVICE_DESCRIPTIONS[service.key] || service.description
 
   return (
     <Link
@@ -85,7 +84,26 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat, interval }: Ser
           className={cn('w-1.5 h-1.5 rounded-full shrink-0', colorClassMap[color] || 'bg-muted')}
         />
         <div className="flex flex-col min-w-0">
-          <span className="text-foreground text-sm font-medium truncate">{service.name}</span>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-foreground text-sm font-medium truncate">{service.name}</span>
+            {description && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={(e) => e.preventDefault()}
+                    className="text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
+                    aria-label={`About ${service.name}`}
+                  >
+                    <HelpCircle size={12} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs">
+                  <p>{description}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
           <span className="text-foreground-lighter text-xs truncate">{subtitle}</span>
         </div>
       </div>
@@ -101,23 +119,16 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat, interval }: Ser
               data={data.total === 0 ? [] : data.eventChartData}
               DateTimeFormat={datetimeFormat}
               onBarClick={onBarClick}
-              EmptyState={
-                <div className="h-full w-full flex items-center" aria-hidden="true">
-                  <div className="h-px w-full bg-border" />
-                </div>
-              }
+              EmptyState={null}
             />
           )}
         </Loading>
       </div>
 
-      <div className="flex items-center gap-2 text-foreground-lighter shrink-0">
-        <span className="text-xs tabular-nums w-8 text-right">{intervalLabel}</span>
-        <ChevronRight
-          size={14}
-          className="text-foreground-lighter group-hover:text-foreground transition-colors"
-        />
-      </div>
+      <ChevronRight
+        size={14}
+        className="text-foreground-lighter group-hover:text-foreground transition-colors shrink-0"
+      />
     </Link>
   )
 }
@@ -127,7 +138,6 @@ export const ServiceHealthTable = ({
   serviceData,
   onBarClick,
   datetimeFormat,
-  interval,
 }: ServiceHealthTableProps) => {
   return (
     <div>
@@ -145,7 +155,6 @@ export const ServiceHealthTable = ({
                 data={data}
                 onBarClick={onBarClick(service.logsUrl)}
                 datetimeFormat={datetimeFormat}
-                interval={interval}
               />
             )
           })}

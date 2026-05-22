@@ -178,7 +178,6 @@ export const ObservabilityOverview = () => {
           serviceData={overviewData.services}
           onBarClick={handleBarClick}
           datetimeFormat={datetimeFormat}
-          interval={interval}
         />
       </div>
 
