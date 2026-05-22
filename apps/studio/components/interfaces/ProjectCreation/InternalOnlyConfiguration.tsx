@@ -1,15 +1,8 @@
 import { useParams } from 'common'
-import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  FormControl,
-  FormField,
-  Input,
-} from 'ui'
+import { FormControl, FormField, Input } from 'ui'
+import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CloudProviderSelector } from './CloudProviderSelector'
@@ -28,16 +21,8 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
 
   return (
     <Panel.Content>
-      <Collapsible>
-        <CollapsibleTrigger className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
-          Internal-only Configuration
-          <ChevronRight
-            size={16}
-            strokeWidth={1}
-            className="mr-2 group-data-open/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
-          />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-2 data-closed:animate-collapsible-up data-open:animate-collapsible-down flex flex-col gap-y-6">
+      <CollapsibleCardSection title="Internal-only Configuration">
+        <div className="flex flex-col gap-y-6">
           <div>
             <p className="text-xs text-foreground-lighter mb-6">
               These settings are only visible to internal staff
@@ -103,8 +88,8 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
               </div>
             </div>
           )}
-        </CollapsibleContent>
-      </Collapsible>
+        </div>
+      </CollapsibleCardSection>
     </Panel.Content>
   )
 }

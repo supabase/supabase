@@ -5,6 +5,17 @@ import * as React from "react"
 
 export const Index: Record<string, any> = {
   "default": {
+    "CollapsibleCardSection": {
+      name: "CollapsibleCardSection",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/CollapsibleCardSection")),
+      source: "",
+      files: ["registry/default//CollapsibleCardSection.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "ConfirmationModal": {
       name: "ConfirmationModal",
       type: "components:fragment",
@@ -221,6 +232,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/collapsible-alert-demo")),
       source: "",
       files: ["registry/default/example/collapsible-alert-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "collapsible-card-section-demo": {
+      name: "collapsible-card-section-demo",
+      type: "components:example",
+      registryDependencies: ["collapsible-card-section"],
+      component: React.lazy(() => import("@/registry/default/example/collapsible-card-section-demo")),
+      source: "",
+      files: ["registry/default/example/collapsible-card-section-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
