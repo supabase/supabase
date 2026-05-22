@@ -61,7 +61,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
         href: `${DOCS_URL}/guides/deployment/database-migrations`,
       },
       cli: generateMigrationCliCommand(id, migrationName),
-      npm: generateMigrationCliCommand(id, migrationName, true),
+      npx: generateMigrationCliCommand(id, migrationName, true),
     },
     {
       id: 'seed' as const,
@@ -78,7 +78,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
         href: `${DOCS_URL}/guides/local-development/seeding-your-database`,
       },
       cli: generateSeedCliCommand(id),
-      npm: generateSeedCliCommand(id, true),
+      npx: generateSeedCliCommand(id, true),
     },
     {
       id: 'sql' as const,
@@ -90,23 +90,23 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
         </>
       ),
       cli: generateFileCliCommand(id, migrationName),
-      npm: generateFileCliCommand(id, migrationName, true),
+      npx: generateFileCliCommand(id, migrationName, true),
     },
   ]
 
   const selectedSnippet = SNIPPETS.find((s) => s.id === downloadFormat) ?? SNIPPETS[0]
-  const commandValue = selectedView === 'CLI' ? selectedSnippet.cli : selectedSnippet.npm
+  const commandValue = selectedView === 'CLI' ? selectedSnippet.cli : selectedSnippet.npx
 
   return (
     <Dialog {...props}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Download query</DialogTitle>
+          <DialogTitle>Export query</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-4">
           <div className="flex items-center justify-between gap-x-2">
-            <p className="text-sm">Download as</p>
+            <p className="text-sm">Export as</p>
             <Select
               value={downloadFormat}
               onValueChange={(value) => setDownloadFormat(value as DownloadFormat)}
@@ -153,14 +153,14 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
         <DialogSection>
           <div className="flex items-center justify-start gap-x-2">
             {selectedSnippet.docLink && (
-              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild type="default" icon={<ExternalLink />}>
                 <Link href={selectedSnippet.docLink.href} target="_blank" rel="noreferrer">
                   {selectedSnippet.docLink.label}
                 </Link>
               </Button>
             )}
 
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <Link href={CLI_DOCS_URL} target="_blank" rel="noreferrer">
                 About CLI
               </Link>
