@@ -9,7 +9,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 // Update this whenever the banner content below changes so old client bundles
 // stop displaying outdated notices after the relevant date passes.
-const BANNER_EXPIRES_AT = new Date('2026-06-01T15:00:00Z')
+const BANNER_EXPIRES_AT = new Date('2026-06-03T15:00:00Z')
 
 const SUPAVISOR_UPDATE_REGIONS = {
   'eu-central-1': {
@@ -18,18 +18,18 @@ const SUPAVISOR_UPDATE_REGIONS = {
     url: 'https://status.supabase.com/incidents/jy1tm4wfs68t',
   },
   'eu-west-1': {
-    start: Date.UTC(2026, 4, 27, 13, 0, 0),
-    end: Date.UTC(2026, 4, 27, 15, 0, 0),
+    start: Date.UTC(2026, 5, 1, 13, 0, 0),
+    end: Date.UTC(2026, 5, 1, 15, 0, 0),
     url: 'https://status.supabase.com/incidents/3t293hpd545z',
   },
   'us-west-1': {
-    start: Date.UTC(2026, 4, 28, 13, 0, 0),
-    end: Date.UTC(2026, 4, 28, 15, 0, 0),
+    start: Date.UTC(2026, 5, 2, 16, 0, 0),
+    end: Date.UTC(2026, 5, 2, 18, 0, 0),
     url: 'https://status.supabase.com/incidents/8f72bnv3xs8r',
   },
   'us-east-1': {
-    start: Date.UTC(2026, 5, 1, 13, 0, 0),
-    end: Date.UTC(2026, 5, 1, 15, 0, 0),
+    start: Date.UTC(2026, 5, 3, 13, 0, 0),
+    end: Date.UTC(2026, 5, 3, 15, 0, 0),
     url: 'https://status.supabase.com/incidents/7zgmgh2p343n',
   },
 }
