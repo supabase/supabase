@@ -63,27 +63,26 @@ export const PublicationsTables = () => {
 
   return (
     <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <Input
-            size="tiny"
-            ref={searchInputRef}
-            icon={<Search />}
-            className="w-48"
-            placeholder="Search for a table"
-            value={filterString}
-            onChange={(e) => setFilterString(e.target.value)}
-            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
-          />
-          {!isLoadingPermissions && !canUpdatePublications && (
-            <Admonition
-              type="note"
-              className="w-[500px]"
-              description="You need additional permissions to update database replications."
-            />
-          )}
-        </div>
+      <div className="flex items-center justify-between mb-4">
+        <Input
+          size="tiny"
+          ref={searchInputRef}
+          icon={<Search />}
+          className="w-48"
+          placeholder="Search for a table"
+          value={filterString}
+          onChange={(e) => setFilterString(e.target.value)}
+          onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+        />
       </div>
+
+      {!isLoadingPermissions && !canUpdatePublications && (
+        <Admonition
+          type="warning"
+          className="mb-4 w-full"
+          description="You need additional permissions to update database replications."
+        />
+      )}
 
       <Card>
         <Table>

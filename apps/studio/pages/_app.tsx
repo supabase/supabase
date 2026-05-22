@@ -47,7 +47,6 @@ import { FeaturePreviewContextProvider } from '@/components/interfaces/App/Featu
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
-import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -91,9 +90,24 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const cloudProvider = useDefaultProvider()
+
+  const getConfigCatFlags = useCallback(
+    (userEmail?: string) => {
+      const customAttributes: Record<string, string> = {}
+      if (cloudProvider) customAttributes.cloud_provider = cloudProvider
+      if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      return getFlags(userEmail, customAttributes)
+    },
+    [cloudProvider, selectedOrganization?.plan?.id]
+  )
 
   return (
-    <FeatureFlagProvider {...props} organizationSlug={selectedOrganization?.slug ?? undefined}>
+    <FeatureFlagProvider
+      {...props}
+      getConfigCatFlags={getConfigCatFlags}
+      organizationSlug={selectedOrganization?.slug ?? undefined}
+    >
       {children}
     </FeatureFlagProvider>
   )
@@ -149,16 +163,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   // [Joshen] Should target hosted staging, local dev, and local CLI only
   const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
 
-  const cloudProvider = useDefaultProvider()
-
-  const getConfigCatFlags = useCallback(
-    (userEmail?: string) => {
-      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
-      return getFlags(userEmail, customAttributes)
-    },
-    [cloudProvider]
-  )
-
   const checkCliEnvironment = async () => {
     const data = await getCLIReleaseVersion()
     if (!!data.current) setIsCLI(true)
@@ -169,16 +173,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   }, [])
 
   return (
-    <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
         <NuqsAdapter>
           <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
-              <FeatureFlagProviderWithOrgContext
-                API_URL={API_URL}
-                enabled={IS_PLATFORM}
-                getConfigCatFlags={getConfigCatFlags}
-              >
+              <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
                 <ProfileProvider>
                   <TimezoneProvider>
                     <TimestampInfoTimezoneBridge>
@@ -221,7 +221,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />
                                       <FeaturePreviewModal />
-                                      <UpdateBillingAddressModal />
                                     </FeaturePreviewContextProvider>
                                   </BannerStackProvider>
                                   <Toaster />
@@ -245,9 +244,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
             </AuthProvider>
           </HydrationBoundary>
         </NuqsAdapter>
-      </QueryClientProvider>
-      <TelemetryTagManager />
-    </ErrorBoundary>
+        <TelemetryTagManager />
+      </ErrorBoundary>
+    </QueryClientProvider>
   )
 }
 

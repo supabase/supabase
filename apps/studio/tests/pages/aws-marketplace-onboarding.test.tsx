@@ -1,18 +1,17 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { AwsMarketplaceOnboardingScreen } from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboarding'
 import type {
   CloudMarketplaceContractLinkingEligibility,
   CloudMarketplaceOnboardingInfo,
 } from '@/components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
+import { CREATE_AWS_MANAGED_ORG_FORM_ID } from '@/components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrgForm'
 import { API_URL } from '@/lib/constants'
 import type { ProfileContextType } from '@/lib/profile'
-import {
-  AwsMarketplaceOnboardingScreen,
-  type AwsMarketplaceMockState,
-} from '@/pages/aws-marketplace-onboarding'
 import { createMockOrganization } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
@@ -60,9 +59,13 @@ const ELIGIBLE_CONTRACT: CloudMarketplaceContractLinkingEligibility = {
   },
 }
 
-function createOnboardingInfo(
-  organizations: Organization[] = [LINKABLE_ORG, UNAVAILABLE_ORG]
-): CloudMarketplaceOnboardingInfo {
+function createOnboardingInfo({
+  organizations = [LINKABLE_ORG, UNAVAILABLE_ORG],
+  eligibleSlugs = [LINKABLE_ORG.slug],
+}: {
+  organizations?: Organization[]
+  eligibleSlugs?: string[]
+} = {}): CloudMarketplaceOnboardingInfo {
   return {
     aws_contract_auto_renewal: true,
     aws_contract_end_date: '2026-12-31T00:00:00.000Z',
@@ -71,8 +74,8 @@ function createOnboardingInfo(
     aws_contract_start_date: '2026-01-01T00:00:00.000Z',
     organization_linking_eligibility: organizations.map((organization) => ({
       slug: organization.slug,
-      is_eligible: organization.slug === LINKABLE_ORG.slug,
-      reasons: organization.slug === LINKABLE_ORG.slug ? [] : ['ALREADY_MANAGED_BY_PARTNER_AWS'],
+      is_eligible: eligibleSlugs.includes(organization.slug),
+      reasons: eligibleSlugs.includes(organization.slug) ? [] : ['ALREADY_MANAGED_BY_PARTNER_AWS'],
     })),
     plan_name_selected_on_marketplace: 'Team',
   }
@@ -81,7 +84,7 @@ function createOnboardingInfo(
 function mockAwsEndpoints({
   organizations = [LINKABLE_ORG, UNAVAILABLE_ORG],
   eligibility = ELIGIBLE_CONTRACT,
-  onboardingInfo = createOnboardingInfo(organizations),
+  onboardingInfo = createOnboardingInfo({ organizations }),
 }: {
   organizations?: Organization[]
   eligibility?: CloudMarketplaceContractLinkingEligibility
@@ -113,6 +116,7 @@ function renderScreen(props: Partial<Parameters<typeof AwsMarketplaceOnboardingS
 describe('AwsMarketplaceOnboardingScreen', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    window.localStorage.clear()
   })
 
   test('renders linkable and unavailable organizations and disables link without selection', async () => {
@@ -164,32 +168,138 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     await screen.findByText('Organization linked')
   })
 
-  test.each([
-    ['invalid', 'Setup unavailable'],
-    ['error', 'Unable to load setup'],
-    ['linked', 'Organization linked'],
-  ] satisfies Array<[AwsMarketplaceMockState, string]>)(
-    'renders %s mock state',
-    async (mock, expectedText) => {
-      renderScreen({ mock })
-      expect(await screen.findByText('Link AWS Marketplace')).toBeInTheDocument()
-      expect(await screen.findByText(expectedText)).toBeInTheDocument()
-    }
-  )
-
-  test('shows what happens when creating an organization in the AWS mock flow', async () => {
+  test('creates an AWS-managed organization with buyerId and returns to linked state', async () => {
     const user = userEvent.setup()
-    renderScreen({ mock: 'create-new' })
+    let createRequest: unknown
 
-    await user.click(await screen.findByRole('button', { name: /Create new organization/ }))
+    mockAwsEndpoints({
+      organizations: [],
+      onboardingInfo: createOnboardingInfo({ organizations: [] }),
+    })
+    mswServer.use(
+      http.post(`${API_URL}/platform/organizations/cloud-marketplace`, async ({ request }) => {
+        createRequest = await request.json()
+        return HttpResponse.json(
+          createMockOrganization({
+            id: 3,
+            name: 'Mock Marketplace Org',
+            slug: 'mock-marketplace-org',
+            billing_partner: 'aws_marketplace',
+          })
+        )
+      })
+    )
 
-    expect(await screen.findByText('Create and link organization')).toBeInTheDocument()
-    expect(
-      screen.getByText(/create an AWS-managed organization, then links it/i)
-    ).toBeInTheDocument()
+    renderScreen()
 
-    await user.click(screen.getByRole('button', { name: 'Show linked state' }))
+    await user.click(await screen.findByRole('button', { name: 'Create organization' }))
+    await user.type(screen.getByPlaceholderText('Organization name'), 'Mock Marketplace Org')
+    fireEvent.submit(document.getElementById(CREATE_AWS_MANAGED_ORG_FORM_ID)!)
 
+    await waitFor(() => {
+      expect(createRequest).toEqual({
+        name: 'Mock Marketplace Org',
+        kind: 'PERSONAL',
+        buyer_id: 'buyer-test',
+      })
+    })
     expect(await screen.findByText('Organization linked')).toBeInTheDocument()
+  })
+
+  test('renders setup unavailable when the buyer ID is missing', async () => {
+    renderScreen({ buyerId: undefined })
+
+    expect(await screen.findByText('Setup unavailable')).toBeInTheDocument()
+    expect(screen.getByText('buyer_id')).toBeInTheDocument()
+  })
+
+  test('renders an error state when onboarding info fails to load', async () => {
+    mockAwsEndpoints()
+    mswServer.use(
+      http.get(`${API_URL}/platform/cloud-marketplace/buyers/:buyer_id/onboarding-info`, () =>
+        HttpResponse.json({ message: 'Failed to load onboarding info' }, { status: 500 })
+      )
+    )
+
+    renderScreen()
+
+    expect(await screen.findByText('Unable to load setup')).toBeInTheDocument()
+  })
+
+  test('renders the generic ineligible state', async () => {
+    mockAwsEndpoints({
+      eligibility: {
+        eligibility: {
+          is_eligible: false,
+          reasons: [],
+          aws_agreement_id: 'agreement-test',
+        },
+      },
+    })
+
+    renderScreen()
+
+    expect(
+      await screen.findByText('This AWS Marketplace subscription cannot be linked right now')
+    ).toBeInTheDocument()
+    expect(screen.getByText('If the problem persists, contact support.')).toBeInTheDocument()
+  })
+
+  test('renders the already-linked ineligible state', async () => {
+    mockAwsEndpoints({
+      eligibility: {
+        eligibility: {
+          is_eligible: false,
+          reasons: ['AGREEMENT_BASED_OFFER'],
+          aws_agreement_id: 'agreement-test',
+        },
+      },
+    })
+
+    renderScreen()
+
+    expect(await screen.findByText('No action required')).toBeInTheDocument()
+  })
+
+  test('promotes the last visited organization into the first visible organizations', async () => {
+    const organizations = [
+      createMockOrganization({ id: 1, name: 'Alpha Team', slug: 'alpha-team' }),
+      createMockOrganization({ id: 2, name: 'Beta Team', slug: 'beta-team' }),
+      createMockOrganization({ id: 3, name: 'Delta Team', slug: 'delta-team' }),
+      createMockOrganization({ id: 4, name: 'Gamma Team', slug: 'gamma-team' }),
+      createMockOrganization({ id: 5, name: 'Zeta Team', slug: 'zeta-team' }),
+    ]
+
+    window.localStorage.setItem(
+      LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+      JSON.stringify('zeta-team')
+    )
+    mockAwsEndpoints({
+      organizations,
+      onboardingInfo: createOnboardingInfo({
+        organizations,
+        eligibleSlugs: organizations.map(({ slug }) => slug),
+      }),
+    })
+    renderScreen()
+
+    const zeta = await screen.findByText('Zeta Team')
+    const alpha = await screen.findByText('Alpha Team')
+    expect(zeta.compareDocumentPosition(alpha) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Show 2 more' })).toBeInTheDocument()
+  })
+
+  test('renders a create organization action when there are no existing organizations', async () => {
+    mockAwsEndpoints({
+      organizations: [],
+      onboardingInfo: createOnboardingInfo({ organizations: [] }),
+    })
+
+    renderScreen()
+
+    expect(await screen.findByRole('button', { name: 'Create organization' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Create new organization/ })
+    ).not.toBeInTheDocument()
   })
 })

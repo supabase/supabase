@@ -1,10 +1,10 @@
 import type { ChangeEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Badge,
   FormControl,
   FormField,
@@ -37,17 +37,17 @@ export const AdvancedSettings = ({
 
   return (
     <div className="px-5">
-      <Accordion_Shadcn_ type="single" collapsible>
-        <AccordionItem_Shadcn_ value="item-1" className="border-none">
-          <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="item-1" className="border-none">
+          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
                 Optional performance tuning
               </span>
             </div>
-          </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          </AccordionTrigger>
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
             {/* Batch wait time - applies to all destinations */}
             <FormField
               control={form.control}
@@ -275,9 +275,9 @@ export const AdvancedSettings = ({
                 />
               </>
             )}
-          </AccordionContent_Shadcn_>
-        </AccordionItem_Shadcn_>
-      </Accordion_Shadcn_>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   )
 }

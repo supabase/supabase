@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { IS_PLATFORM, useFeatureFlags, useFlag } from 'common'
+import { IS_PLATFORM, useFeatureFlags } from 'common'
 import { Database } from 'common/marketplace.types'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -18,6 +18,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
 
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   IntegrationCard,
   IntegrationLoadingCard,
@@ -25,8 +26,9 @@ import {
 import { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { MarketplaceIndex } from '@/components/interfaces/Integrations/Marketplace/MarketplaceIndex'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
@@ -205,8 +207,14 @@ function useFeaturedIntegratios(
 }
 
 const IntegrationsPage: NextPageWithLayout = () => {
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
+  if (isMarketplaceEnabled) return <MarketplaceIndex />
+  return <LegacyIntegrationsPage />
+}
+
+const LegacyIntegrationsPage = () => {
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const [search, setSearch] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
@@ -357,7 +365,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
 
 IntegrationsPage.getLayout = (page) => (
   <DefaultLayout>
-    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
+    <ProjectIntegrationsLayoutDispatch>{page}</ProjectIntegrationsLayoutDispatch>
   </DefaultLayout>
 )
 

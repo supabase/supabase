@@ -17,7 +17,6 @@ import {
   Form,
   FormControl,
   FormField,
-  Input,
   Select,
   SelectContent,
   SelectItem,
@@ -29,6 +28,14 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import {
+  ORG_KIND_DEFAULT,
+  ORG_SIZE_DEFAULT,
+  OrganizationDetailsFields,
+  organizationDetailsSchema,
+  type OrgKind,
+  type OrgSize,
+} from './OrganizationDetailsFields'
 import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
 import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
@@ -53,25 +60,6 @@ import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { validateReturnTo } from '@/lib/gotrue'
 import { useProfile } from '@/lib/profile'
 
-const ORG_KIND_TYPES = {
-  PERSONAL: 'Personal',
-  EDUCATIONAL: 'Educational',
-  STARTUP: 'Startup',
-  AGENCY: 'Agency',
-  COMPANY: 'Company',
-  UNDISCLOSED: 'N/A',
-}
-const ORG_KIND_DEFAULT = 'PERSONAL'
-
-const ORG_SIZE_TYPES = {
-  '1': '1 - 10',
-  '10': '10 - 49',
-  '50': '50 - 99',
-  '100': '100 - 299',
-  '300': 'More than 300',
-}
-const ORG_SIZE_DEFAULT = '1'
-
 interface NewOrgFormProps {
   onPaymentMethodReset: () => void
   setupIntent?: SetupIntentResponse
@@ -80,19 +68,11 @@ interface NewOrgFormProps {
 
 const plans = ['FREE', 'PRO', 'TEAM'] as const
 
-const formSchema = z.object({
+const formSchema = organizationDetailsSchema.extend({
   plan: z
     .string()
     .transform((val) => val.toUpperCase())
     .pipe(z.enum(plans)),
-  name: z.string().min(1, 'Organization name is required'),
-  kind: z
-    .string()
-    .transform((val) => val.toUpperCase())
-    .pipe(
-      z.enum(['PERSONAL', 'EDUCATIONAL', 'STARTUP', 'AGENCY', 'COMPANY', 'UNDISCLOSED'] as const)
-    ),
-  size: z.enum(['1', '10', '50', '100', '300'] as const),
   spend_cap: z.boolean(),
 })
 
@@ -166,8 +146,8 @@ export const NewOrgForm = ({
     defaultValues: {
       plan: defaultValues.plan.toUpperCase() as (typeof plans)[number],
       name: defaultValues.name,
-      kind: defaultValues.kind as typeof ORG_KIND_DEFAULT,
-      size: defaultValues.size as keyof typeof ORG_SIZE_TYPES,
+      kind: defaultValues.kind as OrgKind,
+      size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
     },
   })
@@ -176,8 +156,8 @@ export const NewOrgForm = ({
     form.reset({
       plan: defaultValues.plan.toUpperCase() as (typeof plans)[number],
       name: defaultValues.name,
-      kind: defaultValues.kind as typeof ORG_KIND_DEFAULT,
-      size: defaultValues.size as keyof typeof ORG_SIZE_TYPES,
+      kind: defaultValues.kind as OrgKind,
+      size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
     })
   }, [defaultValues, form])
@@ -438,93 +418,13 @@ export const NewOrgForm = ({
           footerClasses="rounded-b-md"
         >
           <div className="divide-y divide-border-muted">
-            <Panel.Content>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Name"
-                    layout="horizontal"
-                    description="What's the name of your company or team? You can change this later."
-                  >
-                    <FormControl>
-                      <Input
-                        autoFocus
-                        type="text"
-                        placeholder="Organization name"
-                        data-1p-ignore
-                        data-lpignore="true"
-                        data-form-type="other"
-                        data-bwignore
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </Panel.Content>
-            <Panel.Content>
-              <FormField
-                control={form.control}
-                name="kind"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Type"
-                    layout="horizontal"
-                    description="What best describes your organization?"
-                  >
-                    <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                          {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
-                            <SelectItem key={k} value={k}>
-                              {v}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </Panel.Content>
-
-            {form.watch('kind') == 'COMPANY' && (
-              <Panel.Content>
-                <FormField
-                  control={form.control}
-                  name="size"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Company size"
-                      layout="horizontal"
-                      description="How many people are in your company?"
-                    >
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-
-                          <SelectContent>
-                            {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                              <SelectItem key={k} value={k}>
-                                {v}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              </Panel.Content>
-            )}
+            <OrganizationDetailsFields
+              control={form.control}
+              kind={form.watch('kind')}
+              renderFieldWrapper={(children, field) => (
+                <Panel.Content key={field}>{children}</Panel.Content>
+              )}
+            />
 
             {isBillingEnabled && (
               <Panel.Content>

@@ -75,8 +75,8 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
     if (!integration || !projectRef) return
 
     if (integration.installUrlType === 'post') {
-      if (!integration.listingId) return toast.error('Listing ID is required')
-      installOAuthIntegration({ projectRef, id: integration.listingId })
+      if (!integration.id) return toast.error('Listing ID is required')
+      installOAuthIntegration({ projectRef, listingSlug: integration.id })
     } else {
       let redirectUrl = '/'
 

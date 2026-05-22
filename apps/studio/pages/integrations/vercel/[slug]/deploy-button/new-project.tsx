@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import InlineSVG from 'react-inlinesvg'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
@@ -278,6 +278,7 @@ const CreateProject = () => {
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState<string>(PROVIDERS.AWS.default_region.displayName)
+  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
   const track = useTrack()
   const snapshot = useIntegrationInstallationSnapshot()
@@ -286,16 +287,26 @@ const CreateProject = () => {
   const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
     !isDataApiRevokeOnCreateDefault
   )
+  const hasUserModifiedDataApiDefaultPrivileges = useRef(false)
 
-  useTrackDefaultPrivilegesExposure({ surface: 'vercel' })
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (hasUserModifiedDataApiDefaultPrivileges.current) return
+    setDataApiDefaultPrivileges(!dataApiRevokeOnCreateDefaultFlag)
+  }, [dataApiRevokeOnCreateDefaultFlag])
+
+  useTrackDefaultPrivilegesExposure({
+    surface: 'vercel',
+    orgSlug: slug,
+    dataApiDefaultPrivileges,
+    hasUserModified: hasUserModifiedDataApiDefaultPrivileges.current,
+  })
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
     setPasswordStrengthMessage(message)
   }
-
-  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
   const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
 
@@ -562,7 +573,10 @@ const CreateProject = () => {
             id="dataApiDefaultPrivileges"
             name="dataApiDefaultPrivileges"
             checked={dataApiDefaultPrivileges}
-            onCheckedChange={(checked) => setDataApiDefaultPrivileges(!!checked)}
+            onCheckedChange={(checked) => {
+              hasUserModifiedDataApiDefaultPrivileges.current = true
+              setDataApiDefaultPrivileges(!!checked)
+            }}
           />
           <div className="grid gap-1.5 leading-none">
             <label

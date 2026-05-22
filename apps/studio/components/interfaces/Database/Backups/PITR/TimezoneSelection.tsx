@@ -3,12 +3,12 @@ import { useId, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -51,14 +51,14 @@ export const TimezoneSelection = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent id={listboxId} className="w-[350px] p-0">
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No timezones found...</CommandEmpty_Shadcn_>
-              <CommandGroup_Shadcn_>
+          <Command>
+            <CommandInput placeholder="Search timezone..." className="h-9" />
+            <CommandList>
+              <CommandEmpty>No timezones found...</CommandEmpty>
+              <CommandGroup>
                 <ScrollArea className="h-72">
                   {timezoneOptions.map((option) => (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       key={option}
                       value={option}
                       onSelect={(text) => {
@@ -78,12 +78,12 @@ export const TimezoneSelection = ({
                           selectedTimezone.text === option ? 'opacity-100' : 'opacity-0'
                         )}
                       />
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   ))}
                 </ScrollArea>
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
+              </CommandGroup>
+            </CommandList>
+          </Command>
         </PopoverContent>
       </Popover>
     </div>

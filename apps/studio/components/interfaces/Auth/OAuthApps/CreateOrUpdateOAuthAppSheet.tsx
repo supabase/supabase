@@ -456,7 +456,9 @@ export const CreateOrUpdateOAuthAppSheet = ({
                           flow can be used, particularly beneficial for applications that cannot
                           securely store Client Secrets, such as native and mobile apps. This cannot
                           be changed after creation.{' '}
-                          <InlineLink href={`${DOCS_URL}/guides/auth/oauth/public-oauth-apps`}>
+                          <InlineLink
+                            href={`${DOCS_URL}/guides/auth/oauth-server/getting-started#register-an-oauth-client`}
+                          >
                             Learn more
                           </InlineLink>
                         </>

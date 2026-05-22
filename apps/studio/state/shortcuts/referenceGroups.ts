@@ -1,24 +1,29 @@
 export const SHORTCUT_REFERENCE_GROUPS = {
+  GLOBAL_ACTIONS: 'global.actions',
   NAVIGATION_GLOBAL: 'navigation.global',
   NAVIGATION_DATABASE: 'navigation.database',
   NAVIGATION_AUTH: 'navigation.auth',
   NAVIGATION_STORAGE: 'navigation.storage',
   NAVIGATION_FUNCTIONS: 'navigation.functions',
   NAVIGATION_FUNCTION_DETAIL: 'navigation.function-detail',
+  NAVIGATION_REALTIME: 'navigation.realtime',
 } as const
 
 export const SHORTCUT_REFERENCE_GROUP_LABELS: Record<string, string> = {
+  [SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS]: 'Global Actions',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL]: 'Global Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_DATABASE]: 'Database Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_AUTH]: 'Auth Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_STORAGE]: 'Storage Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_FUNCTIONS]: 'Edge Functions Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_FUNCTION_DETAIL]: 'Edge Function Tabs',
+  [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_REALTIME]: 'Realtime Navigation',
 }
 
 export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   'command-menu',
   'shortcuts',
+  SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_DATABASE,
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_AUTH,
@@ -31,6 +36,9 @@ export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_FUNCTION_DETAIL,
   'functions-detail',
   'functions-overview',
+  SHORTCUT_REFERENCE_GROUPS.NAVIGATION_REALTIME,
+  'realtime-inspector',
+  'logs-preview',
   'nav',
   'ai-assistant',
   'inline-editor',
@@ -40,6 +48,7 @@ export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   'table-editor',
   'schema-visualizer',
   'list-page',
+  'platform-webhooks',
   'action-bar',
   'operation-queue',
   'unified-logs',
