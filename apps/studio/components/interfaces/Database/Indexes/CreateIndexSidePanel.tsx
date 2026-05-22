@@ -93,10 +93,6 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const selectedColumns = useWatch({ name: 'columns', control: form.control }) ?? []
   const selectedIndexType = useWatch({ name: 'type', control: form.control })
 
-  //const [selectedSchema, setSelectedSchema] = useState('public')
-  // const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
-  //const [selectedColumns, setSelectedColumns] = useState<string[]>([])
-  //const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
   const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
   const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
   const [schemaSearchTerm, setSchemaSearchTerm] = useState('')
@@ -154,24 +150,6 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     .map((column) => `"${column}"`)
     .join(', ')});
 `.trim()
-
-  /*
-  const onSaveIndex = () => {
-    if (!project) return console.error('Project is required')
-    if (!selectedEntity) return console.error('Entity is required')
-
-    createIndex({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-      payload: {
-        schema: selectedSchema,
-        entity: selectedEntity,
-        type: selectedIndexType,
-        columns: selectedColumns,
-      },
-    })
-  }
-  */
 
   const { reset } = form
   useEffect(() => {
@@ -300,7 +278,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               />
             </SheetSection>
 
-            <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+            <Separator className="w-full" />
 
             <SheetSection>
               <FormField
@@ -414,7 +392,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               />
             </SheetSection>
 
-            <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+            <Separator className="w-full" />
 
             {selectedEntity && (
               <SheetSection>
@@ -447,7 +425,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                               deletableBadge
                               badgeLimit="wrap"
                               showIcon={false}
-                              className="w-full min-w-lg!"
+                              className="w-full"
                             />
                             <MultiSelectorContent>
                               <MultiSelectorList>
@@ -471,97 +449,98 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               </SheetSection>
             )}
 
-            <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+            <Separator className="w-full" />
 
             {selectedColumns.length > 0 && (
-              <SheetSection>
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <>
-                      <FormItemLayout layout="horizontal" label="Select an index type">
-                        <FormControl className="col-span-6">
-                          <Select
-                            disabled={isOrioleDb}
-                            value={field.value}
-                            onValueChange={field.onChange}
+              <>
+                <SheetSection>
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <>
+                        <FormItemLayout layout="horizontal" label="Select an index type">
+                          <FormControl className="col-span-6">
+                            <Select
+                              disabled={isOrioleDb}
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger>
+                                <SelectValue className="font-mono">{selectedIndexType}</SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {INDEX_TYPES.map((index, i) => (
+                                  <Fragment key={index.name}>
+                                    <SelectItem value={index.value}>
+                                      <div className="flex flex-col gap-0.5">
+                                        <span>{index.name}</span>
+                                        {index.description.split('\n').map((x, idx) => (
+                                          <span
+                                            className="text-foreground-lighter group-focus:text-foreground-light group-data-checked:text-foreground-light"
+                                            key={`${index.value}-description-${idx}`}
+                                          >
+                                            {x}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </SelectItem>
+                                    {i < INDEX_TYPES.length - 1 && <SelectSeparator />}
+                                  </Fragment>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItemLayout>
+
+                        {isOrioleDb && (
+                          <Admonition
+                            type="default"
+                            className="mt-2!"
+                            title="OrioleDB currently only supports the B-tree index type"
+                            description="More index types may be supported when OrioleDB is no longer in preview"
                           >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an index type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {INDEX_TYPES.map((index, i) => (
-                                <Fragment key={index.name}>
-                                  <SelectItem value={index.value}>
-                                    <div className="flex flex-col gap-0.5">
-                                      <span>{index.name}</span>
-                                      {index.description.split('\n').map((x, idx) => (
-                                        <span
-                                          className="text-foreground-lighter group-focus:text-foreground-light group-data-checked:text-foreground-light"
-                                          key={`${index.value}-description-${idx}`}
-                                        >
-                                          {x}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  </SelectItem>
-                                  {i < INDEX_TYPES.length - 1 && <SelectSeparator />}
-                                </Fragment>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItemLayout>
+                            {/* [Joshen Oriole] Hook up proper docs URL */}
+                            <DocsButton className="mt-2" abbrev={false} href={`${DOCS_URL}`} />
+                          </Admonition>
+                        )}
+                      </>
+                    )}
+                  />
+                </SheetSection>
 
-                      {isOrioleDb && (
-                        <Admonition
-                          type="default"
-                          className="mt-2!"
-                          title="OrioleDB currently only supports the B-tree index type"
-                          description="More index types may be supported when OrioleDB is no longer in preview"
-                        >
-                          {/* [Joshen Oriole] Hook up proper docs URL */}
-                          <DocsButton className="mt-2" abbrev={false} href={`${DOCS_URL}`} />
-                        </Admonition>
-                      )}
-                    </>
-                  )}
-                />
-              </SheetSection>
+                <Separator className="w-full" />
+                <SheetSection>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm">Preview of SQL statement</p>
+                    <Button asChild type="default">
+                      <Link
+                        href={
+                          project !== undefined
+                            ? `/project/${project.ref}/sql/new?content=${generatedSQL}`
+                            : '/'
+                        }
+                      >
+                        Open in SQL Editor
+                      </Link>
+                    </Button>
+                  </div>
+                </SheetSection>
+                <div className="h-[200px] mt-2!">
+                  <div className="relative h-full">
+                    <CodeEditor
+                      isReadOnly
+                      autofocus={false}
+                      id={`${selectedSchema}-${selectedEntity}-${selectedColumns.join(
+                        ','
+                      )}-${selectedIndexType}`}
+                      language="pgsql"
+                      defaultValue={generatedSQL}
+                    />
+                  </div>
+                </div>
+              </>
             )}
-
-            <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
-
-            <SheetSection>
-              <div className="flex items-center justify-between">
-                <p className="text-sm">Preview of SQL statement</p>
-                <Button asChild type="default">
-                  <Link
-                    href={
-                      project !== undefined
-                        ? `/project/${project.ref}/sql/new?content=${generatedSQL}`
-                        : '/'
-                    }
-                  >
-                    Open in SQL Editor
-                  </Link>
-                </Button>
-              </div>
-            </SheetSection>
-            <div className="h-[200px] mt-2!">
-              <div className="relative h-full">
-                <CodeEditor
-                  isReadOnly
-                  autofocus={false}
-                  id={`${selectedSchema}-${selectedEntity}-${selectedColumns.join(
-                    ','
-                  )}-${selectedIndexType}`}
-                  language="pgsql"
-                  defaultValue={generatedSQL}
-                />
-              </div>
-            </div>
           </form>
         </Form>
         <SheetFooter>
