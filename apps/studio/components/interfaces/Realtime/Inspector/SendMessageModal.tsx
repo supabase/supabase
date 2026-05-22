@@ -45,6 +45,7 @@ export const SendMessageModal = ({
         }
       }}
       title="Broadcast a message to all clients"
+      confirmLabel="Confirm"
     >
       <div className="flex flex-col gap-y-4">
         <FormItemLayout label="Message name" layout="vertical" isReactForm={false}>
