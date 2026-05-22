@@ -11,6 +11,8 @@ import { CustomReportSection } from './CustomReportSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
 import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
 import { ProjectUsageSection as ProjectUsageSectionV1 } from '@/components/interfaces/Home/ProjectUsageSection'
+import { OnboardingSurveyToastPrompt } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyToastPrompt'
+import { useOnboardingSurveyPrompt } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyPrompt'
 import { SortableSection } from '@/components/interfaces/ProjectHome/SortableSection'
 import { TopSection } from '@/components/interfaces/ProjectHome/TopSection'
 import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring'
@@ -34,6 +36,21 @@ export const ProjectHome = () => {
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
   const isComingUp = project?.status === PROJECT_STATUS.COMING_UP
+  const { variant: onboardingSurveyVariant } = useOnboardingSurveyPrompt({
+    surface: 'project_home',
+  })
+  // Platform's `inserted_at` is UTC but lacks a `Z` suffix, so we parse it explicitly as UTC.
+  const isRecentlyCreatedProject =
+    !!project?.inserted_at &&
+    dayjs.utc(project.inserted_at).isAfter(dayjs.utc().subtract(1, 'hour'))
+  const inProvisioningWindow = isComingUp || isRecentlyCreatedProject
+
+  const showOnboardingSurveyToast =
+    !!project &&
+    !isPaused &&
+    inProvisioningWindow &&
+    (onboardingSurveyVariant === 'toast' || onboardingSurveyVariant === 'dialog')
+  const shouldAutoOpenOnboardingSurveyDialog = isComingUp && onboardingSurveyVariant === 'dialog'
 
   const [sectionOrder, setSectionOrder] = useLocalStorage<string[]>(
     `home-section-order-${project?.ref || 'default'}`,
@@ -82,6 +99,9 @@ export const ProjectHome = () => {
 
   return (
     <ProjectNeedsSecuring>
+      {showOnboardingSurveyToast && (
+        <OnboardingSurveyToastPrompt autoOpen={shouldAutoOpenOnboardingSurveyDialog} />
+      )}
       <div className="w-full h-full">
         <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
           <ScaffoldSection

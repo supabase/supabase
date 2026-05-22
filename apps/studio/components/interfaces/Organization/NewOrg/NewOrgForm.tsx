@@ -17,25 +17,21 @@ import {
   Form,
   FormControl,
   FormField,
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
   Switch,
+  Textarea,
 } from 'ui'
+import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
-import {
-  ORG_KIND_DEFAULT,
-  ORG_SIZE_DEFAULT,
-  OrganizationDetailsFields,
-  organizationDetailsSchema,
-  type OrgKind,
-  type OrgSize,
-} from './OrganizationDetailsFields'
+import { organizationDetailsSchema, type OrgKind, type OrgSize } from './OrganizationDetailsFields'
 import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
 import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
@@ -45,8 +41,22 @@ import {
   type PaymentMethodElementRef,
 } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
+import {
+  BUILDING_MAX_LENGTH,
+  BUILDING_PLACEHOLDER,
+  formatHeardFromAnswer,
+  HEARD_FROM_FOLLOW_UP_BY_VALUE,
+  HEARD_FROM_OPTIONS,
+  isOrgFormVariant,
+  ORG_KIND_DEFAULT,
+  ORG_KIND_TYPES,
+  ORG_SIZE_DEFAULT,
+  ORG_SIZE_TYPES,
+} from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
+import { useOnboardingSurveyPrompt } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyPrompt'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
+import { useOnboardingSurveyMutation } from '@/data/organizations/onboarding-survey-mutation'
 import { useOrganizationCreateMutation } from '@/data/organizations/organization-create-mutation'
 import { useOrganizationCreationPreview } from '@/data/organizations/organization-creation-preview'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
@@ -58,6 +68,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface NewOrgFormProps {
   onPaymentMethodReset: () => void
@@ -73,6 +84,9 @@ const formSchema = organizationDetailsSchema.extend({
     .transform((val) => val.toUpperCase())
     .pipe(z.enum(plans)),
   spend_cap: z.boolean(),
+  heard_from: z.string().optional(),
+  heard_from_detail: z.string().optional(),
+  building: z.string().max(BUILDING_MAX_LENGTH).optional(),
 })
 
 type FormState = z.infer<typeof formSchema>
@@ -92,7 +106,9 @@ export const NewOrgForm = ({
 }: NewOrgFormProps) => {
   const router = useRouter()
   const user = useProfile()
+  const track = useTrack()
   const { resolvedTheme } = useTheme()
+  const hasTrackedSurveyOpened = useRef(false)
 
   const isBillingEnabled = useIsFeatureEnabled('billing:all')
 
@@ -147,8 +163,32 @@ export const NewOrgForm = ({
       kind: defaultValues.kind as OrgKind,
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
+      heard_from: '',
+      heard_from_detail: '',
+      building: '',
     },
   })
+
+  const { variant: onboardingSurveyVariant } = useOnboardingSurveyPrompt({
+    surface: 'org_form',
+  })
+  const showOnboardingSurveyInOrgForm = isOrgFormVariant(onboardingSurveyVariant)
+  const showOnboardingSurveyExpanded = onboardingSurveyVariant === 'org_form_expanded'
+  // Skip kind/size on org creation for any variant that will later fire the
+  // survey endpoint — sendOrgCreationSurvey dedupes on (user, org_slug) at the
+  // parent row, so letting both paths fire would swallow the later call.
+  const omitKindFromOrgCreation =
+    onboardingSurveyVariant !== undefined && onboardingSurveyVariant !== 'control'
+
+  useEffect(() => {
+    if (!showOnboardingSurveyInOrgForm) return
+    if (hasTrackedSurveyOpened.current) return
+
+    hasTrackedSurveyOpened.current = true
+    track('onboarding_survey_prompt_opened', {
+      surface: 'org_form',
+    })
+  }, [showOnboardingSurveyInOrgForm, track])
 
   useEffect(() => {
     form.reset({
@@ -157,6 +197,9 @@ export const NewOrgForm = ({
       kind: defaultValues.kind as OrgKind,
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
+      heard_from: form.getValues('heard_from'),
+      heard_from_detail: form.getValues('heard_from_detail'),
+      building: form.getValues('building'),
     })
   }, [defaultValues, form])
 
@@ -191,6 +234,12 @@ export const NewOrgForm = ({
 
   const selectedPlan = form.watch('plan')
   const selectedSpendCap = form.watch('spend_cap')
+  const selectedOrgKind = form.watch('kind')
+  const selectedHeardFrom = form.watch('heard_from')
+  const selectedHeardFromDetail = form.watch('heard_from_detail')
+  const heardFromFollowUp = selectedHeardFrom
+    ? HEARD_FROM_FOLLOW_UP_BY_VALUE[selectedHeardFrom]
+    : undefined
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -235,7 +284,7 @@ export const NewOrgForm = ({
       if ('pending_payment_intent_secret' in org && org.pending_payment_intent_secret) {
         setPaymentIntentSecret(org.pending_payment_intent_secret)
       } else {
-        onOrganizationCreated(org as { slug: string })
+        await onOrganizationCreated(org as { slug: string })
       }
     },
     onError: (data) => {
@@ -243,11 +292,62 @@ export const NewOrgForm = ({
       setNewOrgLoading(false)
     },
   })
+  const { mutateAsync: submitOnboardingSurvey } = useOnboardingSurveyMutation()
+
+  const submitOrganizationSurvey = useCallback(
+    async (slug: string) => {
+      if (!showOnboardingSurveyInOrgForm) return
+
+      const heardFrom = formatHeardFromAnswer(
+        form.getValues('heard_from'),
+        form.getValues('heard_from_detail')
+      )
+      const building = form.getValues('building')?.trim()
+      const kind = form.getValues('kind')
+      const size = kind === 'COMPANY' ? form.getValues('size') : undefined
+      const hasHeardFrom = !!heardFrom
+      const hasBuilding = !!building
+
+      const groupOverrides = { organization: slug }
+
+      if (!hasHeardFrom && !hasBuilding) {
+        track(
+          'onboarding_survey_dismissed',
+          { surface: 'org_form', reason: 'org_form_blank' },
+          groupOverrides
+        )
+        return
+      }
+
+      track(
+        'onboarding_survey_submit_button_clicked',
+        { surface: 'org_form', hasHeardFrom, hasBuilding },
+        groupOverrides
+      )
+
+      try {
+        await submitOnboardingSurvey({
+          slug,
+          kind,
+          size,
+          heard_from: heardFrom,
+          building,
+        })
+      } catch {
+        track(
+          'onboarding_survey_submit_failed',
+          { surface: 'org_form', hasHeardFrom, hasBuilding },
+          groupOverrides
+        )
+      }
+    },
+    [form, showOnboardingSurveyInOrgForm, submitOnboardingSurvey, track]
+  )
 
   const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data && 'slug' in data) {
-        onOrganizationCreated({ slug: data.slug })
+        await onOrganizationCreated({ slug: data.slug })
       }
     },
   })
@@ -260,8 +360,12 @@ export const NewOrgForm = ({
       await confirmPendingSubscriptionChange({
         payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
         name: form.getValues('name'),
-        kind: form.getValues('kind'),
-        size: form.getValues('size'),
+        ...(omitKindFromOrgCreation
+          ? {}
+          : {
+              kind: form.getValues('kind'),
+              size: form.getValues('size'),
+            }),
       })
     } else {
       // If the payment intent is not successful, we reset the payment method and show an error
@@ -273,7 +377,9 @@ export const NewOrgForm = ({
     }
   }
 
-  const onOrganizationCreated = (org: { slug: string }) => {
+  const onOrganizationCreated = async (org: { slug: string }) => {
+    await submitOrganizationSurvey(org.slug)
+
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
       : 'My Project'
@@ -313,13 +419,17 @@ export const NewOrgForm = ({
 
     createOrganization({
       name: formValues.name,
-      kind: formValues.kind,
+      ...(omitKindFromOrgCreation
+        ? {}
+        : {
+            kind: formValues.kind,
+            ...(formValues.kind == 'COMPANY' ? { size: formValues.size } : {}),
+          }),
       tier: ('tier_' + dbTier.toLowerCase()) as
         | 'tier_payg'
         | 'tier_pro'
         | 'tier_free'
         | 'tier_team',
-      ...(formValues.kind == 'COMPANY' ? { size: formValues.size } : {}),
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
       address: dbTier === 'FREE' ? null : customerData?.address,
@@ -355,6 +465,152 @@ export const NewOrgForm = ({
     setPaymentMethod(undefined)
     return onPaymentMethodReset()
   }
+
+  const buildingPlaceholder = BUILDING_PLACEHOLDER
+
+  const orgKindField = (
+    <FormField
+      control={form.control}
+      name="kind"
+      render={({ field }) => (
+        <FormItemLayout
+          label={showOnboardingSurveyInOrgForm ? 'Who is this org for?' : 'Type'}
+          layout="horizontal"
+          description={
+            showOnboardingSurveyInOrgForm ? undefined : 'What best describes your organization?'
+          }
+        >
+          <FormControl>
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent>
+                {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
+                  <SelectItem key={k} value={k}>
+                    {v}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormControl>
+        </FormItemLayout>
+      )}
+    />
+  )
+
+  const orgSizeField = selectedOrgKind == 'COMPANY' && (
+    <FormField
+      control={form.control}
+      name="size"
+      render={({ field }) => (
+        <FormItemLayout label="How many people?" layout="horizontal">
+          <FormControl>
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent>
+                {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
+                  <SelectItem key={k} value={k}>
+                    {v}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormControl>
+        </FormItemLayout>
+      )}
+    />
+  )
+
+  const heardFromField = (
+    <FormField
+      control={form.control}
+      name="heard_from"
+      render={({ field }) => (
+        <FormItemLayout label="Where did you hear about us?" layout="horizontal">
+          <FormControl>
+            <div className="flex flex-col gap-y-2">
+              <Select
+                value={field.value}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                  if (!HEARD_FROM_FOLLOW_UP_BY_VALUE[value]) {
+                    form.setValue('heard_from_detail', '', {
+                      shouldDirty: true,
+                    })
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select an option" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {HEARD_FROM_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {heardFromFollowUp && (
+                <Input
+                  aria-label={heardFromFollowUp.label}
+                  value={selectedHeardFromDetail ?? ''}
+                  placeholder={heardFromFollowUp.placeholder}
+                  onChange={(event) =>
+                    form.setValue('heard_from_detail', event.target.value, {
+                      shouldDirty: true,
+                    })
+                  }
+                />
+              )}
+            </div>
+          </FormControl>
+        </FormItemLayout>
+      )}
+    />
+  )
+
+  const buildingField = (
+    <FormField
+      control={form.control}
+      name="building"
+      render={({ field }) => (
+        <FormItemLayout label="What are you building?" layout="horizontal">
+          <FormControl>
+            <div className="relative">
+              <Textarea
+                {...field}
+                value={field.value ?? ''}
+                rows={3}
+                maxLength={BUILDING_MAX_LENGTH}
+                placeholder={buildingPlaceholder}
+                className="resize-none pb-6"
+              />
+              <span className="pointer-events-none absolute bottom-1.5 right-2 text-xs text-foreground-lighter">
+                {(field.value ?? '').length}/{BUILDING_MAX_LENGTH}
+              </span>
+            </div>
+          </FormControl>
+        </FormItemLayout>
+      )}
+    />
+  )
+
+  const onboardingSurveyFields = (
+    <div className="flex flex-col gap-y-5">
+      {orgKindField}
+      {orgSizeField}
+      {heardFromField}
+      {buildingField}
+    </div>
+  )
 
   return (
     <Form {...form}>
@@ -400,13 +656,32 @@ export const NewOrgForm = ({
           footerClasses="rounded-b-md"
         >
           <div className="divide-y divide-border-muted">
-            <OrganizationDetailsFields
-              control={form.control}
-              kind={form.watch('kind')}
-              renderFieldWrapper={(children, field) => (
-                <Panel.Content key={field}>{children}</Panel.Content>
-              )}
-            />
+            <Panel.Content>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Name"
+                    layout="horizontal"
+                    description="What's the name of your company or team? You can change this later."
+                  >
+                    <FormControl>
+                      <Input
+                        autoFocus
+                        type="text"
+                        placeholder="Organization name"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </Panel.Content>
 
             {isBillingEnabled && (
               <Panel.Content>
@@ -537,6 +812,23 @@ export const NewOrgForm = ({
 
             {hasFreeOrgWithProjects && form.getValues('plan') !== 'FREE' && (
               <UpgradeExistingOrganizationCallout />
+            )}
+
+            {showOnboardingSurveyInOrgForm ? (
+              <Panel.Content>
+                <CollapsibleCardSection
+                  title="Help improve Supabase"
+                  description="Optional questions to help improve the Supabase experience"
+                  defaultOpen={showOnboardingSurveyExpanded}
+                >
+                  {onboardingSurveyFields}
+                </CollapsibleCardSection>
+              </Panel.Content>
+            ) : (
+              <>
+                <Panel.Content>{orgKindField}</Panel.Content>
+                {orgSizeField && <Panel.Content>{orgSizeField}</Panel.Content>}
+              </>
             )}
           </div>
         </Panel>

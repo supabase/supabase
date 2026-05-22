@@ -119,6 +119,8 @@ export const LOCAL_STORAGE_KEYS = {
     `free-micro-upgrade-banner-dismissed-${ref}`,
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
+  ONBOARDING_SURVEY_PROMPT_STATE: (profileId: string, orgSlug: string) =>
+    `supabase-onboarding-survey-prompt-${profileId}-${orgSlug}`,
   PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged-2026-03',
 
   /**
