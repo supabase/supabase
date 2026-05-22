@@ -306,7 +306,7 @@ export const FileExplorerHeader = ({
                 type="outline"
                 aria-label="Go up one level"
                 className="w-7 shrink-0 px-1"
-                icon={<ArrowLeft size={14} strokeWidth={1.5} />}
+                icon={<ArrowLeft size={14} />}
                 onClick={() => {
                   setIsPathDialogOpen(false)
                   onSelectBack()
@@ -317,7 +317,7 @@ export const FileExplorerHeader = ({
               ref={searchInputRef}
               size="tiny"
               className="w-52"
-              icon={<Search strokeWidth={1.5} />}
+              icon={<Search />}
               actions={
                 itemSearchString.length > 0
                   ? [
@@ -325,7 +325,7 @@ export const FileExplorerHeader = ({
                         key="cancel"
                         size="tiny"
                         type="text"
-                        icon={<X strokeWidth={1.5} />}
+                        icon={<X />}
                         onClick={onCancelSearch}
                         className="p-0 h-5 w-5"
                       />,
@@ -345,7 +345,7 @@ export const FileExplorerHeader = ({
               {view === STORAGE_VIEWS.COLUMNS && (
                 <Button
                   size="tiny"
-                  icon={<Edit2 strokeWidth={1.5} />}
+                  icon={<Edit2 />}
                   type="outline"
                   aria-label="Navigate"
                   className="w-7 px-1"
@@ -356,7 +356,7 @@ export const FileExplorerHeader = ({
               <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH} side="bottom">
                 <Button
                   size="tiny"
-                  icon={<RefreshCw strokeWidth={1.5} />}
+                  icon={<RefreshCw />}
                   type="outline"
                   aria-label="Reload"
                   className="w-7 px-1"
@@ -372,13 +372,7 @@ export const FileExplorerHeader = ({
                     size="tiny"
                     aria-label="View options"
                     className="w-7 px-1"
-                    icon={
-                      view === 'LIST' ? (
-                        <List size={16} strokeWidth={1.5} />
-                      ) : (
-                        <Columns size={16} strokeWidth={1.5} />
-                      )
-                    }
+                    icon={view === 'LIST' ? <List size={16} /> : <Columns size={16} />}
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40 min-w-0">
@@ -386,9 +380,7 @@ export const FileExplorerHeader = ({
                     <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
-                        {view === option.key && (
-                          <Check size={16} className="text-brand" strokeWidth={1.5} />
-                        )}
+                        {view === option.key && <Check size={16} className="text-brand" />}
                       </div>
                     </DropdownMenuItem>
                   ))}
@@ -400,9 +392,7 @@ export const FileExplorerHeader = ({
                         <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
-                            {sortBy === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={1.5} />
-                            )}
+                            {sortBy === option.key && <Check size={16} className="text-brand" />}
                           </div>
                         </DropdownMenuItem>
                       ))}
@@ -419,7 +409,7 @@ export const FileExplorerHeader = ({
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortByOrder === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={1.5} />
+                              <Check size={16} className="text-brand" />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -440,7 +430,7 @@ export const FileExplorerHeader = ({
                 open={!canUpdateStorage ? false : undefined}
               >
                 <ButtonTooltip
-                  icon={<FolderPlus size={16} strokeWidth={1.5} />}
+                  icon={<FolderPlus size={16} />}
                   type="outline"
                   disabled={!canUpdateStorage || breadcrumbs.length === 0}
                   onClick={() => addNewFolderPlaceholder(-1)}
@@ -462,7 +452,7 @@ export const FileExplorerHeader = ({
                 open={!canUpdateStorage ? false : undefined}
               >
                 <ButtonTooltip
-                  icon={<Upload size={16} strokeWidth={1.5} />}
+                  icon={<Upload size={16} />}
                   type="primary"
                   disabled={!canUpdateStorage || breadcrumbs.length === 0}
                   onClick={onSelectUpload}
