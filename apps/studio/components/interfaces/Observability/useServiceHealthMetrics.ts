@@ -169,7 +169,6 @@ export const useServiceHealthMetrics = (
     services,
     aggregated,
     isLoading,
-    startDate,
     endDate,
   }
 }

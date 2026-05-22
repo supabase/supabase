@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -38,8 +37,6 @@ export type ServiceHealthTableProps = {
   serviceData: Record<string, ServiceData>
   onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
   datetimeFormat: string
-  startDate: string
-  endDate: string
 }
 
 const colorClassMap: Record<string, string> = {
@@ -77,36 +74,14 @@ type ServiceCellProps = {
   data: ServiceData
   onBarClick: (datum: LogsBarChartDatum) => void
   datetimeFormat: string
-  startDate: string
-  endDate: string
   className?: string
 }
-
-const EmptyChartPlaceholder = ({
-  startDate,
-  endDate,
-  datetimeFormat,
-}: {
-  startDate: string
-  endDate: string
-  datetimeFormat: string
-}) => (
-  <div className="flex flex-col h-full justify-end">
-    <div className="h-px w-full bg-border" />
-    <div className="text-foreground-lighter mt-1 flex items-center justify-between text-[10px] font-mono">
-      <span>{dayjs(startDate).format(datetimeFormat)}</span>
-      <span>{dayjs(endDate).format(datetimeFormat)}</span>
-    </div>
-  </div>
-)
 
 const ServiceCell = ({
   service,
   data,
   onBarClick,
   datetimeFormat,
-  startDate,
-  endDate,
   className,
 }: ServiceCellProps) => {
   const reportUrl = service.reportUrl || service.logsUrl
@@ -153,27 +128,22 @@ const ServiceCell = ({
         </div>
         <ChevronRight
           size={14}
-          className="text-foreground-lighter opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
+          className="text-foreground-lighter group-hover:text-foreground transition-colors shrink-0 mt-0.5"
         />
       </div>
 
-      <div className="h-24" onClick={(e) => e.preventDefault()}>
+      <div className="h-14" onClick={(e) => e.preventDefault()}>
         <Loading isFullHeight active={data.isLoading}>
           {data.isLoading ? (
             <div className="h-full" />
           ) : (
             <LogsBarChart
               isFullHeight
+              hideDateRange
               data={data.eventChartData}
               DateTimeFormat={datetimeFormat}
               onBarClick={onBarClick}
-              EmptyState={
-                <EmptyChartPlaceholder
-                  startDate={startDate}
-                  endDate={endDate}
-                  datetimeFormat={datetimeFormat}
-                />
-              }
+              EmptyState={null}
             />
           )}
         </Loading>
@@ -187,8 +157,6 @@ export const ServiceHealthTable = ({
   serviceData,
   onBarClick,
   datetimeFormat,
-  startDate,
-  endDate,
 }: ServiceHealthTableProps) => {
   const total = services.length
 
@@ -213,8 +181,6 @@ export const ServiceHealthTable = ({
                   data={data}
                   onBarClick={onBarClick(service.logsUrl)}
                   datetimeFormat={datetimeFormat}
-                  startDate={startDate}
-                  endDate={endDate}
                   className={cn(
                     'border-default',
                     !isLastMobileRow && 'border-b',
