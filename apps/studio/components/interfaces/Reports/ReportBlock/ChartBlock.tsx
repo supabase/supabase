@@ -5,6 +5,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
 
+import { HIDDEN_REPORT_METRICS } from '../Reports.constants'
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -279,7 +280,11 @@ export const ChartBlock = ({
           <NoDataPlaceholder
             size="small"
             className="border-0"
-            description="It may take up to 24 hours for data to refresh"
+            description={
+              HIDDEN_REPORT_METRICS.includes(attribute)
+                ? 'This metric may not be available for your instance or disk configuration.'
+                : 'It may take up to 24 hours for data to refresh'
+            }
           />
         </div>
       ) : (

@@ -17,7 +17,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { DEPRECATED_REPORTS } from './Reports.constants'
+import { DEPRECATED_REPORTS, HIDDEN_REPORT_METRICS } from './Reports.constants'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentQuery } from '@/data/content/content-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
@@ -83,7 +83,9 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
               <DropdownMenuSubContent>
                 {METRICS.filter(
                   (metric) =>
-                    !DEPRECATED_REPORTS.includes(metric.key) && metric?.category?.key === cat.key
+                    !DEPRECATED_REPORTS.includes(metric.key) &&
+                    !HIDDEN_REPORT_METRICS.includes(metric.key) &&
+                    metric?.category?.key === cat.key
                 ).map((metric) => {
                   return (
                     <DropdownMenuCheckboxItem

@@ -730,6 +730,13 @@ SELECT
   },
 }
 
+// Metrics hidden from the Custom Reports picker because the underlying data is
+// not available for a large slice of customers (e.g. derived from EC2
+// EBS-bandwidth burst credits, which are not published on larger,
+// non-burstable instance sizes). Saved reports that already reference these
+// keys still render the chart block with an explanatory empty state.
+export const HIDDEN_REPORT_METRICS = ['disk_io_consumption', 'disk_io_budget']
+
 export const DEPRECATED_REPORTS = [
   'total_realtime_ingress',
   'total_rest_options_requests',
