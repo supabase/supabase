@@ -156,6 +156,71 @@ withTestDatabase('primary keys are populated per table', async ({ executeQuery }
 })
 
 withTestDatabase(
+  'composite FK pairs source and target columns by ordinal position',
+  async ({ executeQuery }) => {
+    // A composite FK with N columns must produce exactly N relationship rows,
+    // each pairing source column k with target column k. The naive
+    // `attnum = any(conkey)` + `attnum = any(confkey)` shape produces an N*N
+    // cross-product with mismatched pairings.
+    await executeQuery(`
+      create table public.composite_parent (
+        a int,
+        b int,
+        primary key (a, b)
+      );
+      create table public.composite_child (
+        id bigint primary key,
+        pa int not null,
+        pb int not null,
+        foreign key (pa, pb) references public.composite_parent (a, b)
+      );
+    `)
+
+    const sql = getTablesPaginatedSql({ schema: 'public', limit: 500, afterOid: 0 })
+    const rows = await executeQuery<Row[]>(sql)
+
+    const child = rows.find((r) => r.name === 'composite_child')!
+    const childRels = child.relationships.filter((r) => r.target_table_name === 'composite_parent')
+
+    expect(childRels).toHaveLength(2)
+    expect(childRels).toContainEqual(
+      expect.objectContaining({
+        source_table_name: 'composite_child',
+        source_column_name: 'pa',
+        target_table_name: 'composite_parent',
+        target_column_name: 'a',
+      })
+    )
+    expect(childRels).toContainEqual(
+      expect.objectContaining({
+        source_table_name: 'composite_child',
+        source_column_name: 'pb',
+        target_table_name: 'composite_parent',
+        target_column_name: 'b',
+      })
+    )
+    // No cross-product pairings.
+    expect(childRels).not.toContainEqual(
+      expect.objectContaining({ source_column_name: 'pa', target_column_name: 'b' })
+    )
+    expect(childRels).not.toContainEqual(
+      expect.objectContaining({ source_column_name: 'pb', target_column_name: 'a' })
+    )
+
+    // The parent side (target-arm of the UNION) must also pair correctly.
+    const parent = rows.find((r) => r.name === 'composite_parent')!
+    const parentRels = parent.relationships.filter((r) => r.source_table_name === 'composite_child')
+    expect(parentRels).toHaveLength(2)
+    expect(parentRels).toContainEqual(
+      expect.objectContaining({ source_column_name: 'pa', target_column_name: 'a' })
+    )
+    expect(parentRels).toContainEqual(
+      expect.objectContaining({ source_column_name: 'pb', target_column_name: 'b' })
+    )
+  }
+)
+
+withTestDatabase(
   'relationships populate both source and target sides',
   async ({ executeQuery }) => {
     const sql = getTablesPaginatedSql({ schema: 'public', limit: 100, afterOid: 0 })

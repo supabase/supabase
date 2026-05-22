@@ -112,10 +112,13 @@ export const getTablesPaginatedSql = ({
       from pg_constraint c
       join pg_class csa on csa.oid = c.conrelid
       join pg_namespace nsa on nsa.oid = csa.relnamespace
-      join pg_attribute sa on sa.attrelid = c.conrelid and sa.attnum = any(c.conkey)
+      -- Pair conkey/confkey by ordinal so composite FKs don't fan out into a
+      -- cross-product of (source_col, target_col) rows.
+      join lateral unnest(c.conkey, c.confkey) as fk(src_attnum, tgt_attnum) on true
+      join pg_attribute sa on sa.attrelid = c.conrelid and sa.attnum = fk.src_attnum
       join pg_class cta on cta.oid = c.confrelid
       join pg_namespace nta on nta.oid = cta.relnamespace
-      join pg_attribute ta on ta.attrelid = c.confrelid and ta.attnum = any(c.confkey)
+      join pg_attribute ta on ta.attrelid = c.confrelid and ta.attnum = fk.tgt_attnum
       where c.contype = 'f'
         and csa.oid in (select oid from page)
       union all
@@ -132,10 +135,11 @@ export const getTablesPaginatedSql = ({
       from pg_constraint c
       join pg_class csa on csa.oid = c.conrelid
       join pg_namespace nsa on nsa.oid = csa.relnamespace
-      join pg_attribute sa on sa.attrelid = c.conrelid and sa.attnum = any(c.conkey)
+      join lateral unnest(c.conkey, c.confkey) as fk(src_attnum, tgt_attnum) on true
+      join pg_attribute sa on sa.attrelid = c.conrelid and sa.attnum = fk.src_attnum
       join pg_class cta on cta.oid = c.confrelid
       join pg_namespace nta on nta.oid = cta.relnamespace
-      join pg_attribute ta on ta.attrelid = c.confrelid and ta.attnum = any(c.confkey)
+      join pg_attribute ta on ta.attrelid = c.confrelid and ta.attnum = fk.tgt_attnum
       where c.contype = 'f'
         and cta.oid in (select oid from page)
         and cta.oid <> csa.oid
