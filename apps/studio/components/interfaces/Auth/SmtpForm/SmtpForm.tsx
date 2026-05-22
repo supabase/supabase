@@ -99,7 +99,7 @@ export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
-  const { mutateAsync: resetAuthTemplate } = useAuthTemplateResetMutation()
+  const { mutate: resetAuthTemplate } = useAuthTemplateResetMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
   const [showDisableConfirmation, setShowDisableConfirmation] = useState(false)

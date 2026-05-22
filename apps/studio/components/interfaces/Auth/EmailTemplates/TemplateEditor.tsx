@@ -24,6 +24,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import type { AuthTemplate } from './EmailTemplates.types'
+import { hasCustomEmailSender } from './EmailTemplates.utils'
 import { ResetTemplateDialog } from './ResetTemplateDialog'
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
@@ -116,10 +117,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     | undefined
 
   const messageProperty = properties[messageSlug]
-  const builtInSMTP =
-    isSuccess &&
-    authConfig &&
-    (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
+  const builtInSMTP = isSuccess && authConfig && !hasCustomEmailSender(authConfig)
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 
@@ -368,7 +366,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                         </InlineLink>
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-x-1">
+                    <div className="flex flex-wrap gap-x-1 gap-y-1.5">
                       {template.variables.map((variable) => (
                         <Tooltip key={variable.value}>
                           <TooltipTrigger asChild>
