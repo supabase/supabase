@@ -1916,6 +1916,8 @@ export interface HomeConnectActionClickedEvent {
   groups: TelemetryGroups
 }
 
+export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
+
 /**
  * User opened the ConnectSheet panel.
  *
@@ -1929,7 +1931,7 @@ export interface ConnectSheetOpenedEvent {
     /**
      * Where the sheet was opened from
      */
-    source: 'header_button' | 'connect_section' | 'keyboard_shortcut'
+    source: ConnectSheetSource
   }
   groups: TelemetryGroups
 }
