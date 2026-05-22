@@ -16,9 +16,9 @@ Because the headers follow the W3C standard, any compliant tracing SDK (OpenTele
 - A tracing SDK that registers a W3C-compliant propagator with the OpenTelemetry API.
 
   <Admonition type="note">
-  
+
   Vendor SDKs that wrap OTel (Sentry, Datadog, Honeycomb, etc.) work — but some require additional configuration to inject the standard `traceparent` header alongside their proprietary headers. Check your vendor's OTel integration docs.
-  
+
   </Admonition>
 
 If `@opentelemetry/api` is not installed, or there is no active trace context at request time, the SDK silently no-ops.

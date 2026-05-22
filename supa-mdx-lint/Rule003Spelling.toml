@@ -297,6 +297,7 @@ allow_list = [
     "OrbStack",
     "OrioleDB",
     "OpenTelemetry",
+    "OTel",
     "PaaS",
     "PagerDuty",
     "PGAudit",
