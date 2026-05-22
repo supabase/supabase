@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookOpen, Settings } from 'lucide-react'
+import { ArrowUpRight, BookOpen } from 'lucide-react'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
