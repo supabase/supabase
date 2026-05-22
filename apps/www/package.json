@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "@bsmnt/scrollytelling": "^0.3.3",
-    "@code-hike/mdx": "^0.9.0",
     "@codesandbox/sandpack-react": "^2.20.0",
     "@hcaptcha/react-hcaptcha": "^1.12.0",
     "@heroicons/react": "^1.0.6",
