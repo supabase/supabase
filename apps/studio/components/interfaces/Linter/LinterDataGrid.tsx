@@ -16,8 +16,10 @@ import {
   lintInfoMap,
   NoIssuesFound,
 } from '@/components/interfaces/Linter/Linter.utils'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { Lint } from '@/data/lint/lint-query'
 import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -193,7 +195,9 @@ export const LinterDataGrid = ({
                 </h3>
                 <LintCategoryBadge category={selectedLint.categories[0]} />
               </div>
-              <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
+              <ShortcutTooltip shortcutId={SHORTCUT_IDS.ADVISORS_CLOSE_DETAIL} side="left">
+                <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
+              </ShortcutTooltip>
             </div>
             <div className="p-6 flex-grow min-h-0 overflow-y-auto">
               <LintDetail
