@@ -2430,6 +2430,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/integrations/refine_dev',
+    destination: '/partners/integrations/refine',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/integrations/sequin',
     destination: '/partners/integrations/sequin',
   },
