@@ -11,6 +11,7 @@ import z from 'zod'
 
 import { AttributeMapping } from './AttributeMapping'
 import { JoinOrganizationOnSignup } from './JoinOrganizationOnSignup'
+import { SSOAdvancedSettings } from './SSOAdvancedSettings'
 import { SSODomains } from './SSODomains'
 import { SSOMetadata } from './SSOMetadata'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
@@ -45,6 +46,7 @@ const FormSchema = z
     lastNameMapping: z.array(z.object({ value: z.string().trim() })),
     joinOrgOnSignup: z.boolean(),
     roleOnJoin: z.string().optional(),
+    oidcIssuer: z.string().trim().optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.enableSpInitiated) return
@@ -92,6 +94,7 @@ const defaultValues = {
   lastNameMapping: [{ value: '' }],
   joinOrgOnSignup: false,
   roleOnJoin: 'Developer',
+  oidcIssuer: '',
 }
 
 export const SSOConfig = () => {
@@ -208,6 +211,8 @@ export const SSOConfig = () => {
           ssoConfig.last_name_mapping?.map((lastName) => ({ value: lastName })) || [],
         joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
         roleOnJoin: ssoConfig.join_org_on_signup_role,
+        // oidc_issuer is not in the API type yet — will be added when backend is wired
+        oidcIssuer: (ssoConfig as any).oidc_issuer ?? '',
       })
     }
   })
@@ -258,27 +263,23 @@ export const SSOConfig = () => {
                       name="enabled"
                       render={({ field }) => (
                         <FormItemLayout
-                          layout="flex"
+                          layout="flex-row-reverse"
                           label="Enable Single Sign-On"
                           description={
                             <>
-                              Enable and configure SSO for your organization. Learn more about SSO{' '}
+                              Enable and configure SSO for your organization.{' '}
                               <InlineLink
                                 className="text-foreground-lighter hover:text-foreground"
                                 href={`${DOCS_URL}/guides/platform/sso`}
                               >
-                                here
+                                Learn more
                               </InlineLink>
                               .
                             </>
                           }
                         >
                           <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              size="large"
-                            />
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -358,6 +359,10 @@ export const SSOConfig = () => {
 
                       <CardContent>
                         <JoinOrganizationOnSignup form={form} />
+                      </CardContent>
+
+                      <CardContent>
+                        <SSOAdvancedSettings form={form} />
                       </CardContent>
                     </>
                   )}
