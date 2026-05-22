@@ -247,6 +247,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "alert-dialog-async": {
+      name: "alert-dialog-async",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-async")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-async.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-async-error": {
+      name: "alert-dialog-async-error",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button","admonition"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-async-error")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-async-error.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "alert-dialog-destructive": {
       name: "alert-dialog-destructive",
       type: "components:example",
