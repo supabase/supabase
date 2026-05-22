@@ -5,7 +5,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
 
-import { HIDDEN_REPORT_METRICS } from '../Reports.constants'
+import { computeSizeSupportsIoBalance, IO_BALANCE_DEPENDENT_METRICS } from '../Reports.constants'
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -28,6 +28,7 @@ import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
 } from '@/data/analytics/project-daily-stats-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { METRICS } from '@/lib/constants/metrics'
 import { useFormatDateTime } from '@/lib/datetime'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
@@ -72,6 +73,10 @@ export const ChartBlock = ({
   const { ref } = router.query
 
   const state = useDatabaseSelectorStateSnapshot()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const isIoBalanceUnavailable =
+    IO_BALANCE_DEPENDENT_METRICS.includes(attribute) &&
+    !computeSizeSupportsIoBalance(selectedProject?.infra_compute_size)
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
@@ -281,8 +286,8 @@ export const ChartBlock = ({
             size="small"
             className="border-0"
             description={
-              HIDDEN_REPORT_METRICS.includes(attribute)
-                ? 'This metric may not be available for your instance or disk configuration.'
+              isIoBalanceUnavailable
+                ? 'Not available for 4XL and larger compute sizes'
                 : 'It may take up to 24 hours for data to refresh'
             }
           />

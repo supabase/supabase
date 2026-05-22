@@ -1,6 +1,7 @@
 import { literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import dayjs from 'dayjs'
 
+import type { InfraInstanceSize } from '../DiskManagement/DiskManagement.types'
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
 import { PlanId } from '@/data/subscriptions/types'
@@ -730,12 +731,24 @@ SELECT
   },
 }
 
-// Metrics hidden from the Custom Reports picker because the underlying data is
-// not available for a large slice of customers (e.g. derived from EC2
-// EBS-bandwidth burst credits, which are not published on larger,
-// non-burstable instance sizes). Saved reports that already reference these
-// keys still render the chart block with an explanatory empty state.
-export const HIDDEN_REPORT_METRICS = ['disk_io_consumption', 'disk_io_budget']
+// Metrics derived from EC2 EBS IO/byte balance percent CloudWatch series.
+// AWS only publishes those series on instances smaller than 4XL, so these
+// metrics are structurally unavailable on 4XL and larger compute sizes.
+export const IO_BALANCE_DEPENDENT_METRICS = ['disk_io_consumption', 'disk_io_budget']
+
+const INSTANCE_SIZES_WITH_IO_BALANCE: InfraInstanceSize[] = [
+  'pico',
+  'nano',
+  'micro',
+  'small',
+  'medium',
+  'large',
+  'xlarge',
+  '2xlarge',
+]
+
+export const computeSizeSupportsIoBalance = (computeSize?: InfraInstanceSize | null): boolean =>
+  computeSize != null && INSTANCE_SIZES_WITH_IO_BALANCE.includes(computeSize)
 
 export const DEPRECATED_REPORTS = [
   'total_realtime_ingress',

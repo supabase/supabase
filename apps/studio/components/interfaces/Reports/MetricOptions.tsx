@@ -17,12 +17,17 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { DEPRECATED_REPORTS, HIDDEN_REPORT_METRICS } from './Reports.constants'
+import {
+  computeSizeSupportsIoBalance,
+  DEPRECATED_REPORTS,
+  IO_BALANCE_DEPENDENT_METRICS,
+} from './Reports.constants'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentQuery } from '@/data/content/content-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { Metric, METRIC_CATEGORIES, METRICS } from '@/lib/constants/metrics'
 import { editorPanelState } from '@/state/editor-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -42,8 +47,11 @@ interface MetricOptionsProps {
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const [search, setSearch] = useState('')
+
+  const supportsIoBalance = computeSizeSupportsIoBalance(selectedProject?.infra_compute_size)
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
@@ -84,7 +92,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                 {METRICS.filter(
                   (metric) =>
                     !DEPRECATED_REPORTS.includes(metric.key) &&
-                    !HIDDEN_REPORT_METRICS.includes(metric.key) &&
+                    !(IO_BALANCE_DEPENDENT_METRICS.includes(metric.key) && !supportsIoBalance) &&
                     metric?.category?.key === cat.key
                 ).map((metric) => {
                   return (
