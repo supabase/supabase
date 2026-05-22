@@ -1,11 +1,12 @@
-import { ChevronRight, HelpCircle } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Card, CardContent, cn, Loading } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
-import { ButtonTooltip } from '../../ui/ButtonTooltip'
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
-import type { ServiceKey } from './ObservabilityOverview.utils'
+import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
+
+type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 type ServiceConfig = {
   key: ServiceKey
@@ -29,15 +30,35 @@ export type ServiceHealthTableProps = {
   serviceData: Record<string, ServiceData>
   onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
   datetimeFormat: string
+  interval: ChartIntervalKey
 }
 
-const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
-  db: 'PostgreSQL database health and performance',
-  auth: 'Authentication and user management',
-  functions: 'Serverless Edge Functions execution',
-  storage: 'Object storage for files and assets',
-  realtime: 'WebSocket connections and broadcasts',
-  postgrest: 'Auto-generated REST API for your database',
+const colorClassMap: Record<string, string> = {
+  muted: 'bg-muted',
+  destructive: 'bg-destructive',
+  warning: 'bg-warning',
+  brand: 'bg-brand',
+}
+
+const INTERVAL_LABEL: Record<ChartIntervalKey, string> = {
+  '1hr': '1h',
+  '1day': '24h',
+  '7day': '7d',
+}
+
+const formatPercent = (value: number) =>
+  value >= 1 ? `${value.toFixed(1)}%` : `${value.toFixed(2)}%`
+
+const getSubtitle = (data: ServiceData) => {
+  if (data.isLoading) return ''
+  if (data.total === 0) return 'No traffic'
+
+  const errorRate = data.errorRate
+  const warningRate = data.total > 0 ? (data.warningCount / data.total) * 100 : 0
+
+  if (errorRate > 0) return `${formatPercent(errorRate)} errors`
+  if (warningRate > 0) return `${formatPercent(warningRate)} warnings`
+  return `${data.total.toLocaleString()} requests`
 }
 
 type ServiceRowProps = {
@@ -45,63 +66,44 @@ type ServiceRowProps = {
   data: ServiceData
   onBarClick: (datum: LogsBarChartDatum) => void
   datetimeFormat: string
+  interval: ChartIntervalKey
 }
 
-const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowProps) => {
-  const errorRate = data.total > 0 ? data.errorRate : 0
-  const warningRate = data.total > 0 ? (data.warningCount / data.total) * 100 : 0
-
+const ServiceRow = ({ service, data, onBarClick, datetimeFormat, interval }: ServiceRowProps) => {
   const reportUrl = service.reportUrl || service.logsUrl
+  const { color } = getHealthStatus(data.errorRate, data.total)
+  const subtitle = getSubtitle(data)
+  const intervalLabel = data.total > 0 ? INTERVAL_LABEL[interval] : '—'
 
   return (
     <Link
       href={reportUrl}
-      className="block group py-4 px-card border-b border-default last:border-b-0 hover:bg-surface-200 transition-colors cursor-pointer"
+      className="group flex items-center gap-4 px-card py-3 border-b border-default last:border-b-0 hover:bg-surface-200 transition-colors"
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-foreground font-medium">{service.name}</span>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={(e) => e.preventDefault()}
-                className="text-foreground-lighter hover:text-foreground-light transition-colors"
-              >
-                <HelpCircle size={14} />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="max-w-xs">
-              <p>{SERVICE_DESCRIPTIONS[service.key as ServiceKey] || service.description}</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <div className="flex items-center gap-2">
-          <ButtonTooltip
-            type="text"
-            size="tiny"
-            className="p-1.5"
-            tooltip={{ content: { text: `Go to ${service.name} report` } }}
-          >
-            <ChevronRight
-              size={14}
-              className="text-foreground-lighter group-hover:text-foreground"
-            />
-          </ButtonTooltip>
+      <div className="flex items-center gap-3 w-48 shrink-0 min-w-0">
+        <div
+          className={cn('w-1.5 h-1.5 rounded-full shrink-0', colorClassMap[color] || 'bg-muted')}
+        />
+        <div className="flex flex-col min-w-0">
+          <span className="text-foreground text-sm font-medium truncate">{service.name}</span>
+          <span className="text-foreground-lighter text-xs truncate">{subtitle}</span>
         </div>
       </div>
 
-      <div className="h-16" onClick={(e) => e.preventDefault()}>
-        <Loading active={data.isLoading}>
+      <div className="flex-1 h-12 min-w-0" onClick={(e) => e.preventDefault()}>
+        <Loading isFullHeight active={data.isLoading}>
           {data.isLoading ? (
-            <div />
+            <div className="h-full" />
           ) : (
             <LogsBarChart
+              isFullHeight
+              hideDateRange
               data={data.total === 0 ? [] : data.eventChartData}
               DateTimeFormat={datetimeFormat}
               onBarClick={onBarClick}
               EmptyState={
-                <div className="flex items-center justify-center h-full text-xs text-foreground-lighter">
-                  No data
+                <div className="h-full w-full flex items-center" aria-hidden="true">
+                  <div className="h-px w-full bg-border" />
                 </div>
               }
             />
@@ -109,31 +111,12 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
         </Loading>
       </div>
 
-      <div className="flex items-center justify-center mt-2 text-xs text-foreground-lighter gap-4 font-mono tabular-nums tracking-tight">
-        {data.total > 0 ? (
-          <>
-            {errorRate > 0 && (
-              <span className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
-                {errorRate.toFixed(2)}% errors
-              </span>
-            )}
-            {warningRate > 0 && (
-              <span className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-warning" />
-                {warningRate.toFixed(2)}% warnings
-              </span>
-            )}
-            {errorRate === 0 && warningRate === 0 && (
-              <span className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand" />
-                0% errors
-              </span>
-            )}
-          </>
-        ) : !data.isLoading ? (
-          <span>No requests in this period</span>
-        ) : null}
+      <div className="flex items-center gap-2 text-foreground-lighter shrink-0">
+        <span className="text-xs tabular-nums w-8 text-right">{intervalLabel}</span>
+        <ChevronRight
+          size={14}
+          className="text-foreground-lighter group-hover:text-foreground transition-colors"
+        />
       </div>
     </Link>
   )
@@ -144,6 +127,7 @@ export const ServiceHealthTable = ({
   serviceData,
   onBarClick,
   datetimeFormat,
+  interval,
 }: ServiceHealthTableProps) => {
   return (
     <div>
@@ -161,6 +145,7 @@ export const ServiceHealthTable = ({
                 data={data}
                 onBarClick={onBarClick(service.logsUrl)}
                 datetimeFormat={datetimeFormat}
+                interval={interval}
               />
             )
           })}
