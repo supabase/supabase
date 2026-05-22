@@ -376,8 +376,8 @@ agent:
   bootstrap:
     ota:
       note: Install ota when missing so contributors and agents can run the readiness workflows declared in this contract.
-      sh: curl -fsSL https://dist.ota.run/install.sh | sh
-      powershell: irm https://dist.ota.run/install.ps1 | iex
+      sh: tmp="$(mktemp -t ota-install.XXXXXX.sh)" && curl -fsSLo "$tmp" "https://raw.githubusercontent.com/ota-run/ota/v1.6.15/scripts/install.sh" && printf '%s  %s\n' "cb5020be5e6206e16946b6fe99157c4e09966b51604bde95255a1f9283b65aa1" "$tmp" | shasum -a 256 -c - && sh "$tmp" && rm -f "$tmp"
+      powershell: $url='https://raw.githubusercontent.com/ota-run/ota/v1.6.15/scripts/install.ps1'; $tmp=Join-Path $env:TEMP 'ota-install.ps1'; Invoke-WebRequest -Uri $url -OutFile $tmp; if ((Get-FileHash -Path $tmp -Algorithm SHA256).Hash.ToLower() -ne '8b3ca78b828d2c77e18b3d9b6f832bde69154b015bc5e0a30caf17b6afaffa6a') { throw 'ota installer checksum verification failed' }; & $tmp; Remove-Item -Path $tmp -Force
   notes: |
     This contract intentionally scopes to www/docs workflows for readiness pressure-testing.
     Use `app` for the canonical site development loop and `docs` for docs-only changes.

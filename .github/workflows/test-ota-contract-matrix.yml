@@ -50,6 +50,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js 22
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
@@ -73,7 +75,7 @@ jobs:
           pnpm --version
 
       - name: Setup ota
-        uses: ota-run/setup@v1
+        uses: ota-run/setup@4ec459ee7956050be33e5c30f7e070f1f155c023 # v1
         with:
           ota-version: 1.6.15
 
@@ -398,9 +400,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup ota
-        uses: ota-run/setup@v1
+        uses: ota-run/setup@4ec459ee7956050be33e5c30f7e070f1f155c023 # v1
         with:
           ota-version: 1.6.15
 
@@ -568,6 +572,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js 22
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
@@ -582,7 +588,7 @@ jobs:
           pnpm --version
 
       - name: Setup ota
-        uses: ota-run/setup@v1
+        uses: ota-run/setup@4ec459ee7956050be33e5c30f7e070f1f155c023 # v1
         with:
           ota-version: 1.6.15
 
