@@ -392,6 +392,9 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   [SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE]: {
     id: SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
     label: 'Show all keyboard shortcuts',
+    // '?' isn't yet in @tanstack/hotkeys' PunctuationKey union (TanStack/hotkeys#19),
+    // but matches correctly at runtime — event.key === '?' regardless of layout.
+    // @ts-expect-error — remove this once upstream adds '?' to PunctuationKey.
     sequence: ['Shift+?'],
     showInSettings: false,
     options: { ignoreInputs: true },
