@@ -1,4 +1,4 @@
-import { AlertCircle, Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   Button,
@@ -13,9 +13,6 @@ import {
   PopoverContent,
   PopoverTrigger,
   ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -28,7 +25,7 @@ import { pluralize } from '@/lib/helpers'
  * [Joshen] This would only affect graphql_public and pgmq_public, given that they're intended
  * to be public, we can let users expose them via the API, but not let them adjust the schema via the dashboard
  * */
-const internalSchemasCannotExpose = INTERNAL_SCHEMAS.filter((x) => !x.endsWith('_public'))
+export const internalSchemasCannotExpose = INTERNAL_SCHEMAS.filter((x) => !x.endsWith('_public'))
 
 interface ExposedSchemaSelectorProps {
   disabled?: boolean
