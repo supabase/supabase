@@ -502,8 +502,8 @@ export const RateLimits = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        label="Rate limit for sign-ups and sign-ins"
-                        description="Number of sign-up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users)"
+                        label="Rate limit for OTP/Magic link verification"
+                        description="Number of OTP and magic link verification requests that can be made in a 5 minute interval per IP address. Note: this setting was previously mislabeled as 'sign-ups and sign-ins' and did not enforce the intended limit."
                       >
                         <Tooltip>
                           <TooltipTrigger asChild>
