@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Modal } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useDisableReadOnlyModeMutation } from '@/data/config/project-temp-disable-read-only-mutation'
 
@@ -22,19 +22,19 @@ const ConfirmDisableReadOnlyModeModal = ({
   })
 
   return (
-    <Modal
-      alignFooter="right"
+    <ConfirmationModal
       visible={visible}
       onCancel={onClose}
       loading={isPending}
-      confirmText="Disable read-only mode"
-      header="Confirm to temporarily disable read-only mode"
+      confirmLabel="Disable read-only mode"
+      title="Confirm to temporarily disable read-only mode"
       onConfirm={() => {
         if (!ref) return console.error('Project ref is required')
         disableReadOnlyMode({ projectRef: ref })
       }}
+      size="medium"
     >
-      <Modal.Content className="space-y-2">
+      <div className="space-y-2">
         <p className="text-sm">
           This will temporarily allow writes to your database for the{' '}
           <span className="text-amber-900">next 15 minutes</span>, during which you can reduce your
@@ -45,8 +45,8 @@ const ConfirmDisableReadOnlyModeModal = ({
           If your database size has not been sufficiently reduced after 15 minutes, read-only mode
           will be toggled back on. Otherwise, it will stay disabled.
         </p>
-      </Modal.Content>
-    </Modal>
+      </div>
+    </ConfirmationModal>
   )
 }
 
