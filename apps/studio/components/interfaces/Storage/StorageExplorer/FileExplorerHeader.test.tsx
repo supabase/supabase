@@ -104,7 +104,7 @@ describe('FileExplorerHeader', () => {
     ).toBeTruthy()
   })
 
-  it('renders text-xs breadcrumbs in a row above the search bar in list view', () => {
+  it('renders a go-up button to the left of search when not at bucket root', () => {
     mockUseStoragePreference.mockReturnValue(createPreference(STORAGE_VIEWS.LIST))
 
     render(
@@ -115,19 +115,43 @@ describe('FileExplorerHeader', () => {
       />
     )
 
-    const rootBreadcrumb = screen.getByRole('button', { name: 'my-bucket' })
-    const inactiveBreadcrumb = screen.getByRole('button', { name: 'images' })
-    const activeBreadcrumb = screen.getByText('2024')
-
-    expect(rootBreadcrumb).toHaveClass('text-xs')
-    expect(inactiveBreadcrumb).toHaveClass('text-xs', 'text-foreground-lighter')
-    expect(activeBreadcrumb).toHaveClass('text-xs', 'text-foreground')
-    expect(activeBreadcrumb).not.toHaveClass('text-foreground-lighter')
-    expect(screen.queryByRole('button', { name: '2024' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Go up one level' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'my-bucket' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'images' })).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText('Search in 2024...')).toBeInTheDocument()
   })
 
-  it('uses breadcrumb buttons to navigate back to a previous folder level with keyboard input', async () => {
+  it('does not render the go-up button in column view when not at bucket root', () => {
+    render(
+      <FileExplorerHeader
+        itemSearchString=""
+        setItemSearchString={vi.fn()}
+        onFilesUpload={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByRole('button', { name: 'Go up one level' })).not.toBeInTheDocument()
+  })
+
+  it('does not render the go-up button at bucket root', () => {
+    const snapshot = createSnapshot()
+    snapshot.columns = [makeColumn('my-bucket')]
+    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
+    mockUseStoragePreference.mockReturnValue(createPreference(STORAGE_VIEWS.LIST))
+
+    render(
+      <FileExplorerHeader
+        itemSearchString=""
+        setItemSearchString={vi.fn()}
+        onFilesUpload={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByRole('button', { name: 'Go up one level' })).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search in root directory...')).toBeInTheDocument()
+  })
+
+  it('goes up one folder level when the go-up button is clicked', async () => {
     const snapshot = createSnapshot()
     mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
     mockUseStoragePreference.mockReturnValue(createPreference(STORAGE_VIEWS.LIST))
@@ -140,12 +164,11 @@ describe('FileExplorerHeader', () => {
       />
     )
 
-    const breadcrumbButton = screen.getByRole('button', { name: 'images' })
-    breadcrumbButton.focus()
-    await userEvent.keyboard('{Enter}')
+    await userEvent.click(screen.getByRole('button', { name: 'Go up one level' }))
 
-    expect(snapshot.popColumnAtIndex).toHaveBeenCalledWith(1)
-    expect(snapshot.popOpenedFoldersAtIndex).toHaveBeenCalledWith(0)
+    expect(snapshot.popColumn).toHaveBeenCalled()
+    expect(snapshot.popOpenedFolders).toHaveBeenCalled()
+    expect(snapshot.setSelectedFilePreview).toHaveBeenCalledWith(undefined)
   })
 
   it('opens path edit mode from Navigate and tracks the click', async () => {
