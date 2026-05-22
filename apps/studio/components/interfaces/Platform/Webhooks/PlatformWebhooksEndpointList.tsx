@@ -23,6 +23,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { createNavigationHandler } from '@/lib/navigation'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -112,6 +113,7 @@ export const PlatformWebhooksEndpointList = ({
           value={search}
           className="w-full lg:w-52"
           onChange={(event) => onSearchChange(event.target.value)}
+          onKeyDown={onSearchInputEscape(search, onSearchChange)}
         />
 
         <Shortcut

@@ -9,7 +9,7 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight, Copy, RotateCcw, Search } from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   Badge,
   Button,
@@ -33,7 +33,9 @@ import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface DetailItemProps {
   label: string
@@ -161,7 +163,12 @@ export const PlatformWebhooksEndpointDetails = ({
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
   const hasName = selectedEndpoint.name.trim().length > 0
   const hasDescription = selectedEndpoint.description.trim().length > 0
+  const deliverySearchRef = useRef<HTMLInputElement>(null)
   const [sorting, setSorting] = useState<SortingState>(DEFAULT_DELIVERY_SORTING)
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, () => deliverySearchRef.current?.focus(), {
+    label: 'Search deliveries',
+  })
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DELIVERIES_PAGE_SIZE,
@@ -267,12 +274,14 @@ export const PlatformWebhooksEndpointDetails = ({
         <h2 className="text-foreground text-xl">Deliveries</h2>
         <div className="flex items-center justify-between gap-2">
           <Input
+            ref={deliverySearchRef}
             placeholder="Search deliveries"
             size="tiny"
             icon={<Search />}
             value={deliverySearch}
             className="w-full lg:w-52"
             onChange={(event) => onDeliverySearchChange(event.target.value)}
+            onKeyDown={onSearchInputEscape(deliverySearch, onDeliverySearchChange)}
           />
         </div>
         <Card className="overflow-hidden">
