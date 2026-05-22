@@ -1,6 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { EmailTemplates } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates'
@@ -21,17 +28,30 @@ const TemplatesPage: NextPageWithLayout = () => {
   }
 
   return (
-    <PageContainer size="default" className="pb-16">
-      {!isPermissionsLoaded ? (
-        <PageSection>
-          <PageSectionContent>
-            <GenericSkeletonLoader />
-          </PageSectionContent>
-        </PageSection>
-      ) : (
-        <EmailTemplates />
-      )}
-    </PageContainer>
+    <>
+      <PageHeader size="small">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Templates</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure what emails your users receive and how they are sent
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+
+      <PageContainer size="small" className="pb-16">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <EmailTemplates />
+        )}
+      </PageContainer>
+    </>
   )
 }
 

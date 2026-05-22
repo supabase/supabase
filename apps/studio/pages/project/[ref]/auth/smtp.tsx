@@ -1,6 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { SmtpForm } from '@/components/interfaces/Auth/SmtpForm/SmtpForm'
@@ -21,17 +28,30 @@ const SmtpPage: NextPageWithLayout = () => {
   }
 
   return (
-    <PageContainer size="default">
-      {!isPermissionsLoaded ? (
-        <PageSection>
-          <PageSectionContent>
-            <GenericSkeletonLoader />
-          </PageSectionContent>
-        </PageSection>
-      ) : (
-        <SmtpForm />
-      )}
-    </PageContainer>
+    <>
+      <PageHeader size="small">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>SMTP Settings</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure a custom SMTP provider for sending authentication and security emails
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+
+      <PageContainer size="small">
+        {!isPermissionsLoaded ? (
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        ) : (
+          <SmtpForm />
+        )}
+      </PageContainer>
+    </>
   )
 }
 

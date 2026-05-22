@@ -6,36 +6,24 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-import {
-  Button,
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  Input,
-  Label,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Button, Form, FormControl, FormField, Input, Label, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { useEmailTemplateEditor } from './EmailTemplateEditorContext'
 import type { AuthTemplate } from './EmailTemplates.types'
 import { ResetTemplateDialog } from './ResetTemplateDialog'
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
-import { InlineLink } from '@/components/ui/InlineLink'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { DOCS_URL } from '@/lib/constants'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 interface TemplateEditorProps {
   template: AuthTemplate
@@ -52,6 +40,7 @@ type EmailTemplateSubjectKey = Exclude<
 
 export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
+  const { registerInsertVariable } = useEmailTemplateEditor()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
@@ -71,12 +60,17 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
   const { mutate: validateSpam } = useValidateSpamMutation()
 
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
       setIsSavingTemplate(false)
       toast.error(`Failed to update email templates: ${error.message}`)
     },
   })
+
+  const isSecurityTemplate = template.misc?.emailTemplateType === 'security'
+  const templateEnabledKey = isSecurityTemplate
+    ? (`MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as string)
+    : null
 
   const subjectSlug = Object.keys(properties).find((key) => key.startsWith('MAILER_SUBJECTS_')) as
     | EmailTemplateSubjectKey
@@ -108,6 +102,25 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const form = useForm({
     defaultValues: INITIAL_VALUES,
     resolver: zodResolver(template.validationSchema),
+  })
+
+  const NotificationFormSchema = templateEnabledKey
+    ? z.object({
+        [templateEnabledKey]: z.boolean(),
+      })
+    : z.object({})
+
+  const notificationDefaultValues = templateEnabledKey
+    ? {
+        [templateEnabledKey]: authConfig
+          ? Boolean(authConfig[templateEnabledKey as keyof typeof authConfig])
+          : false,
+      }
+    : {}
+
+  const notificationForm = useForm<z.infer<typeof NotificationFormSchema>>({
+    resolver: zodResolver(NotificationFormSchema),
+    defaultValues: notificationDefaultValues,
   })
 
   const onSubmit = (values: z.infer<typeof template.validationSchema>) => {
@@ -149,7 +162,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               {
                 onSuccess: () => {
                   setIsSavingTemplate(false)
-                  setHasUnsavedChanges(false) // Reset the unsaved changes state
+                  setHasUnsavedChanges(false)
                   toast.success('Successfully updated email template')
                 },
               }
@@ -161,7 +174,21 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     )
   }
 
-  // Check if form values have changed
+  const onSubmitNotification = (values: z.infer<typeof NotificationFormSchema>) => {
+    if (!projectRef) return console.error('Project ref is required')
+    updateAuthConfig(
+      { projectRef, config: { ...values }, skipInvalidation: true },
+      {
+        onSuccess: () => {
+          toast.success('Successfully updated settings')
+        },
+        onError: (error) => {
+          toast.error(`Failed to update settings: ${error?.message}`)
+        },
+      }
+    )
+  }
+
   const formValues = form.watch()
   const baselineValues = INITIAL_VALUES
   const baselineBodyValue = (authConfig && authConfig[messageSlug]) ?? ''
@@ -172,8 +199,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
   const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
 
-  // Function to insert text at cursor position
-  const insertTextAtCursor = (text: string) => {
+  const insertTextAtCursor = useCallback((text: string) => {
     if (!editorRef.current) return
 
     const editor = editorRef.current
@@ -195,18 +221,32 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
         },
       ])
 
-      // Focus the editor after insertion
       editor.focus()
     }
-  }
+  }, [])
 
-  // Update form values when authConfig changes
+  const registerInsertVariableEvent = useStaticEffectEvent(registerInsertVariable)
+  const insertTextAtCursorEvent = useStaticEffectEvent(insertTextAtCursor)
+
+  useEffect(() => {
+    registerInsertVariableEvent(insertTextAtCursorEvent)
+  }, [registerInsertVariableEvent, insertTextAtCursorEvent])
+
   useEffect(() => {
     if (authConfig) {
       form.reset(getFormValuesFromConfig(authConfig))
       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
     }
   }, [authConfig, getFormValuesFromConfig, messageSlug, form])
+
+  useEffect(() => {
+    if (authConfig && templateEnabledKey) {
+      notificationForm.reset({
+        [templateEnabledKey]: Boolean(authConfig[templateEnabledKey as keyof typeof authConfig]),
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authConfig, templateEnabledKey])
 
   useEffect(() => {
     if (projectRef && id && !!authConfig) {
@@ -227,54 +267,103 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     if (!hasChanges) setValidationResult(undefined)
   }, [hasChanges])
 
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <CardContent>
-          {Object.keys(properties).map((x: string) => {
-            const property = properties[x]
-            if (property.type === 'string' && x !== messageSlug) {
-              return (
-                <FormField
-                  key={x}
-                  control={form.control}
-                  name={x}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      className="gap-y-3"
-                      layout="vertical"
-                      label={property.title}
-                      description={
-                        property.description ? (
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {property.description}
-                          </ReactMarkdown>
-                        ) : null
-                      }
-                      labelOptional={
-                        property.descriptionOptional ? (
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {property.descriptionOptional}
-                          </ReactMarkdown>
-                        ) : null
-                      }
-                    >
-                      <FormControl>
-                        <Input id={x} {...field} disabled={!canUpdateConfig} />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              )
-            }
-            return null
-          })}
-        </CardContent>
+  const subjectFields = Object.keys(properties).map((x: string) => {
+    const property = properties[x]
+    if (property.type === 'string' && x !== messageSlug) {
+      return (
+        <FormField
+          key={x}
+          control={form.control}
+          name={x}
+          render={({ field }) => (
+            <FormItemLayout
+              className="gap-y-3"
+              layout="vertical"
+              label={property.title}
+              description={
+                property.description ? (
+                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                    {property.description}
+                  </ReactMarkdown>
+                ) : null
+              }
+              labelOptional={
+                property.descriptionOptional ? (
+                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                    {property.descriptionOptional}
+                  </ReactMarkdown>
+                ) : null
+              }
+            >
+              <FormControl>
+                <Input id={x} {...field} disabled={!canUpdateConfig} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      )
+    }
+    return null
+  })
 
-        {messageProperty && (
-          <>
-            <CardContent className="flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-2">
+  return (
+    <div className="flex h-full min-h-0 flex-1 flex-col">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex h-full min-h-0 flex-1 flex-col"
+        >
+          <div className="flex shrink-0 flex-col gap-6 border-b p-4">
+            {templateEnabledKey && (
+              <Form {...notificationForm}>
+                <form
+                  onSubmit={notificationForm.handleSubmit(onSubmitNotification)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={notificationForm.control}
+                    name={templateEnabledKey as keyof z.infer<typeof NotificationFormSchema>}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Enable notification"
+                        description="Send this email to users when triggered"
+                      >
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  {notificationForm.formState.isDirty && (
+                    <div className="flex justify-end gap-2">
+                      <Button type="default" onClick={() => notificationForm.reset()}>
+                        Cancel
+                      </Button>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        disabled={!canUpdateConfig || isUpdatingConfig}
+                        loading={isUpdatingConfig}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  )}
+                </form>
+              </Form>
+            )}
+
+            <div className="space-y-4">{subjectFields}</div>
+          </div>
+
+          {messageProperty && (
+            <>
+              <div className="flex shrink-0 items-center justify-between gap-2 border-b px-4 py-3">
                 <Label>Body</Label>
                 <TwoOptionToggle
                   width={60}
@@ -284,135 +373,94 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   borderOverride="border-muted"
                 />
               </div>
-              {activeView === 'source' ? (
-                <>
-                  <div className="overflow-hidden rounded-md border dark:border-control overflow-hidden [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
+
+              <div className="relative flex min-h-0 flex-1">
+                {activeView === 'source' ? (
+                  <div className="h-full w-full [&_.monaco-editor]:[--vscode-focusBorder:transparent] [&_.monaco-editor]:outline-none! [&_.monaco-editor.focused]:outline-none! [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! [&_.overflow-guard]:outline-none! [&_.scroll-decoration]:hidden! [&_section]:outline-none! [&_section]:ring-0! [&_section]:shadow-none! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
                     <CodeEditor
                       id="code-id"
                       language="html"
                       isReadOnly={!canUpdateConfig}
-                      className="mb-0! relative h-96 outline-hidden outline-offset-0 outline-width-0 outline-0"
+                      className="mb-0! relative h-full w-full"
                       onInputChange={(e: string | undefined) => {
                         setBodyValue(e ?? '')
                         if (bodyValue !== e) setHasUnsavedChanges(true)
                       }}
-                      options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
+                      options={{
+                        wordWrap: 'on',
+                        contextmenu: false,
+                        renderLineHighlight: 'none',
+                        overviewRulerBorder: false,
+                        overviewRulerLanes: 0,
+                        hideCursorInOverviewRuler: true,
+                      }}
                       value={bodyValue}
                       editorRef={editorRef}
                     />
                   </div>
-
-                  <div className="flex flex-col gap-y-2">
-                    <div className="flex flex-col">
-                      <p className="text-sm">Template variables</p>
-                      <p className="text-sm text-foreground-lighter">
-                        Data placeholders that can be inserted into the subject or body.{' '}
-                        <InlineLink
-                          href={`${DOCS_URL}/guides/local-development/customizing-email-templates#template-variables`}
-                        >
-                          Learn more
-                        </InlineLink>
-                      </p>
+                ) : (
+                  <>
+                    <iframe
+                      className="h-full w-full border-0 bg-white"
+                      title={id}
+                      srcDoc={bodyValue}
+                      sandbox="allow-scripts allow-forms"
+                    />
+                    <div className="absolute bottom-3 left-3 right-3 z-10 max-w-md">
+                      <Admonition
+                        type="default"
+                        title="Email rendering may differ"
+                        description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
+                      />
                     </div>
-                    <div className="flex flex-wrap gap-x-1">
-                      {template.variables.map((variable) => (
-                        <Tooltip key={variable.value}>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="outline"
-                              size="tiny"
-                              className="rounded-full"
-                              onClick={() => insertTextAtCursor(variable.value)}
-                            >
-                              {variable.value}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            {variable.description}
+                  </>
+                )}
+              </div>
 
-                            {variable.name === 'Token' &&
-                              template.variables.some((x) => x.name === 'ConfirmationURL') && (
-                                <>
-                                  , which can be used instead of{' '}
-                                  <code className="text-code-inline">ConfirmationURL</code>
-                                </>
-                              )}
+              <SpamValidation spamRules={spamRules} />
 
-                            {variable.name === 'SiteURL' && (
-                              <>
-                                {' '}
-                                as defined in{' '}
-                                <InlineLink href={`/project/${projectRef}/auth/url-configuration`}>
-                                  URL Configuration
-                                </InlineLink>
-                              </>
-                            )}
-                          </TooltipContent>
-                        </Tooltip>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <iframe
-                    className="mb-0! mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
-                    title={id}
-                    srcDoc={bodyValue}
-                    sandbox="allow-scripts allow-forms"
-                  />
-                  <Admonition
-                    type="default"
-                    title="Email rendering may differ"
-                    description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
-                  />
-                </>
-              )}
-            </CardContent>
-
-            <SpamValidation spamRules={spamRules} />
-
-            <CardFooter className="flex flex-row justify-between gap-2">
-              {hasCustomTemplate && (
-                <ResetTemplateDialog
-                  template={template}
-                  hasUnsavedChanges={hasChanges}
-                  onResetSuccess={(config: AuthConfigResponse) => {
-                    form.reset(getFormValuesFromConfig(config))
-                    setBodyValue((config && config[messageSlug]) ?? '')
-                    setValidationResult(undefined)
-                    setHasUnsavedChanges(false)
-                  }}
-                />
-              )}
-              <div className="ml-auto flex flex-row gap-2">
-                {hasChanges && (
-                  <Button
-                    type="default"
-                    htmlType="button"
-                    onClick={() => {
-                      form.reset(INITIAL_VALUES)
-                      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+              <div className="flex shrink-0 items-center justify-between gap-2 border-t bg-surface-100 p-4">
+                {hasCustomTemplate && (
+                  <ResetTemplateDialog
+                    template={template}
+                    hasUnsavedChanges={hasChanges}
+                    onResetSuccess={(config: AuthConfigResponse) => {
+                      form.reset(getFormValuesFromConfig(config))
+                      setBodyValue((config && config[messageSlug]) ?? '')
+                      setValidationResult(undefined)
                       setHasUnsavedChanges(false)
                     }}
-                  >
-                    Cancel
-                  </Button>
+                  />
                 )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={!canUpdateConfig || isSavingTemplate || !hasChanges}
-                  loading={isSavingTemplate}
-                >
-                  Save changes
-                </Button>
+                <div className="ml-auto flex flex-row gap-2">
+                  {hasChanges && (
+                    <Button
+                      type="default"
+                      htmlType="button"
+                      onClick={() => {
+                        form.reset(INITIAL_VALUES)
+                        setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+                        setHasUnsavedChanges(false)
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={!canUpdateConfig || isSavingTemplate || !hasChanges}
+                    loading={isSavingTemplate}
+                  >
+                    Save changes
+                  </Button>
+                </div>
               </div>
-            </CardFooter>
-          </>
-        )}
-      </form>
-      <PreventNavigationOnUnsavedChanges hasChanges={hasChanges} />
-    </Form>
+            </>
+          )}
+        </form>
+        <PreventNavigationOnUnsavedChanges hasChanges={hasChanges} />
+      </Form>
+    </div>
   )
 }
