@@ -251,6 +251,14 @@ describe('parseConnectionsData', () => {
     expect(result).toEqual({ current: 7, max: 100 })
   })
 
+  it('treats empty-string values as missing and falls back', () => {
+    const mockInfraData = buildResponse(['5', '7', ''])
+
+    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
+
+    expect(result).toEqual({ current: 7, max: 100 })
+  })
+
   it('returns current connections even when maxConnectionsData is undefined', () => {
     const mockInfraData = buildResponse([4])
 

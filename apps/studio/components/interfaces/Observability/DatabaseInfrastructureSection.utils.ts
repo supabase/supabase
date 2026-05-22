@@ -76,7 +76,7 @@ export function parseConnectionsData(
   infraData: InfraMonitoringResponse | undefined,
   maxConnectionsData: MaxConnectionsData | undefined
 ): ConnectionsData {
-  const max = maxConnectionsData?.maxConnections || 0
+  const max = maxConnectionsData?.maxConnections ?? 0
 
   if (!infraData || !('series' in infraData)) {
     return { current: 0, max }
@@ -87,10 +87,10 @@ export function parseConnectionsData(
   // average makes the count vary with bucket granularity (e.g. 1h vs 1m) and
   // skews towards older samples in the window.
   const points = infraData.data ?? []
-  let currentVal: string | number | undefined
+  let currentVal: string | undefined
   for (let i = points.length - 1; i >= 0; i--) {
     const v = points[i]?.values?.pg_stat_database_num_backends
-    if (v !== undefined && v !== null && v !== '') {
+    if (v !== undefined && v !== '') {
       currentVal = v
       break
     }
