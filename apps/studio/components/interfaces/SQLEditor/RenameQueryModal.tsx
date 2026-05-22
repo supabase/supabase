@@ -53,7 +53,7 @@ const formSchema = z.object({
   description: z.string().optional(),
 })
 
-const RenameQueryModal = ({
+export const RenameQueryModal = ({
   snippet = {} as any,
   visible,
   onCancel,
@@ -260,5 +260,3 @@ const RenameQueryModal = ({
     </Dialog>
   )
 }
-
-export default RenameQueryModal

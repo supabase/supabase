@@ -37,7 +37,7 @@ export interface DownloadSnippetModalProps extends DialogProps {
 
 type DownloadFormat = 'migration' | 'seed' | 'sql'
 
-const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
+export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
@@ -171,5 +171,3 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
     </Dialog>
   )
 }
-
-export default DownloadSnippetModal
