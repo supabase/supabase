@@ -324,10 +324,7 @@ const calcChartStart = (
   return [its.add(-extendValue, trunc), trunc]
 }
 
-// TODO(qiao): workaround for self-hosted cron logs error until logflare is fixed
-const basePgCronWhere = IS_PLATFORM
-  ? `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
-  : `where ( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
+const basePgCronWhere = `where ( parsed.application_name = 'pg_cron' or event_message LIKE '%cron job%' )`
 /**
  *
  * generates log event chart query
@@ -679,6 +676,8 @@ function getWarningCondition(table: LogsTableName): string {
       return 'response.status_code >= 400 AND response.status_code < 500'
     case 'function_logs':
       return "metadata.level IN ('warning')"
+    case 'pg_cron_logs':
+      return "parsed.error_severity IN ('WARNING')"
     default:
       return 'false'
   }
