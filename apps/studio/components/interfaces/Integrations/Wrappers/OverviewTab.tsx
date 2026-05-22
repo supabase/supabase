@@ -194,7 +194,7 @@ export const WrapperContent = () => {
 export const WrapperOverviewTab = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
-  if (isMarketplaceEnabled) return <WrapperContent />
+  if (isMarketplaceEnabled) return <RequiredExtensionsSection />
 
   return (
     <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>

@@ -10,7 +10,7 @@ import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-
 import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-const QueuesCustomContent = () => {
+const QueuesContent = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
@@ -44,21 +44,9 @@ const QueuesCustomContent = () => {
   )
 }
 
-export const QueuesContent = () => {
-  return (
-    <>
-      <RequiredExtensionsSection />
-      <QueuesCustomContent />
-    </>
-  )
-}
-
 export const QueuesOverviewTab = () => {
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
-  if (isMarketplaceEnabled) {
-    return <QueuesContent />
-  }
-
-  return <IntegrationOverviewTab actions={<QueuesCustomContent />} />
+  if (isMarketplaceEnabled) return <RequiredExtensionsSection />
+  return <IntegrationOverviewTab actions={<QueuesContent />} />
 }

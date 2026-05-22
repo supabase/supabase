@@ -213,25 +213,37 @@ const StripeSyncContent = () => {
       )}
 
       {!installed && !uninstalling && !uninstallError ? (
-        <IntegrationNotInstalledActions
-          hideInstallCTA
-          installing={installing}
-          canInstall={canInstall}
-          isUninstallRequested={isUninstallRequested}
-          handleUninstall={handleUninstall}
-          setShouldShowInstallSheet={setShouldShowInstallSheet}
-        />
+        <>
+          <StripeSyncChangesCard
+            installationStatus={installationStatus}
+            isUpgrade={upgradeAvailable}
+          />
+          <IntegrationNotInstalledActions
+            hideInstallCTA
+            installing={installing}
+            canInstall={canInstall}
+            isUninstallRequested={isUninstallRequested}
+            handleUninstall={handleUninstall}
+            setShouldShowInstallSheet={setShouldShowInstallSheet}
+          />
+        </>
       ) : (
         (installed || uninstalling || uninstallError) && (
-          <IntegrationInstalledActions
-            disabled={installing || uninstalling || !canManageSecrets}
-            upgradeAvailable={upgradeAvailable}
-            installing={installing}
-            uninstalling={uninstalling}
-            isUninstallRequested={isUninstallRequested}
-            setShouldShowInstallSheet={setShouldShowInstallSheet}
-            setShowUninstallModal={setShowUninstallModal}
-          />
+          <>
+            <StripeSyncChangesCard
+              installationStatus={installationStatus}
+              isUpgrade={upgradeAvailable}
+            />
+            <IntegrationInstalledActions
+              disabled={installing || uninstalling || !canManageSecrets}
+              upgradeAvailable={upgradeAvailable}
+              installing={installing}
+              uninstalling={uninstalling}
+              isUninstallRequested={isUninstallRequested}
+              setShouldShowInstallSheet={setShouldShowInstallSheet}
+              setShowUninstallModal={setShowUninstallModal}
+            />
+          </>
         )
       )}
 
@@ -393,7 +405,9 @@ export const StripeSyncEngineOverviewTab = () => {
 
   return (
     <IntegrationOverviewTab>
-      <StripeSyncContent />
+      <div className="px-4 md:px-10 max-w-4xl space-y-4">
+        <StripeSyncContent />
+      </div>
     </IntegrationOverviewTab>
   )
 }
