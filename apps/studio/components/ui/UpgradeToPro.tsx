@@ -1,7 +1,8 @@
 import { ReactNode } from 'react'
-
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { DocsButton } from './DocsButton'
 import { UpgradePlanButton } from './UpgradePlanButton'
 
 interface UpgradeToProProps {
@@ -21,6 +22,7 @@ interface UpgradeToProProps {
   layout?: 'vertical' | 'horizontal'
   variant?: 'default' | 'primary'
   className?: string
+  docsUrl?: string
 }
 
 export const UpgradeToPro = ({
@@ -37,6 +39,7 @@ export const UpgradeToPro = ({
   layout = 'horizontal',
   variant = 'primary',
   className,
+  docsUrl,
 }: UpgradeToProProps) => {
   return (
     <Admonition
@@ -47,16 +50,19 @@ export const UpgradeToPro = ({
       description={secondaryText}
       className={cn(fullWidth && 'border-0 rounded-none border-b', className)}
       actions={
-        <UpgradePlanButton
-          plan={planToUpgrade}
-          addon={addon}
-          source={source}
-          featureProposition={featureProposition}
-          disabled={disabled}
-          variant={variant}
-        >
-          {buttonText}
-        </UpgradePlanButton>
+        <>
+          <UpgradePlanButton
+            plan={planToUpgrade}
+            addon={addon}
+            source={source}
+            featureProposition={featureProposition}
+            disabled={disabled}
+            variant={variant}
+          >
+            {buttonText}
+          </UpgradePlanButton>
+          {!!docsUrl && <DocsButton href={docsUrl} />}
+        </>
       }
     />
   )

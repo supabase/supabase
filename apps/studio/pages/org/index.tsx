@@ -1,12 +1,13 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { ShimmeringCard } from 'components/interfaces/Home/ProjectList/ShimmeringCard'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import type { NextPageWithLayout } from 'types'
+
+import { ShimmeringCard } from '@/components/interfaces/Home/ProjectList/ShimmeringCard'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { ScaffoldContainerLegacy } from '@/components/layouts/Scaffold'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgIndexPage: NextPageWithLayout = () => {
   const router = useRouter()

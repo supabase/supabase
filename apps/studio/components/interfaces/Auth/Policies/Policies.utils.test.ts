@@ -1,20 +1,19 @@
+import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-
-// Mock generateSqlPolicy for AI tests
-const mockGenerateSqlPolicy = vi.fn()
-vi.mock('data/ai/sql-policy-mutation', () => ({
-  generateSqlPolicy: (...args: unknown[]) => mockGenerateSqlPolicy(...args),
-}))
-
-// Import after mocks are set up
 import {
   generateAiPoliciesForTable,
   generateProgrammaticPoliciesForTable,
   generateStartingPoliciesForTable,
   type GeneratedPolicy,
 } from './Policies.utils'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+
+// Mock generateSqlPolicy for AI tests
+const mockGenerateSqlPolicy = vi.fn()
+vi.mock('@/data/ai/sql-policy-mutation', () => ({
+  generateSqlPolicy: (...args: unknown[]) => mockGenerateSqlPolicy(...args),
+}))
 
 // Helper to create a foreign key constraint
 const createForeignKey = (overrides: Partial<ForeignKeyConstraint> = {}): ForeignKeyConstraint => ({
@@ -251,7 +250,7 @@ describe('Policies.utils - Policy Generation', () => {
         command: 'SELECT',
         table: 'posts',
         schema: 'public',
-        definition: 'true',
+        definition: safeSql`true`,
         action: 'PERMISSIVE',
         roles: ['public'],
       },
@@ -344,7 +343,7 @@ describe('Policies.utils - Policy Generation', () => {
         command: 'SELECT',
         table: 'posts',
         schema: 'public',
-        definition: 'true',
+        definition: safeSql`true`,
         action: 'PERMISSIVE',
         roles: ['public'],
       },

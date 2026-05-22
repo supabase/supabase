@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
+import { IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ApiSettings: NextPageWithLayout = () => {

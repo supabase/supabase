@@ -1,24 +1,19 @@
 import { IS_PLATFORM } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ASSISTANT_SUGGESTIONS } from 'components/ui/HelpPanel/HelpPanel.constants'
-import { getSupportLinkQueryParams } from 'components/ui/HelpPanel/HelpPanel.utils'
-import { HelpSection } from 'components/ui/HelpPanel/HelpSection'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Lightbulb, TriangleAlert } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import {
-  Button,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
+import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
 
 import { FeedbackWidget } from './FeedbackWidget'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ASSISTANT_SUGGESTIONS } from '@/components/ui/HelpPanel/HelpPanel.constants'
+import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
+import { HelpSection } from '@/components/ui/HelpPanel/HelpSection'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
   const router = useRouter()
@@ -28,6 +23,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
   const { openSidebar } = useSidebarManagerSnapshot()
   const [isOpen, setIsOpen] = useState(false)
   const [stage, setStage] = useState<'select' | 'issue-options' | 'widget'>('select')
+  const track = useTrack()
 
   const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
   const supportLinkQueryParams = getSupportLinkQueryParams(
@@ -37,15 +33,16 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
   )
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={isOpen}
       onOpenChange={(e) => {
+        if (e) track('header_feedback_dropdown_opened')
         setIsOpen(e)
         if (!e) setStage('select')
       }}
     >
-      <PopoverTrigger_Shadcn_ asChild>
+      <PopoverTrigger asChild>
         <Button
           asChild
           onClick={() => {
@@ -57,8 +54,8 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
         >
           <span className={className}>Feedback</span>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         side="bottom"
         align="end"
         className="p-0 flex flex-col w-96"
@@ -105,7 +102,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
                 onSupportClick={() => setIsOpen(false)}
               />
             </div>
-            <PopoverSeparator_Shadcn_ />
+            <PopoverSeparator />
             <div className="px-4 pt-4 pb-4">
               <Button type="default" size="tiny" onClick={() => setStage('widget')}>
                 Leave feedback instead
@@ -119,7 +116,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             onSwitchToIssueOptions={() => setStage('issue-options')}
           />
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

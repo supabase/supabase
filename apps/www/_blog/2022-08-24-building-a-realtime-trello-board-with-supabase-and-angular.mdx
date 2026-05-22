@@ -548,7 +548,7 @@ Nonetheless, it's just some CSS and connecting our fields and buttons to the rig
   </div>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+    <div class="bg-white py-8 px-4 shadow-sm sm:rounded-lg sm:px-10">
       <div class="space-y-6" *ngIf="!linkSuccess; else check_mails">
         <div class="space-y-6">
           <label for="email" class="block text-sm font-medium text-gray-700"> Email address </label>
@@ -558,7 +558,7 @@ Nonetheless, it's just some CSS and connecting our fields and buttons to the rig
               [(ngModel)]="email"
               autocomplete="email"
               placeholder="john@doe.com"
-              class="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
+              class="block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-xs focus:border-emerald-500 focus:outline-hidden focus:ring-emerald-500 sm:text-sm"
             />
           </div>
         </div>
@@ -566,7 +566,7 @@ Nonetheless, it's just some CSS and connecting our fields and buttons to the rig
         <div>
           <button
             (click)="signIn()"
-            class="flex w-full justify-center rounded-md border border-transparent bg-emerald-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            class="flex w-full justify-center rounded-md border border-transparent bg-emerald-600 py-2 px-4 text-sm font-medium text-white shadow-xs hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
           >
             Send magic link
           </button>
@@ -820,14 +820,14 @@ Besides that we simply iterate all boards, add the router link to a board based 
     <li
       *ngFor="let board of boards"
       [routerLink]="board.boards.id"
-      class="relative h-52 rounded bg-emerald-200 py-4 px-4 text-lg font-semibold hover:cursor-pointer hover:bg-emerald-300"
+      class="relative h-52 rounded-sm bg-emerald-200 py-4 px-4 text-lg font-semibold hover:cursor-pointer hover:bg-emerald-300"
     >
       {{ board.boards.title }}
     </li>
 
     <li
       (click)="startBoard()"
-      class="relative h-52 rounded bg-emerald-500 py-4 px-4 text-lg font-semibold hover:cursor-pointer"
+      class="relative h-52 rounded-sm bg-emerald-500 py-4 px-4 text-lg font-semibold hover:cursor-pointer"
     >
       + New board
     </li>
@@ -1178,7 +1178,7 @@ Nonetheless we can continue below the previous code in our **src/app/components/
     <!-- ITERATE ALL LISTS -->
     <div
       *ngFor="let list of lists"
-      class="min-h-52 relative h-auto rounded bg-emerald-200 py-4 px-4 text-sm font-semibold"
+      class="min-h-52 relative h-auto rounded-sm bg-emerald-200 py-4 px-4 text-sm font-semibold"
     >
       <div class="flex gap-2 pb-4">
         <p
@@ -1191,7 +1191,7 @@ Nonetheless we can continue below the previous code in our **src/app/components/
         <input
           [(ngModel)]="list.title"
           *ngIf="editTitle[list.id]"
-          class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
+          class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-xs focus:border-emerald-500 focus:outline-hidden focus:ring-emerald-500 sm:text-sm"
         />
         <button class="font-medium" *ngIf="editTitle[list.id]" (click)="updateListTitle(list)">
           Save
@@ -1209,7 +1209,7 @@ Nonetheless we can continue below the previous code in our **src/app/components/
           <input
             [(ngModel)]="card.title"
             *ngIf="editCard[card.id]"
-            class="block rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
+            class="block rounded-md border border-gray-300 px-3 py-2 shadow-xs focus:border-emerald-500 focus:outline-hidden focus:ring-emerald-500 sm:text-sm"
           />
           <div class="align-items-center flex justify-between">
             <button class="font-medium" *ngIf="editCard[card.id]" (click)="updateCard(card)">
@@ -1236,7 +1236,7 @@ Nonetheless we can continue below the previous code in our **src/app/components/
 
     <div
       (click)="addList()"
-      class="relative h-16 rounded bg-emerald-500 py-4 px-4 text-lg font-semibold hover:cursor-pointer"
+      class="relative h-16 rounded-sm bg-emerald-500 py-4 px-4 text-lg font-semibold hover:cursor-pointer"
     >
       + New list
     </div>
@@ -1261,11 +1261,11 @@ Add the following in the `<main>` tag of our **src/app/components/inside/board/b
   <input
     [(ngModel)]="addUserEmail"
     placeholder="john@doe.com"
-    class="block rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
+    class="block rounded-md border border-gray-300 px-3 py-2 shadow-xs focus:border-emerald-500 focus:outline-hidden focus:ring-emerald-500 sm:text-sm"
   />
   <button
     (click)="addUser()"
-    class="inline-flex items-center rounded border border-transparent bg-emerald-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+    class="inline-flex items-center rounded-sm border border-transparent bg-emerald-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-xs hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
   >
     Invite
   </button>

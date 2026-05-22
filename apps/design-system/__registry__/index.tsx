@@ -5,6 +5,17 @@ import * as React from "react"
 
 export const Index: Record<string, any> = {
   "default": {
+    "CollapsibleCardSection": {
+      name: "CollapsibleCardSection",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/CollapsibleCardSection")),
+      source: "",
+      files: ["registry/default//CollapsibleCardSection.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "ConfirmationModal": {
       name: "ConfirmationModal",
       type: "components:fragment",
@@ -56,6 +67,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/../../packages/ui-patterns/src/PageHeader")),
       source: "",
       files: ["registry/default//PageHeader/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "PageBreadcrumbs": {
+      name: "PageBreadcrumbs",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/PageBreadcrumbs")),
+      source: "",
+      files: ["registry/default//PageBreadcrumbs/index.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "PageNav": {
+      name: "PageNav",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/PageNav")),
+      source: "",
+      files: ["registry/default//PageNav/index.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -126,6 +159,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-description-only": {
+      name: "admonition-description-only",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-description-only")),
+      source: "",
+      files: ["registry/default/example/admonition-description-only.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "admonition-warning": {
       name: "admonition-warning",
       type: "components:example",
@@ -133,6 +177,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/admonition-warning")),
       source: "",
       files: ["registry/default/example/admonition-warning.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "admonition-success": {
+      name: "admonition-success",
+      type: "components:example",
+      registryDependencies: ["admonition"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-success")),
+      source: "",
+      files: ["registry/default/example/admonition-success.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -170,13 +225,24 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "alert-collapsible-demo": {
-      name: "alert-collapsible-demo",
+    "collapsible-alert-demo": {
+      name: "collapsible-alert-demo",
       type: "components:example",
-      registryDependencies: ["alert","collapsible","button"],
-      component: React.lazy(() => import("@/registry/default/example/alert-collapsible-demo")),
+      registryDependencies: ["collapsible-alert"],
+      component: React.lazy(() => import("@/registry/default/example/collapsible-alert-demo")),
       source: "",
-      files: ["registry/default/example/alert-collapsible-demo.tsx"],
+      files: ["registry/default/example/collapsible-alert-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "collapsible-card-section-demo": {
+      name: "collapsible-card-section-demo",
+      type: "components:example",
+      registryDependencies: ["collapsible-card-section"],
+      component: React.lazy(() => import("@/registry/default/example/collapsible-card-section-demo")),
+      source: "",
+      files: ["registry/default/example/collapsible-card-section-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -199,6 +265,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/alert-dialog-close-only")),
       source: "",
       files: ["registry/default/example/alert-dialog-close-only.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-async": {
+      name: "alert-dialog-async",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-async")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-async.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-async-error": {
+      name: "alert-dialog-async-error",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button","admonition"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-async-error")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-async-error.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -441,6 +529,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/calendar-form")),
       source: "",
       files: ["registry/default/example/calendar-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "single-value-field-array-demo": {
+      name: "single-value-field-array-demo",
+      type: "components:example",
+      registryDependencies: ["button","form","input"],
+      component: React.lazy(() => import("@/registry/default/example/single-value-field-array-demo")),
+      source: "",
+      files: ["registry/default/example/single-value-field-array-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -731,6 +830,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "data-input-with-reveal-copy-editable": {
+      name: "data-input-with-reveal-copy-editable",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy-editable")),
+      source: "",
+      files: ["registry/default/example/data-input-with-reveal-copy-editable.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-input-with-reveal-copy-editable-empty": {
+      name: "data-input-with-reveal-copy-editable-empty",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy-editable-empty")),
+      source: "",
+      files: ["registry/default/example/data-input-with-reveal-copy-editable-empty.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "date-picker-demo": {
       name: "date-picker-demo",
       type: "components:example",
@@ -1013,6 +1134,39 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/input-otp-form")),
       source: "",
       files: ["registry/default/example/input-otp-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-demo": {
+      name: "keyboard-shortcut-demo",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-demo")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-pill": {
+      name: "keyboard-shortcut-pill",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-pill")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-pill.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-inline": {
+      name: "keyboard-shortcut-inline",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-inline")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-inline.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -1963,6 +2117,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "key-value-field-array-demo": {
+      name: "key-value-field-array-demo",
+      type: "components:example",
+      registryDependencies: ["button","form","input"],
+      component: React.lazy(() => import("@/registry/default/example/key-value-field-array-demo")),
+      source: "",
+      files: ["registry/default/example/key-value-field-array-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "field-choice-card": {
       name: "field-choice-card",
       type: "components:example",
@@ -2216,6 +2381,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "page-breadcrumbs-demo": {
+      name: "page-breadcrumbs-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-breadcrumbs-demo")),
+      source: "",
+      files: ["registry/default/example/page-breadcrumbs-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-nav-demo": {
+      name: "page-nav-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-nav-demo")),
+      source: "",
+      files: ["registry/default/example/page-nav-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "page-layout-detail": {
       name: "page-layout-detail",
       type: "components:example",
@@ -2223,6 +2410,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/page-layout-detail")),
       source: "",
       files: ["registry/default/example/page-layout-detail.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-edge-function": {
+      name: "page-layout-edge-function",
+      type: "components:example",
+      registryDependencies: ["filter-bar"],
+      component: React.lazy(() => import("@/registry/default/example/page-layout-edge-function")),
+      source: "",
+      files: ["registry/default/example/page-layout-edge-function.tsx","registry/default/example/page-layout-logs-content.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-full-width": {
+      name: "page-layout-full-width",
+      type: "components:example",
+      registryDependencies: ["filter-bar"],
+      component: React.lazy(() => import("@/registry/default/example/page-layout-full-width")),
+      source: "",
+      files: ["registry/default/example/page-layout-full-width.tsx","registry/default/example/page-layout-logs-content.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2256,6 +2465,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/page-layout-settings")),
       source: "",
       files: ["registry/default/example/page-layout-settings.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "page-layout-auth-emails": {
+      name: "page-layout-auth-emails",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/page-layout-auth-emails")),
+      source: "",
+      files: ["registry/default/example/page-layout-auth-emails.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2491,6 +2711,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "multi-select-in-dialog": {
+      name: "multi-select-in-dialog",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-in-dialog")),
+      source: "",
+      files: ["registry/default/example/multi-select-in-dialog.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "tree-view-demo": {
       name: "tree-view-demo",
       type: "components:example",
@@ -2674,6 +2905,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/expanding-textarea-demo")),
       source: "",
       files: ["registry/default/example/expanding-textarea-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "error-display-demo": {
+      name: "error-display-demo",
+      type: "components:example",
+      registryDependencies: ["error-display"],
+      component: React.lazy(() => import("@/registry/default/example/error-display-demo")),
+      source: "",
+      files: ["registry/default/example/error-display-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "error-display-with-children": {
+      name: "error-display-with-children",
+      type: "components:example",
+      registryDependencies: ["error-display"],
+      component: React.lazy(() => import("@/registry/default/example/error-display-with-children")),
+      source: "",
+      files: ["registry/default/example/error-display-with-children.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

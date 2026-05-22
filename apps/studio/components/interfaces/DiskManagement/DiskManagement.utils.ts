@@ -1,6 +1,3 @@
-import { ProjectDetail } from 'data/projects/project-detail-query'
-import { PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import {
   COMPUTE_BASELINE_IOPS,
   COMPUTE_MAX_IOPS,
@@ -13,6 +10,9 @@ import {
   InfraInstanceSize,
 } from './DiskManagement.types'
 import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './ui/DiskManagement.constants'
+import { ProjectDetail } from '@/data/projects/project-detail-query'
+import { PlanId, ProjectAddonVariantMeta } from '@/data/subscriptions/types'
+import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from '@/lib/constants'
 
 // Included disk size only applies to primary, not replicas
 export const calculateDiskSizePrice = ({
@@ -282,7 +282,7 @@ export function getAvailableComputeOptions(
 }
 
 export const calculateMaxIopsAllowedForDiskSizeWithGp3 = (totalSize: number) => {
-  return Math.min(3000 * totalSize, 16000)
+  return Math.max(3000, Math.min(500 * totalSize, 16000))
 }
 
 export const calculateDiskSizeRequiredForIopsWithGp3 = (iops: number) => {

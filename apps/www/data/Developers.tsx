@@ -1,7 +1,6 @@
-import { Calendar, Pencil } from 'lucide-react'
+import { Calendar, Pencil, ScrollText } from 'lucide-react'
 import {
   IconBriefcase2,
-  IconChangelog,
   IconDocumentation,
   IconGitHubSolid,
   IconIntegrations,
@@ -57,7 +56,7 @@ export const data = {
           text: 'Changelog',
           description: 'See the latest updates and product improvements.',
           url: '/changelog',
-          icon: IconChangelog,
+          icon: ScrollText,
         },
         {
           text: 'Support',

@@ -8,7 +8,6 @@ const getInitialState = () => {
     showProjectApiDocs: false,
     showCreateBranchModal: false,
     showAiSettingsModal: false,
-    showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
     showSidebar: true,
@@ -71,8 +70,8 @@ export const appState = proxy({
     appState.mobileMenuOpen = value
   },
 
-  connectSheetSource: 'header_button' as 'header_button' | 'connect_section',
-  setConnectSheetSource: (value: 'header_button' | 'connect_section') => {
+  connectSheetSource: 'header_button' as 'header_button' | 'connect_section' | 'keyboard_shortcut',
+  setConnectSheetSource: (value: 'header_button' | 'connect_section' | 'keyboard_shortcut') => {
     appState.connectSheetSource = value
   },
 

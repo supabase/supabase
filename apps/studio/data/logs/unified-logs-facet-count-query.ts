@@ -1,27 +1,32 @@
 import { useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
-import {
-  getFacetCountCTE,
-  getUnifiedLogsCTE,
-} from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
-import { Option } from 'components/ui/DataTable/DataTable.types'
-import { handleError, post } from 'data/fetchers'
-import { ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from 'types'
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl } from './logs-endpoint'
+import { bqIdent, safeSql } from './safe-analytics-sql'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
 } from './unified-logs-infinite-query'
+import { getFacetCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import {
+  getFacetCountCTE,
+  getUnifiedLogsCTE,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { Option } from '@/components/ui/DataTable/DataTable.types'
+import { handleError, post } from '@/data/fetchers'
+import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 type UnifiedLogsFacetCountVariables = UnifiedLogsVariables & {
   facet: string
   facetSearch?: string
+  useOtel?: boolean
 }
 
 export async function getUnifiedLogsFacetCount(
-  { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,
+  { projectRef, search, facet, facetSearch, useOtel = false }: UnifiedLogsFacetCountVariables,
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') {
@@ -29,12 +34,16 @@ export async function getUnifiedLogsFacetCount(
   }
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
-  const sql = `
+  const sql = useOtel
+    ? getFacetCountQuery({ search, facet, facetSearch })
+    : safeSql`
 ${getUnifiedLogsCTE()},
 ${getFacetCountCTE({ search, facet, facetSearch })}
-SELECT dimension, value, count from ${facet}_count;
-`.trim()
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+SELECT dimension, value, count from ${bqIdent(facet + '_count')};
+`
+
+  const endpoint = logsAllEndpointUrl(useOtel)
+  const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
     signal,
@@ -53,12 +62,17 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     enabled = true,
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
-) =>
-  useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
-    queryKey: logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, search),
+) => {
+  const useOtel = !!useFlag('otelUnifiedLogs')
+  return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
+    queryKey: [
+      ...logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, search),
+      { otel: useOtel },
+    ],
     queryFn: ({ signal }) =>
-      getUnifiedLogsFacetCount({ projectRef, search, facet, facetSearch }, signal),
+      getUnifiedLogsFacetCount({ projectRef, search, facet, facetSearch, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
   })
+}

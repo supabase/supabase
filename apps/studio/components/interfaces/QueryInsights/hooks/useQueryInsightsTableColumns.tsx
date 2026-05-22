@@ -1,22 +1,19 @@
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, ExternalLink, ScanSearch } from 'lucide-react'
-import { type RefObject, useMemo } from 'react'
+import { useMemo, type RefObject } from 'react'
 // eslint-disable-next-line no-restricted-imports
 import { type Column, type DataGridHandle } from 'react-data-grid'
 import {
   Button,
   cn,
-  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { buildQueryInsightFixPrompt } from '../../QueryPerformance/QueryPerformance.ai'
@@ -33,6 +30,8 @@ import {
   getColumnName,
   getTableName,
 } from '../QueryInsightsTable/QueryInsightsTable.utils'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface UseQueryInsightsTableColumnsParams {
   sort: { column: string; order: 'asc' | 'desc' }
@@ -78,7 +77,7 @@ export function useQueryInsightsTableColumns({
           return (
             <div className="flex items-center justify-between text-xs w-full">
               <div className="flex items-center gap-x-2">
-                <p className="!text-foreground font-medium">{col.name}</p>
+                <p className="text-foreground! font-medium">{col.name}</p>
                 {col.description && (
                   <p className="text-foreground-lighter font-normal">{col.description}</p>
                 )}
@@ -90,7 +89,7 @@ export function useQueryInsightsTableColumns({
                     <Button
                       type="text"
                       size="tiny"
-                      className="p-1 h-5 w-5 flex-shrink-0"
+                      className="p-1 h-5 w-5 shrink-0"
                       icon={<ChevronDown size={14} className="text-foreground-muted" />}
                       onClick={(e) => e.stopPropagation()}
                     />
@@ -130,7 +129,7 @@ export function useQueryInsightsTableColumns({
             const IssueIcon = row.issueType ? ISSUE_ICONS[row.issueType] : null
             return (
               <div className="w-full flex items-center gap-x-3 group">
-                <div className="flex-shrink-0 w-6">
+                <div className="shrink-0 w-6">
                   {row.issueType && IssueIcon && (
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -154,8 +153,8 @@ export function useQueryInsightsTableColumns({
                 </div>
                 <CodeBlock
                   language="pgsql"
-                  className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap [&>code]:!whitespace-nowrap [&>code]:break-words !overflow-visible !truncate !w-full !pr-20 pointer-events-none"
-                  wrapperClassName="!max-w-full flex-1"
+                  className="bg-transparent! p-0! m-0! border-none! whitespace-nowrap! [&>code]:whitespace-nowrap! [&>code]:wrap-break-word overflow-visible! truncate! w-full! pr-20! pointer-events-none"
+                  wrapperClassName="max-w-full! flex-1"
                   hideLineNumbers
                   hideCopy
                   value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
@@ -172,7 +171,7 @@ export function useQueryInsightsTableColumns({
                     setSheetView('details')
                     gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
                   }}
-                  className="p-1 flex-shrink-0 -translate-x-2 group-hover:flex hidden"
+                  className="p-1 shrink-0 -translate-x-2 group-hover:flex hidden"
                 />
               </div>
             )
@@ -322,7 +321,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'first:pl-6 cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Query</p>
+            <p className="text-foreground! font-medium">Query</p>
           </div>
         ),
         renderCell: (props) => {
@@ -330,7 +329,7 @@ export function useQueryInsightsTableColumns({
           const IssueIcon = row.issueType ? ISSUE_ICONS[row.issueType] : null
           return (
             <div className="w-full flex items-center gap-x-3 group">
-              <div className="flex-shrink-0 w-6">
+              <div className="shrink-0 w-6">
                 {row.issueType && IssueIcon && (
                   <div
                     className={cn(
@@ -379,7 +378,7 @@ export function useQueryInsightsTableColumns({
                   setSelectedTriageRow(props.rowIdx)
                   setSheetView('details')
                 }}
-                className="p-1 flex-shrink-0 group-hover:flex hidden"
+                className="p-1 shrink-0 group-hover:flex hidden"
               />
             </div>
           )
@@ -394,7 +393,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Time consumed</p>
+            <p className="text-foreground! font-medium">Time consumed</p>
           </div>
         ),
         renderCell: (props) => {
@@ -437,7 +436,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Calls</p>
+            <p className="text-foreground! font-medium">Calls</p>
           </div>
         ),
         renderCell: (props) => {
@@ -463,7 +462,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Mean time</p>
+            <p className="text-foreground! font-medium">Mean time</p>
           </div>
         ),
         renderCell: (props) => {
@@ -489,7 +488,7 @@ export function useQueryInsightsTableColumns({
         headerCellClass: 'cursor-default',
         renderHeaderCell: () => (
           <div className="flex items-center text-xs w-full">
-            <p className="!text-foreground font-medium">Actions</p>
+            <p className="text-foreground! font-medium">Actions</p>
           </div>
         ),
         renderCell: (props) => {
@@ -556,27 +555,25 @@ export function useQueryInsightsTableColumns({
                     buildPrompt={() => buildQueryInsightFixPrompt(row).prompt}
                     onOpenAssistant={() => handleAiSuggestedFix(row)}
                     copyLabel="Copy Markdown"
-                    extraDropdownItems={
-                      <>
-                        <DropdownMenuItem onClick={() => handleGoToLogs()} className="gap-2">
-                          <ExternalLink size={14} />
-                          Go to Logs
-                        </DropdownMenuItem>
-                        {row.issueType === 'slow' && (
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedTriageRow(props.rowIdx)
-                              setSheetView('explain')
-                            }}
-                            className="gap-2"
-                          >
-                            <ScanSearch size={14} />
-                            Explain
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuSeparator />
-                      </>
-                    }
+                    additionalDropdownItems={[
+                      {
+                        label: 'Go to Logs',
+                        icon: <ExternalLink size={14} />,
+                        onClick: () => handleGoToLogs(),
+                      },
+                      ...(row.issueType === 'slow'
+                        ? [
+                            {
+                              label: 'Explain',
+                              icon: <ScanSearch size={14} />,
+                              onClick: () => {
+                                setSelectedTriageRow(props.rowIdx)
+                                setSheetView('explain')
+                              },
+                            },
+                          ]
+                        : []),
+                    ]}
                   />
                 </div>
               )}

@@ -1,6 +1,3 @@
-import { ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import {
@@ -10,6 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { z } from 'zod'

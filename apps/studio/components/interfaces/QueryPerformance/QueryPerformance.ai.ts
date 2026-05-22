@@ -1,10 +1,10 @@
 import { QueryPerformanceRow } from './QueryPerformance.types'
-import type { QueryPlanRow } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
-import type { ClassifiedQuery } from 'components/interfaces/QueryInsights/QueryInsightsHealth/QueryInsightsHealth.types'
+import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
+import type { ClassifiedQuery } from '@/components/interfaces/QueryInsights/QueryInsightsHealth/QueryInsightsHealth.types'
 import {
-  getTableName,
   getColumnName,
-} from 'components/interfaces/QueryInsights/QueryInsightsTable/QueryInsightsTable.utils'
+  getTableName,
+} from '@/components/interfaces/QueryInsights/QueryInsightsTable/QueryInsightsTable.utils'
 
 export interface QueryExplanationPrompt {
   query: string

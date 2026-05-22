@@ -257,9 +257,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-backup-schedule",
+        "title": "Get backup schedule",
+        "slug": "v1-get-backup-schedule",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-database-metadata",
         "title": "Get database metadata",
         "slug": "v1-get-database-metadata",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-database-openapi",
+        "title": "Get database openapi",
+        "slug": "v1-get-database-openapi",
         "type": "operation"
       },
       {
@@ -368,6 +380,12 @@
         "id": "v1-setup-a-read-replica",
         "title": "Setup a read replica",
         "slug": "v1-setup-a-read-replica",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-backup-schedule",
+        "title": "Update backup schedule",
+        "slug": "v1-update-backup-schedule",
         "type": "operation"
       },
       {
@@ -677,6 +695,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-organization-entitlements",
+        "title": "Get organization entitlements",
+        "slug": "v1-get-organization-entitlements",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-organizations",
         "title": "List all organizations",
         "slug": "v1-list-all-organizations",
@@ -686,6 +710,18 @@
         "id": "v1-list-organization-members",
         "title": "List organization members",
         "slug": "v1-list-organization-members",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Profile",
+    "items": [
+      {
+        "id": "v1-get-profile",
+        "title": "Get profile",
+        "slug": "v1-get-profile",
         "type": "operation"
       }
     ]

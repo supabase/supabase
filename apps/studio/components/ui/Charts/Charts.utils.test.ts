@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { computeYAxisDomain } from './Charts.utils'
+import { computeYAxisDomain, normalizeStackedSeriesData } from './Charts.utils'
 
 const IOPS_DATA = [
   { timestamp: 1, disk_iops_write: 1200, disk_iops_read: 24203, disk_iops_max: 25000 },
@@ -170,5 +170,55 @@ describe('computeYAxisDomain', () => {
         })
       ).toEqual([0, 25000])
     })
+  })
+})
+
+describe('normalizeStackedSeriesData', () => {
+  it('normalizes each stacked point to 100%', () => {
+    const normalized = normalizeStackedSeriesData({
+      data: [{ system: 25, user: 25, idle: 100 }],
+      attributeNames: ['system', 'user', 'idle'],
+    })
+
+    expect(normalized[0].system).toBeCloseTo(16.6666666667)
+    expect(normalized[0].user).toBeCloseTo(16.6666666667)
+    expect(normalized[0].idle).toBeCloseTo(66.6666666666)
+    expect(
+      Number(normalized[0].system) + Number(normalized[0].user) + Number(normalized[0].idle)
+    ).toBeCloseTo(100)
+  })
+
+  it('leaves empty stacks unchanged', () => {
+    const empty = [{ system: 0, user: 0, idle: 0 }]
+
+    expect(
+      normalizeStackedSeriesData({
+        data: empty,
+        attributeNames: ['system', 'user', 'idle'],
+      })
+    ).toEqual(empty)
+  })
+
+  it('leaves data unchanged when attributeNames is empty', () => {
+    const data = [{ system: 50, user: 30, timestamp: 1000 }]
+
+    expect(
+      normalizeStackedSeriesData({
+        data,
+        attributeNames: [],
+      })
+    ).toEqual(data)
+  })
+
+  it('preserves non-stacked keys (timestamps, metadata) unchanged', () => {
+    const data = [{ system: 60, user: 80, period_start: '2024-01-01', timestamp: 1000 }]
+    const normalized = normalizeStackedSeriesData({
+      data,
+      attributeNames: ['system', 'user'],
+    })
+
+    expect(normalized[0].period_start).toBe('2024-01-01')
+    expect(normalized[0].timestamp).toBe(1000)
+    expect(Number(normalized[0].system) + Number(normalized[0].user)).toBeCloseTo(100)
   })
 })

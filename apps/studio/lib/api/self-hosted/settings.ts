@@ -1,6 +1,7 @@
 import { components } from 'api-types'
-import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'lib/constants/api'
+
 import { assertSelfHosted } from './util'
+import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from '@/lib/constants/api'
 
 type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
   protocol?: string

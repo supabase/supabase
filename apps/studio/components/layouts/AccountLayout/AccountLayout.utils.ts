@@ -1,6 +1,5 @@
-import type { SubMenuSection } from 'components/ui/ProductMenu/ProductMenu.types'
-
 import type { SidebarSection } from './AccountLayout.types'
+import type { SubMenuSection } from '@/components/ui/ProductMenu/ProductMenu.types'
 
 /**
  * Converts AccountLayout SidebarSection[] to SubMenuSection[] for SubMenu/ProductMenu.

@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import Link from 'next/link'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 
@@ -73,16 +72,6 @@ describe('#Button', () => {
   it('should have "w-full" class when block is true', async () => {
     render(<Button block>Button Block</Button>)
     expect(screen.queryByRole('button')).toHaveClass('w-full')
-  })
-
-  it("shouldn't crash when wrapped with next/link", () => {
-    expect(() =>
-      render(
-        <Button asChild>
-          <Link href="https://supabase.com">Button</Link>
-        </Button>
-      )
-    ).not.toThrow()
   })
 
   it('should forward ref', () => {

@@ -1,7 +1,8 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useBannerStack } from './BannerStackProvider'
 import { cn } from 'ui'
+
+import { useBannerStack } from './BannerStackProvider'
 
 export const BannerStack = () => {
   const { banners } = useBannerStack()

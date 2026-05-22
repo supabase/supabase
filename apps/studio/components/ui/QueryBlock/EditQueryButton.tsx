@@ -1,16 +1,7 @@
 import { useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
-import useNewQuery from 'components/interfaces/SQLEditor/hooks'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Edit } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentProps } from 'react'
-import { editorPanelState } from 'state/editor-panel-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   cn,
   DropdownMenu,
@@ -21,6 +12,15 @@ import {
 } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import useNewQuery from '@/components/interfaces/SQLEditor/hooks'
+import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { editorPanelState } from '@/state/editor-panel-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 interface EditQueryButtonProps {
   id?: string

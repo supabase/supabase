@@ -1,11 +1,4 @@
 import { useParams } from 'common'
-import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
-import { RestoreToNewProject } from 'components/interfaces/Database/RestoreToNewProject/RestoreToNewProject'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -15,6 +8,14 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/DatabaseBackupsNav'
+import { RestoreToNewProject } from '@/components/interfaces/Database/RestoreToNewProject/RestoreToNewProject'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   const { ref } = useParams()

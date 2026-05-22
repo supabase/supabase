@@ -28,6 +28,10 @@ function getBearerToken(req: NextApiRequest) {
   return match?.[1]?.trim() ?? null
 }
 
+export const config = {
+  maxDuration: 300, // 5 minutes, since the installation process can take a while even if happening in background
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Hide endpoint if the integration is disabled.
   if (!(await isStripeSyncEnabled())) {

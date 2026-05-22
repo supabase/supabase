@@ -1,7 +1,8 @@
 import { expect, Page } from '@playwright/test'
-import { waitForApiResponse } from './wait-for-response.js'
-import { toUrl } from './to-url.js'
+
 import { dismissToastsIfAny } from './dismiss-toast.js'
+import { toUrl } from './to-url.js'
+import { waitForApiResponse } from './wait-for-response.js'
 
 /**
  * Navigates to a the storage home view
@@ -97,16 +98,13 @@ export const deleteBucket = async (page: Page, ref: string, bucketName: string) 
   await page.getByRole('button', { name: 'Delete bucket' }).click()
   await apiPromise
 
-  // Verify bucket was deleted - should redirect to files page
-  await expect(page, 'Should redirect to storage files page after deletion').toHaveURL(
-    new RegExp(`/storage/files$`)
-  )
-
-  // Verify bucket is no longer in the list
+  // Verify bucket is no longer in the list. The post-delete redirect to
+  // /storage/files can race other history updates, so asserting the row
+  // is gone is a more stable signal that the delete actually succeeded.
   await expect(
     page.getByRole('row').filter({ hasText: bucketName }),
     `Bucket ${bucketName} should not be visible after deletion`
-  ).not.toBeVisible()
+  ).not.toBeVisible({ timeout: 10000 })
 }
 
 /**
@@ -175,14 +173,14 @@ export const uploadFile = async (page: Page, filePath: string, fileName: string)
   const fileInput = page.locator('input[type="file"]')
   await fileInput.setInputFiles(filePath)
 
-  // Wait for upload to complete - file should appear in the explorer
-  await page.waitForTimeout(15_000) // Allow time for upload to process
-
+  await expect(page.getByRole('status')).not.toBeVisible()
   // Verify file appears in the explorer by title
   await expect(
     page.getByTitle(fileName),
     `File ${fileName} should be visible in explorer after upload`
   ).toBeVisible()
+  // Verify its action button is visible too as it means the upload is indeed complete
+  await expect(page.getByRole('button', { name: `${fileName} actions` })).toBeVisible()
 }
 
 /**

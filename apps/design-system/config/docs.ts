@@ -118,6 +118,16 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Collapsible Alert',
+          href: '/docs/fragments/collapsible-alert',
+          items: [],
+        },
+        {
+          title: 'Collapsible Card Section',
+          href: '/docs/fragments/collapsible-card-section',
+          items: [],
+        },
+        {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
           items: [],
@@ -128,13 +138,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Modal',
-          href: '/docs/fragments/modal',
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
           items: [],
         },
         {
-          title: 'Page Container',
-          href: '/docs/fragments/page-container',
+          title: 'Page Breadcrumbs',
+          href: '/docs/fragments/page-breadcrumbs',
+          items: [],
+        },
+        {
+          title: 'Page Nav',
+          href: '/docs/fragments/page-nav',
           items: [],
         },
         {
@@ -210,6 +225,16 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Status Codes',
           href: '/docs/fragments/status-codes',
+          items: [],
+        },
+        {
+          title: 'Key/Value Field Array',
+          href: '/docs/fragments/key-value-field-array',
+          items: [],
+        },
+        {
+          title: 'Single Value Field Array',
+          href: '/docs/fragments/single-value-field-array',
           items: [],
         },
       ],
@@ -500,6 +525,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Expanding Textarea',
           href: '/docs/components/expanding-textarea',
+          items: [],
+        },
+        {
+          title: 'Keyboard Shortcut',
+          href: '/docs/components/keyboard-shortcut',
           items: [],
         },
       ],

@@ -1,27 +1,28 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FileExplorerAndEditor } from 'components/ui/FileExplorerAndEditor'
-import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import { isEqual } from 'lodash'
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
+import { DeployEdgeFunctionWarningModal } from '@/components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
+import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
+import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
@@ -162,13 +163,31 @@ const CodePage = () => {
 
       {isErrorLoadingFiles && (
         <div className="flex flex-col items-center justify-center h-full bg-surface-200">
-          <div className="flex flex-col items-center text-center gap-2 max-w-md">
+          <div className="flex flex-col items-center text-center gap-3 max-w-md">
             <AlertCircle size={24} strokeWidth={1.5} className="text-amber-900" />
             <h3 className="text-md mt-4">Failed to load function code</h3>
             <p className="text-sm text-foreground-light">
               {filesError?.message ||
                 'There was an error loading the function code. The format may be invalid or the function may be corrupted.'}
             </p>
+            <div className="text-sm text-foreground-light border-t border-border-muted pt-3 mt-2">
+              <p className="font-medium mb-2">To resolve this issue:</p>
+              <ol className="text-left space-y-1">
+                <li>1. Update to the latest Supabase CLI version</li>
+                <li>
+                  2. Redeploy your function using:{' '}
+                  <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                    supabase functions deploy
+                  </code>
+                </li>
+                <li>
+                  3. Or use the{' '}
+                  <InlineLink href="https://supabase.com/docs/reference/api/v1-deploy-a-function">
+                    Management API
+                  </InlineLink>
+                </li>
+              </ol>
+            </div>
           </div>
         </div>
       )}

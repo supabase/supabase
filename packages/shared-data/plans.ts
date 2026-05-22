@@ -1,7 +1,7 @@
 export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
 export interface PricingInformation {
-  id: string
+  id: 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'
   planId: PlanId
   name: string
   nameBadge?: string
@@ -79,7 +79,7 @@ export const plans: PricingInformation[] = [
     priceMonthly: 599,
     description: 'Add features such as SSO, control over backups, and industry certifications.',
     features: [
-      'SOC2',
+      'SOC2 & ISO 27001',
       'Project-scoped and read-only access',
       'HIPAA available as paid add-on',
       'SSO for Supabase Dashboard',

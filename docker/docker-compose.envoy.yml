@@ -1,0 +1,51 @@
+# Envoy override for Kong
+# Usage: docker compose -f docker-compose.yml -f docker-compose.envoy.yml up
+
+services:
+  # Disable the original Kong service
+  kong:
+    profiles:
+      - disabled
+
+  # Rewire dependencies that require Kong to Envoy
+  functions:
+    depends_on: !override
+      api-gw:
+        condition: service_healthy
+
+  # Envoy API gateway
+  api-gw:
+    container_name: supabase-envoy
+    image: envoyproxy/envoy:v1.37.2
+    restart: unless-stopped
+    ports:
+      - ${KONG_HTTP_PORT}:8000/tcp
+    volumes:
+      - ./volumes/api/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ./volumes/api/envoy/cds.yaml:/etc/envoy/cds.yaml:ro
+      - ./volumes/api/envoy/lds.template.yaml:/etc/envoy/lds.template.yaml:ro
+      - ./volumes/api/envoy/docker-entrypoint.sh:/docker-entrypoint.sh:ro
+    depends_on:
+      studio:
+        condition: service_healthy
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY:-}
+      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:-}
+      ANON_KEY_ASYMMETRIC: ${ANON_KEY_ASYMMETRIC:-}
+      SERVICE_ROLE_KEY_ASYMMETRIC: ${SERVICE_ROLE_KEY_ASYMMETRIC:-}
+      DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
+      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+    entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
+    healthcheck:
+      # Using a TCP port check because this image does not include curl or wget.
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/8000'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      default:
+        aliases:
+          - kong
+          - envoy

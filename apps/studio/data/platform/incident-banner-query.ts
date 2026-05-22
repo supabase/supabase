@@ -37,8 +37,5 @@ export const incidentBannerQueryOptions = () =>
     // long retry delays.
     retryDelay: (attemptIndex) => Math.min(1000 * 4 ** attemptIndex, 1000 * 60 * 5),
     staleTime: 1000 * 60 * 5,
-    // temporarily disable incident status queries until we have the capacity to handle potential increased load
-    // from retries.
-    enabled: false,
-    // enabled: IS_PLATFORM,
+    enabled: IS_PLATFORM,
   })

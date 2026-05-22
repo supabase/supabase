@@ -49,7 +49,7 @@ Creating a client for the Web is as easy as passing the `accessToken` async func
 ```dart
 await Supabase.initialize(
   url: supabaseUrl,
-  anonKey: supabaseKey,
+  publishableKey: publishableKey,
   debug: false,
   accessToken: () async {
     final token = await FirebaseAuth.instance.currentUser?.getIdToken();

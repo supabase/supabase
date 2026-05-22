@@ -14,6 +14,7 @@ export const authFieldLabels: Record<
   mailer_autoconfirm: 'Confirm Email',
   mailer_secure_email_change_enabled: 'Secure Email Change',
   security_update_password_require_reauthentication: 'Secure Password Change',
+  security_update_password_require_current_password: 'Require Password Change',
   password_hibp_enabled: 'Prevent Leaked Passwords',
   password_min_length: 'Minimum Password Length',
   password_required_characters: {
@@ -111,6 +112,12 @@ export const authEmailProviderSchema = z
       .optional()
       .describe(
         'Users will need to be recently logged in to change their password without requiring reauthentication. (A user is considered recently logged in if the session was created within the last 24 hours.) If disabled, a user can change their password at any time.'
+      ),
+    security_update_password_require_current_password: z
+      .boolean()
+      .optional()
+      .describe(
+        'Users will need to provide their current password in order to change their password. Works alongside security_update_password_require_reauthentication and both can be enabled at the same time.'
       ),
     password_hibp_enabled: z
       .boolean()

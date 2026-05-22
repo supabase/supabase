@@ -53,12 +53,12 @@ Deno.serve(async (req) => {
     const parsedData = JSON.parse(jsonString)
     console.log(parsedData)
     const image = parsedData.images[0]
-
+    const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
     const supabaseClient = createClient(
       // Supabase API URL - env var exported by default.
       Deno.env.get('SUPABASE_URL')!,
-      // Supabase API ANON KEY - env var exported by default.
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      // Supabase API SECRET KEY - env var exported by default.
+      Deno.env.get(SUPABASE_SECRET_KEYS['default'])!
     )
 
     const { data: upload, error: uploadError } = await supabaseClient.storage

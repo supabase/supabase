@@ -1,6 +1,6 @@
-import type { IntegrationsData } from 'data/integrations/integrations-query'
-import type { IntegrationName } from 'data/integrations/integrations.types'
-import type { Organization } from 'types'
+import type { IntegrationsData } from '@/data/integrations/integrations-query'
+import type { IntegrationName } from '@/data/integrations/integrations.types'
+import type { Organization } from '@/types'
 
 export function getHasInstalledObject({
   integrationName,

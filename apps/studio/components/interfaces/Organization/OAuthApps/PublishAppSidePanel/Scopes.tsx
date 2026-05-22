@@ -1,7 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { ChevronDown } from 'lucide-react'
 import { Dispatch, PropsWithChildren, SetStateAction } from 'react'
-
 import {
   Button,
   DropdownMenu,
@@ -11,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps.constants'
 
 const ScopeDropdownCheckboxItem = ({
@@ -113,6 +113,14 @@ export const ScopesPanel = ({
         description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
         readScopeName={OAuthScope.ANALYTICS_READ}
         writeScopeName={OAuthScope.ANALYTICS_WRITE}
+        scopes={scopes}
+        setScopes={setScopes}
+      />
+      <Scope
+        title="Analytics Config"
+        description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
+        readScopeName={OAuthScope.ANALYTICS_CONFIG_READ}
+        writeScopeName={OAuthScope.ANALYTICS_CONFIG_WRITE}
         scopes={scopes}
         setScopes={setScopes}
       />

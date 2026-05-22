@@ -1,5 +1,5 @@
-import type { ConnectionStringPooler } from './Connect.types'
 import type { ConnectionStringMethod } from './Connect.constants'
+import type { ConnectionStringPooler } from './Connect.types'
 
 export const DEFAULT_PORT = '5432'
 export const PASSWORD_PLACEHOLDER = '[YOUR-PASSWORD]'
@@ -18,8 +18,10 @@ export const resolveConnectionString = ({
 }: {
   connectionMethod: ConnectionStringMethod
   useSharedPooler: boolean
-  connectionStringPooler: ConnectionStringPooler
+  connectionStringPooler: ConnectionStringPooler | undefined
 }) => {
+  if (!connectionStringPooler) return ''
+
   if (connectionMethod === 'direct') {
     return connectionStringPooler.direct ?? ''
   }

@@ -1,8 +1,9 @@
-import { PlanId } from 'data/subscriptions/types'
+import { literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import dayjs from 'dayjs'
 
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import { PlanId } from '@/data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 
@@ -76,6 +77,10 @@ export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
 export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_start: REPORTS_DATEPICKER_HELPERS[0].calcFrom(),
   iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
+}
+
+function rewriteWhereToAnd(sql: SafeSqlFragment): SafeSqlFragment {
+  return sql.replace(/^WHERE/, 'AND') as SafeSqlFragment
 }
 
 export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
@@ -380,7 +385,13 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
         -- reports-query-performance-most-frequently-invoked
 set search_path to public, extensions;
 
@@ -410,7 +421,7 @@ select
       else 0
     end as cache_hit_rate${
       runIndexAdvisor
-        ? `,
+        ? safeSql`,
     case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
@@ -426,18 +437,24 @@ select
       )
       else null
     end as index_advisor_result`
-        : ''
+        : safeSql``
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   -- skip queries that were never actually executed
-  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-  ${orderBy || 'order by statements.calls desc'}
+  WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+  ${orderBy || safeSql`order by statements.calls desc`}
   limit 20`,
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        safeSql: (
+          _,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
         -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
@@ -459,7 +476,7 @@ select
       0
     ) as prop_total_time${
       runIndexAdvisor
-        ? `,
+        ? safeSql`,
     case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
@@ -475,18 +492,24 @@ select
       )
       else null
     end as index_advisor_result`
-        : ''
+        : safeSql``
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   -- skip queries that were never actually executed
-  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-  ${orderBy || 'order by total_time desc'}
+  WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+  ${orderBy || safeSql`order by total_time desc`}
   limit 20`,
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
         -- reports-query-performance-slowest-execution-time
 set search_path to public, extensions;
 
@@ -506,7 +529,7 @@ select
     -- mean_time,
     coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows${
       runIndexAdvisor
-        ? `,
+        ? safeSql`,
     case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
@@ -522,18 +545,18 @@ select
       )
       else null
     end as index_advisor_result`
-        : ''
+        : safeSql``
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   -- skip queries that were never actually executed
-  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-  ${orderBy || 'order by max_time desc'}
+  WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+  ${orderBy || safeSql`order by max_time desc`}
   limit 20`,
       },
       queryHitRate: {
         queryType: 'db',
-        sql: (_params) => `-- reports-query-performance-cache-and-index-hit-rate
+        safeSql: (_params) => safeSql`-- reports-query-performance-cache-and-index-hit-rate
 select
     'index hit rate' as name,
     (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) as ratio
@@ -546,8 +569,26 @@ select
       },
       unified: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => {
-          const baseQuery = `
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          filterIndexAdvisor = false,
+          page = 1,
+          pageSize = 20
+        ) => {
+          const offset = (page - 1) * pageSize
+          // When filtering by index suggestions we need a larger scan window since we don't
+          // know how many rows will match. Cap at a reasonable upper bound to avoid running
+          // index_advisor() across the entire dataset on any code path where it's active.
+          const INDEX_ADVISOR_SCAN_CAP = 500
+          const baseScanTarget =
+            filterIndexAdvisor && runIndexAdvisor ? offset + pageSize * 10 : offset + pageSize
+          const baseCteLimit = runIndexAdvisor
+            ? Math.min(baseScanTarget, INDEX_ADVISOR_SCAN_CAP)
+            : baseScanTarget
+          const baseQuery = safeSql`
         -- reports-query-performance-unified
         set search_path to public, extensions;
 
@@ -584,15 +625,15 @@ select
           from pg_stat_statements as statements
             inner join pg_authid as auth on statements.userid = auth.oid
           -- skip queries that were never actually executed
-          WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-          ${orderBy || 'order by total_time desc'}
-          limit 50
+          WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+          ${orderBy || safeSql`order by total_time desc`}
+          ${baseCteLimit !== null ? safeSql`limit ${literal(baseCteLimit)}` : safeSql``}
         ),
         query_results as (
           select
             base.*${
               runIndexAdvisor
-                ? `,
+                ? safeSql`,
             case
               when (lower(base.query) like 'select%' or lower(base.query) like 'with pgrst%')
               then (
@@ -608,22 +649,22 @@ select
               )
               else null
             end as index_advisor_result`
-                : ''
+                : safeSql``
             }
           from base
         )
         select *
         from query_results
-        ${filterIndexAdvisor && runIndexAdvisor ? `where (index_advisor_result->>'has_suggestion')::boolean = true` : ''}
-        ${orderBy || 'order by total_time desc'}
-        limit 20`
+        ${filterIndexAdvisor && runIndexAdvisor ? safeSql`where (index_advisor_result->>'has_suggestion')::boolean = true` : safeSql``}
+        ${orderBy || safeSql`order by total_time desc`}
+        limit ${literal(pageSize)} offset ${literal(offset)}`
 
           return baseQuery
         },
       },
       slowQueriesCount: {
         queryType: 'db',
-        sql: () => `
+        safeSql: () => safeSql`
         -- reports-query-performance-slow-queries-count
         set search_path to public, extensions;
 
@@ -636,7 +677,13 @@ select
       },
       queryMetrics: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          _runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
         -- reports-query-performance-metrics
         set search_path to public, extensions;
 
@@ -652,8 +699,8 @@ select
           ) || '%' as cache_hit_rate
         FROM pg_stat_statements as statements
         -- skip queries that were never actually executed
-        WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-        ${orderBy || ''}`,
+        WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+        ${orderBy || safeSql``}`,
       },
     },
   },
@@ -662,7 +709,7 @@ select
     queries: {
       largeObjects: {
         queryType: 'db',
-        sql: (_) => `-- reports-database-large-objects
+        safeSql: (_) => safeSql`-- reports-database-large-objects
 SELECT
         SCHEMA_NAME,
         relname,

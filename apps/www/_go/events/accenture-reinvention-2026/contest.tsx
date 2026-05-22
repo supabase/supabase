@@ -1,6 +1,11 @@
 import type { GoPageInput } from 'marketing'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
+
+import authors from '@/lib/authors.json'
+
+const speaker = authors.find((a) => a.author_id === 'pedro_rodrigues')
 
 const page: GoPageInput = {
   template: 'lead-gen',
@@ -31,6 +36,62 @@ const page: GoPageInput = {
     ],
   },
   sections: [
+    {
+      type: 'single-column',
+      title: 'What AI-Native Companies Figured Out About Infrastructure',
+      children: (
+        <div className="flex flex-col items-center gap-8">
+          {speaker && (
+            <div className="flex flex-col items-center gap-4">
+              {speaker.author_image_url && (
+                <Image
+                  src={speaker.author_image_url}
+                  alt={speaker.author}
+                  width={192}
+                  height={192}
+                  className="rounded-full object-cover aspect-square w-48 h-48"
+                />
+              )}
+              <div className="flex flex-col items-center gap-0">
+                <p className="text-foreground-light font-medium text-center">
+                  {speaker.author}
+                  {speaker.position && `, ${speaker.position}`}
+                </p>
+                <p className="text-foreground-lighter text-sm text-center">Supabase</p>
+              </div>
+            </div>
+          )}
+          <p className="text-foreground-light text-lg text-center">
+            Enterprise AI initiatives stall not because of the models, but because of the
+            infrastructure underneath. While enterprises spend months provisioning backends for each
+            AI project, AI native companies do it in seconds for millions of users. This session
+            examines the infrastructure pattern that makes this possible and shows how enterprises
+            can adopt it to accelerate AI initiatives, enable agentic workflows safely, and build AI
+            native products for their teams and customers.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button asChild type="primary" size="medium">
+              <Link
+                href="https://supabase.com/docs/guides/getting-started/ai-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Learn about Supabase AI Tools
+              </Link>
+            </Button>
+            <Button asChild type="default" size="medium">
+              <Link
+                href="https://supabase.link/accenture-reinvention-2026-slides"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Download Slides
+              </Link>
+            </Button>
+          </div>
+        </div>
+      ),
+    },
     {
       type: 'single-column',
       id: 'how-to-enter',

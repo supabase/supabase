@@ -1,17 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
-import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { useMemo } from 'react'
+
+import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
+import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
+import { LogsTableName } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type {
   EventChart,
   EventChartData,
   Filters,
   LogsEndpointParams,
-} from 'components/interfaces/Settings/Logs/Logs.types'
-import { genChartQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get } from 'data/fetchers'
-import { useMemo } from 'react'
-
-import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
-import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
+} from '@/components/interfaces/Settings/Logs/Logs.types'
+import { genChartQuery } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { get } from '@/data/fetchers'
 
 interface ProjectUsageStatsHookResult {
   error: string | Object | null

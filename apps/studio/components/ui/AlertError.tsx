@@ -1,9 +1,10 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useTrack } from 'lib/telemetry/track'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface AlertErrorProps {
   projectRef?: string

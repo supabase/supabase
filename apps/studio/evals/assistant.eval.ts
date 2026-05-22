@@ -1,21 +1,23 @@
 import assert from 'node:assert'
-import { openai } from '@ai-sdk/openai'
 import { Eval } from 'braintrust'
-import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
-import { getMockTools } from 'lib/ai/tools/mock-tools'
 
 import { dataset } from './dataset'
-import { buildAssistantEvalOutput } from './output'
 import {
   completenessScorer,
   concisenessScorer,
   correctnessScorer,
   docsFaithfulnessScorer,
   goalCompletionScorer,
+  knowledgeUsageScorer,
+  safetyScorer,
   toolUsageScorer,
   urlValidityScorer,
 } from './scorer'
 import { sqlIdentifierQuotingScorer, sqlSyntaxScorer } from './scorer-wasm'
+import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_ASSISTANT_BASE_MODEL_ID, getAssistantModelEntry } from '@/lib/ai/model.utils'
+import { getMockTools } from '@/lib/ai/tools/mock-tools'
 
 assert(process.env.BRAINTRUST_PROJECT_ID, 'BRAINTRUST_PROJECT_ID is not set')
 assert(process.env.OPENAI_API_KEY, 'OPENAI_API_KEY is not set')
@@ -25,19 +27,28 @@ Eval('Assistant', {
   trialCount: process.env.CI ? 3 : 1,
   data: () => dataset,
   task: async (input) => {
+    const modelEntry = getAssistantModelEntry(DEFAULT_ASSISTANT_BASE_MODEL_ID)
+    const modelResponse = await getModel({ provider: 'openai', modelEntry })
+    if (modelResponse.error) throw modelResponse.error
+
     const result = await generateAssistantResponse({
-      model: openai('gpt-5-mini'),
-      messages: [{ id: '1', role: 'user', parts: [{ type: 'text', text: input.prompt }] }],
+      ...modelResponse.modelParams,
+      messages: [
+        {
+          id: '1',
+          role: 'user',
+          parts: [{ type: 'text', text: input.prompt }],
+        },
+      ],
       tools: await getMockTools(input.mockTables ? { list_tables: input.mockTables } : undefined),
     })
 
-    // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
-    const [finishReason, steps] = await Promise.all([result.finishReason, result.steps])
-
-    return buildAssistantEvalOutput(finishReason, steps)
+    const finishReason = await result.finishReason
+    return { finishReason }
   },
   scores: [
     toolUsageScorer,
+    knowledgeUsageScorer,
     sqlSyntaxScorer,
     sqlIdentifierQuotingScorer,
     goalCompletionScorer,
@@ -45,6 +56,7 @@ Eval('Assistant', {
     completenessScorer,
     docsFaithfulnessScorer,
     correctnessScorer,
+    safetyScorer,
     urlValidityScorer,
   ],
 })

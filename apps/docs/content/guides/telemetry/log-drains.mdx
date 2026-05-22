@@ -47,7 +47,7 @@ Unsigned requests to HTTP endpoints are temporary and all requests will signed i
 
 1. Create and deploy the edge function
 
-Generate a new edge function template and update it to log out the received JSON payload. For simplicity, we will accept any request with an Anon Key.
+Generate a new edge function template and update it to log out the received JSON payload. For simplicity, we will accept any request with a Publishable Key.
 
 ```bash
 supabase functions new hello-world
@@ -86,7 +86,7 @@ Create an HTTP drain under the [Project Settings > Log Drains](/dashboard/projec
 
 - Disable the Gzip, as we want to receive the payload without compression.
 - Under URL, set it to your edge function URL `https://[PROJECT REF].supabase.co/functions/v1/hello-world`
-- Under Headers, set the `Authorization: Bearer [ANON KEY]`
+- Under Headers, set the `Authorization: Bearer [PUBLISHABLE KEY]`
 
 <ProjectConfigVariables variable="publishableKey" />
 

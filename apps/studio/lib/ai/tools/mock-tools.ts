@@ -1,8 +1,9 @@
-import { tool, type ToolSet } from 'ai'
-import { getRenderingTools } from '../tools/rendering-tools'
-import { z } from 'zod'
-import { getMcpTools } from 'lib/ai/tools/mcp-tools'
 import assert from 'node:assert'
+import { tool } from 'ai'
+import { z } from 'zod'
+
+import { getStudioTools } from '../tools/studio-tools'
+import { getMcpTools } from '@/lib/ai/tools/mcp-tools'
 
 const listTablesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to list.'),
@@ -64,6 +65,7 @@ export const MOCK_TABLES_DATA = [
 const MOCK_EXTENSIONS_DATA = [
   { name: 'pgcrypto', schema: 'extensions', installed_version: '1.3' },
   { name: 'uuid-ossp', schema: 'extensions', installed_version: '1.1' },
+  { name: 'pg_cron', schema: 'pg_catalog', installed_version: '1.6.4' },
 ]
 
 const MOCK_EDGE_FUNCTIONS_DATA = [
@@ -142,31 +144,31 @@ const MOCK_LOGS_DATA = [
   },
 ]
 
-function createMockedRenderingTools() {
-  const renderingTools = getRenderingTools()
+function createMockedStudioTools() {
+  const studioTools = getStudioTools()
 
   return Object.fromEntries(
-    Object.entries(renderingTools).map(([name, baseTool]) => {
+    Object.entries(studioTools).map(([name, baseTool]) => {
+      // Always mock execute_sql and deploy_edge_function with needsApproval disabled
+      if (name === 'execute_sql') {
+        return [name, { ...baseTool, needsApproval: false, execute: async () => [] as unknown[] }]
+      }
+      if (name === 'deploy_edge_function') {
+        return [
+          name,
+          { ...baseTool, needsApproval: false, execute: async () => ({ success: true }) },
+        ]
+      }
       if (typeof baseTool.execute === 'function') {
         return [name, baseTool]
       }
 
-      const statusMessage =
-        name === 'execute_sql'
-          ? 'SQL execution mocked successfully.'
-          : name === 'deploy_edge_function'
-            ? 'Edge Function deployment mocked successfully.'
-            : 'Tool call mocked successfully.'
-
       return [
         name,
-        {
-          ...baseTool,
-          execute: async () => ({ status: statusMessage }),
-        },
+        { ...baseTool, execute: async () => ({ status: 'Tool call mocked successfully.' }) },
       ]
     })
-  ) as typeof renderingTools
+  ) as typeof studioTools
 }
 
 function createMockListTablesTool(overrideData?: Record<string, typeof MOCK_TABLES_DATA>) {
@@ -305,7 +307,7 @@ export type MockToolOverrides = {
  * Note: search_docs uses the real implementation
  */
 export async function getMockTools(overrides?: MockToolOverrides) {
-  const mockedRenderingTools = createMockedRenderingTools()
+  const mockedStudioTools = createMockedStudioTools()
 
   const { search_docs } = await getMcpTools({
     accessToken: 'mock-access-token',
@@ -316,7 +318,7 @@ export async function getMockTools(overrides?: MockToolOverrides) {
   assert(search_docs, 'search_docs tool not available from MCP server')
 
   return {
-    ...mockedRenderingTools,
+    ...mockedStudioTools,
     search_docs,
     list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),

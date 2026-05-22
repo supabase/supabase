@@ -22,7 +22,10 @@ export const test = base.extend<TestOptions>({
   page: async ({ page }, use) => {
     const ref = env.PROJECT_REF ?? 'default'
     await page.addInitScript((ref) => {
-      localStorage.setItem(`table-editor-new-filter-banner-dismissed-${ref}`, JSON.stringify(true))
+      localStorage.setItem(
+        `table-editor-queue-operations-banner-dismissed-${ref}`,
+        JSON.stringify(true)
+      )
     }, ref)
     await use(page)
   },

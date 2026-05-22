@@ -1,41 +1,37 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, useParams } from 'common'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { withAuth } from 'hooks/misc/withAuth'
-import { DOCS_URL } from 'lib/constants'
-import { Download, FileArchive, Send } from 'lucide-react'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { Clock, Download, FileArchive, Send } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
   Button,
+  copyToClipboard,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   NavMenu,
   NavMenuItem,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Separator,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageHeader,
   PageHeaderAside,
   PageHeaderBreadcrumb,
+  PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderNavigationTabs,
   PageHeaderSummary,
@@ -44,6 +40,23 @@ import {
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
+import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
+import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
+import CopyButton from '@/components/ui/CopyButton'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
+import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+dayjs.extend(relativeTime)
 
 interface EdgeFunctionDetailsLayoutProps {
   title: string
@@ -58,19 +71,21 @@ const EdgeFunctionDetailsLayout = ({
   const { functionSlug, ref } = useParams()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
     '*'
   )
 
   const [isOpen, setIsOpen] = useState(false)
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false)
+  const [isTimestampHoverCardOpen, setIsTimestampHoverCardOpen] = useState(false)
 
   const {
     data: selectedFunction,
     error,
     isError,
   } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
+  const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
 
   const { data: functionBody = { version: 0, files: [] }, error: filesError } =
     useEdgeFunctionBodyQuery(
@@ -91,6 +106,14 @@ const EdgeFunctionDetailsLayout = ({
     )
 
   const name = selectedFunction?.name || ''
+  const functionUrl =
+    endpoint && selectedFunction?.slug ? `${endpoint}/functions/v1/${selectedFunction.slug}` : ''
+  const createdRelative = selectedFunction?.created_at
+    ? dayjs(selectedFunction.created_at).fromNow()
+    : undefined
+  const updatedRelative = selectedFunction?.updated_at
+    ? dayjs(selectedFunction.updated_at).fromNow()
+    : undefined
   const browserTitle = {
     entity: functionSlug ? name || functionSlug : undefined,
     section: title,
@@ -126,12 +149,12 @@ const EdgeFunctionDetailsLayout = ({
             ]
           : []),
         {
-          label: 'Details',
-          href: `/project/${ref}/functions/${functionSlug}/details`,
-        },
-        {
           label: 'Code',
           href: `/project/${ref}/functions/${functionSlug}/code`,
+        },
+        {
+          label: 'Settings',
+          href: `/project/${ref}/functions/${functionSlug}/details`,
         },
       ]
     : []
@@ -217,6 +240,36 @@ const EdgeFunctionDetailsLayout = ({
     }
   }, [isError])
 
+  const openTestSheet = () => {
+    if (!functionSlug) return
+    setIsOpen(true)
+    if (IS_PLATFORM) {
+      sendEvent({
+        action: 'edge_function_test_side_panel_opened',
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: org?.slug ?? 'Unknown',
+        },
+      })
+    }
+  }
+
+  const copyFunctionUrl = () => {
+    if (!functionUrl) return
+    copyToClipboard(functionUrl)
+    toast.success('Function URL copied to clipboard')
+  }
+
+  useFunctionsDetailShortcuts({
+    projectRef: ref,
+    functionSlug,
+    canReadFunctions,
+    isPlatform: IS_PLATFORM,
+    onOpenTest: openTestSheet,
+    onOpenDownload: () => setIsDownloadOpen((prev) => !prev),
+    onCopyUrl: copyFunctionUrl,
+  })
+
   if (!isLoading && !canReadFunctions) {
     return (
       <ProjectLayout product="Edge Functions" browserTitle={browserTitle}>
@@ -228,7 +281,7 @@ const EdgeFunctionDetailsLayout = ({
   return (
     <EdgeFunctionsLayout title={title} browserTitle={browserTitle}>
       <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader size="full" className="sticky top-0 z-10 bg-background">
+        <PageHeader size="full" className="sticky top-0 z-10 bg-surface-75">
           {breadcrumbItems.length > 0 && (
             <PageHeaderBreadcrumb>
               <BreadcrumbList>
@@ -253,28 +306,80 @@ const EdgeFunctionDetailsLayout = ({
           <PageHeaderMeta>
             <PageHeaderSummary>
               <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
+              <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm!">
+                <div className="flex items-center gap-x-2">
+                  <span className="flex items-center gap-2">{functionUrl}</span>
+                  <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL} side="bottom">
+                    <CopyButton iconOnly type="text" text={functionUrl} />
+                  </ShortcutTooltip>
+                </div>
+
+                <HoverCard
+                  openDelay={250}
+                  closeDelay={100}
+                  open={isTimestampHoverCardOpen}
+                  onOpenChange={setIsTimestampHoverCardOpen}
+                >
+                  <HoverCardTrigger asChild>
+                    <button type="button" className="flex items-center gap-2 group">
+                      <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                      <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
+                        {updatedRelative ?? 'Deploy status unavailable'}
+                      </span>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent side="bottom" align="start" className="w-40 p-0">
+                    {createdRelative && (
+                      <div className="px-4 py-2 space-y-1">
+                        <h3 className="heading-meta text-foreground-light">Created</h3>
+                        {!!selectedFunction && (
+                          <TimestampInfo
+                            className="text-sm"
+                            label={createdRelative}
+                            utcTimestamp={selectedFunction.created_at}
+                          />
+                        )}
+                      </div>
+                    )}
+                    {updatedRelative && (
+                      <div className="px-4 py-2 space-y-1">
+                        <h3 className="heading-meta text-foreground-light">Last deployed</h3>
+                        {!!selectedFunction && (
+                          <TimestampInfo
+                            className="text-sm"
+                            label={updatedRelative}
+                            utcTimestamp={selectedFunction.updated_at}
+                          />
+                        )}
+                      </div>
+                    )}
+                    {selectedFunction?.version !== undefined && (
+                      <div className="px-4 py-2 space-y-1">
+                        <h3 className="heading-meta text-foreground-light">Deployments</h3>
+                        <p className="text-sm text-foreground">{selectedFunction.version}</p>
+                      </div>
+                    )}
+                  </HoverCardContent>
+                </HoverCard>
+              </PageHeaderDescription>
             </PageHeaderSummary>
 
             <PageHeaderAside>
               <div className="flex items-center space-x-2">
-                {isNewAPIDocsEnabled && (
-                  <APIDocsButton
-                    section={
-                      functionSlug !== undefined
-                        ? ['edge-functions', functionSlug]
-                        : ['edge-functions']
-                    }
-                    source="edge-functions"
-                  />
-                )}
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Popover_Shadcn_>
-                  <PopoverTrigger_Shadcn_ asChild>
-                    <Button type="default" icon={<Download />}>
-                      Download
-                    </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ align="end" className="p-0">
+                <Popover open={isDownloadOpen} onOpenChange={setIsDownloadOpen}>
+                  <ShortcutTooltip
+                    shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_DOWNLOAD}
+                    side="bottom"
+                    open={isDownloadOpen ? false : undefined}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button type="default" icon={<Download />}>
+                        Download
+                      </Button>
+                    </PopoverTrigger>
+                  </ShortcutTooltip>
+                  <PopoverContent align="end" className="p-0">
                     {IS_PLATFORM && (
                       <>
                         <div className="p-3 flex flex-col gap-y-2">
@@ -288,7 +393,7 @@ const EdgeFunctionDetailsLayout = ({
                             value={`supabase functions download ${functionSlug}`}
                           />
                         </div>
-                        <Separator className="!bg-border-overlay" />
+                        <Separator className="bg-border-overlay!" />
                       </>
                     )}
                     <div className="py-2 px-1">
@@ -301,27 +406,17 @@ const EdgeFunctionDetailsLayout = ({
                         Download as ZIP
                       </Button>
                     </div>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  </PopoverContent>
+                </Popover>
                 {!!functionSlug && (
-                  <Button
-                    type="default"
-                    icon={<Send />}
-                    onClick={() => {
-                      setIsOpen(true)
-                      if (IS_PLATFORM) {
-                        sendEvent({
-                          action: 'edge_function_test_side_panel_opened',
-                          groups: {
-                            project: ref ?? 'Unknown',
-                            organization: org?.slug ?? 'Unknown',
-                          },
-                        })
-                      }
-                    }}
+                  <ShortcutTooltip
+                    shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST}
+                    side="bottom"
                   >
-                    Test
-                  </Button>
+                    <Button type="default" icon={<Send />} onClick={openTestSheet}>
+                      Test
+                    </Button>
+                  </ShortcutTooltip>
                 )}
               </div>
             </PageHeaderAside>

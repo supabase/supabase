@@ -1,4 +1,4 @@
-import { ErrorDisplay } from 'ui-patterns/ErrorDisplay'
+import { ErrorDisplay } from 'ui-patterns/ErrorDisplay/ErrorDisplay'
 
 export default function ErrorDisplayDemo() {
   return (

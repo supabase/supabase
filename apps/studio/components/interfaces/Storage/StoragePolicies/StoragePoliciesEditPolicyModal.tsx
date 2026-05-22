@@ -1,13 +1,7 @@
-import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies/Policies.constants'
-import PolicySelection from 'components/interfaces/Auth/Policies/PolicySelection'
-import PolicyTemplates from 'components/interfaces/Auth/Policies/PolicyTemplates'
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
-import { noop, pull } from 'lodash'
-import { ChevronLeft } from 'lucide-react'
+import { pull } from 'lodash'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Modal } from 'ui'
+import { Dialog, DialogContent, DialogHeader, DialogSectionSeparator, DialogTitle } from 'ui'
 
 import {
   applyBucketIdToTemplateDefinition,
@@ -17,6 +11,10 @@ import {
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
+import { StoragePolicyEditorModalTitle } from './StoragePolicyEditorModalTitle'
+import { POLICY_MODAL_VIEWS } from '@/components/interfaces/Auth/Policies/Policies.constants'
+import PolicySelection from '@/components/interfaces/Auth/Policies/PolicySelection'
+import PolicyTemplates from '@/components/interfaces/Auth/Policies/PolicyTemplates'
 
 const newPolicyTemplate: any = {
   name: '',
@@ -168,62 +166,22 @@ export const StoragePoliciesEditPolicyModal = ({
     }
   }
 
-  /* Misc components */
-
-  const StoragePolicyEditorModalTitle = ({
-    view,
-    bucketName,
-    onSelectBackFromTemplates = noop,
-  }: any) => {
-    const getTitle = () => {
-      if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
-        return `Adding new policy to ${bucketName}`
-      }
-      if (view === POLICY_MODAL_VIEWS.REVIEW) {
-        return `Reviewing policies to be created for ${bucketName}`
-      }
-    }
-    if (view === POLICY_MODAL_VIEWS.TEMPLATES) {
-      return (
-        <div>
-          <div className="flex items-center space-x-3">
-            <span
-              onClick={onSelectBackFromTemplates}
-              className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
-            >
-              <ChevronLeft strokeWidth={2} size={14} />
-            </span>
-            <h4 className="textlg m-0">Select a template to use for your new policy</h4>
-          </div>
-        </div>
-      )
-    }
-    return (
-      <div className="w-full flex items-center justify-between gap-x-2 pr-6">
-        <h4 className="m-0 truncate">{getTitle()}</h4>
-        <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
-      </div>
-    )
-  }
-
   return (
-    <Modal
-      hideFooter
-      className="[&>div:first-child]:py-3"
-      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
-      visible={visible}
-      contentStyle={{ padding: 0 }}
-      header={[
-        <StoragePolicyEditorModalTitle
-          key="0"
-          view={view}
-          bucketName={bucketName}
-          onSelectBackFromTemplates={onSelectBackFromTemplates}
-        />,
-      ]}
-      onCancel={onSelectCancel}
-    >
-      <div className="w-full">
+    <Dialog open={visible} onOpenChange={() => onSelectCancel()}>
+      <DialogContent
+        size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
+        hideClose={view !== POLICY_MODAL_VIEWS.TEMPLATES}
+      >
+        <DialogHeader>
+          <DialogTitle>
+            <StoragePolicyEditorModalTitle
+              view={view}
+              bucketName={bucketName}
+              onSelectBackFromTemplates={onSelectBackFromTemplates}
+            />
+          </DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
         {view === POLICY_MODAL_VIEWS.SELECTION ? (
           <PolicySelection
             description="PostgreSQL policies control access to your files and folders"
@@ -256,7 +214,7 @@ export const StoragePoliciesEditPolicyModal = ({
         ) : (
           <div />
         )}
-      </div>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   )
 }

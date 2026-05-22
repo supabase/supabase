@@ -1,11 +1,7 @@
+import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { MoreVertical, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-
-import { useQueryClient } from '@tanstack/react-query'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import type { Branch } from 'data/branches/branches-query'
-import { branchKeys } from 'data/branches/keys'
 import { toast } from 'sonner'
 import {
   Button,
@@ -14,6 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import type { Branch } from '@/data/branches/branches-query'
+import { branchKeys } from '@/data/branches/keys'
 
 interface ReviewRowProps {
   branch: Branch

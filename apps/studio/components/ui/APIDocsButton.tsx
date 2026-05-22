@@ -1,17 +1,19 @@
 import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BookOpenText } from 'lucide-react'
-import { useAppStateSnapshot } from 'state/app-state'
 
 import { ButtonTooltip } from './ButtonTooltip'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface APIDocsButtonProps {
   section?: string[]
   source: string
+  label?: string
+  tooltip?: string
 }
 
-export const APIDocsButton = ({ section, source }: APIDocsButtonProps) => {
+export const APIDocsButton = ({ section, source, label, tooltip }: APIDocsButtonProps) => {
   const snap = useAppStateSnapshot()
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
@@ -37,13 +39,15 @@ export const APIDocsButton = ({ section, source }: APIDocsButtonProps) => {
         })
       }}
       icon={<BookOpenText />}
-      className="w-7"
+      className={label ? undefined : 'w-7'}
       tooltip={{
         content: {
           side: 'bottom',
-          text: 'API Docs',
+          text: tooltip ?? 'API Docs',
         },
       }}
-    />
+    >
+      {label}
+    </ButtonTooltip>
   )
 }

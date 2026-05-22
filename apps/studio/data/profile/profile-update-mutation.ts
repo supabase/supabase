@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { profileKeys } from './keys'
+import { handleError, patch } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ProfileUpdateVariables = {
   firstName: string

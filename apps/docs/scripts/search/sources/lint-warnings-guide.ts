@@ -1,7 +1,11 @@
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
+import { retry } from '@octokit/plugin-retry'
 import crypto, { createHash } from 'node:crypto'
+import { OCTOKIT_RETRY_OPTIONS } from '../../../lib/octokit.constants.js'
 import { BaseLoader, BaseSource } from './base.js'
+
+const RetryOctokit = Octokit.plugin(retry)
 
 const appId = process.env.DOCS_GITHUB_APP_ID
 const installationId = process.env.DOCS_GITHUB_APP_INSTALLATION_ID
@@ -28,7 +32,7 @@ export class LintWarningsGuideLoader extends BaseLoader {
       throw new Error('Missing DOCS_GITHUB_APP_* environment variables')
     }
 
-    const octokit = new Octokit({
+    const octokit = new RetryOctokit({
       authStrategy: createAppAuth,
       auth: {
         appId,
@@ -42,6 +46,7 @@ export class LintWarningsGuideLoader extends BaseLoader {
       repo: this.repo,
       path: this.docsDir,
       ref: this.branch,
+      request: OCTOKIT_RETRY_OPTIONS,
       headers: {
         'X-GitHub-Api-Version': '2022-11-28',
       },
@@ -62,15 +67,19 @@ export class LintWarningsGuideLoader extends BaseLoader {
     // Fetch all lint files and combine them into a single guide
     const lints = await Promise.all(
       lintsList.map(async ({ path }) => {
-        const fileResponse = await fetch(
-          `https://raw.githubusercontent.com/${this.org}/${this.repo}/${this.branch}/${path}`
-        )
+        const fileResponse = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+          owner: this.org,
+          repo: this.repo,
+          path,
+          ref: this.branch,
+          request: OCTOKIT_RETRY_OPTIONS,
+        })
 
-        if (fileResponse.status >= 400) {
+        if (!('content' in fileResponse.data) || fileResponse.data.type !== 'file') {
           throw Error(`Could not get contents of file ${this.org}/${this.repo}/${path}`)
         }
 
-        const content = await fileResponse.text()
+        const content = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8')
         const basename = getBasename(path)
 
         return {

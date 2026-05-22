@@ -1,7 +1,7 @@
-import { IS_PLATFORM } from 'lib/constants'
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const ContentFile = ({ connectionStringPooler }: StepContentProps) => {
   const files = [

@@ -1,13 +1,13 @@
 import { useParams } from 'common'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
+import type { NextPageWithLayout } from '@/types'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -33,7 +33,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
 IntegrationPage.getLayout = (page) => (
   <DefaultLayout>
-    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
+    <ProjectIntegrationsLayoutDispatch>{page}</ProjectIntegrationsLayoutDispatch>
   </DefaultLayout>
 )
 

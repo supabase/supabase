@@ -101,16 +101,53 @@ export const threeColumnSectionSchema = z.object({
 
 // ----- Form field schemas -----
 
+/**
+ * Conditional visibility rule: a field is visible only when the referenced
+ * field's current value satisfies all of the supplied criteria.
+ *
+ * - `equals` / `notEquals` — strict string compare against the live value.
+ * - `in` / `notIn` — membership check against a list of values.
+ * - `truthy` — when `true`, requires a non-empty value; when `false`, requires empty.
+ *
+ * Multiple criteria within the same `showWhen` are combined with AND. Hidden
+ * fields are excluded from the submitted payload.
+ */
+export const showWhenSchema = z
+  .object({
+    field: z.string().min(1),
+    equals: z.string().optional(),
+    notEquals: z.string().optional(),
+    in: z.array(z.string()).optional(),
+    notIn: z.array(z.string()).optional(),
+    truthy: z.boolean().optional(),
+  })
+  .refine(
+    (v) =>
+      v.equals !== undefined ||
+      v.notEquals !== undefined ||
+      v.in !== undefined ||
+      v.notIn !== undefined ||
+      v.truthy !== undefined,
+    { message: 'showWhen must include at least one of: equals, notEquals, in, notIn, truthy' }
+  )
+
 const formFieldBase = z.object({
   name: z.string().min(1),
   label: z.string().min(1),
+  /** Helper text rendered beneath the input. */
+  description: z.string().optional(),
   placeholder: z.string().optional(),
   required: z.boolean().optional().default(false),
   half: z.boolean().optional().default(false),
+  showWhen: showWhenSchema.optional(),
 })
 
 export const textFieldSchema = formFieldBase.extend({
   type: z.literal('text'),
+})
+
+export const urlFieldSchema = formFieldBase.extend({
+  type: z.literal('url'),
 })
 
 export const emailFieldSchema = formFieldBase.extend({
@@ -127,20 +164,37 @@ export const selectFieldSchema = formFieldBase.extend({
   options: z.array(z.object({ label: z.string(), value: z.string() })).min(1),
 })
 
+export const checkboxFieldSchema = formFieldBase.extend({
+  type: z.literal('checkbox'),
+})
+
 export const formFieldSchema = z.discriminatedUnion('type', [
   textFieldSchema,
+  urlFieldSchema,
   emailFieldSchema,
   textareaFieldSchema,
   selectFieldSchema,
+  checkboxFieldSchema,
 ])
 
 // ----- Form CRM config schemas -----
+
+/**
+ * Matches a UUID or a bare 32-char hex ID (Notion's database IDs often come
+ * without dashes). Used for values interpolated into outbound API URLs — the
+ * `crm` config travels over the server-action wire and must be treated as
+ * untrusted input.
+ */
+const uuidLikeIdSchema = z.union([
+  z.string().uuid(),
+  z.string().regex(/^[0-9a-f]{32}$/i, 'Must be a 32-character hex ID'),
+])
 
 export const hubspotFormConfigSchema = z.object({
   /**
    * HubSpot form GUID. The portal ID is read from HUBSPOT_PORTAL_ID env var.
    */
-  formGuid: z.string().min(1),
+  formGuid: uuidLikeIdSchema,
   /**
    * Map each form field `name` to a HubSpot field name.
    * If omitted, the form field name is used as-is.
@@ -171,13 +225,35 @@ export const customerioFormConfigSchema = z.object({
   staticProperties: z.record(z.string(), z.unknown()).optional(),
 })
 
+export const notionFormConfigSchema = z.object({
+  /**
+   * Notion database ID to create a page in. The integration token is read
+   * from the NOTION_FORMS_API_KEY env var and must have write access to the database.
+   */
+  database_id: uuidLikeIdSchema,
+  /**
+   * Map each form field `name` to a Notion database column name.
+   * Only fields listed here are sent. Property types (title, rich_text,
+   * email, etc.) are auto-detected from the database schema.
+   * Example: { email_address: 'email', first_name: 'first_name' }
+   */
+  columnMap: z.record(z.string(), z.string()).optional(),
+  /**
+   * Static properties merged into the Notion page. Keys must match column
+   * names in the target database.
+   * Example: { source: 'Website Go Page' }
+   */
+  staticProperties: z.record(z.string(), z.unknown()).optional(),
+})
+
 export const formCrmConfigSchema = z
   .object({
     hubspot: hubspotFormConfigSchema.optional(),
     customerio: customerioFormConfigSchema.optional(),
+    notion: notionFormConfigSchema.optional(),
   })
-  .refine((v) => v.hubspot || v.customerio, {
-    message: 'At least one CRM provider (hubspot or customerio) must be configured',
+  .refine((v) => v.hubspot || v.customerio || v.notion, {
+    message: 'At least one CRM provider (hubspot, customerio, or notion) must be configured',
   })
 
 export const formSectionSchema = z.object({
@@ -289,6 +365,15 @@ export const quoteSectionSchema = z.object({
   avatar: imageSchema.optional(),
 })
 
+export const hubspotMeetingSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('hubspot-meeting'),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  /** The HubSpot meeting link path, e.g. "your-name/meeting-type" */
+  meetingSlug: z.string().min(1),
+})
+
 // ----- Dynamic sections -----
 
 export const goSectionSchema = z.discriminatedUnion('type', [
@@ -303,6 +388,7 @@ export const goSectionSchema = z.discriminatedUnion('type', [
   codeBlockSectionSchema,
   stepsSectionSchema,
   quoteSectionSchema,
+  hubspotMeetingSectionSchema,
 ])
 
 // ----- Page-level schemas -----
@@ -358,9 +444,11 @@ export type GoSingleColumnSection = z.infer<typeof singleColumnSectionSchema>
 export type GoTwoColumnSection = z.infer<typeof twoColumnSectionSchema>
 export type GoThreeColumnSection = z.infer<typeof threeColumnSectionSchema>
 export type GoFormField = z.infer<typeof formFieldSchema>
+export type GoFormFieldShowWhen = z.infer<typeof showWhenSchema>
 export type GoFormSection = z.infer<typeof formSectionSchema>
 export type GoHubSpotFormConfig = z.infer<typeof hubspotFormConfigSchema>
 export type GoCustomerIOFormConfig = z.infer<typeof customerioFormConfigSchema>
+export type GoNotionFormConfig = z.infer<typeof notionFormConfigSchema>
 export type GoFormCrmConfig = z.infer<typeof formCrmConfigSchema>
 export type GoFeatureGridItem = z.infer<typeof featureGridItemSchema>
 export type GoFeatureGridSection = z.infer<typeof featureGridSectionSchema>
@@ -374,6 +462,7 @@ export type GoCodeBlockSection = z.infer<typeof codeBlockSectionSchema>
 export type GoStepItem = z.infer<typeof stepItemSchema>
 export type GoStepsSection = z.infer<typeof stepsSectionSchema>
 export type GoQuoteSection = z.infer<typeof quoteSectionSchema>
+export type GoHubSpotMeetingSection = z.infer<typeof hubspotMeetingSectionSchema>
 export type GoSection = z.infer<typeof goSectionSchema>
 export type GoMetadata = z.infer<typeof metadataSchema>
 

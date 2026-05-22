@@ -2,21 +2,21 @@ import {
   getDeleteOldCronJobRunDetailsByCtidSql,
   getJobRunDetailsPageCountSql,
 } from '@supabase/pg-meta'
-import {
-  CTID_BATCH_PAGE_SIZE,
-  validatePageNumber,
-} from 'data/database-cron-jobs/database-cron-jobs.utils'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
 import type { ConnectionVars } from '@/data/common.types'
 import {
+  CTID_BATCH_PAGE_SIZE,
+  validatePageNumber,
+} from '@/data/database-cron-jobs/database-cron-jobs.utils'
+import {
   getDeleteOldCronJobRunDetailsByCtidKey,
   getJobRunDetailsPageCountKey,
 } from '@/data/database-cron-jobs/keys'
 import { useScheduleCronJobRunDetailsCleanupMutation } from '@/data/database-cron-jobs/schedule-clean-up-mutation'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 
 // Delay between batches to allow other queries to proceed (in milliseconds)
 const BATCH_DELAY_MS = 100

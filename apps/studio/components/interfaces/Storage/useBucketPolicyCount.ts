@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react'
 
-import { extractBucketNameFromDefinition } from 'components/interfaces/Storage/Storage.utils'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { extractBucketNameFromDefinition } from '@/components/interfaces/Storage/Storage.utils'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function useBucketPolicyCount() {
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()

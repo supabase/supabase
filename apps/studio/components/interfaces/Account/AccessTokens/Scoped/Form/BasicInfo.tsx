@@ -1,26 +1,26 @@
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { Control, ControllerRenderProps } from 'react-hook-form'
-
-import { DatePicker } from 'components/ui/DatePicker'
 import {
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  FormControl,
+  FormField,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import {
   CUSTOM_EXPIRY_VALUE,
   EXPIRES_AT_OPTIONS,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../../AccessToken.constants'
 import { type TokenFormValues } from '../../AccessToken.schemas'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 interface BasicInfoProps {
   control: Control<TokenFormValues>
@@ -65,49 +65,45 @@ export const BasicInfo = ({
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
-      <FormField_Shadcn_
+      <FormField
         key="tokenName"
         name="tokenName"
         control={control}
         render={({ field }) => (
           <FormItemLayout name="tokenName" label="Name">
-            <FormControl_Shadcn_>
-              <Input_Shadcn_
-                id="tokenName"
-                {...field}
-                placeholder="Provide a name for your token"
-              />
-            </FormControl_Shadcn_>
+            <FormControl>
+              <Input id="tokenName" {...field} placeholder="Provide a name for your token" />
+            </FormControl>
           </FormItemLayout>
         )}
       />
 
-      <FormField_Shadcn_
+      <FormField
         key="expiresAt"
         name="expiresAt"
         control={control}
         render={({ field }) => (
           <FormItemLayout name="expiresAt" label="Expires in">
             <div className="flex gap-2">
-              <FormControl_Shadcn_ className="flex-grow">
-                <Select_Shadcn_
+              <FormControl className="grow">
+                <Select
                   value={field.value}
                   onValueChange={(value) => handleExpiryChange(value, field)}
                 >
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="Expires at" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Expires at" />
+                  </SelectTrigger>
+                  <SelectContent>
                     {Object.values(EXPIRES_AT_OPTIONS).map(
                       (option: { value: string; label: string }) => (
-                        <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                        <SelectItem key={option.value} value={option.value}>
                           {option.label}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       )
                     )}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
-              </FormControl_Shadcn_>
+                  </SelectContent>
+                </Select>
+              </FormControl>
               {isCustomSelected && (
                 <DatePicker
                   selectsRange={false}

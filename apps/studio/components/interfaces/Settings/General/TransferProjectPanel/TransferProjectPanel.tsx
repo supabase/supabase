@@ -1,16 +1,15 @@
 import { Truck } from 'lucide-react'
-
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { TransferProjectButton } from './TransferProjectButton'
 import { Card, CardContent } from 'ui'
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+import { TransferProjectButton } from './TransferProjectButton'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const TransferProjectPanel = () => {
   const { data: project } = useSelectedProjectQuery()

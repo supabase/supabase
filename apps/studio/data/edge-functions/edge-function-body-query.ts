@@ -1,11 +1,11 @@
 import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
 import * as Sentry from '@sentry/nextjs'
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { edgeFunctionsKeys } from './keys'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type EdgeFunctionBodyVariables = {
   projectRef?: string
