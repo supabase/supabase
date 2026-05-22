@@ -1,4 +1,4 @@
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, BookOpen, Globe } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -6,16 +6,17 @@ import { getMarketplaceType, getMarketplaceTypeLabel } from './Marketplace.const
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
 interface RailRowProps {
-  label: string
+  label?: string
   value: ReactNode
   href?: string
   mono?: boolean
+  icon?: ReactNode
 }
 
-const RailRow = ({ label, value, href, mono }: RailRowProps) => {
+const RailRow = ({ label, value, href, mono, icon }: RailRowProps) => {
   const valueCls = cn(
     'flex items-center gap-1 text-sm',
-    href ? 'text-brand-link' : 'text-foreground',
+    href ? 'text-foreground-lighter hover:text-foreground' : 'text-foreground',
     mono && 'font-mono'
   )
   const content = (
@@ -26,14 +27,17 @@ const RailRow = ({ label, value, href, mono }: RailRowProps) => {
   )
   return (
     <div className="flex flex-col gap-1">
-      <div className="font-mono text-xs uppercase text-foreground-lighter">{label}</div>
-      {href ? (
-        <a href={href} target="_blank" rel="noreferrer" className={valueCls}>
-          {content}
-        </a>
-      ) : (
-        <div className={valueCls}>{content}</div>
-      )}
+      {label && <div className="font-mono text-xs uppercase text-foreground-lighter">{label}</div>}
+      <div className="flex items-center gap-1.5">
+        {icon && <span className="shrink-0 text-foreground-lighter">{icon}</span>}
+        {href ? (
+          <a href={href} target="_blank" rel="noreferrer" className={valueCls}>
+            {content}
+          </a>
+        ) : (
+          <div className={valueCls}>{content}</div>
+        )}
+      </div>
     </div>
   )
 }
@@ -80,8 +84,12 @@ export const MarketplaceDetailRail = ({ integration, isInstalled }: MarketplaceD
 
       {(docsUrl || siteUrl) && (
         <RailGroup title="Links">
-          {docsUrl && <RailRow label="Documentation" value="Read the docs" href={docsUrl} />}
-          {siteUrl && siteHost && <RailRow label="Website" value={siteHost} href={siteUrl} />}
+          {docsUrl && (
+            <RailRow value="Documentation" icon={<BookOpen size={14} />} href={docsUrl} />
+          )}
+          {siteUrl && siteHost && (
+            <RailRow value={siteHost} icon={<Globe size={14} />} href={siteUrl} />
+          )}
         </RailGroup>
       )}
     </aside>
