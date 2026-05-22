@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Button, Modal } from 'ui'
 import { Admonition } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
 import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
@@ -59,14 +59,16 @@ const RemoveRestrictionModal = ({
   }
 
   return (
-    <Modal
-      hideFooter
+    <ConfirmationModal
       size="medium"
       visible={visible}
       onCancel={onClose}
-      header="Confirm to remove restriction"
+      onConfirm={onSubmit}
+      loading={isApplying}
+      title="Confirm to remove restriction"
+      confirmLabel="Remove restriction"
     >
-      <Modal.Content className="space-y-4">
+      <div className="space-y-4">
         <p className="text-sm text-foreground-light">
           The IPv4 address <code className="text-code-inline">{selectedRestriction}</code> will be
           removed from your list of network restrictions
@@ -82,16 +84,8 @@ const RemoveRestrictionModal = ({
             all IP addresses."
           />
         )}
-      </Modal.Content>
-      <Modal.Content className="flex items-center justify-end space-x-2">
-        <Button type="default" disabled={isApplying} onClick={() => onClose()}>
-          Cancel
-        </Button>
-        <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
-          Remove restriction
-        </Button>
-      </Modal.Content>
-    </Modal>
+      </div>
+    </ConfirmationModal>
   )
 }
 
