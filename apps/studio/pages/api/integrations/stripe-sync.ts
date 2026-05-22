@@ -21,11 +21,32 @@ async function isStripeSyncEnabled() {
   return true
 }
 
-function getBearerToken(req: NextApiRequest) {
+async function getBearerToken(req: NextApiRequest, res: NextApiResponse, projectRef: string) {
   const authHeader = req.headers.authorization
-  if (!authHeader || Array.isArray(authHeader)) return null
-  const match = authHeader.match(/^Bearer\s+(.+)$/i)
-  return match?.[1]?.trim() ?? null
+  const match =
+    !authHeader || Array.isArray(authHeader) ? null : authHeader.match(/^Bearer\s+(.+)$/i)
+  const token = match?.[1]?.trim()
+  if (!token) {
+    res
+      .status(401)
+      .json({ data: null, error: { message: 'Unauthorized: Invalid Authorization header' } })
+    return null
+  }
+
+  const verifyResponse = await fetch(
+    `${process.env.NEXT_PUBLIC_API_DOMAIN}/v1/projects/${projectRef}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  )
+  if (!verifyResponse.ok) {
+    const status =
+      verifyResponse.status === 401 || verifyResponse.status === 403 ? verifyResponse.status : 403
+    res
+      .status(status)
+      .json({ data: null, error: { message: 'Unauthorized: token cannot access this project' } })
+    return null
+  }
+
+  return token
 }
 
 export const config = {
@@ -52,13 +73,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const supabaseToken = getBearerToken(req)
-  if (!supabaseToken) {
-    return res
-      .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Invalid Authorization header' } })
-  }
-
   const parsed = UninstallBodySchema.safeParse(req.body)
   if (!parsed.success) {
     return res
@@ -66,6 +80,9 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
       .json({ data: null, error: { message: 'Bad Request: Invalid request body' } })
   }
   const { projectRef, startTime } = parsed.data
+
+  const supabaseToken = await getBearerToken(req, res, projectRef)
+  if (!supabaseToken) return
 
   waitUntil(
     uninstall({
@@ -86,13 +103,6 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
 }
 
 async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const supabaseToken = getBearerToken(req)
-  if (!supabaseToken) {
-    return res
-      .status(401)
-      .json({ data: null, error: { message: 'Unauthorized: Invalid Authorization header' } })
-  }
-
   const parsed = InstallBodySchema.safeParse(req.body)
   if (!parsed.success) {
     return res
@@ -100,6 +110,9 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
       .json({ data: null, error: { message: 'Bad Request: Invalid request body' } })
   }
   const { projectRef, stripeSecretKey, startTime } = parsed.data
+
+  const supabaseToken = await getBearerToken(req, res, projectRef)
+  if (!supabaseToken) return
 
   // Validate the Stripe API key before proceeding with installation
   try {
