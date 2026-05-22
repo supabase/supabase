@@ -1,6 +1,15 @@
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, cn, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Card,
+  CardContent,
+  cn,
+  Loading,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
@@ -104,7 +113,11 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
               </Tooltip>
             )}
           </div>
-          <span className="text-foreground-lighter text-xs truncate">{subtitle}</span>
+          {data.isLoading ? (
+            <Skeleton className="h-3 w-20 mt-0.5" />
+          ) : (
+            <span className="text-foreground-lighter text-xs truncate">{subtitle}</span>
+          )}
         </div>
       </div>
 
