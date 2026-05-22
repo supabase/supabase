@@ -24,6 +24,10 @@ import {
   observabilityPageRegistry,
 } from './registry/observability-page'
 import {
+  PLATFORM_WEBHOOKS_SHORTCUT_IDS,
+  platformWebhooksRegistry,
+} from './registry/platform-webhooks'
+import {
   REALTIME_INSPECTOR_SHORTCUT_IDS,
   realtimeInspectorRegistry,
 } from './registry/realtime-inspector'
@@ -136,6 +140,9 @@ export const SHORTCUT_IDS = {
 
   // LogsPreviewer shortcuts (Function Logs, Function Invocations, Logs Explorer)
   ...LOGS_PREVIEW_SHORTCUT_IDS,
+
+  // Platform Webhooks page shortcuts (org and project level)
+  ...PLATFORM_WEBHOOKS_SHORTCUT_IDS,
 } as const
 
 /**
@@ -461,4 +468,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // LogsPreviewer shortcut registration
   ...logsPreviewRegistry,
+
+  // Platform Webhooks page shortcut registration
+  ...platformWebhooksRegistry,
 }

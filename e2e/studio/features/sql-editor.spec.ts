@@ -786,11 +786,11 @@ hello world`)
     await expect(page.getByText('result found')).toBeVisible()
     await searchBar.fill('') // clear search bar
 
-    // download as migration file
+    // export query as migration file
     await privateSnippetSection
       .getByTitle(sqlSnippetName, { exact: true })
       .click({ button: 'right' })
-    await page.getByRole('menuitem', { name: 'Download as migration file' }).click()
+    await page.getByRole('menuitem', { name: 'Export query' }).click()
     await expect(page.getByText('supabase migration new')).toBeVisible()
     await page.getByRole('button', { name: 'Close' }).click()
 

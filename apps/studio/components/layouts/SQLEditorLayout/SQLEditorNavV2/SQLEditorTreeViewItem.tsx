@@ -411,7 +411,7 @@ export const SQLEditorTreeViewItem = ({
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
                   <Download size={14} />
-                  Download as migration file
+                  Export query
                 </ContextMenuItem>
               )}
               {onSelectDelete !== undefined && isOwner && (

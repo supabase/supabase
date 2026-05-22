@@ -2,7 +2,7 @@ import { useParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import SQLQuickstarts from '@/components/interfaces/SQLEditor/SQLTemplates/SQLQuickstarts'
+import SQLExamples from '@/components/interfaces/SQLEditor/SQLTemplates/SQLExamples'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayout'
@@ -10,7 +10,7 @@ import { SQLEditorMenu } from '@/components/layouts/SQLEditorLayout/SQLEditorMen
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
 
-const SqlQuickstarts: NextPageWithLayout = () => {
+const SqlExamples: NextPageWithLayout = () => {
   const router = useRouter()
   const ref = useParams<{ ref: string }>()?.ref
   const tabs = useTabsStateSnapshot()
@@ -18,22 +18,22 @@ const SqlQuickstarts: NextPageWithLayout = () => {
   useEffect(() => {
     if (!router.isReady) return
 
-    const tabId = createTabId('sql', { id: 'quickstarts' })
+    const tabId = createTabId('sql', { id: 'examples' })
     tabs.addTab({
       id: tabId,
       type: 'sql',
-      label: 'Quickstarts',
+      label: 'Examples',
       metadata: {
-        sqlId: 'quickstarts',
-        name: 'quickstarts',
+        sqlId: 'examples',
+        name: 'examples',
       },
     })
   }, [router.isReady, ref])
 
-  return <SQLQuickstarts />
+  return <SQLExamples />
 }
 
-SqlQuickstarts.getLayout = (page) => (
+SqlExamples.getLayout = (page) => (
   <DefaultLayout>
     <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
       <SQLEditorLayout>{page}</SQLEditorLayout>
@@ -41,4 +41,4 @@ SqlQuickstarts.getLayout = (page) => (
   </DefaultLayout>
 )
 
-export default SqlQuickstarts
+export default SqlExamples
