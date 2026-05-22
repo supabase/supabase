@@ -17,7 +17,7 @@ See per-service updates below for details.
 
 - [Making Analytics and Vector opt-in](https://github.com/orgs/supabase/discussions/46084)
 - [Upgrading from PG 15 to 17 (breaking change)](https://github.com/orgs/supabase/discussions/46080)
-- [Switching Studio from `supabase_admin` to `postgres` (breaking change](https://github.com/orgs/supabase/discussions/46081)
+- [Switching Studio from `supabase_admin` to `postgres` (breaking change)](https://github.com/orgs/supabase/discussions/46081)
 
 ---
 
