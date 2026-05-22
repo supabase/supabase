@@ -2,15 +2,15 @@ import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
 import { GitCommit, ListFilter, Rss, X } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { MDXRemote } from 'next-mdx-remote'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client/serialize'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, cn, IconYCombinator, Input_Shadcn_ } from 'ui'
+import { Badge, Button, cn, IconYCombinator, Input } from 'ui'
 
 import { ChangelogLlmMarkdownButton } from '@/components/Changelog/ChangelogLlmMarkdownButton'
 import { ChangelogTimelineList } from '@/components/Changelog/ChangelogTimelineList'
@@ -262,7 +262,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   <label htmlFor="changelog-filter-search" className="sr-only">
                     Search changelog
                   </label>
-                  <Input_Shadcn_
+                  <Input
                     id="changelog-filter-search"
                     size="small"
                     placeholder="Search changelog..."
@@ -393,7 +393,11 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     </div>
                     <div className="col-span-8 lg:max-w-[calc(100vw-80px)]">
                       <article className="prose prose-docs max-w-none wrap-break-word [&>*:first-child:not(style):not(script)]:mt-0 [&>style:first-child+*]:mt-0 [&>script:first-child+*]:mt-0 [&>*:last-child:not(style):not(script)]:mb-0">
-                        <MDXRemote {...entry.source} components={mdxComponents('blog')} />
+                        {'error' in entry.source ? (
+                          <p>Error rendering changelog: {entry.source.error.message}</p>
+                        ) : (
+                          <MDXClient {...entry.source} components={mdxComponents('blog')} />
+                        )}
                       </article>
                     </div>
                   </div>

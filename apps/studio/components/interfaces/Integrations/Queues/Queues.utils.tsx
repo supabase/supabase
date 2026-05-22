@@ -109,7 +109,11 @@ export const prepareQueuesForDataGrid = (queues: PostgresQueue[]): QueueWithMetr
   }))
 }
 
-export const QueryNameSchema = z
+// pgmq stores queue names as-provided in pgmq.meta and lowercases them only when
+// building the underlying q_/a_ relations, so uppercase queue names are fine —
+// the user-facing name is preserved and table-name lookups go through
+// pgmqQueueTable / pgmqArchiveTable which lowercase to match pgmq's behavior.
+export const QueueNameSchema = z
   .string()
   .trim()
   .min(1, 'Please provide a name for your queue')
@@ -119,9 +123,13 @@ export const QueryNameSchema = z
     'Name must contain only alphanumeric characters, underscores, and hyphens'
   )
 
-/**
- * Checks if the queue name is valid. Returns a boolean.
- */
 export const isQueueNameValid = (queueName: string) => {
-  return QueryNameSchema.safeParse(queueName).success
+  return QueueNameSchema.safeParse(queueName).success
 }
+
+// pgmq.format_table_name() lowercases its input, so the actual relations in the
+// pgmq schema are always q_/a_ followed by the lowercased queue name — even when
+// pgmq.meta stores the original casing. Use these helpers anywhere a queue name
+// is mapped to a relname.
+export const pgmqQueueTable = (queueName: string) => `q_${queueName.toLowerCase()}`
+export const pgmqArchiveTable = (queueName: string) => `a_${queueName.toLowerCase()}`

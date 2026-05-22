@@ -1,8 +1,8 @@
 import { cva } from 'class-variance-authority'
 import { ComponentProps, forwardRef, ReactNode } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, cn } from 'ui'
 
-type AdmonitionType =
+export type AdmonitionType =
   | 'note'
   | 'tip'
   | 'caution'
@@ -13,44 +13,21 @@ type AdmonitionType =
   | 'success'
   | 'warning'
 
-type AdmonitionBodyContent =
-  | {
-      description: string | ReactNode
-      children?: ReactNode
-    }
-  | {
-      description?: string | ReactNode
-      children: ReactNode
-    }
-
-type AdmonitionContentProps =
-  | ({
-      title?: string
-      /** @deprecated Use title instead. */
-      label?: string
-    } & AdmonitionBodyContent)
-  | {
-      title?: never
-      /** @deprecated Use title instead. */
-      label?: never
-      description?: string | ReactNode
-      children?: ReactNode
-    }
-
-interface AdmonitionBaseProps {
+export interface AdmonitionProps {
   type?: AdmonitionType
+  title?: string
+  description?: ReactNode
+  children?: ReactNode
   showIcon?: boolean
   childProps?: {
-    title?: ComponentProps<typeof AlertTitle_Shadcn_>
-    description?: ComponentProps<typeof AlertDescription_Shadcn_>
+    title?: ComponentProps<typeof AlertTitle>
+    description?: ComponentProps<typeof AlertDescription>
   }
   layout?: 'horizontal' | 'vertical' | 'responsive'
   actions?: ReactNode
   icon?: ReactNode
   className?: string
 }
-
-export type AdmonitionProps = AdmonitionBaseProps & AdmonitionContentProps
 
 const admonitionToAlertMapping: Record<AdmonitionType, 'default' | 'destructive' | 'warning'> = {
   note: 'default',
@@ -113,7 +90,7 @@ const admonitionSVG = cva('', {
   variants: {
     type: {
       default: `[&>svg]:bg-foreground-muted`,
-      success: `bg-brand-400 dark:bg-brand bg-opacity-15 dark:bg-opacity-10 border-brand-400 dark:border-brand-500 [&>svg]:text-white dark:[&>svg]:text-brand-link [&>svg]:bg-brand dark:[&>svg]:bg-brand-500/50`,
+      success: `bg-brand-400/15 dark:bg-brand/10 border-brand-400 dark:border-brand-500 [&>svg]:text-white dark:[&>svg]:text-brand-link [&>svg]:bg-brand dark:[&>svg]:bg-brand-500/50`,
       warning: ``,
       destructive: ``,
     },
@@ -124,8 +101,8 @@ const admonitionBodyClassName =
   '[&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0 [&_p:only-child]:!mb-0 [&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5'
 
 export const Admonition = forwardRef<
-  React.ElementRef<typeof Alert_Shadcn_>,
-  Omit<React.ComponentPropsWithoutRef<typeof Alert_Shadcn_>, keyof AdmonitionProps | 'children'> &
+  React.ElementRef<typeof Alert>,
+  Omit<React.ComponentPropsWithoutRef<typeof Alert>, keyof AdmonitionProps | 'children'> &
     AdmonitionProps
 >(
   (
@@ -133,7 +110,6 @@ export const Admonition = forwardRef<
       type = 'note',
       variant,
       showIcon = true,
-      label,
       title,
       description,
       children,
@@ -147,13 +123,10 @@ export const Admonition = forwardRef<
   ) => {
     const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
     const typeStyle = type === 'success' ? 'success' : typeMapped
-
-    if (process.env.NODE_ENV !== 'production' && (label || title) && !description && !children) {
-      throw new Error('Admonition title-only usage is not supported. Add description or children.')
-    }
+    const heading = title
 
     return (
-      <Alert_Shadcn_
+      <Alert
         ref={ref}
         variant={typeMapped}
         {...props}
@@ -171,7 +144,7 @@ export const Admonition = forwardRef<
           icon
         ) : showIcon && typeStyle === 'success' ? (
           <SuccessIcon />
-        ) : (showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+        ) : showIcon && (typeMapped === 'warning' || typeMapped === 'destructive') ? (
           <WarningIcon />
         ) : showIcon ? (
           <InfoIcon />
@@ -185,45 +158,44 @@ export const Admonition = forwardRef<
               'flex-col @md:flex-row @md:items-center @md:justify-between @md:gap-x-6 @lg:gap-x-8'
           )}
         >
-          {label || title || description ? (
-            <div>
-              {(label || title) && (
-                <AlertTitle_Shadcn_
-                  {...childProps.title}
-                  className={cn(
-                    'text mt-0.5 flex gap-3 text-sm !font-medium',
-                    !label && 'flex-col',
-                    childProps.title?.className
-                  )}
-                >
-                  {label || title}
-                </AlertTitle_Shadcn_>
-              )}
-              {description && (
-                <AlertDescription_Shadcn_
-                  {...childProps.description}
-                  className={cn(
-                    admonitionBodyClassName,
-                    !label && !title && 'my-0.5',
-                    childProps.description?.className
-                  )}
-                >
-                  {description}
-                </AlertDescription_Shadcn_>
-              )}
-              {/* // children is to handle Docs and MDX issues with children and <p> elements */}
-              {children && (
-                <AlertDescription_Shadcn_
-                  {...childProps.description}
-                  className={cn(admonitionBodyClassName, childProps?.description?.className)}
-                >
-                  {children}
-                </AlertDescription_Shadcn_>
-              )}
-            </div>
-          ) : (
-            <div className={cn('text my-0.5', admonitionBodyClassName)}>{children}</div>
-          )}
+          <div>
+            {heading && (
+              <AlertTitle
+                {...childProps.title}
+                className={cn(
+                  'text mt-0.5 flex flex-col gap-3 text-sm',
+                  childProps.title?.className
+                )}
+              >
+                {heading}
+              </AlertTitle>
+            )}
+            {description && (
+              <AlertDescription
+                {...childProps.description}
+                className={cn(
+                  admonitionBodyClassName,
+                  !heading && 'my-0.5',
+                  childProps.description?.className
+                )}
+              >
+                {description}
+              </AlertDescription>
+            )}
+            {/* // children is to handle Docs and MDX issues with children and <p> elements */}
+            {children && (
+              <AlertDescription
+                {...childProps.description}
+                className={cn(
+                  admonitionBodyClassName,
+                  !heading && !description && 'my-0.5',
+                  childProps?.description?.className
+                )}
+              >
+                {children}
+              </AlertDescription>
+            )}
+          </div>
           {actions && (
             <div
               className={cn(
@@ -237,7 +209,7 @@ export const Admonition = forwardRef<
             </div>
           )}
         </div>
-      </Alert_Shadcn_>
+      </Alert>
     )
   }
 )

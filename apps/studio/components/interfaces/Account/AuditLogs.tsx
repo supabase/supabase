@@ -17,7 +17,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import {
   TIMESTAMP_MICROS_PER_MS,
-  type V2AuditLog,
+  type AuditLog,
 } from '@/data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from '@/data/profile/profile-audit-logs-query'
@@ -35,7 +35,7 @@ export const AuditLogs = () => {
     to: currentTime.toISOString(),
   })
 
-  const [selectedLog, setSelectedLog] = useState<V2AuditLog>()
+  const [selectedLog, setSelectedLog] = useState<AuditLog>()
   const [filters, setFilters] = useState<{ projects: string[] }>({
     projects: [],
   })

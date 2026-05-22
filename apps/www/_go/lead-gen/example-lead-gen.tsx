@@ -261,14 +261,23 @@ alter table posts enable row level security;`,
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
-        hubspot: {
-          formGuid: 'b9abbf77-86ae-4fe7-9147-d15922bf58ca',
-          fieldMap: {
-            firstName: 'firstname',
-            lastName: 'lastname',
+        // hubspot: {
+        //   formGuid: 'b9abbf77-86ae-4fe7-9147-d15922bf58ca',
+        //   fieldMap: {
+        //     firstName: 'firstname',
+        //     lastName: 'lastname',
+        //   },
+        //   consent:
+        //     'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
+        // },
+        notion: {
+          database_id: '3525004b775f80419b2ac0245affad06',
+          columnMap: {
+            firstName: 'First Name',
+            lastName: 'Last Name',
+            email: 'Company Email',
+            interest: 'What are you interested in?',
           },
-          consent:
-            'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
         },
       },
     },

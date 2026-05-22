@@ -1,3 +1,4 @@
+import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -5,8 +6,6 @@ import type { DatabaseEventTrigger } from './database-event-triggers-query'
 import { databaseEventTriggerKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
-
-const escapeIdentifier = (value: string) => value.replace(/"/g, '""')
 
 export type DatabaseEventTriggerDeleteVariables = {
   trigger: DatabaseEventTrigger
@@ -19,7 +18,7 @@ export async function deleteDatabaseEventTrigger({
   projectRef,
   connectionString,
 }: DatabaseEventTriggerDeleteVariables) {
-  const sql = `DROP EVENT TRIGGER IF EXISTS "${escapeIdentifier(trigger.name)}";`
+  const sql = safeSql`DROP EVENT TRIGGER IF EXISTS ${ident(trigger.name)};`
 
   const { result } = await executeSql({
     projectRef,

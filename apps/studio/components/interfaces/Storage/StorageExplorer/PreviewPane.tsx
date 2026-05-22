@@ -11,6 +11,7 @@ import {
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
+import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -22,10 +23,12 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 
 const PreviewFile = ({ item }: { item: StorageItem }) => {
-  const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
+  const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
+  const folderPath = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
+  const path = [folderPath, item.name].filter(Boolean).join('/')
 
   const { data: previewUrl, isPending: isLoading } = useFetchFileUrlQuery({
-    file: item,
+    path,
     projectRef: projectRef,
     bucket: selectedBucket,
   })

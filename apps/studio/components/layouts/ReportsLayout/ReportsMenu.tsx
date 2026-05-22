@@ -1,12 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Plus } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { cn, Menu } from 'ui'
+import { Menu } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -14,6 +13,7 @@ import { ReportMenuItem } from './ReportMenuItem'
 import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ProductMenu } from '@/components/ui/ProductMenu'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { Content, useContentQuery } from '@/data/content/content-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -164,7 +164,7 @@ const ReportsMenu = () => {
   ]
 
   return (
-    <Menu type="pills" className="mt-6">
+    <div className="mt-6">
       {isLoading ? (
         <div className="px-5 my-4 space-y-2">
           <ShimmeringLoader />
@@ -197,7 +197,7 @@ const ReportsMenu = () => {
           </div>
 
           {reportMenuItems.length > 0 ? (
-            <div>
+            <Menu type="pills">
               <Menu.Group
                 title={<span className="uppercase font-mono">Your custom reports</span>}
               />
@@ -215,39 +215,16 @@ const ReportsMenu = () => {
                   }}
                 />
               ))}
-            </div>
+            </Menu>
           ) : null}
 
-          {menuItems.map((item) => (
-            <div key={item.key + '-menu-group'}>
-              {item.items ? (
-                <>
-                  <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
-                  <div key={item.key} className="flex flex-col">
-                    {item.items.map((subItem) => (
-                      <li
-                        key={subItem.key}
-                        className={cn(
-                          'pr-2 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
-                          'flex items-center justify-between rounded-md group relative',
-                          subItem.key === pageKey
-                            ? 'bg-surface-300 text-foreground'
-                            : 'hover:bg-surface-200'
-                        )}
-                      >
-                        <Link
-                          href={subItem.url}
-                          className="grow h-7 flex justify-between items-center pl-3"
-                        >
-                          <span>{subItem.name}</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </div>
-                </>
-              ) : null}
-            </div>
-          ))}
+          <ProductMenu
+            page={pageKey}
+            menu={menuItems.map((item) => ({
+              ...item,
+              items: item.items.map((subItem) => ({ ...subItem, items: [] })),
+            }))}
+          />
 
           <UpdateCustomReportModal
             onCancel={() => setSelectedReportToUpdate(undefined)}
@@ -282,7 +259,7 @@ const ReportsMenu = () => {
           />
         </div>
       )}
-    </Menu>
+    </div>
   )
 }
 

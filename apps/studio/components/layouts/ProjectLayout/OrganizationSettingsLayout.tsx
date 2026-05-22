@@ -236,5 +236,3 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
     </WithSidebar>
   )
 }
-
-export default OrganizationSettingsLayout

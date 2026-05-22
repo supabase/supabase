@@ -12,9 +12,9 @@ import {
   type ReactNode,
 } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   cn,
   LogoLoader,
   ResizableHandle,
@@ -299,7 +299,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 ref={combinedRef}
               >
                 {showStripeProjectBanner && (
-                  <Alert_Shadcn_
+                  <Alert
                     variant="default"
                     className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
                   >
@@ -309,10 +309,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       size="medium"
                     />
                     <div className="flex-1">
-                      <AlertTitle_Shadcn_>This project is connected to Stripe</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
+                      <AlertTitle>This project is connected to Stripe</AlertTitle>
+                      <AlertDescription>
                         Changes made here may affect your connected Stripe project.
-                      </AlertDescription_Shadcn_>
+                      </AlertDescription>
                     </div>
                     <ButtonTooltip
                       type="text"
@@ -322,7 +322,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       aria-label="Dismiss project integration banner"
                       tooltip={{ content: { text: 'Dismiss' } }}
                     />
-                  </Alert_Shadcn_>
+                  </Alert>
                 )}
                 {showPausedState ? (
                   <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center px-4">

@@ -4,18 +4,11 @@ import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  LoadingLine,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Separator,
-} from 'ui'
+import { Button, cn, LoadingLine, Popover, PopoverContent, PopoverTrigger, Separator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { pgmqQueueTable } from './Queues.utils'
 import { DeleteQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
 import { PurgeQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
 import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
@@ -51,7 +44,8 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = tables?.find((x) => x.name === `q_${queueName}`)
+  const queueRelname = queueName ? pgmqQueueTable(queueName) : undefined
+  const queueTable = tables?.find((x) => x.name === queueRelname)
   const isRlsEnabled = queueTable?.rls_enabled ?? false
 
   const { data: policies } = useDatabasePoliciesQuery({
@@ -59,7 +53,7 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queuePolicies = (policies ?? []).filter((policy) => policy.table === `q_${queueName}`)
+  const queuePolicies = (policies ?? []).filter((policy) => policy.table === queueRelname)
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,
@@ -190,17 +184,17 @@ export const QueueTab = () => {
               )}
             </>
           ) : (
-            <Popover_Shadcn_
+            <Popover
               modal={false}
               open={openRlsPopover}
               onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
             >
-              <PopoverTrigger_Shadcn_ asChild>
+              <PopoverTrigger asChild>
                 <Button type={isExposed ? 'warning' : 'default'} icon={<Lock strokeWidth={1.5} />}>
                   RLS disabled
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
+              </PopoverTrigger>
+              <PopoverContent className="w-80 text-sm" align="end">
                 <h3 className="text-xs flex items-center gap-x-2">
                   <Lock size={14} /> Row Level Security (RLS)
                 </h3>
@@ -239,8 +233,8 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
                     </>
                   )}
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
 
           <Button type="primary" onClick={() => setSendMessageModalShown(true)}>

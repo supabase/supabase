@@ -13,7 +13,8 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
 
-import { serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const ExamplesCarousel = dynamic(() => import('~/components/Examples/ExamplesCarousel'))
 const GlobalPresenceSection = dynamic(
@@ -60,6 +61,12 @@ function EdgeFunctions() {
                 image: `https://supabase.com${basePath}/images/product/functions/functions-og.jpg`,
               })
             ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.edgeFunctions)),
           }}
         />
       </Head>

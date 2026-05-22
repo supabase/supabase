@@ -53,11 +53,11 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:!border-destructive-500',
           closeButton: cn(
             // unset all styles set from sonner
-            'absolute right-2 top-2 rounded-md text-foreground/50 opacity-0 transition-opacity',
-            'hover:text-foreground focus:opacity-100 focus:outline-hidden focus:ring-2 group-hover:opacity-100',
+            'absolute right-2 top-2 size-6 flex items-center justify-center rounded-md text-foreground-light opacity-0 transition',
+            'hover:text-foreground hover:bg-surface-200 focus:opacity-100 focus:outline-hidden focus:ring-2 group-hover:opacity-100',
             'group-[.destructive]:text-destructive-300 group-[.destructive]:hover:text-destructive-50',
             'group-[.destructive]:focus:ring-destructive-400 group-[.destructive]:focus:ring-offset-destructive-600',
-            'left-auto transform-none bg-transparent border-0 border-transparent hover:bg-transparent! hover:border-transparent'
+            'left-auto transform-none border-0 border-transparent'
           ),
           content: 'grow',
           //group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay

@@ -28,6 +28,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { pgmqArchiveTable, pgmqQueueTable } from '../Queues.utils'
 import { getQueueFunctionsMapping } from './Queue.utils'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -83,15 +84,17 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = queueTables?.find((x) => x.name === `q_${name}`)
-  const archiveTable = queueTables?.find((x) => x.name === `a_${name}`)
+  const queueRelname = name ? pgmqQueueTable(name) : undefined
+  const archiveRelname = name ? pgmqArchiveTable(name) : undefined
+  const queueTable = queueTables?.find((x) => x.name === queueRelname)
+  const archiveTable = queueTables?.find((x) => x.name === archiveRelname)
 
   const { data: allTablePrivileges, isSuccess: isSuccessPrivileges } = useTablePrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const queuePrivileges = allTablePrivileges?.find(
-    (x) => x.schema === 'pgmq' && x.name === `q_${name}`
+    (x) => x.schema === 'pgmq' && x.name === queueRelname
   )
 
   const { mutateAsync: grantPrivilege } = useTablePrivilegesGrantMutation()

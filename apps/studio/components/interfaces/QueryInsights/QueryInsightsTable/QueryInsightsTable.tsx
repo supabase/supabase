@@ -1,3 +1,4 @@
+import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useParams } from 'common'
 import { Search, TextSearch, X } from 'lucide-react'
@@ -174,7 +175,7 @@ export const QueryInsightsTable = ({
   }, [mode, selectedTriageRow, selectedRow, filteredTriageItems, explorerItems])
 
   const runExplain = useCallback(
-    (query: string) => {
+    (query: SafeSqlFragment) => {
       if (explainResults[query]) return
       if (explainLoadingQuery) return
       const requestQuery = query
@@ -183,7 +184,7 @@ export const QueryInsightsTable = ({
         {
           projectRef: project?.ref,
           connectionString: project?.connectionString,
-          sql: wrapWithRollback(`EXPLAIN ANALYZE ${requestQuery}`),
+          sql: wrapWithRollback(safeSql`EXPLAIN ANALYZE ${requestQuery}`),
         },
         {
           onSuccess(data) {

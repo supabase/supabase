@@ -24,7 +24,8 @@ import ExtensionsExamplesData from '@/data/products/database/extensions-examples
 import HighlightsCards from '@/data/products/database/highlight-cards'
 import SqlViewCarouselData from '@/data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from '@/data/products/database/table-view-carousel.json'
-import { serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -86,6 +87,12 @@ function Database() {
                 image: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
               })
             ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.database)),
           }}
         />
       </Head>

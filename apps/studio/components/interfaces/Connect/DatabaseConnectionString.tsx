@@ -6,15 +6,15 @@ import {
   Badge,
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DIALOG_PADDING_X,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -289,18 +289,18 @@ export const DatabaseConnectionString = () => {
             <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
               Type
             </span>
-            <Select_Shadcn_ value={selectedTab} onValueChange={handleTabChange}>
-              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
+            <Select value={selectedTab} onValueChange={handleTabChange}>
+              <SelectTrigger size="small" className="w-full md:w-auto rounded-l-none">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {DATABASE_CONNECTION_TYPES.map((type) => (
-                  <SelectItem_Shadcn_ key={type.id} value={type.id}>
+                  <SelectItem key={type.id} value={type.id}>
                     {type.label}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </div>
           <DatabaseSelector
             align="start"
@@ -315,13 +315,13 @@ export const DatabaseConnectionString = () => {
             <span className="w-1/2 md:w-auto flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
               Method
             </span>
-            <Select_Shadcn_ value={selectedMethod} onValueChange={handleMethodChange}>
-              <SelectTrigger_Shadcn_ size="small" className="w-full md:w-auto rounded-l-none">
-                <SelectValue_Shadcn_ size="tiny">
+            <Select value={selectedMethod} onValueChange={handleMethodChange}>
+              <SelectTrigger size="small" className="w-full md:w-auto rounded-l-none">
+                <SelectValue size="tiny">
                   {connectionStringMethodOptions[selectedMethod].label}
-                </SelectValue_Shadcn_>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_ className="max-w-sm">
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="max-w-sm">
                 {Object.keys(connectionStringMethodOptions).map((method) => (
                   <ConnectionStringMethodSelectItem
                     key={method}
@@ -329,8 +329,8 @@ export const DatabaseConnectionString = () => {
                     poolerBadge={method === 'transaction' ? poolerBadge : undefined}
                   />
                 ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <p className="text-xs inline-flex items-center gap-1 text-foreground-lighter">
@@ -487,10 +487,10 @@ export const DatabaseConnectionString = () => {
                   {!sharedPoolerPreferred && !ipv4Addon && (
                     <>
                       <Separator className="w-full" />
-                      <Collapsible_Shadcn_ className="group">
-                        <CollapsibleTrigger_Shadcn_
+                      <Collapsible className="group">
+                        <CollapsibleTrigger
                           asChild
-                          className="w-full justify-start !last:rounded-b group-data-open:rounded-b-none border-light px-3"
+                          className="w-full justify-start !last:rounded-b group-data-open:rounded-b-none px-3"
                         >
                           <Button
                             type="default"
@@ -505,8 +505,8 @@ export const DatabaseConnectionString = () => {
                               <Badge variant="success">IPv4 compatible</Badge>
                             </div>
                           </Button>
-                        </CollapsibleTrigger_Shadcn_>
-                        <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="bg-dash-sidebar rounded-b border text-xs">
                           <CodeBlock
                             wrapperClassName={cn(
                               '[&_pre]:border-x-0 [&_pre]:border-t-0 [&_pre]:px-4 [&_pre]:py-3',
@@ -522,8 +522,8 @@ export const DatabaseConnectionString = () => {
                             Only recommended when your network does not support IPv6. Added latency
                             compared to dedicated pooler.
                           </p>
-                        </CollapsibleContent_Shadcn_>
-                      </Collapsible_Shadcn_>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </>
                   )}
                 </ConnectionPanel>
@@ -589,8 +589,8 @@ export const DatabaseConnectionString = () => {
       {selectedTab === 'python' && (
         <>
           <Separator />
-          <Collapsible_Shadcn_ className="px-8 py-5">
-            <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:-rotate-180!">
+          <Collapsible className="px-8 py-5">
+            <CollapsibleTrigger className="group [&[data-state=open]>div>svg]:-rotate-180!">
               <div className="flex items-center gap-x-2 w-full">
                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                   Connecting to SQL Alchemy
@@ -601,8 +601,8 @@ export const DatabaseConnectionString = () => {
                   size={14}
                 />
               </div>
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="my-2">
+            </CollapsibleTrigger>
+            <CollapsibleContent className="my-2">
               <div className="text-foreground-light text-xs grid gap-2">
                 <p>
                   Please use <code>postgresql://</code> instead of <code>postgres://</code> as your
@@ -614,8 +614,8 @@ export const DatabaseConnectionString = () => {
                 </p>
                 <p className="text-sm font-mono tracking-tight text-foreground-lighter"></p>
               </div>
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
+            </CollapsibleContent>
+          </Collapsible>
         </>
       )}
 
@@ -661,7 +661,7 @@ const ConnectionStringMethodSelectItem = ({
   }
 
   return (
-    <SelectItem_Shadcn_ value={method} className="[&>span:first-child]:top-3.5">
+    <SelectItem value={method} className="[&>span:first-child]:top-3.5">
       <div className="flex flex-col w-full py-1">
         <div className="flex gap-x-2 items-center">
           {connectionStringMethodOptions[method].label}
@@ -673,6 +673,6 @@ const ConnectionStringMethodSelectItem = ({
           {badges.map((badge) => badge)}
         </div>
       </div>
-    </SelectItem_Shadcn_>
+    </SelectItem>
   )
 }

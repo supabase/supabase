@@ -19,7 +19,8 @@ import Solutions from '@/data/MainProducts'
 import ApiExamples from '@/data/products/storage/api-examples'
 import DashboardViewData from '@/data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from '@/data/products/storage/permissions-examples'
-import { serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
@@ -67,6 +68,12 @@ function StoragePage() {
                 image: `https://supabase.com${basePath}/images/product/storage/storage-og.jpg`,
               })
             ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.storage)),
           }}
         />
       </Head>

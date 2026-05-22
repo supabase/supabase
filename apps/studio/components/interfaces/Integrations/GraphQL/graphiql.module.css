@@ -1,4 +1,4 @@
-@reference "../../../../styles/main.css";
+@reference "../../../../styles/globals.css";
 
 .root :global(.graphiql-sidebar) {
   @apply border-r border-default;

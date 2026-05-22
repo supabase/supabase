@@ -1,6 +1,6 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
-import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -15,7 +15,11 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import { ASSISTANT_ERRORS } from './AiAssistant.constants'
 import type { SqlSnippet } from './AIAssistant.types'
-import { onErrorChat } from './AIAssistant.utils'
+import {
+  hasPendingToolApproval,
+  onErrorChat,
+  resolvePendingToolApprovalsAsDenied,
+} from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
 import { AssistantChatForm } from './AssistantChatForm'
@@ -127,7 +131,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
-  const snippetContent = snippet?.snippet?.content?.sql
+  const snippetContent = snippet?.snippet?.content?.unchecked_sql
 
   const { data: tables } = useTablesQuery(
     {
@@ -158,7 +162,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     error,
     sendMessage,
     setMessages,
-    addToolResult,
+    addToolApprovalResponse,
     stop,
     regenerate,
   } = useChat({
@@ -166,11 +170,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     ...(snap.activeChatId && snap.chatInstances[snap.activeChatId]
       ? { chat: snap.chatInstances[snap.activeChatId] }
       : {}),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onError: onErrorChat,
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
+  const hasPendingApproval = hasPendingToolApproval(chatMessages)
+  const isChatInputDisabled = !isApiKeySet || disablePrompts || isLoadingOrganization
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -281,7 +287,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             message={message}
             isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
             readOnly={message.role === 'user'}
-            addToolResult={addToolResult}
+            addToolApprovalResponse={addToolApprovalResponse}
             onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
@@ -300,7 +306,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       cancelEdit,
       editingMessageId,
       chatStatus,
-      addToolResult,
+      addToolApprovalResponse,
       handleRateMessage,
       messageRatings,
     ]
@@ -326,6 +332,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
     snap.clearSqlSnippets()
     lastUserMessageRef.current = payload
+    if (hasPendingApproval && !editingMessageId) {
+      setMessages(resolvePendingToolApprovalsAsDenied(chatMessages))
+    }
     sendMessage(payload, {
       body: {
         schema: currentSchema,
@@ -556,7 +565,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
-            disabled={!isApiKeySet || disablePrompts || isLoadingOrganization}
+            disabled={isChatInputDisabled}
             placeholder={
               hasMessages
                 ? 'Ask a follow up question...'

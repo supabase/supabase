@@ -67,7 +67,7 @@ export const Shortcut = ({
   label,
   tooltipOpen,
 }: ShortcutProps) => {
-  useShortcut(id, onTrigger, options)
+  useShortcut(id, onTrigger, label !== undefined ? { ...options, label } : options)
 
   return (
     <ShortcutTooltip

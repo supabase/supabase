@@ -1,7 +1,8 @@
 import { keepPreviousData } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useBreakpoint, useParams } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Trash } from 'lucide-react'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -49,32 +50,78 @@ export type HeaderProps = {
 
 export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true }: HeaderProps) => {
   useInitializeFiltersFromUrl()
-
   useSyncFiltersToUrl()
 
+  const isMobile = useBreakpoint('md')
   const snap = useTableEditorTableStateSnapshot()
+  const [isInputFocus, setIsInputFocus] = useState(false)
+  const filterContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isInputFocus) return
+
+    const handleMouseDown = (e: MouseEvent) => {
+      const target = e.target as Element
+      const withinFilter = filterContainerRef.current?.contains(target)
+      const withinPortal = target?.closest?.('[data-radix-popper-content-wrapper]')
+      if (!withinFilter && !withinPortal) {
+        setIsInputFocus(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [isInputFocus])
 
   return (
-    <div>
-      <div className="flex flex-wrap min-h-10 items-center bg-dash-sidebar dark:bg-surface-100">
-        {customHeader ? (
-          <div className="flex-1 px-1.5">{customHeader}</div>
-        ) : snap.selectedRows.size > 0 ? (
-          <div className="flex-1 px-1.5">
-            <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
-          </div>
-        ) : (
-          <div className="w-full flex items-center justify-between gap-2 pr-1.5 py-1.5 border-b border-border">
-            <FilterPopoverNew isRefetching={isRefetching} />
-          </div>
-        )}
-        <div className="flex items-center gap-2 overflow-x-auto px-1.5 py-1.5">
-          {!customHeader && snap.selectedRows.size === 0 && (
-            <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
+    <div className="flex flex-wrap md:min-h-10 items-center bg-dash-sidebar dark:bg-surface-100">
+      {customHeader ? (
+        <div className="flex-1 px-1.5">{customHeader}</div>
+      ) : snap.selectedRows.size > 0 ? (
+        <div className="flex-1 px-1.5">
+          <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
+        </div>
+      ) : (
+        <div
+          ref={filterContainerRef}
+          className="w-full flex items-center justify-between gap-2 pr-1.5 border-b border-border md:border-none pt-1 md:pt-0"
+        >
+          <FilterPopoverNew
+            isRefetching={isRefetching}
+            onInputFocus={() => setIsInputFocus(true)}
+            onInputBlur={() => setIsInputFocus(false)}
+          />
+
+          {!isMobile && (
+            <AnimatePresence>
+              {!isInputFocus && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 420,
+                    damping: 30,
+                    mass: 0.4,
+                  }}
+                  className="hidden md:flex items-center gap-2 overflow-x-auto"
+                >
+                  <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
+                  <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           )}
+        </div>
+      )}
+
+      {isMobile && (
+        <div className="flex items-center gap-2 overflow-x-auto px-1.5 py-1.5">
+          <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
           <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
         </div>
-      </div>
+      )}
     </div>
   )
 }
@@ -270,6 +317,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
           <Shortcut
             id={SHORTCUT_IDS.TABLE_EDITOR_DELETE_SELECTED_ROWS}
             onTrigger={onRowsDelete}
+            side="bottom"
             options={{
               registerInCommandMenu: true,
               enabled: !(snap.allRowsSelected && isImpersonatingRole),
@@ -366,12 +414,13 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
         {snap.selectedRows.size > 0 && totalRows > allRows.length && (
           <>
             <div className="h-6 ml-0.5">
-              <Separator orientation="vertical" />
+              <Separator orientation="vertical" className="bg-border" />
             </div>
             <Shortcut
               id={SHORTCUT_IDS.TABLE_EDITOR_SELECT_ALL_IN_TABLE}
               onTrigger={onToggleSelectAllInTable}
               options={{ registerInCommandMenu: true }}
+              side="bottom"
             >
               <Button type="text" onClick={onToggleSelectAllInTable}>
                 {snap.allRowsSelected ? 'Deselect all rows in table' : 'Select all rows in table'}

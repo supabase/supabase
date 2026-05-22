@@ -59,6 +59,7 @@ export function LogDrains({
   const axiomEnabled = useFlag('axiomLogDrain')
   const otlpEnabled = useFlag('otlpLogDrain')
   const last9Enabled = useFlag('Last9LogDrain')
+  const syslogEnabled = useFlag('syslogLogDrain')
   const hasLogDrains = !!logDrains?.length
 
   const { mutate: deleteLogDrain } = useDeleteLogDrainMutation({
@@ -99,6 +100,7 @@ export function LogDrains({
             if (t.value === 'axiom') return axiomEnabled
             if (t.value === 'otlp') return otlpEnabled
             if (t.value === 'last9') return last9Enabled
+            if (t.value === 'syslog') return syslogEnabled
             return true
           }).map((src) => (
             <LogDrainsCard
@@ -208,7 +210,7 @@ export function LogDrains({
             onConfirm={() => {
               if (selectedLogDrain && ref) {
                 deleteLogDrain({ token: selectedLogDrain.token, projectRef: ref })
-                track('log_drain_confirm_button_submitted', {
+                track('log_drain_removed', {
                   destination: selectedLogDrain.type,
                 })
               }

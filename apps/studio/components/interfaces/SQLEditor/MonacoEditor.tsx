@@ -291,7 +291,7 @@ const MonacoEditor = ({
         onMount={handleEditorOnMount}
         onChange={handleEditorChange}
         defaultLanguage="pgsql"
-        defaultValue={snippet?.snippet.content?.sql}
+        defaultValue={snippet?.snippet.content?.unchecked_sql}
         path={id}
         options={{
           tabSize: 2,

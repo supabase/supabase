@@ -106,7 +106,7 @@ export const ResponseCodeFormatter = ({ value }: { value: string }) => {
     // 4XX || 3XX responses
     case '4':
     case '3':
-      return <ResponseCodeItem className="bg-amber-300 text-amber-1100">{value}</ResponseCodeItem>
+      return <ResponseCodeItem className="bg-warning/10 text-warning">{value}</ResponseCodeItem>
 
     // All other responses
     default:

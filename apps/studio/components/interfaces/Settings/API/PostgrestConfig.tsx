@@ -260,6 +260,11 @@ export const PostgrestConfig = () => {
     name: 'functionNamesToRemove',
   })
 
+  const missingExposedSchema = useMemo(
+    () => watchedDbSchema.filter((schema) => !allSchemas.some((s) => s.name === schema)),
+    [allSchemas, watchedDbSchema]
+  )
+
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
@@ -282,6 +287,9 @@ export const PostgrestConfig = () => {
                       layout="flex-row-reverse"
                       label="Exposed schemas"
                       description="Select schemas to include in the Data API. Schemas must be included before tables can be exposed."
+                      error={
+                        missingExposedSchema.length > 0 ? 'Some exposed schemas are missing' : null
+                      }
                     >
                       <ExposedSchemaSelector
                         selectedSchemas={watchedDbSchema}
@@ -393,8 +401,8 @@ export const PostgrestConfig = () => {
                           <FormItem>
                             <FormItemLayout
                               layout="flex-row-reverse"
-                              label="Automatically expose new tables and functions"
-                              description="Grants privileges to Data API roles by default, exposing new tables and functions. We recommend disabling this to control access manually."
+                              label="Automatically expose new tables"
+                              description="Grants privileges to Data API roles by default, exposing new tables. We recommend disabling this to control access manually."
                             >
                               <FormControl>
                                 <div>

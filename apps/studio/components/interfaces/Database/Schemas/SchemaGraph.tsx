@@ -1,4 +1,4 @@
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PGSchema } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Background,
@@ -64,6 +64,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { tablesToSQL } from '@/lib/helpers'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -75,7 +76,7 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const [selectedTable, setSelectedTable] = useState<PostgresTable | null>(null)
+  const [selectedTable, setSelectedTable] = useState<SafePostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
   const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 
@@ -186,14 +187,17 @@ export const SchemaGraph = () => {
       }
 
       const selectedNodeIds = new Set(params.nodes.map((n) => n.id))
-      reactFlowInstance.setEdges(
-        reactFlowInstance.getEdges().map((edge) => ({
-          ...edge,
-          animated:
-            selectedNodeIds.size > 0 &&
-            (selectedNodeIds.has(edge.source) || selectedNodeIds.has(edge.target)),
-        }))
-      )
+      const currentEdges = reactFlowInstance.getEdges()
+      let hasChanges = false
+      const nextEdges = currentEdges.map((edge) => {
+        const shouldAnimate =
+          selectedNodeIds.size > 0 &&
+          (selectedNodeIds.has(edge.source) || selectedNodeIds.has(edge.target))
+        if (edge.animated === shouldAnimate) return edge
+        hasChanges = true
+        return { ...edge, animated: shouldAnimate }
+      })
+      if (hasChanges) reactFlowInstance.setEdges(nextEdges)
     }
   )
 
@@ -241,7 +245,7 @@ export const SchemaGraph = () => {
   const isFirstLoad = useRef(true)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
-      const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
+      const schema = schemas.find((s) => s.name === selectedSchema) as PGSchema
       getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
@@ -252,16 +256,7 @@ export const SchemaGraph = () => {
         }
       })
     }
-  }, [
-    isSuccessTables,
-    isSuccessSchemas,
-    tables,
-    reactFlowInstance,
-    ref,
-    resolvedTheme,
-    schemas,
-    selectedSchema,
-  ])
+  }, [isSuccessTables, isSuccessSchemas, tables, reactFlowInstance, ref, schemas, selectedSchema])
 
   const schemaGraphContext = useMemo<SchemaGraphContextType>(
     () => ({
@@ -469,6 +464,7 @@ export const SchemaGraph = () => {
                   fitView
                   minZoom={0.8}
                   maxZoom={1.8}
+                  onlyRenderVisibleElements
                   proOptions={{ hideAttribution: true }}
                   onNodeDragStop={saveNodePositions}
                   onSelectionChange={handleSelectionChange}

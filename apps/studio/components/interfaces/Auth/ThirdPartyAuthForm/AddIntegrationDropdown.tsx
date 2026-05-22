@@ -21,6 +21,8 @@ interface AddIntegrationDropdownProps {
   buttonText?: string
   align?: 'end' | 'center'
   type?: 'primary' | 'default'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
 }
 
@@ -49,10 +51,12 @@ const ProviderDropdownItem = ({
 export const AddIntegrationDropdown = ({
   type = 'primary',
   align = 'end',
+  open,
+  onOpenChange,
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button type={type} iconRight={<ChevronDown />}>
           Add provider

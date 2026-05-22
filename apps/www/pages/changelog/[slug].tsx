@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import type { GetStaticPaths, GetStaticProps } from 'next'
-import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { MDXClient, type SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -62,7 +62,11 @@ const ChangelogDetailPage = ({ title, url, created_at, slug, source, labels }: P
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10 mb-8 lg:mb-20">
           <div className="min-w-0 lg:col-span-8">
             <article className="prose prose-docs max-w-none wrap-break-word [&>*:first-child:not(style):not(script)]:mt-0 [&>style:first-child+*]:mt-0 [&>script:first-child+*]:mt-0 [&>*:last-child:not(style):not(script)]:mb-0">
-              <MDXRemote {...source} components={mdxComponents('blog')} />
+              {'error' in source ? (
+                <p>Error rendering blog post: {source.error.message}</p>
+              ) : (
+                <MDXClient {...source} components={mdxComponents('blog')} />
+              )}
             </article>
           </div>
 

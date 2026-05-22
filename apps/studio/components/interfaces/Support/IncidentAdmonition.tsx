@@ -9,6 +9,7 @@ import { processIncidentData } from '@/data/platform/incident-status-utils'
 
 interface IncidentAdmonitionProps {
   isActive: boolean
+  className?: string
 }
 
 const STATUS_DESCRIPTION_SIGN_OFF = 'Follow the status page for updates.'
@@ -53,7 +54,7 @@ const getStatusDescription = (
   }
 }
 
-export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
+export function IncidentAdmonition({ isActive, className }: IncidentAdmonitionProps) {
   const { data: allStatusPageEvents, isLoading, isError } = useIncidentStatusQuery()
   const { incidents = [] } = allStatusPageEvents ?? {}
 
@@ -83,6 +84,7 @@ export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
           <Admonition
             type="warning"
             layout="horizontal"
+            className={className}
             title={statusTitle}
             description={getStatusDescription(overallStatus, hasMultipleIncidents, allSameStatus)}
             actions={

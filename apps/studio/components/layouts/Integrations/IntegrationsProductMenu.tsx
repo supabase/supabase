@@ -8,7 +8,6 @@ import { generateIntegrationsMenu } from './IntegrationsMenu.utils'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import AlertError from '@/components/ui/AlertError'
 import { ProductMenu } from '@/components/ui/ProductMenu'
-import { ProductMenuItem } from '@/components/ui/ProductMenu/ProductMenuItem'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
@@ -46,29 +45,14 @@ export function IntegrationsProductMenu() {
         menu={generateIntegrationsMenu({ projectRef, flags: { showWrappers } })}
       />
       <Separator />
-      <div className="px-4 py-6 md:px-6">
-        <Menu.Group
-          title={
-            <div className="flex flex-col space-y-2 uppercase font-mono">
-              <span>Installed</span>
-            </div>
-          }
-        />
-        {isLoading && <GenericSkeletonLoader />}
-        {isError && (
-          <AlertError
-            showIcon={false}
-            error={error}
-            subject="Failed to retrieve installed integrations"
-          />
-        )}
-        {isSuccess &&
-          resolvedProjectRef &&
-          integrations.map((integration) => (
-            <ProductMenuItem
-              key={`integrations/${integration.id}`}
-              isActive={page === `integrations/${integration.id}`}
-              item={{
+      {isSuccess && resolvedProjectRef ? (
+        <ProductMenu
+          page={page}
+          menu={[
+            {
+              key: 'installed',
+              title: 'Installed',
+              items: integrations.map((integration) => ({
                 name: integration.name,
                 label: integration.status,
                 key: `integrations/${integration.id}`,
@@ -79,10 +63,31 @@ export function IntegrationsProductMenu() {
                   </div>
                 ),
                 items: [],
-              }}
+              })),
+            },
+          ]}
+        />
+      ) : (
+        <div className="px-4 py-6 md:px-6">
+          <Menu type="pills">
+            <Menu.Group
+              title={
+                <div className="flex flex-col space-y-2 uppercase font-mono">
+                  <span>Installed</span>
+                </div>
+              }
             />
-          ))}
-      </div>
+          </Menu>
+          {isLoading && <GenericSkeletonLoader />}
+          {isError && (
+            <AlertError
+              showIcon={false}
+              error={error}
+              subject="Failed to retrieve installed integrations"
+            />
+          )}
+        </div>
+      )}
     </>
   )
 }

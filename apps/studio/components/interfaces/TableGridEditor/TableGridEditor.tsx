@@ -178,7 +178,7 @@ export const TableGridEditor = ({
             gridProps={{ height: '100%' }}
             customHeader={
               (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
-                <div className="flex items-center space-x-2">
+                <div className="px-2 flex items-center gap-x-2">
                   <p>
                     SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
                   </p>

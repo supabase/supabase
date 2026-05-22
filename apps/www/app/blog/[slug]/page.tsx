@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
+import { notFound } from 'next/navigation'
 
 import BlogPostClient from './BlogPostClient'
 import authors from '@/lib/authors.json'
@@ -8,8 +9,9 @@ import {
   getAbsoluteBlogSocialImage,
   toAbsoluteBlogImageUrl,
 } from '@/lib/blog-images'
+import { breadcrumbs } from '@/lib/breadcrumbs'
 import { SITE_ORIGIN } from '@/lib/constants'
-import { blogPostingSchema, serializeJsonLd } from '@/lib/json-ld'
+import { blogPostingSchema, breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '@/lib/posts'
 import type { Blog, BlogData, PostReturnType } from '@/types/post'
 
@@ -105,14 +107,17 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   const { isEnabled: isDraft } = await draftMode()
 
   const matter = (await import('gray-matter')).default
-  const { mdxSerialize } = await import('lib/mdx/mdxSerialize')
 
   try {
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const content = parsedContent.content
     const tocDepth = (parsedContent.data as any)?.toc_depth ?? 3
-    const mdxSource = await mdxSerialize(content, { tocDepth })
+    const { preprocessMdxWithCodeTabs } = await import('~/components/CodeTabs')
+    const { addSelfClosingTags } = await import('lib/mdx/addSelfClosingTags')
+    const { extractToc } = await import('lib/mdx/extractToc')
+    const preprocessed = await preprocessMdxWithCodeTabs(addSelfClosingTags(content))
+    const tocResult = await extractToc(preprocessed, tocDepth)
     const { generateReadingTime } = await import('lib/helpers')
     const blogPost = {
       ...parsedContent.data,
@@ -129,12 +134,15 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     const currentIndex = allPosts.findIndex((post) => post.slug === slug)
     const nextPost = currentIndex === allPosts.length - 1 ? null : allPosts[currentIndex + 1]
     const prevPost = currentIndex === 0 ? null : allPosts[currentIndex - 1]
-    const tocResult = (mdxSource as any).scope?.toc || { content: '' }
-    const processedContent = tocResult.content
+    const frontmatterTags = (parsedContent.data as { tags?: Array<string | { name: string }> })
+      ?.tags
+    const tagNames = Array.isArray(frontmatterTags)
+      ? frontmatterTags.map((t) => (typeof t === 'string' ? t : t?.name)).filter(Boolean)
+      : undefined
     const relatedPosts = getSortedPosts({
       directory: '_blog',
       limit: 3,
-      tags: (mdxSource as { scope: { tags?: string[] } }).scope.tags,
+      tags: tagNames,
       currentPostSlug: slug,
     }) as unknown as (BlogData & PostReturnType)[]
 
@@ -145,11 +153,8 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       blog: {
         ...(blogPost as any),
         slug,
-        content: mdxSource,
-        toc: {
-          ...tocResult,
-          content: processedContent,
-        },
+        content: preprocessed,
+        toc: tocResult,
       } as any,
       isDraftMode: isDraft,
     }
@@ -167,6 +172,10 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       datePublished: frontmatter.date,
       authors: blogAuthors.length > 0 ? blogAuthors : [{ name: 'Supabase' }],
     })
+    const breadcrumbJsonLd = breadcrumbListSchema([
+      ...breadcrumbs.blogIndex,
+      { name: frontmatter.title, url: `https://supabase.com/blog/${slug}` },
+    ])
 
     return (
       <>
@@ -174,8 +183,16 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(blogJsonLd) }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+        />
         <BlogPostClient {...props} />
       </>
     )
-  } catch {}
+  } catch (err) {
+    if (err instanceof Error && (err as Error & { code?: string }).code === 'POST_NOT_FOUND')
+      notFound()
+    throw err
+  }
 }

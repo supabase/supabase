@@ -19,7 +19,8 @@ import AuthProviders from '@/data/auth.json'
 import MainProducts from '@/data/MainProducts'
 import ApiExamples from '@/data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from '@/data/products/auth/auth-sql-rules-examples'
-import { serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const SplitCodeBlockCarousel = dynamic(
   () => import('~/components/Carousels/SplitCodeBlockCarousel')
@@ -68,6 +69,12 @@ function AuthPage() {
                 image: `https://supabase.com${basePath}/images/product/auth/auth-og.jpg`,
               })
             ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.auth)),
           }}
         />
       </Head>

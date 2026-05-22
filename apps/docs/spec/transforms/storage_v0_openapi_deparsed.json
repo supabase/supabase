@@ -48,6 +48,11 @@
       "post": {
         "summary": "Handle POST request for TUS Resumable uploads",
         "tags": ["resumable"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -69,6 +74,11 @@
       "post": {
         "summary": "Handle POST request for TUS Resumable uploads",
         "tags": ["resumable"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -88,6 +98,11 @@
       "put": {
         "summary": "Handle PUT request for TUS Resumable uploads",
         "tags": ["resumable"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -107,6 +122,11 @@
       "patch": {
         "summary": "Handle PATCH request for TUS Resumable uploads",
         "tags": ["resumable"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -126,6 +146,11 @@
       "head": {
         "summary": "Handle HEAD request for TUS Resumable uploads",
         "tags": ["resumable"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -145,6 +170,11 @@
       "delete": {
         "summary": "Handle DELETE request for TUS Resumable uploads",
         "tags": ["resumable"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -376,15 +406,9 @@
             }
           }
         },
-        "parameters": [
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -481,15 +505,11 @@
             "in": "query",
             "name": "search",
             "required": false
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -644,15 +664,11 @@
             "in": "query",
             "name": "search",
             "required": false
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -770,15 +786,11 @@
             "in": "path",
             "name": "bucketId",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -876,15 +888,11 @@
             "in": "query",
             "name": "search",
             "required": false
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -1002,15 +1010,11 @@
             "in": "path",
             "name": "bucketId",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -1110,15 +1114,11 @@
             "in": "path",
             "name": "bucketId",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -1260,16 +1260,12 @@
             }
           }
         },
-        "parameters": [
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
-          },
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
           {
             "schema": {
               "type": "string"
@@ -1335,15 +1331,11 @@
             "in": "path",
             "name": "bucketId",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -1412,15 +1404,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -1490,6 +1478,11 @@
             "required": true
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "4XX": {
             "description": "Default Response",
@@ -1537,15 +1530,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -1667,6 +1656,11 @@
             "required": true
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "4XX": {
             "description": "Default Response",
@@ -1714,15 +1708,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -1807,15 +1797,11 @@
             "in": "path",
             "name": "bucketName",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -2042,15 +2028,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -2148,15 +2130,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -2208,15 +2186,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -2411,15 +2385,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -2654,15 +2624,11 @@
             "in": "path",
             "name": "bucketName",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -2754,15 +2720,9 @@
             }
           }
         },
-        "parameters": [
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -2865,6 +2825,11 @@
             "required": true
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -2928,15 +2893,11 @@
             "in": "path",
             "name": "bucketName",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -3194,15 +3155,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -3300,15 +3257,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -3411,6 +3364,11 @@
             "required": true
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "4XX": {
             "description": "Default Response",
@@ -3509,6 +3467,11 @@
             "required": true
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "4XX": {
             "description": "Default Response",
@@ -3584,15 +3547,9 @@
             }
           }
         },
-        "parameters": [
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -4117,6 +4074,11 @@
             "required": true
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "4XX": {
             "description": "Error response",
@@ -4221,6 +4183,11 @@
             "in": "path",
             "name": "*",
             "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -4948,15 +4915,11 @@
             "in": "path",
             "name": "*",
             "required": true
-          },
+          }
+        ],
+        "security": [
           {
-            "schema": {
-              "type": "string"
-            },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
-            "required": true
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -5007,6 +4970,11 @@
       "get": {
         "summary": "healthcheck",
         "tags": ["health"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -5016,6 +4984,11 @@
       "head": {
         "summary": "healthcheck",
         "tags": ["health"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -5027,6 +5000,1863 @@
       "head": {
         "summary": "healthcheck",
         "tags": ["health"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/bucket": {
+      "post": {
+        "summary": "Create an analytics bucket",
+        "tags": ["bucket"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "avatars"
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "get": {
+        "summary": "List analytics buckets",
+        "tags": ["bucket"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 10,
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 0,
+            "in": "query",
+            "name": "offset",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["id", "name", "created_at", "updated_at"]
+            },
+            "in": "query",
+            "name": "sortColumn",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            },
+            "in": "query",
+            "name": "sortOrder",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-bucket",
+            "in": "query",
+            "name": "search",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "head": {
+        "summary": "List analytics buckets",
+        "tags": ["bucket"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 10,
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 0,
+            "in": "query",
+            "name": "offset",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["id", "name", "created_at", "updated_at"]
+            },
+            "in": "query",
+            "name": "sortColumn",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            },
+            "in": "query",
+            "name": "sortOrder",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-bucket",
+            "in": "query",
+            "name": "search",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/bucket/{bucketName}": {
+      "delete": {
+        "summary": "Delete an analytics bucket",
+        "tags": ["bucket"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/v1/config": {
+      "get": {
+        "summary": "Get Iceberg catalog configuration",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-warehouse",
+            "in": "query",
+            "name": "warehouse",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "head": {
+        "summary": "Get Iceberg catalog configuration",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-warehouse",
+            "in": "query",
+            "name": "warehouse",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/v1/{prefix}/namespaces": {
+      "post": {
+        "summary": "Create a namespace",
+        "tags": ["iceberg"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "namespace": {
+                    "type": "string",
+                    "example": "namespace"
+                  },
+                  "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["namespace"]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "get": {
+        "summary": "List namespaces",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "pageToken",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "pageSize",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "parent",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "head": {
+        "summary": "List namespaces",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "pageToken",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "pageSize",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "parent",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/v1/{prefix}/namespaces/{namespace}": {
+      "head": {
+        "summary": "Load a namespace",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "get": {
+        "summary": "Load a namespace",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Drop a namespace",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/iceberg/v1/{prefix}/namespaces/{namespace}/tables": {
+      "post": {
+        "summary": "Create a table in the given namespace",
+        "tags": ["iceberg"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "schema"],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string",
+                    "format": "uri",
+                    "nullable": true
+                  },
+                  "schema": {
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "required": ["type", "fields"],
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": ["struct"]
+                          },
+                          "fields": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["id", "name", "type", "required"],
+                              "properties": {
+                                "id": {
+                                  "type": "integer"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "object",
+                                      "required": ["type", "fields"],
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": ["struct"]
+                                        },
+                                        "fields": {
+                                          "type": "array",
+                                          "items": {
+                                            "$comment": "recurse nested StructField definitions here"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "type": "object",
+                                      "required": [
+                                        "type",
+                                        "element-id",
+                                        "element",
+                                        "element-required"
+                                      ],
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": ["list"]
+                                        },
+                                        "element-id": {
+                                          "type": "integer"
+                                        },
+                                        "element": {
+                                          "$comment": "Type object (recurse)"
+                                        },
+                                        "element-required": {
+                                          "type": "boolean"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "type": "object",
+                                      "required": [
+                                        "type",
+                                        "key-id",
+                                        "key",
+                                        "value-id",
+                                        "value",
+                                        "value-required"
+                                      ],
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "enum": ["map"]
+                                        },
+                                        "key-id": {
+                                          "type": "integer"
+                                        },
+                                        "key": {
+                                          "$comment": "Type object (recurse)"
+                                        },
+                                        "value-id": {
+                                          "type": "integer"
+                                        },
+                                        "value": {
+                                          "$comment": "Type object (recurse)"
+                                        },
+                                        "value-required": {
+                                          "type": "boolean"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                },
+                                "required": {
+                                  "type": "boolean"
+                                },
+                                "doc": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "schema-id": {
+                            "type": "integer",
+                            "readOnly": true
+                          },
+                          "identifier-field-ids": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "spec": {
+                    "type": "object",
+                    "required": ["fields"],
+                    "properties": {
+                      "spec-id": {
+                        "type": "integer",
+                        "readOnly": true
+                      },
+                      "fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["source-id", "transform", "name"],
+                          "properties": {
+                            "field-id": {
+                              "type": "integer"
+                            },
+                            "source-id": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "transform": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "stage-create": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "write-order": {
+                    "type": "object",
+                    "nullable": true,
+                    "required": ["fields"],
+                    "properties": {
+                      "order-id": {
+                        "type": "integer",
+                        "readOnly": true
+                      },
+                      "fields": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["source-id", "transform", "direction", "null-order"],
+                          "properties": {
+                            "source-id": {
+                              "type": "integer"
+                            },
+                            "transform": {
+                              "type": "string"
+                            },
+                            "direction": {
+                              "type": "string",
+                              "enum": ["asc", "desc"]
+                            },
+                            "null-order": {
+                              "type": "string",
+                              "enum": ["nulls-first", "nulls-last"]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Create a table",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "pageToken",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "pageSize",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "parent",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "summary": "Create a table",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "pageToken",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "number"
+            },
+            "in": "query",
+            "name": "pageSize",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "parent",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/iceberg/v1/{prefix}/namespaces/{namespace}/tables/{table}": {
+      "get": {
+        "summary": "Load an Iceberg Table",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "table",
+            "in": "path",
+            "name": "table",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "summary": "Load an Iceberg Table",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "table",
+            "in": "path",
+            "name": "table",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Drop a Table",
+        "tags": ["iceberg"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["true", "false", "True", "False"],
+              "default": "false"
+            },
+            "in": "query",
+            "name": "purgeRequested",
+            "required": false,
+            "description": "If true, the table will be permanently deleted"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "table",
+            "in": "path",
+            "name": "table",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      },
+      "post": {
+        "summary": "Commit updates to multiple tables in an atomic operation",
+        "tags": ["iceberg"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Commit updates to multiple tables in an atomic operation",
+                "properties": {
+                  "requirements": {
+                    "type": "array",
+                    "description": "Assertions to validate before applying updates",
+                    "items": {
+                      "type": "object",
+                      "description": "A requirement assertion",
+                      "required": ["type"],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Type of the requirement (e.g. assert-ref-snapshot-id, assert-table-uuid)",
+                          "example": "assert-ref-snapshot-id"
+                        },
+                        "ref": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "args": {
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  },
+                  "updates": {
+                    "type": "array",
+                    "description": "Metadata updates to apply to the table",
+                    "items": {
+                      "type": "object",
+                      "description": "A single update operation",
+                      "required": ["action"],
+                      "properties": {
+                        "action": {
+                          "type": "string",
+                          "description": "Action to perform (e.g. add-snapshot, set-snapshot-ref)",
+                          "example": "add-snapshot"
+                        },
+                        "snapshot": {
+                          "type": "object",
+                          "properties": {
+                            "sequence-number": {
+                              "type": "integer"
+                            },
+                            "timestamp-ms": {
+                              "type": "integer"
+                            },
+                            "manifest-list": {
+                              "type": "string"
+                            },
+                            "summary": {
+                              "type": "object",
+                              "additionalProperties": true,
+                              "properties": {
+                                "operation": {
+                                  "type": "string"
+                                },
+                                "added-files-size": {
+                                  "type": "string"
+                                },
+                                "added-data-files": {
+                                  "type": "string"
+                                },
+                                "added-records": {
+                                  "type": "string"
+                                },
+                                "total-delete-files": {
+                                  "type": "string"
+                                },
+                                "total-records": {
+                                  "type": "string"
+                                },
+                                "total-position-deletes": {
+                                  "type": "string"
+                                },
+                                "total-equality-deletes": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "schema-id": {
+                              "type": "integer"
+                            }
+                          },
+                          "additionalProperties": true
+                        },
+                        "ref-name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "args": {
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                "required": ["updates", "requirements"]
+              }
+            }
+          },
+          "description": "Commit updates to multiple tables in an atomic operation"
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "prefix",
+            "in": "path",
+            "name": "prefix",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace",
+            "in": "path",
+            "name": "namespace",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "example": "table",
+            "in": "path",
+            "name": "table",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vector/CreateIndex": {
+      "post": {
+        "summary": "Create a vector index",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dataType": {
+                    "type": "string",
+                    "enum": ["float32"]
+                  },
+                  "dimension": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4096
+                  },
+                  "distanceMetric": {
+                    "type": "string",
+                    "enum": ["cosine", "euclidean"]
+                  },
+                  "indexName": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 45,
+                    "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$",
+                    "description": "3-63 chars, lowercase letters, numbers, hyphens, dots; must start/end with letter or number. Must be unique within the vector bucket."
+                  },
+                  "metadataConfiguration": {
+                    "type": "object",
+                    "required": ["nonFilterableMetadataKeys"],
+                    "properties": {
+                      "nonFilterableMetadataKeys": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "vectorBucketName": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "dataType",
+                  "dimension",
+                  "distanceMetric",
+                  "indexName",
+                  "vectorBucketName"
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/DeleteIndex": {
+      "post": {
+        "summary": "Delete a vector index",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "indexName": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 45,
+                    "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$",
+                    "description": "3-63 chars, lowercase letters, numbers, hyphens, dots; must start/end with letter or number. Must be unique within the vector bucket."
+                  },
+                  "vectorBucketName": {
+                    "type": "string"
+                  }
+                },
+                "required": ["indexName", "vectorBucketName"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/ListIndexes": {
+      "post": {
+        "summary": "List indexes in a vector bucket",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vectorBucketName": {
+                    "type": "string"
+                  },
+                  "maxResults": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 500,
+                    "default": 500
+                  },
+                  "nextToken": {
+                    "type": "string"
+                  },
+                  "prefix": {
+                    "type": "string"
+                  }
+                },
+                "required": ["vectorBucketName"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/GetIndex": {
+      "post": {
+        "summary": "Get a vector index",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vectorBucketName": {
+                    "type": "string"
+                  },
+                  "indexName": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 45,
+                    "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$",
+                    "description": "3-63 chars, lowercase letters, numbers, hyphens, dots; must start/end with letter or number. Must be unique within the vector bucket."
+                  }
+                },
+                "required": ["vectorBucketName", "indexName"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/CreateVectorBucket": {
+      "post": {
+        "summary": "Create a vector bucket",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vectorBucketName": {
+                    "type": "string"
+                  }
+                },
+                "required": ["vectorBucketName"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/DeleteVectorBucket": {
+      "post": {
+        "summary": "Create a vector bucket",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vectorBucketName": {
+                    "type": "string"
+                  }
+                },
+                "required": ["vectorBucketName"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/ListVectorBuckets": {
+      "post": {
+        "summary": "List vector buckets",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "maxResults": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 500,
+                    "default": 500
+                  },
+                  "nextToken": {
+                    "type": "string"
+                  },
+                  "prefix": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/GetVectorBucket": {
+      "post": {
+        "summary": "Create a vector bucket",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vectorBucketName": {
+                    "type": "string"
+                  }
+                },
+                "required": ["vectorBucketName"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/PutVectors": {
+      "post": {
+        "summary": "Put vectors into an index",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vectorBucketName": {
+                    "type": "string"
+                  },
+                  "indexName": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 45,
+                    "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$",
+                    "description": "3-63 chars, lowercase letters, numbers, hyphens, dots; must start/end with letter or number. Must be unique within the vector bucket."
+                  },
+                  "vectors": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 500,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "float32": {
+                              "type": "array",
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "required": ["float32"]
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          }
+                        },
+                        "key": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["data"]
+                    }
+                  }
+                },
+                "required": ["vectorBucketName", "indexName", "vectors"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/QueryVectors": {
+      "post": {
+        "summary": "Query vectors",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filter": {
+                    "type": "object",
+                    "description": "Boolean filter expression. Supports field operators ($eq, $ne, $gt, $gte, $lt, $lte, $in, $nin, $exists) and logical operators ($and, $or) with arbitrary nesting.",
+                    "additionalProperties": true
+                  },
+                  "indexArn": {
+                    "type": "string"
+                  },
+                  "indexName": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 45,
+                    "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$"
+                  },
+                  "queryVector": {
+                    "type": "object",
+                    "properties": {
+                      "float32": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "required": ["float32"],
+                    "additionalProperties": false
+                  },
+                  "returnDistance": {
+                    "type": "boolean"
+                  },
+                  "returnMetadata": {
+                    "type": "boolean"
+                  },
+                  "topK": {
+                    "type": "number"
+                  },
+                  "vectorBucketName": {
+                    "type": "string"
+                  }
+                },
+                "required": ["vectorBucketName", "indexName", "queryVector", "topK"],
+                "additionalProperties": false,
+                "title": "queryVectorBodyDoc"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/DeleteVectors": {
+      "post": {
+        "summary": "Delete vectors from an index",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vectorBucketName": {
+                    "type": "string"
+                  },
+                  "indexName": {
+                    "type": "string"
+                  },
+                  "keys": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["vectorBucketName", "indexName", "keys"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/ListVectors": {
+      "post": {
+        "summary": "List vectors in a vector index",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vectorBucketName": {
+                    "type": "string"
+                  },
+                  "indexArn": {
+                    "type": "string"
+                  },
+                  "indexName": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 45,
+                    "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$",
+                    "description": "3-63 chars, lowercase letters, numbers, hyphens, dots; must start/end with letter or number. Must be unique within the vector bucket."
+                  },
+                  "maxResults": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 500
+                  },
+                  "nextToken": {
+                    "type": "string"
+                  },
+                  "returnData": {
+                    "type": "boolean"
+                  },
+                  "returnMetadata": {
+                    "type": "boolean"
+                  },
+                  "segmentCount": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 16
+                  },
+                  "segmentIndex": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 15
+                  }
+                },
+                "required": ["vectorBucketName", "indexName"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/vector/GetVectors": {
+      "post": {
+        "summary": "Returns vector attributes",
+        "tags": ["vector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "indexName": {
+                    "type": "string"
+                  },
+                  "keys": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "returnData": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "returnMetadata": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "vectorBucketName": {
+                    "type": "string"
+                  }
+                },
+                "required": ["indexName", "keys", "vectorBucketName"]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -5036,6 +6866,13 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "jwt"
+      }
+    },
     "schemas": {
       "def-0": {
         "type": "object",
@@ -5063,6 +6900,53 @@
         },
         "required": ["statusCode", "error", "message"],
         "title": "errorSchema"
+      },
+      "def-2": {
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "object",
+            "description": "Boolean filter expression. Supports field operators ($eq, $ne, $gt, $gte, $lt, $lte, $in, $nin, $exists) and logical operators ($and, $or) with arbitrary nesting.",
+            "additionalProperties": true
+          },
+          "indexArn": {
+            "type": "string"
+          },
+          "indexName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 45,
+            "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$"
+          },
+          "queryVector": {
+            "type": "object",
+            "properties": {
+              "float32": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": ["float32"],
+            "additionalProperties": false
+          },
+          "returnDistance": {
+            "type": "boolean"
+          },
+          "returnMetadata": {
+            "type": "boolean"
+          },
+          "topK": {
+            "type": "number"
+          },
+          "vectorBucketName": {
+            "type": "string"
+          }
+        },
+        "required": ["vectorBucketName", "indexName", "queryVector", "topK"],
+        "additionalProperties": false,
+        "title": "queryVectorBodyDoc"
       }
     }
   }

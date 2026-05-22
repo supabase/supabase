@@ -29,7 +29,7 @@ export const ProjectBranchSelectorTrigger = forwardRef<
     return (
       <SidebarMenuButton
         size="lg"
-        className="group py-1 gap-1.5 w-full flex h-auto text-left data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground touch-manipulation"
+        className="group py-1 gap-1.5 w-full flex h-auto text-left data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground touch-manipulation gap-x-3"
         onClick={onClick}
         ref={ref}
       >

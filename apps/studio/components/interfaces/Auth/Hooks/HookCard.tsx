@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, Webhook } from 'lucide-react'
-import { Badge, copyToClipboard, Input } from 'ui'
+import { Badge } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { Hook } from './hooks.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -32,31 +33,33 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
                 <span className="text-foreground">Postgres function</span>
               </div>
               <div className="flex flex-row items-center">
-                <span className="text-foreground-light w-20">schema</span>
+                <label htmlFor="schema" className="text-foreground-light w-20">
+                  schema
+                </label>
                 <Input
+                  id="schema"
                   title={hook.method.schema}
                   copy
                   readOnly
                   disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  containerClassName="flex-1"
+                  className="font-mono text-xs md:text-xs disabled:text-foreground-light opacity-100"
                   value={hook.method.schema}
-                  onCopy={() =>
-                    hook.method.type === 'postgres' && copyToClipboard(hook.method.schema)
-                  }
                 />
               </div>
               <div className="flex flex-row items-center">
-                <span className="text-foreground-light w-20">function</span>
+                <label htmlFor="functionName" className="text-foreground-light w-20">
+                  function
+                </label>
                 <Input
+                  id="functionName"
                   title={hook.method.functionName}
                   copy
                   readOnly
                   disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  containerClassName="flex-1"
+                  className="font-mono text-xs md:text-xs disabled:text-foreground-light opacity-100"
                   value={hook.method.functionName}
-                  onCopy={() =>
-                    hook.method.type === 'postgres' && copyToClipboard(hook.method.functionName)
-                  }
                 />
               </div>
             </div>
@@ -67,26 +70,33 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
                 <span className="text-foreground">HTTPS endpoint</span>
               </div>
               <div className="flex flex-row items-center">
-                <span className="text-foreground-light w-20">endpoint</span>
+                <label htmlFor="url" className="text-foreground-light w-20">
+                  endpoint
+                </label>
                 <Input
+                  id="url"
                   title={hook.method.url}
                   copy
                   readOnly
                   disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  containerClassName="flex-1"
+                  className="font-mono text-xs md:text-xs disabled:text-foreground-light opacity-100"
                   value={hook.method.url}
-                  onCopy={() => hook.method.type === 'https' && copyToClipboard(hook.method.url)}
                 />
               </div>
               <div className="flex flex-row items-center">
-                <span className="text-foreground-light w-20">secret</span>
+                <label htmlFor="secret" className="text-foreground-light w-20">
+                  secret
+                </label>
                 <Input
+                  id="secret"
                   copy
                   title={hook.method.secret}
                   reveal={true}
                   readOnly
                   disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  containerClassName="flex-1"
+                  className="font-mono text-xs md:text-xs disabled:text-foreground-light opacity-100"
                   value={hook.method.secret}
                 />
               </div>

@@ -2,21 +2,20 @@ import { Copy, Expand } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 import {
-  cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
   copyToClipboard,
 } from 'ui'
 
 import { CellDetailPanel } from './CellDetailPanel'
-import { formatCellValue, formatClipboardValue } from './Results.utils'
+import { ResultCell } from './ResultCell'
+import { formatClipboardValue } from './Results.utils'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 
 export const Results = ({ rows }: { rows: readonly any[] }) => {
-  const [expandCell, setExpandCell] = useState(false)
-  const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
+  const [expandedCell, setExpandedCell] = useState<{ column: string; value: any } | null>(null)
   const contextMenuCellRef = useRef<{ column: string; value: any } | null>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
 
@@ -72,23 +71,14 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
           frozen: false,
           sortable: false,
           isLastFrozenColumn: false,
-          renderCell: ({ row }: { row: any }) => {
-            const cellValue = row[key]
-            return (
-              <div
-                className={cn(
-                  'flex items-center h-full font-mono text-xs w-full whitespace-pre',
-                  cellValue === null && 'text-foreground-lighter'
-                )}
-                onContextMenu={(e) => {
-                  e.preventDefault()
-                  handleContextMenu(e, key, cellValue)
-                }}
-              >
-                {formatCellValue(cellValue)}
-              </div>
-            )
-          },
+          renderCell: ({ row }: { row: any }) => (
+            <ResultCell
+              column={key}
+              value={row[key]}
+              onContextMenu={handleContextMenu}
+              onExpand={(column, value) => setExpandedCell({ column, value })}
+            />
+          ),
           renderHeaderCell: () => columnRender(key),
         }
       }),
@@ -105,12 +95,12 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
         </div>
       ) : (
         <>
-          <ContextMenu_Shadcn_ modal={false}>
-            <ContextMenuTrigger_Shadcn_ asChild>
+          <ContextMenu modal={false}>
+            <ContextMenuTrigger asChild>
               <div ref={triggerRef} className="fixed pointer-events-none w-0 h-0" />
-            </ContextMenuTrigger_Shadcn_>
-            <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
-              <ContextMenuItem_Shadcn_
+            </ContextMenuTrigger>
+            <ContextMenuContent onCloseAutoFocus={(e) => e.stopPropagation()}>
+              <ContextMenuItem
                 className="gap-x-2"
                 onSelect={() => {
                   const value = formatClipboardValue(contextMenuCellRef.current?.value ?? '')
@@ -120,30 +110,32 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
               >
                 <Copy size={12} />
                 Copy cell content
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuItem_Shadcn_
+              </ContextMenuItem>
+              <ContextMenuItem
                 className="gap-x-2"
-                onSelect={() => setExpandCell(true)}
+                onSelect={() => {
+                  const cell = contextMenuCellRef.current
+                  if (cell) setExpandedCell({ column: cell.column, value: cell.value })
+                }}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
                 <Expand size={12} />
                 View cell content
-              </ContextMenuItem_Shadcn_>
-            </ContextMenuContent_Shadcn_>
-          </ContextMenu_Shadcn_>
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
           <DataGrid
             columns={columns}
             rows={rows}
             className="grow min-h-0 border-t-0"
             rowClass={() => '[&>.rdg-cell]:items-center'}
-            onSelectedCellChange={setCellPosition}
             onCellKeyDown={handleCellKeyDown}
           />
           <CellDetailPanel
-            column={cellPosition?.column.name ?? ''}
-            value={cellPosition?.row?.[cellPosition.column.name]}
-            visible={expandCell}
-            onClose={() => setExpandCell(false)}
+            column={expandedCell?.column ?? ''}
+            value={expandedCell?.value}
+            visible={expandedCell !== null}
+            onClose={() => setExpandedCell(null)}
           />
         </>
       )}

@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -28,10 +28,24 @@ import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migration
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatMigrationVersionLabel, parseMigrationVersion } from '@/lib/migration-utils'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search migrations' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setSearch(''))
 
   const { data: project } = useSelectedProjectQuery()
   const {
@@ -96,6 +110,7 @@ const Migrations = () => {
             {data.length > 0 && (
               <div className="flex flex-col gap-y-4">
                 <Input
+                  ref={searchInputRef}
                   size="tiny"
                   placeholder="Search for a migration"
                   value={search}

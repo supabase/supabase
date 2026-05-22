@@ -1,4 +1,4 @@
-@reference './index.css';
+@reference './globals.css';
 
 .contributors-bg-circle {
   @apply bg-gradient-to-r from-background-alternative via-border-strong to-background-alternative rounded-full p-[1px] aspect-square absolute;

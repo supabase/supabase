@@ -4,7 +4,8 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, Input, Input_Shadcn_ } from 'ui'
+import { Form, FormControl, FormField, Input } from 'ui'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -108,7 +109,7 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
                 description="A string will be randomly generated if a name is not provided"
               >
                 <FormControl>
-                  <Input_Shadcn_ id="name" {...field} />
+                  <Input id="name" {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -225,14 +226,12 @@ const SecondStep = ({
           <InformationBox
             title="Unable to scan?"
             description={
-              <Input
-                copy
-                disabled
-                id="ref"
-                size="small"
+              <FormItemLayout
+                isReactForm={false}
                 label="You can also enter this secret key into your authenticator app"
-                value={factor.totp.secret}
-              />
+              >
+                <PasswordInput copy disabled id="ref" size="small" value={factor.totp.secret} />
+              </FormItemLayout>
             }
           />
 
@@ -249,7 +248,7 @@ const SecondStep = ({
                 render={({ field }) => (
                   <FormItemLayout name="code" label="Authentication code">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="code"
                         autoFocus
                         {...field}

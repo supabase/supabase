@@ -44,7 +44,7 @@
         Tus,
       } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
 
-      const SUPABASE_ANON_KEY = 'replace-with-your-publishable-key'
+      const SUPABASE_PUBLISHABLE_KEY = 'replace-with-your-publishable-key'
       const SUPABASE_PROJECT_ID = 'replace-with-your-project-id'
       const STORAGE_BUCKET = 'replace-with-your-bucket-id'
       const BEARER_TOKEN='replace-with-your-bearer-token'
@@ -63,7 +63,7 @@
           endpoint: supabaseStorageURL,
           headers: {
             authorization: `Bearer ${BEARER_TOKEN}`,
-            apikey: SUPABASE_ANON_KEY,
+            apikey: SUPABASE_PUBLISHABLE_KEY,
           },
           uploadDataDuringCreation: true,
           chunkSize: 6 * 1024 * 1024,

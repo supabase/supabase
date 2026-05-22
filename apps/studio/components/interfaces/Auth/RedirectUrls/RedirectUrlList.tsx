@@ -5,7 +5,9 @@ import { Button, Checkbox } from 'ui'
 import { ValueContainer } from './ValueContainer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { EmptyListState } from '@/components/ui/EmptyListState'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RedirectUrlListProps {
   allowList: string[]
@@ -87,20 +89,28 @@ export const RedirectUrlList = ({
             </ButtonTooltip>
           </div>
         ) : (
-          <ButtonTooltip
-            disabled={!canUpdateConfig}
-            onClick={() => onSelectAddURL()}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canUpdateConfig
-                  ? 'You need additional permissions to update redirect URLs'
-                  : undefined,
-              },
-            }}
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+            label="Add redirect URL"
+            onTrigger={() => onSelectAddURL()}
+            options={{ enabled: canUpdateConfig }}
+            side="bottom"
           >
-            Add URL
-          </ButtonTooltip>
+            <ButtonTooltip
+              disabled={!canUpdateConfig}
+              onClick={() => onSelectAddURL()}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canUpdateConfig
+                    ? 'You need additional permissions to update redirect URLs'
+                    : undefined,
+                },
+              }}
+            >
+              Add URL
+            </ButtonTooltip>
+          </Shortcut>
         )}
       </ValueContainer>
       {allowList.length > 0 ? (

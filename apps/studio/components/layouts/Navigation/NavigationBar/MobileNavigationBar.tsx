@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { MobileSheetNav } from 'ui-patterns'
 
-import { HeaderUpgradeButton } from '../LayoutHeader/HeaderUpgradeButton'
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
@@ -62,7 +61,7 @@ const MobileNavigationBar = ({
           {isProjectScope ? (
             <>
               <ProjectBranchSelector />
-              <ConnectButton className="[&_span]:hidden h-8 w-8" />
+              <ConnectButton iconOnly className="w-8 h-8" />
             </>
           ) : IS_PLATFORM && showOrgSelection ? (
             <OrgSelector />
@@ -71,7 +70,6 @@ const MobileNavigationBar = ({
           )}
         </div>
         <div className="flex shrink-0 gap-2">
-          {IS_PLATFORM && <HeaderUpgradeButton />}
           {IS_PLATFORM ? <UserDropdown /> : <LocalDropdown />}
           {!hideMobileMenu && (
             <Button

@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react'
 import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -58,6 +58,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const axiomEnabled = useFlag('axiomLogDrain')
   const otlpEnabled = useFlag('otlpLogDrain')
   const last9Enabled = useFlag('Last9LogDrain')
+  const syslogEnabled = useFlag('syslogLogDrain')
 
   const { data: logDrains } = useLogDrainsQuery(
     { ref },
@@ -146,9 +147,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
         {isLoadingPermissions ? (
           <GenericSkeletonLoader />
         ) : !canManageLogDrains ? (
-          <Alert_Shadcn_ variant="default">
-            You do not have permission to manage log drains
-          </Alert_Shadcn_>
+          <Alert variant="default">You do not have permission to manage log drains</Alert>
         ) : (
           <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
         )}
@@ -226,6 +225,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                       if (t.value === 'axiom') return axiomEnabled
                       if (t.value === 'otlp') return otlpEnabled
                       if (t.value === 'last9') return last9Enabled
+                      if (t.value === 'syslog') return syslogEnabled
                       return true
                     }).map((drainType) => (
                       <DropdownMenuItem

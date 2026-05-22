@@ -12,7 +12,7 @@ import {
 import { WwwCommandMenu } from 'components/CommandMenu'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { API_URL } from 'lib/constants'
-import { themes, TooltipProvider } from 'ui'
+import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
 
@@ -26,7 +26,7 @@ function Providers({ children }: { children: React.ReactNode }) {
     <AuthProvider>
       <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
         <DevToolbarProvider apiUrl={API_URL}>
-          <ThemeProvider themes={themes.map((t) => t.value)} enableSystem disableTransitionOnChange>
+          <ThemeProvider>
             <TooltipProvider delayDuration={0}>
               <CommandProvider>
                 <TelemetryTagManager />

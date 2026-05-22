@@ -1,10 +1,14 @@
-import { literal } from '@supabase/pg-meta/src/pg-format'
+import { ident, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { last } from 'lodash'
 
 import { databaseQueuesKeys } from './keys'
-import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import {
+  isQueueNameValid,
+  pgmqArchiveTable,
+  pgmqQueueTable,
+} from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import { DATE_FORMAT } from '@/lib/constants'
@@ -47,34 +51,46 @@ export async function getDatabaseQueue({
   }
 
   // handles when scheduled and available are deselected
-  let queueQuery = ``
+  const queueTable = safeSql`${ident('pgmq')}.${ident(pgmqQueueTable(queueName))}`
+  const archivedTable = safeSql`${ident('pgmq')}.${ident(pgmqArchiveTable(queueName))}`
+  const nowLiteral = literal(dayjs(new Date()).format(DATE_FORMAT))
+
+  let queueQuery: SafeSqlFragment | null = null
   if (status.includes('available') && status.includes('scheduled')) {
-    queueQuery = `SELECT msg_id, enqueued_at, read_ct, vt, message, NULL as archived_at FROM "pgmq"."q_${queueName}"`
+    queueQuery = safeSql`SELECT msg_id, enqueued_at, read_ct, vt, message, NULL as archived_at FROM ${queueTable}`
   } else if (status.includes('available') && !status.includes('scheduled')) {
-    queueQuery = `SELECT msg_id, enqueued_at, read_ct, vt, message, NULL as archived_at FROM "pgmq"."q_${queueName}" WHERE vt < '${dayjs(new Date()).format(DATE_FORMAT)}'`
+    queueQuery = safeSql`SELECT msg_id, enqueued_at, read_ct, vt, message, NULL as archived_at FROM ${queueTable} WHERE vt < ${nowLiteral}`
   } else if (!status.includes('available') && status.includes('scheduled')) {
-    queueQuery = `SELECT msg_id, enqueued_at, read_ct, vt, message, NULL as archived_at FROM "pgmq"."q_${queueName}" WHERE vt > '${dayjs(new Date()).format(DATE_FORMAT)}'`
+    queueQuery = safeSql`SELECT msg_id, enqueued_at, read_ct, vt, message, NULL as archived_at FROM ${queueTable} WHERE vt > ${nowLiteral}`
   }
 
-  let archivedQuery = ``
-  if (status.includes('archived')) {
-    archivedQuery = `SELECT msg_id, enqueued_at, read_ct, vt, message, archived_at FROM "pgmq"."a_${queueName}"`
-  }
+  const archivedQuery = status.includes('archived')
+    ? safeSql`SELECT msg_id, enqueued_at, read_ct, vt, message, archived_at FROM ${archivedTable}`
+    : null
 
-  let query = `SELECT
+  const unionParts = [queueQuery, archivedQuery].filter(
+    (part): part is SafeSqlFragment => part !== null
+  )
+  const unionFragment = unionParts.reduce(
+    (acc, part, index) => (index === 0 ? part : safeSql`${acc} UNION ALL ${part}`),
+    safeSql``
+  )
+
+  const whereClause = afterTimestamp
+    ? safeSql` WHERE enqueued_at > ${literal(afterTimestamp)}`
+    : safeSql``
+
+  const sql = safeSql`SELECT
       *
     FROM
       (
-        ${[queueQuery, archivedQuery].filter(Boolean).join(' UNION ALL ')}
-      ) AS combined`
-  if (afterTimestamp) {
-    query += ` WHERE enqueued_at > ${literal(afterTimestamp)}`
-  }
+        ${unionFragment}
+      ) AS combined${whereClause} order by enqueued_at LIMIT ${literal(QUEUE_MESSAGES_PAGE_SIZE)}`
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `${query} order by enqueued_at LIMIT ${QUEUE_MESSAGES_PAGE_SIZE}`,
+    sql,
   })
   return result as DatabaseQueueData
 }
