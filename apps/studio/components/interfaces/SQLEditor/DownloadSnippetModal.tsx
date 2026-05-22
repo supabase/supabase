@@ -1,9 +1,18 @@
-import type { ModalProps } from '@ui/components/Modal/Modal'
 import { snakeCase } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, Modal, Tabs } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Tabs,
+  type DialogProps,
+} from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { Markdown } from '../Markdown'
@@ -16,11 +25,11 @@ import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { DOCS_URL } from '@/lib/constants'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
-export interface DownloadSnippetModalProps extends ModalProps {
+export interface DownloadSnippetModalProps extends DialogProps {
   id: string
 }
 
-const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
+export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
@@ -57,19 +66,17 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
   ]
 
   return (
-    <Modal
-      hideFooter
-      showCloseButton
-      size="xlarge"
-      header={<p>Download snippet as local migration file via the Supabase CLI.</p>}
-      {...props}
-    >
-      <div className="flex flex-col items-start justify-between gap-4 relative pt-2">
-        <Tabs type="underlined" listClassNames="pl-5">
+    <Dialog {...props}>
+      <DialogContent size="xlarge">
+        <DialogHeader>
+          <DialogTitle>Download snippet as local migration file via the Supabase CLI</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Tabs type="underlined" listClassNames="pl-5 pt-2">
           {SNIPPETS.map((snippet) => {
             return (
               <Tabs.Panel key={snippet.id} id={snippet.id} label={snippet.label}>
-                <Modal.Content className="py-0!">
+                <DialogSection>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex flex-col gap-y-1">
                       <p className="text-base">{snippet.title}</p>
@@ -96,12 +103,12 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
                       {selectedView === 'CLI' ? snippet.cli : snippet.npm}
                     </CodeBlock>
                   </pre>
-                </Modal.Content>
+                </DialogSection>
               </Tabs.Panel>
             )
           })}
         </Tabs>
-        <Modal.Content className="w-full flex items-center justify-between pt-0">
+        <DialogSection className="flex items-center justify-between">
           <p className="text-xs text-lighter">Run this command from your project directory</p>
           <div className="flex justify-between items-center gap-x-2">
             <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
@@ -124,10 +131,8 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
               </Link>
             </Button>
           </div>
-        </Modal.Content>
-      </div>
-    </Modal>
+        </DialogSection>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default DownloadSnippetModal
