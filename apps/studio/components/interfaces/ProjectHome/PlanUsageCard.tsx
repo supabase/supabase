@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
 
@@ -14,13 +14,30 @@ type MetricConfig = {
   key: PricingMetric
   label: string
   unit: MetricUnit
+  /** Anchor id of the matching section on the org usage page. */
+  anchor: string
 }
 
 const METRICS: MetricConfig[] = [
-  { key: PricingMetric.EGRESS, label: 'Egress', unit: 'gigabytes' },
-  { key: PricingMetric.DATABASE_SIZE, label: 'Database size', unit: 'gigabytes' },
-  { key: PricingMetric.MONTHLY_ACTIVE_USERS, label: 'Monthly active users', unit: 'count' },
-  { key: PricingMetric.STORAGE_SIZE, label: 'File storage', unit: 'gigabytes' },
+  { key: PricingMetric.EGRESS, label: 'Egress', unit: 'gigabytes', anchor: 'egress' },
+  {
+    key: PricingMetric.DATABASE_SIZE,
+    label: 'Database size',
+    unit: 'gigabytes',
+    anchor: 'databaseSize',
+  },
+  {
+    key: PricingMetric.MONTHLY_ACTIVE_USERS,
+    label: 'Monthly active users',
+    unit: 'count',
+    anchor: 'mau',
+  },
+  {
+    key: PricingMetric.STORAGE_SIZE,
+    label: 'File storage',
+    unit: 'gigabytes',
+    anchor: 'storageSize',
+  },
 ]
 
 const formatGigabytes = (value: number) => {
@@ -145,9 +162,11 @@ interface PlanUsageCardProps {
 const CompactMetricRow = ({
   usageItem,
   config,
+  orgSlug,
 }: {
   usageItem: OrgMetricsUsage
   config: MetricConfig
+  orgSlug: string
 }) => {
   const current = usageItem.usage ?? 0
   const limit = usageItem.pricing_free_units ?? 0
@@ -156,31 +175,48 @@ const CompactMetricRow = ({
   const isApproaching = limit > 0 && ratio >= 0.8 && !isOver
 
   return (
-    <div className="flex items-center justify-between gap-2">
-      <div className="flex items-center gap-2 min-w-0">
-        <ProgressRing ratio={ratio} isOver={isOver} isApproaching={isApproaching} />
-        <span className="text-xs text-foreground truncate">{config.label}</span>
+    <Link
+      href={`/org/${orgSlug}/usage#${config.anchor}`}
+      className="group/row block px-4 hover:bg-surface-200 transition-colors"
+    >
+      <div className="flex items-center justify-between gap-2 py-2 border-t border-dashed">
+        <div className="flex items-center gap-2 min-w-0">
+          <ProgressRing ratio={ratio} isOver={isOver} isApproaching={isApproaching} />
+          <span className="text-[11px] text-foreground-light uppercase font-mono truncate">
+            {config.label}
+          </span>
+        </div>
+        <div className="flex items-center shrink-0">
+          <span className="text-[11px] font-mono tabular-nums whitespace-nowrap">
+            <span className={cn(isOver ? 'text-warning' : 'text-foreground')}>
+              {formatValue(current, config.unit)}
+            </span>
+            <span className="text-muted"> / </span>
+            <span className="text-foreground-lighter"> {formatLimit(limit, config.unit)}</span>
+          </span>
+          <ChevronRight
+            size={12}
+            strokeWidth={1.5}
+            className="text-foreground w-0 ml-0 opacity-0 overflow-hidden group-hover/row:w-3 group-hover/row:ml-1 group-hover/row:opacity-100 transition-all"
+          />
+        </div>
       </div>
-      <span className="text-[11px] font-mono tabular-nums whitespace-nowrap">
-        <span className={cn(isOver ? 'text-warning' : 'text-foreground-light')}>
-          {formatValue(current, config.unit)}
-        </span>
-        <span className="text-foreground-lighter"> / {formatLimit(limit, config.unit)}</span>
-      </span>
-    </div>
+    </Link>
   )
 }
 
 const SkeletonMetricRow = ({ label }: { label: string }) => (
-  <div className="flex items-center justify-between gap-2">
-    <div className="flex items-center gap-2 min-w-0">
-      <div
-        className="w-4 h-4 rounded-full border-2 border-foreground-muted/40 shrink-0"
-        aria-hidden
-      />
-      <span className="text-xs text-foreground-light truncate">{label}</span>
+  <div className="px-4">
+    <div className="flex items-center justify-between gap-2 py-2 border-t border-dotted border-red-500">
+      <div className="flex items-center gap-2 min-w-0">
+        <div
+          className="w-4 h-4 rounded-full border-2 border-foreground-muted/40 shrink-0"
+          aria-hidden
+        />
+        <span className="text-xs text-foreground-light truncate">{label}</span>
+      </div>
+      <div className="h-3 w-16 rounded bg-surface-200 animate-pulse" aria-hidden />
     </div>
-    <div className="h-3 w-16 rounded bg-surface-200 animate-pulse" aria-hidden />
   </div>
 )
 
@@ -216,11 +252,11 @@ export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCar
         <div
           className={cn(
             'group relative bg-surface-100 border border-surface rounded-md',
-            'h-44 p-4 flex flex-col gap-y-2'
+            'flex flex-col gap-y-2'
           )}
         >
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex flex-col gap-y-0.5 min-w-0">
+          <div className="flex items-center justify-between gap-4 p-4 pb-2">
+            <div className="flex flex-col min-w-0">
               <h5 className="text-sm text-foreground truncate">Free plan usage</h5>
               <p className="text-xs text-foreground-lighter truncate">Current billing cycle</p>
             </div>
@@ -230,19 +266,17 @@ export const PlanUsageCard = ({ placement, asProjectCard = false }: PlanUsageCar
                 plan="Pro"
                 onClick={() => track('upgrade_cta_clicked', { placement })}
               />
-              <Link
-                href={`/org/${organization?.slug ?? '_'}/usage`}
-                className="text-xs text-foreground-light hover:text-foreground inline-flex items-center gap-1"
-              >
-                View all usage
-                <ArrowRight size={11} strokeWidth={1.5} />
-              </Link>
             </div>
           </div>
-          <div className="flex-1 flex flex-col gap-y-1.5 justify-end pb-0.5">
+          <div className="flex flex-col justify-end pb-2 [&>:first-child>*]:border-t-0">
             {isSuccess
               ? visibleRows.map(({ config, usageItem }) => (
-                  <CompactMetricRow key={config.key} usageItem={usageItem} config={config} />
+                  <CompactMetricRow
+                    key={config.key}
+                    usageItem={usageItem}
+                    config={config}
+                    orgSlug={organization?.slug ?? '_'}
+                  />
                 ))
               : METRICS.map((config) => (
                   <SkeletonMetricRow key={config.key} label={config.label} />
