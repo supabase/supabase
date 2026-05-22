@@ -13,7 +13,7 @@ import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 
 const OPTIONS = ['templates', 'examples'] as const
 
-export function CommunitySnippetsSection() {
+export function ReferenceSnippetsSection() {
   const { ref } = useParams()
   const router = useRouter()
 

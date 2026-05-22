@@ -14,27 +14,27 @@ import {
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { CommunitySnippetsSection } from './CommunitySnippetsSection'
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
+import { ReferenceSnippetsSection } from './ReferenceSnippetsSection'
 import { ShareSnippetModal } from './ShareSnippetModal'
-import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
+import { SQLEditorLoadingSnippets } from './SQLEditorLoadingSnippets'
 import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
-import DownloadSnippetModal from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
+import { DownloadSnippetModal } from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from '@/components/interfaces/SQLEditor/MoveQueryModal'
-import RenameQueryModal from '@/components/interfaces/SQLEditor/RenameQueryModal'
+import { RenameQueryModal } from '@/components/interfaces/SQLEditor/RenameQueryModal'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { EmptyPrivateQueriesPanel } from '@/components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
-import EditorMenuListSkeleton from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
+import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { useSqlEditorTabsCleanup } from '@/components/layouts/Tabs/Tabs.utils'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { useSQLSnippetFoldersDeleteMutation } from '@/data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from '@/data/content/sql-folders-query'
-import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
+import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippets-query'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
@@ -209,7 +209,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     let snippets = favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
     if (snippet && snippet.favorite && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as any)
+      snippets.push(snippet as SqlSnippet)
     }
 
     return (
@@ -260,7 +260,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     let snippets = sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
     if (snippet && snippet.visibility === 'project' && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as any)
+      snippets.push(snippet as SqlSnippet)
     }
 
     return (
@@ -750,7 +750,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
       <InnerSideMenuSeparator />
 
-      <CommunitySnippetsSection />
+      <ReferenceSnippetsSection />
 
       <InnerSideMenuSeparator />
 

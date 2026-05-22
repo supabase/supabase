@@ -20,7 +20,7 @@ export interface DownloadSnippetModalProps extends ModalProps {
   id: string
 }
 
-const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
+export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
@@ -129,5 +129,3 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
     </Modal>
   )
 }
-
-export default DownloadSnippetModal
