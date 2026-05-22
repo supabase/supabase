@@ -178,7 +178,16 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         <div className="space-y-2">
           <h4 className="text-sm font-medium">From GitHub</h4>
           <p className="text-xs text-foreground-lighter">
-            Install the Supabase plugin directly from the GitHub repository.
+            Install the Supabase plugin directly from the{' '}
+            <a
+              href="https://github.com/supabase-community/supabase-plugin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-link hover:underline"
+            >
+              GitHub repository
+            </a>
+            .
           </p>
           <CodeBlock
             value="copilot plugin install supabase-community/supabase-plugin"
