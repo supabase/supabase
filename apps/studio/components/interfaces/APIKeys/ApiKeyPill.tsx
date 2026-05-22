@@ -76,7 +76,7 @@ export function ApiKeyPill({
       return key ?? ''
     } catch {
       toast.error('Failed to copy secret API key')
-      return apiKey.api_key
+      return ''
     }
   }
 
