@@ -15,7 +15,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
-const SQLQuickstarts = () => {
+const SQLExamples = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
@@ -65,11 +65,8 @@ const SQLQuickstarts = () => {
     <div className="block h-full space-y-8 overflow-y-auto p-6 px-10 bg-dash-sidebar dark:bg-surface-100">
       <div className="mb-8">
         <div className="mb-6">
-          <h2 className="mb-1">Quickstarts</h2>
-          <p className="text-foreground-light text-sm">
-            Click on any script to fill the query box, modify the script, then click
-            <span className="text-code">Run</span>.
-          </p>
+          <h2 className="mb-1">Examples</h2>
+          <p className="text-foreground-light text-sm">End-to-end examples and starter projects</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {quickStart.map((x, i) => (
@@ -96,4 +93,4 @@ const SQLQuickstarts = () => {
   )
 }
 
-export default SQLQuickstarts
+export default SQLExamples

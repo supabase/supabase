@@ -48,11 +48,11 @@ export const ObservabilityOverview = () => {
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1)
+    queryClient.invalidateQueries({ queryKey: ['projects', projectRef, 'service-health'] })
     queryClient.invalidateQueries({ queryKey: ['project-metrics'] })
-    queryClient.invalidateQueries({ queryKey: ['postgrest-overview-metrics'] })
     queryClient.invalidateQueries({ queryKey: ['infra-monitoring'] })
     queryClient.invalidateQueries({ queryKey: ['max-connections'] })
-  }, [queryClient])
+  }, [queryClient, projectRef])
 
   const serviceBase = useMemo(
     () => [

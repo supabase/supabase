@@ -55,6 +55,6 @@ Path-specific rules in `.github/instructions/`:
 - **E2E Tests**: `studio-e2e-tests.instructions.md` — selector priority, anti-patterns (`waitForTimeout`, `force: true`)
 - **Composition Patterns**: `studio-composition-patterns.instructions.md` — avoid boolean props, use compound components
 - **shadcn/Radix Components**: `studio-shadcn-components.instructions.md` — accessibility handled by primitives, do not flag
-- **Keyboard Shortcuts**: `studio-shortcuts.instructions.md` — shared registry usage, discovery, collision checks
+- **Keyboard Shortcuts**: `studio-shortcuts.instructions.md` — shortcut registry pattern, search-input escape handler, when to flag missing coverage
 
 These files are scoped to `apps/studio/` and applied automatically during reviews.

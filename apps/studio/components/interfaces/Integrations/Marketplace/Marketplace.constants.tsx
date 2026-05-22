@@ -31,17 +31,14 @@ import type {
 
 export type { MarketplaceSource } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
-// Launch-partner pin list for the featured rail. Order here is the order
-// shown. Stripe is the only first-party template in the set (id matches the
-// static catalogue); the rest are marketplaceDB slugs and only render if the
-// listing is published.
+// Defines featured integrations and their order in the featured hero
 export const FEATURED_INTEGRATION_IDS = [
   'grafana',
   'stripe_sync_engine',
   'aikido',
   'aikido-security',
   'doppler',
-  'cipherstash',
+  'resend',
 ] as const
 
 export type MarketplaceIntegrationType = 'oauth' | 'postgres_extension' | 'template' | 'wrapper'
