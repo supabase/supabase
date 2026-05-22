@@ -18,8 +18,6 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
         {showNoticeBanner && <NoticeBanner />}
         <FlyDeprecationBanner />
         <OrganizationResourceBanner />
-        {/* Disabled until reintroduced or removed altogether. */}
-        {/* <TaxIdBanner /> */}
         {clockSkewBanner && <ClockSkewBanner />}
       </div>
       {children}

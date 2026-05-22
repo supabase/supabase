@@ -1,6 +1,6 @@
 import { noop } from 'lodash'
 import { Edit, ExternalLink, FlaskConical, Grid } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle, Button, Modal } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, DialogSection } from 'ui'
 
 import CardButton from '@/components/ui/CardButton'
 
@@ -20,7 +20,7 @@ const PolicySelection = ({
   onToggleFeaturePreviewModal,
 }: PolicySelectionProps) => {
   return (
-    <Modal.Content className="space-y-4 py-4">
+    <DialogSection>
       <div className="flex flex-col gap-y-2">
         <p className="text-sm text-foreground-light">{description}</p>
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-1">
@@ -86,7 +86,7 @@ const PolicySelection = ({
           </div>
         </Alert>
       )}
-    </Modal.Content>
+    </DialogSection>
   )
 }
 

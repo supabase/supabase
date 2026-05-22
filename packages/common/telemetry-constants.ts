@@ -1461,21 +1461,6 @@ export interface AiAssistantInSupportFormClickedEvent {
 }
 
 /**
- * User clicked the Assistant follow-up card after submitting a support ticket.
- *
- * @group Events
- * @source studio
- * @page /dashboard/support/new
- */
-export interface SupportAssistantFollowUpCardClickedEvent {
-  action: 'support_assistant_follow_up_card_clicked'
-  properties: {
-    ticketCategory: string
-  }
-  groups: Partial<TelemetryGroups>
-}
-
-/**
  * User rated an AI assistant message with thumbs up or thumbs down.
  *
  * @group Events
@@ -1944,7 +1929,7 @@ export interface ConnectSheetOpenedEvent {
     /**
      * Where the sheet was opened from
      */
-    source: 'header_button' | 'connect_section'
+    source: 'header_button' | 'connect_section' | 'keyboard_shortcut'
   }
   groups: TelemetryGroups
 }
@@ -3385,7 +3370,6 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
-  | SupportAssistantFollowUpCardClickedEvent
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent

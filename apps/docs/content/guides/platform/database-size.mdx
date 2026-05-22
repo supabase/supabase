@@ -160,4 +160,4 @@ Disks don't automatically downsize during normal operation. Once you have [reduc
 
 In case you have a large WAL directory, you may [modify WAL settings](/docs/guides/database/custom-postgres-config) such as `max_wal_size`. Use at your own risk as changing these settings can have side effects. To query your current WAL size, use `SELECT SUM(size) FROM pg_ls_waldir()`.
 
-In the event that your project is already on the latest version of Postgres and cannot be upgraded, a new version of Postgres will be released approximately every week which you can then upgrade to once it becomes available.
+In the event that your project is already on the latest version of Postgres and waiting for the next release to allow upgrading is a concern, you can migrate your database to a new project as an alternative following the [Migrating within Supabase guide](/docs/guides/platform/migrating-within-supabase).
