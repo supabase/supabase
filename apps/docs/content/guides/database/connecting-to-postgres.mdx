@@ -297,8 +297,8 @@ Because the dedicated pooler is hosted on the same machine as your database, it 
 
 **Shared pooler (Supavisor):**
 
-- Best for: IPv4-only environments and serverless workloads (IPv4-only on every tier)
-  - Supavisor session mode → persistent backends on IPv4 networks
+- Best for: connections from IPv4 networks (IPv4-only on every tier)
+  - Supavisor session mode → persistent backend on IPv4 networks
   - Supavisor transaction mode → serverless functions or short-lived tasks
 - Use for application runtime traffic (queries, writes)
 
