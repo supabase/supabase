@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
@@ -22,6 +23,9 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+const SELF_HOSTING_DOCS_URL = 'https://supabase.com/docs/guides/self-hosting'
+const LOCAL_DEVELOPMENT_DOCS_URL = 'https://supabase.com/docs/guides/local-development'
 
 export const General = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -63,6 +67,52 @@ export const General = () => {
           toast.success('Successfully saved settings')
         },
       }
+    )
+  }
+
+  if (!IS_PLATFORM) {
+    return (
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>General settings</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          {project === undefined ? (
+            <Card>
+              <CardContent>
+                <GenericSkeletonLoader />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardContent>
+                <FormItemLayout
+                  layout="flex-row-reverse"
+                  label="Project name"
+                  description="Set via the DEFAULT_PROJECT_NAME environment variable."
+                  className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                >
+                  <PasswordInput copy readOnly size="small" value={project.name ?? ''} />
+                </FormItemLayout>
+              </CardContent>
+            </Card>
+          )}
+          <Admonition
+            type="default"
+            title="Managed via configuration variables"
+            description={
+              <>
+                Project settings are configured outside of Studio. For self-hosted deployments see
+                the <InlineLink href={SELF_HOSTING_DOCS_URL}>self-hosting guides</InlineLink>. For
+                local development and the Supabase CLI see the{' '}
+                <InlineLink href={LOCAL_DEVELOPMENT_DOCS_URL}>local development guides</InlineLink>.
+              </>
+            }
+          />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 

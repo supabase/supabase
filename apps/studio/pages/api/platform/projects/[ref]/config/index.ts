@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from '@/lib/api/apiWrapper'
+import { AUTH_JWT_SECRET } from '@/lib/api/self-hosted/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -24,8 +25,7 @@ const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
     db_anon_role: 'anon',
     db_extra_search_path: 'public',
     db_schema: 'public, storage',
-    jwt_secret:
-      process.env.AUTH_JWT_SECRET ?? 'super-secret-jwt-token-with-at-least-32-characters-long',
+    jwt_secret: AUTH_JWT_SECRET,
     max_rows: 100,
     role_claim_key: '.role',
   })

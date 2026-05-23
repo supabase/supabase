@@ -1,5 +1,6 @@
 import { components } from 'api-types'
 
+import { AUTH_JWT_SECRET } from './constants'
 import { assertSelfHosted } from './util'
 import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from '@/lib/constants/api'
 
@@ -35,8 +36,7 @@ export function getProjectSettings() {
     db_port: 5432,
     db_user: 'postgres',
     inserted_at: '2021-08-02T06:40:40.646Z',
-    jwt_secret:
-      process.env.AUTH_JWT_SECRET ?? 'super-secret-jwt-token-with-at-least-32-characters-long',
+    jwt_secret: AUTH_JWT_SECRET,
     name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
     ref: 'default',
     region: 'ap-southeast-1',

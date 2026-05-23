@@ -26,10 +26,50 @@ export const useGenerateSettingsMenu = () => {
         title: 'Configuration',
         items: [
           {
+            name: 'General',
+            key: 'general',
+            url: `/project/${ref}/settings/general`,
+            items: [],
+          },
+          {
+            name: 'API Keys',
+            key: 'api-keys',
+            url: `/project/${ref}/settings/api-keys`,
+            items: [],
+          },
+          {
+            name: 'JWT Keys',
+            key: 'jwt',
+            url: legacyJwtKeysEnabled
+              ? `/project/${ref}/settings/jwt`
+              : `/project/${ref}/settings/jwt/signing-keys`,
+            items: [],
+          },
+          {
             name: `Log Drains`,
             key: `log-drains`,
             url: `/project/${ref}/settings/log-drains`,
             items: [],
+          },
+        ],
+      },
+      {
+        title: 'Integrations',
+        items: [
+          {
+            name: 'Data API',
+            key: 'api',
+            url: `/project/${ref}/integrations/data_api/overview`,
+            items: [],
+            rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          },
+          {
+            name: 'Vault',
+            key: 'vault',
+            url: `/project/${ref}/integrations/vault/overview`,
+            items: [],
+            rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+            label: 'Beta',
           },
         ],
       },

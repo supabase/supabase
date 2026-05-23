@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { BarChart, Shield } from 'lucide-react'
+import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { AiIconAnimation, Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 import { Row } from 'ui-patterns'
@@ -57,8 +58,8 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   const hiddenIssuesCount = totalIssues - visibleAdvisorItems.length
 
   const titleContent = useMemo(() => {
-    if (totalIssues === 0) return <h2>Advisor found no issues</h2>
-    const issuesText = totalIssues === 1 ? 'issue' : 'issues'
+    if (totalIssues === 0) return <h2>Advisors found no critical issues</h2>
+    const issuesText = totalIssues === 1 ? 'critical issue' : 'critical issues'
     const numberDisplay = totalIssues.toString()
     return (
       <h2>
@@ -110,7 +111,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   )
 
   if (showEmptyState) {
-    return <EmptyState />
+    return <EmptyState projectRef={projectRef} />
   }
 
   // [Joshen] Note that we're intentionally (for now) not waiting for advisor signals to load
@@ -122,7 +123,17 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
         <ShimmeringLoader className="w-96 mb-6" />
       ) : (
         <div className="flex justify-between items-center mb-6">
-          {titleContent}
+          <div className="flex items-baseline gap-x-3">
+            {titleContent}
+            {projectRef && (
+              <Link
+                href={`/project/${projectRef}/advisors/security`}
+                className="text-sm text-foreground-light hover:text-foreground"
+              >
+                View all in Advisors
+              </Link>
+            )}
+          </div>
           <Button type="default" icon={<AiIconAnimation />} onClick={handleAskAssistant}>
             Ask Assistant
           </Button>
@@ -229,26 +240,45 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           {hiddenIssuesCount > 0 && (
             <div className="mt-4 flex justify-end">
               <Button type="text" onClick={() => openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)}>
-                View {hiddenIssuesCount} more issue{hiddenIssuesCount !== 1 ? 's' : ''} in Advisor
+                View {hiddenIssuesCount} more issue{hiddenIssuesCount !== 1 ? 's' : ''} in Advisors
               </Button>
             </div>
           )}
         </>
       ) : (
-        <EmptyState />
+        <EmptyState projectRef={projectRef} />
       )}
     </div>
   )
 }
 
-function EmptyState() {
+function EmptyState({ projectRef }: { projectRef?: string }) {
   return (
     <Card className="bg-transparent h-64">
       <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
         <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
-          No security or performance issues found
+          No critical (error-level) security or performance issues found.
         </p>
+        {projectRef && (
+          <p className="text-sm text-foreground-lighter text-center">
+            Warnings and informational findings are shown in the{' '}
+            <Link
+              href={`/project/${projectRef}/advisors/security`}
+              className="text-foreground underline underline-offset-2 hover:text-foreground"
+            >
+              Security
+            </Link>{' '}
+            and{' '}
+            <Link
+              href={`/project/${projectRef}/advisors/performance`}
+              className="text-foreground underline underline-offset-2 hover:text-foreground"
+            >
+              Performance
+            </Link>{' '}
+            advisor pages.
+          </p>
+        )}
       </CardContent>
     </Card>
   )

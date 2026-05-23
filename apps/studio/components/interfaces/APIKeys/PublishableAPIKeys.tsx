@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -86,7 +86,7 @@ export const PublishableAPIKeys = () => {
       <FormHeader
         title="Publishable key"
         description="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies."
-        actions={<CreatePublishableAPIKeyDialog />}
+        actions={IS_PLATFORM ? <CreatePublishableAPIKeyDialog /> : null}
       />
 
       {!canReadAPIKeys && !isLoadingPermissions ? (

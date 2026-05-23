@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM } from 'common'
 import { Check, ChevronDown, Copy, Database, KeyRound, Link2, Terminal } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -54,7 +55,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
 
   const { data: databases, isLoading: isLoadingDatabases } = useReadReplicasQuery(
     { projectRef },
-    { enabled: open && !!projectRef }
+    { enabled: IS_PLATFORM && open && !!projectRef }
   )
   const primaryDatabase = databases?.find((db) => db.identifier === projectRef)
 
@@ -84,6 +85,12 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
     [projectRef]
   )
 
+  // Self-hosted projects may not have a publishable key configured. Rather
+  // than show a permanently-disabled "Publishable key unavailable" row, hide
+  // the entry entirely on !IS_PLATFORM when the key isn't available. Platform
+  // behavior is unchanged.
+  const showPublishableKey = IS_PLATFORM || !!publishableKey?.api_key
+
   const menuItems = useMemo(
     () => [
       {
@@ -95,35 +102,46 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
         disabled: isLoadingApiUrl || !projectUrl,
         icon: Link2,
       },
-      {
-        label: 'Publishable key',
-        value: publishableKey?.api_key ?? '',
-        displayValue:
-          isLoadingPermissions || isLoadingKeys
-            ? 'Loading publishable key...'
-            : canReadAPIKeys
-              ? (publishableKey?.api_key ?? 'Publishable key unavailable')
-              : "You don't have permission to view API keys.",
-        disabled:
-          isLoadingPermissions || isLoadingKeys || !canReadAPIKeys || !publishableKey?.api_key,
-        icon: KeyRound,
-      },
-      {
-        label: 'Direct connection string',
-        value: directConnectionString,
-        displayValue: isLoadingDatabases
-          ? 'Loading connection string...'
-          : directConnectionString || 'Connection string unavailable',
-        disabled: isLoadingDatabases || !directConnectionString,
-        icon: Database,
-      },
-      {
-        label: 'CLI setup commands',
-        value: cliCommands,
-        displayValue: cliCommands.replace(/\n/g, ' - '),
-        disabled: !projectRef,
-        icon: Terminal,
-      },
+      ...(showPublishableKey
+        ? [
+            {
+              label: 'Publishable key',
+              value: publishableKey?.api_key ?? '',
+              displayValue:
+                isLoadingPermissions || isLoadingKeys
+                  ? 'Loading publishable key...'
+                  : canReadAPIKeys
+                    ? (publishableKey?.api_key ?? 'Publishable key unavailable')
+                    : "You don't have permission to view API keys.",
+              disabled:
+                isLoadingPermissions ||
+                isLoadingKeys ||
+                !canReadAPIKeys ||
+                !publishableKey?.api_key,
+              icon: KeyRound,
+            },
+          ]
+        : []),
+      ...(IS_PLATFORM
+        ? [
+            {
+              label: 'Direct connection string',
+              value: directConnectionString,
+              displayValue: isLoadingDatabases
+                ? 'Loading connection string...'
+                : directConnectionString || 'Connection string unavailable',
+              disabled: isLoadingDatabases || !directConnectionString,
+              icon: Database,
+            },
+            {
+              label: 'CLI setup commands',
+              value: cliCommands,
+              displayValue: cliCommands.replace(/\n/g, ' - '),
+              disabled: !projectRef,
+              icon: Terminal,
+            },
+          ]
+        : []),
     ],
     [
       canReadAPIKeys,
@@ -136,6 +154,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       projectRef,
       projectUrl,
       publishableKey?.api_key,
+      showPublishableKey,
     ]
   )
 
