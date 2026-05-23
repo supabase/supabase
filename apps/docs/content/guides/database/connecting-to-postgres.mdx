@@ -18,12 +18,16 @@ The table below summarizes each mode, its host and port, IP version support per 
 
 | Mode                              | Host:Port                                 | Free | Paid | Paid + IPv4 add-on | Best for                                   |
 | --------------------------------- | ----------------------------------------- | ---- | ---- | ------------------ | ------------------------------------------ |
-| Direct                            | `db.[id].supabase.co:5432`                | IPv6 | IPv6 | IPv4               | Migrations, `pg_dump`, long-lived backend  |
+| Direct                            | `db.[project-id].supabase.co:5432`        | IPv6 | IPv6 | IPv4               | Migrations, `pg_dump`, long-lived backend  |
 | Shared session (Supavisor)        | `aws-0-[region].pooler.supabase.com:5432` | IPv4 | IPv4 | IPv4               | Persistent backend on IPv4-only networks   |
 | Shared transaction (Supavisor)    | `aws-0-[region].pooler.supabase.com:6543` | IPv4 | IPv4 | IPv4               | Serverless and edge functions              |
-| Dedicated transaction (PgBouncer) | `db.[id].supabase.co:6543`                | -    | IPv6 | IPv4               | High-performance app traffic on paid tiers |
+| Dedicated transaction (PgBouncer) | `db.[project-id].supabase.co:6543`        | -    | IPv6 | IPv4               | High-performance app traffic on paid tiers |
 
-The IPv4 add-on swaps the project's IPv6 connectivity for IPv4 - it does not add IPv4 alongside IPv6.
+<Admonition type="caution">
+
+The IPv4 add-on is not dual-stack: enabling it swaps the project's IPv6 (AAAA) DNS record for an IPv4 (A) record, so the project endpoint becomes reachable only over IPv4.
+
+</Admonition>
 
 ## Quickstarts
 
@@ -126,7 +130,7 @@ Get your project's Transaction pooler connection string from your project dashbo
 
 ## Dedicated pooler
 
-For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.pgbouncer.org/)) that's co-located with your Postgres database. The Dedicated Pooler runs in transaction mode only - for session mode, use the [Shared Pooler](#pooler-session-mode). It requires IPv6, or the [IPv4 add-on](/docs/guides/platform/ipv4-address) if your network is IPv4-only.
+For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.pgbouncer.org/)) that's co-located with your Postgres database. The Dedicated Pooler runs in transaction mode only - for session mode, use the [Shared Pooler](#pooler-session-mode). It is reachable over IPv6, or over IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 The connection string looks like this:
 
@@ -197,7 +201,7 @@ This error occurs when your credentials are incorrect. Double-check your usernam
 
 ### How do you connect using IPv4?
 
-Supabase's direct connection uses IPv6 by default. To connect over IPv4, use the Shared Pooler (Supavisor) in either session or transaction mode - it is IPv4-only on every project tier. Alternatively, add the [IPv4 add-on](/docs/guides/platform/ipv4-address) to your project, which swaps the project's IPv6 connectivity (direct and Dedicated Pooler) for IPv4.
+You have two options. The Shared Pooler (Supavisor) is IPv4-only on every project tier - use it in either session or transaction mode. Alternatively, add the [IPv4 add-on](/docs/guides/platform/ipv4-address) to your project, which makes the direct connection and Dedicated Pooler reachable over IPv4 instead of IPv6.
 
 ### Where is the Postgres connection string in Supabase?
 
@@ -293,7 +297,7 @@ Because the dedicated pooler is hosted on the same machine as your database, it 
 
 - Best for: persistent backend services
 - Use for migrations, pg_dump, backup and management tools
-- Limitation: IPv6 only by default. IPv4 available as [Add-on](/docs/guides/platform/ipv4-address).
+- Network: reachable over IPv6, or over IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 **Shared pooler (Supavisor):**
 
@@ -307,7 +311,7 @@ Because the dedicated pooler is hosted on the same machine as your database, it 
 - Best for: high-performance apps that need dedicated resources
 - Use for application runtime traffic (queries, writes)
 - Transaction mode only - use the Shared Pooler if you need session mode
-- IPv6 by default, IPv4 with the add-on
+- Network: reachable over IPv6, or over IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address)
 
 See the [connection method matrix](#how-to-connect-to-your-postgres-databases) at the top of this page for a quick reference, or follow the decision flow in the diagram below to choose the right option for your environment.
 
