@@ -159,7 +159,7 @@ export const SecretAPIKeys = () => {
                 {showApiKeysLastUsed && (
                   <TableHead className="hidden lg:table-cell">Last Used</TableHead>
                 )}
-                <TableHead />
+                {IS_PLATFORM && <TableHead />}
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -23,9 +23,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-const SELF_HOSTING_DOCS_URL = 'https://supabase.com/docs/guides/self-hosting'
-const LOCAL_DEVELOPMENT_DOCS_URL = 'https://supabase.com/docs/guides/local-development'
+import { DOCS_URL } from '@/lib/constants'
 
 export const General = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -78,7 +76,7 @@ export const General = () => {
             <PageSectionTitle>General settings</PageSectionTitle>
           </PageSectionSummary>
         </PageSectionMeta>
-        <PageSectionContent>
+        <PageSectionContent className="space-y-4">
           {project === undefined ? (
             <Card>
               <CardContent>
@@ -92,10 +90,9 @@ export const General = () => {
                   <FormItemLayout
                     layout="flex-row-reverse"
                     label="Project name"
-                    description="Set via the DEFAULT_PROJECT_NAME environment variable."
                     className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                   >
-                    <PasswordInput copy readOnly size="small" value={project.name ?? ''} />
+                    <PasswordInput readOnly size="small" value={project.name ?? ''} />
                   </FormItemLayout>
                 </CardContent>
               </Card>
@@ -103,14 +100,20 @@ export const General = () => {
           )}
           <Admonition
             type="default"
-            title="Managed via configuration variables"
+            title="Project settings are configured outside of Studio"
             description={
-              <>
-                Project settings are configured outside of Studio. For self-hosted deployments see
-                the <InlineLink href={SELF_HOSTING_DOCS_URL}>self-hosting guides</InlineLink>. For
-                local development and the Supabase CLI see the{' '}
-                <InlineLink href={LOCAL_DEVELOPMENT_DOCS_URL}>local development guides</InlineLink>.
-              </>
+              <p>
+                For{' '}
+                <InlineLink href={`${DOCS_URL}/guides/self-hosting`}>
+                  self-hosted Supabase
+                </InlineLink>
+                , update your <code className="text-code-inline">.env</code> and{' '}
+                <code className="text-code-inline">docker-compose.yml</code>. For{' '}
+                <InlineLink href={`${DOCS_URL}/guides/local-development`}>
+                  CLI / local development
+                </InlineLink>
+                , edit <code className="text-code-inline">supabase/config.toml</code>.
+              </p>
             }
           />
         </PageSectionContent>

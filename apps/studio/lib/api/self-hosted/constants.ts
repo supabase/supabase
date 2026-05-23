@@ -19,10 +19,3 @@ export const POSTGRES_USER_READ_ONLY =
 // shipped by the supabase/cli — keep them in sync.
 export const DEFAULT_AUTH_JWT_SECRET = 'super-secret-jwt-token-with-at-least-32-characters-long'
 export const AUTH_JWT_SECRET = process.env.AUTH_JWT_SECRET || DEFAULT_AUTH_JWT_SECRET
-
-// Docs page covering how to configure auth keys (JWT secret, asymmetric
-// signing keys, publishable/secret API keys) for self-hosted deployments.
-// Linked from settings pages where the corresponding controls are read-only
-// because the values are configured outside of Studio.
-export const SELF_HOSTED_AUTH_KEYS_DOCS_URL =
-  'https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys'

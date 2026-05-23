@@ -18,13 +18,13 @@ import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database
 import { JitDbAccessConfiguration } from '@/components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration'
 import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions'
 import { PoolingModesModal } from '@/components/interfaces/Settings/Database/PoolingModesModal'
-import { SettingsDatabaseEmptyStateLocal } from '@/components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
 import { SSLConfiguration } from '@/components/interfaces/Settings/Database/SSLConfiguration'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { LocalSetupGuide } from '@/components/ui/LocalSetupGuide'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from '@/lib/constants'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseSettings: NextPageWithLayout = () => {
@@ -69,7 +69,42 @@ const DatabaseSettings: NextPageWithLayout = () => {
         <PageContainer size="small" className="pb-12">
           <PageSection>
             <PageSectionContent className="space-y-4 md:space-y-8">
-              <SettingsDatabaseEmptyStateLocal />
+              <LocalSetupGuide
+                cli={{
+                  body: (
+                    <p>
+                      Configure database settings in{' '}
+                      <code className="text-code-inline">supabase/config.toml</code> — applied
+                      automatically on <code className="text-code-inline">supabase start</code>.
+                    </p>
+                  ),
+                  docsHref: `${DOCS_URL}/guides/local-development/cli/config#database-config`,
+                }}
+                selfHosted={{
+                  body: (
+                    <p>
+                      Change settings in{' '}
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://github.com/supabase/supabase/blob/master/docker/.env.example"
+                      >
+                        .env file
+                      </a>{' '}
+                      and{' '}
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml"
+                      >
+                        docker-compose.yml
+                      </a>
+                      .
+                    </p>
+                  ),
+                  docsHref: `${DOCS_URL}/guides/self-hosting/docker#configuring-and-securing-supabase`,
+                }}
+              />
             </PageSectionContent>
           </PageSection>
         </PageContainer>

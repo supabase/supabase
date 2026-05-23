@@ -17,7 +17,7 @@ import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { SELF_HOSTED_AUTH_KEYS_DOCS_URL } from '@/lib/api/self-hosted/constants'
+import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ApiKeysNewPage: NextPageWithLayout = () => {
@@ -39,26 +39,31 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
 
   if (!IS_PLATFORM) {
     return (
-      <>
+      <div className="flex flex-col gap-8">
         <Admonition
           type="default"
-          title="Managed via configuration variables"
+          title="API keys are configured outside of Studio"
           description={
-            <>
-              Publishable and secret API keys are configured outside of Studio for self-hosted
-              deployments via the <code>SUPABASE_PUBLISHABLE_KEY</code> and{' '}
-              <code>SUPABASE_SECRET_KEY</code> environment variables. See the{' '}
-              <InlineLink href={SELF_HOSTED_AUTH_KEYS_DOCS_URL}>
-                self-hosted auth keys guide
-              </InlineLink>{' '}
-              for setup instructions.
-            </>
+            <p>
+              For{' '}
+              <InlineLink href={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`}>
+                self-hosted Supabase
+              </InlineLink>
+              , set <code className="text-code-inline">SUPABASE_PUBLISHABLE_KEY</code> and{' '}
+              <code className="text-code-inline">SUPABASE_SECRET_KEY</code> in your{' '}
+              <code className="text-code-inline">.env</code> and{' '}
+              <code className="text-code-inline">docker-compose.yml</code>. For{' '}
+              <InlineLink href={`${DOCS_URL}/guides/local-development`}>
+                CLI / local development
+              </InlineLink>
+              , configure them in <code className="text-code-inline">supabase/config.toml</code>.
+            </p>
           }
         />
         <PublishableAPIKeys />
         <Separator />
         <SecretAPIKeys />
-      </>
+      </div>
     )
   }
 

@@ -79,7 +79,9 @@ describe('General', () => {
       expect(screen.getByText('ProjectAccessSection')).toBeInTheDocument()
 
       // No self-hosted admonition
-      expect(screen.queryByText(/configured outside of Studio/i)).not.toBeInTheDocument()
+      expect(
+        screen.queryByText(/Project settings are configured outside of Studio/i)
+      ).not.toBeInTheDocument()
     })
   })
 
@@ -88,23 +90,17 @@ describe('General', () => {
       mockIsPlatform.value = false
     })
 
-    it('renders the admonition with both docs links and a read-only project name', () => {
+    it('renders the admonition alongside a read-only project name', () => {
       render(<General />)
 
       // Read-only project name with value populated
       expect(screen.getByText('Project name')).toBeInTheDocument()
       expect(screen.getByDisplayValue('My Project')).toHaveAttribute('readonly')
 
-      // Admonition mentions both docs targets
-      expect(screen.getByText(/configured outside of Studio/i)).toBeInTheDocument()
-      expect(screen.getByRole('link', { name: /self-hosting guides/i })).toHaveAttribute(
-        'href',
-        'https://supabase.com/docs/guides/self-hosting'
-      )
-      expect(screen.getByRole('link', { name: /local development guides/i })).toHaveAttribute(
-        'href',
-        'https://supabase.com/docs/guides/local-development'
-      )
+      // Admonition pointing to self-hosting + CLI docs
+      expect(
+        screen.getByText(/Project settings are configured outside of Studio/i)
+      ).toBeInTheDocument()
     })
 
     it('does not render Project ID, region, Save action, or the member access section', () => {

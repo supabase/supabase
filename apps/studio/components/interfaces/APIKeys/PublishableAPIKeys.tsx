@@ -102,7 +102,7 @@ export const PublishableAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                <TableHead />
+                {IS_PLATFORM && <TableHead />}
               </TableRow>
             </TableHeader>
 

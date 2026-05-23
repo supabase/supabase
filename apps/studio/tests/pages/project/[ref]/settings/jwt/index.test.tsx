@@ -42,6 +42,10 @@ vi.mock('@/components/interfaces/JwtSecrets/jwt-secret-keys-table', () => ({
   JWTSecretKeysTable: () => <div>JWTSecretKeysTable</div>,
 }))
 
+vi.mock('@/components/ui/LocalSetupGuide', () => ({
+  LocalSetupGuide: () => <div>LocalSetupGuide</div>,
+}))
+
 describe('/project/[ref]/settings/jwt', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
@@ -52,19 +56,15 @@ describe('/project/[ref]/settings/jwt', () => {
     render(<JWTSigningKeysPage dehydratedState={{}} />)
 
     expect(screen.getByText('JWTSecretKeysTable')).toBeInTheDocument()
-    expect(screen.queryByText(/configured outside of Studio/i)).not.toBeInTheDocument()
+    expect(screen.queryByText('LocalSetupGuide')).not.toBeInTheDocument()
   })
 
-  it('renders the self-hosted admonition with docs link instead of the table', () => {
+  it('renders the LocalSetupGuide on self-hosted instead of the table', () => {
     mockIsPlatform.value = false
 
     render(<JWTSigningKeysPage dehydratedState={{}} />)
 
     expect(screen.queryByText('JWTSecretKeysTable')).not.toBeInTheDocument()
-    expect(screen.getByText(/configured outside of Studio/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /self-hosted auth keys guide/i })).toHaveAttribute(
-      'href',
-      'https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys'
-    )
+    expect(screen.getByText('LocalSetupGuide')).toBeInTheDocument()
   })
 })

@@ -199,26 +199,44 @@ export const JWTSettings = () => {
       toast.error(`Failed to update JWT secret: ${error.message}`)
     }
   }
+
+  if (!IS_PLATFORM) {
+    return (
+      <Panel>
+        <Panel.Content className="border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark">
+          <Form {...form}>
+            <FormItemLayout
+              layout="flex-row-reverse"
+              id="JWT_SECRET"
+              label="JWT secret"
+              description="Used to sign and verify JWTs issued by Supabase Auth."
+            >
+              <Input id="JWT_SECRET" copy reveal readOnly value={config?.jwt_secret || ''} />
+            </FormItemLayout>
+          </Form>
+        </Panel.Content>
+      </Panel>
+    )
+  }
+
   return (
     <>
       <Panel
         footer={
-          IS_PLATFORM ? (
-            <div className="flex py-4 w-full">
-              <FormActions
-                form={formId}
-                isSubmitting={isUpdatingAuthConfig}
-                hasChanges={isDirty}
-                handleReset={reset}
-                disabled={!canUpdateConfig}
-                helper={
-                  !canUpdateConfig
-                    ? 'You need additional permissions to update JWT settings'
-                    : undefined
-                }
-              />
-            </div>
-          ) : undefined
+          <div className="flex py-4 w-full">
+            <FormActions
+              form={formId}
+              isSubmitting={isUpdatingAuthConfig}
+              hasChanges={isDirty}
+              handleReset={reset}
+              disabled={!canUpdateConfig}
+              helper={
+                !canUpdateConfig
+                  ? 'You need additional permissions to update JWT settings'
+                  : undefined
+              }
+            />
+          </div>
         }
       >
         <Panel.Content className="border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark">
@@ -239,30 +257,26 @@ export const JWTSettings = () => {
                   {legacyKey && legacyKey.status !== 'revoked' && (
                     <Admonition
                       type="warning"
-                      title="Legacy JWT secret settings have moved to new JWT Signing Keys"
+                      title="Legacy JWT secret has been migrated to new JWT Signing Keys"
                     >
-                      {IS_PLATFORM && (
-                        <>
-                          <p className="leading-normal!">
-                            Legacy JWT secret can only be changed by rotating to a standby key and
-                            then revoking it. It is used to{' '}
-                            <em className="text-foreground not-italic">
-                              {legacyKey.status === 'in_use' ? 'sign and verify' : 'only verify'}
-                            </em>{' '}
-                            JSON Web Tokens by Supabase products.
-                          </p>
+                      <p className="leading-normal!">
+                        Legacy JWT secret can only be changed by rotating to a standby key and then
+                        revoking it. It is used to{' '}
+                        <em className="text-foreground not-italic">
+                          {legacyKey.status === 'in_use' ? 'sign and verify' : 'only verify'}
+                        </em>{' '}
+                        JSON Web Tokens by Supabase products.
+                      </p>
 
-                          {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
-                            <p className="leading-normal!">
-                              <em className="text-warning not-italic">
-                                This includes the <code className="text-code-inline">anon</code> and{' '}
-                                <code className="text-code-inline">service_role</code> JWT based API
-                                keys.
-                              </em>{' '}
-                              Consider switching to publishable and secret API keys to disable them.
-                            </p>
-                          )}
-                        </>
+                      {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
+                        <p className="leading-normal!">
+                          <em className="text-warning not-italic">
+                            This includes the <code className="text-code-inline">anon</code> and{' '}
+                            <code className="text-code-inline">service_role</code> JWT based API
+                            keys.
+                          </em>{' '}
+                          Consider switching to publishable and secret API keys to disable them.
+                        </p>
                       )}
 
                       <Button asChild type="default" icon={<ExternalLink />} className="mt-2">
@@ -279,86 +293,82 @@ export const JWTSettings = () => {
                       description="No new JSON Web Tokens are issued nor verified with it by Supabase products."
                     />
                   )}
-                  {IS_PLATFORM && (
-                    <>
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    id="JWT_SECRET"
+                    label={
+                      legacyKey?.status === 'revoked'
+                        ? 'Revoked legacy JWT secret'
+                        : legacyKey
+                          ? 'Legacy JWT secret (still used)'
+                          : 'Legacy JWT secret'
+                    }
+                    description={
+                      legacyKey?.status === 'revoked'
+                        ? 'No longer used to sign JWTs by Supabase Auth.'
+                        : !legacyKey || legacyKey.status === 'in_use'
+                          ? 'Used to sign and verify JWTs issued by Supabase Auth.'
+                          : 'Used only to verify JWTs.'
+                    }
+                  >
+                    <Input
+                      id="JWT_SECRET"
+                      copy={canReadJWTSecret && isNotUpdatingJwtSecret}
+                      reveal={canReadJWTSecret && isNotUpdatingJwtSecret}
+                      readOnly
+                      value={
+                        !canReadJWTSecret
+                          ? 'You need additional permissions to view the JWT secret'
+                          : isJwtSecretUpdateFailed
+                            ? 'JWT secret update failed'
+                            : isUpdatingJwtSecret
+                              ? 'Updating JWT secret...'
+                              : config?.jwt_secret || ''
+                      }
+                    />
+                  </FormItemLayout>
+
+                  <FormField
+                    control={form.control}
+                    name="JWT_EXP"
+                    disabled={!canUpdateConfig || isLoadingAuthConfig}
+                    render={({ field }) => (
                       <FormItemLayout
+                        name="JWT_EXP"
                         layout="flex-row-reverse"
-                        id="JWT_SECRET"
-                        label={
-                          legacyKey?.status === 'revoked'
-                            ? 'Revoked legacy JWT secret'
-                            : legacyKey
-                              ? 'Legacy JWT secret (still used)'
-                              : 'Legacy JWT secret'
-                        }
+                        label="Access token expiry time"
                         description={
-                          legacyKey?.status === 'revoked'
-                            ? 'No longer used to sign JWTs by Supabase Auth.'
-                            : !legacyKey || legacyKey.status === 'in_use'
-                              ? 'Used to sign and verify JWTs issued by Supabase Auth.'
-                              : 'Used only to verify JWTs.'
+                          <>
+                            <p>
+                              How long access tokens are valid for before a refresh token has to be
+                              used.
+                            </p>
+                            <p>Recommendation: 3600 (1 hour).</p>
+                          </>
                         }
                       >
-                        <Input
-                          id="JWT_SECRET"
-                          copy={canReadJWTSecret && isNotUpdatingJwtSecret}
-                          reveal={canReadJWTSecret && isNotUpdatingJwtSecret}
-                          readOnly
-                          value={
-                            !canReadJWTSecret
-                              ? 'You need additional permissions to view the JWT secret'
-                              : isJwtSecretUpdateFailed
-                                ? 'JWT secret update failed'
-                                : isUpdatingJwtSecret
-                                  ? 'Updating JWT secret...'
-                                  : config?.jwt_secret || ''
-                          }
-                        />
+                        <FormControl>
+                          <InputGroup>
+                            <FormInputGroupInput
+                              {...field}
+                              id="JWT_EXP"
+                              type="number"
+                              min={0}
+                              max={MAX_JWT_EXP}
+                              onChange={(e) =>
+                                field.onChange(
+                                  isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber
+                                )
+                              }
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>seconds</InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormControl>
                       </FormItemLayout>
-
-                      <FormField
-                        control={form.control}
-                        name="JWT_EXP"
-                        disabled={!canUpdateConfig || isLoadingAuthConfig}
-                        render={({ field }) => (
-                          <FormItemLayout
-                            name="JWT_EXP"
-                            layout="flex-row-reverse"
-                            label="Access token expiry time"
-                            description={
-                              <>
-                                <p>
-                                  How long access tokens are valid for before a refresh token has to
-                                  be used.
-                                </p>
-                                <p>Recommendation: 3600 (1 hour).</p>
-                              </>
-                            }
-                          >
-                            <FormControl>
-                              <InputGroup>
-                                <FormInputGroupInput
-                                  {...field}
-                                  id="JWT_EXP"
-                                  type="number"
-                                  min={0}
-                                  max={MAX_JWT_EXP}
-                                  onChange={(e) =>
-                                    field.onChange(
-                                      isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber
-                                    )
-                                  }
-                                />
-                                <InputGroupAddon align="inline-end">
-                                  <InputGroupText>seconds</InputGroupText>
-                                </InputGroupAddon>
-                              </InputGroup>
-                            </FormControl>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </>
-                  )}
+                    )}
+                  />
                 </>
               )}
             </form>

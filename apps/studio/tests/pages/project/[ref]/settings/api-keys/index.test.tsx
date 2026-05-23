@@ -77,7 +77,7 @@ describe('/project/[ref]/settings/api-keys', () => {
     expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
     expect(screen.getByText('ApiKeysFeedbackBanner')).toBeInTheDocument()
     expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
-    expect(screen.queryByText(/configured outside of Studio/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/API keys are configured outside of Studio/i)).not.toBeInTheDocument()
   })
 
   it('renders the create callout on platform when no new keys exist', () => {
@@ -89,19 +89,15 @@ describe('/project/[ref]/settings/api-keys', () => {
     expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
   })
 
-  it('renders the self-hosted admonition with docs link and hides the callout/banner', () => {
+  it('renders the admonition above the keys on self-hosted and hides the callout/banner', () => {
     mockIsPlatform.value = false
 
     render(<ApiKeysPage dehydratedState={{}} />)
 
+    expect(screen.getByText(/API keys are configured outside of Studio/i)).toBeInTheDocument()
     expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
     expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
     expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
     expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
-    expect(screen.getByText(/configured outside of Studio/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /self-hosted auth keys guide/i })).toHaveAttribute(
-      'href',
-      'https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys'
-    )
   })
 })
