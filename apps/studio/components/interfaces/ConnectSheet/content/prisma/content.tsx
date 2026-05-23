@@ -22,10 +22,10 @@ DIRECT_URL="${connectionStringPooler.sessionShared}"
       : connectionStringPooler.transactionDedicated &&
           connectionStringPooler.ipv4SupportedForDedicatedPooler
         ? `
-# Connect to Postgres via the dedicated transaction-mode pooler (IPv4 or IPv6)
+# Connect to Postgres via the dedicated transaction-mode pooler (IPv4-only)
 DATABASE_URL="${connectionStringPooler.transactionDedicated}?pgbouncer=true"
 
-# Connect to Postgres via the dedicated session-mode pooler (used for migrations)
+# Connect to Postgres directly (used for migrations)
 DIRECT_URL="${connectionStringPooler.sessionDedicated}"
         `
         : connectionStringPooler.transactionDedicated &&
@@ -37,7 +37,7 @@ DATABASE_URL="${connectionStringPooler.transactionShared}?pgbouncer=true"
 # Connect to Postgres via the shared session-mode pooler (used for migrations)
 DIRECT_URL="${connectionStringPooler.sessionShared}"
 
-# For paid projects, if your network supports IPv6, or you purchased the IPv4 add-on, use the dedicated pooler as an alternative
+# For paid projects, if your network supports IPv6, or you purchased the IPv4 add-on, use the dedicated transaction-mode pooler with a direct connection to Postgres for migrations as an alternative
 # DATABASE_URL="${connectionStringPooler.transactionDedicated}?pgbouncer=true"
 # DIRECT_URL="${connectionStringPooler.sessionDedicated}"
  `

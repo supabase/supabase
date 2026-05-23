@@ -85,6 +85,13 @@ export const getSelfHostedDirectStrings = (
   }
 }
 
+/**
+ * Returns `{ direct, pooler }`. `.direct` depends only on `connectionInfo`, so
+ * when callers invoke this twice (once per pooler flavor) as
+ * `connectionStringsShared` / `connectionStringsDedicated`, both `.direct`
+ * fields are identical — the `Shared`/`Dedicated` suffix only describes which
+ * pooler URI you get from `.pooler`.
+ */
 export const getConnectionStrings = ({
   connectionInfo,
   poolingInfo,
@@ -258,6 +265,9 @@ export const buildConnectionStringPooler = ({
     }
   }
 
+  // Port-swap 6543→5432 derives session from transaction. For shared this is a
+  // real Supavisor session connection; for dedicated it lands on direct Postgres
+  // (PgBouncer has no session mode).
   return {
     transactionShared: connectionStringsShared.pooler.uri,
     sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),

@@ -16,7 +16,7 @@ DATABASE_URL="${connectionStringPooler.transactionShared}"
       : connectionStringPooler.transactionDedicated &&
           connectionStringPooler.ipv4SupportedForDedicatedPooler
         ? `
-# Connect to Postgres via the dedicated transaction-mode pooler (IPv4 or IPv6)
+# Connect to Postgres via the dedicated transaction-mode pooler (IPv4-only)
 DATABASE_URL="${connectionStringPooler.transactionDedicated}"
         `
         : connectionStringPooler.transactionDedicated &&
