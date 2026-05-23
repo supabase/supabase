@@ -86,6 +86,11 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
           shortcutId: SHORTCUT_IDS.NAV_DATABASE_INDEXES,
         },
         {
+          name: 'Sequences',
+          key: 'sequences',
+          url: getDatabaseURL('sequences'),
+        },
+        {
           name: 'Publications',
           key: 'publications',
           url: getDatabaseURL('publications'),
