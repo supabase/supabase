@@ -86,18 +86,20 @@ export const General = () => {
               </CardContent>
             </Card>
           ) : (
-            <Card>
-              <CardContent>
-                <FormItemLayout
-                  layout="flex-row-reverse"
-                  label="Project name"
-                  description="Set via the DEFAULT_PROJECT_NAME environment variable."
-                  className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
-                >
-                  <PasswordInput copy readOnly size="small" value={project.name ?? ''} />
-                </FormItemLayout>
-              </CardContent>
-            </Card>
+            <Form {...form}>
+              <Card>
+                <CardContent>
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Project name"
+                    description="Set via the DEFAULT_PROJECT_NAME environment variable."
+                    className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                  >
+                    <PasswordInput copy readOnly size="small" value={project.name ?? ''} />
+                  </FormItemLayout>
+                </CardContent>
+              </Card>
+            </Form>
           )}
           <Admonition
             type="default"
