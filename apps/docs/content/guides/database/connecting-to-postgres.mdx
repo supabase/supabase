@@ -10,7 +10,7 @@ How you connect to your database depends on where you're connecting from:
 
 - For frontend applications, use the [Data API](#data-apis-and-client-libraries)
 - For Postgres clients, use a connection string
-  - For single sessions (for example, database GUIs) or Postgres native commands (for example, using client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html), [migrations](/docs/guides/deployment/database-migrations), [backup-restore](/docs/guides/platform/migrating-within-supabase/backup-restore), or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external)) use the [direct connection string](#direct-connection) if your environment supports IPv6. IPv4 available as [Add-on](/docs/guides/platform/ipv4-address).
+  - For single sessions (for example, database GUIs) or Postgres native commands (for example, using client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html), [migrations](/docs/guides/deployment/database-migrations), [backup-restore](/docs/guides/platform/migrating-within-supabase/backup-restore), or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external)), use the [direct connection string](#direct-connection). The direct endpoint is on IPv6, or on IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
   - For application traffic from persistent clients on IPv4-only networks, use [pooler session mode](#pooler-session-mode)
   - For application traffic from temporary clients (for example, serverless or edge functions) use [pooler transaction mode](#pooler-transaction-mode)
 
@@ -78,7 +78,7 @@ The direct connection string connects directly to your Postgres instance. It is 
 
 <Admonition type="caution">
 
-Direct connections use IPv6 by default. If your environment doesn't support IPv6, use [pooler session mode](#pooler-session-mode) or get the [IPv4 add-on](/docs/guides/platform/ipv4-address), which swaps your project's IPv6 connectivity for IPv4.
+Direct connections are on IPv6, or on IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address). If your network is IPv4-only and you don't have the add-on, use [pooler session mode](#pooler-session-mode) instead.
 
 </Admonition>
 
@@ -92,7 +92,7 @@ Get your project's direct connection string from your project dashboard by click
 
 ## Poolers
 
-Supabase offers two poolers. The **Shared Pooler** ([Supavisor](https://github.com/supabase/supavisor)) is multi-tenant, available on every project, and accepts IPv4 connections only. The **Dedicated Pooler** ([PgBouncer](https://www.pgbouncer.org/)) is available on paid plans, co-located with your Postgres instance, and accepts IPv6 connections (or IPv4 with the [add-on](/docs/guides/platform/ipv4-address)).
+Supabase offers two poolers. The **Shared Pooler** ([Supavisor](https://github.com/supabase/supavisor)) is multi-tenant, available on every project, and IPv4-only. The **Dedicated Pooler** ([PgBouncer](https://www.pgbouncer.org/)) is available on paid plans and co-located with your Postgres instance; like the direct connection, it is on IPv6, or on IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 ### Pooler session mode
 
