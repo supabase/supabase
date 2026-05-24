@@ -1,0 +1,70 @@
+# VictoriaMetrics scrape configuration for self-hosted Supabase.
+#
+# Mounted into the VictoriaMetrics container by docker-compose.metrics.yml.
+#
+# Bearer JWT for Supavisor and Realtime: ANON_KEY from your .env file.
+# Generate the jwt file with:
+#   grep '^ANON_KEY=' .env | cut -d= -f2 > volumes/monitoring/jwt
+
+global:
+  scrape_interval: 60s
+
+scrape_configs:
+
+  # Supavisor — connection pooler, on by default, requires Bearer JWT
+  - job_name: supabase-supavisor
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials_file: /etc/vm/jwt
+    static_configs:
+      - targets: ["supabase-pooler:4000"]
+        labels:
+          service: supavisor
+
+  # Realtime — on by default, requires Bearer JWT
+  - job_name: supabase-realtime
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials_file: /etc/vm/jwt
+    static_configs:
+      - targets: ["realtime-dev.supabase-realtime:4000"]
+        labels:
+          service: realtime
+
+  # Auth (GoTrue) — requires GOTRUE_METRICS_ENABLED=true
+  # (see docker-compose.override.yml)
+  - job_name: supabase-auth
+    metrics_path: /
+    static_configs:
+      - targets: ["supabase-auth:9100"]
+        labels:
+          service: auth
+
+  # PostgreSQL — via postgres_exporter sidecar
+  # (added by docker-compose.metrics.yml)
+  - job_name: supabase-postgres
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+        labels:
+          service: postgres
+
+  # Kong — requires prometheus plugin + KONG_ADMIN_LISTEN=0.0.0.0:8001
+  # (see docker-compose.override.yml)
+  - job_name: supabase-kong
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supabase-kong:8001"]
+        labels:
+          service: kong
+
+  # Vector — requires vector.metrics.yml mounted alongside vector.yml
+  # (see docker-compose.override.yml)
+  - job_name: supabase-vector
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supabase-vector:9598"]
+        labels:
+          service: vector
