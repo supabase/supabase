@@ -1,14 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { configKeys } from './keys'
 import { handleError } from '@/data/fetchers'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type DeploymentMode = {
+export type DeploymentModeResponse = {
   is_cli_mode: boolean
 }
 
-export async function getDeploymentMode(signal?: AbortSignal): Promise<DeploymentMode> {
+export async function getDeploymentMode(signal?: AbortSignal): Promise<DeploymentModeResponse> {
   const response = await fetch(`${API_URL}/platform/deployment-mode`, { signal })
   const body = await response.json()
 
@@ -28,7 +29,7 @@ export const useDeploymentModeQuery = <TData = DeploymentModeData>(
   const { enabled = true, ...rest } = options
 
   return useQuery<DeploymentModeData, DeploymentModeError, TData>({
-    queryKey: ['deployment-mode'],
+    queryKey: configKeys.deploymentMode(),
     queryFn: ({ signal }) => getDeploymentMode(signal),
     // Only fetch in non-platform mode (CLI or self-hosted)
     enabled: enabled && !IS_PLATFORM,

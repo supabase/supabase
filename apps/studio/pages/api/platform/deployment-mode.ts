@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import type { DeploymentModeResponse } from '@/data/config/deployment-mode-query'
 import apiWrapper from '@/lib/api/apiWrapper'
+import { IS_CLI } from '@/lib/constants'
 
 export default function deploymentMode(req: NextApiRequest, res: NextApiResponse) {
   return apiWrapper(req, res, handler)
@@ -18,15 +20,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type ResponseData = {
-  is_cli_mode: boolean
-}
-
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
-  // CURRENT_CLI_VERSION is set by the Supabase CLI when starting Studio
-  const isCliMode = !!process.env.CURRENT_CLI_VERSION
-
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse<DeploymentModeResponse>) => {
   return res.status(200).json({
-    is_cli_mode: isCliMode,
+    is_cli_mode: IS_CLI,
   })
 }

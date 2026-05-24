@@ -27,7 +27,12 @@ export type DeploymentMode = {
  */
 export function useDeploymentMode(): DeploymentMode {
   const { data } = useDeploymentModeQuery()
-  const isCli = !IS_PLATFORM && (data?.is_cli_mode ?? false)
+  // Default to CLI (`?? true`) during the loading window. `'direct'` is the only
+  // method valid in every environment, so a self-hosted user briefly seeing CLI
+  // defaults lands on a valid (if not preferred) choice — whereas a CLI user
+  // briefly seeing self-hosted defaults gets `connectionMethod` pinned to
+  // `'session'`, which isn't a valid CLI method.
+  const isCli = !IS_PLATFORM && (data?.is_cli_mode ?? true)
   const isSelfHosted = !IS_PLATFORM && !isCli
   return useMemo(() => ({ isPlatform: IS_PLATFORM, isCli, isSelfHosted }), [isCli, isSelfHosted])
 }
