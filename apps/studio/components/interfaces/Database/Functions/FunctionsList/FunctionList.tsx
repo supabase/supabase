@@ -104,7 +104,7 @@ const FunctionList = ({
 
         return (
           <TableRow key={x.id}>
-            <TableCell className="truncate">
+            <TableCell className="min-w-[150px] truncate">
               <Button
                 type="text"
                 className="text-link-table-cell text-sm disabled:opacity-100 disabled:no-underline p-0 hover:bg-transparent title"
@@ -115,7 +115,7 @@ const FunctionList = ({
                 {x.name}
               </Button>
             </TableCell>
-            <TableCell className="table-cell">
+            <TableCell className="min-w-[120px]">
               <p
                 title={x.argument_types}
                 className={`truncate ${x.argument_types ? 'text-foreground-light' : 'text-foreground-muted'}`}
@@ -123,7 +123,7 @@ const FunctionList = ({
                 {x.argument_types || '–'}
               </p>
             </TableCell>
-            <TableCell className="table-cell">
+            <TableCell className="min-w-[120px]">
               {x.return_type === 'trigger' ? (
                 <Link
                   href={getDatabaseTriggersHref(projectRef, x.name)}
@@ -138,7 +138,7 @@ const FunctionList = ({
                 </p>
               )}
             </TableCell>
-            <TableCell className="table-cell">
+            <TableCell className="min-w-[100px]">
               <p className="truncate text-foreground-light">
                 {x.security_definer ? 'Definer' : 'Invoker'}
               </p>

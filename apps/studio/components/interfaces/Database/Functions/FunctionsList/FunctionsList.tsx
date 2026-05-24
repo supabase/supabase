@@ -372,18 +372,18 @@ export const FunctionsList = () => {
           </div>
 
           {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
-          <Card>
-            <Table className="table-fixed overflow-x-auto">
+          <Card className="overflow-x-auto">
+            <Table className="min-w-[650px]">
               <TableHeader>
                 <TableRow>
                   <TableHead key="name">Name</TableHead>
-                  <TableHead key="arguments" className="table-cell">
+                  <TableHead key="arguments" className="min-w-[120px]">
                     Arguments
                   </TableHead>
-                  <TableHead key="return_type" className="table-cell">
+                  <TableHead key="return_type" className="min-w-[120px]">
                     Return type
                   </TableHead>
-                  <TableHead key="security" className="table-cell w-[100px]">
+                  <TableHead key="security" className="min-w-[120px]">
                     Security
                   </TableHead>
                   <TableHead key="buttons" className="w-1/6"></TableHead>
