@@ -1,4 +1,4 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { useCallback, type ChangeEvent, type DragEvent } from 'react'
@@ -25,7 +25,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 
 interface SpreadsheetImportProps {
   visible: boolean
-  selectedTable?: PostgresTable
+  selectedTable?: PGTable
   saveContent: (prefillData: ImportContent) => void
   closePanel: () => void
   updateEditorDirty?: (value: boolean) => void

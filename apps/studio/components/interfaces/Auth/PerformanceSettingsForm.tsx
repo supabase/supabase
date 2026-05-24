@@ -15,11 +15,11 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -312,7 +312,7 @@ export const PerformanceSettingsForm = () => {
                       }
                     >
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
                             const values = databaseForm.getValues()
@@ -340,23 +340,20 @@ export const PerformanceSettingsForm = () => {
                             }
                           }}
                         >
-                          <SelectTrigger_Shadcn_
-                            size="small"
-                            disabled={!canUpdateConfig || promptUpgrade}
-                          >
-                            <SelectValue_Shadcn_>
+                          <SelectTrigger size="small" disabled={!canUpdateConfig || promptUpgrade}>
+                            <SelectValue>
                               {field.value === 'percent' ? 'Percentage' : 'Absolute'}
-                            </SelectValue_Shadcn_>
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_ align="end">
-                            <SelectItem_Shadcn_ value="connections" className="text-xs">
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent align="end">
+                            <SelectItem value="connections" className="text-xs">
                               Absolute number of connections
-                            </SelectItem_Shadcn_>
-                            <SelectItem_Shadcn_ value="percent" className="text-xs">
+                            </SelectItem>
+                            <SelectItem value="percent" className="text-xs">
                               Percent of max connections
-                            </SelectItem_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}

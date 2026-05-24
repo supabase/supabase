@@ -20,7 +20,11 @@ export const TABLE_EVENT_ACTIONS = {
   TableCreated: 'table_created',
   TableDataAdded: 'table_data_added',
   TableRLSEnabled: 'table_rls_enabled',
-} as const
+} as const satisfies {
+  TableCreated: TableCreatedEvent['action']
+  TableDataAdded: TableDataAddedEvent['action']
+  TableRLSEnabled: TableRLSEnabledEvent['action']
+}
 
 export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
 
@@ -175,6 +179,10 @@ export interface CronJobUpdatedEvent {
  */
 export interface CronJobRemovedEvent {
   action: 'cron_job_removed'
+  properties: {
+    /** Cron job classification, parsed from the job's command at deletion time. */
+    type: 'sql_function' | 'sql_snippet' | 'edge_function' | 'http_request'
+  }
   groups: TelemetryGroups
 }
 
@@ -287,24 +295,6 @@ export interface TimezonePickerClickedEvent {
   groups: TelemetryGroups
 }
 /**
- * User was exposed to the project creation form (exposure event for RLS option experiment).
- *
- * @group Events
- * @source studio
- * @page new/{slug}
- */
-export interface ProjectCreationRlsOptionExperimentExposedEvent {
-  action: 'project_creation_rls_option_experiment_exposed'
-  properties: {
-    /**
-     * Experiment variant: 'control' (checkbox hidden) or 'test' (checkbox shown)
-     */
-    variant: 'control' | 'test'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * Top-of-funnel event for the dataApiRevokeOnCreateDefault rollout. Fires once per
  * mount after the flag resolves so cohort attribution is clean — pair with
  * project_creation_simple_version_submitted to measure the flag's impact on
@@ -320,16 +310,22 @@ export interface ProjectCreationDefaultPrivilegesExposedEvent {
     /** Where the checkbox was shown. */
     surface: 'main' | 'vercel'
     /**
-     * State of the "Enable Data API" toggle at exposure time. Main flow only —
-     * the Vercel surface has no such toggle, so this is omitted there.
+     * Current state of the "Automatically expose new tables" checkbox
+     * (`dataApiDefaultPrivileges` form field) at exposure time. This is the
+     * field the experiment actually controls.
+     * true = default privileges granted (legacy behaviour)
+     * false = revoke SQL runs on create (new behaviour, treatment default)
      */
-    dataApiEnabled?: boolean
+    dataApiDefaultPrivileges: boolean
     /**
      * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
-     * true = revoke cohort (checkbox defaulted to unchecked)
-     * false = control cohort (checkbox defaulted to checked)
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = revoke cohort (checkbox defaulted to unchecked)
+     * false = outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
      */
-    dataApiRevokeOnCreateDefaultEnabled: boolean
+    dataApiRevokeOnCreateDefaultEnabled: boolean | string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -388,14 +384,17 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     dataApiDefaultPrivilegesGranted?: boolean
     /**
-     * Whether the dataApiRevokeOnCreateDefault PostHog flag was enabled for this user.
+     * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at submission time.
      * Controls only the default checkbox state of "Automatically expose new tables and functions"
      * at project creation. Tracking it lets us correlate flag cohort with user choice.
-     * true = user is in the staged rollout cohort (checkbox defaulted to unchecked)
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = user is in the treatment arm (checkbox defaulted to unchecked)
      * false = user is outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
      * omitted = PostHog flags had not loaded at the time of project creation
      */
-    dataApiRevokeOnCreateDefaultEnabled?: boolean
+    dataApiRevokeOnCreateDefaultEnabled?: boolean | string
   }
   groups: TelemetryGroups
 }
@@ -451,72 +450,6 @@ export interface TableApiAccessToggleClickedEvent {
     schemaName: string
   }
   groups: TelemetryGroups
-}
-
-/**
- * On the InitialStep.tsx screen, where user can chose to prompt, start blank or migrate, at least 5 characters were typed
- * in the prompt textarea indicating an intention to use the prompt.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationInitialStepPromptIntendedEvent {
-  action: 'project_creation_initial_step_prompt_intended'
-  /**
-   * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
-   * words, was this not just an edit. In this case, it should always be true.
-   */
-  properties: {
-    isNewPrompt: boolean
-  }
-}
-
-/**
- * First step of project creation was submitted, where the user writes a prompt or select to start blank or to migrate.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationInitialStepSubmittedEvent {
-  action: 'project_creation_initial_step_submitted'
-  properties: {
-    /**
-     * Records what the user selected in the first step of project creation.
-     */
-    onboardingPath: 'use_prompt' | 'start_blank' | 'migrate'
-  }
-}
-
-/**
- * After the InitialStep screen, at least 5 characters were typed in the prompt textarea indicating an intention to use the prompt.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationSecondStepPromptIntendedEvent {
-  action: 'project_creation_second_step_prompt_intended'
-  properties: {
-    /**
-     * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
-     * words, was this not just an edit.
-     */
-    isNewPrompt: boolean
-  }
-}
-
-/**
- * Second and final step of project creation was submitted. More precisely, right after the user clicks on "Create Project". To check,
- * if the project creation was successful, please refer to project_created event.
- *
- * @group Events
- * @source studio
- * @page new/v2/{slug}
- */
-export interface ProjectCreationSecondStepSubmittedEvent {
-  action: 'project_creation_second_step_submitted'
 }
 
 /**
@@ -792,7 +725,13 @@ export interface AssistantSuggestionRunQueryClickedEvent {
      * The type of suggestion that was run by the user. Mutate or Select query types only.
      */
     queryType: string
-    category?: string
+    /**
+     * For mutation queries only: the DDL subtype detected from the SQL.
+     * 'functions' for CREATE FUNCTION / CREATE OR REPLACE FUNCTION,
+     * 'rls-policies' for CREATE POLICY / ALTER POLICY,
+     * 'unknown' for any other mutation. Omitted for non-mutation queries.
+     */
+    mutationType?: 'functions' | 'rls-policies' | 'unknown'
   }
   groups: TelemetryGroups
 }
@@ -956,6 +895,7 @@ export interface WwwPricingPlanCtaClickedEvent {
     section: 'main' | 'comparison_table'
     tableMode?: 'mobile' | 'desktop'
   }
+  groups?: Partial<TelemetryGroups>
 }
 
 /**
@@ -966,7 +906,7 @@ export interface WwwPricingPlanCtaClickedEvent {
  * @page /events/*
  */
 export interface EventPageCtaClickedEvent {
-  action: 'www_pricing_plan_cta_clicked'
+  action: 'www_event_page_cta_clicked'
   properties: {
     /**
      * The title of the event clicked.
@@ -1099,23 +1039,6 @@ export interface RequestDemoButtonClickedEvent {
 }
 
 /**
- * User clicked the "Register" button in the State of Startups 2025 newsletter form.
- *
- * @group Events
- * @source www
- */
-export interface RegisterStateOfStartups2025NewsletterClicked {
-  action: 'register_for_state_of_startups_newsletter_clicked'
-  properties: {
-    /**
-     * The source of the button click, e.g. homepage hero, cta banner, product page header.
-     * If it states it came from the request demo form, it can come from different pages so refer to path name to determine.
-     */
-    buttonLocation: string
-  }
-}
-
-/**
  * User clicked the sign-in button in various locations described in properties.
  *
  * @group Events
@@ -1192,13 +1115,13 @@ export interface ImportDataButtonClickedEvent {
 }
 
 /**
- * User dropped a file into the import data dropzone on an empty table.
+ * User added a file to the import data dropzone on an empty table.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface ImportDataFileDroppedEvent {
+export interface ImportDataFileAddedEvent {
   action: 'import_data_dropzone_file_added'
   groups: TelemetryGroups
 }
@@ -1305,26 +1228,17 @@ export interface MetricsAPIBannerDismissButtonClickedEvent {
 }
 
 /**
- * Index Advisor banner enable button clicked event.
+ * User clicked the enable button for Index Advisor, either from the banner or the confirmation dialog.
  *
  * @group Events
  * @source studio
  * @page /observability/query-performance
  */
-export interface IndexAdvisorBannerEnableButtonClickedEvent {
-  action: 'index_advisor_banner_enable_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * Index Advisor dialog enable button clicked event.
- *
- * @group Events
- * @source studio
- * @page /observability/query-performance
- */
-export interface IndexAdvisorDialogEnableButtonClickedEvent {
-  action: 'index_advisor_dialog_enable_button_clicked'
+export interface IndexAdvisorEnableButtonClickedEvent {
+  action: 'index_advisor_enable_button_clicked'
+  properties: {
+    origin: 'banner' | 'dialog'
+  }
   groups: TelemetryGroups
 }
 
@@ -1979,24 +1893,6 @@ export interface HomeCustomReportBlockRemovedEvent {
 }
 
 /**
- * User was exposed to the HomeV2 experiment (shown the new home page).
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeNewExperimentExposedEvent {
-  action: 'home_new_experiment_exposed'
-  properties: {
-    /**
-     * The experiment variant shown to the user
-     */
-    variant: string
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * Connect section was shown to the user on the project homepage.
  *
  * @group Events
@@ -2026,6 +1922,8 @@ export interface HomeConnectActionClickedEvent {
   groups: TelemetryGroups
 }
 
+export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
+
 /**
  * User opened the ConnectSheet panel.
  *
@@ -2039,7 +1937,7 @@ export interface ConnectSheetOpenedEvent {
     /**
      * Where the sheet was opened from
      */
-    source: 'header_button' | 'connect_section'
+    source: ConnectSheetSource
   }
   groups: TelemetryGroups
 }
@@ -2079,6 +1977,7 @@ export interface HomeSectionRowsMovedEvent {
  */
 export interface DpaRequestButtonClickedEvent {
   action: 'dpa_request_button_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -2226,68 +2125,6 @@ export interface RLSGeneratedPolicyRemovedEvent {
  */
 export interface RLSGeneratedPoliciesCreatedEvent {
   action: 'rls_generated_policies_created'
-  groups: TelemetryGroups
-}
-
-/**
- * Conversion event for the generate policies experiment.
- * Fires when a user in the experiment creates a new table via table editor.
- * This is separate from TableCreatedEvent to keep experiment tracking isolated.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface TableCreateGeneratePoliciesExperimentConvertedEvent {
-  action: 'table_create_generate_policies_experiment_converted'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'tableCreateGeneratePolicies'
-    /**
-     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
-     */
-    variant: 'control' | 'variation'
-    /**
-     * Whether RLS was enabled on the table
-     */
-    has_rls_enabled: boolean
-    /**
-     * Whether the table was created with any RLS policies (manual or generated)
-     */
-    has_rls_policies: boolean
-    /**
-     * Whether AI-generated policies were used (only possible in variation)
-     */
-    has_generated_policies: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User was exposed to the generate policies experiment (shown or not shown the Generate Policies button).
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/editor
- */
-export interface TableCreateGeneratePoliciesExperimentExposedEvent {
-  action: 'table_create_generate_policies_experiment_exposed'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'tableCreateGeneratePolicies'
-    /**
-     * Experiment variant: 'control' (feature disabled) or 'variation' (feature enabled)
-     */
-    variant: 'control' | 'variation'
-    /**
-     * Days since project creation (to segment by new user cohorts)
-     */
-    days_since_project_creation: number
-  }
   groups: TelemetryGroups
 }
 
@@ -2611,17 +2448,17 @@ export interface LogDrainSaveButtonClickedEvent {
 }
 
 /**
- * User confirmed addition of log drain destination.
+ * User confirmed removal of a log drain destination in the delete-confirm modal.
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/settings/log-drains (LogDrains)
+ * @page /dashboard/project/{ref}/settings/log-drains
  */
-export interface LogDrainConfirmButtonSubmittedEvent {
-  action: 'log_drain_confirm_button_submitted'
+export interface LogDrainRemovedEvent {
+  action: 'log_drain_removed'
   properties: {
     /**
-     * Type of the destination confirmed
+     * Type of the destination removed
      */
     destination:
       | 'postgres'
@@ -3214,18 +3051,6 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
- * User clicked the "Upgrade to Pro" CTA in the dashboard header.
- * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
- *
- * @group Events
- * @source studio
- */
-export interface HeaderUpgradeCtaClickedEvent {
-  action: 'header_upgrade_cta_clicked'
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3263,7 +3088,12 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 export interface UnifiedLogsRowClickedEvent {
   action: 'unified_logs_row_clicked'
   properties: {
-    logType: string
+    /**
+     * Service that produced the log row. Mirrors `LOG_TYPES` in UnifiedLogs.constants.tsx.
+     * Server values are validated against this set by zod (UnifiedLogs.schema.ts) before
+     * reaching the table; anything else is rejected upstream so the union here is exhaustive.
+     */
+    logType: 'postgres' | 'postgrest' | 'auth' | 'storage' | 'edge function'
   }
   groups: TelemetryGroups
 }
@@ -3440,6 +3270,18 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 }
 
 /**
+ * User ran a query in the RLS tester feature preview.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface RLSTesterRunQueryClickedEvent {
+  action: 'rls_tester_run_query_clicked'
+  properties: { type: 'raw' | 'inferred' }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3459,16 +3301,11 @@ export type TelemetryEvent =
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | TimezonePickerClickedEvent
-  | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationDefaultPrivilegesExposedEvent
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | TableApiAccessToggleClickedEvent
-  | ProjectCreationInitialStepPromptIntendedEvent
-  | ProjectCreationInitialStepSubmittedEvent
-  | ProjectCreationSecondStepPromptIntendedEvent
-  | ProjectCreationSecondStepSubmittedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
   | RealtimeInspectorMessageClickedEvent
@@ -3507,12 +3344,11 @@ export type TelemetryEvent =
   | StartProjectButtonClickedEvent
   | SeeDocumentationButtonClickedEvent
   | RequestDemoButtonClickedEvent
-  | RegisterStateOfStartups2025NewsletterClicked
   | SignInButtonClickedEvent
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
   | ImportDataButtonClickedEvent
-  | ImportDataFileDroppedEvent
+  | ImportDataFileAddedEvent
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
@@ -3526,9 +3362,8 @@ export type TelemetryEvent =
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
   | MetricsAPIBannerDismissButtonClickedEvent
-  | IndexAdvisorBannerEnableButtonClickedEvent
+  | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
-  | IndexAdvisorDialogEnableButtonClickedEvent
   | IndexAdvisorTabClickedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
@@ -3559,7 +3394,6 @@ export type TelemetryEvent =
   | BranchSelectorCreateClickedEvent
   | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
-  | HomeNewExperimentExposedEvent
   | HomeConnectSectionExposedEvent
   | HomeConnectActionClickedEvent
   | ConnectSheetOpenedEvent
@@ -3578,8 +3412,6 @@ export type TelemetryEvent =
   | RLSGeneratePoliciesClickedEvent
   | RLSGeneratedPolicyRemovedEvent
   | RLSGeneratedPoliciesCreatedEvent
-  | TableCreateGeneratePoliciesExperimentExposedEvent
-  | TableCreateGeneratePoliciesExperimentConvertedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuClosedEvent
@@ -3589,7 +3421,7 @@ export type TelemetryEvent =
   | QueueOperationsSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
-  | LogDrainConfirmButtonSubmittedEvent
+  | LogDrainRemovedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
@@ -3617,7 +3449,6 @@ export type TelemetryEvent =
   | FlyDeprecationBannerDismissedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
-  | HeaderUpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
@@ -3638,3 +3469,4 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | RLSTesterRunQueryClickedEvent

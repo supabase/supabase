@@ -18,7 +18,7 @@ export default {
     const { name }: ReqPayload = await req.json();
 
     // Using 'sb_secret_xyz' bypasses RLS — use for privileged operations
-    if (ctx.authType === "secret") {
+    if (ctx.authMode === "secret") {
       return Response.json({
         message: \`Hello \${name} admin!\`,
       });

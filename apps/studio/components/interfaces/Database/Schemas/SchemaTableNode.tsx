@@ -13,6 +13,7 @@ import {
   Table2,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { memo } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -41,13 +42,15 @@ import { formatSql } from '@/lib/formatSql'
 export const TABLE_NODE_WIDTH = 320
 export const TABLE_NODE_ROW_HEIGHT = 40
 
-export const TableNode = ({
+type TableNodeOwnProps = NodeProps<Node<TableNodeData>> & { placeholder?: boolean }
+
+const TableNodeComponent = ({
   id,
   data,
   targetPosition,
   sourcePosition,
   placeholder,
-}: NodeProps<Node<TableNodeData>> & { placeholder?: boolean }) => {
+}: TableNodeOwnProps) => {
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
   const hiddenNodeConnector = 'h-px! w-px! min-w-0! min-h-0! cursor-grab! border-0! opacity-0!'
@@ -358,3 +361,17 @@ export const TableNode = ({
     </article>
   )
 }
+
+// Custom comparator: xyflow re-renders nodes on selection/drag with new prop
+// objects; only the listed props affect rendered output. Selection-driven styling
+// (highlighted edges) is read from context inside the component, so we can safely
+// ignore xyflow's `selected`/`dragging`/etc. here.
+export const TableNode = memo(
+  TableNodeComponent,
+  (prev, next) =>
+    prev.id === next.id &&
+    prev.data === next.data &&
+    prev.targetPosition === next.targetPosition &&
+    prev.sourcePosition === next.sourcePosition &&
+    prev.placeholder === next.placeholder
+)

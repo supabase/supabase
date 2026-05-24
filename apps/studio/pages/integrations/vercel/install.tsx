@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 
 import OrganizationPicker from '@/components/interfaces/Integrations/Vercel/OrganizationPicker'
 import { Markdown } from '@/components/interfaces/Markdown'
@@ -203,29 +203,27 @@ const VercelIntegration: NextPageWithLayout = () => {
               configurationId={configurationId}
             />
             {alreadyInstalled && (
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <AlertTriangle className="h-4 w-4" strokeWidth={2} />
-                <AlertTitle_Shadcn_>Vercel Integration is already installed.</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
+                <AlertTitle>Vercel Integration is already installed.</AlertTitle>
+                <AlertDescription>
                   You will need to choose another organization to install the integration.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
             {noOrganizations && (
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <AlertTriangle className="h-4 w-4" strokeWidth={2} />
-                <AlertTitle_Shadcn_>
-                  No Supabase Organizations to install Integration.
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="prose">
+                <AlertTitle>No Supabase Organizations to install Integration.</AlertTitle>
+                <AlertDescription className="prose">
                   You will need to create a Supabase Organization before you can install the Vercel
                   Integration. You can create a new organization{' '}
                   <Link href="https://supabase.com/dashboard/new" target="_blank">
                     here
                   </Link>
                   .
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
             <div className="flex flex-row w-full justify-end">
               <Button
@@ -242,13 +240,13 @@ const VercelIntegration: NextPageWithLayout = () => {
         </ScaffoldColumn>
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-6 py-3">
-        <Alert_Shadcn_ variant="default">
+        <Alert variant="default">
           <Info className="h-4 w-4" strokeWidth={2} />
-          <AlertTitle_Shadcn_>You can uninstall this Integration at any time.</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>You can uninstall this Integration at any time.</AlertTitle>
+          <AlertDescription>
             Remove this integration at any time from Vercel or the Supabase dashboard.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       </ScaffoldContainer>
     </>
   )

@@ -14,11 +14,10 @@ import { entityTypeKeys } from '@/data/entity-types/keys'
 import { lintKeys } from '@/data/lint/keys'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useChangedSync } from '@/hooks/misc/useChanged'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface DisplayBlockRendererProps {
   messageId: string
@@ -40,6 +39,7 @@ interface DisplayBlockRendererProps {
   onDeny?: () => void
   /** AI SDK tool state used to show approval UI for pending tool calls. */
   toolState?: ToolUIPart['state']
+  toolApprovalRespondedApproved?: boolean
   isLastPart?: boolean
   isLastMessage?: boolean
   showConfirmFooter?: boolean
@@ -57,6 +57,7 @@ export const DisplayBlockRenderer = ({
   onApprove,
   onDeny,
   toolState,
+  toolApprovalRespondedApproved,
   isLastPart = false,
   isLastMessage = false,
   showConfirmFooter = true,
@@ -77,9 +78,8 @@ export const DisplayBlockRenderer = ({
   const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
-  const { data: org } = useSelectedOrganizationQuery()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
@@ -141,16 +141,11 @@ export const DisplayBlockRenderer = ({
 
     onQueryRun?.(queryType)
 
-    sendEvent({
-      action: 'assistant_suggestion_run_query_clicked',
-      properties: {
-        queryType,
-        ...(queryType === 'mutation' ? { category: identifyQueryType(sqlQuery) ?? 'unknown' } : {}),
-      },
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
+    track('assistant_suggestion_run_query_clicked', {
+      queryType,
+      ...(queryType === 'mutation'
+        ? { mutationType: identifyQueryType(sqlQuery) ?? 'unknown' }
+        : {}),
     })
   }
 
@@ -223,13 +218,16 @@ export const DisplayBlockRenderer = ({
     )
   }
 
+  const isApprovalRequested = toolState === 'approval-requested'
+  const isApprovalResponded = toolState === 'approval-responded'
+  const isApprovalDenied = isApprovalResponded && toolApprovalRespondedApproved === false
   const shouldShowConfirmFooter =
     showConfirmFooter &&
-    toolState === 'approval-requested' &&
+    (isApprovalRequested || (isApprovalResponded && !isApprovalDenied)) &&
     isLastPart &&
     isLastMessage &&
-    !!onApprove &&
-    !!onDeny
+    (isApprovalResponded || (!!onApprove && !!onDeny))
+  const isRunningApprovedTool = (isApprovalResponded && !isApprovalDenied) || executeSqlLoading
 
   return (
     <div className="display-block w-auto overflow-x-hidden">
@@ -246,7 +244,7 @@ export const DisplayBlockRenderer = ({
           draggable={isDraggableToReports}
           onDragStart={handleDragStart}
           disabled={shouldShowConfirmFooter}
-          isExecuting={executeSqlLoading}
+          isExecuting={isRunningApprovedTool}
         />
       </div>
       {shouldShowConfirmFooter && (
@@ -254,10 +252,11 @@ export const DisplayBlockRenderer = ({
           <ConfirmFooter
             message="Assistant wants to run this query"
             cancelLabel="Skip"
-            confirmLabel={executeSqlLoading ? 'Running...' : 'Run Query'}
-            isLoading={executeSqlLoading}
-            onCancel={onDeny}
-            onConfirm={onApprove}
+            confirmLabel="Run Query"
+            confirmLabelLoading="Running..."
+            isLoading={isApprovalResponded || executeSqlLoading}
+            onCancel={isApprovalRequested ? onDeny : undefined}
+            onConfirm={isApprovalRequested ? onApprove : undefined}
           />
         </div>
       )}

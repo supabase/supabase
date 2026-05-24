@@ -8,7 +8,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
@@ -556,27 +555,25 @@ export function useQueryInsightsTableColumns({
                     buildPrompt={() => buildQueryInsightFixPrompt(row).prompt}
                     onOpenAssistant={() => handleAiSuggestedFix(row)}
                     copyLabel="Copy Markdown"
-                    extraDropdownItems={
-                      <>
-                        <DropdownMenuItem onClick={() => handleGoToLogs()} className="gap-2">
-                          <ExternalLink size={14} />
-                          Go to Logs
-                        </DropdownMenuItem>
-                        {row.issueType === 'slow' && (
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedTriageRow(props.rowIdx)
-                              setSheetView('explain')
-                            }}
-                            className="gap-2"
-                          >
-                            <ScanSearch size={14} />
-                            Explain
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuSeparator />
-                      </>
-                    }
+                    additionalDropdownItems={[
+                      {
+                        label: 'Go to Logs',
+                        icon: <ExternalLink size={14} />,
+                        onClick: () => handleGoToLogs(),
+                      },
+                      ...(row.issueType === 'slow'
+                        ? [
+                            {
+                              label: 'Explain',
+                              icon: <ScanSearch size={14} />,
+                              onClick: () => {
+                                setSelectedTriageRow(props.rowIdx)
+                                setSheetView('explain')
+                              },
+                            },
+                          ]
+                        : []),
+                    ]}
                   />
                 </div>
               )}
