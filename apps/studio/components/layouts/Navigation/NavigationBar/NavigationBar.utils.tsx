@@ -30,10 +30,6 @@ interface OtherFeatures {
   showLogs?: boolean
 }
 
-interface SettingsFeatures {
-  isPlatform?: boolean
-}
-
 function getRouteContext(ref?: string, project?: Project): RouteContext {
   return {
     ref,
@@ -210,7 +206,7 @@ export const generateOtherRoutes = (
   ]
 }
 
-export const generateSettingsRoutes = (ref?: string, _features?: SettingsFeatures): Route[] => {
+export const generateSettingsRoutes = (ref?: string): Route[] => {
   return [
     {
       key: 'settings',

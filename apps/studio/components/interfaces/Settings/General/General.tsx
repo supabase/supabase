@@ -92,7 +92,7 @@ export const General = () => {
                     label="Project name"
                     className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                   >
-                    <PasswordInput readOnly size="small" value={project.name ?? ''} />
+                    <Input readOnly value={project.name ?? ''} />
                   </FormItemLayout>
                 </CardContent>
               </Card>

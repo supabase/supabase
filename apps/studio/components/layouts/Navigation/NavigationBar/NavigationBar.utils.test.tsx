@@ -177,20 +177,14 @@ describe('generateOtherRoutes', () => {
 })
 
 describe('generateSettingsRoutes', () => {
-  it('links to general settings on platform', () => {
-    const routes = generateSettingsRoutes(REF, { isPlatform: true })
-    const settingsRoute = routes.find((r) => r.key === 'settings')
-    expect(settingsRoute?.link).toBe(`/project/${REF}/settings/general`)
-  })
-
-  it('links to general settings in self-hosted mode', () => {
-    const routes = generateSettingsRoutes(REF, { isPlatform: false })
+  it('links to general settings', () => {
+    const routes = generateSettingsRoutes(REF)
     const settingsRoute = routes.find((r) => r.key === 'settings')
     expect(settingsRoute?.link).toBe(`/project/${REF}/settings/general`)
   })
 
   it('returns a link as false when ref is undefined', () => {
-    const routes = generateSettingsRoutes(undefined, { isPlatform: true })
+    const routes = generateSettingsRoutes(undefined)
     const settingsRoute = routes.find((r) => r.key === 'settings')
     expect(settingsRoute?.link).toBe(undefined)
   })
