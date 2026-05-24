@@ -1,5 +1,5 @@
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { Blocks, Lightbulb, Logs, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
@@ -191,7 +191,7 @@ export const generateOtherRoutes = (
             key: 'logs',
             label: 'Logs',
             disabled: false,
-            icon: <List size={ICON_SIZE} strokeWidth={1.75} />,
+            icon: <Logs size={ICON_SIZE} strokeWidth={1.6} />,
             link:
               ref &&
               (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
