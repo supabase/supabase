@@ -58,8 +58,8 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
   const hiddenIssuesCount = totalIssues - visibleAdvisorItems.length
 
   const titleContent = useMemo(() => {
-    if (totalIssues === 0) return <h2>No critical issues found</h2>
-    const issuesText = totalIssues === 1 ? 'critical issue' : 'critical issues'
+    if (totalIssues === 0) return <h2>No high-priority issues found</h2>
+    const issuesText = totalIssues === 1 ? 'high-priority issue' : 'high-priority issues'
     const numberDisplay = totalIssues.toString()
     return (
       <h2>
@@ -130,7 +130,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                 href={`/project/${projectRef}/advisors/security`}
                 className="text-sm text-foreground-light hover:text-foreground"
               >
-                View all in Advisors
+                See warnings and info in Advisors
               </Link>
             )}
           </div>
@@ -258,7 +258,7 @@ function EmptyState({ projectRef }: { projectRef?: string }) {
       <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
         <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
-          No critical (error-level) security or performance issues found.
+          No high-priority security or performance issues found.
         </p>
         {projectRef && (
           <p className="text-sm text-foreground-lighter text-center">
