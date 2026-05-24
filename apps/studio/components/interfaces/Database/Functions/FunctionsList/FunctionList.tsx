@@ -125,7 +125,7 @@ const FunctionList = ({
             <TableCell className="table-cell">
               {x.return_type === 'trigger' ? (
                 <Link
-                  href={`/project/${projectRef}/database/triggers?search=${x.name}`}
+                  href={`/project/${projectRef}/database/triggers?search=${encodeURIComponent(x.name)}`}
                   className="truncate text-link"
                   title={x.return_type}
                 >

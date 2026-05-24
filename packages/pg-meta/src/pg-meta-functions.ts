@@ -191,27 +191,31 @@ function _generateCreateFunctionSql(
     config_params,
   }: PGFunctionCreate,
   { replace = false } = {}
-): string {
-  return /* SQL */ `
-    CREATE ${replace ? 'OR REPLACE' : ''} FUNCTION ${ident(schema!)}.${ident(name!)}(${
+): SafeSqlFragment {
+  const params = config_params
+    ? safeSql`${joinSqlFragments(
+        Object.entries(config_params).map(([param, value]) =>
+          safeSql`SET ${ident(param)} ${
+            value === 'FROM CURRENT'
+              ? safeSql`FROM CURRENT`
+              : safeSql`TO ${value === '""' ? literal("''") : literal(value)}`
+          }`
+        ),
+        '\n'
+      )}`
+    : safeSql``
+
+  return safeSql`
+    CREATE ${replace ? safeSql`OR REPLACE` : safeSql``} FUNCTION ${ident(schema!)}.${ident(name!)}(${
       args?.join(', ') || ''
     })
-    RETURNS ${return_type}
+    RETURNS ${ident(return_type ?? 'void')}
     AS ${literal(definition)}
-    LANGUAGE ${language}
-    ${behavior}
+    LANGUAGE ${ident(language ?? 'sql')}
+    ${ident(behavior ?? 'VOLATILE')}
     CALLED ON NULL INPUT
-    ${security_definer ? 'SECURITY DEFINER' : 'SECURITY INVOKER'}
-    ${
-      config_params
-        ? Object.entries(config_params)
-            .map(
-              ([param, value]) =>
-                `SET ${param} ${value === 'FROM CURRENT' ? 'FROM CURRENT' : 'TO ' + (value === '""' ? "''" : value)}`
-            )
-            .join('\n')
-        : ''
-    };
+    ${security_definer ? safeSql`SECURITY DEFINER` : safeSql`SECURITY INVOKER`}
+    ${params}
   `
 }
 
@@ -225,7 +229,7 @@ export function create({
   behavior = 'VOLATILE',
   security_definer = false,
   config_params = {},
-}: PGFunctionCreate) {
+}: PGFunctionCreate): { sql: SafeSqlFragment; zod: typeof z.void } {
   const sql = _generateCreateFunctionSql({
     name,
     schema,
@@ -253,52 +257,52 @@ export const pgFunctionUpdateZod = z.object({
 export type PGFunctionUpdate = z.infer<typeof pgFunctionUpdateZod>
 
 export function update(currentFunc: PGFunction, { name, schema, definition }: PGFunctionUpdate) {
-  const args = currentFunc.argument_types.split(', ')
   const identityArgs = currentFunc.identity_argument_types
 
-  const updateDefinitionSql =
+  const updateDefinitionSql: SafeSqlFragment =
     typeof definition === 'string'
       ? _generateCreateFunctionSql(
           {
-            ...currentFunc!,
+            ...currentFunc,
             definition,
-            args,
-            config_params: currentFunc!.config_params ?? {},
+            args: currentFunc.argument_types.split(', '),
+            config_params: currentFunc.config_params ?? {},
           },
           { replace: true }
         )
-      : ''
+      : safeSql``
 
-  const updateNameSql =
-    name && name !== currentFunc!.name
-      ? `ALTER FUNCTION ${ident(currentFunc!.schema)}.${ident(
-          currentFunc!.name
-        )}(${identityArgs}) RENAME TO ${ident(name)};`
-      : ''
+  const updateNameSql: SafeSqlFragment =
+    name && name !== currentFunc.name
+      ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(
+          currentFunc.name
+        )}(${identityArgs}) RENAME TO ${ident(name)}`
+      : safeSql``
 
-  const updateSchemaSql =
-    schema && schema !== currentFunc!.schema
-      ? `ALTER FUNCTION ${ident(currentFunc!.schema)}.${ident(
-          name || currentFunc!.name
-        )}(${identityArgs})  SET SCHEMA ${ident(schema)};`
-      : ''
+  const updateSchemaSql: SafeSqlFragment =
+    schema && schema !== currentFunc.schema
+      ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(
+          name || currentFunc.name
+        )}(${identityArgs}) SET SCHEMA ${ident(schema)}`
+      : safeSql``
 
-  const sql = /* SQL */ `
+  const sql = safeSql`
     DO LANGUAGE plpgsql $$
     BEGIN
-      IF ${typeof definition === 'string' ? 'TRUE' : 'FALSE'} THEN
+      IF ${typeof definition === 'string' ? safeSql`TRUE` : safeSql`FALSE`} THEN
         ${updateDefinitionSql}
 
         IF (
           SELECT id
           FROM (${FUNCTIONS_SQL}) AS f
-          WHERE f.schema = ${literal(currentFunc!.schema)}
-          AND f.name = ${literal(currentFunc!.name)}
+          WHERE f.schema = ${literal(currentFunc.schema)}
+          AND f.name = ${literal(currentFunc.name)}
           AND f.identity_argument_types = ${literal(identityArgs)}
-        ) != ${currentFunc.id} THEN
-          RAISE EXCEPTION 'Cannot find function "${currentFunc!.schema}"."${
-            currentFunc!.name
-          }"(${identityArgs})';
+        ) != ${literal(currentFunc.id)} THEN
+          RAISE EXCEPTION 'Cannot find function "%s"."%s"(%s)',
+            ${literal(currentFunc.schema)},
+            ${literal(currentFunc.name)},
+            ${literal(identityArgs)};
         END IF;
       END IF;
 
@@ -306,7 +310,7 @@ export function update(currentFunc: PGFunction, { name, schema, definition }: PG
 
       ${updateSchemaSql}
     END;
-    $$;
+    $$
   `
 
   return {
@@ -322,9 +326,9 @@ export const pgFunctionDeleteZod = z.object({
 export type PGFunctionDelete = z.infer<typeof pgFunctionDeleteZod>
 
 export function remove(func: PGFunction, { cascade = false }: PGFunctionDelete = {}) {
-  const sql = /* SQL */ `DROP FUNCTION ${ident(func.schema)}.${ident(func.name)}
+  const sql = safeSql`DROP FUNCTION ${ident(func.schema)}.${ident(func.name)}
   (${func.identity_argument_types})
-  ${cascade ? 'CASCADE' : 'RESTRICT'};`
+  ${cascade ? safeSql`CASCADE` : safeSql`RESTRICT`}`
 
   return {
     sql,

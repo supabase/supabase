@@ -132,7 +132,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
           <TableCell className="space-x-2">
             {x.function_name ? (
               <Link
-                href={`/project/${projectRef}/database/functions?search=${x.function_name}&schema=${x.function_schema}`}
+                href={`/project/${projectRef}/database/functions?search=${encodeURIComponent(x.function_name ?? '')}&schema=${encodeURIComponent(x.function_schema ?? '')}`}
                 className="text-link-table-cell block max-w-40 text-foreground-light"
               >
                 {x.function_name}

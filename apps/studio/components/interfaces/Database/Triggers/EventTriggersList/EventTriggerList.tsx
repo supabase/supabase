@@ -126,7 +126,7 @@ export const EventTriggerList = ({
             <TableCell className="space-x-2">
               {trigger.function_name ? (
                 <Link
-                  href={`/project/${projectRef}/database/functions?search=${trigger.function_name}&schema=${trigger.function_schema}`}
+                  href={`/project/${projectRef}/database/functions?search=${encodeURIComponent(trigger.function_name ?? '')}&schema=${encodeURIComponent(trigger.function_schema ?? '')}`}
                   className="text-link-table-cell block max-w-40 text-foreground-light"
                 >
                   {trigger.function_name}
