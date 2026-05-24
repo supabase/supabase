@@ -159,7 +159,7 @@ describe('Advisor signals integration', () => {
       </>
     )
 
-    expect(screen.getByText('Advisor found 2 issues')).toBeInTheDocument()
+    expect(screen.getByText('Advisor found 2 high-priority issues')).toBeInTheDocument()
     expect(screen.getByText('Banned IP address')).toBeInTheDocument()
     expect(screen.getAllByText('Critical lint detail').length).toBeGreaterThan(0)
     expect(
@@ -255,8 +255,10 @@ describe('Advisor signals integration', () => {
 
     render(<AdvisorSection />)
 
-    expect(screen.getByText('Advisor found 5 issues')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'View 1 more issue in Advisor' })).toBeInTheDocument()
+    expect(screen.getByText('Advisor found 5 high-priority issues')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'View 1 more issue in Advisors' })
+    ).toBeInTheDocument()
     expect(screen.queryByText('Banned IP address')).not.toBeInTheDocument()
   })
 
@@ -275,6 +277,6 @@ describe('Advisor signals integration', () => {
     render(<AdvisorSection />)
 
     // Lints have loaded — homepage renders without being blocked by signal loading
-    expect(screen.getByText('Advisor found no issues')).toBeInTheDocument()
+    expect(screen.getByText('No high-priority issues found')).toBeInTheDocument()
   })
 })
