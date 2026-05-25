@@ -124,7 +124,7 @@ const renderTemplateEditor = ({
   })
   useAsyncCheckPermissionsMock.mockReturnValue({ can: canUpdateConfig })
   useAuthConfigUpdateMutationMock.mockReturnValue({ mutate: updateAuthConfigMock })
-  useAuthTemplateResetMutationMock.mockReturnValue({ mutateAsync: resetTemplateMock })
+  useAuthTemplateResetMutationMock.mockReturnValue({ mutate: resetTemplateMock })
 
   return render(<TemplateEditor template={confirmationTemplate} />)
 }
@@ -187,7 +187,7 @@ describe('TemplateEditor reset to default', () => {
 
   it('resets the template through the dedicated reset endpoint after confirmation', async () => {
     const user = userEvent.setup()
-    resetTemplateMock.mockResolvedValue(resetAuthConfig)
+    resetTemplateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.(resetAuthConfig))
 
     renderTemplateEditor({ hasCustomBody: true })
 
@@ -196,10 +196,10 @@ describe('TemplateEditor reset to default', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Reset' }))
 
     await waitFor(() =>
-      expect(resetTemplateMock).toHaveBeenCalledWith({
-        projectRef: 'project-ref',
-        template: 'confirmation',
-      })
+      expect(resetTemplateMock).toHaveBeenCalledWith(
+        { projectRef: 'project-ref', template: 'confirmation' },
+        expect.any(Object)
+      )
     )
 
     expect(toast.success).toHaveBeenCalledWith('Email template reset to default')
@@ -207,7 +207,7 @@ describe('TemplateEditor reset to default', () => {
 
   it('does not reset through the auth config update payload', async () => {
     const user = userEvent.setup()
-    resetTemplateMock.mockResolvedValue(resetAuthConfig)
+    resetTemplateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.(resetAuthConfig))
 
     renderTemplateEditor({ hasCustomBody: true })
 
@@ -222,7 +222,7 @@ describe('TemplateEditor reset to default', () => {
 
   it('uses the reset response as the new editor state', async () => {
     const user = userEvent.setup()
-    resetTemplateMock.mockResolvedValue(resetAuthConfig)
+    resetTemplateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.(resetAuthConfig))
 
     renderTemplateEditor({
       body: '<p>Custom body</p>',

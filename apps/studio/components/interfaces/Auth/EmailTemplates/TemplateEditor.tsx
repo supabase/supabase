@@ -94,7 +94,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as EmailTemplateContentKey
 
-  const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig } = useAuthConfigQuery({ projectRef })
 
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
