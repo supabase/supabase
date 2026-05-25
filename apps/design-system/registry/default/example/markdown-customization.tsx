@@ -1,17 +1,46 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Markdown } from 'ui-patterns/Markdown'
+import { visit } from 'unist-util-visit'
+
+// Demo-only remark plugin: turns `<PascalCase ... />` in markdown into nodes that
+// react-markdown can map to entries in the `components` prop (MDX-like behavior).
+const JSX_SELF_CLOSING = /^<([A-Z]\w*)((?:\s+[\w-]+(?:="[^"]*")?)*)\s*\/>$/
+const ATTR_PATTERN = /([\w-]+)(?:="([^"]*)")?/g
+
+const remarkJsxComponents = () => (tree: any) => {
+  visit(tree, 'html', (node: any, index: number | undefined, parent: any) => {
+    if (!parent || index === undefined) return
+    const match = node.value.trim().match(JSX_SELF_CLOSING)
+    if (!match) return
+
+    const [, name, attrsStr] = match
+    const properties: Record<string, string | boolean> = {}
+    ATTR_PATTERN.lastIndex = 0
+    let attrMatch: RegExpExecArray | null
+    while ((attrMatch = ATTR_PATTERN.exec(attrsStr || '')) !== null) {
+      properties[attrMatch[1]] = attrMatch[2] !== undefined ? attrMatch[2] : true
+    }
+
+    parent.children[index] = {
+      type: 'jsxComponent',
+      data: { hName: name, hProperties: properties },
+    }
+  })
+}
 
 export default function MarkdownCustomization() {
   return (
-    <div className="space-y-8">
-      <div>
-        <h3 className="mb-4 text-sm font-semibold">Auth Error Codes</h3>
-        <ErrorCodes service="auth" />
-      </div>
-      <div>
-        <h3 className="mb-4 text-sm font-semibold">Database Error Codes</h3>
-        <ErrorCodes service="database" />
-      </div>
-    </div>
+    <Markdown
+      remarkPlugins={[remarkJsxComponents]}
+      components={{
+        ErrorCodes,
+      }}
+    >
+      {`## Auth error codes
+
+<ErrorCodes service="auth" />
+`}
+    </Markdown>
   )
 }
 
@@ -37,6 +66,12 @@ const ErrorCodes = ({ service = 'auth' }: ErrorCodesProps) => {
         description: 'User does not have permission for this operation',
       },
       { code: 'row_level_security', description: 'Row-level security policy blocked the request' },
+    ],
+    realtime: [
+      { code: 'SUBSCRIPTION_JOINED', description: 'Client successfully subscribed to a channel' },
+      { code: 'SUBSCRIPTION_LEFT', description: 'Client left a subscribed channel' },
+      { code: 'MESSAGE_BROADCAST', description: 'Broadcast message received on channel' },
+      { code: 'PRESENCE_STATE', description: 'Presence state synchronized' },
     ],
   }
 
