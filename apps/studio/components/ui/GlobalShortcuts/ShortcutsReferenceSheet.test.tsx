@@ -32,6 +32,13 @@ const ACTIVE_DATABASE_SHORTCUT_IDS = [
   SHORTCUT_IDS.NAV_DATABASE_TABLES,
 ] satisfies ShortcutId[]
 
+const ACTIVE_GLOBAL_ACTION_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.AI_ASSISTANT_TOGGLE,
+  SHORTCUT_IDS.INLINE_EDITOR_TOGGLE,
+  SHORTCUT_IDS.CONNECT_OPEN_SHEET,
+] satisfies ShortcutId[]
+
 const ACTIVE_AUTH_SHORTCUT_IDS = [
   ...ACTIVE_SHORTCUT_IDS,
   SHORTCUT_IDS.NAV_AUTH_USERS,
@@ -65,6 +72,14 @@ const ACTIVE_SURFACE_SHORTCUT_IDS = [
   SHORTCUT_IDS.SQL_EDITOR_FORMAT,
   SHORTCUT_IDS.STORAGE_BUCKETS_REFRESH,
   SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
+] satisfies ShortcutId[]
+
+const ACTIVE_PLATFORM_WEBHOOKS_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.PLATFORM_WEBHOOKS_EDIT_ENDPOINT,
+  SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_ENDPOINT_URL,
+  SHORTCUT_IDS.PLATFORM_WEBHOOKS_RETRY_DELIVERY,
+  SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_PAYLOAD,
 ] satisfies ShortcutId[]
 
 let sequenceIdCounter = 0
@@ -163,6 +178,20 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Go to Tables')).toBeInTheDocument()
   })
 
+  it('shows the global actions section when global action shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_GLOBAL_ACTION_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Global Actions')).toBeInTheDocument()
+    expect(screen.getByText('Toggle AI Assistant panel')).toBeInTheDocument()
+    expect(screen.getByText('Toggle inline SQL editor')).toBeInTheDocument()
+    expect(screen.getByText('Open Connect sheet')).toBeInTheDocument()
+    expect(screen.getByText('O')).toBeInTheDocument()
+    expect(screen.getAllByText('then').length).toBeGreaterThan(0)
+    expect(screen.getByText('C')).toBeInTheDocument()
+    expect(screen.queryByText('AI Assistant')).not.toBeInTheDocument()
+    expect(screen.queryByText('Inline Editor')).not.toBeInTheDocument()
+  })
+
   it('shows the auth navigation section when auth shortcuts are active', async () => {
     renderShortcutsReferenceSheet(ACTIVE_AUTH_SHORTCUT_IDS)
 
@@ -219,6 +248,17 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.queryByText('sql-editor')).not.toBeInTheDocument()
     expect(screen.queryByText('storage-buckets')).not.toBeInTheDocument()
     expect(screen.queryByText('storage-explorer')).not.toBeInTheDocument()
+  })
+
+  it('shows the platform webhooks section with human labels when webhooks shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_PLATFORM_WEBHOOKS_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Platform Webhooks')).toBeInTheDocument()
+    expect(screen.getByText('Edit endpoint')).toBeInTheDocument()
+    expect(screen.getByText('Copy endpoint URL')).toBeInTheDocument()
+    expect(screen.getByText('Retry delivery')).toBeInTheDocument()
+    expect(screen.getByText('Copy payload')).toBeInTheDocument()
+    expect(screen.queryByText('platform-webhooks')).not.toBeInTheDocument()
   })
 
   it('does not show inactive database shortcuts in search results', async () => {

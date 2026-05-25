@@ -10,6 +10,7 @@ import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
+import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
@@ -38,6 +39,8 @@ export const ConnectSheet = () => {
   const track = useTrack()
   const prevShowConnect = useRef(false)
   const { ref: projectRef } = useParams()
+
+  useConnectSheetShortcut()
 
   const availableModeIds = useAvailableConnectModes()
   const { connectSheetSource, setConnectSheetSource } = useAppStateSnapshot()
