@@ -433,7 +433,7 @@ export const PlanUpdateSidePanel = () => {
       />
 
       <UpgradeSurveyModal
-        visible={!showUpgradeSurvey}
+        visible={showUpgradeSurvey}
         originalPlan={originalPlanRef.current}
         subscription={subscription}
         onClose={(success?: boolean) => {
