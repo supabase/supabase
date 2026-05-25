@@ -53,7 +53,9 @@ const MembersExceedLimitModal = ({ visible, onClose }: MembersExceedLimitModalPr
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose} type="button">Understood</AlertDialogCancel>
+          <AlertDialogCancel onClick={onClose} type="button">
+            Understood
+          </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
