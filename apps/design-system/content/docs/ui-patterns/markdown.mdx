@@ -17,7 +17,6 @@ A composable `react-markdown` component.
 
 ```tsx
 import { Markdown } from 'ui-patterns/Markdown'
-
 ;<Markdown>
   {`# Heading
 
@@ -36,7 +35,6 @@ Renders all standard markdown elements (headings, paragraphs, lists, blockquotes
 
 ```tsx
 import { Markdown } from 'ui-patterns/Markdown'
-
 ;<Markdown
   codeBlock={true}
   className="custom-wrapper"
@@ -68,7 +66,6 @@ Override elements via the `components` prop:
 import { Markdown } from 'ui-patterns/Markdown'
 
 import { CustomLink } from '@/components/CustomLink'
-
 ;<Markdown components={{ a: CustomLink }}>{content}</Markdown>
 ```
 
@@ -98,7 +95,6 @@ Combine customizations:
 
 ```tsx
 import { Markdown, Quote } from 'ui-patterns/Markdown'
-
 ;<Markdown components={{ Quote }}>
   {`<Quote attribution="Jane Doe" src="..." caption="CEO">
   This is a powerful insight.
@@ -110,7 +106,6 @@ import { Markdown, Quote } from 'ui-patterns/Markdown'
 
 ```tsx
 import { Avatar } from 'ui-patterns/Markdown'
-
 ;<Avatar src="https://example.com/avatar.jpg" caption="John Smith, CEO" />
 ```
 
