@@ -4,6 +4,7 @@ import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 
+import { hotkeyToKeys } from './formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from './registry'
 import type { ShortcutOptions } from './types'
 import { useIsShortcutEnabled } from './useIsShortcutEnabled'
@@ -17,14 +18,25 @@ import useLatest from '@/hooks/misc/useLatest'
  * own a direct dep on `@tanstack/hotkeys`, so we keep the extension local.
  */
 export interface ShortcutHotkeyMeta extends HotkeyMeta {
-  id: ShortcutId
+  /**
+   * Stable identifier for the registration. `useShortcut` always sets this to
+   * a registered `ShortcutId`; `useDynamicShortcut` may pass any string so
+   * runtime-built shortcuts can flow through the same reference sheet.
+   */
+  id: ShortcutId | string
   referenceGroup?: string
 }
 
-const hotkeyToKeys = (hotkey: string): string[] =>
-  hotkey.split('+').map((part) => (part === 'Mod' ? 'Meta' : part))
-
-const orderShortcutCommands = (commands: ICommand[], commandsToInsert: ICommand[]): ICommand[] => {
+/**
+ * Shared orderer for the Cmd+K "Shortcuts" section. Keeps the "Show all
+ * keyboard shortcuts" entry pinned to the bottom regardless of registration
+ * order; everything else is order-stable. Exported so `useDynamicShortcut`
+ * can share the same ordering behavior.
+ */
+export const orderShortcutCommands = (
+  commands: ICommand[],
+  commandsToInsert: ICommand[]
+): ICommand[] => {
   const mergedCommands = [...commands, ...commandsToInsert]
 
   return mergedCommands.sort((a, b) => {
