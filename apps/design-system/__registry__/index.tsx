@@ -3206,6 +3206,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "markdown-customization": {
+      name: "markdown-customization",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-customization")),
+      source: "",
+      files: ["registry/default/example/markdown-customization.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "markdown-headings": {
       name: "markdown-headings",
       type: "components:example",

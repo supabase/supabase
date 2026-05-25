@@ -1715,6 +1715,12 @@ export const examples: Registry = [
     files: ['example/markdown-full-example.tsx'],
   },
   {
+    name: 'markdown-customization',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-customization.tsx'],
+  },
+  {
     name: 'markdown-headings',
     type: 'components:example',
     registryDependencies: ['markdown'],

@@ -7,52 +7,18 @@ The Markdown component provides a standardized way to render markdown content ac
 
 ## Overview
 
-A composable `react-markdown` component.
+A composable `react-markdown` component with common defaults for all standard markdown elements (headings, paragraphs, lists, blockquotes, links, images, tables, code). Customize any element via the `components` prop, and import optional components such as Quote or Avatar to opt-in to enhanced functionality.
 
-- **Defaults**: All standard markdown elements
-- **Composable**: import and add optional components such as Quote or Avatar to `components` to opt-in
-- **Custom Overrides**: Override any element via `components` prop
-
-## Basic Usage
-
-```tsx
-import { Markdown } from 'ui-patterns/Markdown'
-;<Markdown>
-  {`# Heading
-
-Paragraph with **bold** and *italic*.
-
-- List item 1
-- List item 2`}
-</Markdown>
-```
-
-Renders all standard markdown elements (headings, paragraphs, lists, blockquotes, links, images, tables, code) with sensible default styling.
+<ComponentPreview name="markdown-full-example" peekCode />
 
 ## API
-
-### Markdown Component
-
-```tsx
-import { Markdown } from 'ui-patterns/Markdown'
-;<Markdown
-  codeBlock={true}
-  className="custom-wrapper"
-  components={{ a: CustomLink }}
-  remarkPlugins={[customPlugin]}
->
-  {markdownContent}
-</Markdown>
-```
-
-### Props
 
 | Prop            | Type                  | Default       | Description                                                            |
 | --------------- | --------------------- | ------------- | ---------------------------------------------------------------------- |
 | `children`      | `string`              | -             | Markdown content to render                                             |
 | `content`       | `string`              | `''`          | **Deprecated**: Use `children` instead                                 |
 | `codeBlock`     | `boolean`             | `false`       | Enable syntax highlighting for code blocks (lazy-loaded via CodeBlock) |
-| `components`    | `Partial<Components>` | -             | Override specific markdown elements                                    |
+| `components`    | `Partial<Components>` | -             | Override or add specific markdown elements                             |
 | `className`     | `string`              | -             | CSS class for the wrapper div                                          |
 | `remarkPlugins` | `PluggableList`       | `[remarkGfm]` | Additional remark plugins (GFM is included by default)                 |
 
@@ -60,54 +26,9 @@ All other `react-markdown` options are supported via spread props.
 
 ## Customization
 
-Override elements via the `components` prop:
+Override any element via the `components` prop, enable syntax highlighting, or combine multiple customizations:
 
-```tsx
-import { Markdown } from 'ui-patterns/Markdown'
-
-import { CustomLink } from '@/components/CustomLink'
-;<Markdown components={{ a: CustomLink }}>{content}</Markdown>
-```
-
-Enable syntax highlighting:
-
-```tsx
-<Markdown codeBlock>{contentWithCodeBlocks}</Markdown>
-```
-
-Combine customizations:
-
-```tsx
-<Markdown
-  codeBlock
-  components={{
-    h1: (props) => <CustomHeading {...props} />,
-    a: CustomLink,
-  }}
->
-  {content}
-</Markdown>
-```
-
-## Optional Components
-
-### Quote with Attribution
-
-```tsx
-import { Markdown, Quote } from 'ui-patterns/Markdown'
-;<Markdown components={{ Quote }}>
-  {`<Quote attribution="Jane Doe" src="..." caption="CEO">
-  This is a powerful insight.
-</Quote>`}
-</Markdown>
-```
-
-### Avatar
-
-```tsx
-import { Avatar } from 'ui-patterns/Markdown'
-;<Avatar src="https://example.com/avatar.jpg" caption="John Smith, CEO" />
-```
+<ComponentPreview name="markdown-customization" peekCode />
 
 ## Primitive Components
 
@@ -142,10 +63,6 @@ import {
   UnorderedList,
 } from 'ui-patterns/Markdown'
 ```
-
-## Full Example
-
-<ComponentPreview name="markdown-full-example" />
 
 ## Component Examples
 
@@ -189,10 +106,12 @@ import {
 
 <ComponentPreview name="markdown-horizontal-rules" />
 
-### Quote
+## Optional Components
 
-<ComponentPreview name="markdown-quote-component" />
+### Quote with Attribution
+
+<ComponentPreview name="markdown-quote-component" peekCode />
 
 ### Avatar
 
-<ComponentPreview name="markdown-avatar-component" />
+<ComponentPreview name="markdown-avatar-component" peekCode />
