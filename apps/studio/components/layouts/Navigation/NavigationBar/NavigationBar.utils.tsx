@@ -179,7 +179,7 @@ export const generateOtherRoutes = (
             key: 'observability',
             label: 'Observability',
             disabled: !isProjectActive,
-            icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <Telescope size={ICON_SIZE} strokeWidth={1.4} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
             shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY,
           },
