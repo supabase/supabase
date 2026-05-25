@@ -16,7 +16,7 @@ export const SendEmailHookActiveAdmonition = () => {
       type="default"
       layout="responsive"
       title="Email templates are not used"
-      description="A send-email hook is active. Auth passes event metadata directly to your hook — email templates are bypassed entirely."
+      description="A Send Email hook is active. Event metadata is passed directly to your hook, meaning these templates are bypassed entirely."
       actions={
         <Button asChild type="default">
           <Link href={`/project/${projectRef}/auth/hooks?hook=send-email`}>Manage hook</Link>
