@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import ReactMarkdown, { type Components, type Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from 'ui'
@@ -62,7 +63,7 @@ interface MarkdownProps extends Omit<Options, 'children' | 'node' | 'components'
   codeBlock?: boolean
   /** @deprecated Use children instead */
   content?: string
-  components?: Components
+  components?: Partial<Components> & Record<string, React.ComponentType<any>>
 }
 
 export function Markdown({

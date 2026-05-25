@@ -1,6 +1,16 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Markdown } from 'ui-patterns/Markdown'
 
+export default function MarkdownCustomization() {
+  return (
+    <Markdown
+      components={{
+        ErrorCodes,
+      }}
+    />
+  )
+}
+
 // Custom ErrorCodes component for markdown
 const ErrorCodes = () => {
   const errorCodes = [
@@ -32,8 +42,4 @@ const ErrorCodes = () => {
       </Table>
     </div>
   )
-}
-
-export default function MarkdownCustomization() {
-  return <ErrorCodes />
 }
