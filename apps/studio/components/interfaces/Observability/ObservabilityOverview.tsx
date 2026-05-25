@@ -47,7 +47,7 @@ export const ObservabilityOverview = () => {
     refreshKey
   )
 
-  const { tableHitRate, indexHitRate, isLoading: hitRatesLoading } = useHitRates(refreshKey)
+  const { tableHitRate, indexHitRate, isLoading: hitRatesLoading } = useHitRates()
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1)
@@ -55,6 +55,8 @@ export const ObservabilityOverview = () => {
     queryClient.invalidateQueries({ queryKey: ['project-metrics'] })
     queryClient.invalidateQueries({ queryKey: ['infra-monitoring'] })
     queryClient.invalidateQueries({ queryKey: ['max-connections'] })
+    // invalidates useDbQuery-based hooks (slow queries count, hit rates)
+    queryClient.invalidateQueries({ queryKey: ['projects', projectRef, 'db'] })
   }, [queryClient, projectRef])
 
   const serviceBase = useMemo(

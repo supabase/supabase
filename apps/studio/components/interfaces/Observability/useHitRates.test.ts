@@ -1,32 +1,29 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildHitRatesSql, parseHitRates } from './useHitRates'
+import { QUERY_HIT_RATE_SQL } from '@/components/interfaces/Reports/Reports.constants'
+import { parseHitRates } from './useHitRates'
 
-describe('buildHitRatesSql', () => {
+describe('QUERY_HIT_RATE_SQL', () => {
   it('queries pg_statio_user_indexes for index hit rate', () => {
-    const sql = buildHitRatesSql()
-    expect(sql).toContain('pg_statio_user_indexes')
-    expect(sql).toContain('idx_blks_hit')
-    expect(sql).toContain('idx_blks_read')
+    expect(QUERY_HIT_RATE_SQL).toContain('pg_statio_user_indexes')
+    expect(QUERY_HIT_RATE_SQL).toContain('idx_blks_hit')
+    expect(QUERY_HIT_RATE_SQL).toContain('idx_blks_read')
   })
 
   it('queries pg_statio_user_tables for table hit rate', () => {
-    const sql = buildHitRatesSql()
-    expect(sql).toContain('pg_statio_user_tables')
-    expect(sql).toContain('heap_blks_hit')
-    expect(sql).toContain('heap_blks_read')
+    expect(QUERY_HIT_RATE_SQL).toContain('pg_statio_user_tables')
+    expect(QUERY_HIT_RATE_SQL).toContain('heap_blks_hit')
+    expect(QUERY_HIT_RATE_SQL).toContain('heap_blks_read')
   })
 
   it('uses NULLIF to guard against division by zero', () => {
-    const sql = buildHitRatesSql()
-    expect(sql).toContain('nullif')
+    expect(QUERY_HIT_RATE_SQL).toContain('nullif')
   })
 
   it('returns union of index and table rows', () => {
-    const sql = buildHitRatesSql()
-    expect(sql).toContain('union all')
-    expect(sql).toContain("'index hit rate'")
-    expect(sql).toContain("'table hit rate'")
+    expect(QUERY_HIT_RATE_SQL).toContain('union all')
+    expect(QUERY_HIT_RATE_SQL).toContain("'index hit rate'")
+    expect(QUERY_HIT_RATE_SQL).toContain("'table hit rate'")
   })
 })
 
