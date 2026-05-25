@@ -17,14 +17,18 @@ import {
 
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
+import { DeleteSendEmailHookConfirmationDialog } from './DeleteSendEmailHookConfirmationDialog'
 import { HookCard } from './HookCard'
 import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
+import { FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { isSmtpEnabled } from '@/components/interfaces/Auth/SmtpForm/SmtpForm.utils'
 import AlertError from '@/components/ui/AlertError'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
 import { executeSql } from '@/data/sql/execute-sql-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -32,6 +36,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const {
     data: authConfig,
     error: authConfigError,
@@ -45,7 +50,11 @@ export const HooksListing = () => {
   const [addHookAsideOpen, setAddHookAsideOpen] = useState(false)
   const [addHookEmptyOpen, setAddHookEmptyOpen] = useState(false)
 
-  const { mutate: updateAuthHooks, isPending: isDeletingAuthHook } = useAuthHooksUpdateMutation({
+  const {
+    mutate: updateAuthHooks,
+    mutateAsync: updateAuthHooksAsync,
+    isPending: isDeletingAuthHook,
+  } = useAuthHooksUpdateMutation({
     onSuccess: async () => {
       if (!selectedHookForDeletion) return
 
@@ -80,6 +89,27 @@ export const HooksListing = () => {
 
   const validHooks = hooks.filter((h) => isValidHook(h))
   const hasValidHooks = validHooks.length > 0
+
+  // Whether deleting the Send Email hook will lock template editing:
+  // post-cutoff Free plan projects without custom SMTP.
+  const willLockTemplatesOnSendEmailDelete =
+    !!selectedOrganization &&
+    selectedOrganization.plan?.id === 'free' &&
+    !!project?.inserted_at &&
+    project.inserted_at >= FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE &&
+    !isSmtpEnabled(authConfig)
+
+  const handleDeleteSendEmailHook = (): Promise<void> => {
+    if (!selectedHookForDeletion) return Promise.resolve()
+    return updateAuthHooksAsync({
+      projectRef: projectRef!,
+      config: {
+        [selectedHookForDeletion.enabledKey]: false,
+        [selectedHookForDeletion.uriKey]: null,
+        [selectedHookForDeletion.secretsKey]: null,
+      },
+    })
+  }
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
@@ -173,8 +203,17 @@ export const HooksListing = () => {
           authConfig={authConfig!}
         />
 
+        <DeleteSendEmailHookConfirmationDialog
+          open={selectedHookForDeletion?.id === 'send-email'}
+          onOpenChange={(open) => {
+            if (!open) setSelectedHookForDeletion(null)
+          }}
+          onConfirm={handleDeleteSendEmailHook}
+          willLockTemplates={willLockTemplatesOnSendEmailDelete}
+        />
+
         <ConfirmationModal
-          visible={!!selectedHookForDeletion}
+          visible={!!selectedHookForDeletion && selectedHookForDeletion.id !== 'send-email'}
           size="large"
           variant="destructive"
           loading={isDeletingAuthHook}

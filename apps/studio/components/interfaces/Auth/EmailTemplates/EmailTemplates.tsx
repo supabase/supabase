@@ -26,6 +26,7 @@ import {
   isCustomEmailTemplateRestrictionStatusKnown,
   slugifyTitle,
 } from './EmailTemplates.utils'
+import { SendEmailHookActiveAdmonition } from './SendEmailHookActiveAdmonition'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
@@ -79,6 +80,8 @@ export const EmailTemplates = () => {
   })
 
   const usingBuiltInEmailSender = isSuccess && authConfig && !hasCustomEmailSender(authConfig)
+  const hasSendEmailHook =
+    isSuccess && !!(authConfig?.HOOK_SEND_EMAIL_ENABLED && authConfig?.HOOK_SEND_EMAIL_URI)
   const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
     authConfig,
     organization: selectedOrganization,
@@ -139,6 +142,14 @@ export const EmailTemplates = () => {
             <PageSection>
               <PageSectionContent>
                 <CustomEmailTemplateRestrictionAdmonition />
+              </PageSectionContent>
+            </PageSection>
+          )}
+
+          {hasSendEmailHook && (
+            <PageSection>
+              <PageSectionContent>
+                <SendEmailHookActiveAdmonition />
               </PageSectionContent>
             </PageSection>
           )}
