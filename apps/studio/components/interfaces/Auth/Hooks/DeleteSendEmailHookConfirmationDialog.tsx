@@ -26,9 +26,12 @@ export const DeleteSendEmailHookConfirmationDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Send Email hook</AlertDialogTitle>
+          <AlertDialogTitle>Delete hook</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2">
-            <p>The default email templates will be used to send auth emails.</p>
+            <p>
+              The {willLockTemplates ? 'default' : 'built-in'} email templates will be used when
+              sending authentication-related emails.
+            </p>
             {willLockTemplates && (
               <p>Email templates cannot be edited on the Free plan without custom SMTP.</p>
             )}
@@ -36,7 +39,7 @@ export const DeleteSendEmailHookConfirmationDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={onConfirm}>
+          <AlertDialogAction variant="danger" onClick={onConfirm}>
             Delete hook
           </AlertDialogAction>
         </AlertDialogFooter>
