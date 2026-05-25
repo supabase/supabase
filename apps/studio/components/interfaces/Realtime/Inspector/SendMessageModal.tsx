@@ -10,7 +10,6 @@ import {
   DialogTitle,
   Input,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
@@ -43,19 +42,7 @@ export const SendMessageModal = ({
   }, [visible])
 
   return (
-    <Dialog
-      open={visible}
-      onOpenChange={onSelectCancel}
-      onConfirm={() => {
-        const payload = tryParseJson(values.payload)
-        if (payload === undefined) {
-          setError('Please provide a valid JSON')
-        } else {
-          onSelectConfirm({ ...values, payload })
-        }
-      }}
-      confirmLabel="Confirm"
-    >
+    <Dialog open={visible} onOpenChange={onSelectCancel}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Broadcast a message to all clients</DialogTitle>
