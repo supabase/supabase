@@ -32,6 +32,7 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
@@ -53,6 +54,7 @@ const NotificationsFormSchema = z.object({
 export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedProject } = useSelectedProjectQuery()
 
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -80,12 +82,14 @@ export const EmailTemplates = () => {
   const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
     authConfig,
     organization: selectedOrganization,
+    projectInsertedAt: selectedProject?.inserted_at,
   })
   const isTemplateEditBlocked =
     isTemplateRestrictionStatusKnown &&
     isCustomEmailTemplateEditingRestricted({
       authConfig,
       organization: selectedOrganization,
+      projectInsertedAt: selectedProject?.inserted_at,
     })
 
   const defaultValues = notificationEnabledKeys.reduce(

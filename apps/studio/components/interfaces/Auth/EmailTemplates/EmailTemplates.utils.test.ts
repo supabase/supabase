@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE,
   hasCustomEmailSender,
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
@@ -10,12 +11,17 @@ import type { Organization } from '@/types'
 const freeOrganization = { plan: { id: 'free', name: 'Free' } } as unknown as Organization
 const proOrganization = { plan: { id: 'pro', name: 'Pro' } } as unknown as Organization
 
+// Dates relative to the cutoff
+const PRE_CUTOFF = '2025-01-01T00:00:00Z'
+const POST_CUTOFF = '2026-12-01T00:00:00Z'
+
 describe('EmailTemplates.utils', () => {
-  it('waits for auth config before resolving restriction status', () => {
+  it('waits for auth config, organization, and project before resolving restriction status', () => {
     expect(
       isCustomEmailTemplateRestrictionStatusKnown({
         authConfig: {},
         organization: freeOrganization,
+        projectInsertedAt: POST_CUTOFF,
       })
     ).toBe(true)
 
@@ -23,6 +29,7 @@ describe('EmailTemplates.utils', () => {
       isCustomEmailTemplateRestrictionStatusKnown({
         authConfig: undefined,
         organization: freeOrganization,
+        projectInsertedAt: POST_CUTOFF,
       })
     ).toBe(false)
 
@@ -30,17 +37,41 @@ describe('EmailTemplates.utils', () => {
       isCustomEmailTemplateRestrictionStatusKnown({
         authConfig: {},
         organization: undefined,
+        projectInsertedAt: POST_CUTOFF,
+      })
+    ).toBe(false)
+
+    expect(
+      isCustomEmailTemplateRestrictionStatusKnown({
+        authConfig: {},
+        organization: freeOrganization,
+        projectInsertedAt: undefined,
       })
     ).toBe(false)
   })
 
-  it('restricts free projects that use the built-in email sender', () => {
+  it('restricts post-cutoff free projects that use the built-in email sender', () => {
     expect(
       isCustomEmailTemplateEditingRestricted({
         authConfig: {},
         organization: freeOrganization,
+        projectInsertedAt: POST_CUTOFF,
       })
     ).toBe(true)
+  })
+
+  it('does not restrict pre-cutoff free projects (grandfathered)', () => {
+    expect(
+      isCustomEmailTemplateEditingRestricted({
+        authConfig: {},
+        organization: freeOrganization,
+        projectInsertedAt: PRE_CUTOFF,
+      })
+    ).toBe(false)
+  })
+
+  it('uses the correct cutoff date', () => {
+    expect(FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE).toBe('2026-06-01T00:00:00Z')
   })
 
   it('allows paid projects that use the built-in email sender', () => {
@@ -48,6 +79,7 @@ describe('EmailTemplates.utils', () => {
       isCustomEmailTemplateEditingRestricted({
         authConfig: {},
         organization: proOrganization,
+        projectInsertedAt: POST_CUTOFF,
       })
     ).toBe(false)
   })
@@ -68,6 +100,7 @@ describe('EmailTemplates.utils', () => {
       isCustomEmailTemplateEditingRestricted({
         authConfig,
         organization: freeOrganization,
+        projectInsertedAt: POST_CUTOFF,
       })
     ).toBe(false)
   })
@@ -84,6 +117,7 @@ describe('EmailTemplates.utils', () => {
           SMTP_MAX_FREQUENCY: 60,
         },
         organization: freeOrganization,
+        projectInsertedAt: POST_CUTOFF,
       })
     ).toBe(true)
   })
@@ -96,6 +130,7 @@ describe('EmailTemplates.utils', () => {
           HOOK_SEND_EMAIL_URI: 'https://example.com/auth/send-email',
         },
         organization: freeOrganization,
+        projectInsertedAt: POST_CUTOFF,
       })
     ).toBe(false)
   })
