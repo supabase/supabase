@@ -5,9 +5,9 @@ import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandM
 
 import { hotkeyToKeys } from './formatShortcut'
 import type { ShortcutHotkeyMeta, ShortcutOptions } from './types'
+import { orderShortcutCommands } from './utils'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import useLatest from '@/hooks/misc/useLatest'
-import { orderShortcutCommands } from './utils'
 
 /**
  * Props shared by both the hook and the `<DynamicShortcut>` component.

@@ -1,4 +1,5 @@
 import { HotkeyMeta, HotkeySequence } from '@tanstack/react-hotkeys'
+
 import { ShortcutId } from './registry'
 
 export type DisabledShortcuts = Record<string, boolean>
