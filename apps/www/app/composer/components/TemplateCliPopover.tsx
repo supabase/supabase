@@ -79,15 +79,14 @@ export function TemplateCliPopover({
         <p className="px-3 pt-3 pb-3 text-xs leading-relaxed text-foreground-light">
           {description}
         </p>
-        <div className="flex items-center gap-2 rounded-none border-t bg-background/25 py-2">
-          <code className="min-w-0 flex-1 truncate pl-3 font-mono text-xs text-foreground">
-            {command}
-          </code>
+        <div className="flex items-center gap-2 border-t bg-background/25 px-3 py-2 font-mono text-xs text-foreground-light">
+          <span className="shrink-0 text-foreground-muted">$</span>
+          <code className="min-w-0 flex-1 truncate text-foreground">{command}</code>
           <CopyToClipboard text={command}>
             <button
               type="button"
               aria-label="Copy command"
-              className="mr-2 flex h-6 w-6 shrink-0 items-center justify-center rounded text-foreground-light hover:bg-surface-200"
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-foreground-light hover:bg-surface-200"
               onClick={handleCopy}
             >
               {copied ? (
