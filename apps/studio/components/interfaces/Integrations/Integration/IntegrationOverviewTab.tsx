@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { PropsWithChildren, ReactNode } from 'react'
 import { cn } from 'ui'
 
-import { INTEGRATIONS } from '../Landing/Integrations.constants'
+import { IntegrationDefinition, INTEGRATIONS } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
 import { RequiredExtensionsSection } from './RequiredExtensionsSection'
@@ -23,7 +23,7 @@ export const OverviewTabSharedContent = ({
   alert,
   children,
 }: PropsWithChildren<{
-  integration: any
+  integration: IntegrationDefinition
   hideRequiredExtensionsSection?: boolean
   actions?: ReactNode
   alert?: ReactNode
