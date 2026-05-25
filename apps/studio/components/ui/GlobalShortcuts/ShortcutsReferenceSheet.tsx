@@ -42,6 +42,7 @@ interface ShortcutGroup {
 const GROUP_LABELS: Record<string, string> = {
   ...SHORTCUT_REFERENCE_GROUP_LABELS,
   'action-bar': 'Actions',
+  'advisors-page': 'Advisors',
   'ai-assistant': 'AI Assistant',
   'auth-users': 'Auth Users',
   'command-menu': 'Command Menu',
@@ -51,6 +52,7 @@ const GROUP_LABELS: Record<string, string> = {
   'functions-overview': 'Edge Function Overview',
   'inline-editor': 'Inline Editor',
   'list-page': 'List pages',
+  'platform-webhooks': 'Platform Webhooks',
   'logs-preview': 'Logs Explorer',
   nav: 'Navigation',
   'operation-queue': 'Operation Queue',

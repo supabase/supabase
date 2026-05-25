@@ -11,27 +11,39 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import type { Organization } from '@/types'
 
 const VISIBLE_ORGANIZATIONS_LIMIT = 3
-const CONNECT_DISCLOSURE_TRIGGER_CLASSNAME =
-  'mx-auto flex h-7 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground'
+const CONNECT_DISCLOSURE_TRIGGER_CLASSNAME = cn(
+  'mx-auto flex h-7 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2',
+  'text-xs text-foreground-lighter transition-colors',
+  'hover:bg-surface-200 hover:text-foreground',
+  '[&[data-state=open]>svg]:-rotate-180!'
+)
 
 export const OrganizationSelector = ({
   organizations,
+  unavailableOrganizations = [],
   selectedSlug,
   disabled = false,
   description,
   createLabel,
   createHrefParams,
+  onCreate,
   onSelect,
   getOrganizationDescription,
+  getUnavailableOrganizationDescription,
+  unavailableReason,
 }: {
   organizations: Organization[]
+  unavailableOrganizations?: Organization[]
   selectedSlug?: string | null
   disabled?: boolean
   description?: ReactNode
   createLabel?: string
   createHrefParams?: { [key: string]: string }
+  onCreate?: () => void
   onSelect: (slug: string) => void
   getOrganizationDescription?: (organization: Organization) => ReactNode
+  getUnavailableOrganizationDescription?: (organization: Organization) => ReactNode
+  unavailableReason?: ReactNode
 }) => {
   const [showMore, setShowMore] = useState(false)
   const [lastVisitedOrganization] = useLocalStorageQuery(
@@ -77,6 +89,7 @@ export const OrganizationSelector = ({
   }, [lastVisitedOrganization, organizations, selectedSlug])
 
   const hasOverflow = overflowOrganizations.length > 0
+  const hasUnavailableOrganizations = unavailableOrganizations.length > 0
 
   return (
     <section className="space-y-2" aria-label="Organizations">
@@ -100,17 +113,20 @@ export const OrganizationSelector = ({
           />
         ))}
 
-        {!!createLabel && !!createHrefParams && (
-          <CreateOrganizationCard params={createHrefParams} label={createLabel} />
+        {!!createLabel && (!!createHrefParams || !!onCreate) && (
+          <CreateOrganizationCard
+            params={createHrefParams}
+            label={createLabel}
+            disabled={disabled}
+            onClick={onCreate}
+          />
         )}
 
         {hasOverflow && (
           <Collapsible open={showMore} onOpenChange={setShowMore}>
             <CollapsibleTrigger className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
               <span>{showMore ? 'Show fewer' : `Show ${overflowOrganizations.length} more`}</span>
-              <ChevronDown
-                className={cn('size-3.5 transition-transform', showMore && 'rotate-180')}
-              />
+              <ChevronDown className="size-3.5 transition-transform" />
             </CollapsibleTrigger>
             <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
               <div className="space-y-2 pt-1">
@@ -126,6 +142,35 @@ export const OrganizationSelector = ({
                     }
                   />
                 ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+
+        {hasUnavailableOrganizations && (
+          <Collapsible>
+            <CollapsibleTrigger className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
+              <span>Organizations that can't be linked</span>
+              <ChevronDown className="size-3.5 transition-transform" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
+              <div className="space-y-2 pt-1">
+                {unavailableOrganizations.map((organization) => (
+                  <ConnectOrganizationButton
+                    key={organization.slug}
+                    organization={organization}
+                    disabled
+                    description={
+                      getUnavailableOrganizationDescription?.(organization) ??
+                      getPlanDescription(organization)
+                    }
+                  />
+                ))}
+                {unavailableReason && (
+                  <p className="mx-auto max-w-xs text-center text-xs text-foreground-lighter text-balance">
+                    {unavailableReason}
+                  </p>
+                )}
               </div>
             </CollapsibleContent>
           </Collapsible>

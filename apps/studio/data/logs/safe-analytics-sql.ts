@@ -1,3 +1,15 @@
+// SECURITY MODEL — Proven authorship for analytics SQL
+//
+// Analytics queries (BigQuery for legacy cloud, ClickHouse for self-hosted OTEL)
+// carry the same injection risk as Postgres queries: filter keys, values, and
+// other fragments that originate from URL parameters, UI inputs, or LLM output
+// can be spliced into SQL that is executed on behalf of the project. The pattern
+// here mirrors the pg-meta safe-SQL model described in
+// .claude/skills/safe-sql-execution/SKILL.md: every value that flows from an
+// external source must pass through a sanitization helper before being
+// interpolated, and the wire boundary (`executeAnalyticsSql`) refuses plain
+// strings at compile time.
+//
 // pg-meta's `literal()` and `ident()` are Postgres-specific: `literal()` emits
 // `E'…'` for backslash-bearing strings and `::jsonb` casts for objects;
 // `ident()` quotes identifiers with double-quotes, which BigQuery rejects
@@ -123,4 +135,54 @@ export function clickhouseIdent(value: string): SafeLogSqlFragment {
     throw new Error(`clickhouseIdent: invalid ClickHouse identifier "${value}"`)
   }
   return rawSql('"' + value + '"')
+}
+
+/**
+ * Validates `value` against an allow-list of pre-branded fragments and returns
+ * the matching fragment. Use for SQL operators or keywords where the permitted
+ * set is known at compile time (e.g. `keyword(op, [safeSql`AND`, safeSql`OR`])`).
+ * Matching is case-insensitive (SQL keywords are case-insensitive by convention);
+ * the returned value is always the allow-listed fragment, never the raw input.
+ * Throws if `value` does not match any fragment in `allowed`.
+ */
+export function keyword(value: string, allowed: readonly SafeLogSqlFragment[]): SafeLogSqlFragment {
+  const lower = value.toLowerCase()
+  const match = allowed.find((frag) => frag.toLowerCase() === lower)
+  if (match === undefined) {
+    throw new Error(
+      `keyword: "${value}" is not in the allowed list [${allowed.map((s) => `"${s}"`).join(', ')}]`
+    )
+  }
+  return match
+}
+
+/**
+ * Quotes a dotted BigQuery identifier by wrapping the entire path in backticks,
+ * validating each segment individually.
+ * Accepts `a`, `a.b`, or `a.b.c`; each segment must match `[A-Za-z_][A-Za-z0-9_]*`.
+ * Example: `bqDottedIdent('request.method')` → `` `request.method` ``
+ *
+ * BigQuery requires the entire dotted path to be enclosed in a single pair of
+ * backticks; individually quoting each segment (`` `request`.`method` ``) is a
+ * syntax error in BigQuery's dialect.
+ */
+export function bqDottedIdent(value: string): SafeLogSqlFragment {
+  const segments = value.split('.')
+  if (segments.length === 0 || segments.some((s) => !SAFE_IDENT_RE.test(s))) {
+    throw new Error(`bqDottedIdent: invalid BigQuery dotted identifier "${value}"`)
+  }
+  return rawSql('`' + segments.join('.') + '`')
+}
+
+/**
+ * Quotes a dotted ClickHouse identifier using double-quotes, validating each segment.
+ * Accepts `a`, `a.b`, or `a.b.c`; each segment must match `[A-Za-z_][A-Za-z0-9_]*`.
+ * Example: `clickhouseDottedIdent('request.method')` → `"request"."method"`
+ */
+export function clickhouseDottedIdent(value: string): SafeLogSqlFragment {
+  const segments = value.split('.')
+  if (segments.length === 0 || segments.some((s) => !SAFE_IDENT_RE.test(s))) {
+    throw new Error(`clickhouseDottedIdent: invalid ClickHouse dotted identifier "${value}"`)
+  }
+  return rawSql(segments.map((s) => '"' + s + '"').join('.'))
 }

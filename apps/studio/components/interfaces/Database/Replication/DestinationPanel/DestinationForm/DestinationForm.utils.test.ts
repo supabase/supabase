@@ -35,7 +35,6 @@ const baseDucklakeFormData = {
   ducklakeS3UrlStyle: 'path' as const,
   ducklakeS3UseSsl: true,
   ducklakeMetadataSchema: ' ducklake_metadata ',
-  ducklakeExpireSnapshotsOlderThan: ' 7 days ',
 }
 
 describe('DestinationForm.utils DuckLake', () => {
@@ -46,7 +45,6 @@ describe('DestinationForm.utils DuckLake', () => {
       data: {
         ...baseDucklakeFormData,
         ducklakeMetadataSchema: '   ',
-        ducklakeExpireSnapshotsOlderThan: '   ',
       },
     })
 
@@ -62,7 +60,6 @@ describe('DestinationForm.utils DuckLake', () => {
         s3UrlStyle: 'path',
         s3UseSsl: true,
         metadataSchema: undefined,
-        expireSnapshotsOlderThan: undefined,
       },
     })
   })
@@ -91,7 +88,6 @@ describe('DestinationForm.utils DuckLake', () => {
         s3UrlStyle: 'path',
         s3UseSsl: true,
         metadataSchema: 'ducklake_metadata',
-        expireSnapshotsOlderThan: '7 days',
       },
     })
     expect(createS3AccessKey).not.toHaveBeenCalled()
