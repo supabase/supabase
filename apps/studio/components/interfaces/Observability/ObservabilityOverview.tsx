@@ -15,6 +15,7 @@ import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
+import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -27,6 +28,7 @@ export const ObservabilityOverview = () => {
   const queryClient = useQueryClient()
 
   const { projectStorageAll: storageSupported } = useIsFeatureEnabled(['project_storage:all'])
+  const { isEnabled: isDataApiEnabled } = useIsDataApiEnabled({ projectRef })
 
   const DEFAULT_INTERVAL: ChartIntervalKey = '1day'
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
@@ -65,6 +67,14 @@ export const ObservabilityOverview = () => {
         hasReport: true,
       },
       {
+        key: 'data_api' as const,
+        name: 'API Gateway',
+        reportUrl: undefined,
+        logsUrl: `/project/${projectRef}/logs/edge-logs`,
+        enabled: isDataApiEnabled,
+        hasReport: false,
+      },
+      {
         key: 'auth' as const,
         name: 'Auth',
         reportUrl: `/project/${projectRef}/observability/auth`,
@@ -98,14 +108,14 @@ export const ObservabilityOverview = () => {
       },
       {
         key: 'postgrest' as const,
-        name: 'Data API',
+        name: 'PostgREST',
         reportUrl: `/project/${projectRef}/observability/postgrest`,
         logsUrl: `/project/${projectRef}/logs/postgrest-logs`,
         enabled: true,
         hasReport: true,
       },
     ],
-    [projectRef, storageSupported]
+    [projectRef, storageSupported, isDataApiEnabled]
   )
 
   const enabledServices = serviceBase.filter((s) => s.enabled)
