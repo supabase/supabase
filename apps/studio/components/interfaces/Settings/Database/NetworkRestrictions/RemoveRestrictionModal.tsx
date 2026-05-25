@@ -61,15 +61,9 @@ const RemoveRestrictionModal = ({
         projectRef: ref,
         dbAllowedCidrs: ['0.0.0.0/0'],
         dbAllowedCidrsV6: ['::/0'],
-      }).catch(() => {
-        // Catch the error but ignore it, letting the default onError trigger
       })
     } else {
-      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 }).catch(
-        () => {
-          // Catch the error but ignore it, letting the default onError trigger
-        }
-      )
+      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
     }
   }
 

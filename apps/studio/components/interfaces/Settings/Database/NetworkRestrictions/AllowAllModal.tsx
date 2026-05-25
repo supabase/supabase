@@ -30,8 +30,6 @@ const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
       projectRef: ref,
       dbAllowedCidrs: ['0.0.0.0/0'],
       dbAllowedCidrsV6: ['::/0'],
-    }).catch(() => {
-      // Catch the error but ignore it, letting the default onError trigger
     })
   }
 

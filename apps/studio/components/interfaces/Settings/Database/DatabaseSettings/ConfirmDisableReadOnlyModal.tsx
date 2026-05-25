@@ -55,9 +55,7 @@ const ConfirmDisableReadOnlyModeModal = ({
           <AlertDialogAction
             onClick={async () => {
               if (!ref) return console.error('Project ref is required')
-              await disableReadOnlyMode({ projectRef: ref }).catch(() => {
-                // Catch the error but ignore it, letting the default onError trigger
-              })
+              await disableReadOnlyMode({ projectRef: ref })
             }}
             disabled={isPending}
             loading={isPending}

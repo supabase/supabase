@@ -29,8 +29,6 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
       projectRef: ref,
       dbAllowedCidrs: [],
       dbAllowedCidrsV6: [],
-    }).catch(() => {
-      // Catch the error but ignore it, letting the default onError trigger
     })
   }
 
