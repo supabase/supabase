@@ -1,39 +1,48 @@
-export interface ProjectComposerTemplateFile {
+export interface TemplateFile {
   path: string
   content: string
 }
 
-export interface ProjectComposerTemplateDependencies {
+export interface TemplateDependencies {
   required?: string[]
   optional?: string[]
 }
 
-export interface ProjectComposerTemplateMetadata {
+export interface TemplateAuthor {
+  name: string
+  url?: string
+}
+
+export interface TemplateSummary {
   id: string
   name: string
   description: string
   category: string
+  version: string
   tags?: string[]
-  dependencies?: ProjectComposerTemplateDependencies
+  dependencies?: TemplateDependencies
   defaultEnabled?: boolean
+  author?: TemplateAuthor
+  repository?: string
+  license?: string
 }
 
-export interface ProjectComposerTemplate extends ProjectComposerTemplateMetadata {
-  files: ProjectComposerTemplateFile[]
+export interface Template extends TemplateSummary {
+  files: TemplateFile[]
   readme?: string
 }
 
-export interface ProjectComposerTemplateIndex {
-  templates: ProjectComposerTemplate[]
+export interface TemplateIndex {
+  templates: Template[]
 }
 
-export interface ProjectComposerTemplateRegistry {
+export interface TemplateRegistry {
   templates: string[]
 }
 
-export function parseTemplateRegistry(value: unknown): ProjectComposerTemplateRegistry {
+export function parseTemplateRegistry(value: unknown): TemplateRegistry {
   if (!isRecord(value)) {
-    throw new Error('Project composer template registry must be an object')
+    throw new Error('Template registry must be an object')
   }
 
   const templates = readStringArray(value, 'templates')
@@ -41,7 +50,7 @@ export function parseTemplateRegistry(value: unknown): ProjectComposerTemplateRe
 
   for (const templateId of templates) {
     if (seenTemplateIds.has(templateId)) {
-      throw new Error(`Project composer template registry contains duplicate "${templateId}"`)
+      throw new Error(`Template registry contains duplicate "${templateId}"`)
     }
 
     seenTemplateIds.add(templateId)
@@ -50,45 +59,86 @@ export function parseTemplateRegistry(value: unknown): ProjectComposerTemplateRe
   return { templates }
 }
 
-export function parseTemplateMetadata(value: unknown): ProjectComposerTemplateMetadata {
+export function parseTemplateSummary(value: unknown): TemplateSummary {
   if (!isRecord(value)) {
-    throw new Error('Project composer template metadata must be an object')
+    throw new Error('Template metadata must be an object')
   }
 
   const id = readString(value, 'id')
   const name = readString(value, 'name')
   const description = readString(value, 'description')
   const category = readString(value, 'category')
+  const version = readString(value, 'version')
   const tags = readOptionalStringArray(value, 'tags')
   const dependencies = parseDependencies(value.dependencies, id)
   const defaultEnabled =
     typeof value.defaultEnabled === 'boolean' ? value.defaultEnabled : undefined
+  const author = parseAuthor(value.author, id)
+  const repository = readOptionalString(value, 'repository')
+  const license = readOptionalString(value, 'license')
 
   return {
     id,
     name,
     description,
     category,
+    version,
     tags,
     dependencies,
     defaultEnabled,
+    author,
+    repository,
+    license,
   }
 }
 
-export function createTemplateIndex(
-  templates: ProjectComposerTemplate[]
-): ProjectComposerTemplateIndex {
+export function parseTemplate(value: unknown): Template {
+  const summary = parseTemplateSummary(value)
+
+  if (!isRecord(value)) {
+    throw new Error('Template must be an object')
+  }
+
+  const filesValue = value.files
+
+  if (!Array.isArray(filesValue)) {
+    throw new Error(`Template "${summary.id}" must contain a files array`)
+  }
+
+  const readme = typeof value.readme === 'string' ? value.readme : undefined
+
+  return {
+    ...summary,
+    files: filesValue.map((file) => parseTemplateFile(file, summary.id)),
+    readme,
+  }
+}
+
+export function createTemplateIndex(templates: Template[]): TemplateIndex {
   return { templates }
 }
 
-function parseDependencies(
-  value: unknown,
-  templateId: string
-): ProjectComposerTemplateDependencies | undefined {
+export function toTemplateSummary(template: Template): TemplateSummary {
+  const { files: _files, readme: _readme, ...summary } = template
+  return summary
+}
+
+function parseTemplateFile(value: unknown, templateId: string): TemplateFile {
+  if (!isRecord(value)) {
+    throw new Error(`Template file in "${templateId}" must be an object`)
+  }
+
+  return {
+    path: readString(value, 'path'),
+    content: readString(value, 'content'),
+  }
+}
+
+function parseDependencies(value: unknown, templateId: string): TemplateDependencies | undefined {
   if (value === undefined) return undefined
 
   if (!isRecord(value)) {
-    throw new Error(`Project composer dependencies in template "${templateId}" must be an object`)
+    throw new Error(`Dependencies in template "${templateId}" must be an object`)
   }
 
   return {
@@ -97,11 +147,36 @@ function parseDependencies(
   }
 }
 
+function parseAuthor(value: unknown, templateId: string): TemplateAuthor | undefined {
+  if (value === undefined) return undefined
+
+  if (!isRecord(value)) {
+    throw new Error(`Author in template "${templateId}" must be an object`)
+  }
+
+  return {
+    name: readString(value, 'name'),
+    url: readOptionalString(value, 'url'),
+  }
+}
+
 function readString(value: Record<string, unknown>, key: string): string {
   const field = value[key]
 
   if (typeof field !== 'string' || field.trim().length === 0) {
-    throw new Error(`Project composer template field "${key}" must be a non-empty string`)
+    throw new Error(`Template field "${key}" must be a non-empty string`)
+  }
+
+  return field
+}
+
+function readOptionalString(value: Record<string, unknown>, key: string): string | undefined {
+  const field = value[key]
+
+  if (field === undefined) return undefined
+
+  if (typeof field !== 'string' || field.trim().length === 0) {
+    throw new Error(`Template field "${key}" must be a non-empty string when provided`)
   }
 
   return field
@@ -111,7 +186,7 @@ function readStringArray(value: Record<string, unknown>, key: string): string[] 
   const field = value[key]
 
   if (!Array.isArray(field) || field.some((item) => typeof item !== 'string')) {
-    throw new Error(`Project composer template field "${key}" must be an array of strings`)
+    throw new Error(`Template field "${key}" must be an array of strings`)
   }
 
   return field
@@ -126,7 +201,7 @@ function readOptionalStringArray(
   if (field === undefined) return undefined
 
   if (!Array.isArray(field) || field.some((item) => typeof item !== 'string')) {
-    throw new Error(`Project composer template field "${key}" must be an array of strings`)
+    throw new Error(`Template field "${key}" must be an array of strings`)
   }
 
   return field

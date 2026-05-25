@@ -1,33 +1,30 @@
 import { fileURLToPath } from 'node:url'
-import { projectComposerTemplateIndex, projectComposerTemplates } from '..'
+import { templateIndex, templates } from '..'
 import { describe, expect, it } from 'vitest'
 
 import { bundleTemplateRepository } from './bundle'
-import { parseTemplateMetadata, parseTemplateRegistry } from './schema'
+import { parseTemplateRegistry, parseTemplateSummary } from './schema'
 
 const packageRoot = fileURLToPath(new URL('..', import.meta.url))
 
-describe('project composer template package', () => {
+describe('templates package bundle', () => {
   it('bundles the registry-driven template folders into the runtime template shape', async () => {
-    await expect(bundleTemplateRepository({ rootDir: packageRoot })).resolves.toEqual(
-      projectComposerTemplates
-    )
+    const result = await bundleTemplateRepository({ rootDir: packageRoot })
+    expect(result.templates).toEqual(templates)
   })
 
   it('exports a repository index that can be served as JSON', () => {
-    expect(projectComposerTemplateIndex).toEqual({ templates: projectComposerTemplates })
+    expect(templateIndex).toEqual({ templates })
   })
 
   it('bundles optional readme.md files from template folders', () => {
-    const agentTemplate = projectComposerTemplates.find((template) => template.id === 'agent')
+    const agentTemplate = templates.find((template) => template.id === 'agent')
 
     expect(agentTemplate?.readme).toContain('persistent AI agents')
   })
 
   it('keeps generated file paths relative to the exported project root', () => {
-    const stripeTemplate = projectComposerTemplates.find(
-      (template) => template.id === 'functions-stripe-webhook'
-    )
+    const stripeTemplate = templates.find((template) => template.id === 'functions-stripe-webhook')
 
     expect(stripeTemplate?.files.map((file) => file.path)).toEqual([
       'supabase/functions/stripe-webhook/index.ts',
@@ -37,13 +34,24 @@ describe('project composer template package', () => {
 
   it('rejects duplicate registry entries', () => {
     expect(() => parseTemplateRegistry({ templates: ['auth', 'auth'] })).toThrow(
-      'Project composer template registry contains duplicate "auth"'
+      'Template registry contains duplicate "auth"'
     )
   })
 
   it('rejects invalid template metadata before bundling', () => {
-    expect(() => parseTemplateMetadata({ id: 'missing-fields' })).toThrow(
-      'Project composer template field "name" must be a non-empty string'
+    expect(() => parseTemplateSummary({ id: 'missing-fields' })).toThrow(
+      'Template field "name" must be a non-empty string'
     )
+  })
+
+  it('requires a version on template metadata', () => {
+    expect(() =>
+      parseTemplateSummary({
+        id: 'no-version',
+        name: 'No Version',
+        description: 'x',
+        category: 'Core',
+      })
+    ).toThrow('Template field "version" must be a non-empty string')
   })
 })

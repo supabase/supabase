@@ -3,8 +3,17 @@
   "name": "Email Authentication",
   "description": "Email/password authentication with user profiles and RLS",
   "category": "Auth",
-  "tags": ["auth", "profiles", "rls", "email"],
+  "version": "1.0.0",
+  "tags": [
+    "auth",
+    "profiles",
+    "rls",
+    "email"
+  ],
   "dependencies": {
-    "required": ["auth", "database"]
+    "required": [
+      "auth",
+      "database"
+    ]
   }
 }

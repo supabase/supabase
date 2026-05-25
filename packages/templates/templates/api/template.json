@@ -3,8 +3,15 @@
   "name": "Data API",
   "description": "PostgREST API for database access over HTTP",
   "category": "API",
-  "tags": ["api", "rest", "postgrest"],
+  "version": "1.0.0",
+  "tags": [
+    "api",
+    "rest",
+    "postgrest"
+  ],
   "dependencies": {
-    "required": ["database"]
+    "required": [
+      "database"
+    ]
   }
 }

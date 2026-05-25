@@ -3,9 +3,26 @@
   "name": "Agent",
   "description": "Agent sessions and memory with vector recall, plus an Edge Function tool endpoint for structured tool calls",
   "category": "AI",
-  "tags": ["ai", "agents", "memory", "sessions", "pgvector", "tools", "functions"],
+  "version": "1.0.0",
+  "tags": [
+    "ai",
+    "agents",
+    "memory",
+    "sessions",
+    "pgvector",
+    "tools",
+    "functions"
+  ],
   "dependencies": {
-    "required": ["database", "api", "auth", "functions"],
-    "optional": ["ai-vector-search", "ai-automatic-embeddings"]
+    "required": [
+      "database",
+      "api",
+      "auth",
+      "functions"
+    ],
+    "optional": [
+      "ai-vector-search",
+      "ai-automatic-embeddings"
+    ]
   }
 }

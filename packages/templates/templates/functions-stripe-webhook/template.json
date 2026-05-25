@@ -3,8 +3,16 @@
   "name": "Stripe Webhook",
   "description": "Edge Function scaffold for receiving Stripe webhooks",
   "category": "Ecommerce",
-  "tags": ["stripe", "webhook", "functions"],
+  "version": "1.0.0",
+  "tags": [
+    "stripe",
+    "webhook",
+    "functions"
+  ],
   "dependencies": {
-    "required": ["functions", "database"]
+    "required": [
+      "functions",
+      "database"
+    ]
   }
 }

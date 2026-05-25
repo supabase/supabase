@@ -1,11 +1,13 @@
-import { createTemplateIndex, type ProjectComposerTemplate } from './schema'
+import type { CategoriesManifest } from './categories'
+import { createTemplateIndex, type Template } from './schema'
 
-export const projectComposerTemplates: ProjectComposerTemplate[] = [
+export const templates: Template[] = [
   {
     "id": "database",
     "name": "Database",
     "description": "PostgreSQL database with schemas and seed support",
     "category": "Core",
+    "version": "1.0.0",
     "tags": [
       "database",
       "postgres"
@@ -23,6 +25,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Edge Functions",
     "description": "Deno-based serverless functions at the edge",
     "category": "Core",
+    "version": "1.0.0",
     "tags": [
       "functions",
       "edge",
@@ -41,6 +44,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Storage",
     "description": "S3-compatible object storage for files",
     "category": "Core",
+    "version": "1.0.0",
     "tags": [
       "storage",
       "files",
@@ -63,6 +67,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Auth",
     "description": "User authentication and authorization service",
     "category": "Auth",
+    "version": "1.0.0",
     "tags": [
       "auth",
       "users",
@@ -85,6 +90,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Data API",
     "description": "PostgREST API for database access over HTTP",
     "category": "API",
+    "version": "1.0.0",
     "tags": [
       "api",
       "rest",
@@ -107,6 +113,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "GraphQL",
     "description": "Auto-generated GraphQL API via pg_graphql over Postgres",
     "category": "API",
+    "version": "1.0.0",
     "tags": [
       "api",
       "graphql",
@@ -133,6 +140,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Auto-enable RLS",
     "description": "Event trigger that automatically enables Row Level Security on new public tables",
     "category": "Security",
+    "version": "1.0.0",
     "tags": [
       "security",
       "rls",
@@ -156,6 +164,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "RBAC & Custom Claims",
     "description": "Role and permission tables with authorize() helper and custom access token auth hook",
     "category": "Auth",
+    "version": "1.0.0",
     "tags": [
       "rbac",
       "auth",
@@ -189,6 +198,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Multi-tenant",
     "description": "Organizations, memberships, and tenant-scoped RLS policies",
     "category": "Auth",
+    "version": "1.0.0",
     "tags": [
       "multi-tenant",
       "organizations",
@@ -214,6 +224,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Email Authentication",
     "description": "Email/password authentication with user profiles and RLS",
     "category": "Auth",
+    "version": "1.0.0",
     "tags": [
       "auth",
       "profiles",
@@ -238,6 +249,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Avatar Uploads",
     "description": "Public avatar bucket with user-owned upload policies",
     "category": "Storage",
+    "version": "1.0.0",
     "tags": [
       "storage",
       "avatars",
@@ -264,6 +276,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Realtime Comments",
     "description": "Comments table configured for realtime collaborative feeds",
     "category": "Realtime",
+    "version": "1.0.0",
     "tags": [
       "realtime",
       "comments",
@@ -286,6 +299,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Stripe Webhook",
     "description": "Edge Function scaffold for receiving Stripe webhooks",
     "category": "Ecommerce",
+    "version": "1.0.0",
     "tags": [
       "stripe",
       "webhook",
@@ -313,6 +327,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Product Analytics",
     "description": "Event table and indexes for lightweight product analytics",
     "category": "Analytics",
+    "version": "1.0.0",
     "tags": [
       "analytics",
       "events",
@@ -335,6 +350,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "App Logs",
     "description": "Structured application logs table for debugging and audits",
     "category": "Observability",
+    "version": "1.0.0",
     "tags": [
       "logs",
       "observability",
@@ -357,6 +373,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Queues (pgmq)",
     "description": "pgmq extension with a default job queue for background processing",
     "category": "Database",
+    "version": "1.0.0",
     "tags": [
       "queues",
       "pgmq",
@@ -380,6 +397,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Vector Search",
     "description": "pgvector extension with documents table and HNSW index for semantic search",
     "category": "AI",
+    "version": "1.0.0",
     "tags": [
       "ai",
       "pgvector",
@@ -405,6 +423,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Agent",
     "description": "Agent sessions and memory with vector recall, plus an Edge Function tool endpoint for structured tool calls",
     "category": "AI",
+    "version": "1.0.0",
     "tags": [
       "ai",
       "agents",
@@ -443,6 +462,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "Automatic Embeddings",
     "description": "Queue, triggers, and Edge Function scaffold to generate and sync embeddings automatically",
     "category": "AI",
+    "version": "1.0.0",
     "tags": [
       "ai",
       "embeddings",
@@ -481,6 +501,7 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
     "name": "MCP Server",
     "description": "Cursor MCP configuration for local Supabase MCP and hosted project access",
     "category": "AI",
+    "version": "1.0.0",
     "tags": [
       "mcp",
       "ai",
@@ -507,4 +528,28 @@ export const projectComposerTemplates: ProjectComposerTemplate[] = [
   }
 ]
 
-export const projectComposerTemplateIndex = createTemplateIndex(projectComposerTemplates)
+export const templateIndex = createTemplateIndex(templates)
+
+export const categories: CategoriesManifest = {
+  "categories": [
+    "Core",
+    "Auth",
+    "Security",
+    "API",
+    "Storage",
+    "Realtime",
+    "Database",
+    "AI",
+    "Ecommerce",
+    "Analytics",
+    "Observability"
+  ],
+  "featuredTemplates": [
+    "database",
+    "functions",
+    "storage",
+    "auth",
+    "api",
+    "graphql"
+  ]
+}

@@ -3,8 +3,17 @@
   "name": "MCP Server",
   "description": "Cursor MCP configuration for local Supabase MCP and hosted project access",
   "category": "AI",
-  "tags": ["mcp", "ai", "cursor", "tools"],
+  "version": "1.0.0",
+  "tags": [
+    "mcp",
+    "ai",
+    "cursor",
+    "tools"
+  ],
   "dependencies": {
-    "required": ["database", "api"]
+    "required": [
+      "database",
+      "api"
+    ]
   }
 }

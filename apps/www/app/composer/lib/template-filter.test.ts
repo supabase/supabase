@@ -9,6 +9,7 @@ const templates: Template[] = [
     name: 'Auth OTP',
     description: 'One-time password login flow',
     category: 'Auth',
+        version: '1.0.0',
     tags: ['otp', 'magic-link'],
     files: [],
   },
@@ -17,6 +18,7 @@ const templates: Template[] = [
     name: 'Storage',
     description: 'S3 compatible bucket storage',
     category: 'Storage',
+        version: '1.0.0',
     tags: ['s3', 'files'],
     files: [],
   },
@@ -25,6 +27,7 @@ const templates: Template[] = [
     name: 'Analytics',
     description: 'PostHog events pipeline',
     category: 'Observability',
+        version: '1.0.0',
     files: [],
   },
 ]

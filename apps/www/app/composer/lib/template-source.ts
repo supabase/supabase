@@ -1,16 +1,13 @@
-import {
-  createMockTemplateSource,
-  mockTemplates,
-  type Template,
-  type TemplateSource,
-} from './templates'
+import { parseTemplate, type Template } from 'templates'
+
+import { createMockTemplateSource, mockTemplates, type TemplateSource } from './templates'
 
 interface RepositoryTemplateSourceOptions {
   indexUrl: string
   fetcher?: typeof fetch
 }
 
-type TemplateIndexPayload = Template[] | { templates?: unknown }
+type TemplateIndexPayload = unknown
 
 export function createProjectComposerTemplateSource(): TemplateSource {
   const repositoryIndexUrl = process.env.PROJECT_COMPOSER_TEMPLATE_INDEX_URL
@@ -36,7 +33,7 @@ export function createRepositoryTemplateSource({
         next: {
           revalidate: 3600,
         },
-      })
+      } as RequestInit & { next?: { revalidate?: number } })
 
       if (!response.ok) {
         throw new Error(`Failed to fetch project composer templates: ${response.status}`)
@@ -47,97 +44,24 @@ export function createRepositoryTemplateSource({
   }
 }
 
+/**
+ * Composer-specific: parses a single-fetch payload that contains all full
+ * templates (including file contents). This is distinct from the marketplace
+ * `parseTemplateListResponse` in the templates package, which returns lightweight
+ * summaries. Composer needs the full payload upfront to render merge previews.
+ */
 export function parseTemplateIndex(payload: TemplateIndexPayload): Template[] {
-  const templates = Array.isArray(payload) ? payload : payload.templates
+  const templates = Array.isArray(payload)
+    ? payload
+    : isRecord(payload) && Array.isArray(payload.templates)
+      ? payload.templates
+      : null
 
-  if (!Array.isArray(templates)) {
+  if (!templates) {
     throw new Error('Project composer template index must contain a templates array')
   }
 
   return templates.map(parseTemplate)
-}
-
-function parseTemplate(value: unknown): Template {
-  if (!isRecord(value)) {
-    throw new Error('Project composer template must be an object')
-  }
-
-  const id = readString(value, 'id')
-  const name = readString(value, 'name')
-  const description = readString(value, 'description')
-  const category = readString(value, 'category')
-  const tags = readOptionalStringArray(value, 'tags')
-  const filesValue = value.files
-
-  if (!Array.isArray(filesValue)) {
-    throw new Error(`Project composer template "${id}" must contain a files array`)
-  }
-
-  const dependencies = parseDependencies(value.dependencies, id)
-  const defaultEnabled =
-    typeof value.defaultEnabled === 'boolean' ? value.defaultEnabled : undefined
-  const readme = typeof value.readme === 'string' ? value.readme : undefined
-
-  return {
-    id,
-    name,
-    description,
-    category,
-    tags,
-    files: filesValue.map((file) => parseTemplateFile(file, id)),
-    dependencies,
-    defaultEnabled,
-    readme,
-  }
-}
-
-function parseTemplateFile(value: unknown, templateId: string): Template['files'][number] {
-  if (!isRecord(value)) {
-    throw new Error(`Project composer file in template "${templateId}" must be an object`)
-  }
-
-  return {
-    path: readString(value, 'path'),
-    content: readString(value, 'content'),
-  }
-}
-
-function parseDependencies(value: unknown, templateId: string): Template['dependencies'] {
-  if (value === undefined) return undefined
-
-  if (!isRecord(value)) {
-    throw new Error(`Project composer dependencies in template "${templateId}" must be an object`)
-  }
-
-  return {
-    required: readOptionalStringArray(value, 'required'),
-    optional: readOptionalStringArray(value, 'optional'),
-  }
-}
-
-function readString(value: Record<string, unknown>, key: string): string {
-  const field = value[key]
-
-  if (typeof field !== 'string' || field.trim().length === 0) {
-    throw new Error(`Project composer template field "${key}" must be a non-empty string`)
-  }
-
-  return field
-}
-
-function readOptionalStringArray(
-  value: Record<string, unknown>,
-  key: string
-): string[] | undefined {
-  const field = value[key]
-
-  if (field === undefined) return undefined
-
-  if (!Array.isArray(field) || field.some((item) => typeof item !== 'string')) {
-    throw new Error(`Project composer template field "${key}" must be an array of strings`)
-  }
-
-  return field
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

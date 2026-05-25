@@ -3,8 +3,15 @@
   "name": "App Logs",
   "description": "Structured application logs table for debugging and audits",
   "category": "Observability",
-  "tags": ["logs", "observability", "debugging"],
+  "version": "1.0.0",
+  "tags": [
+    "logs",
+    "observability",
+    "debugging"
+  ],
   "dependencies": {
-    "required": ["database"]
+    "required": [
+      "database"
+    ]
   }
 }

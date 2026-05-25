@@ -1,4 +1,4 @@
-import { projectComposerTemplateIndex } from 'templates'
+import { templateIndex } from 'templates'
 import { describe, expect, it } from 'vitest'
 
 import { createProjectComposerTemplateSource, parseTemplateIndex } from './template-source'
@@ -14,6 +14,7 @@ describe('project composer template source', () => {
             name: 'Database',
             description: 'Database template',
             category: 'Core',
+            version: '1.0.0',
             tags: ['database'],
             defaultEnabled: true,
             dependencies: {
@@ -30,6 +31,7 @@ describe('project composer template source', () => {
         name: 'Database',
         description: 'Database template',
         category: 'Core',
+        version: '1.0.0',
         tags: ['database'],
         defaultEnabled: true,
         dependencies: {
@@ -43,14 +45,12 @@ describe('project composer template source', () => {
 
   it('rejects invalid repository template indexes before they reach the composer', () => {
     expect(() => parseTemplateIndex({ templates: [{ id: 'missing-fields' }] })).toThrow(
-      'Project composer template field "name" must be a non-empty string'
+      'Template field "name" must be a non-empty string'
     )
   })
 
   it('parses the generated package index used for public distribution', () => {
-    expect(parseTemplateIndex(projectComposerTemplateIndex)).toEqual(
-      projectComposerTemplateIndex.templates
-    )
+    expect(parseTemplateIndex(templateIndex)).toEqual(templateIndex.templates)
   })
 
   it('uses the package templates as the local fallback source', async () => {

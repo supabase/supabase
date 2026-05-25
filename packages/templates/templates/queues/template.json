@@ -3,8 +3,15 @@
   "name": "Queues (pgmq)",
   "description": "pgmq extension with a default job queue for background processing",
   "category": "Database",
-  "tags": ["queues", "pgmq", "background-jobs"],
+  "version": "1.0.0",
+  "tags": [
+    "queues",
+    "pgmq",
+    "background-jobs"
+  ],
   "dependencies": {
-    "required": ["database"]
+    "required": [
+      "database"
+    ]
   }
 }

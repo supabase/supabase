@@ -3,8 +3,15 @@
   "name": "Auto-enable RLS",
   "description": "Event trigger that automatically enables Row Level Security on new public tables",
   "category": "Security",
-  "tags": ["security", "rls", "event-trigger"],
+  "version": "1.0.0",
+  "tags": [
+    "security",
+    "rls",
+    "event-trigger"
+  ],
   "dependencies": {
-    "required": ["database"]
+    "required": [
+      "database"
+    ]
   }
 }

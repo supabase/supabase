@@ -1,19 +1,3 @@
-import type { ProjectComposerTemplate } from '../schema'
-
-export type ComposerTemplate = ProjectComposerTemplate
-
-export interface MergedFile {
-  path: string
-  content: string
-  sources: string[]
-}
-
-export interface MergeResult {
-  files: MergedFile[]
-  compositionId: string
-  warnings: string[]
-}
-
 export interface MergeStrategyInput {
   path: string
   files: Array<{ content: string; templateId: string }>

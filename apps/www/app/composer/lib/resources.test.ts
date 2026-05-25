@@ -17,6 +17,7 @@ describe('project composer resources', () => {
       name: 'Config',
       description: 'Config template',
       category: 'Core',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/config.toml',
@@ -48,6 +49,7 @@ enabled = true
       name: 'Database',
       description: 'Database template',
       category: 'Core',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/config.toml',
@@ -79,6 +81,7 @@ schemas = ["public", "graphql_public"]
       name: 'Billing',
       description: 'Billing template',
       category: 'Database',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/schemas/billing.sql',
@@ -110,6 +113,7 @@ schemas = ["public", "graphql_public"]
       name: 'Stripe',
       description: 'Stripe schema template',
       category: 'Database',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/schemas/stripe.sql',
@@ -131,6 +135,7 @@ schemas = ["public", "graphql_public"]
       name: 'Stripe Webhook',
       description: 'Stripe webhook function',
       category: 'Ecommerce',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/functions/stripe-webhook/index.ts',
@@ -155,6 +160,7 @@ schemas = ["public", "graphql_public"]
       name: 'Avatars',
       description: 'Avatar bucket',
       category: 'Storage',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/schemas/storage.sql',
@@ -179,6 +185,7 @@ on conflict (id) do nothing;
       name: 'First',
       description: 'First table template',
       category: 'Database',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/schemas/app.sql',
@@ -191,6 +198,7 @@ on conflict (id) do nothing;
       name: 'Second',
       description: 'Second table template',
       category: 'Database',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/schemas/app.sql',

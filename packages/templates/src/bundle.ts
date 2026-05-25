@@ -1,39 +1,43 @@
 import { access, readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 
-import {
-  parseTemplateMetadata,
-  parseTemplateRegistry,
-  type ProjectComposerTemplate,
-} from './schema'
+import { parseCategoriesManifest, type CategoriesManifest } from './categories'
+import { parseTemplateRegistry, parseTemplateSummary, type Template } from './schema'
 
 interface BundleTemplateRepositoryOptions {
   rootDir: string
 }
 
+export interface BundledRepository {
+  templates: Template[]
+  categories: CategoriesManifest
+}
+
 export async function bundleTemplateRepository({
   rootDir,
-}: BundleTemplateRepositoryOptions): Promise<ProjectComposerTemplate[]> {
+}: BundleTemplateRepositoryOptions): Promise<BundledRepository> {
   const registry = parseTemplateRegistry(await readJsonFile(path.join(rootDir, 'registry.json')))
 
-  return Promise.all(
+  const templates = await Promise.all(
     registry.templates.map((templateId) => bundleTemplateDirectory({ rootDir, templateId }))
   )
+
+  const categories = parseCategoriesManifest(
+    await readJsonFile(path.join(rootDir, 'categories.json'))
+  )
+
+  return { templates, categories }
 }
 
 async function bundleTemplateDirectory({
   rootDir,
   templateId,
-}: BundleTemplateRepositoryOptions & { templateId: string }): Promise<ProjectComposerTemplate> {
+}: BundleTemplateRepositoryOptions & { templateId: string }): Promise<Template> {
   const templateDir = path.join(rootDir, 'templates', templateId)
-  const metadata = parseTemplateMetadata(
-    await readJsonFile(path.join(templateDir, 'template.json'))
-  )
+  const summary = parseTemplateSummary(await readJsonFile(path.join(templateDir, 'template.json')))
 
-  if (metadata.id !== templateId) {
-    throw new Error(
-      `Project composer template "${templateId}" metadata id must match its registry id`
-    )
+  if (summary.id !== templateId) {
+    throw new Error(`Template "${templateId}" metadata id must match its registry id`)
   }
 
   const supabaseDir = path.join(templateDir, 'supabase')
@@ -46,13 +50,13 @@ async function bundleTemplateDirectory({
   )
 
   if (files.length === 0) {
-    throw new Error(`Project composer template "${templateId}" must contain at least one file`)
+    throw new Error(`Template "${templateId}" must contain at least one file`)
   }
 
   const readme = await readOptionalReadme(templateDir)
 
   return {
-    ...metadata,
+    ...summary,
     files,
     ...(readme ? { readme } : {}),
   }

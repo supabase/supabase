@@ -9,6 +9,7 @@ const databaseTemplate: Template = {
   name: 'Database',
   description: 'Database template',
   category: 'Core',
+    version: '1.0.0',
   files: [{ path: 'supabase/config.toml', content: '[db]\nenabled = true\n' }],
 }
 
@@ -17,6 +18,7 @@ const authTemplate: Template = {
   name: 'Email Auth',
   description: 'Email auth template',
   category: 'Auth',
+    version: '1.0.0',
   dependencies: {
     required: ['database'],
   },

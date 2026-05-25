@@ -16,6 +16,7 @@ const baseTemplate: Template = {
   name: 'Base',
   description: 'Base template',
   category: 'Core',
+    version: '1.0.0',
   files: [
     {
       path: 'supabase/config.toml',
@@ -40,6 +41,7 @@ describe('project composer', () => {
       name: 'Feature',
       description: 'Feature template',
       category: 'Auth',
+            version: '1.0.0',
       dependencies: {
         required: ['base'],
       },
@@ -58,6 +60,7 @@ describe('project composer', () => {
       name: 'Database',
       description: 'Database template',
       category: 'Core',
+            version: '1.0.0',
       files: [],
     }
     const auth: Template = {
@@ -65,6 +68,7 @@ describe('project composer', () => {
       name: 'Auth',
       description: 'Auth template',
       category: 'Auth',
+            version: '1.0.0',
       dependencies: {
         required: ['database'],
       },
@@ -81,6 +85,7 @@ describe('project composer', () => {
       name: 'Feature',
       description: 'Feature template',
       category: 'Auth',
+            version: '1.0.0',
       dependencies: {
         required: ['missing-template'],
       },
@@ -99,6 +104,7 @@ describe('project composer', () => {
       name: 'API',
       description: 'API template',
       category: 'API',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/config.toml',
@@ -126,6 +132,7 @@ schemas = ["public", "graphql_public"]
       name: 'First',
       description: 'First SQL template',
       category: 'Database',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/schemas/app.sql',
@@ -141,6 +148,7 @@ schemas = ["public", "graphql_public"]
       name: 'Second',
       description: 'Second SQL template',
       category: 'Database',
+            version: '1.0.0',
       files: [
         {
           path: 'supabase/schemas/app.sql',

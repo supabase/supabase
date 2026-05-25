@@ -3,8 +3,15 @@
   "name": "GraphQL",
   "description": "Auto-generated GraphQL API via pg_graphql over Postgres",
   "category": "API",
-  "tags": ["api", "graphql", "pg_graphql"],
+  "version": "1.0.0",
+  "tags": [
+    "api",
+    "graphql",
+    "pg_graphql"
+  ],
   "dependencies": {
-    "required": ["api"]
+    "required": [
+      "api"
+    ]
   }
 }

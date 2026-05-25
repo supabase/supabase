@@ -3,8 +3,17 @@
   "name": "Multi-tenant",
   "description": "Organizations, memberships, and tenant-scoped RLS policies",
   "category": "Auth",
-  "tags": ["multi-tenant", "organizations", "rls", "saas"],
+  "version": "1.0.0",
+  "tags": [
+    "multi-tenant",
+    "organizations",
+    "rls",
+    "saas"
+  ],
   "dependencies": {
-    "required": ["auth", "database"]
+    "required": [
+      "auth",
+      "database"
+    ]
   }
 }

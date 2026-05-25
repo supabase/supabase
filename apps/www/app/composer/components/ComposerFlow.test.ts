@@ -10,6 +10,7 @@ const storageTemplate: Template = {
   name: 'Storage',
   description: 'Storage template',
   category: 'Storage',
+    version: '1.0.0',
   files: [
     {
       path: 'supabase/schemas/storage.sql',

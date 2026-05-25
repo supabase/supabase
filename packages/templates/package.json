@@ -5,6 +5,10 @@
   "private": true,
   "main": "./index.ts",
   "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./node": "./node.ts"
+  },
   "sideEffects": false,
   "scripts": {
     "preinstall": "npx only-allow pnpm",

@@ -9,6 +9,7 @@ const templates: Template[] = [
     name: 'Database',
     description: '',
     category: 'Core',
+        version: '1.0.0',
     files: [],
   },
   {
@@ -16,6 +17,7 @@ const templates: Template[] = [
     name: 'Auth',
     description: '',
     category: 'Auth',
+        version: '1.0.0',
     dependencies: { required: ['database'] },
     files: [],
   },
@@ -24,6 +26,7 @@ const templates: Template[] = [
     name: 'Storage',
     description: '',
     category: 'Storage',
+        version: '1.0.0',
     dependencies: { required: ['database'] },
     files: [],
   },

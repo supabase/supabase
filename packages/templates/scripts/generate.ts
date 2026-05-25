@@ -6,13 +6,16 @@ import { bundleTemplateRepository } from '../src/bundle'
 
 async function main() {
   const packageRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
-  const templates = await bundleTemplateRepository({ rootDir: packageRoot })
+  const { templates, categories } = await bundleTemplateRepository({ rootDir: packageRoot })
 
-  const output = `import { createTemplateIndex, type ProjectComposerTemplate } from './schema'
+  const output = `import type { CategoriesManifest } from './categories'
+import { createTemplateIndex, type Template } from './schema'
 
-export const projectComposerTemplates: ProjectComposerTemplate[] = ${JSON.stringify(templates, null, 2)}
+export const templates: Template[] = ${JSON.stringify(templates, null, 2)}
 
-export const projectComposerTemplateIndex = createTemplateIndex(projectComposerTemplates)
+export const templateIndex = createTemplateIndex(templates)
+
+export const categories: CategoriesManifest = ${JSON.stringify(categories, null, 2)}
 `
 
   await writeFile(path.join(packageRoot, 'src', 'generated.ts'), output)
