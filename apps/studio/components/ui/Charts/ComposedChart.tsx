@@ -78,6 +78,11 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   highlightActions?: ChartHighlightAction[]
   showNewBadge?: boolean
   normalizeVisibleStackToPercent?: boolean
+  /**
+   * When provided, a red shaded ReferenceArea is rendered above this Y value
+   * to highlight the danger zone (e.g. memory over-commitment region).
+   */
+  dangerZoneAbove?: number
 }
 
 interface CustomizedDotProps {
@@ -138,6 +143,7 @@ export function ComposedChart({
   titleTooltip,
   showNewBadge,
   normalizeVisibleStackToPercent = false,
+  dangerZoneAbove,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
@@ -610,6 +616,16 @@ export function ComposedChart({
                 />
               </ReferenceLine>
             ))}
+
+          {/* Danger zone — shaded region above a threshold (e.g. memory commit limit) */}
+          {typeof dangerZoneAbove === 'number' && (
+            <ReferenceArea
+              y1={dangerZoneAbove}
+              fill={isDarkMode ? '#7f1d1d' : '#fecaca'}
+              fillOpacity={0.35}
+              stroke="none"
+            />
+          )}
 
           {/* Selection highlight */}
           {showHighlightActions && (

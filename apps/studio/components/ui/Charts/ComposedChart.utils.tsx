@@ -36,6 +36,11 @@ export interface ReportAttributes {
   }
   normalizeVisibleStackToPercent?: boolean
   hideHighlightedValue?: boolean
+  /**
+   * When set, renders a red danger-zone shading above this Y value to indicate
+   * the region where the metric exceeds a safe threshold (e.g. commit limit).
+   */
+  dangerZoneAbove?: number
 }
 
 export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'

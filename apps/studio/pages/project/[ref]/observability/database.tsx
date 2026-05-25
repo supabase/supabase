@@ -40,7 +40,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { NextPageWithLayout } from '@/types'
@@ -112,6 +112,15 @@ const DatabaseUsage = () => {
     ]
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
 
+  // Memory commit limit = physical RAM + swap. Supabase always provisions 1 GB swap regardless of compute size.
+  const SWAP_BYTES = 1 * 1024 * 1024 * 1024
+  const fallbackSpecs =
+    project?.infra_compute_size === 'nano' ? INSTANCE_NANO_SPECS : INSTANCE_MICRO_SPECS
+  const instanceMemoryGb =
+    (computeInstance?.variant.meta as { memory_gb?: number } | undefined)?.memory_gb ??
+    fallbackSpecs.memory_gb
+  const memoryCommitLimitBytes = instanceMemoryGb * 1024 * 1024 * 1024 + SWAP_BYTES
+
   const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -141,7 +150,8 @@ const DatabaseUsage = () => {
     maxConnections,
     defaultMaxClientConn,
     isSpendCapEnabled,
-    showDiskIOBurstBalanceChart
+    showDiskIOBurstBalanceChart,
+    memoryCommitLimitBytes
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({

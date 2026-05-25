@@ -50,6 +50,7 @@ export interface ComposedChartHandlerProps {
     domain?: [number | string, number | string]
     allowDataOverflow?: boolean
   }
+  dangerZoneAbove?: number
 }
 
 /**

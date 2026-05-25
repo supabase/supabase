@@ -29,7 +29,8 @@ export const getReportAttributesV2: (
   maxConnections?: MaxConnectionsData,
   pgBouncerMaxConnections?: number,
   isSpendCapEnabled?: boolean,
-  showDiskIOBurstBalanceChart?: boolean
+  showDiskIOBurstBalanceChart?: boolean,
+  memoryCommitLimitBytes?: number
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
@@ -37,7 +38,8 @@ export const getReportAttributesV2: (
   maxConnections,
   pgBouncerMaxConnections,
   isSpendCapEnabled,
-  showDiskIOBurstBalanceChart
+  showDiskIOBurstBalanceChart,
+  memoryCommitLimitBytes
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   const provisionedDiskIops = diskConfig?.attributes?.iops
@@ -128,6 +130,45 @@ export const getReportAttributesV2: (
           label: 'Swap',
           tooltip:
             'Swap space in use by the operating system. Sustained swap usage indicates memory pressure and may degrade database performance',
+        },
+      ],
+    },
+    {
+      id: 'memory-commitment',
+      label: 'Memory commitment',
+      titleTooltip:
+        'Virtual memory promised to processes (Committed_AS). When this exceeds the commit limit (RAM + swap), the kernel cannot fulfill all allocations, risking out-of-memory kills.',
+      docsUrl: `${DOCS_URL}/guides/troubleshooting/memory-and-swap-usage-explained-aPNgm0`,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: true,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      dangerZoneAbove: memoryCommitLimitBytes,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+      },
+      attributes: [
+        {
+          attribute: 'ram_usage_swap',
+          provider: 'infra-monitoring',
+          label: 'Committed',
+          tooltip:
+            'Virtual memory promised to processes (Committed_AS from /proc/meminfo). Spikes above the commit limit risk out-of-memory kills.',
+        },
+        {
+          attribute: 'memory_commit_limit',
+          provider: 'reference-line',
+          label: 'Commit limit',
+          value: memoryCommitLimitBytes,
+          tooltip:
+            'Maximum virtual memory the system can honor (physical RAM + swap). Sustained commitment above this value risks OOM.',
+          isMaxValue: true,
         },
       ],
     },
