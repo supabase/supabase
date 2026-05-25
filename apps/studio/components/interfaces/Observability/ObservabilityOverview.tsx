@@ -67,6 +67,14 @@ export const ObservabilityOverview = () => {
         hasReport: true,
       },
       {
+        key: 'data_api' as const,
+        name: 'API Gateway',
+        reportUrl: undefined,
+        logsUrl: `/project/${projectRef}/logs/edge-logs`,
+        enabled: isDataApiEnabled,
+        hasReport: false,
+      },
+      {
         key: 'auth' as const,
         name: 'Auth',
         reportUrl: `/project/${projectRef}/observability/auth`,
@@ -97,14 +105,6 @@ export const ObservabilityOverview = () => {
         logsUrl: `/project/${projectRef}/logs/storage-logs`,
         enabled: storageSupported,
         hasReport: true,
-      },
-      {
-        key: 'data_api' as const,
-        name: 'Data API',
-        reportUrl: undefined,
-        logsUrl: `/project/${projectRef}/logs/edge-logs`,
-        enabled: isDataApiEnabled,
-        hasReport: false,
       },
       {
         key: 'postgrest' as const,

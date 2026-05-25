@@ -37,7 +37,7 @@ const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   functions: 'Serverless Edge Functions execution',
   storage: 'Object storage for files and assets',
   realtime: 'WebSocket connections and broadcasts',
-  data_api: 'API Gateway handling incoming requests to your project',
+  data_api: 'Incoming API requests routed through the edge network',
   postgrest: 'Auto-generated REST API for your database',
 }
 
