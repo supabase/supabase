@@ -1,20 +1,128 @@
 'use client'
 
-import Image from 'next/image'
+import ReactMarkdown, { type Components, type Options } from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { cn } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
 
-const NextImageHandler = (props: any) => {
+import {
+  Anchor,
+  Avatar,
+  Blockquote,
+  Code,
+  CodeBlockPre,
+  DefaultPre,
+  H1,
+  H2,
+  H3,
+  H4,
+  H5,
+  H6,
+  Hr,
+  Img,
+  InlineCode,
+  ListItem,
+  OrderedList,
+  Paragraph,
+  Quote,
+  SimplePre,
+  Table,
+  Td,
+  Th,
+  Tr,
+  UnorderedList,
+} from './components'
+
+// Default components - sensible markdown defaults
+const defaultComponents: Components = {
+  h1: (props) => <Heading tag="h1" {...props} />,
+  h2: (props) => <Heading tag="h2" {...props} />,
+  h3: (props) => <Heading tag="h3" {...props} />,
+  h4: (props) => <Heading tag="h4" {...props} />,
+  h5: (props) => <Heading tag="h5" {...props} />,
+  h6: (props) => <Heading tag="h6" {...props} />,
+  p: Paragraph,
+  a: Anchor,
+  code: Code,
+  img: Img,
+  ul: UnorderedList,
+  ol: OrderedList,
+  li: ListItem,
+  blockquote: Blockquote,
+  hr: Hr,
+  pre: DefaultPre,
+  table: Table,
+  tr: Tr,
+  th: Th,
+  td: Td,
+}
+
+interface MarkdownProps extends Omit<Options, 'children' | 'node'> {
+  className?: string
+  codeBlock?: boolean
+  /** @deprecated Use children instead */
+  content?: string
+}
+
+export function Markdown({
+  children,
+  content = '',
+  codeBlock = false,
+  components,
+  className,
+  remarkPlugins,
+  ...props
+}: React.PropsWithChildren<MarkdownProps>) {
+  // Allow opting into code block syntax highlighting
+  const mergedComponents = {
+    ...defaultComponents,
+    ...(codeBlock && { pre: CodeBlockPre }),
+    ...components,
+  }
+
   return (
-    <span className={cn('next-image--dynamic-fill', props.className)}>
-      <Image {...props} className={['rounded-md border'].join(' ')} layout="fill" />
-    </span>
+    <div className={cn('text-sm', className)}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, ...(remarkPlugins ?? [])]}
+        components={mergedComponents}
+        {...props}
+      >
+        {(children as string) ?? content}
+      </ReactMarkdown>
+    </div>
   )
 }
 
 export const markdownComponents = {
   mono: (props: any) => <code className="text-sm">{props.children}</code>,
-  code: (props: any) => <CodeBlock {...props} />,
-  img: (props: any) => NextImageHandler(props),
-  Image: (props: any) => NextImageHandler(props),
+  code: Code,
+  img: Img,
+}
+
+export {
+  Anchor,
+  Avatar,
+  Blockquote,
+  Code,
+  CodeBlockPre,
+  DefaultPre,
+  H1,
+  H2,
+  H3,
+  H4,
+  H5,
+  H6,
+  Hr,
+  Img,
+  InlineCode,
+  ListItem,
+  OrderedList,
+  Paragraph,
+  Quote,
+  SimplePre,
+  Table,
+  Td,
+  Th,
+  Tr,
+  UnorderedList,
 }
