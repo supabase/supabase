@@ -57,11 +57,12 @@ const defaultComponents: Components = {
 }
 
 interface MarkdownProps extends Omit<Options, 'children' | 'node' | 'components'> {
+  children?: string
   className?: string
   codeBlock?: boolean
   /** @deprecated Use children instead */
   content?: string
-  components?: Components & Record<string, React.ComponentType<any>>
+  components?: Components
 }
 
 export function Markdown({
@@ -72,7 +73,7 @@ export function Markdown({
   className,
   remarkPlugins,
   ...props
-}: React.PropsWithChildren<MarkdownProps>) {
+}: MarkdownProps) {
   // Allow opting into code block syntax highlighting
   const mergedComponents = {
     ...defaultComponents,
@@ -87,7 +88,7 @@ export function Markdown({
         components={mergedComponents}
         {...props}
       >
-        {(children as string) ?? content}
+        {children ?? content}
       </ReactMarkdown>
     </div>
   )
