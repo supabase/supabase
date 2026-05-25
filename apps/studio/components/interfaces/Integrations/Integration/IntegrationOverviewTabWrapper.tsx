@@ -6,7 +6,6 @@
 import { PropsWithChildren } from 'react'
 
 import { IntegrationOverviewTab, IntegrationOverviewTabProps } from './IntegrationOverviewTab'
-import { IntegrationOverviewTabV2 } from './IntegrationOverviewTabV2'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export const IntegrationOverviewTabWrapper = (
@@ -15,8 +14,8 @@ export const IntegrationOverviewTabWrapper = (
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   if (isMarketplaceEnabled) {
-    return <IntegrationOverviewTabV2>{props.children}</IntegrationOverviewTabV2>
-  } else {
-    return <IntegrationOverviewTab {...props} />
+    return null
   }
+
+  return <IntegrationOverviewTab {...props} />
 }

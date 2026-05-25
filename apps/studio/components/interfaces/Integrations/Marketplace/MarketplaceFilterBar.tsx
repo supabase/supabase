@@ -210,7 +210,7 @@ export const MarketplaceFilterBar = ({
           aria-label="Grid view"
           onClick={() => onViewModeChange('grid')}
           className={cn(
-            'border-r px-2 py-1.5 rounded-l-md',
+            'border-r px-2 py-1.5 rounded-l-md cursor-pointer',
             'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
             viewMode === 'grid'
               ? 'bg-surface-200 text-foreground'
@@ -224,7 +224,7 @@ export const MarketplaceFilterBar = ({
           aria-label="List view"
           onClick={() => onViewModeChange('list')}
           className={cn(
-            'px-2 py-1.5 rounded-r-md',
+            'px-2 py-1.5 rounded-r-md cursor-pointer',
             'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
             viewMode === 'list'
               ? 'bg-surface-200 text-foreground'
