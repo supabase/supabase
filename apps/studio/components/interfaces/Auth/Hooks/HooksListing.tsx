@@ -4,7 +4,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { cn } from 'ui'
-import { EmptyStatePresentational, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition, EmptyStatePresentational, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
@@ -20,11 +20,14 @@ import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
 import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
+import { FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { isSmtpEnabled } from '@/components/interfaces/Auth/SmtpForm/SmtpForm.utils'
 import AlertError from '@/components/ui/AlertError'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
 import { executeSql } from '@/data/sql/execute-sql-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -32,6 +35,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const {
     data: authConfig,
     error: authConfigError,
@@ -80,6 +84,17 @@ export const HooksListing = () => {
 
   const validHooks = hooks.filter((h) => isValidHook(h))
   const hasValidHooks = validHooks.length > 0
+
+  // When deleting the send-email hook on a post-cutoff free project without custom SMTP,
+  // templates will resume being used but editing will be locked.
+  const isDeletingSendEmailHook = selectedHookForDeletion?.id === 'send-email'
+  const willLockTemplatesOnHookDelete =
+    isDeletingSendEmailHook &&
+    !!selectedOrganization &&
+    selectedOrganization.plan?.id === 'free' &&
+    !!project?.inserted_at &&
+    project.inserted_at >= FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE &&
+    !isSmtpEnabled(authConfig)
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
@@ -199,9 +214,25 @@ export const HooksListing = () => {
             <p className="md:px-5 text-sm text-foreground-light">
               Are you sure you want to delete the {selectedHookForDeletion?.title}?
             </p>
+            {isDeletingSendEmailHook && (
+              <Admonition
+                type={willLockTemplatesOnHookDelete ? 'warning' : 'default'}
+                title={
+                  willLockTemplatesOnHookDelete
+                    ? 'Email templates will be locked'
+                    : 'Email templates will resume being used'
+                }
+                description={
+                  willLockTemplatesOnHookDelete
+                    ? "Auth will revert to sending emails using your templates, but on the free plan without custom SMTP they can't be edited. Set up custom SMTP to regain editing access."
+                    : 'Auth will revert to sending emails using your templates.'
+                }
+                className="md:mx-5 mt-3"
+              />
+            )}
             {selectedHookForDeletion?.method.type === 'postgres' && (
               <>
-                <p className="md:px-5 text-sm text-foreground-light">
+                <p className="md:px-5 text-sm text-foreground-light mt-3">
                   The following statements will be executed on the{' '}
                   {selectedHookForDeletion?.method.schema}.
                   {selectedHookForDeletion?.method.functionName} function:
