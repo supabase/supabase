@@ -1,32 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Markdown } from 'ui-patterns/Markdown'
-import { visit } from 'unist-util-visit'
-
-// Demo-only remark plugin: turns `<PascalCase ... />` in markdown into nodes that
-// react-markdown can map to entries in the `components` prop (MDX-like behavior).
-const JSX_SELF_CLOSING = /^<([A-Z]\w*)((?:\s+[\w-]+(?:="[^"]*")?)*)\s*\/>$/
-const ATTR_PATTERN = /([\w-]+)(?:="([^"]*)")?/g
-
-const remarkJsxComponents = () => (tree: any) => {
-  visit(tree, 'html', (node: any, index: number | undefined, parent: any) => {
-    if (!parent || index === undefined) return
-    const match = node.value.trim().match(JSX_SELF_CLOSING)
-    if (!match) return
-
-    const [, name, attrsStr] = match
-    const properties: Record<string, string | boolean> = {}
-    ATTR_PATTERN.lastIndex = 0
-    let attrMatch: RegExpExecArray | null
-    while ((attrMatch = ATTR_PATTERN.exec(attrsStr || '')) !== null) {
-      properties[attrMatch[1]] = attrMatch[2] !== undefined ? attrMatch[2] : true
-    }
-
-    parent.children[index] = {
-      type: 'jsxComponent',
-      data: { hName: name, hProperties: properties },
-    }
-  })
-}
+import { visit } from 'unist-util-visit' // for demo-only remark plugin
 
 export default function MarkdownCustomization() {
   return (
@@ -99,4 +73,30 @@ const ErrorCodes = ({ service = 'auth' }: ErrorCodesProps) => {
       </Table>
     </div>
   )
+}
+
+// Demo-only remark plugin: turns `<PascalCase ... />` in markdown into nodes that
+// react-markdown can map to entries in the `components` prop (MDX-like behavior).
+const JSX_SELF_CLOSING = /^<([A-Z]\w*)((?:\s+[\w-]+(?:="[^"]*")?)*)\s*\/>$/
+const ATTR_PATTERN = /([\w-]+)(?:="([^"]*)")?/g
+
+const remarkJsxComponents = () => (tree: any) => {
+  visit(tree, 'html', (node: any, index: number | undefined, parent: any) => {
+    if (!parent || index === undefined) return
+    const match = node.value.trim().match(JSX_SELF_CLOSING)
+    if (!match) return
+
+    const [, name, attrsStr] = match
+    const properties: Record<string, string | boolean> = {}
+    ATTR_PATTERN.lastIndex = 0
+    let attrMatch: RegExpExecArray | null
+    while ((attrMatch = ATTR_PATTERN.exec(attrsStr || '')) !== null) {
+      properties[attrMatch[1]] = attrMatch[2] !== undefined ? attrMatch[2] : true
+    }
+
+    parent.children[index] = {
+      type: 'jsxComponent',
+      data: { hName: name, hProperties: properties },
+    }
+  })
 }
