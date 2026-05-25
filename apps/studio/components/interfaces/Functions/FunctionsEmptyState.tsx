@@ -48,6 +48,7 @@ export const FunctionsEmptyState = () => {
           <CardTitle>Deploy your first edge function</CardTitle>
         </CardHeader>
         <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
+          {/* Editor Option */}
           {IS_PLATFORM && (
             <>
               <div className="p-8">
@@ -73,6 +74,7 @@ export const FunctionsEmptyState = () => {
                 </Button>
               </div>
 
+              {/* AI Assistant Option */}
               <div className="p-8">
                 <div className="flex items-center gap-2">
                   <AiIconAnimation size={20} />
@@ -123,6 +125,7 @@ export const FunctionsEmptyState = () => {
             </>
           )}
 
+          {/* CLI Option */}
           {(IS_PLATFORM || isCli) && (
             <div className="p-8">
               <div className="flex items-center gap-2">

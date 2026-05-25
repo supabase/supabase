@@ -48,9 +48,7 @@ const SecretsPage: NextPageWithLayout = () => {
                 title="Self-hosted Supabase"
                 description={
                   <p>
-                    Set custom secrets in your <code className="text-code-inline">.env</code> and
-                    the <code className="text-code-inline">functions</code> service in{' '}
-                    <code className="text-code-inline">docker-compose.yml</code>.
+                    Set custom secrets via environment variables.
                   </p>
                 }
                 actions={

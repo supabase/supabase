@@ -57,9 +57,7 @@ const AuthSettingsPage: NextPageWithLayout = () => {
                 title="Self-hosted Supabase"
                 description={
                   <p>
-                    Auth settings are configured via your{' '}
-                    <code className="text-code-inline">.env</code> and{' '}
-                    <code className="text-code-inline">docker-compose.yml</code>, and described in
+                    Auth settings are configured via environment variables, and described in{' '}
                     the self-hosting how-to guides.
                   </p>
                 }

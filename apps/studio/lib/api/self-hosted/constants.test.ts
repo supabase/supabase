@@ -102,4 +102,46 @@ describe('api/self-hosted/constants', () => {
       expect(POSTGRES_USER_READ_ONLY).toBe('supabase_read_only_user')
     })
   })
+
+  describe('AUTH_JWT_SECRET', () => {
+    it('should use AUTH_JWT_SECRET when set', async () => {
+      vi.stubEnv('AUTH_JWT_SECRET', 'custom-jwt-secret-32-chars-long-xyz')
+      const { AUTH_JWT_SECRET } = await import('./constants')
+      expect(AUTH_JWT_SECRET).toBe('custom-jwt-secret-32-chars-long-xyz')
+    })
+
+    it('should fall back to DEFAULT_AUTH_JWT_SECRET when unset', async () => {
+      vi.stubEnv('AUTH_JWT_SECRET', '')
+      const { AUTH_JWT_SECRET, DEFAULT_AUTH_JWT_SECRET } = await import('./constants')
+      expect(AUTH_JWT_SECRET).toBe(DEFAULT_AUTH_JWT_SECRET)
+    })
+  })
+
+  describe('REGION', () => {
+    it('should use REGION when set', async () => {
+      vi.stubEnv('REGION', 'eu-west-1')
+      const { REGION } = await import('./constants')
+      expect(REGION).toBe('eu-west-1')
+    })
+
+    it('should default to local', async () => {
+      vi.stubEnv('REGION', '')
+      const { REGION } = await import('./constants')
+      expect(REGION).toBe('local')
+    })
+  })
+
+  describe('STORAGE_S3_ACCESS_KEY', () => {
+    it('should use STORAGE_S3_ACCESS_KEY when set', async () => {
+      vi.stubEnv('STORAGE_S3_ACCESS_KEY', 'aws-key-abc123')
+      const { STORAGE_S3_ACCESS_KEY } = await import('./constants')
+      expect(STORAGE_S3_ACCESS_KEY).toBe('aws-key-abc123')
+    })
+
+    it('should default to empty string', async () => {
+      vi.stubEnv('STORAGE_S3_ACCESS_KEY', '')
+      const { STORAGE_S3_ACCESS_KEY } = await import('./constants')
+      expect(STORAGE_S3_ACCESS_KEY).toBe('')
+    })
+  })
 })

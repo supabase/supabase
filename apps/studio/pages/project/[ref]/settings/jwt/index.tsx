@@ -39,9 +39,8 @@ const JWTSigningKeysPage: NextPageWithLayout = () => {
             variant="selfHosted"
             body={
               <p>
-                The asymmetric key pair used to sign user session JWTs is configured via your{' '}
-                <code className="text-code-inline">.env</code> and{' '}
-                <code className="text-code-inline">docker-compose.yml</code>.
+                The asymmetric key pair used to sign user session JWTs is configured{' '}
+                via environment variables.
               </p>
             }
             docsHref={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`}

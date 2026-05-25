@@ -61,8 +61,8 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
             description={
               <p>
                 <code className="text-code-inline">SUPABASE_PUBLISHABLE_KEY</code> and{' '}
-                <code className="text-code-inline">SUPABASE_SECRET_KEY</code> are set in your{' '}
-                <code className="text-code-inline">.env</code>.
+                <code className="text-code-inline">SUPABASE_SECRET_KEY</code> are set{' '}
+                via environment variables.
               </p>
             }
             actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`} />}

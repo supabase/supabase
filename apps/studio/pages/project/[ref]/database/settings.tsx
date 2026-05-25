@@ -89,9 +89,8 @@ const DatabaseSettings: NextPageWithLayout = () => {
                   variant="selfHosted"
                   body={
                     <p>
-                      Change settings in{' '}
-                      <code className="text-code-inline">.env</code> file and{' '}
-                      <code className="text-code-inline">docker-compose.yml</code>.
+                      Database settings can be changed via environment variables and{' '}
+                      Postgres configuration files.
                     </p>
                   }
                   docsHref={`${DOCS_URL}/guides/self-hosting/docker#accessing-postgres`}

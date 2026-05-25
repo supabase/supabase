@@ -64,9 +64,7 @@ export const S3ConnectionSelfHosted = () => {
             title="Self-hosted Supabase"
             description={
               <p>
-                S3 protocol settings are configured via your{' '}
-                <code className="text-code-inline">.env</code> and{' '}
-                <code className="text-code-inline">docker-compose.yml</code>.
+                S3 protocol settings are configured via environment variables.
               </p>
             }
           />

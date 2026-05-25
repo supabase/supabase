@@ -214,11 +214,18 @@ const nextConfig = {
         destination: '/project/:ref/settings/general',
         permanent: true,
       },
-      {
-        source: '/project/:ref/auth/settings',
-        destination: '/project/:ref/auth/users',
-        permanent: true,
-      },
+      // Preserves bookmarks to the legacy platform Auth Settings page (removed in the
+      // 2022 Auth IA reshuffle). Scoped to platform so self-hosted's new stub page at
+      // /auth/settings is reachable.
+      ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+        ? [
+            {
+              source: '/project/:ref/auth/settings',
+              destination: '/project/:ref/auth/users',
+              permanent: true,
+            },
+          ]
+        : []),
       {
         source: '/project/:ref/settings/billing/subscription',
         has: [

@@ -37,7 +37,7 @@ export const DataApiURLSettings = () => {
             <Admonition
               type="default"
               title="Managed via configuration variables"
-              description="Data API settings are configured via config.toml for CLI and local development, or via docker-compose.yml and .env for self-hosted deployments."
+              description="Data API settings are configured via config.toml for CLI, or via environment variables for self-hosted Supabase."
             />
           )}
         </>

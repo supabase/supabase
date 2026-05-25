@@ -122,9 +122,7 @@ export const General = () => {
               title="Self-hosted Supabase"
               description={
                 <p>
-                  Project settings are configured in your{' '}
-                  <code className="text-code-inline">.env</code> and{' '}
-                  <code className="text-code-inline">docker-compose.yml</code>.
+                  Project settings are configured via environment variables.
                 </p>
               }
               actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting`} />}
