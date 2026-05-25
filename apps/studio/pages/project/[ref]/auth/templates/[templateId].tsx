@@ -278,7 +278,7 @@ const RedirectToTemplates = () => {
             )}
 
             <PageSection>
-              {(showConfigurationSection || isTemplateEditBlocked) && (
+              {showConfigurationSection && (
                 <PageSectionMeta>
                   <PageSectionSummary>
                     <PageSectionTitle>Content</PageSectionTitle>
