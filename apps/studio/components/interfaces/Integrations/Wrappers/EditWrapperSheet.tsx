@@ -14,19 +14,10 @@ import {
   Separator,
   SheetFooter,
   SheetHeader,
-  SheetSection,
   SheetTitle,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import {
-  PageSection,
-  PageSectionContent,
-  PageSectionDescription,
-  PageSectionMeta,
-  PageSectionSummary,
-  PageSectionTitle,
-} from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
 import InputField from './InputField'
@@ -40,6 +31,11 @@ import {
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import {
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from '@/components/ui/Forms/FormSection'
 import { invalidateSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
 import { FDW } from '@/data/fdw/fdws-query'
@@ -204,14 +200,9 @@ export const EditWrapperSheet = ({
                 Edit {wrapperMeta.label} wrapper: {wrapper.name}
               </SheetTitle>
             </SheetHeader>
-            <SheetSection className="grow overflow-y-auto">
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Wrapper Configuration</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
+            <div className="grow overflow-y-auto">
+              <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
                     name="wrapper_name"
@@ -239,16 +230,14 @@ export const EditWrapperSheet = ({
                       </FormItemLayout>
                     )}
                   />
-                </PageSectionContent>
-              </PageSection>
-              <PageSection>
-                <Separator />
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>{wrapperMeta.label} Configuration</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent className="flex flex-col gap-2">
+                </FormSectionContent>
+              </FormSection>
+              <Separator />
+
+              <FormSection
+                header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
+              >
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   {wrapperMeta.server.options
                     .filter((option) => !option.hidden)
                     .map((option) => (
@@ -259,19 +248,20 @@ export const EditWrapperSheet = ({
                         loading={option.secureEntry ? isLoadingSecrets : undefined}
                       />
                     ))}
-                </PageSectionContent>
-              </PageSection>
-              <PageSection>
-                <Separator />
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Foreign Tables</PageSectionTitle>
-                    <PageSectionDescription>
+                </FormSectionContent>
+              </FormSection>
+              <Separator />
+              <FormSection
+                header={
+                  <FormSectionLabel>
+                    <p>Foreign Tables</p>
+                    <p className="text-foreground-light mt-2 w-[90%]">
                       You can query your data from these foreign tables after the wrapper is created
-                    </PageSectionDescription>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent className="flex flex-col space-y-2">
+                    </p>
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   {tablesField.map((t, tableIndex) => {
                     // FIXME: make inference work
                     const table = t as unknown as FormattedWrapperTable
@@ -321,9 +311,9 @@ export const EditWrapperSheet = ({
                       {errors.tables.message?.toString()}
                     </p>
                   )}
-                </PageSectionContent>
-              </PageSection>
-            </SheetSection>
+                </FormSectionContent>
+              </FormSection>
+            </div>
             <SheetFooter>
               <Button
                 size="tiny"
