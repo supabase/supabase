@@ -146,7 +146,7 @@ curl -s "http://localhost:8428/api/v1/label/__name__/values" | \
 ## Related
 
 - [Overview → Full service reference and getting started guide](./README.md)
-- [Prometheus pull → Supavisor, Realtime, Auth, Postgres, Kong, Vector](./prometheus-pull.md)
+- [Prometheus pull → Supavisor, Realtime, Auth, Postgres, Kong, Envoy, Vector](./prometheus-pull.md)
 - [docker-compose.override.yml → Enables Storage OTel push](./examples/docker-compose.override.yml)
 - [docker-compose.metrics.yml → Defines OTel Collector and VictoriaMetrics](./examples/docker-compose.metrics.yml)
 - [otelcol/config.yml → OTel Collector configuration](./examples/otelcol/config.yml)

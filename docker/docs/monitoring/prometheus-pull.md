@@ -200,10 +200,15 @@ docker run --rm --network supabase_default curlimages/curl:latest \
 
 ---
 
-## 5. Kong
+## 5. Kong *(deprecation pending)*
+
+> **Note:** Kong will be deprecated soon in the self-hosted stack. The optional
+> [Envoy gateway](https://supabase.com/docs/guides/self-hosting/self-hosted-envoy)
+> (`docker-compose.envoy.yml`) is its replacement. See [Envoy →](#6-envoy) below
+> for how to collect metrics from the Envoy gateway.
 
 [Source](https://github.com/Kong/kong) ·
-[Prometheus plugin](https://docs.konghq.com/hub/kong-inc/prometheus/)
+[Prometheus plugin](https://developer.konghq.com/plugins/prometheus/)
 
 Two changes are required, both included in
 [`examples/docker-compose.override.yml`](./examples/docker-compose.override.yml):
@@ -231,6 +236,11 @@ services:
         request-termination,ip-restriction,post-function,prometheus
       KONG_ADMIN_LISTEN: "0.0.0.0:8001"  # Kong Admin API binds to 127.0.0.1 by default; this opens it to the Docker network
 ```
+
+> ⚠️ Kong's Admin API (`:8001`) exposes management endpoints beyond just
+> metrics — including routes, plugins, and consumers. Keep port `8001`
+> internal to the Docker network — do not map it to the host.
+> See [Kong's security guide](https://developer.konghq.com/gateway/secure-the-admin-api/).
 
 ### Verify
 
@@ -261,7 +271,71 @@ docker run --rm --network supabase_default curlimages/curl:latest \
 
 ---
 
-## 6. Vector
+## 6. Envoy
+
+[Source](https://github.com/envoyproxy/envoy) ·
+[Supabase Envoy docs](https://supabase.com/docs/guides/self-hosting/self-hosted-envoy) ·
+[Admin API docs](https://www.envoyproxy.io/docs/envoy/latest/operations/admin)
+
+Envoy is the replacement for Kong as the self-hosted API gateway, available via
+`docker-compose.envoy.yml`. Envoy exposes Prometheus-compatible metrics at
+`:9901/stats/prometheus` through its admin interface.
+
+By default, the admin interface binds to `127.0.0.1:9901` — accessible only
+from within the container itself. To allow a metrics collector running in the
+same Docker network to scrape it, change the bind address in
+`volumes/api/envoy/envoy.yaml`:
+
+```yaml
+admin:
+  address:
+    socket_address:
+      address: 0.0.0.0  # changed from 127.0.0.1
+      port_value: 9901
+```
+
+Apply the change:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.envoy.yml up -d api-gw
+```
+
+> ⚠️ Envoy's admin endpoint (`:9901`) exposes `/config_dump` which includes
+> API keys, JWTs, and the dashboard basic auth hash in plaintext. Keep port
+> `9901` internal to the Docker network — do not map it to the host.
+> See the [Envoy security hardening guide](https://supabase.com/docs/guides/self-hosting/self-hosted-envoy#security-hardening).
+
+### Verify
+
+```bash
+docker run --rm --network supabase_default curlimages/curl:latest \
+  curl -s http://supabase-envoy:9901/stats/prometheus | head -5
+```
+
+### Key metrics
+
+| Metric | Description |
+|--------|-------------|
+| `envoy_cluster_upstream_rq_total` | Total requests forwarded per upstream cluster (auth, rest, realtime, storage, functions, meta, studio) |
+| `envoy_cluster_upstream_rq_time` | Request latency histogram per upstream cluster |
+| `envoy_http_downstream_rq_total` | Total requests received from downstream clients |
+| `envoy_server_memory_allocated` | Envoy process memory usage |
+| `envoy_cluster_assignment_stale` | CDS assignment staleness counter per cluster |
+
+### Scrape config
+
+```yaml
+- job_name: supabase-envoy
+  metrics_path: /stats/prometheus
+  static_configs:
+    - targets: ["supabase-envoy:9901"]
+      labels:
+        service: envoy
+```
+
+---
+
+## 7. Vector
 
 [Source](https://github.com/vectordotdev/vector) ·
 [internal_metrics](https://vector.dev/docs/reference/configuration/sources/internal_metrics/)
@@ -305,8 +379,10 @@ docker run --rm --network supabase_default curlimages/curl:latest \
 
 ## Complete scrape config
 
-A complete VictoriaMetrics scrape config for all six services is available at
+A complete VictoriaMetrics scrape config for all services — including both Kong
+and Envoy scrape jobs — is available at
 [`examples/victoriametrics/scrape.yml`](./examples/victoriametrics/scrape.yml).
+Enable the job that matches your active gateway.
 
 ---
 
@@ -314,6 +390,8 @@ A complete VictoriaMetrics scrape config for all six services is available at
 
 - [Overview → Full service reference and getting started guide](./README.md)
 - [OTel push → Storage metrics via OpenTelemetry Collector](./otel-push.md)
+- [Security → Endpoint exposure risks and hardening recommendations](./security.md)
+- [Supabase Envoy gateway docs](https://supabase.com/docs/guides/self-hosting/self-hosted-envoy)
 - [victoriametrics/scrape.yml → Complete VictoriaMetrics scrape config](./examples/victoriametrics/scrape.yml)
 - [docker-compose.override.yml → Enables Auth, Kong, Vector, Storage metrics](./examples/docker-compose.override.yml)
 - [docker-compose.metrics.yml → Adds VictoriaMetrics, postgres_exporter, and OTel Collector](./examples/docker-compose.metrics.yml)

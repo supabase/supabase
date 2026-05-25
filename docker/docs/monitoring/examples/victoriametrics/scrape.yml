@@ -5,6 +5,10 @@
 # Bearer JWT for Supavisor and Realtime: ANON_KEY from your .env file.
 # Generate the jwt file with:
 #   grep '^ANON_KEY=' .env | cut -d= -f2 > volumes/monitoring/jwt
+#
+# API gateway: Supabase ships with Kong (default) and Envoy (optional).
+# Kong will be deprecated soon — Envoy is its replacement.
+# Enable the scrape job that matches your active gateway.
 
 global:
   scrape_interval: 60s
@@ -51,7 +55,8 @@ scrape_configs:
         labels:
           service: postgres
 
-  # Kong — requires prometheus plugin + KONG_ADMIN_LISTEN=0.0.0.0:8001
+  # Kong API Gateway (deprecation pending — use Envoy job below if on Envoy)
+  # Requires prometheus plugin + KONG_ADMIN_LISTEN=0.0.0.0:8001
   # (see docker-compose.override.yml)
   - job_name: supabase-kong
     metrics_path: /metrics
@@ -60,7 +65,20 @@ scrape_configs:
         labels:
           service: kong
 
-  # Vector — requires vector.metrics.yml mounted alongside vector.yml
+  # Envoy API Gateway (replaces Kong)
+  # Requires admin address set to 0.0.0.0 in volumes/api/envoy/envoy.yaml
+  # Only applies when running with docker-compose.envoy.yml
+  # ⚠️ Keep port 9901 internal to the Docker network — do not map to host.
+  #    See: https://supabase.com/docs/guides/self-hosting/self-hosted-envoy#security-hardening
+  - job_name: supabase-envoy
+    metrics_path: /stats/prometheus
+    static_configs:
+      - targets: ["supabase-envoy:9901"]
+        labels:
+          service: envoy
+
+  # Vector (log pipeline)
+  # Requires vector.metrics.yml mounted alongside vector.yml
   # (see docker-compose.override.yml)
   - job_name: supabase-vector
     metrics_path: /metrics
