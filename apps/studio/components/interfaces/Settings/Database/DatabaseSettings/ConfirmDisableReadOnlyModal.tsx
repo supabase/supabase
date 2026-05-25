@@ -1,6 +1,15 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 
 import { useDisableReadOnlyModeMutation } from '@/data/config/project-temp-disable-read-only-mutation'
 
@@ -22,31 +31,40 @@ const ConfirmDisableReadOnlyModeModal = ({
   })
 
   return (
-    <ConfirmationModal
-      visible={visible}
-      onCancel={onClose}
-      loading={isPending}
-      confirmLabel="Disable read-only mode"
-      title="Confirm to temporarily disable read-only mode"
-      onConfirm={() => {
-        if (!ref) return console.error('Project ref is required')
-        disableReadOnlyMode({ projectRef: ref })
-      }}
-      size="medium"
-    >
-      <div className="space-y-2">
-        <p className="text-sm">
-          This will temporarily allow writes to your database for the{' '}
-          <span className="text-amber-900">next 15 minutes</span>, during which you can reduce your
-          database size. After deleting data, you should run a vacuum to reclaim as much space as
-          possible.
-        </p>
-        <p className="text-sm">
-          If your database size has not been sufficiently reduced after 15 minutes, read-only mode
-          will be toggled back on. Otherwise, it will stay disabled.
-        </p>
-      </div>
-    </ConfirmationModal>
+    <AlertDialog open={visible} onOpenChange={onClose}>
+      <AlertDialogContent size="medium">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Confirm to temporarily disable read-only mode</AlertDialogTitle>
+          <AlertDialogDescription>
+            <div className="flex flex-col space-y-2">
+              <p className="text-sm">
+                This will temporarily allow writes to your database for the{' '}
+                <span className="text-amber-900">next 15 minutes</span>, during which you can reduce
+                your database size. After deleting data, you should run a vacuum to reclaim as much
+                space as possible.
+              </p>
+              <p className="text-sm">
+                If your database size has not been sufficiently reduced after 15 minutes, read-only
+                mode will be toggled back on. Otherwise, it will stay disabled.
+              </p>
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              if (!ref) return console.error('Project ref is required')
+              disableReadOnlyMode({ projectRef: ref })
+            }}
+            disabled={isPending}
+            loading={isPending}
+          >
+            Disable read-only mode
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 

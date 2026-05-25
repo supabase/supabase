@@ -1,7 +1,16 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
 import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
@@ -59,33 +68,43 @@ const RemoveRestrictionModal = ({
   }
 
   return (
-    <ConfirmationModal
-      size="medium"
-      visible={visible}
-      onCancel={onClose}
-      onConfirm={onSubmit}
-      loading={isApplying}
-      title="Confirm to remove restriction"
-      confirmLabel="Remove restriction"
-    >
-      <div className="space-y-4">
-        <p className="text-sm text-foreground-light">
-          The IPv4 address <code className="text-code-inline">{selectedRestriction}</code> will be
-          removed from your list of network restrictions
-          {isRemovingOnlyRestriction
-            ? '.'
-            : ", and no longer have access to your project's database."}
-        </p>
-        {isRemovingOnlyRestriction && (
-          <Admonition
-            type="warning"
-            title="Database access will no longer be restricted"
-            description="Removing all network restrictions will default to your database being accessible from
-            all IP addresses."
-          />
-        )}
-      </div>
-    </ConfirmationModal>
+    <AlertDialog open={visible} onOpenChange={onClose}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Confirm to remove restriction</AlertDialogTitle>
+          <AlertDialogDescription>
+            <div className="flex flex-col space-y-4">
+              <p>
+                The IPv4 address <code className="text-code-inline">{selectedRestriction}</code>{' '}
+                will be removed from your list of network restrictions
+                {isRemovingOnlyRestriction
+                  ? '.'
+                  : ", and no longer have access to your project's database."}
+              </p>
+              {isRemovingOnlyRestriction && (
+                <Admonition
+                  type="warning"
+                  title="Database access will no longer be restricted"
+                  description="Removing all network restrictions will default to your database being accessible from
+                  all IP addresses."
+                />
+              )}
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isApplying}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onSubmit}
+            disabled={isApplying}
+            loading={isApplying}
+            variant="danger"
+          >
+            Remove restriction
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 

@@ -1,5 +1,14 @@
 import { useParams } from 'common/hooks'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 
 import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
 
@@ -25,19 +34,22 @@ const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   }
 
   return (
-    <ConfirmationModal
-      size="small"
-      visible={visible}
-      onCancel={onClose}
-      onConfirm={onSubmit}
-      loading={isApplying}
-      title="Allow access from all IP addresses"
-      confirmLabel="Confirm"
-    >
-      <p className="text-sm text-foreground-light">
-        This will allow any IP address to access your project's database. Are you sure?
-      </p>
-    </ConfirmationModal>
+    <AlertDialog open={visible} onOpenChange={onClose}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Allow access from all IP addresses</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will allow any IP address to access your project's database. Are you sure?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isApplying}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onSubmit} disabled={isApplying} loading={isApplying}>
+            Confirm
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 
