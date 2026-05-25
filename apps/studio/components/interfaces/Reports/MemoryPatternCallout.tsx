@@ -39,5 +39,4 @@ const MemoryPatternCallout = () => {
   )
 }
 
-export default MemoryPatternCallout
 export { MemoryPatternCallout }

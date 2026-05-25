@@ -42,7 +42,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
-import { MemoryPatternCallout } from './MemoryPatternCallout'
+import { MemoryPatternCallout } from '@/components/interfaces/Reports/MemoryPatternCallout'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { NextPageWithLayout } from '@/types'
 
