@@ -4,7 +4,7 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Modal } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-import { FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { isBeforeFreeTierTemplateBlockCutoff } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { OrgSubscription, ProjectAddon } from '@/data/subscriptions/types'
 
@@ -81,7 +81,7 @@ const DowngradeModal = ({
   // Only warn about template reset if at least one project is post-cutoff.
   // Pre-cutoff projects are grandfathered and keep template editing access after downgrade.
   const hasPostCutoffProjects = projects.some(
-    (project) => project.inserted_at >= FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE
+    (project) => !isBeforeFreeTierTemplateBlockCutoff(project.inserted_at)
   )
 
   return (

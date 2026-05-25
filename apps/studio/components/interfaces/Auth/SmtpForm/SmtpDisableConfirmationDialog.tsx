@@ -13,14 +13,14 @@ interface SmtpDisableConfirmationDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: () => Promise<void>
-  isGrandfathered?: boolean
+  blockEditingOnReset?: boolean
 }
 
 export const SmtpDisableConfirmationDialog = ({
   open,
   onOpenChange,
   onConfirm,
-  isGrandfathered = false,
+  blockEditingOnReset = false,
 }: SmtpDisableConfirmationDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -36,7 +36,7 @@ export const SmtpDisableConfirmationDialog = ({
               </strong>
               .
             </p>
-            {!isGrandfathered && (
+            {!blockEditingOnReset && (
               <p>
                 You won't be able to edit email templates until you set up custom SMTP again or
                 upgrade your plan.

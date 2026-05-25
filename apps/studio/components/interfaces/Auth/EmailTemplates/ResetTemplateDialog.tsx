@@ -40,15 +40,21 @@ export const ResetTemplateDialog = ({
   const { id } = template
   const templateType = getAuthTemplateType(id)
 
-  const { mutateAsync: resetAuthTemplate } = useAuthTemplateResetMutation()
+  const { mutate: resetAuthTemplate } = useAuthTemplateResetMutation()
 
   const resetTemplateToDefault = async () => {
     if (!projectRef) throw new Error('Project ref is required')
     if (!templateType) throw new Error('Template type is required')
 
-    const config = await resetAuthTemplate({ projectRef, template: templateType })
-    toast.success('Email template reset to default')
-    onResetSuccess(config)
+    resetAuthTemplate(
+      { projectRef, template: templateType },
+      {
+        onSuccess: (config) => {
+          toast.success('Email template reset to default')
+          onResetSuccess(config)
+        },
+      }
+    )
   }
 
   return (

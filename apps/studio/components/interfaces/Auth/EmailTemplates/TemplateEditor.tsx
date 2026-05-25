@@ -117,7 +117,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     | undefined
 
   const messageProperty = properties[messageSlug]
-  const builtInSMTP = isSuccess && authConfig && !hasCustomEmailSender(authConfig)
+  const builtInSMTP = !hasCustomEmailSender(authConfig)
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 

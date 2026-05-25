@@ -26,13 +26,13 @@ import * as z from 'zod'
 
 import { urlRegex } from '../Auth.constants'
 import { AUTH_TEMPLATE_RESET_TYPES } from '../EmailTemplates/EmailTemplates.constants'
-import { FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE } from '../EmailTemplates/EmailTemplates.utils'
+import { isBeforeFreeTierTemplateBlockCutoff } from '../EmailTemplates/EmailTemplates.utils'
 import { SmtpDisableConfirmationDialog } from './SmtpDisableConfirmationDialog'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
@@ -101,9 +101,7 @@ export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { data: selectedProject } = useSelectedProjectQuery()
-  const isGrandfathered =
-    !!selectedProject?.inserted_at &&
-    selectedProject.inserted_at < FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE
+
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
   const { mutateAsync: resetAuthTemplate } = useAuthTemplateResetMutation()
 
@@ -119,6 +117,10 @@ export const SmtpForm = () => {
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
+
+  const blockEditingOnReset =
+    !!selectedProject?.inserted_at &&
+    isBeforeFreeTierTemplateBlockCutoff(selectedProject.inserted_at)
 
   const form = useForm<SmtpFormValues>({
     resolver: zodResolver(
@@ -148,29 +150,15 @@ export const SmtpForm = () => {
 
   const { isDirty } = form.formState
 
-  // Update form values when auth config is loaded
-  useEffect(() => {
-    if (authConfig) {
-      const formValues = generateFormValues(authConfig)
-      form.reset({
-        ...formValues,
-        ENABLE_SMTP: isSmtpEnabled(authConfig),
-      } as SmtpFormValues)
-      setEnableSmtp(isSmtpEnabled(authConfig))
-    }
-  }, [authConfig, form])
-
-  // Update enableSmtp state when the form field changes
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === 'ENABLE_SMTP') {
-        setEnableSmtp(value.ENABLE_SMTP as boolean)
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [form])
-
-  const doUpdate = (values: SmtpFormValues, onSuccess?: () => void, onError?: () => void) => {
+  const doUpdate = ({
+    values,
+    onSuccess,
+    onError,
+  }: {
+    values: SmtpFormValues
+    onSuccess?: () => void
+    onError?: () => void
+  }) => {
     const { ENABLE_SMTP, ...rest } = values
     const basePayload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
 
@@ -217,16 +205,16 @@ export const SmtpForm = () => {
       return
     }
 
-    doUpdate(values)
+    doUpdate({ values })
   }
 
   const handleConfirmDisable = (): Promise<void> => {
     if (!pendingValues || !projectRef) return Promise.resolve()
 
     return new Promise<void>((resolve, reject) => {
-      doUpdate(
-        pendingValues,
-        async () => {
+      doUpdate({
+        values: pendingValues,
+        onSuccess: async () => {
           setPendingValues(null)
           try {
             const results = await Promise.allSettled(
@@ -241,10 +229,32 @@ export const SmtpForm = () => {
             resolve()
           }
         },
-        reject
-      )
+        onError: reject,
+      })
     })
   }
+
+  // Update form values when auth config is loaded
+  useEffect(() => {
+    if (authConfig) {
+      const formValues = generateFormValues(authConfig)
+      form.reset({
+        ...formValues,
+        ENABLE_SMTP: isSmtpEnabled(authConfig),
+      } as SmtpFormValues)
+      setEnableSmtp(isSmtpEnabled(authConfig))
+    }
+  }, [authConfig, form])
+
+  // Update enableSmtp state when the form field changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'ENABLE_SMTP') {
+        setEnableSmtp(value.ENABLE_SMTP as boolean)
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
 
   if (isError) {
     return (
@@ -536,7 +546,7 @@ export const SmtpForm = () => {
         open={showDisableConfirmation}
         onOpenChange={setShowDisableConfirmation}
         onConfirm={handleConfirmDisable}
-        isGrandfathered={isGrandfathered}
+        blockEditingOnReset={blockEditingOnReset}
       />
     </PageSection>
   )

@@ -78,7 +78,7 @@ export const EmailTemplates = () => {
     },
   })
 
-  const usingBuiltInEmailSender = isSuccess && authConfig && !hasCustomEmailSender(authConfig)
+  const usingBuiltInEmailSender = !hasCustomEmailSender(authConfig)
   const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
     authConfig,
     organization: selectedOrganization,
@@ -135,16 +135,10 @@ export const EmailTemplates = () => {
       )}
       {isSuccess && (
         <>
-          {isTemplateEditBlocked && (
-            <PageSection>
-              <PageSectionContent>
-                <CustomEmailTemplateRestrictionAdmonition />
-              </PageSectionContent>
-            </PageSection>
-          )}
-
           <PageSection>
-            {usingBuiltInEmailSender && !isTemplateEditBlocked && (
+            {isTemplateEditBlocked ? (
+              <CustomEmailTemplateRestrictionAdmonition />
+            ) : usingBuiltInEmailSender ? (
               <Admonition
                 type="warning"
                 title="Set up custom SMTP"
@@ -160,14 +154,13 @@ export const EmailTemplates = () => {
                   </p>
                 }
                 layout="horizontal"
-                className="mb-4"
                 actions={
                   <Button asChild type="default">
                     <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
                   </Button>
                 }
               />
-            )}
+            ) : null}
             <PageSectionMeta>
               <PageSectionSummary>
                 <PageSectionTitle>Authentication</PageSectionTitle>

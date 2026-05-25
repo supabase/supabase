@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 import { type AuthTemplateType, type KebabCase } from './EmailTemplates.types'
 import type { components } from '@/data/api'
@@ -43,6 +45,10 @@ export const isCustomEmailTemplateRestrictionStatusKnown = ({
   return authConfig !== undefined && organization !== undefined && projectInsertedAt !== undefined
 }
 
+export const isBeforeFreeTierTemplateBlockCutoff = (projectInsertedAt?: string) => {
+  return dayjs(projectInsertedAt).isBefore(FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE)
+}
+
 export const isCustomEmailTemplateEditingRestricted = ({
   authConfig,
   organization,
@@ -57,7 +63,9 @@ export const isCustomEmailTemplateEditingRestricted = ({
 
   // Grandfathering: projects created before the cutoff date keep editing access.
   // Mirrors FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE enforcement in the platform.
-  if (projectInsertedAt && projectInsertedAt < FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE) return false
+  if (projectInsertedAt && isBeforeFreeTierTemplateBlockCutoff(projectInsertedAt)) {
+    return false
+  }
 
   // Temporary Studio-side paygate while Platform/Auth own the exact eligibility cohort.
   return !hasCustomEmailSender(authConfig)
