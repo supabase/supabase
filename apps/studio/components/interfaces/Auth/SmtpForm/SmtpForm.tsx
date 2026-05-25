@@ -26,6 +26,7 @@ import * as z from 'zod'
 
 import { urlRegex } from '../Auth.constants'
 import { AUTH_TEMPLATE_RESET_TYPES } from '../EmailTemplates/EmailTemplates.constants'
+import { FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE } from '../EmailTemplates/EmailTemplates.utils'
 import { SmtpDisableConfirmationDialog } from './SmtpDisableConfirmationDialog'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
@@ -36,6 +37,7 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const smtpEnabledSchema = z.object({
   ENABLE_SMTP: z.literal(true),
@@ -98,6 +100,10 @@ type SmtpFormValues = z.infer<typeof smtpSchema>
 export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const isGrandfathered =
+    !!selectedProject?.inserted_at &&
+    selectedProject.inserted_at < FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
   const { mutateAsync: resetAuthTemplate } = useAuthTemplateResetMutation()
 
@@ -530,6 +536,7 @@ export const SmtpForm = () => {
         open={showDisableConfirmation}
         onOpenChange={setShowDisableConfirmation}
         onConfirm={handleConfirmDisable}
+        isGrandfathered={isGrandfathered}
       />
     </PageSection>
   )

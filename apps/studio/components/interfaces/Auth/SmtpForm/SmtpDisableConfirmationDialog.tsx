@@ -13,12 +13,14 @@ interface SmtpDisableConfirmationDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: () => Promise<void>
+  isGrandfathered?: boolean
 }
 
 export const SmtpDisableConfirmationDialog = ({
   open,
   onOpenChange,
   onConfirm,
+  isGrandfathered = false,
 }: SmtpDisableConfirmationDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -34,10 +36,12 @@ export const SmtpDisableConfirmationDialog = ({
               </strong>
               .
             </p>
-            <p>
-              You won't be able to edit email templates until you set up custom SMTP again or
-              upgrade your plan.
-            </p>
+            {!isGrandfathered && (
+              <p>
+                You won't be able to edit email templates until you set up custom SMTP again or
+                upgrade your plan.
+              </p>
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
