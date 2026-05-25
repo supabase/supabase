@@ -3,7 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from '@/lib/api/apiWrapper'
 import { getLegacySigningKey } from '@/lib/api/self-hosted/signing-keys'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+export default function signingKeys(req: NextApiRequest, res: NextApiResponse) {
+  return apiWrapper(req, res, handler)
+}
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req

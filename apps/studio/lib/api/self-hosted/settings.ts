@@ -1,6 +1,6 @@
 import { components } from 'api-types'
 
-import { POSTGRES_PORT, AUTH_JWT_SECRET, REGION } from './constants'
+import { AUTH_JWT_SECRET, POSTGRES_PORT, REGION } from './constants'
 import { assertSelfHosted } from './util'
 import { PROJECT_DB_HOST, PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from '@/lib/constants/api'
 

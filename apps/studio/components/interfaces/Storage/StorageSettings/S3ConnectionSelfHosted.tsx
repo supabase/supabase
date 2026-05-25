@@ -62,11 +62,7 @@ export const S3ConnectionSelfHosted = () => {
             type="default"
             className="mt-2"
             title="Self-hosted Supabase"
-            description={
-              <p>
-                S3 protocol settings are configured via environment variables.
-              </p>
-            }
+            description={<p>S3 protocol settings are configured via environment variables.</p>}
           />
           <Card>
             <CardContent>

@@ -2,7 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from '@/lib/api/apiWrapper'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+export default function updateStatus(req: NextApiRequest, res: NextApiResponse) {
+  return apiWrapper(req, res, handler)
+}
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req

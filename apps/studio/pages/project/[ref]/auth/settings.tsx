@@ -55,11 +55,7 @@ const AuthSettingsPage: NextPageWithLayout = () => {
               <Admonition
                 type="default"
                 title="Self-hosted Supabase"
-                description={
-                  <p>
-                    Auth settings are configured via environment variables.
-                  </p>
-                }
+                description={<p>Auth settings are configured via environment variables.</p>}
                 actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting`} />}
               />
             )}

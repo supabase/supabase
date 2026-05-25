@@ -28,7 +28,8 @@ const JWTSigningKeysPage: NextPageWithLayout = () => {
             variant="cli"
             body={
               <p>
-                The asymmetric key pair used to sign user session JWTs is configured by the Supabase CLI.
+                The asymmetric key pair used to sign user session JWTs is configured by the Supabase
+                CLI.
               </p>
             }
             docsHref={`${DOCS_URL}/guides/local-development`}
@@ -39,8 +40,8 @@ const JWTSigningKeysPage: NextPageWithLayout = () => {
             variant="selfHosted"
             body={
               <p>
-                The asymmetric key pair used to sign user session JWTs is configured{' '}
-                via environment variables.
+                The asymmetric key pair used to sign user session JWTs is configured via environment
+                variables.
               </p>
             }
             docsHref={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`}

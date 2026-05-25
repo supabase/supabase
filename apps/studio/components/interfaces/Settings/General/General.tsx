@@ -120,11 +120,7 @@ export const General = () => {
             <Admonition
               type="default"
               title="Self-hosted Supabase"
-              description={
-                <p>
-                  Project settings are configured via environment variables.
-                </p>
-              }
+              description={<p>Project settings are configured via environment variables.</p>}
               actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting`} />}
             />
           )}

@@ -46,11 +46,7 @@ const SecretsPage: NextPageWithLayout = () => {
               <Admonition
                 type="default"
                 title="Self-hosted Supabase"
-                description={
-                  <p>
-                    Set custom secrets via environment variables.
-                  </p>
-                }
+                description={<p>Set custom secrets via environment variables.</p>}
                 actions={
                   <DocsButton
                     href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions#custom-environment-variables`}

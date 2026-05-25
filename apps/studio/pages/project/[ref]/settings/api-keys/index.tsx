@@ -48,7 +48,8 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
             title="Local development with the Supabase CLI"
             description={
               <p>
-                The API keys are automatically managed by the Supabase CLI and are not manually configurable.
+                The API keys are automatically managed by the Supabase CLI and are not manually
+                configurable.
               </p>
             }
             actions={<DocsButton href={`${DOCS_URL}/guides/local-development`} />}
@@ -61,8 +62,8 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
             description={
               <p>
                 <code className="text-code-inline">SUPABASE_PUBLISHABLE_KEY</code> and{' '}
-                <code className="text-code-inline">SUPABASE_SECRET_KEY</code> are set{' '}
-                via environment variables.
+                <code className="text-code-inline">SUPABASE_SECRET_KEY</code> are set via
+                environment variables.
               </p>
             }
             actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`} />}
