@@ -57,8 +57,7 @@ const AuthSettingsPage: NextPageWithLayout = () => {
                 title="Self-hosted Supabase"
                 description={
                   <p>
-                    Auth settings are configured via environment variables, and described in{' '}
-                    the self-hosting how-to guides.
+                    Auth settings are configured via environment variables.
                   </p>
                 }
                 actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting`} />}
