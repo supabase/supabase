@@ -1,0 +1,7 @@
+{
+  "id": "storage",
+  "name": "Storage",
+  "description": "S3-compatible object storage for files",
+  "category": "Core",
+  "tags": ["storage", "files", "s3"]
+}

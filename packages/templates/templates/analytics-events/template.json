@@ -1,0 +1,10 @@
+{
+  "id": "analytics-events",
+  "name": "Product Analytics",
+  "description": "Event table and indexes for lightweight product analytics",
+  "category": "Analytics",
+  "tags": ["analytics", "events", "database"],
+  "dependencies": {
+    "required": ["database"]
+  }
+}

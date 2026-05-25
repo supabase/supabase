@@ -1,0 +1,7 @@
+{
+  "id": "auth",
+  "name": "Auth",
+  "description": "User authentication and authorization service",
+  "category": "Auth",
+  "tags": ["auth", "users", "sessions"]
+}

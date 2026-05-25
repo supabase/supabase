@@ -1,0 +1,11 @@
+{
+  "id": "storage-avatars",
+  "name": "Avatar Uploads",
+  "description": "Public avatar bucket with user-owned upload policies",
+  "category": "Storage",
+  "tags": ["storage", "avatars", "images"],
+  "dependencies": {
+    "required": ["storage", "auth"],
+    "optional": ["auth-email"]
+  }
+}

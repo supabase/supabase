@@ -1,0 +1,7 @@
+{
+  "id": "functions",
+  "name": "Edge Functions",
+  "description": "Deno-based serverless functions at the edge",
+  "category": "Core",
+  "tags": ["functions", "edge", "serverless", "deno"]
+}

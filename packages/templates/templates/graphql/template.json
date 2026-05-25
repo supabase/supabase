@@ -1,0 +1,10 @@
+{
+  "id": "graphql",
+  "name": "GraphQL",
+  "description": "Auto-generated GraphQL API via pg_graphql over Postgres",
+  "category": "API",
+  "tags": ["api", "graphql", "pg_graphql"],
+  "dependencies": {
+    "required": ["api"]
+  }
+}

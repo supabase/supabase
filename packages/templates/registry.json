@@ -1,0 +1,16 @@
+{
+  "templates": [
+    "database",
+    "functions",
+    "storage",
+    "auth",
+    "api",
+    "graphql",
+    "auth-email",
+    "storage-avatars",
+    "realtime-comments",
+    "functions-stripe-webhook",
+    "analytics-events",
+    "observability-logs"
+  ]
+}

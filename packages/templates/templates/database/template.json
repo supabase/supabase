@@ -1,0 +1,8 @@
+{
+  "id": "database",
+  "name": "Database",
+  "description": "PostgreSQL database with schemas and seed support",
+  "category": "Core",
+  "tags": ["database", "postgres"],
+  "defaultEnabled": true
+}

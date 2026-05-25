@@ -1,4 +1,5 @@
 import '@code-hike/mdx/styles.css'
+import '@xyflow/react/dist/style.css'
 import 'config/code-hike.css'
 import '../styles/globals.css'
 import '../pages/launch-week/launchWeek.css'
