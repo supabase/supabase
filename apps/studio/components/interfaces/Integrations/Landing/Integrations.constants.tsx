@@ -231,8 +231,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/CronJobs/OverviewTab').then(
+                (mod) => mod.CronOverviewTab
               ),
             {
               loading: Loading,
@@ -275,8 +275,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/Vault/OverviewTab').then(
+                (mod) => mod.VaultOverviewTab
               ),
             {
               loading: Loading,
@@ -445,8 +445,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/GraphQL/OverviewTab').then(
+                (mod) => mod.GraphQLOverviewTab
               ),
             {
               loading: Loading,
