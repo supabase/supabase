@@ -33,7 +33,6 @@ import {
   UnorderedList,
 } from './components'
 
-// Default components - sensible markdown defaults
 const defaultComponents: Components = {
   h1: (props) => <Heading tag="h1" {...props} />,
   h2: (props) => <Heading tag="h2" {...props} />,
@@ -57,11 +56,12 @@ const defaultComponents: Components = {
   td: Td,
 }
 
-interface MarkdownProps extends Omit<Options, 'children' | 'node'> {
+interface MarkdownProps extends Omit<Options, 'children' | 'node' | 'components'> {
   className?: string
   codeBlock?: boolean
   /** @deprecated Use children instead */
   content?: string
+  components?: Components & Record<string, React.ComponentType<any>>
 }
 
 export function Markdown({
