@@ -82,6 +82,14 @@ const ACTIVE_PLATFORM_WEBHOOKS_SHORTCUT_IDS = [
   SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_PAYLOAD,
 ] satisfies ShortcutId[]
 
+const ACTIVE_PROJECT_SETTINGS_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL,
+  SHORTCUT_IDS.API_KEYS_NEW_PUBLISHABLE,
+  SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY,
+  SHORTCUT_IDS.LOG_DRAINS_ADD_DESTINATION,
+] satisfies ShortcutId[]
+
 let sequenceIdCounter = 0
 
 const buildSequenceRegistration = (id: ShortcutId): SequenceRegistrationView => {
@@ -259,6 +267,22 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByText('Retry delivery')).toBeInTheDocument()
     expect(screen.getByText('Copy payload')).toBeInTheDocument()
     expect(screen.queryByText('platform-webhooks')).not.toBeInTheDocument()
+  })
+
+  it('shows project settings navigation and action sections with human labels', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_PROJECT_SETTINGS_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Project Settings Navigation')).toBeInTheDocument()
+    expect(screen.getByText('API Keys')).toBeInTheDocument()
+    expect(screen.getByText('JWT Keys')).toBeInTheDocument()
+    expect(screen.getByText('Log Drains')).toBeInTheDocument()
+    expect(screen.getByText('Go to General')).toBeInTheDocument()
+    expect(screen.getByText('New publishable key')).toBeInTheDocument()
+    expect(screen.getByText('Create standby key')).toBeInTheDocument()
+    expect(screen.getByText('Add destination')).toBeInTheDocument()
+    expect(screen.queryByText('api-keys')).not.toBeInTheDocument()
+    expect(screen.queryByText('jwt-keys')).not.toBeInTheDocument()
+    expect(screen.queryByText('log-drains')).not.toBeInTheDocument()
   })
 
   it('does not show inactive database shortcuts in search results', async () => {
