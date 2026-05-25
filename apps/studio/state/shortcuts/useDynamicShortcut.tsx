@@ -4,10 +4,10 @@ import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { hotkeyToKeys } from './formatShortcut'
-import type { ShortcutOptions } from './types'
-import { orderShortcutCommands, type ShortcutHotkeyMeta } from './useShortcut'
+import type { ShortcutHotkeyMeta, ShortcutOptions } from './types'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import useLatest from '@/hooks/misc/useLatest'
+import { orderShortcutCommands } from './utils'
 
 /**
  * Props shared by both the hook and the `<DynamicShortcut>` component.

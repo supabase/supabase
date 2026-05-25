@@ -1,4 +1,5 @@
-import { HotkeySequence } from '@tanstack/react-hotkeys'
+import { HotkeyMeta, HotkeySequence } from '@tanstack/react-hotkeys'
+import { ShortcutId } from './registry'
 
 export type DisabledShortcuts = Record<string, boolean>
 
@@ -130,3 +131,19 @@ export interface ShortcutDefinition {
 }
 
 export type RegistryDefinations<T extends string> = Record<T, ShortcutDefinition>
+
+/**
+ * Shape we store on each registration's `options.meta` so the Keyboard
+ * shortcuts reference sheet can read it back via `useHotkeyRegistrations()`.
+ * The library's `HotkeyMeta` is open for declaration merging, but we don't
+ * own a direct dep on `@tanstack/hotkeys`, so we keep the extension local.
+ */
+export interface ShortcutHotkeyMeta extends HotkeyMeta {
+  /**
+   * Stable identifier for the registration. `useShortcut` always sets this to
+   * a registered `ShortcutId`; `useDynamicShortcut` may pass any string so
+   * runtime-built shortcuts can flow through the same reference sheet.
+   */
+  id: ShortcutId | string
+  referenceGroup?: string
+}

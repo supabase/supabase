@@ -1,50 +1,15 @@
-import { useHotkeySequence, type HotkeyMeta } from '@tanstack/react-hotkeys'
+import { useHotkeySequence } from '@tanstack/react-hotkeys'
 import { Fragment, useCallback, useMemo } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 
 import { hotkeyToKeys } from './formatShortcut'
-import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from './registry'
-import type { ShortcutOptions } from './types'
+import { SHORTCUT_DEFINITIONS, type ShortcutId } from './registry'
+import type { ShortcutHotkeyMeta, ShortcutOptions } from './types'
 import { useIsShortcutEnabled } from './useIsShortcutEnabled'
+import { orderShortcutCommands } from './utils'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import useLatest from '@/hooks/misc/useLatest'
-
-/**
- * Shape we store on each registration's `options.meta` so the Keyboard
- * shortcuts reference sheet can read it back via `useHotkeyRegistrations()`.
- * The library's `HotkeyMeta` is open for declaration merging, but we don't
- * own a direct dep on `@tanstack/hotkeys`, so we keep the extension local.
- */
-export interface ShortcutHotkeyMeta extends HotkeyMeta {
-  /**
-   * Stable identifier for the registration. `useShortcut` always sets this to
-   * a registered `ShortcutId`; `useDynamicShortcut` may pass any string so
-   * runtime-built shortcuts can flow through the same reference sheet.
-   */
-  id: ShortcutId | string
-  referenceGroup?: string
-}
-
-/**
- * Shared orderer for the Cmd+K "Shortcuts" section. Keeps the "Show all
- * keyboard shortcuts" entry pinned to the bottom regardless of registration
- * order; everything else is order-stable. Exported so `useDynamicShortcut`
- * can share the same ordering behavior.
- */
-export const orderShortcutCommands = (
-  commands: ICommand[],
-  commandsToInsert: ICommand[]
-): ICommand[] => {
-  const mergedCommands = [...commands, ...commandsToInsert]
-
-  return mergedCommands.sort((a, b) => {
-    if (a.id === SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE) return 1
-    if (b.id === SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE) return -1
-    return 0
-  })
-}
 
 /**
  * Subscribe to a registered keyboard shortcut.
