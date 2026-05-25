@@ -254,7 +254,7 @@ export const CreateIcebergWrapperSheet = ({
             </SheetHeader>
             <SheetSection className="grow overflow-y-auto">
               <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
-                <FormSectionContent>
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
                     name="wrapper_name"
@@ -282,7 +282,7 @@ export const CreateIcebergWrapperSheet = ({
                 </FormSectionContent>
               </FormSection>
               <FormSection header={<FormSectionLabel>Data target</FormSectionLabel>}>
-                <FormSectionContent>
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
                     name="target"
@@ -343,7 +343,7 @@ export const CreateIcebergWrapperSheet = ({
               <FormSection
                 header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
               >
-                <FormSectionContent>
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   {targetOptions.map((option) =>
                     option.hidden ? (
                       <input
@@ -373,7 +373,7 @@ export const CreateIcebergWrapperSheet = ({
                   </FormSectionLabel>
                 }
               >
-                <FormSectionContent>
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   {wrapperMeta.sourceSchemaOption && (
                     <InputField control={form.control} option={wrapperMeta.sourceSchemaOption} />
                   )}
