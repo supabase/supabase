@@ -303,7 +303,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                       }
                     >
                       <FormControl>
-                        <Input id={x} {...field} disabled={!canEdit} />
+                        <Input id={x} {...field} readOnly={!canEdit} />
                       </FormControl>
                     </FormItemLayout>
                   )}
