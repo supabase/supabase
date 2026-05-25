@@ -1,5 +1,6 @@
-import { ICommand } from "ui-patterns"
-import { SHORTCUT_IDS } from "./registry"
+import { ICommand } from 'ui-patterns'
+
+import { SHORTCUT_IDS } from './registry'
 
 /**
  * Shared orderer for the Cmd+K "Shortcuts" section. Keeps the "Show all
