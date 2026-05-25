@@ -19,17 +19,19 @@ interface AllowAllModalProps {
 
 const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   const { ref } = useParams()
-  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
+  const { mutateAsync: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
     })
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
-    applyNetworkRestrictions({
+    await applyNetworkRestrictions({
       projectRef: ref,
       dbAllowedCidrs: ['0.0.0.0/0'],
       dbAllowedCidrsV6: ['::/0'],
+    }).catch(() => {
+      // Catch the error but ignore it, letting the default onError trigger
     })
   }
 

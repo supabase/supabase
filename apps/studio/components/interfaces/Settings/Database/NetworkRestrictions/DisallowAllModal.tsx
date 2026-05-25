@@ -20,7 +20,7 @@ interface DisallowAllModalProps {
 
 const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
   const { ref } = useParams()
-  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
+  const { mutateAsync: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({ onSuccess: () => onClose() })
 
   const onSubmit = async () => {
@@ -29,6 +29,8 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
       projectRef: ref,
       dbAllowedCidrs: [],
       dbAllowedCidrsV6: [],
+    }).catch(() => {
+      // Catch the error but ignore it, letting the default onError trigger
     })
   }
 

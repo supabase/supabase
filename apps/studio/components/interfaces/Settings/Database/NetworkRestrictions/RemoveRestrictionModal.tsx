@@ -34,7 +34,7 @@ const RemoveRestrictionModal = ({
   const ipv6Restrictions: string[] = data?.config?.dbAllowedCidrsV6 ?? []
   const restrictedIps = ipv4Restrictions.concat(ipv6Restrictions)
 
-  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
+  const { mutateAsync: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
       onError: (error) => {
@@ -57,13 +57,19 @@ const RemoveRestrictionModal = ({
       : ipv6Restrictions
 
     if (dbAllowedCidrs.length === 0 && dbAllowedCidrsV6.length === 0) {
-      applyNetworkRestrictions({
+      await applyNetworkRestrictions({
         projectRef: ref,
         dbAllowedCidrs: ['0.0.0.0/0'],
         dbAllowedCidrsV6: ['::/0'],
+      }).catch(() => {
+        // Catch the error but ignore it, letting the default onError trigger
       })
     } else {
-      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
+      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 }).catch(
+        () => {
+          // Catch the error but ignore it, letting the default onError trigger
+        }
+      )
     }
   }
 

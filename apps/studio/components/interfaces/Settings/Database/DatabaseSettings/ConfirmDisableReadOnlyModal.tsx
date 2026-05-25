@@ -23,7 +23,7 @@ const ConfirmDisableReadOnlyModeModal = ({
   onClose,
 }: ConfirmDisableReadOnlyModeModalProps) => {
   const { ref } = useParams()
-  const { mutate: disableReadOnlyMode, isPending } = useDisableReadOnlyModeMutation({
+  const { mutateAsync: disableReadOnlyMode, isPending } = useDisableReadOnlyModeMutation({
     onSuccess: () => {
       toast.success('Successfully disabled read-only mode for 15 minutes')
       onClose()
