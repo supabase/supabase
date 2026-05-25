@@ -10,6 +10,7 @@ import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
+import { useHitRates } from './useHitRates'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -45,6 +46,8 @@ export const ObservabilityOverview = () => {
     projectRef,
     refreshKey
   )
+
+  const { tableHitRate, indexHitRate, isLoading: hitRatesLoading } = useHitRates(refreshKey)
 
   const handleRefresh = useCallback(() => {
     setRefreshKey((prev) => prev + 1)
@@ -165,6 +168,9 @@ export const ObservabilityOverview = () => {
           isLoading={dbServiceData.isLoading}
           slowQueriesCount={slowQueriesCount}
           slowQueriesLoading={slowQueriesLoading}
+          tableHitRate={tableHitRate}
+          indexHitRate={indexHitRate}
+          hitRatesLoading={hitRatesLoading}
         />
 
         <ServiceHealthTable

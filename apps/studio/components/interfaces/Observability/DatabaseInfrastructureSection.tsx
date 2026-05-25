@@ -25,6 +25,9 @@ type DatabaseInfrastructureSectionProps = {
   isLoading: boolean
   slowQueriesCount?: number
   slowQueriesLoading?: boolean
+  tableHitRate?: number | null
+  indexHitRate?: number | null
+  hitRatesLoading?: boolean
 }
 
 export const DatabaseInfrastructureSection = ({
@@ -34,6 +37,9 @@ export const DatabaseInfrastructureSection = ({
   isLoading: _dbLoading,
   slowQueriesCount = 0,
   slowQueriesLoading = false,
+  tableHitRate,
+  indexHitRate,
+  hitRatesLoading = false,
 }: DatabaseInfrastructureSectionProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -256,6 +262,52 @@ export const DatabaseInfrastructureSection = ({
                 <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
+              ) : (
+                <MetricCardValue>--</MetricCardValue>
+              )}
+            </MetricCardContent>
+          </MetricCard>
+        </Link>
+
+        <Link
+          href={`/project/${projectRef}/observability/query-performance`}
+          className="block group"
+        >
+          <MetricCard isLoading={hitRatesLoading}>
+            <MetricCardHeader
+              href={`/project/${projectRef}/observability/query-performance`}
+              linkTooltip="Go to query performance"
+            >
+              <MetricCardLabel tooltip="Percentage of table block reads served from shared memory (buffer cache) vs disk. Values above 99% are healthy. Lower values suggest the shared_buffers setting may need tuning or the working set exceeds available memory.">
+                Table Hit Rate
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              {tableHitRate != null ? (
+                <MetricCardValue>{tableHitRate.toFixed(2)}%</MetricCardValue>
+              ) : (
+                <MetricCardValue>--</MetricCardValue>
+              )}
+            </MetricCardContent>
+          </MetricCard>
+        </Link>
+
+        <Link
+          href={`/project/${projectRef}/observability/query-performance`}
+          className="block group"
+        >
+          <MetricCard isLoading={hitRatesLoading}>
+            <MetricCardHeader
+              href={`/project/${projectRef}/observability/query-performance`}
+              linkTooltip="Go to query performance"
+            >
+              <MetricCardLabel tooltip="Percentage of index block reads served from shared memory (buffer cache) vs disk. Values above 99% are healthy. Low values may indicate missing indexes or insufficient memory.">
+                Index Hit Rate
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              {indexHitRate != null ? (
+                <MetricCardValue>{indexHitRate.toFixed(2)}%</MetricCardValue>
               ) : (
                 <MetricCardValue>--</MetricCardValue>
               )}
