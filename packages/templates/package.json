@@ -9,6 +9,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules",
+    "generate": "tsx scripts/generate.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest --run"
   },

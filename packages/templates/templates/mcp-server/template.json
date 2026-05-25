@@ -1,0 +1,10 @@
+{
+  "id": "mcp-server",
+  "name": "MCP Server",
+  "description": "Cursor MCP configuration for local Supabase MCP and hosted project access",
+  "category": "AI",
+  "tags": ["mcp", "ai", "cursor", "tools"],
+  "dependencies": {
+    "required": ["database", "api"]
+  }
+}

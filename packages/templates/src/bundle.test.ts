@@ -18,6 +18,12 @@ describe('project composer template package', () => {
     expect(projectComposerTemplateIndex).toEqual({ templates: projectComposerTemplates })
   })
 
+  it('bundles optional readme.md files from template folders', () => {
+    const agentTemplate = projectComposerTemplates.find((template) => template.id === 'agent')
+
+    expect(agentTemplate?.readme).toContain('persistent AI agents')
+  })
+
   it('keeps generated file paths relative to the exported project root', () => {
     const stripeTemplate = projectComposerTemplates.find(
       (template) => template.id === 'functions-stripe-webhook'
@@ -30,9 +36,9 @@ describe('project composer template package', () => {
   })
 
   it('rejects duplicate registry entries', () => {
-    expect(() =>
-      parseTemplateRegistry({ templates: ['auth', 'auth'] })
-    ).toThrow('Project composer template registry contains duplicate "auth"')
+    expect(() => parseTemplateRegistry({ templates: ['auth', 'auth'] })).toThrow(
+      'Project composer template registry contains duplicate "auth"'
+    )
   })
 
   it('rejects invalid template metadata before bundling', () => {

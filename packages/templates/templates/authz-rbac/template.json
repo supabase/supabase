@@ -1,0 +1,10 @@
+{
+  "id": "authz-rbac",
+  "name": "RBAC & Custom Claims",
+  "description": "Role and permission tables with authorize() helper and custom access token auth hook",
+  "category": "Auth",
+  "tags": ["rbac", "auth", "permissions", "custom-claims"],
+  "dependencies": {
+    "required": ["auth", "database"]
+  }
+}

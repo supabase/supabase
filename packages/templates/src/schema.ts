@@ -20,6 +20,7 @@ export interface ProjectComposerTemplateMetadata {
 
 export interface ProjectComposerTemplate extends ProjectComposerTemplateMetadata {
   files: ProjectComposerTemplateFile[]
+  readme?: string
 }
 
 export interface ProjectComposerTemplateIndex {

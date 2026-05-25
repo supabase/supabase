@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
   Button,
 } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 
 import type { MergeResult } from '../lib/composer'
@@ -71,7 +72,15 @@ export function ComposerHeader({
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem className="min-w-0">
-          <BreadcrumbPage className="truncate">Compose a project</BreadcrumbPage>
+          <BreadcrumbPage className="truncate">
+            <span className="inline-flex items-center gap-1">
+              Composer
+              <InfoTooltip side="bottom" className="max-w-[280px]">
+                Start a project from vetted, predefined templates, or remix templates with agents to
+                match your stack.
+              </InfoTooltip>
+            </span>
+          </BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </PageBreadcrumbs>

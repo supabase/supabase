@@ -17,6 +17,7 @@ export interface Template {
   category: string
   tags?: string[]
   files: TemplateFile[]
+  readme?: string
   dependencies?: TemplateDependencies
   defaultEnabled?: boolean
 }
@@ -28,23 +29,18 @@ export interface TemplateSource {
 export const categoryOrder = [
   'Core',
   'Auth',
+  'Security',
   'API',
   'Storage',
   'Realtime',
   'Database',
+  'AI',
   'Ecommerce',
   'Analytics',
   'Observability',
 ] as const
 
-export const templateOrder = [
-  'database',
-  'functions',
-  'storage',
-  'auth',
-  'api',
-  'graphql',
-] as const
+export const templateOrder = ['database', 'functions', 'storage', 'auth', 'api', 'graphql'] as const
 
 export const mockTemplates: Template[] = projectComposerTemplates
 

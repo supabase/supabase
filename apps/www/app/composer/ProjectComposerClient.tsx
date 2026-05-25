@@ -6,6 +6,7 @@ import { CodeTabsPanel } from './components/CodeTabsPanel'
 import { ComposerFlow } from './components/ComposerFlow'
 import { ComposerHeader } from './components/ComposerHeader'
 import { TemplateBrowser } from './components/TemplateBrowser'
+import { TemplateDetailSheet } from './components/TemplateDetailSheet'
 import {
   canRemoveTemplate,
   createZipBlob,
@@ -28,6 +29,7 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
   const [copied, setCopied] = useState(false)
   const [hoveredTemplateId, setHoveredTemplateId] = useState<string | null>(null)
   const [activeFilePath, setActiveFilePath] = useState<string | null>(null)
+  const [detailTemplateId, setDetailTemplateId] = useState<string | null>(null)
 
   const resolution = useMemo(() => {
     return resolveTemplateDependencies(Array.from(selectedIds), templates)
@@ -42,6 +44,16 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
   const resources = useMemo(() => {
     return extractComposerResources({ templates: resolution.resolved, mergeResult })
   }, [mergeResult, resolution.resolved])
+
+  const detailTemplate = useMemo(
+    () => templates.find((template) => template.id === detailTemplateId) ?? null,
+    [detailTemplateId, templates]
+  )
+
+  const resolvedIds = useMemo(
+    () => new Set(resolution.resolved.map((template) => template.id)),
+    [resolution.resolved]
+  )
 
   function addTemplate(id: string) {
     setSelectedIds((current) => new Set([...current, id]))
@@ -97,7 +109,9 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
               selectedIds={selectedIds}
               resolution={resolution}
               search={search}
+              activeDetailTemplateId={detailTemplateId}
               onSearchChange={setSearch}
+              onOpenTemplate={setDetailTemplateId}
               onAddTemplate={addTemplate}
               onRemoveTemplate={removeTemplate}
               onHoverTemplate={setHoveredTemplateId}
@@ -125,6 +139,18 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
             </div>
           </section>
         </div>
+
+        <TemplateDetailSheet
+          template={detailTemplate}
+          selectedIds={selectedIds}
+          resolvedIds={resolvedIds}
+          onOpenChange={(open) => {
+            if (!open) setDetailTemplateId(null)
+          }}
+          onAdd={() => {
+            if (detailTemplate) addTemplate(detailTemplate.id)
+          }}
+        />
       </div>
     </DefaultLayout>
   )

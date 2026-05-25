@@ -1,0 +1,10 @@
+{
+  "id": "ai-vector-search",
+  "name": "Vector Search",
+  "description": "pgvector extension with documents table and HNSW index for semantic search",
+  "category": "AI",
+  "tags": ["ai", "pgvector", "embeddings", "semantic-search"],
+  "dependencies": {
+    "required": ["database", "api"]
+  }
+}

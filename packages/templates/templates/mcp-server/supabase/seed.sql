@@ -1,0 +1,4 @@
+-- MCP setup notes:
+-- 1. Copy supabase/integrations/cursor-mcp.json to .cursor/mcp.json in your project root.
+-- 2. Local MCP is available at http://127.0.0.1:54321/mcp when running `supabase start`.
+-- 3. Hosted MCP: https://supabase.com/docs/guides/ai-tools/mcp

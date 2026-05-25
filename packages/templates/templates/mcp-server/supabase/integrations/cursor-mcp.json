@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "supabase-local": {
+      "url": "http://127.0.0.1:54321/mcp"
+    },
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { readdir, readFile } from 'node:fs/promises'
+import { access, readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import {
@@ -49,10 +49,27 @@ async function bundleTemplateDirectory({
     throw new Error(`Project composer template "${templateId}" must contain at least one file`)
   }
 
+  const readme = await readOptionalReadme(templateDir)
+
   return {
     ...metadata,
     files,
+    ...(readme ? { readme } : {}),
   }
+}
+
+async function readOptionalReadme(templateDir: string): Promise<string | undefined> {
+  const readmePath = path.join(templateDir, 'readme.md')
+
+  try {
+    await access(readmePath)
+  } catch {
+    return undefined
+  }
+
+  const content = (await readFile(readmePath, 'utf8')).trim()
+
+  return content.length > 0 ? content : undefined
 }
 
 async function readJsonFile(filePath: string): Promise<unknown> {

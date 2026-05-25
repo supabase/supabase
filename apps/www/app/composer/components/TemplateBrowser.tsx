@@ -1,24 +1,25 @@
 'use client'
 
-import { Check, Minus, Plus, Search } from 'lucide-react'
-import { Card, CardContent, cn, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Search } from 'lucide-react'
+import { Card, CardContent, cn, Input } from 'ui'
 
 import { canRemoveTemplate, type DependencyResolution } from '../lib/composer'
 import { groupTemplatesByCategory, sortCategories, type Template } from '../lib/templates'
 import {
-  getTemplateAddCommand,
   getTemplateSearchCommand,
-  templateAddCliDescription,
   TemplateCliPopover,
   templateSearchCliDescription,
 } from './TemplateCliPopover'
+import { TemplateItemHeader } from './TemplateItemHeader'
 
 interface TemplateBrowserProps {
   templates: Template[]
   selectedIds: Set<string>
   resolution: DependencyResolution
   search: string
+  activeDetailTemplateId: string | null
   onSearchChange: (search: string) => void
+  onOpenTemplate: (id: string) => void
   onAddTemplate: (id: string) => void
   onRemoveTemplate: (id: string) => void
   onHoverTemplate: (id: string | null) => void
@@ -29,7 +30,9 @@ export function TemplateBrowser({
   selectedIds,
   resolution,
   search,
+  activeDetailTemplateId,
   onSearchChange,
+  onOpenTemplate,
   onAddTemplate,
   onRemoveTemplate,
   onHoverTemplate,
@@ -82,8 +85,11 @@ export function TemplateBrowser({
                         key={template.id}
                         template={template}
                         isSelected={isSelected}
+                        isActiveDetail={activeDetailTemplateId === template.id}
                         isAutoIncluded={isAutoIncluded}
                         isRemovalBlocked={isRemovalBlocked}
+                        resolvedIds={resolvedIds}
+                        onOpen={() => onOpenTemplate(template.id)}
                         onAdd={() => onAddTemplate(template.id)}
                         onRemove={() => onRemoveTemplate(template.id)}
                         onHoverChange={(isHovered) =>
@@ -108,9 +114,12 @@ function TemplateItem({
   template,
   templates,
   selectedIds,
+  resolvedIds,
   isSelected,
+  isActiveDetail,
   isAutoIncluded,
   isRemovalBlocked,
+  onOpen,
   onAdd,
   onRemove,
   onHoverChange,
@@ -118,165 +127,42 @@ function TemplateItem({
   template: Template
   templates: Template[]
   selectedIds: Set<string>
+  resolvedIds: Set<string>
   isSelected: boolean
+  isActiveDetail: boolean
   isAutoIncluded: boolean
   isRemovalBlocked: boolean
+  onOpen: () => void
   onAdd: () => void
   onRemove: () => void
   onHoverChange: (isHovered: boolean) => void
 }) {
-  const requiredDependencyNames = template.dependencies?.required?.map((id) => {
-    return templates.find((candidate) => candidate.id === id)?.name ?? id
-  })
   const isAdded = isSelected || isAutoIncluded
-  const dependencyTooltip = isAutoIncluded
-    ? getDependencyTooltip(template.id, selectedIds, templates)
-    : isRemovalBlocked
-      ? getDependencyTooltip(template.id, selectedIds, templates)
-      : undefined
-
-  function handleContentClick() {
-    if (!isAdded) onAdd()
-  }
 
   return (
     <CardContent
       className={cn(
-        'group border-b px-3 py-3 last:border-b-0',
-        isAdded ? 'bg-muted' : 'bg-muted/50'
+        'border-b px-3 py-3 last:border-b-0',
+        isAdded ? 'bg-muted' : 'bg-muted/50',
+        isActiveDetail && 'ring-1 ring-inset ring-brand'
       )}
       onMouseEnter={() => onHoverChange(true)}
       onMouseLeave={() => onHoverChange(false)}
+      onFocus={() => onHoverChange(true)}
+      onBlur={() => onHoverChange(false)}
     >
-      <div className="flex flex-col gap-0.5">
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            className="min-w-0 flex-1 text-left"
-            onFocus={() => onHoverChange(true)}
-            onBlur={() => onHoverChange(false)}
-            onClick={handleContentClick}
-          >
-            <span className="line-clamp-1 text-sm font-medium text-foreground">
-              {template.name}
-            </span>
-          </button>
-          <div className="flex shrink-0 items-center gap-2">
-            {requiredDependencyNames && requiredDependencyNames.length > 0 ? (
-              <p className="max-w-32 truncate text-xs text-foreground-lighter">
-                Requires {requiredDependencyNames.join(', ')}
-              </p>
-            ) : null}
-            <TemplateCliPopover
-              command={getTemplateAddCommand(template.id)}
-              description={templateAddCliDescription}
-            />
-            <TemplateItemAction
-              isAdded={isAdded}
-              isAutoIncluded={isAutoIncluded}
-              isRemovalBlocked={isRemovalBlocked}
-              dependencyTooltip={dependencyTooltip}
-              onAdd={onAdd}
-              onRemove={onRemove}
-            />
-          </div>
-        </div>
-        <button
-          type="button"
-          className="w-full text-left"
-          onFocus={() => onHoverChange(true)}
-          onBlur={() => onHoverChange(false)}
-          onClick={handleContentClick}
-        >
-          <p className="line-clamp-3 text-xs leading-relaxed text-foreground-light">
-            {template.description}
-          </p>
-        </button>
-      </div>
+      <TemplateItemHeader
+        template={template}
+        templates={templates}
+        selectedIds={selectedIds}
+        resolvedIds={resolvedIds}
+        isRemovalBlocked={isRemovalBlocked}
+        onOpen={onOpen}
+        onAdd={onAdd}
+        onRemove={onRemove}
+      />
     </CardContent>
   )
-}
-
-function TemplateItemAction({
-  isAdded,
-  isAutoIncluded,
-  isRemovalBlocked,
-  dependencyTooltip,
-  onAdd,
-  onRemove,
-}: {
-  isAdded: boolean
-  isAutoIncluded: boolean
-  isRemovalBlocked: boolean
-  dependencyTooltip?: string
-  onAdd: () => void
-  onRemove: () => void
-}) {
-  if (!isAdded) {
-    return (
-      <button
-        type="button"
-        aria-label="Add template"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-control text-foreground-light"
-        onClick={onAdd}
-      >
-        <Plus className="h-3.5 w-3.5" />
-      </button>
-    )
-  }
-
-  const check = (
-    <Check
-      aria-hidden
-      className={cn(
-        'h-3.5 w-3.5',
-        isAutoIncluded ? 'text-warning' : 'text-brand group-hover:invisible'
-      )}
-      strokeWidth={2}
-    />
-  )
-
-  if ((isAutoIncluded || isRemovalBlocked) && dependencyTooltip) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="flex h-7 w-7 shrink-0 cursor-default items-center justify-center">
-            {check}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="left">{dependencyTooltip}</TooltipContent>
-      </Tooltip>
-    )
-  }
-
-  return (
-    <div className="relative flex h-7 w-7 shrink-0 items-center justify-center">
-      {check}
-      {!isRemovalBlocked ? (
-        <button
-          type="button"
-          aria-label="Remove template"
-          className="absolute hidden h-7 w-7 items-center justify-center rounded-full border border-control text-foreground-light group-hover:flex hover:bg-surface-200"
-          onClick={onRemove}
-        >
-          <Minus className="h-3.5 w-3.5" />
-        </button>
-      ) : null}
-    </div>
-  )
-}
-
-function getDependencyTooltip(templateId: string, selectedIds: Set<string>, templates: Template[]) {
-  const requiredBy = templates
-    .filter(
-      (template) =>
-        selectedIds.has(template.id) && template.dependencies?.required?.includes(templateId)
-    )
-    .map((template) => template.name)
-
-  if (requiredBy.length === 0) return 'Included as a dependency'
-  if (requiredBy.length === 1) return `Required by ${requiredBy[0]}`
-  return `Required by ${requiredBy.join(', ')}`
 }
 
 function filterTemplates(templates: Template[], search: string): Template[] {

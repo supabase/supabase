@@ -6,11 +6,19 @@
     "auth",
     "api",
     "graphql",
+    "security-rls",
+    "authz-rbac",
+    "multi-tenant",
     "auth-email",
     "storage-avatars",
     "realtime-comments",
     "functions-stripe-webhook",
     "analytics-events",
-    "observability-logs"
+    "observability-logs",
+    "queues",
+    "ai-vector-search",
+    "agent",
+    "ai-automatic-embeddings",
+    "mcp-server"
   ]
 }
