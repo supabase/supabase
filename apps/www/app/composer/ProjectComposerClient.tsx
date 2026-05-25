@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 
 import { CodeTabsPanel } from './components/CodeTabsPanel'
 import { ComposerFlow } from './components/ComposerFlow'
-import { ComposerHeader } from './components/ComposerHeader'
+import { ComposerActions } from './components/ComposerHeader'
 import { TemplateBrowser } from './components/TemplateBrowser'
 import { TemplateDetailSheet } from './components/TemplateDetailSheet'
 import {
@@ -86,17 +86,10 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
   }
 
   return (
-    <DefaultLayout hideHeader hideFooter className="bg-background">
+    <DefaultLayout hideHeader hideFooter className="bg-muted/10">
       <div className="flex min-h-[720px] h-screen w-full flex-col overflow-hidden">
-        <ComposerHeader
-          mergeResult={mergeResult}
-          copied={copied}
-          onCopyCommand={copyCommand}
-          onDownload={downloadComposition}
-        />
-
         <div className="grid min-h-0 flex-1 w-full grid-cols-1 overflow-hidden lg:grid-cols-[440px_minmax(0,1fr)]">
-          <div className="min-h-0">
+          <div className="min-h-0 overflow-hidden">
             <TemplateBrowser
               templates={templates}
               selectedIds={selectedIds}
@@ -111,26 +104,35 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
             />
           </div>
 
-          <section className="flex min-h-0 flex-col overflow-hidden">
-            <div className="min-h-0 flex-1">
-              <ComposerFlow
-                templates={templates}
-                resolution={resolution}
+          <div className="flex min-h-0 flex-col overflow-hidden pt-4 pr-4 pb-4">
+            <section className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border bg">
+              <ComposerActions
                 mergeResult={mergeResult}
-                resources={resources}
-                hoveredTemplateId={hoveredTemplateId}
-                onSelectFile={setActiveFilePath}
+                copied={copied}
+                onCopyCommand={copyCommand}
+                onDownload={downloadComposition}
               />
-            </div>
 
-            <div className="h-[320px] shrink-0">
-              <CodeTabsPanel
-                mergeResult={mergeResult}
-                activeFilePath={activeFilePath}
-                onActiveFilePathChange={setActiveFilePath}
-              />
-            </div>
-          </section>
+              <div className="min-h-0 flex-1">
+                <ComposerFlow
+                  templates={templates}
+                  resolution={resolution}
+                  mergeResult={mergeResult}
+                  resources={resources}
+                  hoveredTemplateId={hoveredTemplateId}
+                  onSelectFile={setActiveFilePath}
+                />
+              </div>
+
+              <div className="h-[320px] shrink-0">
+                <CodeTabsPanel
+                  mergeResult={mergeResult}
+                  activeFilePath={activeFilePath}
+                  onActiveFilePathChange={setActiveFilePath}
+                />
+              </div>
+            </section>
+          </div>
         </div>
 
         <TemplateDetailSheet

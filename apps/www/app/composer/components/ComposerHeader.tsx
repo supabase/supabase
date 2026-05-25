@@ -4,6 +4,7 @@ import { Check, Copy, Download } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
+  Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -12,50 +13,19 @@ import {
   Button,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 
 import type { MergeResult } from '../lib/composer'
 
-interface ComposerHeaderProps {
+interface ComposerActionsProps {
   mergeResult: MergeResult | null
   copied: boolean
   onCopyCommand: () => void
   onDownload: () => void
 }
 
-export function ComposerHeader({
-  mergeResult,
-  copied,
-  onCopyCommand,
-  onDownload,
-}: ComposerHeaderProps) {
+export function ComposerBreadcrumbs() {
   return (
-    <PageBreadcrumbs
-      actions={
-        mergeResult ? (
-          <PageBreadcrumbsActions>
-            <div className="flex h-[34px] items-center gap-2 rounded-md border bg-surface-75 px-3 font-mono text-xs text-foreground-light">
-              <span className="shrink-0 text-foreground-muted">$</span>
-              <code className="max-w-[min(40vw,28rem)] truncate">
-                supabase init --composition {mergeResult.compositionId}
-              </code>
-              <Button
-                type="text"
-                size="tiny"
-                className="h-[26px] w-[26px] shrink-0 px-0"
-                icon={copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                onClick={onCopyCommand}
-                aria-label="Copy composition command"
-              />
-            </div>
-
-            <Button type="default" size="small" icon={<Download />} onClick={onDownload}>
-              Download ZIP
-            </Button>
-          </PageBreadcrumbsActions>
-        ) : undefined
-      }
-    >
+    <Breadcrumb className="min-w-0 [&_li]:text-sm">
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
@@ -83,6 +53,38 @@ export function ComposerHeader({
           </BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
-    </PageBreadcrumbs>
+    </Breadcrumb>
+  )
+}
+
+export function ComposerActions({
+  mergeResult,
+  copied,
+  onCopyCommand,
+  onDownload,
+}: ComposerActionsProps) {
+  if (!mergeResult) return null
+
+  return (
+    <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+      <div className="flex h-[34px] items-center gap-2 rounded-md border bg-surface-75 px-3 font-mono text-xs text-foreground-light">
+        <span className="shrink-0 text-foreground-muted">$</span>
+        <code className="max-w-[min(40vw,28rem)] truncate">
+          supabase init --composition {mergeResult.compositionId}
+        </code>
+        <Button
+          type="text"
+          size="tiny"
+          className="h-[26px] w-[26px] shrink-0 px-0"
+          icon={copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          onClick={onCopyCommand}
+          aria-label="Copy composition command"
+        />
+      </div>
+
+      <Button type="secondary" size="small" icon={<Download />} onClick={onDownload}>
+        Download ZIP
+      </Button>
+    </div>
   )
 }
