@@ -6,6 +6,7 @@ import {
   Position,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
   type Edge,
   type Node,
   type NodeMouseHandler,
@@ -82,6 +83,7 @@ function ComposerFlowCanvas({
 }: ComposerFlowProps) {
   const { resolvedTheme } = useTheme()
   const [documentTheme, setDocumentTheme] = useState<'dark' | 'light'>('dark')
+  const { fitView } = useReactFlow()
   const { nodes, edges } = useMemo(() => {
     return buildPrototypeFlow({
       templates,
@@ -91,6 +93,21 @@ function ComposerFlowCanvas({
       hoveredTemplateId,
     })
   }, [hoveredTemplateId, mergeResult, resolution, resources, templates])
+
+  const graphLayoutKey = useMemo(
+    () => buildGraphLayoutKey({ resolution, mergeResult, resources }),
+    [mergeResult, resolution, resources]
+  )
+
+  useEffect(() => {
+    if (nodes.length === 0) return
+
+    const frame = requestAnimationFrame(() => {
+      void fitView({ padding: 0.15, duration: 200 })
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [fitView, graphLayoutKey, nodes.length])
 
   const handleNodeClick: NodeMouseHandler = (_, node) => {
     if (!node.id.startsWith('resource:')) return
@@ -397,4 +414,27 @@ function getHighlightedTemplateIds(hoveredTemplateId: string, templates: Templat
   const template = templates.find((candidate) => candidate.id === hoveredTemplateId)
   template?.dependencies?.required?.forEach((dependencyId) => ids.add(dependencyId))
   return ids
+}
+
+/** Stable key for graph structure — excludes hover so fitView does not run on highlight. */
+export function buildGraphLayoutKey({
+  resolution,
+  mergeResult,
+  resources,
+}: {
+  resolution: DependencyResolution
+  mergeResult: MergeResult | null
+  resources: ComposerResource[]
+}) {
+  const templatePart = resolution.resolved
+    .map((template) => template.id)
+    .sort()
+    .join(',')
+  const resourcePart = resources
+    .map((resource) => `${resource.id}:${resource.parentResourceId ?? ''}`)
+    .sort()
+    .join(',')
+  const warningPart = [...(mergeResult?.warnings ?? []), ...resolution.missingDeps].join('|')
+
+  return `${templatePart}|${resourcePart}|${warningPart}`
 }
