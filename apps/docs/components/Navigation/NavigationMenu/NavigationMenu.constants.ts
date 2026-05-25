@@ -756,6 +756,12 @@ export const auth: NavMenuConstant = {
         },
 
         {
+          name: 'Passkey',
+          url: '/guides/auth/passkeys',
+          enabled: allAuthProvidersEnabled,
+        },
+
+        {
           name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
           items: [{ name: 'Overview', url: '/guides/auth/social-login' }, ...SocialLoginItems],
