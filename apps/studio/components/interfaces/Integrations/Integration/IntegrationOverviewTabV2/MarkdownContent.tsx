@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Markdown } from 'ui-patterns/Markdown'
+
+import { Markdown } from '@/components/interfaces/Markdown'
 
 interface MarkdownContentProps {
   content: string | null | undefined
@@ -33,5 +34,5 @@ export const MarkdownContent = ({
 
   const content = remoteContent || localContent
 
-  return <Markdown>{content}</Markdown>
+  return <Markdown className="flex flex-col gap-y-4 text-foreground-light">{content}</Markdown>
 }
