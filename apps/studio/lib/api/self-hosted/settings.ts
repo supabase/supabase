@@ -1,6 +1,6 @@
 import { components } from 'api-types'
 
-import { AUTH_JWT_SECRET } from './constants'
+import { AUTH_JWT_SECRET, REGION } from './constants'
 import { assertSelfHosted } from './util'
 import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from '@/lib/constants/api'
 
@@ -39,17 +39,17 @@ export function getProjectSettings() {
     jwt_secret: AUTH_JWT_SECRET,
     name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
     ref: 'default',
-    region: 'ap-southeast-1',
+    region: REGION,
     service_api_keys: [
-      {
-        api_key: process.env.SUPABASE_SERVICE_KEY ?? '',
-        name: 'service_role key',
-        tags: 'service_role',
-      },
       {
         api_key: process.env.SUPABASE_ANON_KEY ?? '',
         name: 'anon key',
         tags: 'anon',
+      },
+      {
+        api_key: process.env.SUPABASE_SERVICE_KEY ?? '',
+        name: 'service_role key',
+        tags: 'service_role',
       },
     ],
     ssl_enforced: false,

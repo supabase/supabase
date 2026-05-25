@@ -10,6 +10,7 @@ import {
   useIsAnalyticsBucketsEnabled,
   useIsVectorBucketsEnabled,
 } from '@/data/config/project-storage-config-query'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -24,6 +25,7 @@ export const StorageMenuV2 = () => {
   const router = useRouter()
   const { ref } = useParams()
   const page = useStorageV2Page()
+  const { isSelfHosted } = useDeploymentMode()
 
   const { storageAnalytics, storageVectors } = useIsFeatureEnabled([
     'storage:analytics',
@@ -47,8 +49,9 @@ export const StorageMenuV2 = () => {
     () => router.push(`/project/${ref}/storage/vectors`),
     { enabled: showVectors }
   )
+  const showS3Configuration = IS_PLATFORM || isSelfHosted
   useShortcut(SHORTCUT_IDS.NAV_STORAGE_S3, () => router.push(`/project/${ref}/storage/s3`), {
-    enabled: IS_PLATFORM,
+    enabled: showS3Configuration,
   })
 
   const bucketTypes = Object.entries(BUCKET_TYPES).filter(([key]) => {
@@ -95,7 +98,7 @@ export const StorageMenuV2 = () => {
           })}
         </div>
 
-        {IS_PLATFORM && (
+        {showS3Configuration && (
           <>
             <div className="h-px w-[calc(100%-1.5rem)] mx-auto md:w-full bg-border" />
             <div className="md:mx-3">

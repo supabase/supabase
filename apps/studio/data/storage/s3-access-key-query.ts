@@ -3,7 +3,6 @@ import { components } from 'api-types'
 
 import { storageCredentialsKeys } from './s3-access-key-keys'
 import { get, handleError } from '@/data/fetchers'
-import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type StorageCredentialsVariables = { projectRef?: string }
@@ -39,6 +38,6 @@ export const useStorageCredentialsQuery = <TData = StorageCredentialsData>(
   useQuery<StorageCredentialsData, ResponseError, TData>({
     queryKey: storageCredentialsKeys.credentials(projectRef),
     queryFn: ({ signal }) => fetchStorageCredentials({ projectRef }, signal),
-    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })

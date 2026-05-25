@@ -209,7 +209,7 @@ export const JWTSettings = () => {
               layout="flex-row-reverse"
               id="JWT_SECRET"
               label="JWT secret"
-              description="Used to sign and verify JWTs issued by Supabase Auth."
+              description="Used to verify legacy user session JWTs issued by Supabase Auth."
             >
               <Input id="JWT_SECRET" copy reveal readOnly value={config?.jwt_secret || ''} />
             </FormItemLayout>

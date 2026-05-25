@@ -19,9 +19,11 @@ import * as z from 'zod'
 
 import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { ProjectAccessSection } from './ProjectAccessSection'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -68,6 +70,8 @@ export const General = () => {
     )
   }
 
+  const { isCli, isSelfHosted } = useDeploymentMode()
+
   if (!IS_PLATFORM) {
     return (
       <PageSection>
@@ -98,24 +102,34 @@ export const General = () => {
               </Card>
             </Form>
           )}
-          <Admonition
-            type="default"
-            title="Project settings are configured outside of Studio"
-            description={
-              <p>
-                For{' '}
-                <InlineLink href={`${DOCS_URL}/guides/self-hosting`}>
-                  self-hosted Supabase
-                </InlineLink>
-                , update your <code className="text-code-inline">.env</code> and{' '}
-                <code className="text-code-inline">docker-compose.yml</code>. For{' '}
-                <InlineLink href={`${DOCS_URL}/guides/local-development`}>
-                  CLI / local development
-                </InlineLink>
-                , edit <code className="text-code-inline">supabase/config.toml</code>.
-              </p>
-            }
-          />
+          {isCli && (
+            <Admonition
+              type="default"
+              title="Local development with the Supabase CLI"
+              description={
+                <p>
+                  Project settings are configured in{' '}
+                  <code className="text-code-inline">supabase/config.toml</code> — applied on{' '}
+                  <code className="text-code-inline">supabase start</code>.
+                </p>
+              }
+              actions={<DocsButton href={`${DOCS_URL}/guides/local-development`} />}
+            />
+          )}
+          {isSelfHosted && (
+            <Admonition
+              type="default"
+              title="Self-hosted Supabase"
+              description={
+                <p>
+                  Project settings are configured in your{' '}
+                  <code className="text-code-inline">.env</code> and{' '}
+                  <code className="text-code-inline">docker-compose.yml</code>.
+                </p>
+              }
+              actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting`} />}
+            />
+          )}
         </PageSectionContent>
       </PageSection>
     )

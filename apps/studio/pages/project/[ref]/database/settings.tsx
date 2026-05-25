@@ -22,12 +22,14 @@ import { SSLConfiguration } from '@/components/interfaces/Settings/Database/SSLC
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { LocalSetupGuide } from '@/components/ui/LocalSetupGuide'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseSettings: NextPageWithLayout = () => {
+  const { isCli, isSelfHosted } = useDeploymentMode()
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const jitDbAccessEnabled = useIsJitDbAccessEnabled()
@@ -69,42 +71,32 @@ const DatabaseSettings: NextPageWithLayout = () => {
         <PageContainer size="small" className="pb-12">
           <PageSection>
             <PageSectionContent className="space-y-4 md:space-y-8">
-              <LocalSetupGuide
-                cli={{
-                  body: (
+              {isCli && (
+                <LocalSetupGuide
+                  variant="cli"
+                  body={
                     <p>
                       Configure database settings in{' '}
                       <code className="text-code-inline">supabase/config.toml</code> — applied
                       automatically on <code className="text-code-inline">supabase start</code>.
                     </p>
-                  ),
-                  docsHref: `${DOCS_URL}/guides/local-development/cli/config#database-config`,
-                }}
-                selfHosted={{
-                  body: (
+                  }
+                  docsHref={`${DOCS_URL}/guides/local-development/cli/config#database-config`}
+                />
+              )}
+              {isSelfHosted && (
+                <LocalSetupGuide
+                  variant="selfHosted"
+                  body={
                     <p>
                       Change settings in{' '}
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="https://github.com/supabase/supabase/blob/master/docker/.env.example"
-                      >
-                        .env file
-                      </a>{' '}
-                      and{' '}
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml"
-                      >
-                        docker-compose.yml
-                      </a>
-                      .
+                      <code className="text-code-inline">.env</code> file and{' '}
+                      <code className="text-code-inline">docker-compose.yml</code>.
                     </p>
-                  ),
-                  docsHref: `${DOCS_URL}/guides/self-hosting/docker#configuring-and-securing-supabase`,
-                }}
-              />
+                  }
+                  docsHref={`${DOCS_URL}/guides/self-hosting/docker#accessing-postgres`}
+                />
+              )}
             </PageSectionContent>
           </PageSection>
         </PageContainer>

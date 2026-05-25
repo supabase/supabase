@@ -19,3 +19,10 @@ export const POSTGRES_USER_READ_ONLY =
 // shipped by the supabase/cli — keep them in sync.
 export const DEFAULT_AUTH_JWT_SECRET = 'super-secret-jwt-token-with-at-least-32-characters-long'
 export const AUTH_JWT_SECRET = process.env.AUTH_JWT_SECRET || DEFAULT_AUTH_JWT_SECRET
+
+// S3 protocol access key id for the storage service (set in docker-compose).
+// Used as the read-only access key surfaced on the self-hosted S3 settings page.
+export const STORAGE_S3_ACCESS_KEY = process.env.STORAGE_S3_ACCESS_KEY ?? ''
+
+// Storage region (set in docker-compose). Surfaced on the self-hosted S3 settings page.
+export const REGION = process.env.REGION || 'local'

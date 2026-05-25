@@ -54,6 +54,9 @@ export const PublishableAPIKeys = () => {
     [apiKeysData]
   )
 
+  const showSelfHostedEmptyState =
+    !IS_PLATFORM && publishableApiKeys.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
+
   const [deleteId, setDeleteId] = useQueryState('deletePublishableKey', parseAsString)
   const apiKeyToDelete = publishableApiKeys?.find((key) => key.id === deleteId)
 
@@ -95,6 +98,15 @@ export const PublishableAPIKeys = () => {
         <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
         <AlertError error={error} subject="Failed to load API keys" />
+      ) : showSelfHostedEmptyState ? (
+        <Card>
+          <div className="rounded-b-md! overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+            <p className="text-sm text-foreground">No publishable API keys found</p>
+            <p className="text-sm text-foreground-light">
+              This may be a configuration issue. Ensure your API keys are available to Studio.
+            </p>
+          </div>
+        </Card>
       ) : (
         <Card className="bg-surface-100">
           <Table>

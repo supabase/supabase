@@ -10,42 +10,56 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { DefaultEdgeFunctionSecrets } from '@/components/interfaces/Functions/EdgeFunctionSecrets/DefaultEdgeFunctionSecrets'
-import { getVisibleDefaultEdgeFunctionSecrets } from '@/components/interfaces/Functions/EdgeFunctionSecrets/DefaultEdgeFunctionSecrets.utils'
+import { DEFAULT_EDGE_FUNCTION_SECRETS } from '@/components/interfaces/Functions/EdgeFunctionSecrets/DefaultEdgeFunctionSecrets.utils'
 import { EdgeFunctionSecrets } from '@/components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { InlineLink } from '@/components/ui/InlineLink'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const SecretsPage: NextPageWithLayout = () => {
+  const { isCli, isSelfHosted } = useDeploymentMode()
+
   if (!IS_PLATFORM) {
     return (
       <PageContainer size="large">
         <PageSection>
           <PageSectionContent className="space-y-4 md:space-y-8">
-            <Admonition
-              type="default"
-              title="Edge function secrets are configured outside of Studio"
-              description={
-                <p>
-                  For{' '}
-                  <InlineLink
+            {isCli && (
+              <Admonition
+                type="default"
+                title="Local development with the Supabase CLI"
+                description={
+                  <p>
+                    Add custom secrets to{' '}
+                    <code className="text-code-inline">supabase/functions/.env</code>, or pass{' '}
+                    <code className="text-code-inline">--env-file</code> to{' '}
+                    <code className="text-code-inline">supabase functions serve</code>.
+                  </p>
+                }
+                actions={<DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />}
+              />
+            )}
+            {isSelfHosted && (
+              <Admonition
+                type="default"
+                title="Self-hosted Supabase"
+                description={
+                  <p>
+                    Set custom secrets in your <code className="text-code-inline">.env</code> and
+                    the <code className="text-code-inline">functions</code> service in{' '}
+                    <code className="text-code-inline">docker-compose.yml</code>.
+                  </p>
+                }
+                actions={
+                  <DocsButton
                     href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions#custom-environment-variables`}
-                  >
-                    self-hosted Supabase
-                  </InlineLink>
-                  , set them in your <code className="text-code-inline">.env</code> and the{' '}
-                  <code className="text-code-inline">functions</code> service in{' '}
-                  <code className="text-code-inline">docker-compose.yml</code>. For{' '}
-                  <InlineLink href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`}>
-                    CLI / local development
-                  </InlineLink>
-                  , add them to <code className="text-code-inline">supabase/functions/.env</code>.
-                </p>
-              }
-            />
+                  />
+                }
+              />
+            )}
             <section className="space-y-4">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div className="space-y-1">
@@ -54,10 +68,16 @@ const SecretsPage: NextPageWithLayout = () => {
                     Reserved secrets available in every project
                   </p>
                 </div>
-                <DocsButton href={`${DOCS_URL}/guides/functions/secrets#default-secrets`} />
+                <DocsButton
+                  href={
+                    isSelfHosted
+                      ? `${DOCS_URL}/guides/self-hosting/self-hosted-functions#calling-supabase-services-from-functions`
+                      : `${DOCS_URL}/guides/functions/secrets#default-secrets`
+                  }
+                />
               </div>
               <DefaultEdgeFunctionSecrets
-                secrets={getVisibleDefaultEdgeFunctionSecrets(new Set())}
+                secrets={DEFAULT_EDGE_FUNCTION_SECRETS.filter((secret) => !secret.isRuntime)}
               />
             </section>
           </PageSectionContent>

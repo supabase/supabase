@@ -7,11 +7,13 @@ import { customRender as render } from '@/tests/lib/custom-render'
 const {
   mockIsPlatform,
   mockUseAsyncCheckPermissions,
+  mockUseDeploymentMode,
   mockUseProjectUpdateMutation,
   mockUseSelectedProjectQuery,
 } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
   mockUseAsyncCheckPermissions: vi.fn(),
+  mockUseDeploymentMode: vi.fn(),
   mockUseProjectUpdateMutation: vi.fn(),
   mockUseSelectedProjectQuery: vi.fn(),
 }))
@@ -34,6 +36,10 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: mockUseSelectedProjectQuery,
 }))
 
+vi.mock('@/hooks/misc/useDeploymentMode', () => ({
+  useDeploymentMode: mockUseDeploymentMode,
+}))
+
 vi.mock('@/data/projects/project-update-mutation', () => ({
   useProjectUpdateMutation: mockUseProjectUpdateMutation,
 }))
@@ -46,6 +52,11 @@ describe('General', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isLoading: false })
+    mockUseDeploymentMode.mockReturnValue({
+      isPlatform: true,
+      isCli: false,
+      isSelfHosted: false,
+    })
     mockUseProjectUpdateMutation.mockReturnValue({ mutate: vi.fn(), isPending: false })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: {
@@ -78,29 +89,51 @@ describe('General', () => {
       // Member access section rendered
       expect(screen.getByText('ProjectAccessSection')).toBeInTheDocument()
 
-      // No self-hosted admonition
-      expect(
-        screen.queryByText(/Project settings are configured outside of Studio/i)
-      ).not.toBeInTheDocument()
+      // No deployment-mode admonitions
+      expect(screen.queryByText(/Local development with the Supabase CLI/i)).not.toBeInTheDocument()
+      expect(screen.queryByText(/Self-hosted Supabase/i)).not.toBeInTheDocument()
     })
   })
 
-  describe('self-hosted', () => {
+  describe('self-hosted (CLI mode)', () => {
     beforeEach(() => {
       mockIsPlatform.value = false
+      mockUseDeploymentMode.mockReturnValue({
+        isPlatform: false,
+        isCli: true,
+        isSelfHosted: false,
+      })
     })
 
-    it('renders the admonition alongside a read-only project name', () => {
+    it('renders the CLI admonition alongside a read-only project name', () => {
       render(<General />)
 
-      // Read-only project name with value populated
       expect(screen.getByText('Project name')).toBeInTheDocument()
       expect(screen.getByDisplayValue('My Project')).toHaveAttribute('readonly')
 
-      // Admonition pointing to self-hosting + CLI docs
-      expect(
-        screen.getByText(/Project settings are configured outside of Studio/i)
-      ).toBeInTheDocument()
+      expect(screen.getByText(/Local development with the Supabase CLI/i)).toBeInTheDocument()
+      expect(screen.queryByText(/Self-hosted Supabase/i)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('self-hosted (Docker mode)', () => {
+    beforeEach(() => {
+      mockIsPlatform.value = false
+      mockUseDeploymentMode.mockReturnValue({
+        isPlatform: false,
+        isCli: false,
+        isSelfHosted: true,
+      })
+    })
+
+    it('renders the self-hosted admonition alongside a read-only project name', () => {
+      render(<General />)
+
+      expect(screen.getByText('Project name')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('My Project')).toHaveAttribute('readonly')
+
+      expect(screen.getByText(/Self-hosted Supabase/i)).toBeInTheDocument()
+      expect(screen.queryByText(/Local development with the Supabase CLI/i)).not.toBeInTheDocument()
     })
 
     it('does not render Project ID, region, Save action, or the member access section', () => {

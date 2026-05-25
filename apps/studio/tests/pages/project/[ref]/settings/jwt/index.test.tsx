@@ -4,9 +4,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import JWTSigningKeysPage from '@/pages/project/[ref]/settings/jwt/index'
 
-const { mockIsPlatform, mockUseAsyncCheckPermissions } = vi.hoisted(() => ({
+const { mockIsPlatform, mockUseAsyncCheckPermissions, mockUseDeploymentMode } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
   mockUseAsyncCheckPermissions: vi.fn(),
+  mockUseDeploymentMode: vi.fn(),
 }))
 
 vi.mock('common', async () => {
@@ -21,6 +22,10 @@ vi.mock('common', async () => {
 
 vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+}))
+
+vi.mock('@/hooks/misc/useDeploymentMode', () => ({
+  useDeploymentMode: mockUseDeploymentMode,
 }))
 
 vi.mock('@/components/layouts/DefaultLayout', () => ({
@@ -50,6 +55,11 @@ describe('/project/[ref]/settings/jwt', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isSuccess: true })
+    mockUseDeploymentMode.mockReturnValue({
+      isPlatform: true,
+      isCli: false,
+      isSelfHosted: false,
+    })
   })
 
   it('renders the JWT signing keys table on platform', () => {
@@ -59,12 +69,31 @@ describe('/project/[ref]/settings/jwt', () => {
     expect(screen.queryByText('LocalSetupGuide')).not.toBeInTheDocument()
   })
 
-  it('renders the LocalSetupGuide on self-hosted instead of the table', () => {
+  it('renders only the CLI LocalSetupGuide on self-hosted (CLI mode)', () => {
     mockIsPlatform.value = false
+    mockUseDeploymentMode.mockReturnValue({
+      isPlatform: false,
+      isCli: true,
+      isSelfHosted: false,
+    })
 
     render(<JWTSigningKeysPage dehydratedState={{}} />)
 
     expect(screen.queryByText('JWTSecretKeysTable')).not.toBeInTheDocument()
-    expect(screen.getByText('LocalSetupGuide')).toBeInTheDocument()
+    expect(screen.getAllByText('LocalSetupGuide')).toHaveLength(1)
+  })
+
+  it('renders only the self-hosted LocalSetupGuide on self-hosted (Docker mode)', () => {
+    mockIsPlatform.value = false
+    mockUseDeploymentMode.mockReturnValue({
+      isPlatform: false,
+      isCli: false,
+      isSelfHosted: true,
+    })
+
+    render(<JWTSigningKeysPage dehydratedState={{}} />)
+
+    expect(screen.queryByText('JWTSecretKeysTable')).not.toBeInTheDocument()
+    expect(screen.getAllByText('LocalSetupGuide')).toHaveLength(1)
   })
 })

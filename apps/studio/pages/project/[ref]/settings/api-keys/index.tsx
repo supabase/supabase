@@ -14,14 +14,16 @@ import ApiKeysLayout from '@/components/layouts/APIKeys/APIKeysLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
-import { InlineLink } from '@/components/ui/InlineLink'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ApiKeysNewPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
+  const { isCli, isSelfHosted } = useDeploymentMode()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeysData = [] } = useAPIKeysQuery(
     {
@@ -40,26 +42,32 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
   if (!IS_PLATFORM) {
     return (
       <div className="flex flex-col gap-8">
-        <Admonition
-          type="default"
-          title="API keys are configured outside of Studio"
-          description={
-            <p>
-              For{' '}
-              <InlineLink href={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`}>
-                self-hosted Supabase
-              </InlineLink>
-              , set <code className="text-code-inline">SUPABASE_PUBLISHABLE_KEY</code> and{' '}
-              <code className="text-code-inline">SUPABASE_SECRET_KEY</code> in your{' '}
-              <code className="text-code-inline">.env</code> and{' '}
-              <code className="text-code-inline">docker-compose.yml</code>. For{' '}
-              <InlineLink href={`${DOCS_URL}/guides/local-development`}>
-                CLI / local development
-              </InlineLink>
-              , configure them in <code className="text-code-inline">supabase/config.toml</code>.
-            </p>
-          }
-        />
+        {isCli && (
+          <Admonition
+            type="default"
+            title="Local development with the Supabase CLI"
+            description={
+              <p>
+                The API keys are automatically managed by the Supabase CLI and are not manually configurable.
+              </p>
+            }
+            actions={<DocsButton href={`${DOCS_URL}/guides/local-development`} />}
+          />
+        )}
+        {isSelfHosted && (
+          <Admonition
+            type="default"
+            title="Self-hosted Supabase"
+            description={
+              <p>
+                <code className="text-code-inline">SUPABASE_PUBLISHABLE_KEY</code> and{' '}
+                <code className="text-code-inline">SUPABASE_SECRET_KEY</code> are set in your{' '}
+                <code className="text-code-inline">.env</code>.
+              </p>
+            }
+            actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`} />}
+          />
+        )}
         <PublishableAPIKeys />
         <Separator />
         <SecretAPIKeys />

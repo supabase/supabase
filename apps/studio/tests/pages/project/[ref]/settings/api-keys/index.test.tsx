@@ -4,11 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import ApiKeysPage from '@/pages/project/[ref]/settings/api-keys/index'
 
-const { mockIsPlatform, mockUseAsyncCheckPermissions, mockUseAPIKeysQuery } = vi.hoisted(() => ({
-  mockIsPlatform: { value: true },
-  mockUseAsyncCheckPermissions: vi.fn(),
-  mockUseAPIKeysQuery: vi.fn(),
-}))
+const { mockIsPlatform, mockUseAsyncCheckPermissions, mockUseAPIKeysQuery, mockUseDeploymentMode } =
+  vi.hoisted(() => ({
+    mockIsPlatform: { value: true },
+    mockUseAsyncCheckPermissions: vi.fn(),
+    mockUseAPIKeysQuery: vi.fn(),
+    mockUseDeploymentMode: vi.fn(),
+  }))
 
 vi.mock('common', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('common')
@@ -27,6 +29,10 @@ vi.mock('@/hooks/misc/useCheckPermissions', () => ({
 
 vi.mock('@/data/api-keys/api-keys-query', () => ({
   useAPIKeysQuery: mockUseAPIKeysQuery,
+}))
+
+vi.mock('@/hooks/misc/useDeploymentMode', () => ({
+  useDeploymentMode: mockUseDeploymentMode,
 }))
 
 vi.mock('@/components/layouts/DefaultLayout', () => ({
@@ -65,6 +71,11 @@ describe('/project/[ref]/settings/api-keys', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isLoading: false })
+    mockUseDeploymentMode.mockReturnValue({
+      isPlatform: true,
+      isCli: false,
+      isSelfHosted: false,
+    })
     mockUseAPIKeysQuery.mockReturnValue({
       data: [{ type: 'publishable' }, { type: 'secret' }],
     })
@@ -77,7 +88,8 @@ describe('/project/[ref]/settings/api-keys', () => {
     expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
     expect(screen.getByText('ApiKeysFeedbackBanner')).toBeInTheDocument()
     expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
-    expect(screen.queryByText(/API keys are configured outside of Studio/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Local development with the Supabase CLI/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Self-hosted Supabase/i)).not.toBeInTheDocument()
   })
 
   it('renders the create callout on platform when no new keys exist', () => {
@@ -89,12 +101,36 @@ describe('/project/[ref]/settings/api-keys', () => {
     expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
   })
 
-  it('renders the admonition above the keys on self-hosted and hides the callout/banner', () => {
+  it('renders the CLI admonition above the keys on self-hosted (CLI mode)', () => {
     mockIsPlatform.value = false
+    mockUseDeploymentMode.mockReturnValue({
+      isPlatform: false,
+      isCli: true,
+      isSelfHosted: false,
+    })
 
     render(<ApiKeysPage dehydratedState={{}} />)
 
-    expect(screen.getByText(/API keys are configured outside of Studio/i)).toBeInTheDocument()
+    expect(screen.getByText(/Local development with the Supabase CLI/i)).toBeInTheDocument()
+    expect(screen.queryByText(/Self-hosted Supabase/i)).not.toBeInTheDocument()
+    expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
+    expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
+    expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
+    expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
+  })
+
+  it('renders the self-hosted admonition above the keys on self-hosted (Docker mode)', () => {
+    mockIsPlatform.value = false
+    mockUseDeploymentMode.mockReturnValue({
+      isPlatform: false,
+      isCli: false,
+      isSelfHosted: true,
+    })
+
+    render(<ApiKeysPage dehydratedState={{}} />)
+
+    expect(screen.getByText(/Self-hosted Supabase/i)).toBeInTheDocument()
+    expect(screen.queryByText(/Local development with the Supabase CLI/i)).not.toBeInTheDocument()
     expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
     expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
     expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()

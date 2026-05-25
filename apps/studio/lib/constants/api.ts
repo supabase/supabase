@@ -18,6 +18,6 @@ export const DEFAULT_PROJECT = {
   organization_id: 1,
   cloud_provider: 'localhost',
   status: 'ACTIVE_HEALTHY',
-  region: 'local',
+  region: process.env.REGION || 'local',
   inserted_at: '2021-08-02T06:40:40.646Z',
 }

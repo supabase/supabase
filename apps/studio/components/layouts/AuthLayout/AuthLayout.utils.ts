@@ -91,6 +91,16 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           items: [],
           shortcutId: SHORTCUT_IDS.NAV_AUTH_POLICIES,
         },
+        ...(!isPlatform
+          ? [
+              {
+                name: 'Settings',
+                key: 'settings',
+                url: `${baseUrl}/settings`,
+                items: [],
+              },
+            ]
+          : []),
         ...(isPlatform
           ? [
               ...(features.signInProviders

@@ -9,10 +9,12 @@ import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsL
 import { LocalSetupGuide } from '@/components/ui/LocalSetupGuide'
 import NoPermission from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const JWTSigningKeysPage: NextPageWithLayout = () => {
+  const { isCli, isSelfHosted } = useDeploymentMode()
   const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'auth_signing_keys'
@@ -20,29 +22,32 @@ const JWTSigningKeysPage: NextPageWithLayout = () => {
 
   if (!IS_PLATFORM) {
     return (
-      <LocalSetupGuide
-        cli={{
-          body: (
-            <p>
-              Asymmetric JWT signing keys are not managed via Studio for local development. The
-              Supabase CLI signs JWTs using the symmetric{' '}
-              <code className="text-code-inline">JWT_SECRET</code> from{' '}
-              <code className="text-code-inline">supabase/config.toml</code>.
-            </p>
-          ),
-          docsHref: `${DOCS_URL}/guides/local-development`,
-        }}
-        selfHosted={{
-          body: (
-            <p>
-              Configure asymmetric JWT signing keys outside of Studio via your{' '}
-              <code className="text-code-inline">.env</code> and{' '}
-              <code className="text-code-inline">docker-compose.yml</code>.
-            </p>
-          ),
-          docsHref: `${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`,
-        }}
-      />
+      <div className="space-y-4">
+        {isCli && (
+          <LocalSetupGuide
+            variant="cli"
+            body={
+              <p>
+                The asymmetric key pair used to sign user session JWTs is configured by the Supabase CLI.
+              </p>
+            }
+            docsHref={`${DOCS_URL}/guides/local-development`}
+          />
+        )}
+        {isSelfHosted && (
+          <LocalSetupGuide
+            variant="selfHosted"
+            body={
+              <p>
+                The asymmetric key pair used to sign user session JWTs is configured via your{' '}
+                <code className="text-code-inline">.env</code> and{' '}
+                <code className="text-code-inline">docker-compose.yml</code>.
+              </p>
+            }
+            docsHref={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`}
+          />
+        )}
+      </div>
     )
   }
 

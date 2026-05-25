@@ -100,10 +100,9 @@ describe('generateAuthMenu', () => {
     expect(names).not.toContain('OAuth Apps')
     expect(groupTitles).not.toContain('Notifications')
 
-    // Configuration should only have Policies
+    // Configuration should only have Policies and Settings (stub)
     const configGroup = menu.find((g) => g.title === 'Configuration')!
-    expect(configGroup.items).toHaveLength(1)
-    expect(configGroup.items[0].name).toBe('Policies')
+    expect(configGroup.items.map((i) => i.name)).toEqual(['Policies', 'Settings'])
   })
 
   it('shows Overview when showOverview is true', () => {
