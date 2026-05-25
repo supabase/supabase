@@ -12,29 +12,33 @@ import {
 import Link from 'next/link'
 import { ReactNode, useId, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   CriticalIcon,
   Input,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import {
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -134,17 +138,19 @@ const ColumnType = ({
     return (
       <Tooltip>
         <TooltipTrigger>
-          <Input
-            readOnly
-            disabled
-            label={showLabel ? 'Type' : ''}
+          <FormItemLayout
             layout={showLabel ? layout : undefined}
-            className="md:gap-x-0 [&>div>div]:text-left"
-            size="small"
-            icon={inferIcon(getOptionType(value))}
-            value={displayValue}
-            descriptionText={showLabel ? unsupportedDataTypeText : undefined}
-          />
+            label={showLabel ? 'Type' : ''}
+            description={showLabel ? unsupportedDataTypeText : undefined}
+            isReactForm={false}
+          >
+            <InputGroup>
+              <InputGroupInput readOnly disabled size="small" value={displayValue} />
+              <InputGroupAddon align="inline-start">
+                {inferIcon(getOptionType(value))}
+              </InputGroupAddon>
+            </InputGroup>
+          </FormItemLayout>
         </TooltipTrigger>
         {!showLabel && (
           <TooltipContent side="bottom" className="w-80">
@@ -159,15 +165,14 @@ const ColumnType = ({
     return (
       <Tooltip>
         <TooltipTrigger>
-          <Input
-            readOnly
-            disabled
+          <FormItemLayout
+            layout={showLabel ? layout : undefined}
             label={showLabel ? 'Type' : ''}
-            layout={showLabel ? 'horizontal' : undefined}
-            className="md:gap-x-0"
-            size="small"
-            value={displayValue}
-          />
+            description={showLabel ? unsupportedDataTypeText : undefined}
+            isReactForm={false}
+          >
+            <Input readOnly disabled size="small" value={displayValue} />
+          </FormItemLayout>
         </TooltipTrigger>
         {!showLabel && description && (
           <TooltipContent side="bottom">
@@ -180,9 +185,9 @@ const ColumnType = ({
 
   return (
     <div className={cn('flex flex-col gap-y-2', className)}>
-      {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
-      <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      {showLabel && <Label className="text-foreground-light">Type</Label>}
+      <Popover modal open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             type={error ? 'danger' : 'default'}
             role="combobox"
@@ -202,29 +207,24 @@ const ColumnType = ({
               'Choose a column type...'
             )}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          id={listboxId}
-          className="w-[460px] p-0"
-          side="bottom"
-          align="center"
-        >
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_
+        </PopoverTrigger>
+        <PopoverContent id={listboxId} className="w-[460px] p-0" side="bottom" align="center">
+          <Command>
+            <CommandInput
               placeholder="Search types..."
               // [Joshen] Addresses style issues when this component is being used in the old Form component
               // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
               className="bg-transparent! focus:shadow-none! focus:ring-0! text-xs"
             />
-            <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
+            <CommandEmpty>Type not found.</CommandEmpty>
 
-            <CommandList_Shadcn_>
+            <CommandList>
               <ScrollArea className="h-[240px]">
-                <CommandGroup_Shadcn_ heading="Postgres data types">
+                <CommandGroup heading="Postgres data types">
                   {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => {
                     const isSelected = matchesBuiltin(option.name, value)
                     return (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={option.name}
                         value={option.name}
                         className={cn('relative', isSelected ? 'bg-surface-200' : '')}
@@ -241,19 +241,19 @@ const ColumnType = ({
                         <span className="absolute right-3 top-2">
                           {isSelected ? <Check className="text-brand" size={14} /> : ''}
                         </span>
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     )
                   })}
-                </CommandGroup_Shadcn_>
+                </CommandGroup>
 
                 {enumTypes.length > 0 && (
                   <>
-                    <CommandSeparator_Shadcn_ />
-                    <CommandGroup_Shadcn_ heading="Other types">
+                    <CommandSeparator />
+                    <CommandGroup heading="Other types">
                       {enumTypes.map((option) => {
                         const isSelected = matchesEnum(option, value)
                         return (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             key={option.id}
                             value={option.format}
                             className={cn('relative', isSelected ? 'bg-surface-200' : '')}
@@ -287,27 +287,27 @@ const ColumnType = ({
                                 </span>
                               )}
                             </div>
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         )
                       })}
-                    </CommandGroup_Shadcn_>
+                    </CommandGroup>
                   </>
                 )}
               </ScrollArea>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
 
       {showRecommendation && recommendation !== undefined && (
-        <Alert_Shadcn_ variant="warning" className="mt-2">
+        <Alert variant="warning" className="mt-2">
           <CriticalIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             {' '}
             It is recommended to use{' '}
             <code className="text-code-inline">{recommendation.alternative}</code> instead
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          </AlertTitle>
+          <AlertDescription>
             <p>
               Postgres recommends against using the data type{' '}
               <code className="text-code-inline">{displayValue}</code> unless you have a very
@@ -326,8 +326,8 @@ const ColumnType = ({
                 Use {recommendation.alternative}
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   )

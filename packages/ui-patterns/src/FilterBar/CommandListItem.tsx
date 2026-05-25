@@ -31,9 +31,9 @@ export function CommandListItem({
       )}
       data-testid={`filter-menu-item-${item.value}`}
     >
-      <span className="flex items-center gap-2">
+      <span className="flex items-center gap-2 min-w-0">
         {includeIcon && item.icon}
-        {getActionItemLabel(item)}
+        <span className="truncate">{getActionItemLabel(item)}</span>
       </span>
       {item.operatorSymbol && <OperatorSymbolBadge symbol={item.operatorSymbol} />}
     </div>

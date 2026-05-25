@@ -14,7 +14,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -219,7 +219,7 @@ export const GitHubIntegrationConnectionForm = ({
         workdir: data.supabaseDirectory,
         supabase_changes_only: data.supabaseChangesOnly,
         branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr,
+        new_branch_per_pr: data.new_branch_per_pr ?? false,
       },
     })
 
@@ -268,7 +268,7 @@ export const GitHubIntegrationConnectionForm = ({
         workdir: data.supabaseDirectory,
         supabase_changes_only: data.supabaseChangesOnly,
         branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr,
+        new_branch_per_pr: data.new_branch_per_pr ?? false,
       },
     })
 
@@ -439,7 +439,7 @@ export const GitHubIntegrationConnectionForm = ({
                           }
                         >
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
                               placeholder="."
                               autoComplete="off"
@@ -460,7 +460,7 @@ export const GitHubIntegrationConnectionForm = ({
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Deploy to production"
-                            description="Deploy changes to production on push including PR merges"
+                            description="Apply changes to your production database when you merge into your configured production GitHub branch"
                           >
                             <FormControl>
                               <Switch
@@ -490,7 +490,7 @@ export const GitHubIntegrationConnectionForm = ({
                             >
                               <div className="relative w-full">
                                 <FormControl>
-                                  <Input_Shadcn_
+                                  <Input
                                     {...field}
                                     autoComplete="off"
                                     disabled={!canUpdateGitHubConnection || !enableProductionSync}
@@ -572,7 +572,7 @@ export const GitHubIntegrationConnectionForm = ({
                               description="Maximum number of preview branches"
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   type="number"
                                   autoComplete="off"

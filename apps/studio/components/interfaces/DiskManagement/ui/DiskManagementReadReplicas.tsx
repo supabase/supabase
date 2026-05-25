@@ -1,11 +1,6 @@
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  Alert_Shadcn_ as Alert,
-  AlertDescription_Shadcn_ as AlertDescription,
-  AlertTitle_Shadcn_ as AlertTitle,
-  InfoIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, InfoIcon } from 'ui'
 
 import { BillingChangeBadge } from './BillingChangeBadge'
 import { DISK_LIMITS, DISK_PRICING, DiskType } from './DiskManagement.constants'

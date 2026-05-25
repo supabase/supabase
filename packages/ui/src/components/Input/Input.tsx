@@ -39,7 +39,7 @@ export interface Props extends Omit<
 }
 
 /**
- * @deprecated Use `import { Input_Shadcn_ } from 'ui'` instead or `import { Input } from 'ui-patterns/DataInputs/Input'`
+ * @deprecated Use `import { Input } from 'ui'` instead or `import { Input } from 'ui-patterns/DataInputs/Input'`
  */
 function Input({
   autoComplete,

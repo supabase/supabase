@@ -15,10 +15,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Table,
   TableBody,
   TableCell,
@@ -247,16 +247,16 @@ export const TableList = ({
               onOpenChange={setSchemaSelectorOpen}
             />
           </Shortcut>
-          <Popover_Shadcn_>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover>
+            <PopoverTrigger asChild>
               <Button
                 size="tiny"
                 type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
                 className="px-1"
                 icon={<Filter />}
               />
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+            </PopoverTrigger>
+            <PopoverContent className="p-0 w-56" side="bottom" align="center">
               <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
                 <p className="text-xs">Show entity types</p>
                 <div className="flex flex-col">
@@ -275,9 +275,9 @@ export const TableList = ({
                             }
                           }}
                         />
-                        <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
+                        <Label htmlFor={key} className="capitalize text-xs">
                           {key.toLowerCase().replace('_', ' ')}
-                        </Label_Shadcn_>
+                        </Label>
                       </div>
                       <Button
                         size="tiny"
@@ -291,8 +291,8 @@ export const TableList = ({
                   ))}
                 </div>
               </div>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="flex grow justify-between gap-2 items-center">
           <Input
@@ -493,7 +493,7 @@ export const TableList = ({
                             {!isSchemaLocked && (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button type="default" className="px-1" icon={<MoreVertical />} />
+                                  <Button type="text" className="px-1" icon={<MoreVertical />} />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent side="bottom" align="end" className="w-40">
                                   <DropdownMenuItem

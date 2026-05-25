@@ -2,7 +2,7 @@
 
 import { Triangle } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
-import { Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 type BlogCollapsibleProps = PropsWithChildren<{
   title: string
@@ -11,8 +11,8 @@ type BlogCollapsibleProps = PropsWithChildren<{
 
 const BlogCollapsible = ({ title, containerClassName, ...props }: BlogCollapsibleProps) => {
   return (
-    <Collapsible_Shadcn_ className={containerClassName}>
-      <CollapsibleTrigger_Shadcn_
+    <Collapsible className={containerClassName}>
+      <CollapsibleTrigger
         className="
         data-[state=open]:text
         hover:text-foreground-light
@@ -26,9 +26,9 @@ const BlogCollapsible = ({ title, containerClassName, ...props }: BlogCollapsibl
       >
         <Triangle size={10} />
         <span>{title}</span>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ {...props} />
-    </Collapsible_Shadcn_>
+      </CollapsibleTrigger>
+      <CollapsibleContent {...props} />
+    </Collapsible>
   )
 }
 

@@ -10,9 +10,9 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DialogSectionSeparator,
   Form,
   Separator,
@@ -22,7 +22,10 @@ import { Admonition } from 'ui-patterns'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
 import { DiskManagementMessage } from './DiskManagement.types'
-import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
+import {
+  calculateDiskSizeRequiredForIopsWithGp3,
+  mapComputeSizeNameToAddonVariantId,
+} from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog'
 import { AutoScaleFields } from './fields/AutoScaleFields'
@@ -35,6 +38,7 @@ import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import {
   DISK_LIMITS,
   DiskType,
+  PLAN_DETAILS,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
@@ -190,6 +194,18 @@ export function DiskManagementForm() {
     modifiedComputeSize &&
     !isSpendCapEnabled &&
     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
+
+  const watchedTotalSize = form.watch('totalSize') ?? 0
+  const watchedStorageType = form.watch('storageType')
+  // Minimum disk size where the platform API will accept an IOPS payload (500 IOPS/GB rule).
+  const minDiskSizeForCustomIops = calculateDiskSizeRequiredForIopsWithGp3(
+    DISK_LIMITS[DiskType.GP3].minIops
+  )
+  // Suggested target when prompting a resize, sits above the floor so users
+  // aren't pinned at the minimum during the 4-hour disk-config cooldown.
+  const suggestedDiskSizeForCustomIops = PLAN_DETAILS.pro.includedDiskGB.gp3
+  const isDiskTooSmallForCustomIops =
+    watchedStorageType === 'gp3' && watchedTotalSize < minDiskSizeForCustomIops
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -470,11 +486,11 @@ export function DiskManagementForm() {
               <>
                 <Separator />
 
-                <Collapsible_Shadcn_
+                <Collapsible
                   open={advancedSettingsOpen}
                   onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
                 >
-                  <CollapsibleTrigger_Shadcn_ className="px-card py-3 w-full border flex items-center gap-6 rounded-t data-closed:rounded-b group justify-between">
+                  <CollapsibleTrigger className="px-card py-3 w-full border flex items-center gap-6 rounded-t data-closed:rounded-b group justify-between">
                     <div className="flex flex-col items-start">
                       <span className="text-sm text-foreground">Advanced disk settings</span>
                       <span className="text-sm text-foreground-light text-left">
@@ -487,8 +503,8 @@ export function DiskManagementForm() {
                       className="text-foreground-light transition-all group-data-open:rotate-90"
                       strokeWidth={1}
                     />
-                  </CollapsibleTrigger_Shadcn_>
-                  <CollapsibleContent_Shadcn_
+                  </CollapsibleTrigger>
+                  <CollapsibleContent
                     ref={advancedSettingsRef}
                     className={cn(
                       'transition-all rounded-b',
@@ -524,22 +540,55 @@ export function DiskManagementForm() {
                             )
                           }
                         />
+                        <NoticeBar
+                          type="default"
+                          visible={
+                            isDiskTooSmallForCustomIops &&
+                            !disableIopsThroughputConfig &&
+                            !disableDiskInputs
+                          }
+                          title={`Increase disk size to adjust IOPS or throughput`}
+                          description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are locked for 4 hours after each resize).`}
+                          actions={
+                            !disableDiskSizeInput ? (
+                              <Button
+                                type="default"
+                                onClick={() => {
+                                  form.setValue('totalSize', suggestedDiskSizeForCustomIops, {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                  })
+                                }}
+                              >
+                                Increase to {suggestedDiskSizeForCustomIops} GB
+                              </Button>
+                            ) : undefined
+                          }
+                        />
                         <StorageTypeField
                           form={form}
                           disableInput={disableIopsThroughputConfig || disableDiskInputs}
                         />
                         <IOPSField
                           form={form}
-                          disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                          disableInput={
+                            disableIopsThroughputConfig ||
+                            disableDiskInputs ||
+                            isDiskTooSmallForCustomIops
+                          }
                         />
                         <ThroughputField
                           form={form}
-                          disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                          disableInput={
+                            disableIopsThroughputConfig ||
+                            disableDiskInputs ||
+                            isDiskTooSmallForCustomIops
+                          }
                         />
                       </div>
                     </div>
-                  </CollapsibleContent_Shadcn_>
-                </Collapsible_Shadcn_>
+                  </CollapsibleContent>
+                </Collapsible>
               </>
             )}
           </ScaffoldContainer>

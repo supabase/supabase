@@ -15,9 +15,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   Separator,
-  TextArea_Shadcn_,
+  TextArea,
 } from 'ui'
 import {
   MultiSelector,
@@ -45,7 +45,7 @@ interface FormItem {
   placeholder: string
   required: boolean
   className?: string
-  component: typeof TextArea_Shadcn_ | typeof Input_Shadcn_
+  component: typeof TextArea | typeof Input
 }
 
 interface Track {
@@ -155,11 +155,7 @@ const FormContent = memo(function FormContent({
                 <FormItem className="w-full md:flex-1">
                   <FormLabel className="text-foreground">First Name *</FormLabel>
                   <FormControl>
-                    <Input_Shadcn_
-                      placeholder="Your first name"
-                      autoComplete="given-name"
-                      {...field}
-                    />
+                    <Input placeholder="Your first name" autoComplete="given-name" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -175,11 +171,7 @@ const FormContent = memo(function FormContent({
                   <FormLabel className="text-foreground">Last Name *</FormLabel>
                   <FormControl>
                     <div className="relative ">
-                      <Input_Shadcn_
-                        placeholder="Your last name"
-                        autoComplete="family-name"
-                        {...field}
-                      />
+                      <Input placeholder="Your last name" autoComplete="family-name" {...field} />
                     </div>
                   </FormControl>
 
@@ -197,7 +189,7 @@ const FormContent = memo(function FormContent({
                 <FormLabel className="text-foreground">Email Address *</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Input_Shadcn_
+                    <Input
                       type="email"
                       placeholder="Your personal or work email"
                       autoComplete="email"
@@ -282,7 +274,7 @@ const FormContent = memo(function FormContent({
                   </FormDescription>
                   <FormControl>
                     <div className="relative">
-                      <TextArea_Shadcn_
+                      <TextArea
                         autoComplete="off"
                         rows={3}
                         className="bg-foreground/[.026]"
@@ -315,7 +307,7 @@ const FormContent = memo(function FormContent({
                   </FormDescription>
                   <FormControl>
                     <div className="relative">
-                      <TextArea_Shadcn_
+                      <TextArea
                         autoComplete="off"
                         rows={3}
                         className="bg-foreground/[.026]"
@@ -384,7 +376,7 @@ const FormContent = memo(function FormContent({
                   </FormDescription>
                   <FormControl>
                     <div className="relative mt-1">
-                      <Input_Shadcn_ type="text" {...field} />
+                      <Input type="text" {...field} />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -423,7 +415,7 @@ const FormContent = memo(function FormContent({
                     <FormLabel className="text-foreground">City *</FormLabel>
                     <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="City" {...field} />
+                        <Input type="text" placeholder="City" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -443,7 +435,7 @@ const FormContent = memo(function FormContent({
                   </FormDescription>
                   <FormControl>
                     <div className="relative mt-1">
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -506,7 +498,7 @@ const FormContent = memo(function FormContent({
                     <FormLabel className="text-foreground">Discord</FormLabel>
                     <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="#username" {...field} />
+                        <Input type="text" placeholder="#username" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -522,7 +514,7 @@ const FormContent = memo(function FormContent({
                     <FormLabel className="text-foreground">GitHub</FormLabel>
                     <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="@yourusername" {...field} />
+                        <Input type="text" placeholder="@yourusername" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -538,7 +530,7 @@ const FormContent = memo(function FormContent({
                     <FormLabel className="text-foreground">Twitter</FormLabel>
                     <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="@yourhandle" {...field} />
+                        <Input type="text" placeholder="@yourhandle" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />

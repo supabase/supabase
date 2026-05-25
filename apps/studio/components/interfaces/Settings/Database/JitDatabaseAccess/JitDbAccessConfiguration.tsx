@@ -46,7 +46,7 @@ import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
 import { useJitDbAccessQuery } from '@/data/jit-db-access/jit-db-access-query'
@@ -63,6 +63,8 @@ export const JitDbAccessConfiguration = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+
+  const parentProjectRef = project?.parent_project_ref
 
   const [enabled, setEnabled] = useState(false)
   const [, setShowCreateRuleSheet] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
@@ -330,7 +332,24 @@ export const JitDbAccessConfiguration = () => {
         </PageSectionMeta>
 
         <PageSectionContent className="space-y-4">
-          {isErrorJitDbAccessConfiguration && (
+          {parentProjectRef && (
+            <Admonition
+              type="note"
+              title="Managed in the main branch"
+              description={
+                <>
+                  Temporary access rules are configured in the main branch and apply across all
+                  preview branches. Return to the{' '}
+                  <InlineLink href={`/project/${parentProjectRef}/settings/database`}>
+                    main branch
+                  </InlineLink>{' '}
+                  to manage your access rules.
+                </>
+              }
+            />
+          )}
+
+          {!parentProjectRef && isErrorJitDbAccessConfiguration && (
             <AlertError
               projectRef={ref}
               subject="Failed to load temporary access"
@@ -339,7 +358,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {!isErrorJitDbAccessConfiguration && isJitDbAccessUnavailable && (
+          {!parentProjectRef && !isErrorJitDbAccessConfiguration && isJitDbAccessUnavailable && (
             <Admonition
               type="note"
               layout="responsive"
@@ -375,7 +394,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {!isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
+          {!parentProjectRef && !isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
             <Card>
               <CardContent className="space-y-4">
                 <FormLayout
@@ -436,7 +455,7 @@ export const JitDbAccessConfiguration = () => {
             </Card>
           )}
 
-          {enabled && !isJitDbAccessUnavailable && !isUpdatingJitDbAccess && (
+          {!parentProjectRef && enabled && !isJitDbAccessUnavailable && !isUpdatingJitDbAccess && (
             <>
               {isErrorJitMembers && (
                 <AlertError

@@ -1,7 +1,7 @@
 import type { PGTable } from '@supabase/pg-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
-import { Label_Shadcn_, SidePanel, Switch } from 'ui'
+import { Label, SidePanel, Switch } from 'ui'
 
 import { ActionBar } from '../ActionBar'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -199,7 +199,7 @@ export const RowEditor = ({
                 checked={createMore}
                 onCheckedChange={(checked) => setCreateMore(checked)}
               />
-              <Label_Shadcn_ htmlFor="create-more">Create more</Label_Shadcn_>
+              <Label htmlFor="create-more">Create more</Label>
             </div>
           )}
         </ActionBar>

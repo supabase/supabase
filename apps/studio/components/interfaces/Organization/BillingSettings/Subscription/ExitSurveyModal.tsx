@@ -1,7 +1,18 @@
 import { useFlag, useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button, cn, Modal, TextArea_Shadcn_ as TextArea } from 'ui'
+import {
+  Button,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  TextArea,
+} from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
@@ -101,76 +112,84 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   }
 
   return (
-    <Modal hideFooter size="xlarge" visible={visible} onCancel={onClose} header="Help us improve">
-      <Modal.Content>
-        <div className="space-y-4">
-          <p className="text-sm text-foreground-light">
-            What made you decide to downgrade your plan?
-          </p>
-          <div className="space-y-8 mt-6">
-            <div className="flex flex-wrap gap-2" data-toggle="buttons">
-              {shuffledReasons.map((option) => {
-                const active = selectedReason[0] === option.value
-                return (
-                  <label
-                    key={option.value}
-                    className={cn(
-                      'flex cursor-pointer items-center space-x-2 rounded-md py-1',
-                      'pl-2 pr-3 text-center text-sm',
-                      'shadow-xs transition-all duration-100',
-                      active
-                        ? `bg-foreground text-background opacity-100 hover:bg-foreground/75`
-                        : `bg-border-strong text-foreground opacity-75 hover:opacity-100`
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="options"
-                      value={option.value}
-                      className="hidden"
-                      checked={active}
-                      onChange={() => onSelectCancellationReason(option.value)}
-                    />
-                    <div>{option.value}</div>
-                  </label>
-                )
-              })}
+    <Dialog open={visible} onOpenChange={onClose}>
+      <DialogContent size="xlarge">
+        <DialogHeader>
+          <DialogTitle>Help us improve</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
+          <div className="flex flex-col space-y-4">
+            <p className="text-sm text-foreground-light">
+              What made you decide to downgrade your plan?
+            </p>
+            <div className="space-y-8 mt-6">
+              <div className="flex flex-wrap gap-2" data-toggle="buttons">
+                {shuffledReasons.map((option) => {
+                  const active = selectedReason[0] === option.value
+                  return (
+                    <label
+                      key={option.value}
+                      className={cn(
+                        'flex cursor-pointer items-center space-x-2 rounded-md py-1',
+                        'pl-2 pr-3 text-center text-sm',
+                        'shadow-xs transition-all duration-100',
+                        active
+                          ? `bg-foreground text-background opacity-100 hover:bg-foreground/75`
+                          : `bg-border-strong text-foreground opacity-75 hover:opacity-100`
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name="options"
+                        value={option.value}
+                        className="hidden"
+                        checked={active}
+                        onChange={() => onSelectCancellationReason(option.value)}
+                      />
+                      <div>{option.value}</div>
+                    </label>
+                  )
+                })}
+              </div>
+              <div className="text-area-text-sm flex flex-col gap-y-2">
+                <label htmlFor="message" className="text-sm whitespace-pre-line wrap-break-word">
+                  {textareaLabel}
+                </label>
+                <TextArea
+                  id="message"
+                  name="message"
+                  value={message}
+                  onChange={(event: any) => setMessage(event.target.value)}
+                  rows={3}
+                />
+              </div>
             </div>
-            <div className="text-area-text-sm flex flex-col gap-y-2">
-              <label htmlFor="message" className="text-sm whitespace-pre-line wrap-break-word">
-                {textareaLabel}
-              </label>
-              <TextArea
-                id="message"
-                name="message"
-                value={message}
-                onChange={(event: any) => setMessage(event.target.value)}
-                rows={3}
+            {hasProjectsWithComputeDowngrade && (
+              <Admonition
+                type="warning"
+                layout="horizontal"
+                title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
+                description={
+                  <>
+                    This is due to changes in compute instances from the downgrade. Affected
+                    projects include{' '}
+                    {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
+                  </>
+                }
               />
-            </div>
+            )}
           </div>
-          {hasProjectsWithComputeDowngrade && (
-            <Admonition
-              type="warning"
-              layout="horizontal"
-              title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
-              description={
-                <>
-                  This is due to changes in compute instances from the downgrade. Affected projects
-                  include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
-                </>
-              }
-            />
-          )}
-        </div>
-      </Modal.Content>
 
-      <div className="flex items-center justify-between border-t px-4 py-4">
-        <p className="text-xs text-foreground-lighter">
-          The unused amount for the remaining time of your billing cycle will be refunded as credits
-        </p>
+          <div className="flex items-center justify-between border-t px-4 py-4">
+            <p className="text-xs text-foreground-lighter">
+              The unused amount for the remaining time of your billing cycle will be refunded as
+              credits
+            </p>
+          </div>
+        </DialogSection>
 
-        <div className="flex items-center space-x-2">
+        <DialogFooter>
           <Button type="default" onClick={() => onClose()}>
             Cancel
           </Button>
@@ -185,8 +204,8 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
               Confirm downgrade
             </Button>
           </ProjectUpdateDisabledTooltip>
-        </div>
-      </div>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
