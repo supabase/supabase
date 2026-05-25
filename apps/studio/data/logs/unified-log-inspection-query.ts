@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import {
   aggregateFunctionLogs,
@@ -198,21 +199,16 @@ WHERE id = ${lit(logId)}
 LIMIT 1
 `
 
-  const { data, error } = await post('/platform/projects/{ref}/analytics/endpoints/logs.all.otel', {
-    params: { path: { ref: projectRef } },
-    body: {
-      iso_timestamp_start: isoTimestampStart,
-      iso_timestamp_end: isoTimestampEnd,
-      sql,
-    },
+  const rawData = await executeAnalyticsSql({
+    projectRef,
+    endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: isoTimestampEnd,
     signal,
   })
 
-  if (error) {
-    handleError(error)
-  }
-
-  const otelData = data as { result?: OtelLogRow[] } | undefined
+  const otelData = rawData as { result?: OtelLogRow[] } | undefined
   const row = otelData?.result?.[0]
   if (!row) {
     return { result: [] }
@@ -234,23 +230,20 @@ ORDER BY timestamp ASC
 LIMIT 100
 `
 
-      const { data: fnData, error: fnError } = await post(
-        '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
-        {
-          params: { path: { ref: projectRef } },
-          body: {
-            iso_timestamp_start: isoTimestampStart,
-            iso_timestamp_end: isoTimestampEnd,
-            sql: fnSql,
-          },
+      try {
+        const fnData = await executeAnalyticsSql({
+          projectRef,
+          endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
+          sql: fnSql,
+          iso_timestamp_start: isoTimestampStart,
+          iso_timestamp_end: isoTimestampEnd,
           signal,
-        }
-      )
-
-      if (!fnError) {
+        })
         const fnRows = ((fnData as { result?: OtelLogRow[] } | undefined)?.result ??
           []) as OtelLogRow[]
         Object.assign(entry, aggregateFunctionLogs(fnRows))
+      } catch {
+        // function logs are supplementary; silently ignore fetch errors
       }
     }
   }
