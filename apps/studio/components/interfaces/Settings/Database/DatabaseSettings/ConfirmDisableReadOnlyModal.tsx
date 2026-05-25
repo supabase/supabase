@@ -53,9 +53,11 @@ const ConfirmDisableReadOnlyModeModal = ({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => {
+            onClick={async () => {
               if (!ref) return console.error('Project ref is required')
-              disableReadOnlyMode({ projectRef: ref })
+              await disableReadOnlyMode({ projectRef: ref }).catch(() => {
+                // Catch the error but ignore it, letting the default onError trigger
+              })
             }}
             disabled={isPending}
             loading={isPending}
