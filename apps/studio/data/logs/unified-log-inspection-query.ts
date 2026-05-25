@@ -8,7 +8,7 @@ import {
   flattenOtelInspectionRow,
   type OtelLogRow,
 } from './otel-inspection.utils'
-import { analyticsLiteral as lit, safeSql } from './safe-analytics-sql'
+import { analyticsLiteral as lit, safeSql, type SafeLogSqlFragment } from './safe-analytics-sql'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -21,7 +21,6 @@ import {
   getStorageServiceFlowQuery,
 } from '@/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 // Service flow types - subset of LOG_TYPES that support service flows
@@ -141,7 +140,7 @@ export async function getUnifiedLogInspection(
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
   if (!useOtel) {
-    let sql = ''
+    let sql: SafeLogSqlFragment
     switch (type) {
       case 'postgrest':
         sql = getPostgrestServiceFlowQuery(logId)
@@ -162,19 +161,14 @@ export async function getUnifiedLogInspection(
         throw new Error('Invalid type')
     }
 
-    const { data, error } = await post('/platform/projects/{ref}/analytics/endpoints/logs.all', {
-      params: { path: { ref: projectRef } },
-      body: {
-        iso_timestamp_start: isoTimestampStart,
-        iso_timestamp_end: isoTimestampEnd,
-        sql: sql,
-      },
+    const data = await executeAnalyticsSql({
+      projectRef,
+      endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+      sql,
+      iso_timestamp_start: isoTimestampStart,
+      iso_timestamp_end: isoTimestampEnd,
       signal,
     })
-
-    if (error) {
-      handleError(error)
-    }
 
     return data as unknown as UnifiedLogInspectionResponse
   }
