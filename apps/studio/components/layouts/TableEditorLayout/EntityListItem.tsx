@@ -29,6 +29,7 @@ import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/Ta
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getTableDefinition } from '@/data/database/table-definition-query'
+import { getViewDefinition } from '@/data/database/view-definition-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { Entity } from '@/data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
@@ -289,6 +290,48 @@ export const EntityListItem = ({
                 </DropdownMenuItem>
               )}
 
+              {(entity.type === ENTITY_TYPE.VIEW ||
+                entity.type === ENTITY_TYPE.MATERIALIZED_VIEW) && (
+                <DropdownMenuItem
+                  key="copy-view-definition"
+                  className="space-x-2"
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    const label =
+                      entity.type === ENTITY_TYPE.MATERIALIZED_VIEW ? 'materialized view' : 'view'
+                    const toastId = toast.loading(`Getting ${label} definition...`)
+
+                    const formattedDefinition = getViewDefinition({
+                      id: entity.id,
+                      projectRef: project?.ref,
+                      connectionString: project?.connectionString,
+                      includeCreateStatement: true,
+                    }).then((definition) => {
+                      if (!definition) {
+                        throw new Error(`Failed to get ${label} definition`)
+                      }
+                      return formatSql(definition)
+                    })
+
+                    try {
+                      await copyToClipboard(formattedDefinition, () => {
+                        toast.success(
+                          `${label[0].toUpperCase() + label.slice(1)} definition copied to clipboard`,
+                          { id: toastId }
+                        )
+                      })
+                    } catch (err: any) {
+                      toast.error(`Failed to copy ${label} definition: ` + (err.message || err), {
+                        id: toastId,
+                      })
+                    }
+                  }}
+                >
+                  <Copy size={12} />
+                  <span>Copy view definition</span>
+                </DropdownMenuItem>
+              )}
+
               {entity.type === ENTITY_TYPE.TABLE && (
                 <>
                   <DropdownMenuSeparator />
@@ -375,6 +418,102 @@ export const EntityListItem = ({
                   >
                     <Trash size={12} />
                     <span>Delete table</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+
+              {entity.type === ENTITY_TYPE.VIEW && (
+                <>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="gap-x-2">
+                      <Download size={12} />
+                      Export data
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        key="download-view-csv"
+                        className="space-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportCsv()
+                        }}
+                      >
+                        <span>Export view as CSV</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="download-view-sql"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportSql()
+                        }}
+                      >
+                        <span>Export view as SQL</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    key="delete-view"
+                    className="gap-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      snap.onDeleteView()
+                    }}
+                  >
+                    <Trash size={12} />
+                    <span>Delete view</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+
+              {entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && (
+                <>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="gap-x-2">
+                      <Download size={12} />
+                      Export data
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        key="download-mv-csv"
+                        className="space-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportCsv()
+                        }}
+                      >
+                        <span>Export view as CSV</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="download-mv-sql"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportSql()
+                        }}
+                      >
+                        <span>Export view as SQL</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    key="delete-materialized-view"
+                    className="gap-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      snap.onDeleteMaterializedView()
+                    }}
+                  >
+                    <Trash size={12} />
+                    <span>Delete view</span>
                   </DropdownMenuItem>
                 </>
               )}
