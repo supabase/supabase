@@ -1,32 +1,30 @@
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  Button,
 } from 'ui'
 
 interface SmtpDisableConfirmationDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onConfirm: () => void
-  isLoading: boolean
+  onConfirm: () => Promise<void>
 }
 
 export const SmtpDisableConfirmationDialog = ({
   open,
   onOpenChange,
   onConfirm,
-  isLoading,
 }: SmtpDisableConfirmationDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Disable custom SMTP </AlertDialogTitle>
+          <AlertDialogTitle>Disable custom SMTP</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2">
             <p>
               Switching back to the built-in SMTP service will{' '}
@@ -37,16 +35,16 @@ export const SmtpDisableConfirmationDialog = ({
               .
             </p>
             <p>
-              You won’t be able to edit email templates until you set up custom SMTP again or
+              You won't be able to edit email templates until you set up custom SMTP again or
               upgrade your plan.
             </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-          <Button type="warning" onClick={onConfirm} loading={isLoading}>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction variant="warning" onClick={onConfirm}>
             Disable custom SMTP
-          </Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

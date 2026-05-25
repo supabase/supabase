@@ -99,7 +99,7 @@ export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
-  const { mutate: resetAuthTemplate } = useAuthTemplateResetMutation()
+  const { mutateAsync: resetAuthTemplate } = useAuthTemplateResetMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
   const [showDisableConfirmation, setShowDisableConfirmation] = useState(false)
@@ -164,7 +164,7 @@ export const SmtpForm = () => {
     return () => subscription.unsubscribe()
   }, [form])
 
-  const doUpdate = (values: SmtpFormValues, onSuccess?: () => void) => {
+  const doUpdate = (values: SmtpFormValues, onSuccess?: () => void, onError?: () => void) => {
     const { ENABLE_SMTP, ...rest } = values
     const basePayload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
 
@@ -192,6 +192,7 @@ export const SmtpForm = () => {
       {
         onError: (error) => {
           toast.error(`Failed to update settings: ${error.message}`)
+          onError?.()
         },
         onSuccess: () => {
           toast.success('Successfully updated settings')
@@ -213,16 +214,29 @@ export const SmtpForm = () => {
     doUpdate(values)
   }
 
-  const handleConfirmDisable = () => {
-    if (!pendingValues || !projectRef) return
+  const handleConfirmDisable = (): Promise<void> => {
+    if (!pendingValues || !projectRef) return Promise.resolve()
 
-    doUpdate(pendingValues, () => {
-      setShowDisableConfirmation(false)
-      setPendingValues(null)
-      // Reset templates as best-effort background work after SMTP is disabled
-      for (const template of AUTH_TEMPLATE_RESET_TYPES) {
-        resetAuthTemplate({ projectRef, template })
-      }
+    return new Promise<void>((resolve, reject) => {
+      doUpdate(
+        pendingValues,
+        async () => {
+          setPendingValues(null)
+          try {
+            const results = await Promise.allSettled(
+              AUTH_TEMPLATE_RESET_TYPES.map((template) =>
+                resetAuthTemplate({ projectRef, template })
+              )
+            )
+            if (results.some((r) => r.status === 'rejected')) {
+              toast.error('SMTP disabled, but some email templates could not be reset')
+            }
+          } finally {
+            resolve()
+          }
+        },
+        reject
+      )
     })
   }
 
@@ -516,7 +530,6 @@ export const SmtpForm = () => {
         open={showDisableConfirmation}
         onOpenChange={setShowDisableConfirmation}
         onConfirm={handleConfirmDisable}
-        isLoading={isUpdatingConfig}
       />
     </PageSection>
   )
