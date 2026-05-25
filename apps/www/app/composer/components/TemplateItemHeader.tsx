@@ -4,6 +4,7 @@ import { Check, Minus, Plus } from 'lucide-react'
 import type { MouseEvent } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { getDependencyTooltip } from '../lib/dependency-tooltips'
 import type { Template } from '../lib/templates'
 import {
   getTemplateAddCommand,
@@ -179,17 +180,4 @@ function TemplateItemAction({
       ) : null}
     </div>
   )
-}
-
-function getDependencyTooltip(templateId: string, selectedIds: Set<string>, templates: Template[]) {
-  const requiredBy = templates
-    .filter(
-      (template) =>
-        selectedIds.has(template.id) && template.dependencies?.required?.includes(templateId)
-    )
-    .map((template) => template.name)
-
-  if (requiredBy.length === 0) return 'Included as a dependency'
-  if (requiredBy.length === 1) return `Required by ${requiredBy[0]}`
-  return `Required by ${requiredBy.join(', ')}`
 }

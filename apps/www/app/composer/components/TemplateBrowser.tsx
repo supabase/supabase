@@ -4,6 +4,7 @@ import { Search } from 'lucide-react'
 import { Card, CardContent, cn, Input } from 'ui'
 
 import { canRemoveTemplate, type DependencyResolution } from '../lib/composer'
+import { filterTemplates } from '../lib/template-filter'
 import { groupTemplatesByCategory, sortCategories, type Template } from '../lib/templates'
 import {
   getTemplateSearchCommand,
@@ -43,24 +44,30 @@ export function TemplateBrowser({
 
   return (
     <section className="flex h-full flex-col overflow-hidden border-r bg-muted/10">
-      <div className="shrink-0 px-5 pb-0 pt-5">
-        <div className="flex items-center gap-2">
-          <div className="relative min-w-0 flex-1">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground-muted" />
-            <Input
-              size="small"
-              value={search}
-              onChange={(event) => onSearchChange(event.target.value)}
-              placeholder="Search templates..."
-              className="h-8 pl-8 text-xs"
+      <div className="relative z-10 shrink-0 bg-background">
+        <div className="px-5 pb-0 pt-5">
+          <div className="flex items-center gap-2">
+            <div className="relative min-w-0 flex-1">
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground-muted" />
+              <Input
+                size="small"
+                value={search}
+                onChange={(event) => onSearchChange(event.target.value)}
+                placeholder="Search templates..."
+                className="h-8 pl-8 text-xs"
+              />
+            </div>
+            <TemplateCliPopover
+              matchSearchInput
+              command={getTemplateSearchCommand(search)}
+              description={templateSearchCliDescription}
             />
           </div>
-          <TemplateCliPopover
-            matchSearchInput
-            command={getTemplateSearchCommand(search)}
-            description={templateSearchCliDescription}
-          />
         </div>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-full z-10 h-10 bg-linear-to-b from-background to-transparent"
+        />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-4">
@@ -163,19 +170,4 @@ function TemplateItem({
       />
     </CardContent>
   )
-}
-
-function filterTemplates(templates: Template[], search: string): Template[] {
-  const normalizedSearch = search.trim().toLowerCase()
-
-  if (!normalizedSearch) return templates
-
-  return templates.filter((template) => {
-    return (
-      template.name.toLowerCase().includes(normalizedSearch) ||
-      template.description.toLowerCase().includes(normalizedSearch) ||
-      template.id.toLowerCase().includes(normalizedSearch) ||
-      template.tags?.some((tag) => tag.toLowerCase().includes(normalizedSearch))
-    )
-  })
 }

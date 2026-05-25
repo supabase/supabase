@@ -76,6 +76,7 @@ function parseTemplate(value: unknown): Template {
   const dependencies = parseDependencies(value.dependencies, id)
   const defaultEnabled =
     typeof value.defaultEnabled === 'boolean' ? value.defaultEnabled : undefined
+  const readme = typeof value.readme === 'string' ? value.readme : undefined
 
   return {
     id,
@@ -86,6 +87,7 @@ function parseTemplate(value: unknown): Template {
     files: filesValue.map((file) => parseTemplateFile(file, id)),
     dependencies,
     defaultEnabled,
+    readme,
   }
 }
 

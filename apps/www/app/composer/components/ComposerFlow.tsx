@@ -11,25 +11,14 @@ import {
   type NodeMouseHandler,
   type NodeProps,
 } from '@xyflow/react'
-import {
-  AlertTriangle,
-  Database,
-  FileCode,
-  HardDrive,
-  Key,
-  Layers,
-  Package,
-  Server,
-  Shield,
-  Table,
-  Zap,
-  type LucideIcon,
-} from 'lucide-react'
+import { AlertTriangle, Database, Package, type LucideIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { Card, CardContent, cn } from 'ui'
 
 import type { DependencyResolution, MergeResult } from '../lib/composer'
+import { buildRowLayout, type ColumnPosition } from '../lib/flow-layout'
+import { getResourceIcon } from '../lib/resource-icons'
 import type { ComposerResource } from '../lib/resources'
 import type { Template } from '../lib/templates'
 
@@ -55,7 +44,10 @@ const LAYOUT = {
   columnGap: NODE_GAP,
 }
 
-const TOP_LEVEL_CONFIG_ORDER = ['db', 'api', 'auth', 'storage', 'edge_runtime', 'realtime'] as const
+const ROW_LAYOUT_CONFIG = {
+  columnWidth: LAYOUT.columnWidth,
+  columnGap: LAYOUT.columnGap,
+}
 
 const nodeTypes = {
   database: DatabaseNode,
@@ -183,6 +175,10 @@ function buildPrototypeFlow({
     return { nodes: [], edges: [] }
   }
 
+  const resourceIds = new Set(resources.map((resource) => resource.id))
+  const topLevelResources = getTopLevelResources(resources, resourceIds)
+  const childrenByParentId = groupChildrenByParent(resources, resourceIds)
+
   const nodes: Node[] = [
     {
       id: 'database',
@@ -195,10 +191,10 @@ function buildPrototypeFlow({
     },
   ]
   const edges: Edge[] = []
-  const topLevelResources = getTopLevelResources(resources)
   const topLevelLayout = buildRowLayout(
     topLevelResources.map((resource) => resource.id),
-    0
+    0,
+    ROW_LAYOUT_CONFIG
   )
   const highlightedTemplateIds = hoveredTemplateId
     ? getHighlightedTemplateIds(hoveredTemplateId, templates)
@@ -221,7 +217,8 @@ function buildPrototypeFlow({
         templateIds: resource.sourceTemplateIds,
       },
     })
-    if (connectsToDatabase(resource)) {
+
+    if (resource.connectsToDatabase) {
       edges.push({
         id: `database-${nodeId}`,
         source: 'database',
@@ -235,9 +232,7 @@ function buildPrototypeFlow({
   }
 
   for (const topLevelResource of topLevelResources) {
-    const childResources = resources.filter((resource) => {
-      return getParentResourceId(resource, resources) === topLevelResource.id
-    })
+    const childResources = childrenByParentId.get(topLevelResource.id) ?? []
     const layout = topLevelLayout.get(topLevelResource.id) ?? { x: 0 }
 
     childResources.forEach((resource, index) => {
@@ -348,101 +343,44 @@ function FeatureNode({ data }: NodeProps) {
   )
 }
 
-function buildRowLayout(nodeIds: string[], centerX: number) {
-  const rowConfig = new Map<string, { x: number; width: number }>()
-  if (nodeIds.length === 0) return rowConfig
-
-  const totalWidth =
-    nodeIds.length * LAYOUT.columnWidth + LAYOUT.columnGap * Math.max(0, nodeIds.length - 1)
-  let cursor = centerX - totalWidth / 2
-
-  nodeIds.forEach((nodeId) => {
-    const center = cursor + LAYOUT.columnWidth / 2
-    rowConfig.set(nodeId, { x: center, width: LAYOUT.columnWidth })
-    cursor = center + LAYOUT.columnWidth / 2 + LAYOUT.columnGap
-  })
-
-  return rowConfig
-}
-
-function connectsToDatabase(resource: ComposerResource) {
-  // Edge runtime is not a database dependency; all other top-level resources are.
-  return resource.label !== 'edge_runtime'
-}
-
-function getTopLevelResources(resources: ComposerResource[]) {
-  const resourceIds = new Set(resources.map((resource) => resource.id))
-
+/**
+ * Top-level resources are those without a `parentResourceId`, or whose parent
+ * isn't in the current resource set (orphaned). Sort by extractor-declared
+ * `displayOrder` (lower first), then alphabetically by label.
+ */
+function getTopLevelResources(resources: ComposerResource[], resourceIds: Set<string>) {
   return resources
-    .filter((resource) => {
-      return isTopLevelResource(resource) || !getParentResourceId(resource, resourceIds)
+    .filter((resource) => !resource.parentResourceId || !resourceIds.has(resource.parentResourceId))
+    .sort((a, b) => {
+      const aOrder = a.displayOrder ?? Number.POSITIVE_INFINITY
+      const bOrder = b.displayOrder ?? Number.POSITIVE_INFINITY
+      if (aOrder !== bOrder) return aOrder - bOrder
+      return a.label.localeCompare(b.label)
     })
-    .sort(compareTopLevelResources)
 }
 
-function isTopLevelResource(resource: ComposerResource) {
-  return resource.kind === 'config' || resource.kind === 'schema'
-}
+function groupChildrenByParent(resources: ComposerResource[], resourceIds: Set<string>) {
+  const grouped = new Map<string, ComposerResource[]>()
 
-function getParentResourceId(
-  resource: ComposerResource,
-  resources: ComposerResource[] | Set<string>
-) {
-  const resourceIds = Array.isArray(resources)
-    ? new Set(resources.map((candidate) => candidate.id))
-    : resources
-
-  let parentId: string | null = null
-
-  if (resource.kind === 'table') {
-    parentId = `schema:${resource.schema ?? 'public'}`
-  } else if (resource.kind === 'bucket') {
-    parentId = 'config:storage'
-  } else if (resource.kind === 'edge-function') {
-    parentId = 'config:edge_runtime'
+  for (const resource of resources) {
+    const parentId = resource.parentResourceId
+    if (!parentId || !resourceIds.has(parentId)) continue
+    const siblings = grouped.get(parentId) ?? []
+    siblings.push(resource)
+    grouped.set(parentId, siblings)
   }
 
-  return parentId && resourceIds.has(parentId) ? parentId : null
-}
-
-function compareTopLevelResources(a: ComposerResource, b: ComposerResource) {
-  const aRank = getTopLevelResourceRank(a)
-  const bRank = getTopLevelResourceRank(b)
-
-  if (aRank !== bRank) return aRank - bRank
-
-  return a.label.localeCompare(b.label)
-}
-
-function getTopLevelResourceRank(resource: ComposerResource) {
-  if (resource.kind === 'config') {
-    const index = TOP_LEVEL_CONFIG_ORDER.indexOf(
-      resource.label as (typeof TOP_LEVEL_CONFIG_ORDER)[number]
-    )
-
-    return index === -1 ? TOP_LEVEL_CONFIG_ORDER.length : index
+  for (const siblings of grouped.values()) {
+    siblings.sort((a, b) => a.label.localeCompare(b.label))
   }
 
-  return TOP_LEVEL_CONFIG_ORDER.length + 1
+  return grouped
 }
 
-function getWarningColumnX(layout: Map<string, { x: number; width: number }>) {
+function getWarningColumnX(layout: Map<string, ColumnPosition>) {
   if (layout.size === 0) return LAYOUT.columnWidth + LAYOUT.columnGap
 
   return Math.max(...Array.from(layout.values()).map((item) => item.x))
-}
-
-function getResourceIcon(resource: ComposerResource): LucideIcon {
-  if (resource.kind === 'table') return Table
-  if (resource.kind === 'bucket') return HardDrive
-  if (resource.kind === 'edge-function') return Server
-  if (resource.kind === 'schema') return Layers
-  if (resource.label === 'auth') return Key
-  if (resource.label === 'storage') return HardDrive
-  if (resource.label === 'edge_runtime') return Server
-  if (resource.label === 'realtime') return Zap
-  if (resource.label === 'vault') return Shield
-  return FileCode
 }
 
 function getResourceTypeLabel(resource: ComposerResource) {

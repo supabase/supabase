@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { inferLanguage } from 'templates'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 import { FileTreeSidebar } from './FileTreeSidebar'
@@ -99,47 +100,36 @@ function FileTabTrigger({ path }: { path: string }) {
 
 function ExplorerFilePreview({ file }: { file: ExplorerFile }) {
   return (
-    <div className="min-h-0 flex-1 overflow-auto bg-background [&_code]:!bg-transparent [&_pre]:!bg-background">
-      <div className="flex items-center justify-between gap-3 border-b px-4 py-2.5">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
+      <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-3 border-b bg-background px-4 py-2.5">
         <code className="truncate text-xs text-foreground-light">{file.path}</code>
         {file.meta ? (
           <span className="shrink-0 text-xs text-foreground-light">{file.meta}</span>
         ) : null}
       </div>
-      <SyntaxHighlighter
-        language={inferLanguage(file.path)}
-        style={oneDark}
-        wrapLongLines
-        customStyle={{
-          margin: 0,
-          background: 'hsl(var(--background-default))',
-          padding: '16px',
-          fontSize: '0.75rem',
-          lineHeight: 1.6,
-        }}
-        codeTagProps={{ className: 'font-mono !bg-transparent' }}
-      >
-        {file.content}
-      </SyntaxHighlighter>
+      <div className="min-h-0 flex-1 overflow-auto [&_code]:!bg-transparent [&_pre]:!bg-background">
+        <SyntaxHighlighter
+          language={inferLanguage(file.path)}
+          style={oneDark}
+          wrapLongLines
+          customStyle={{
+            margin: 0,
+            background: 'hsl(var(--background-default))',
+            padding: '16px',
+            fontSize: '0.75rem',
+            lineHeight: 1.6,
+          }}
+          codeTagProps={{ className: 'font-mono !bg-transparent' }}
+        >
+          {file.content}
+        </SyntaxHighlighter>
+      </div>
     </div>
   )
 }
 
 function getFileLabel(path: string) {
   return path.split('/').pop() || path
-}
-
-function inferLanguage(path: string) {
-  const extension = path.split('.').pop()?.toLowerCase()
-
-  if (extension === 'toml') return 'toml'
-  if (extension === 'sql') return 'sql'
-  if (extension === 'ts') return 'typescript'
-  if (extension === 'tsx') return 'tsx'
-  if (extension === 'js') return 'javascript'
-  if (extension === 'json') return 'json'
-
-  return 'text'
 }
 
 export function toExplorerFiles(

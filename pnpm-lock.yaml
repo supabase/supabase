@@ -1755,9 +1755,6 @@ importers:
       parse-numeric-range:
         specifier: ^1.3.0
         version: 1.3.0
-      templates:
-        specifier: workspace:*
-        version: link:../../packages/templates
       radix-ui:
         specifier: 'catalog:'
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1803,6 +1800,9 @@ importers:
       swiper:
         specifier: ^12.1.2
         version: 12.1.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      templates:
+        specifier: workspace:*
+        version: link:../../packages/templates
       typed.js:
         specifier: ^2.0.16
         version: 2.0.16
@@ -2369,7 +2369,21 @@ importers:
         specifier: 'catalog:'
         version: 4.1.4(@opentelemetry/api@1.9.0)(@types/node@22.13.14)(@vitest/coverage-v8@4.1.4)(@vitest/ui@4.1.4)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(vite@8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3))
 
+  packages/shared-data:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.76
+    devDependencies:
+      tsconfig:
+        specifier: 'workspace:'
+        version: link:../tsconfig
+
   packages/templates:
+    dependencies:
+      smol-toml:
+        specifier: ^1.3.4
+        version: 1.6.1
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -2383,16 +2397,6 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.1.4(@opentelemetry/api@1.9.0)(@types/node@22.13.14)(@vitest/coverage-v8@4.1.4)(@vitest/ui@4.1.4)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(vite@8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3))
-
-  packages/shared-data:
-    dependencies:
-      zod:
-        specifier: 'catalog:'
-        version: 3.25.76
-    devDependencies:
-      tsconfig:
-        specifier: 'workspace:'
-        version: link:../tsconfig
 
   packages/tsconfig: {}
 

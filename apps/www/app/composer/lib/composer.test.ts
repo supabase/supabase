@@ -1,8 +1,10 @@
+import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 
 import {
   canRemoveTemplate,
   createCompositionManifest,
+  createTemplateZipBlob,
   generateCompositionId,
   mergeTemplates,
   resolveTemplateDependencies,
@@ -115,7 +117,7 @@ schemas = ["public", "graphql_public"]
     expect(config?.content).toContain('[db]')
     expect(config?.content).toContain('enabled = true')
     expect(config?.content).toContain('[api]')
-    expect(config?.content).toContain('schemas = ["public", "graphql_public"]')
+    expect(config?.content).toMatch(/schemas\s*=\s*\[\s*"public"\s*,\s*"graphql_public"\s*\]/)
   })
 
   it('deduplicates repeated SQL objects and emits warnings for unsafe duplicates', () => {
@@ -154,7 +156,16 @@ schemas = ["public", "graphql_public"]
     const sqlFile = result.files.find((file) => file.path === 'supabase/schemas/app.sql')
 
     expect(sqlFile?.content.match(/create table public\.todos/g)).toHaveLength(1)
-    expect(result.warnings).toContain('Duplicate table "todos" from second')
+    expect(result.warnings).toContain('Duplicate table "public.todos" from second')
+  })
+
+  it('packages a single template into a zip archive', async () => {
+    const blob = await createTemplateZipBlob(baseTemplate)
+    const zip = await JSZip.loadAsync(blob)
+    const config = await zip.file('supabase/config.toml')?.async('string')
+
+    expect(config).toContain('[db]')
+    expect(zip.file('composition.json')).toBeNull()
   })
 
   it('creates a stable manifest shape for exports', () => {

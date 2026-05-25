@@ -10,6 +10,7 @@ import { TemplateDetailSheet } from './components/TemplateDetailSheet'
 import {
   canRemoveTemplate,
   createZipBlob,
+  downloadBlob,
   mergeTemplates,
   resolveTemplateDependencies,
 } from './lib/composer'
@@ -81,15 +82,7 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
     if (!mergeResult) return
 
     const blob = await createZipBlob(mergeResult)
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-
-    link.href = url
-    link.download = `supabase-composition-${mergeResult.compositionId}.zip`
-    document.body.append(link)
-    link.click()
-    link.remove()
-    URL.revokeObjectURL(url)
+    downloadBlob(blob, `supabase-composition-${mergeResult.compositionId}.zip`)
   }
 
   return (

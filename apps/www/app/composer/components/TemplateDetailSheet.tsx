@@ -4,7 +4,7 @@ import { Check, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Button_Shadcn_, cn, Sheet, SheetContent, SheetSection } from 'ui'
+import { Button_Shadcn_, cn, Sheet, SheetContent, SheetSection, SheetTitle } from 'ui'
 
 import type { Template } from '../lib/templates'
 import { FileExplorerPanel } from './FileExplorerPanel'
@@ -13,6 +13,7 @@ import {
   templateAddCliDescription,
   TemplateCliPopover,
 } from './TemplateCliPopover'
+import { TemplateDownloadButton } from './TemplateDownloadButton'
 import { templateMarkdownComponents } from './templateMarkdownComponents'
 
 interface TemplateDetailSheetProps {
@@ -56,14 +57,13 @@ export function TemplateDetailSheet({
   return (
     <Sheet open={Boolean(template)} onOpenChange={onOpenChange}>
       <SheetContent size="lg" className="flex flex-col gap-0 p-0" showClose={false}>
-        <div className="flex shrink-0 items-center gap-4 border-b px-6 py-5">
+        <div className="flex shrink-0 items-center gap-4 border-b px-5 py-3">
           {template ? (
             <>
               <div className="min-w-0 flex-1">
-                <p className="line-clamp-1 text-sm font-medium text-foreground">{template.name}</p>
-                <p className="line-clamp-2 text-xs leading-relaxed text-foreground-light">
-                  {template.description}
-                </p>
+                <SheetTitle className="line-clamp-1 text-sm font-medium text-foreground">
+                  {template.name}
+                </SheetTitle>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <TemplateCliPopover
@@ -71,6 +71,7 @@ export function TemplateDetailSheet({
                   command={getTemplateAddCommand(template.id)}
                   description={templateAddCliDescription}
                 />
+                <TemplateDownloadButton template={template} matchSearchInput />
                 {!isAdded ? (
                   <Button_Shadcn_
                     type="button"
@@ -89,18 +90,21 @@ export function TemplateDetailSheet({
                     variant="outline"
                     size="sm"
                     aria-label="Template added"
-                    className="size-8 shrink-0 p-0"
+                    className="shrink-0 gap-1.5"
                     disabled
                   >
                     <Check
                       className={cn('h-3.5 w-3.5', isAutoIncluded ? 'text-warning' : 'text-brand')}
                       strokeWidth={2}
                     />
+                    Added
                   </Button_Shadcn_>
                 )}
               </div>
             </>
-          ) : null}
+          ) : (
+            <SheetTitle className="sr-only">Template details</SheetTitle>
+          )}
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto border-b px-6 py-12">
@@ -116,14 +120,14 @@ export function TemplateDetailSheet({
         </div>
 
         <SheetSection
-          className={`flex ${templateFilesPanelHeight} shrink-0 flex-col overflow-hidden border-b p-0`}
+          className={`flex ${templateFilesPanelHeight} shrink-0 flex-col overflow-hidden border-b bg-background p-0`}
         >
           <FileExplorerPanel
             files={explorerFiles}
             activeFilePath={activeFilePath}
             onActiveFilePathChange={setActiveFilePath}
             emptyMessage="This template has no files."
-            className="flex min-h-0 flex-1 flex-col lg:flex-row"
+            className="flex min-h-0 flex-1 flex-col bg-background lg:flex-row"
           />
         </SheetSection>
       </SheetContent>
