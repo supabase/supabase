@@ -3,8 +3,15 @@
 import { Check, Minus, Plus, Search } from 'lucide-react'
 import { Card, CardContent, cn, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import type { DependencyResolution } from '../lib/composer'
+import { canRemoveTemplate, type DependencyResolution } from '../lib/composer'
 import { groupTemplatesByCategory, sortCategories, type Template } from '../lib/templates'
+import {
+  getTemplateAddCommand,
+  getTemplateSearchCommand,
+  templateAddCliDescription,
+  TemplateCliPopover,
+  templateSearchCliDescription,
+} from './TemplateCliPopover'
 
 interface TemplateBrowserProps {
   templates: Template[]
@@ -34,13 +41,21 @@ export function TemplateBrowser({
   return (
     <section className="flex h-full flex-col overflow-hidden border-r bg-muted/10">
       <div className="shrink-0 px-5 pb-0 pt-5">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-muted" />
-          <Input
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search the market..."
-            className="pl-9"
+        <div className="flex items-center gap-2">
+          <div className="relative min-w-0 flex-1">
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-foreground-muted" />
+            <Input
+              size="small"
+              value={search}
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder="Search templates..."
+              className="h-8 pl-8 text-xs"
+            />
+          </div>
+          <TemplateCliPopover
+            matchSearchInput
+            command={getTemplateSearchCommand(search)}
+            description={templateSearchCliDescription}
           />
         </div>
       </div>
@@ -59,6 +74,8 @@ export function TemplateBrowser({
                   {templatesByCategory[category].map((template) => {
                     const isSelected = selectedIds.has(template.id)
                     const isAutoIncluded = !isSelected && resolvedIds.has(template.id)
+                    const isRemovalBlocked =
+                      isSelected && !canRemoveTemplate(template.id, selectedIds, templates)
 
                     return (
                       <TemplateItem
@@ -66,6 +83,7 @@ export function TemplateBrowser({
                         template={template}
                         isSelected={isSelected}
                         isAutoIncluded={isAutoIncluded}
+                        isRemovalBlocked={isRemovalBlocked}
                         onAdd={() => onAddTemplate(template.id)}
                         onRemove={() => onRemoveTemplate(template.id)}
                         onHoverChange={(isHovered) =>
@@ -92,6 +110,7 @@ function TemplateItem({
   selectedIds,
   isSelected,
   isAutoIncluded,
+  isRemovalBlocked,
   onAdd,
   onRemove,
   onHoverChange,
@@ -101,6 +120,7 @@ function TemplateItem({
   selectedIds: Set<string>
   isSelected: boolean
   isAutoIncluded: boolean
+  isRemovalBlocked: boolean
   onAdd: () => void
   onRemove: () => void
   onHoverChange: (isHovered: boolean) => void
@@ -111,7 +131,9 @@ function TemplateItem({
   const isAdded = isSelected || isAutoIncluded
   const dependencyTooltip = isAutoIncluded
     ? getDependencyTooltip(template.id, selectedIds, templates)
-    : undefined
+    : isRemovalBlocked
+      ? getDependencyTooltip(template.id, selectedIds, templates)
+      : undefined
 
   function handleContentClick() {
     if (!isAdded) onAdd()
@@ -145,9 +167,14 @@ function TemplateItem({
                 Requires {requiredDependencyNames.join(', ')}
               </p>
             ) : null}
+            <TemplateCliPopover
+              command={getTemplateAddCommand(template.id)}
+              description={templateAddCliDescription}
+            />
             <TemplateItemAction
               isAdded={isAdded}
               isAutoIncluded={isAutoIncluded}
+              isRemovalBlocked={isRemovalBlocked}
               dependencyTooltip={dependencyTooltip}
               onAdd={onAdd}
               onRemove={onRemove}
@@ -173,12 +200,14 @@ function TemplateItem({
 function TemplateItemAction({
   isAdded,
   isAutoIncluded,
+  isRemovalBlocked,
   dependencyTooltip,
   onAdd,
   onRemove,
 }: {
   isAdded: boolean
   isAutoIncluded: boolean
+  isRemovalBlocked: boolean
   dependencyTooltip?: string
   onAdd: () => void
   onRemove: () => void
@@ -207,7 +236,7 @@ function TemplateItemAction({
     />
   )
 
-  if (isAutoIncluded && dependencyTooltip) {
+  if ((isAutoIncluded || isRemovalBlocked) && dependencyTooltip) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
@@ -223,14 +252,16 @@ function TemplateItemAction({
   return (
     <div className="relative flex h-7 w-7 shrink-0 items-center justify-center">
       {check}
-      <button
-        type="button"
-        aria-label="Remove template"
-        className="absolute hidden h-7 w-7 items-center justify-center rounded-full border border-control text-foreground-light group-hover:flex hover:bg-surface-200"
-        onClick={onRemove}
-      >
-        <Minus className="h-3.5 w-3.5" />
-      </button>
+      {!isRemovalBlocked ? (
+        <button
+          type="button"
+          aria-label="Remove template"
+          className="absolute hidden h-7 w-7 items-center justify-center rounded-full border border-control text-foreground-light group-hover:flex hover:bg-surface-200"
+          onClick={onRemove}
+        >
+          <Minus className="h-3.5 w-3.5" />
+        </button>
+      ) : null}
     </div>
   )
 }

@@ -30,6 +30,27 @@ export interface DependencyResolution {
   missingDeps: string[]
 }
 
+export function getTemplatesRequiringDependency(
+  dependencyId: string,
+  selectedIds: Iterable<string>,
+  allTemplates: Template[]
+): Template[] {
+  const selected = new Set(selectedIds)
+
+  return allTemplates.filter(
+    (template) =>
+      selected.has(template.id) && template.dependencies?.required?.includes(dependencyId)
+  )
+}
+
+export function canRemoveTemplate(
+  templateId: string,
+  selectedIds: Iterable<string>,
+  allTemplates: Template[]
+): boolean {
+  return getTemplatesRequiringDependency(templateId, selectedIds, allTemplates).length === 0
+}
+
 export function generateCompositionId(templateIds: string[]): string {
   const hashInput = [...templateIds].sort().join('-')
   let hashCode = 0

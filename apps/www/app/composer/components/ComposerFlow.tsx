@@ -190,9 +190,7 @@ function buildPrototypeFlow({
       position: { x: 0, y: LAYOUT.topRowY },
       data: {
         label: 'Database',
-        sublabel: 'PostgreSQL',
-        computeSize: 'Micro',
-        region: 'Asia-Pacific',
+        sublabel: 'Postgres',
       },
     },
   ]
@@ -223,15 +221,17 @@ function buildPrototypeFlow({
         templateIds: resource.sourceTemplateIds,
       },
     })
-    edges.push({
-      id: `database-${nodeId}`,
-      source: 'database',
-      target: nodeId,
-      sourceHandle: 'bottom',
-      targetHandle: 'target-top',
-      animated: true,
-      style: { stroke: '#555', strokeWidth: 1.5 },
-    })
+    if (connectsToDatabase(resource)) {
+      edges.push({
+        id: `database-${nodeId}`,
+        source: 'database',
+        target: nodeId,
+        sourceHandle: 'bottom',
+        targetHandle: 'target-top',
+        animated: true,
+        style: { stroke: '#555', strokeWidth: 1.5 },
+      })
+    }
   }
 
   for (const topLevelResource of topLevelResources) {
@@ -311,11 +311,11 @@ function DatabaseNode({ data }: NodeProps) {
           <Database className="size-4 text-foreground-lighter" strokeWidth={1.5} />
           <div className="flex min-w-0 flex-1 flex-col leading-tight">
             <span className="truncate text-xs font-medium">{String(data.label)}</span>
-            <div className="flex flex-wrap justify-center gap-1 text-xs">
-              <span className="bg-primary/20 text-primary">{String(data.computeSize)}</span>
-              <span className="text-foreground-light">in</span>
-              <span className="bg-primary/20 text-primary">{String(data.region)}</span>
-            </div>
+            {data.sublabel ? (
+              <span className="truncate text-xs text-foreground-light">
+                {String(data.sublabel)}
+              </span>
+            ) : null}
           </div>
         </CardContent>
       </Card>
@@ -363,6 +363,11 @@ function buildRowLayout(nodeIds: string[], centerX: number) {
   })
 
   return rowConfig
+}
+
+function connectsToDatabase(resource: ComposerResource) {
+  // Edge runtime is not a database dependency; all other top-level resources are.
+  return resource.label !== 'edge_runtime'
 }
 
 function getTopLevelResources(resources: ComposerResource[]) {

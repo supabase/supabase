@@ -3,5 +3,8 @@
   "name": "Auth",
   "description": "User authentication and authorization service",
   "category": "Auth",
-  "tags": ["auth", "users", "sessions"]
+  "tags": ["auth", "users", "sessions"],
+  "dependencies": {
+    "required": ["database"]
+  }
 }

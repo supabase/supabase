@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  canRemoveTemplate,
   createCompositionManifest,
   generateCompositionId,
   mergeTemplates,
@@ -47,6 +48,29 @@ describe('project composer', () => {
 
     expect(resolution.missingDeps).toEqual([])
     expect(resolution.resolved.map((template) => template.id)).toEqual(['base', 'feature'])
+  })
+
+  it('prevents removing a template required by another selected template', () => {
+    const database: Template = {
+      id: 'database',
+      name: 'Database',
+      description: 'Database template',
+      category: 'Core',
+      files: [],
+    }
+    const auth: Template = {
+      id: 'auth',
+      name: 'Auth',
+      description: 'Auth template',
+      category: 'Auth',
+      dependencies: {
+        required: ['database'],
+      },
+      files: [],
+    }
+
+    expect(canRemoveTemplate('database', ['auth', 'database'], [database, auth])).toBe(false)
+    expect(canRemoveTemplate('auth', ['auth', 'database'], [database, auth])).toBe(true)
   })
 
   it('reports missing dependencies without adding unknown templates', () => {

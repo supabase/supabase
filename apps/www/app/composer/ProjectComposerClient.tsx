@@ -6,7 +6,12 @@ import { CodeTabsPanel } from './components/CodeTabsPanel'
 import { ComposerFlow } from './components/ComposerFlow'
 import { ComposerHeader } from './components/ComposerHeader'
 import { TemplateBrowser } from './components/TemplateBrowser'
-import { createZipBlob, mergeTemplates, resolveTemplateDependencies } from './lib/composer'
+import {
+  canRemoveTemplate,
+  createZipBlob,
+  mergeTemplates,
+  resolveTemplateDependencies,
+} from './lib/composer'
 import { extractComposerResources } from './lib/resources'
 import { getDefaultEnabledTemplateIds, type Template } from './lib/templates'
 import DefaultLayout from '@/components/Layouts/Default'
@@ -43,6 +48,8 @@ export default function ProjectComposerClient({ templates }: ProjectComposerClie
   }
 
   function removeTemplate(id: string) {
+    if (!canRemoveTemplate(id, selectedIds, templates)) return
+
     setSelectedIds((current) => {
       const next = new Set(current)
       next.delete(id)
