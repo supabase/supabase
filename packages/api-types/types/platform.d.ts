@@ -5733,11 +5733,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -5870,11 +5865,6 @@ export interface components {
                * @example s3://<bucket-name>/
                */
               data_path: string
-              /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
               /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
@@ -9394,11 +9384,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -9543,11 +9528,6 @@ export interface components {
                  * @example s3://<bucket-name>/
                  */
                 data_path: string
-                /**
-                 * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-                 * @example 7 days
-                 */
-                expire_snapshots_older_than?: string
                 /**
                  * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                  * @default ducklake
@@ -11385,11 +11365,6 @@ export interface components {
                */
               data_path: string
               /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
-              /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
                * @example ducklake
@@ -11522,11 +11497,6 @@ export interface components {
                * @example s3://<bucket-name>/
                */
               data_path: string
-              /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
               /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
@@ -12071,11 +12041,6 @@ export interface components {
                * @example s3://<bucket-name>/
                */
               data_path: string
-              /**
-               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
-               * @example 7 days
-               */
-              expire_snapshots_older_than?: string
               /**
                * @description Schema used for DuckLake metadata tables stored in PostgreSQL
                * @default ducklake
