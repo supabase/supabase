@@ -37,9 +37,6 @@ export function TemplateItemHeader({
   className,
   descriptionClassName,
 }: TemplateItemHeaderProps) {
-  const requiredDependencyNames = template.dependencies?.required?.map((id) => {
-    return templates.find((candidate) => candidate.id === id)?.name ?? id
-  })
   const isSelected = selectedIds.has(template.id)
   const isAutoIncluded = !isSelected && resolvedIds.has(template.id)
   const isAdded = isSelected || isAutoIncluded
@@ -49,66 +46,61 @@ export function TemplateItemHeader({
       ? getDependencyTooltip(template.id, selectedIds, templates)
       : undefined
 
-  const title = (
-    <span className="line-clamp-1 text-sm font-medium text-foreground">{template.name}</span>
-  )
-
-  const description = (
-    <p
-      className={cn(
-        'line-clamp-3 text-xs leading-relaxed text-foreground-light',
-        descriptionClassName
-      )}
-    >
-      {template.description}
-    </p>
+  const content = (
+    <>
+      <span className="line-clamp-2 text-sm font-medium text-foreground">{template.name}</span>
+      <p
+        className={cn(
+          'line-clamp-3 text-xs leading-relaxed text-foreground-light',
+          descriptionClassName
+        )}
+      >
+        {template.description}
+      </p>
+    </>
   )
 
   return (
-    <div className={cn('group flex flex-col gap-0.5', className)}>
-      <div className="flex items-center justify-between gap-3">
-        {onOpen ? (
-          <button type="button" className="min-w-0 flex-1 text-left" onClick={onOpen}>
-            {title}
-          </button>
-        ) : (
-          <div className="min-w-0 flex-1">{title}</div>
-        )}
-        <div className="flex shrink-0 items-center gap-2">
-          {requiredDependencyNames && requiredDependencyNames.length > 0 ? (
-            <p className="max-w-32 truncate text-xs text-foreground-lighter">
-              Requires {requiredDependencyNames.join(', ')}
-            </p>
-          ) : null}
-          <div className="flex items-center gap-0.5">
-            <TemplateCliPopover
-              command={getTemplateAddCommand(template.id)}
-              description={templateAddCliDescription}
-            />
-            <TemplateItemAction
-              isAdded={isAdded}
-              isAutoIncluded={isAutoIncluded}
-              isRemovalBlocked={isRemovalBlocked}
-              dependencyTooltip={dependencyTooltip}
-              onAdd={(event) => {
-                event.stopPropagation()
-                onAdd()
-              }}
-              onRemove={(event) => {
-                event.stopPropagation()
-                onRemove()
-              }}
-            />
-          </div>
-        </div>
-      </div>
+    <div className={cn('flex min-h-0 flex-1 flex-col', className)}>
       {onOpen ? (
-        <button type="button" className="w-full text-left" onClick={onOpen}>
-          {description}
+        <button
+          type="button"
+          className="flex flex-1 w-full flex-col items-center gap-1 px-3 py-3 text-center"
+          onClick={onOpen}
+        >
+          {content}
         </button>
       ) : (
-        description
+        <div className="flex flex-1 flex-col items-center gap-1 px-3 py-3 text-center">
+          {content}
+        </div>
       )}
+
+      <div className="mt-auto flex shrink-0 border-t">
+        <div className="flex min-w-0 flex-1">
+          <TemplateCliPopover
+            variant="split"
+            className="w-full"
+            command={getTemplateAddCommand(template.id)}
+            description={templateAddCliDescription}
+          />
+        </div>
+        <div aria-hidden className="w-px shrink-0 self-stretch bg-border" />
+        <TemplateItemAction
+          isAdded={isAdded}
+          isAutoIncluded={isAutoIncluded}
+          isRemovalBlocked={isRemovalBlocked}
+          dependencyTooltip={dependencyTooltip}
+          onAdd={(event) => {
+            event.stopPropagation()
+            onAdd()
+          }}
+          onRemove={(event) => {
+            event.stopPropagation()
+            onRemove()
+          }}
+        />
+      </div>
     </div>
   )
 }
@@ -133,10 +125,11 @@ function TemplateItemAction({
       <button
         type="button"
         aria-label="Add template"
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-control text-foreground-light"
+        className="flex h-8 min-h-8 w-full flex-1 items-center justify-center gap-1.5 text-xs text-foreground-light hover:bg-surface-200"
         onClick={onAdd}
       >
         <Plus className="h-3.5 w-3.5" />
+        Add
       </button>
     )
   }
@@ -156,28 +149,27 @@ function TemplateItemAction({
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="flex h-7 w-7 shrink-0 cursor-default items-center justify-center">
+          <span
+            aria-label="Template added"
+            className="flex h-8 min-h-8 w-full flex-1 cursor-default items-center justify-center text-foreground-light"
+          >
             {check}
           </span>
         </TooltipTrigger>
-        <TooltipContent side="left">{dependencyTooltip}</TooltipContent>
+        <TooltipContent side="top">{dependencyTooltip}</TooltipContent>
       </Tooltip>
     )
   }
 
   return (
-    <div className="relative flex h-7 w-7 shrink-0 items-center justify-center">
+    <button
+      type="button"
+      aria-label="Remove template"
+      className="group relative flex h-8 min-h-8 w-full flex-1 items-center justify-center text-foreground-light hover:bg-surface-200"
+      onClick={onRemove}
+    >
       {check}
-      {!isRemovalBlocked ? (
-        <button
-          type="button"
-          aria-label="Remove template"
-          className="absolute hidden h-7 w-7 items-center justify-center rounded-full border border-control text-foreground-light group-hover:flex hover:bg-surface-200"
-          onClick={onRemove}
-        >
-          <Minus className="h-3.5 w-3.5" />
-        </button>
-      ) : null}
-    </div>
+      <Minus className="absolute hidden h-3.5 w-3.5 group-hover:block" />
+    </button>
   )
 }

@@ -57,7 +57,15 @@ export function FileTreeSidebar({
             level={level}
             levelPadding={14}
             xPadding={8}
-            icon={isBranch ? undefined : <File strokeWidth={1.5} size={14} className="shrink-0" />}
+            icon={
+              isBranch ? undefined : (
+                <>
+                  {/* Align with branch chevron column so nesting guides don't sit on the icon */}
+                  <span className="inline-block w-[14px] shrink-0" aria-hidden />
+                  <File strokeWidth={1.5} size={14} className="shrink-0" />
+                </>
+              )
+            }
             name={element.name}
             className={
               isActive

@@ -1,7 +1,7 @@
 'use client'
 
 import { Search } from 'lucide-react'
-import { Card, CardContent, cn, Input } from 'ui'
+import { cn, Input } from 'ui'
 
 import { canRemoveTemplate, type DependencyResolution } from '../lib/composer'
 import { filterTemplates } from '../lib/template-filter'
@@ -80,7 +80,7 @@ export function TemplateBrowser({
             {categories.map((category) => (
               <div key={category}>
                 <h3 className="heading-meta mb-2">{category}</h3>
-                <Card className="overflow-hidden rounded-lg border bg-transparent shadow-none">
+                <div className="grid grid-cols-2 gap-2">
                   {templatesByCategory[category].map((template) => {
                     const isSelected = selectedIds.has(template.id)
                     const isAutoIncluded = !isSelected && resolvedIds.has(template.id)
@@ -107,7 +107,7 @@ export function TemplateBrowser({
                       />
                     )
                   })}
-                </Card>
+                </div>
               </div>
             ))}
           </div>
@@ -147,9 +147,9 @@ function TemplateItem({
   const isAdded = isSelected || isAutoIncluded
 
   return (
-    <CardContent
+    <div
       className={cn(
-        'border-b px-3 py-3 last:border-b-0',
+        'flex h-full flex-col overflow-hidden rounded-lg border',
         isAdded ? 'bg-muted' : 'bg-muted/50',
         isActiveDetail && 'ring-1 ring-inset ring-brand'
       )}
@@ -168,6 +168,6 @@ function TemplateItem({
         onAdd={onAdd}
         onRemove={onRemove}
       />
-    </CardContent>
+    </div>
   )
 }

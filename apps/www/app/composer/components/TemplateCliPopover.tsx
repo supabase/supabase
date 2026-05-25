@@ -10,6 +10,7 @@ interface TemplateCliPopoverProps {
   description: string
   className?: string
   matchSearchInput?: boolean
+  variant?: 'default' | 'search' | 'split'
 }
 
 export function TemplateCliPopover({
@@ -17,6 +18,7 @@ export function TemplateCliPopover({
   description,
   className,
   matchSearchInput = false,
+  variant = 'default',
 }: TemplateCliPopoverProps) {
   const [copied, setCopied] = useState(false)
 
@@ -25,30 +27,45 @@ export function TemplateCliPopover({
     setTimeout(() => setCopied(false), 1000)
   }
 
-  const trigger = matchSearchInput ? (
-    <Button_Shadcn_
-      type="button"
-      variant="outline"
-      size="sm"
-      aria-label="Show CLI command"
-      className={cn('size-8 shrink-0 p-0', className)}
-      onClick={(event) => event.stopPropagation()}
-    >
-      <Terminal className="h-3.5 w-3.5" />
-    </Button_Shadcn_>
-  ) : (
-    <button
-      type="button"
-      aria-label="Show CLI command"
-      className={cn(
-        'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-control text-foreground-light hover:bg-surface-200',
-        className
-      )}
-      onClick={(event) => event.stopPropagation()}
-    >
-      <Terminal className="h-3.5 w-3.5" />
-    </button>
-  )
+  const resolvedVariant = variant === 'default' && matchSearchInput ? 'search' : variant
+
+  const trigger =
+    resolvedVariant === 'search' ? (
+      <Button_Shadcn_
+        type="button"
+        variant="outline"
+        size="sm"
+        aria-label="Show CLI command"
+        className={cn('size-8 shrink-0 p-0', className)}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <Terminal className="h-3.5 w-3.5" />
+      </Button_Shadcn_>
+    ) : resolvedVariant === 'split' ? (
+      <button
+        type="button"
+        aria-label="Show CLI command"
+        className={cn(
+          'flex h-8 min-h-8 w-full flex-1 items-center justify-center text-foreground-light hover:bg-surface-200',
+          className
+        )}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <Terminal className="h-3.5 w-3.5" />
+      </button>
+    ) : (
+      <button
+        type="button"
+        aria-label="Show CLI command"
+        className={cn(
+          'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-control text-foreground-light hover:bg-surface-200',
+          className
+        )}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <Terminal className="h-3.5 w-3.5" />
+      </button>
+    )
 
   return (
     <Popover>
