@@ -19,8 +19,8 @@ The table below summarizes each mode, its host and port, IP version support per 
 | Mode                              | Host:Port                                 | Free | Paid | Paid + IPv4 add-on | Best for                                   |
 | --------------------------------- | ----------------------------------------- | ---- | ---- | ------------------ | ------------------------------------------ |
 | Direct                            | `db.[project-id].supabase.co:5432`        | IPv6 | IPv6 | IPv4               | Migrations, `pg_dump`, long-lived backend  |
-| Shared session (Supavisor)        | `aws-0-[region].pooler.supabase.com:5432` | IPv4 | IPv4 | IPv4               | Persistent backend on IPv4-only networks   |
-| Shared transaction (Supavisor)    | `aws-0-[region].pooler.supabase.com:6543` | IPv4 | IPv4 | IPv4               | Serverless and edge functions              |
+| Shared session (Supavisor)        | `aws-[region].pooler.supabase.com:5432` | IPv4 | IPv4 | IPv4               | Persistent backend on IPv4-only networks   |
+| Shared transaction (Supavisor)    | `aws-[region].pooler.supabase.com:6543` | IPv4 | IPv4 | IPv4               | Serverless and edge functions              |
 | Dedicated transaction (PgBouncer) | `db.[project-id].supabase.co:6543`        | -    | IPv6 | IPv4               | High-performance app traffic on paid tiers |
 
 <Admonition type="caution">
@@ -105,7 +105,7 @@ The session mode connection string connects to your Postgres instance via the Sh
 The connection string looks like this:
 
 ```
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:5432/postgres
 ```
 
 Get your project's Session pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=session).
@@ -123,7 +123,7 @@ Transaction mode does not support [prepared statements](https://postgresql.org/d
 The connection string looks like this:
 
 ```
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:6543/postgres
 ```
 
 Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction).
