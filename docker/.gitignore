@@ -1,5 +1,6 @@
 volumes/db/data
 volumes/storage
+volumes/monitoring/
 .env
 test.http
 /docker-compose.override.yml
