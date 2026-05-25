@@ -29,8 +29,8 @@ import { RealtimeToggleDialog } from './RealtimeToggleDialog'
 import { SecurityDefinerViewPopover } from './SecurityDefinerViewPopover'
 import { ViewEntityAutofixSecurityModal } from './ViewEntityAutofixSecurityModal'
 import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
-import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
 import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
 import {
   getEntityLintDetails,
   getTablePoliciesUrl,
