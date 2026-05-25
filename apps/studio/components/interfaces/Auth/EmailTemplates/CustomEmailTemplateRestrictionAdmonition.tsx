@@ -53,7 +53,7 @@ export const CustomEmailTemplateRestrictionAdmonition = () => {
               <DropdownMenuItem asChild>
                 <Link href={`/project/${projectRef}/auth/hooks?hook=send-email`}>
                   <div className="flex flex-col gap-y-0.5">
-                    <p className="block text-foreground">Configure send-email hook</p>
+                    <p className="block text-foreground">Configure Send Email hook</p>
                     <p className="block text-foreground-lighter text-balance">
                       Send auth emails through your own workflow
                     </p>
