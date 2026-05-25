@@ -4,9 +4,10 @@ import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -263,9 +264,8 @@ const DatabaseUsage = () => {
               !chart.entitlement ||
               isEntitlementLoading ||
               entitledFeatures.includes(chart.entitlement)
-            return chartAvailable ? (
+            const chartElement = chartAvailable ? (
               <LazyComposedChartHandler
-                key={chart.id}
                 {...chart}
                 attributes={chart.attributes as MultiAttribute[]}
                 interval={selectedDateRange.interval}
@@ -284,10 +284,15 @@ const DatabaseUsage = () => {
               />
             ) : (
               <ReportChartUpsell
-                key={chart.id}
                 report={{ label: chart.label, requiredPlan: chart.requiredPlan }}
                 orgSlug={org?.slug ?? ''}
               />
+            )
+            return (
+              <Fragment key={chart.id}>
+                {chartElement}
+                {chart.id === 'swap-usage' && <MemoryPatternCallout />}
+              </Fragment>
             )
           })}
         {selectedDateRange && isReplicaSelected && (
@@ -439,5 +444,44 @@ const DatabaseUsage = () => {
         <ObservabilityLink />
       </div>
     </>
+  )
+}
+
+const MemoryPatternCallout = () => {
+  return (
+    <Admonition type="default" title="What to look for in memory charts">
+      <ul className="mt-1 space-y-2 text-sm text-foreground-light list-none">
+        <li>
+          <span className="font-medium text-foreground">Overcommitment with memory spikes</span>
+          {' — '}
+          If Used memory approaches or briefly exceeds Total RAM, the database is at risk of going
+          offline. Even short spikes above the commit limit can trigger an out-of-memory event.
+          Upgrade compute or reduce workload before the next spike.
+        </li>
+        <li>
+          <span className="font-medium text-foreground">Gradual linear growth over time</span>
+          {' — '}A steady upward trend in Used memory that does not level off is a strong signal of
+          a memory leak or a workload that has outgrown the current compute size. Monitor over a
+          longer window (hours to days) to confirm the trend.
+        </li>
+        <li>
+          <span className="font-medium text-foreground">
+            Shrinking cache at low Postgres hit rates
+          </span>
+          {' — '}
+          Cache penalties become significant when the Postgres buffer cache hit rate falls below
+          95%. When Used memory is high, the OS shrinks the page cache to compensate, forcing more
+          queries to read from disk and slowing down the database. Check the cache hit rate in the
+          Query Performance report if you see this pattern.
+        </li>
+        <li>
+          <span className="font-medium text-foreground">Other fluctuations</span>
+          {' — '}
+          Occasional bumps or periodic cycles in memory are generally normal and can be safely
+          ignored unless they coincide with visible database degradation (slow queries, connection
+          errors, or downtime).
+        </li>
+      </ul>
+    </Admonition>
   )
 }
