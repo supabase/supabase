@@ -1,8 +1,7 @@
-import { useChat, type UIMessage as MessageType } from '@ai-sdk/react'
-import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { ArrowUpRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { JSX } from 'react'
 import type { StreamdownProps } from 'streamdown'
 import {
@@ -25,6 +24,8 @@ import { useAiAssistantStateSnapshot, type AiAssistantState } from '@/state/ai-a
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 type SupportAssistantPreviewChat = AiAssistantState['chatInstances'][string]
+
+const EMPTY_MESSAGES: MessageType[] = []
 
 const Streamdown = dynamic<StreamdownProps>(
   () => import('streamdown').then((mod) => mod.Streamdown),
@@ -119,11 +120,8 @@ export function SupportAssistantSuccessCard({
           aria-hidden
         />
       </CardHeader>
-      {chatId && chat ? (
-        <SupportAssistantResponsePreview
-          chatId={chatId}
-          chat={chat as SupportAssistantPreviewChat}
-        />
+      {chat ? (
+        <SupportAssistantResponsePreview chat={chat as SupportAssistantPreviewChat} />
       ) : (
         <CardContent>
           <SupportAssistantResponseLoadingSkeleton />
@@ -131,6 +129,19 @@ export function SupportAssistantSuccessCard({
       )}
     </Card>
   )
+}
+
+function useChatMessages(chat: SupportAssistantPreviewChat | undefined) {
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      return chat?.['~registerMessagesCallback']?.(onStoreChange) ?? (() => {})
+    },
+    [chat]
+  )
+
+  const getSnapshot = useCallback(() => chat?.messages ?? EMPTY_MESSAGES, [chat])
+
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
 }
 
 function getAssistantMessageText(message: MessageType) {
@@ -143,17 +154,11 @@ function getAssistantMessageText(message: MessageType) {
 }
 
 function SupportAssistantResponsePreview({
-  chatId,
   chat,
 }: {
-  chatId: string
   chat: SupportAssistantPreviewChat
 }) {
-  const { messages } = useChat({
-    id: chatId,
-    chat,
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
-  })
+  const messages = useChatMessages(chat)
 
   const latestAssistantMessage = [...messages]
     .reverse()
@@ -180,15 +185,19 @@ function SupportAssistantPreviewMarkdown({ children }: { children: string }) {
   return (
     <Streamdown
       className="prose prose-sm dark:prose-dark max-w-none space-y-3 text-sm text-foreground-light prose-p:my-0 prose-strong:font-medium prose-strong:text-foreground prose-code:text-xs prose-li:my-0 prose-ul:my-0 prose-ol:my-0"
-      components={{
-        img: ({ src }: JSX.IntrinsicElements['img']) => (
-          <span className="font-mono text-foreground-lighter">[Image: {src?.toString()}]</span>
-        ),
-      }}
+      components={supportAssistantPreviewMarkdownComponents}
     >
       {children}
     </Streamdown>
   )
+}
+
+function SupportAssistantPreviewImage({ src }: JSX.IntrinsicElements['img']) {
+  return <span className="font-mono text-foreground-lighter">[Image: {src?.toString()}]</span>
+}
+
+const supportAssistantPreviewMarkdownComponents: StreamdownProps['components'] = {
+  img: SupportAssistantPreviewImage,
 }
 
 function SupportAssistantResponseLoadingSkeleton() {

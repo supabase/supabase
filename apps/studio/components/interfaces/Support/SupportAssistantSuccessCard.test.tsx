@@ -1,5 +1,5 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -7,23 +7,20 @@ import { SupportAssistantSuccessCard } from './SupportAssistantSuccessCard'
 import type { SubmittedSupportRequest } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 
-const { chatInstances, mockNewChat, mockOpenSidebar, mockSelectChat, mockTrack, mockUseChat } =
-  vi.hoisted(() => ({
-    chatInstances: {} as Record<string, unknown>,
+const { chatInstances, mockNewChat, mockOpenSidebar, mockSelectChat, mockTrack } = vi.hoisted(
+  () => ({
+    chatInstances: {} as Record<string, MockChat>,
     mockNewChat: vi.fn(),
     mockOpenSidebar: vi.fn(),
     mockSelectChat: vi.fn(),
     mockTrack: vi.fn(),
-    mockUseChat: vi.fn(),
-  }))
+  })
+)
 
-vi.mock('@ai-sdk/react', () => ({
-  useChat: mockUseChat,
-}))
-
-vi.mock('ai', () => ({
-  lastAssistantMessageIsCompleteWithToolCalls: vi.fn(),
-}))
+type MockChat = {
+  messages: Array<{ id: string; role: string; parts: Array<{ type: string; text: string }> }>
+  '~registerMessagesCallback': ReturnType<typeof vi.fn>
+}
 
 vi.mock('streamdown', () => ({
   Streamdown: ({ children }: { children: string }) => (
@@ -69,21 +66,31 @@ const supportRequest: SubmittedSupportRequest = {
 }
 
 describe('SupportAssistantSuccessCard', () => {
+  let nextChatMessages: MockChat['messages']
+  let emitChatMessagesChange: (() => void) | undefined
+
+  function createMockChat(messages: MockChat['messages'] = []) {
+    return {
+      messages,
+      '~registerMessagesCallback': vi.fn((onStoreChange: () => void) => {
+        emitChatMessagesChange = onStoreChange
+        return vi.fn()
+      }),
+    }
+  }
+
   beforeEach(() => {
     Object.keys(chatInstances).forEach((key) => delete chatInstances[key])
     mockNewChat.mockReset()
     mockOpenSidebar.mockReset()
     mockSelectChat.mockReset()
     mockTrack.mockReset()
-    mockUseChat.mockReset()
+    nextChatMessages = []
+    emitChatMessagesChange = undefined
 
     mockNewChat.mockImplementation(() => {
-      chatInstances['chat-1'] = { id: 'chat-1' }
+      chatInstances['chat-1'] = createMockChat(nextChatMessages)
       return 'chat-1'
-    })
-    mockUseChat.mockReturnValue({
-      messages: [],
-      status: 'submitted',
     })
   })
 
@@ -115,22 +122,42 @@ describe('SupportAssistantSuccessCard', () => {
 
   it('renders the full assistant response preview inside the clipped content area', async () => {
     const longResponse = 'A'.repeat(500)
-    mockUseChat.mockReturnValue({
-      messages: [
-        {
-          id: 'assistant-message',
-          role: 'assistant',
-          parts: [{ type: 'text', text: longResponse }],
-        },
-      ],
-      status: 'streaming',
-    })
+    nextChatMessages = [
+      {
+        id: 'assistant-message',
+        role: 'assistant',
+        parts: [{ type: 'text', text: longResponse }],
+      },
+    ]
 
     render(<SupportAssistantSuccessCard request={supportRequest} />)
 
     const preview = await screen.findByTestId('assistant-preview-message')
     expect(preview).toHaveTextContent(longResponse)
     expect(preview.closest('[class*="max-h-48"]')).toHaveClass('overflow-hidden')
+  })
+
+  it('updates the preview when the shared chat receives an assistant message', async () => {
+    render(<SupportAssistantSuccessCard request={supportRequest} />)
+
+    await waitFor(() => {
+      expect(chatInstances['chat-1']?.['~registerMessagesCallback']).toHaveBeenCalled()
+    })
+
+    act(() => {
+      chatInstances['chat-1'].messages = [
+        {
+          id: 'assistant-message',
+          role: 'assistant',
+          parts: [{ type: 'text', text: 'Try checking the API logs first.' }],
+        },
+      ]
+      emitChatMessagesChange?.()
+    })
+
+    expect(await screen.findByTestId('assistant-preview-message')).toHaveTextContent(
+      'Try checking the API logs first.'
+    )
   })
 
   it('opens the generated assistant chat when the action is clicked', async () => {
