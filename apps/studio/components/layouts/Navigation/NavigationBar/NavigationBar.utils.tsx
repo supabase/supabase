@@ -179,7 +179,7 @@ export const generateOtherRoutes = (
             key: 'observability',
             label: 'Observability',
             disabled: !isProjectActive,
-            icon: <Telescope size={ICON_SIZE} strokeWidth={1.4} />,
+            icon: <Telescope size={ICON_SIZE} strokeWidth={1.45} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
             shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY,
           },
@@ -191,7 +191,13 @@ export const generateOtherRoutes = (
             key: 'logs',
             label: 'Logs',
             disabled: false,
-            icon: <Logs size={ICON_SIZE} strokeWidth={1.6} />,
+            icon: (
+              <Logs
+                size={ICON_SIZE}
+                strokeWidth={ICON_STROKE_WIDTH}
+                className="dark:text-foreground/70"
+              />
+            ),
             link:
               ref &&
               (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
