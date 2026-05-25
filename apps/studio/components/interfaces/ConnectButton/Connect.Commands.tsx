@@ -1,27 +1,14 @@
 import { Plug } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { Fragment } from 'react'
-import { KeyboardShortcut } from 'ui'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
+import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
-import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
-
-const ConnectShortcutBadge = () => (
-  <div className="flex items-center gap-1">
-    {SHORTCUT_DEFINITIONS[SHORTCUT_IDS.CONNECT_OPEN_SHEET].sequence.map((step, index) => (
-      <Fragment key={`${step}-${index}`}>
-        {index > 0 && <span className="text-foreground-lighter text-[11px]">then</span>}
-        <KeyboardShortcut keys={hotkeyToKeys(step)} />
-      </Fragment>
-    ))}
-  </div>
-)
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export function useConnectCommands() {
   const setIsOpen = useSetCommandMenuOpen()
@@ -43,7 +30,7 @@ export function useConnectCommands() {
           setIsOpen(false)
         },
         icon: () => <Plug className="rotate-90" />,
-        badge: ConnectShortcutBadge,
+        badge: () => <ShortcutBadge shortcutId={SHORTCUT_IDS.CONNECT_OPEN_SHEET} />,
       },
       {
         id: 'connect-mcp',

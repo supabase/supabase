@@ -1,12 +1,12 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
-import { handleError, post } from '@/data/fetchers'
 import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -42,17 +42,16 @@ export async function getUnifiedLogsChart(
   // Get SQL query from utility function (with dynamic bucketing)
   const sql = pickLogsQueryBuilder(useOtel, getLogsChartQuery, getLogsChartQueryBq)(search)
 
-  let headers = new Headers(headersInit)
-
   const endpoint = logsAllEndpointUrl(useOtel)
-  const { data, error } = await post(endpoint, {
-    params: { path: { ref: projectRef } },
-    body: { sql, iso_timestamp_start: dateStart, iso_timestamp_end: dateEnd },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: dateStart,
+    iso_timestamp_end: dateEnd,
     signal,
-    headers,
+    headers: headersInit,
   })
-
-  if (error) handleError(error)
 
   const chartData: Array<{
     timestamp: number
