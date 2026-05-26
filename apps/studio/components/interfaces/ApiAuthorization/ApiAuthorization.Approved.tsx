@@ -6,12 +6,7 @@ import {
   AuthorizeRequesterDetails,
   RequesterLogo,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
-import {
-  InterstitialLayout,
-  InterstitialMetadataPill,
-  LogoPair,
-  SupabaseLogo,
-} from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout, LogoPair, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { Organization } from '@/types'
 
@@ -36,8 +31,6 @@ export function ApiAuthorizationApprovedScreen({
       }
       title={requester.name}
       description="is authorized for Supabase"
-      subtitle={<InterstitialMetadataPill>{requester.domain}</InterstitialMetadataPill>}
-      subtitleClassName="leading-none"
     >
       <div className="flex flex-col gap-5 px-6 pb-6">
         <Admonition

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowRightLeft } from 'lucide-react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { Card, CardContent, CardHeader, cn } from 'ui'
@@ -8,18 +8,14 @@ import { BASE_PATH } from '@/lib/constants'
 
 const MotionCard = motion.create(Card)
 
-const EXPANDABLE_CONTENT_TRANSITION = { duration: 0.22, ease: [0.16, 1, 0.3, 1] } as const
-
 interface InterstitialLayoutProps {
   logo?: ReactNode
   title?: ReactNode
   description?: ReactNode
-  subtitle?: ReactNode
   containerClassName?: string
   cardClassName?: string
   titleClassName?: string
   descriptionClassName?: string
-  subtitleClassName?: string
 }
 
 /**
@@ -33,12 +29,10 @@ export const InterstitialLayout = ({
   logo,
   title,
   description,
-  subtitle,
   containerClassName,
   cardClassName,
   titleClassName,
   descriptionClassName,
-  subtitleClassName,
   children,
 }: PropsWithChildren<InterstitialLayoutProps>) => {
   const TitleElement = typeof title === 'string' ? 'h1' : 'div'
@@ -78,18 +72,13 @@ export const InterstitialLayout = ({
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         className={cn('overflow-hidden max-w-[400px] w-full mx-auto', cardClassName)}
       >
-        {(logo || title || description || subtitle) && (
+        {(logo || title || description) && (
           <CardHeader className="font-normal items-center gap-0 space-y-0 px-6 py-6 text-center [--card-padding-x:1.5rem] border-0">
             {logo && <div className="mb-4 flex justify-center">{logo}</div>}
             {(titleElement || descriptionElement) && (
               <div className="flex flex-col items-center gap-1">
                 {titleElement}
                 {descriptionElement}
-              </div>
-            )}
-            {subtitle && (
-              <div className={cn('mt-2.5 text-sm text-foreground-lighter', subtitleClassName)}>
-                {subtitle}
               </div>
             )}
           </CardHeader>
@@ -139,12 +128,6 @@ export const SupabaseLogo = () => (
   </LogoBox>
 )
 
-export const InterstitialMetadataPill = ({ children }: PropsWithChildren) => (
-  <span className="mx-auto mt-1.5 flex w-fit items-center gap-1 rounded-full border border-muted px-2 py-1 font-mono text-[11px] tracking-tight text-foreground-lighter">
-    {children}
-  </span>
-)
-
 export const InterstitialAccountRow = ({
   avatarUrl,
   displayName,
@@ -177,23 +160,4 @@ export const InterstitialAccountRow = ({
       {action}
     </CardContent>
   </Card>
-)
-
-export const InterstitialExpandableContent = ({
-  show,
-  children,
-}: PropsWithChildren<{ show: boolean }>) => (
-  <AnimatePresence initial={false}>
-    {show && (
-      <motion.div
-        initial={{ height: 0, opacity: 0 }}
-        animate={{ height: 'auto', opacity: 1 }}
-        exit={{ height: 0, opacity: 0 }}
-        transition={EXPANDABLE_CONTENT_TRANSITION}
-        className="overflow-hidden"
-      >
-        {children}
-      </motion.div>
-    )}
-  </AnimatePresence>
 )
