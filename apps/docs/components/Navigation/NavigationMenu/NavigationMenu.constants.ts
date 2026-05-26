@@ -1875,10 +1875,7 @@ export const realtime: NavMenuConstant = {
           name: 'Realtime Reports',
           url: '/guides/realtime/reports' as `/${string}`,
         },
-        {
-          name: 'Subscribing to Database Changes',
-          url: '/guides/realtime/subscribing-to-database-changes' as `/${string}`,
-        },
+
         {
           name: 'Using Realtime with Next.js',
           url: '/guides/realtime/realtime-with-nextjs' as `/${string}`,
