@@ -1,0 +1,11 @@
+{
+  "id": "ai-storage-rag-ingest",
+  "name": "Storage RAG Ingest",
+  "description": "Ingest text and markdown files from Storage into the existing RAG pipeline",
+  "category": "AI",
+  "version": "1.0.0",
+  "tags": ["ai", "rag", "storage", "embeddings", "files", "functions"],
+  "dependencies": {
+    "required": ["database", "storage", "functions", "ai-rag-pipeline"]
+  }
+}

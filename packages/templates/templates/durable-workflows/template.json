@@ -1,0 +1,12 @@
+{
+  "id": "durable-workflows",
+  "name": "Durable Workflows",
+  "description": "Workflow runs, retryable steps, attempts, queues, and an Edge Function worker scaffold",
+  "category": "Database",
+  "version": "1.0.0",
+  "tags": ["workflows", "background-jobs", "pgmq", "pg_cron", "functions", "retries"],
+  "dependencies": {
+    "required": ["database", "functions"],
+    "optional": ["queues"]
+  }
+}

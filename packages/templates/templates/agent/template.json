@@ -1,7 +1,7 @@
 {
   "id": "agent",
   "name": "Agent",
-  "description": "Agent sessions and memory with vector recall, plus an Edge Function tool endpoint for structured tool calls",
+  "description": "Streaming AI SDK agent endpoint with session persistence, memory, and MCP tool access",
   "category": "AI",
   "version": "1.0.0",
   "tags": [
@@ -11,6 +11,8 @@
     "sessions",
     "pgvector",
     "tools",
+    "mcp",
+    "streaming",
     "functions"
   ],
   "dependencies": {
@@ -22,7 +24,8 @@
     ],
     "optional": [
       "ai-vector-search",
-      "ai-automatic-embeddings"
+      "ai-automatic-embeddings",
+      "mcp-server"
     ]
   }
 }

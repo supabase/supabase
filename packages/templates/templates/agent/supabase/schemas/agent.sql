@@ -1,9 +1,9 @@
--- Persistent memory store for AI agents.
+-- Persistent sessions, memory, and MCP server configuration for streaming AI agents.
 -- Pair with ai-vector-search or ai-automatic-embeddings for embedding generation.
 
 create extension if not exists vector with schema extensions;
 
-create table public.agent_sessions (
+create table if not exists public.agent_sessions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users on delete cascade,
   title text,
@@ -14,7 +14,7 @@ create table public.agent_sessions (
 
 comment on table public.agent_sessions is 'Conversation sessions for an agent or user.';
 
-create table public.agent_memories (
+create table if not exists public.agent_memories (
   id uuid primary key default gen_random_uuid(),
   session_id uuid references public.agent_sessions on delete cascade not null,
   role text not null check (role in ('user', 'assistant', 'system', 'tool')),
@@ -26,14 +26,28 @@ create table public.agent_memories (
 
 comment on table public.agent_memories is 'Individual messages and tool results within a session.';
 
-create index agent_memories_session_id_idx on public.agent_memories (session_id);
+create table if not exists public.agent_mcp_servers (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  url text not null,
+  headers jsonb not null default '{}',
+  enabled boolean not null default true,
+  metadata jsonb not null default '{}',
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 
-create index agent_memories_embedding_idx
+comment on table public.agent_mcp_servers is 'MCP servers whose tools can be exposed to the streaming agent endpoint. Avoid storing long-lived secrets in headers.';
+
+create index if not exists agent_memories_session_id_idx on public.agent_memories (session_id);
+
+create index if not exists agent_memories_embedding_idx
 on public.agent_memories
 using hnsw (embedding extensions.halfvec_cosine_ops);
 
 alter table public.agent_sessions enable row level security;
 alter table public.agent_memories enable row level security;
+alter table public.agent_mcp_servers enable row level security;
 
 create policy "Users can read their own sessions"
 on public.agent_sessions
@@ -84,6 +98,12 @@ with check (
       and agent_sessions.user_id = auth.uid()
   )
 );
+
+create policy "Authenticated users can read enabled MCP servers"
+on public.agent_mcp_servers
+for select
+to authenticated
+using (enabled = true);
 
 create or replace function public.match_agent_memories(
   session_id uuid,

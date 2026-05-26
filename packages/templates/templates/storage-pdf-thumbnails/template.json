@@ -1,0 +1,11 @@
+{
+  "id": "storage-pdf-thumbnails",
+  "name": "PDF Thumbnails",
+  "description": "Generate thumbnail images for uploaded PDFs via storage trigger and an Edge Function",
+  "category": "Storage",
+  "version": "1.0.0",
+  "tags": ["storage", "pdf", "thumbnails", "media", "triggers", "functions"],
+  "dependencies": {
+    "required": ["storage", "database", "functions"]
+  }
+}

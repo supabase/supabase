@@ -1,0 +1,11 @@
+{
+  "id": "feature-flags",
+  "name": "Feature Flags",
+  "description": "Projects, environments, rollout rules, variants, overrides, and SQL flag evaluation",
+  "category": "Database",
+  "version": "1.0.0",
+  "tags": ["feature-flags", "experiments", "rollouts", "targeting", "database"],
+  "dependencies": {
+    "required": ["database", "api", "auth"]
+  }
+}

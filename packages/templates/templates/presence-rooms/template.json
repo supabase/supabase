@@ -1,0 +1,11 @@
+{
+  "id": "presence-rooms",
+  "name": "Presence Rooms",
+  "description": "Durable rooms, memberships, last-seen state, and RLS to complement Supabase Realtime Presence",
+  "category": "Realtime",
+  "version": "1.0.0",
+  "tags": ["realtime", "presence", "rooms", "collaboration", "auth", "rls"],
+  "dependencies": {
+    "required": ["database", "auth"]
+  }
+}

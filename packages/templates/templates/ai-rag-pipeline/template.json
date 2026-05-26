@@ -1,0 +1,12 @@
+{
+  "id": "ai-rag-pipeline",
+  "name": "RAG Pipeline",
+  "description": "Turn-key retrieval-augmented generation: ingest text via an Edge Function, auto-chunk and embed, then query for similar passages",
+  "category": "AI",
+  "version": "1.0.0",
+  "tags": ["ai", "rag", "embeddings", "pgvector", "pgmq", "openai"],
+  "dependencies": {
+    "required": ["database", "api", "functions"],
+    "optional": ["queues", "ai-vector-search"]
+  }
+}
