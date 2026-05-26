@@ -264,19 +264,23 @@ const buildBaseWhere = (
   if (excludeField !== 'log_type') {
     parts.push(logTypeWherePredicate(effectiveLogTypes))
   }
-  if (search.hide_connection_logs) {
-    // De Morgan equivalent of NOT (source='postgres_logs' AND (msg LIKE x OR msg LIKE y OR ...))
-    // Uses only != and NOT LIKE which the OTEL endpoint already handles elsewhere.
-    parts.push(
-      safeSql`(source != 'postgres_logs' OR (
-        event_message NOT LIKE 'connection received%' AND
-        event_message NOT LIKE 'connection authenticated%' AND
-        event_message NOT LIKE 'connection authorized%'
-      ))`
-    )
-  }
   parts.push(...buildPredicates(search, excludeField))
   return parts
+}
+
+/**
+ * Returns a WHERE predicate that excludes Postgres connection lifecycle messages.
+ * Applied only to the row query and chart query so sidebar facets remain unaffected
+ * (the OTEL endpoint's UNION ALL count query fails silently when this predicate is
+ * included there, returning empty facet data).
+ */
+const connectionLogsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
+  if (!search.hide_connection_logs) return null
+  return safeSql`(source != 'postgres_logs' OR (
+    event_message NOT LIKE 'connection received%' AND
+    event_message NOT LIKE 'connection authenticated%' AND
+    event_message NOT LIKE 'connection authorized%'
+  ))`
 }
 
 /**
@@ -284,6 +288,8 @@ const buildBaseWhere = (
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const predicates = buildBaseWhere(search)
+  const connFilter = connectionLogsFilter(search)
+  if (connFilter) predicates.push(connFilter)
   return safeSql`
 SELECT ${rowProjection()}
 FROM logs
@@ -401,6 +407,8 @@ export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   const truncationLevel = calculateChartBucketing(search)
   const truncFn = truncationFunction(truncationLevel)
   const predicates = buildBaseWhere(search)
+  const connFilter = connectionLogsFilter(search)
+  if (connFilter) predicates.push(connFilter)
 
   return safeSql`
 SELECT
