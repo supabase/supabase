@@ -493,7 +493,7 @@ export const TableList = ({
                             {!isSchemaLocked && (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button type="text" className="px-1" icon={<MoreVertical />} />
+                                  <Button type="default" className="px-1" icon={<MoreVertical />} />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent side="bottom" align="end" className="w-40">
                                   <DropdownMenuItem

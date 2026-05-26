@@ -73,7 +73,7 @@ Once trace context is flowing through, the `trace_id` appears in:
 - **API Gateway logs** — every request to PostgREST, Auth, Storage, and Realtime
 - **Edge Function logs** — invocations and any structured logs emitted from within the function
 
-If you forward Supabase logs to a third-party backend via [Log Drains](/guides/telemetry/log-drains), you can join Supabase logs to your own client and server traces using the shared `trace_id`. This is especially useful for self-hosted setups where you already operate your own OpenTelemetry collector — Supabase logs become first-class citizens in your existing tracing UI.
+If you forward Supabase logs to a third-party backend via [Log Drains](/docs/guides/telemetry/log-drains), you can join Supabase logs to your own client and server traces using the shared `trace_id`. This is especially useful for self-hosted setups where you already operate your own OpenTelemetry collector — Supabase logs become first-class citizens in your existing tracing UI.
 
 ## Using a vendor tracing SDK
 

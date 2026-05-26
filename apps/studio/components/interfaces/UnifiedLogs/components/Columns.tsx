@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
@@ -203,10 +203,6 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'pathname',
       header: 'Pathname',
-      cell: ({ row }) => {
-        const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
-        return value
-      },
       enableSorting: false,
       enableResizing: false,
       size: 250,
@@ -215,6 +211,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       meta: {
         cellClassName: 'font-mono tracking-tight w-[250px]',
         headerClassName: 'w-[250px]',
+      },
+      cell: ({ row }) => {
+        const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
+        return value
       },
     },
     // Event message column - controlled by columnVisibility
@@ -241,7 +241,13 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
                 </TooltipContent>
               </Tooltip>
             )}
-            {displayMessage && <span className="text-muted-foreground">{displayMessage}</span>}
+            {displayMessage && (
+              <span
+                className={cn('text-muted-foreground', logType === 'auth' && 'capitalize-sentence')}
+              >
+                {displayMessage}
+              </span>
+            )}
           </div>
         )
       },

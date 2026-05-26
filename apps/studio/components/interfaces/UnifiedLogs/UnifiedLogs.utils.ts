@@ -124,16 +124,28 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
  */
 export function parseAuthLogEventMessage(value: string | undefined): string | undefined {
   if (!value) return value
+
   try {
     const parsed = JSON.parse(value)
+
     if (parsed && typeof parsed === 'object') {
+      const err = parsed.error || parsed.error_code
+      if (typeof err === 'string' && err.trim()) {
+        return !/^\d{3}:/.test(err) ? err.replaceAll('_', ' ') : err
+      }
+
       const msg = parsed.msg
-      const err = parsed.error
-      if (typeof msg === 'string' && msg.trim()) return msg
-      if (typeof err === 'string' && err.trim()) return err
+      if (typeof msg === 'string' && msg.trim()) {
+        const authEvent =
+          'action' in parsed || 'auth_event_action' in parsed
+            ? (parsed.action || parsed.auth_event.action).replaceAll('_', ' ')
+            : undefined
+        return `${authEvent ? `${authEvent}: ` : ''}${msg}`
+      }
     }
+
     return value
-  } catch {
+  } catch (error) {
     return value
   }
 }
