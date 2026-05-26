@@ -236,7 +236,7 @@ This is the unglamorous half of supply-chain defence: fewer packages, fewer atta
 ## CI / lockfile hygiene
 
 - Run `--frozen-lockfile` / `npm ci` in every CI job. Never let CI silently regenerate the lockfile.
-- Review lockfile diffs in PRs the same way you review code diffs. Unexpected new transitives or version jumps deserve a question.
+- Review lockfile diffs in PRs the same way you review code diffs. Unexpected new transitive dependencies or version jumps deserve a question.
 - Configure Dependabot or Renovate to batch updates and respect the same min-age you set locally. Renovate's `minimumReleaseAge` option is the direct equivalent.
 - Run `npm audit signatures` as a non-blocking CI step so a tampered tarball is caught early.
 
