@@ -2,7 +2,10 @@ import Papa from 'papaparse'
 
 import type { SupaTable } from '@/components/grid/types'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { getCellValue } from '@/data/table-rows/get-cell-value-mutation'
+
+export type CopyRowsFormat = 'csv' | 'json' | 'sql'
 
 export const formatRowsForCSV = ({ rows, columns }: { rows: any[]; columns: string[] }) => {
   const formattedRows = rows.map((row) => {
@@ -81,4 +84,45 @@ export const hydrateTruncatedRows = async ({
   }
 
   return { status: 'ok', rows: hydrated }
+}
+
+
+export const hasTruncatedCellValues = (rows: Record<string, unknown>[]) =>
+  rows.some((row) =>
+    Object.values(row).some((value) => typeof value === 'string' && isValueTruncated(value))
+  )
+
+/**
+ * Hydrates truncated cell values and serializes the rows to the requested
+ * format. Throws if hydration fails so the caller can surface an error in the
+ * surrounding async flow (e.g. copyToClipboard).
+ */
+export const formatRowsForCopy = async ({
+  rows,
+  table,
+  format,
+  projectRef,
+  connectionString,
+}: {
+  rows: Record<string, unknown>[]
+  table: SupaTable
+  format: CopyRowsFormat
+  projectRef: string
+  connectionString: string | null
+}): Promise<string> => {
+  const hydrated = await hydrateTruncatedRows({ rows, table, projectRef, connectionString })
+  if (hydrated.status !== 'ok') {
+    throw new Error('Failed to fetch full values for truncated cells')
+  }
+  const hydratedRows = hydrated.rows
+  if (format === 'csv') {
+    return formatRowsForCSV({
+      rows: hydratedRows,
+      columns: table.columns.map((column) => column.name),
+    })
+  } else if (format === 'sql') {
+    return formatTableRowsToSQL(table, hydratedRows)
+  } else {
+    return JSON.stringify(hydratedRows)
+  }
 }

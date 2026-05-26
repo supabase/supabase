@@ -7,12 +7,14 @@ import DataGrid, { CalculatedColumn, Column } from 'react-data-grid'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { CopyExportRowsActions } from '../header/CopyExportRowsActions'
 import { BinaryFormatter } from './BinaryFormatter'
 import { BooleanFormatter } from './BooleanFormatter'
 import { CellContextMenuWrapper } from './CellContextMenuWrapper'
 import { DefaultFormatter } from './DefaultFormatter'
 import { JsonFormatter } from './JsonFormatter'
 import { COLUMN_MIN_WIDTH } from '@/components/grid/constants'
+import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import type { SupaColumn, SupaRow } from '@/components/grid/types'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
@@ -25,6 +27,7 @@ import {
   isJsonColumn,
 } from '@/components/grid/utils/types'
 import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -54,6 +57,13 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
     },
     { placeholderData: keepPreviousData }
   )
+
+  const { data: entity } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id: table.id,
+  })
+  const supaTable = useMemo(() => (entity ? parseSupaTable(entity) : undefined), [entity])
 
   const rows = useMemo(() => data?.rows ?? [], [data?.rows])
   const selectedCellRef = useRef<{ idx: number; rowIdx: number } | null>(null)
@@ -155,14 +165,28 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
           ),
         }}
       />
-      <div className="flex items-center justify-end px-2 py-1">
+      <div className="flex items-center justify-between gap-x-2 px-2 py-1">
+        <div className="flex items-center gap-x-2">
+          <CopyExportRowsActions
+            rows={rows}
+            table={supaTable}
+            project={
+              project
+                ? { ref: project.ref, connectionString: project.connectionString ?? null }
+                : undefined
+            }
+          />
+        </div>
+
         <EditorTablePageLink
           href={`/project/${ref}/editor/${table.id}?schema=${table.schema}&filter=${column}%3Aeq%3A${value}`}
           projectRef={ref}
           id={String(table.id)}
           filters={[{ column, operator: '=', value: String(value) }]}
         >
-          <Button type="default">Open table</Button>
+          <Button type="default" size="tiny">
+            Open table
+          </Button>
         </EditorTablePageLink>
       </div>
     </>
