@@ -154,10 +154,7 @@ export const StorageExplorer = () => {
   }
 
   return (
-    <div
-      ref={storageExplorerRef}
-      className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col"
-    >
+    <div ref={storageExplorerRef} className="bg-studio flex h-full w-full flex-col">
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
           itemSearchString={itemSearchString}
