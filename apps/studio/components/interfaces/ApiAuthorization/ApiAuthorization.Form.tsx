@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   AlertDialog,
@@ -9,6 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   Card,
   CardContent,
@@ -24,7 +25,6 @@ import {
   SelectValue,
 } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
 import {
@@ -172,18 +172,28 @@ function PublisherInfoDialog({
   name: string
   redirectUrl?: string
 }): ReactNode {
-  const [open, setOpen] = useState(false)
-
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1 rounded-full border border-muted py-1 pl-2.5 pr-1.5 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
-      >
-        <span>{domain}</span>
-        <InfoTooltip side="bottom">About this publisher</InfoTooltip>
-      </button>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button
+          type="button"
+          className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1 rounded-full border border-muted py-1 pl-2.5 pr-1.5 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
+        >
+          <span>{domain}</span>
+          <svg
+            aria-hidden
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            className="size-3.5 fill-foreground-muted transition-colors"
+          >
+            <path
+              d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z"
+              fillRule="evenodd"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>About this publisher</AlertDialogTitle>
