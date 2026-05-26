@@ -401,6 +401,13 @@ function buildBySlug(
     functionsList.push({ id: entry.id, $ref: fn.$ref })
   }
 
+  // Sort items alphabetically (case-insensitive) within categories and within
+  // subcategories. Subcategories still appear at the end of each category (the
+  // order they are pushed below preserves that: withoutSub entries first, then
+  // each subcategory block).
+  const byName = (a: { name: string }, b: { name: string }) =>
+    a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+
   for (const category of orderedCategories) {
     const group = groups.get(category)!
     const product = slugifyTag(category)
@@ -410,16 +417,19 @@ function buildBySlug(
     bySlug[product] = cat
     sections.push({ ...cat, items: catItems })
 
-    for (const fn of group.withoutSub) writeFunction(fn, product, catItems)
+    for (const fn of [...group.withoutSub].sort(byName)) writeFunction(fn, product, catItems)
 
-    for (const [subcategory, fns] of group.bySub) {
+    const sortedSubs = [...group.bySub.entries()].sort(([a], [b]) =>
+      a.toLowerCase().localeCompare(b.toLowerCase())
+    )
+    for (const [subcategory, fns] of sortedSubs) {
       const subSlug = `${product}-${slugifyTag(subcategory)}`
       const sub = subcategoryEntry(subSlug, subcategory, product)
       const subItems: SectionEntry[] = []
       bySlug[subSlug] = sub
       catItems.push({ ...sub, items: subItems })
 
-      for (const fn of fns) writeFunction(fn, product, subItems)
+      for (const fn of [...fns].sort(byName)) writeFunction(fn, product, subItems)
     }
   }
 
