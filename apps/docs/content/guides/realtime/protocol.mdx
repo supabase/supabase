@@ -249,7 +249,7 @@ This is the initial message required to join a channel. The client sends this me
     - `event`: Database change event to listen to, accepts `INSERT`, `UPDATE`, `DELETE`, or `*` to listen to all events.
     - `schema`: Schema of the table to listen to, accepts `*` wildcard to listen to all schemas
     - `table`: Table of the database to listen to, accepts `*` wildcard to listen to all tables
-    - `filter`: Filter to be used when pulling changes from database. Read more about filters in the usage docs for [Postgres Changes](/docs/guides/realtime/postgres-changes?queryGroups=language&language=js#filtering-for-specific-changes)
+    - `filter`: Filter to be used when pulling changes from database. Supports a single filter expression (e.g. `"id=eq.1"`) or multiple expressions joined by commas for logical AND (e.g. `"quantity=gt.10,quantity=lt.100"`). Commas inside `in(...)` value lists are not treated as separators. An empty or whitespace-only string is treated as no filter. Read more about filters in the usage docs for [Postgres Changes](/docs/guides/realtime/postgres-changes?queryGroups=language&language=js#filtering-for-specific-changes)
 - `access_token`: Optional access token for authentication, if not provided, the server will use the API key.
 
 Example on protocol version `2.0.0`:
@@ -511,7 +511,8 @@ Contains the status of the join request and any additional information requested
          "id": number,
          "event": string,
          "schema": string,
-         "table": string
+         "table": string,
+         "filter": string
       }
    ]
 }
@@ -522,6 +523,7 @@ Contains the status of the join request and any additional information requested
   - `event`: The type of event the client is subscribed to, such as `INSERT`, `UPDATE`, `DELETE`, or `*`
   - `schema`: The schema of the table the client is subscribed to
   - `table`: The table the client is subscribed to
+  - `filter`: The filter expression used for this subscription, echoed from the `phx_join` payload
 
 Example on protocol version `2.0.0`:
 
