@@ -265,12 +265,12 @@ Talk to the Supabase Functions team if your security posture depends on a featur
 
 Move quickly. Order of operations:
 
-1. **Treat the install host as potentially compromised.** Anything readable by the user that ran the install — env vars, files, secrets in memory — should be assumed exfiltrated.
+1. **Treat the install host as potentially compromised.** Anything readable by the user that ran the install — env vars, files, secrets in memory — should be assumed stolen.
 2. **Rotate credentials reachable from that host**: cloud provider keys (AWS, GCP, Azure), Kubernetes / Vault tokens, GitHub tokens, npm tokens, SSH keys, and any Supabase service-role keys or anon keys that touched the box.
 3. **Wipe `node_modules`** and your package manager cache (`npm cache clean --force`, `pnpm store prune`, `yarn cache clean`).
 4. **Pin to a known-good version** in `package.json` and reinstall against a fresh cache.
 5. **Check `npm audit` and the [GitHub Advisory Database](https://github.com/advisories)** for the package.
-6. **Report it**: file a GitHub Security Advisory on the upstream repo, and email `security@npmjs.com` if the version is still installable.
+6. **Report it**: file a GitHub Security Advisory on the upstream repo, and email `security@npmjs.com` if the version can still be installed.
 
 ## What Supabase does on its side
 
