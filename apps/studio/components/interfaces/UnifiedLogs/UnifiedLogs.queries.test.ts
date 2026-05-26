@@ -59,8 +59,24 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         pathname: '/customers',
       } as any)
       expect(sql).toContain(`log_attributes['request.method'] IN ('GET')`)
-      expect(sql).toContain(`log_attributes['response.status_code'] IN ('401')`)
+      // Status filter wraps the CASE that picks HTTP code or Postgres SQLSTATE
+      // so e.g. '00000' matches postgres success rows.
+      expect(sql).toContain(`log_attributes['parsed.sql_state_code']`)
+      expect(sql).toMatch(/END\) IN \('401'\)/)
       expect(sql).toContain(`log_attributes['request.path'] LIKE '%/customers%'`)
+    })
+
+    it('excludes connection log messages by default (hide_connection_logs=true)', () => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: true } as any)
+      expect(sql).toContain("source != 'postgres_logs'")
+      expect(sql).toContain("event_message NOT LIKE 'connection received%'")
+      expect(sql).toContain("event_message NOT LIKE 'connection authenticated%'")
+      expect(sql).toContain("event_message NOT LIKE 'connection authorized%'")
+    })
+
+    it('includes connection log messages when hide_connection_logs=false', () => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: false } as any)
+      expect(sql).not.toContain("event_message NOT LIKE 'connection received%'")
     })
 
     it('does not emit subqueries or CTEs (rejected by the OTEL endpoint)', () => {
@@ -128,9 +144,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         search: { ...baseSearch, method: ['GET'], status: ['200'] } as any,
         facet: 'method',
       })
-      // Filtered facet is excluded from WHERE; other filters still applied
+      // Filtered facet is excluded from WHERE; other filters still applied.
+      // For facet='method' the SELECT projection doesn't include STATUS_EXPR,
+      // so SQLSTATE/IN ('200') must come from the WHERE clause.
       expect(sql).not.toContain(`log_attributes['request.method'] IN ('GET')`)
-      expect(sql).toContain(`log_attributes['response.status_code'] IN ('200')`)
+      expect(sql).toContain(`log_attributes['parsed.sql_state_code']`)
+      expect(sql).toMatch(/END\) IN \('200'\)/)
       expect(sql).toContain('GROUP BY value')
       expect(sql).toContain('LIMIT 20')
     })

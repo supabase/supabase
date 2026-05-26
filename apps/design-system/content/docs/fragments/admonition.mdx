@@ -4,7 +4,7 @@ description: Displays a callout for user attention.
 fragment: true
 ---
 
-Admonition provides focus for situations that require a callout.
+Admonition provides the standard product callout pattern for situations that require user attention.
 
 <ComponentPreview
   name="admonition-demo"
@@ -13,13 +13,13 @@ Admonition provides focus for situations that require a callout.
   wide
 />
 
-Use Admonition instead of [Alert](../components/alert) unless you specifically need the primitives. If in doubt, stick with Admonition.
+Use Admonition instead of the low-level [Alert](../components/alert) primitive unless you specifically need custom composition. If in doubt, stick with Admonition.
+
+Use [Collapsible Alert](./collapsible-alert) when the callout needs to remain visible while optional detail can be expanded. Use [Collapsible](../components/collapsible) for generic disclosure behaviour that is not itself a callout.
 
 Use `title` for the heading slot when the callout needs its own heading. `title` is optional: short callouts may use `description` without a title when nearby content already provides enough context.
 
 Avoid title-only Admonitions in new code. A callout with `title` should also include `description` or `children` so it does not read like an incomplete heading.
-
-`label` is still supported for older Docs content, but new code should use `title`.
 
 ## Usage
 

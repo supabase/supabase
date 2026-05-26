@@ -11,7 +11,7 @@ import type { ActionConfig, Filter, QueryPagination, QueryTable, Sort } from './
 
 export interface IQueryModifier {
   range: (from: number, to: number) => QueryModifier
-  toSql: () => string
+  toSql: () => SafeSqlFragment
 }
 
 export class QueryModifier implements IQueryModifier {

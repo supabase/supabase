@@ -4,6 +4,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import type { LogData } from '../Logs.types'
 import { RowLayout, SeverityFormatter, TextFormatter } from '../LogsFormatters'
 import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
+import { parseAuthLogEventMessage } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 
 const columns: Column<LogData>[] = [
   {
@@ -23,7 +24,7 @@ const columns: Column<LogData>[] = [
             className="w-full"
             value={`${props.row.path ? props.row.path + ' | ' : ''}${
               // not all log events have metadata.msg
-              (props.row.msg as string)?.trim() || props.row.event_message
+              (props.row.msg as string)?.trim() || parseAuthLogEventMessage(props.row.event_message)
             }`}
           />
         </RowLayout>

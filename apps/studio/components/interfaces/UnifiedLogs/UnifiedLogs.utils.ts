@@ -115,3 +115,37 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
 
   return specialCases[serviceType.toLowerCase()] || serviceType
 }
+
+/**
+ * Parses an auth log event_message that may be a stringified JSON object.
+ * Auth log entries store metadata as JSON in event_message (e.g. {"msg":"...","level":"info"}).
+ * Extracts the human-readable msg field, falling back to error, then the raw string.
+ * The fallback ensures self-hosted versions with different formats still render correctly.
+ */
+export function parseAuthLogEventMessage(value: string | undefined): string | undefined {
+  if (!value) return value
+
+  try {
+    const parsed = JSON.parse(value)
+
+    if (parsed && typeof parsed === 'object') {
+      const err = parsed.error || parsed.error_code
+      if (typeof err === 'string' && err.trim()) {
+        return !/^\d{3}:/.test(err) ? err.replaceAll('_', ' ') : err
+      }
+
+      const msg = parsed.msg
+      if (typeof msg === 'string' && msg.trim()) {
+        const authEvent =
+          'action' in parsed || 'auth_event_action' in parsed
+            ? (parsed.action || parsed.auth_event.action).replaceAll('_', ' ')
+            : undefined
+        return `${authEvent ? `${authEvent}: ` : ''}${msg}`
+      }
+    }
+
+    return value
+  } catch (error) {
+    return value
+  }
+}

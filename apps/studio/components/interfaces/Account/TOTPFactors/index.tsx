@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
@@ -30,15 +30,15 @@ export const TOTPFactors = () => {
           {isSuccess && (
             <>
               {data.totp.length === 1 && (
-                <Alert_Shadcn_ variant="default" className="mb-2">
+                <Alert variant="default" className="mb-2">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>
+                  <AlertTitle>
                     We recommend configuring two authenticator apps across different devices
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                  </AlertTitle>
+                  <AlertDescription className="flex flex-col gap-3">
                     The two authenticator apps will serve as a backup for each other.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertDescription>
+                </Alert>
               )}
               <div>
                 {data.totp.map((factor) => {

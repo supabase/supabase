@@ -745,7 +745,7 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Email (Magic Link or OTP)',
+          name: 'Email (Magic link or OTP)',
           url: '/guides/auth/auth-email-passwordless',
           enabled: allAuthProvidersEnabled,
         },
@@ -1163,18 +1163,24 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'Replication',
-          url: '/guides/database/replication/replication-setup' as `/${string}`,
+          name: 'External replication',
+          url: '/guides/database/replication/external-replication-setup' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/replication-setup' as `/${string}`,
+              url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+              items: [
+                {
+                  name: 'BigQuery',
+                  url: '/guides/database/replication/bigquery' as `/${string}`,
+                },
+              ],
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/external-replication-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/external-replication-faq' },
           ],
         },
         {
@@ -1689,6 +1695,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/auth',
           items: [
             { name: 'Securing your functions', url: '/guides/functions/auth' },
+            { name: 'Authorization headers', url: '/guides/functions/auth-headers' },
             { name: 'Legacy JWT secret', url: '/guides/functions/auth-legacy-jwt' },
           ],
         },
@@ -2515,6 +2522,7 @@ export const security: NavMenuConstant = {
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
       ],
     },
   ],
@@ -2849,8 +2857,16 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
         },
         {
+          name: 'Logs field reference',
+          url: '/guides/telemetry/log-field-reference' as `/${string}`,
+        },
+        {
           name: 'Log drains',
           url: '/guides/telemetry/log-drains' as `/${string}`,
+        },
+        {
+          name: 'Tracing with the JS SDK',
+          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
         },
         {
           name: 'Reports',

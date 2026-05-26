@@ -2,12 +2,7 @@
 
 import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
-import {
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
-  Button,
-} from 'ui'
+import { AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
 
 import { RestartProjectDialog } from './RestartProjectDialog'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'

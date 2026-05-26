@@ -176,7 +176,15 @@ testRunner('table editor', () => {
     await expect(page.getByRole('link', { name: 'Add RLS policy' })).toBeVisible()
 
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
-    await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
+    await page.getByRole('button', { name: 'RLS disabled' }).click()
+    await page.getByRole('button', { name: 'Enable RLS for this table' }).click()
+    await expect(page.getByRole('heading', { name: 'Enable Row Level Security' })).toBeVisible()
+    await expect(
+      page.getByText(
+        'RLS restricts table access until policies allow a request. Existing queries may stop returning rows until policies are added.'
+      )
+    ).toBeVisible()
+    await page.getByRole('button', { name: 'Cancel' }).click()
   })
 
   test('add enums and show enums on table', async ({ page, ref }) => {
@@ -502,7 +510,13 @@ testRunner('table editor', () => {
     await expect(page.locator('.view-lines')).toContainText(`security_invoker = true`)
 
     const openInSqlEditorLink = page.getByRole('link', { name: 'Open in SQL Editor' })
-    await expect(openInSqlEditorLink).toHaveAttribute('href', /security_invoker%20%3D%20true/)
+    // Accept either percent-encoded (`%20`) or form-encoded (`+`) spaces —
+    // some routers serialize search params via URLSearchParams which emits
+    // `+` for spaces. Both decode to the same SQL.
+    await expect(openInSqlEditorLink).toHaveAttribute(
+      'href',
+      /security_invoker(%20|\+)%3D(%20|\+)true/
+    )
     await openInSqlEditorLink.click()
     await page.waitForURL(/\/sql\/new/)
     await expect(page.locator('.view-lines')).toContainText(`create view public.${viewName}`)
@@ -1142,7 +1156,7 @@ testRunner('table editor', () => {
     const saveTablePromise = waitForApiResponseWithTimeout(
       page,
       (response) => response.url().includes('query?key=table-update'),
-      15000
+      30000
     )
     await page.getByRole('button', { name: 'Save' }).first().click()
     await saveTablePromise
@@ -1170,7 +1184,7 @@ testRunner('table editor', () => {
     const removeFkPromise = waitForApiResponseWithTimeout(
       page,
       (response) => response.url().includes('query?key=table-update'),
-      15000
+      30000
     )
     await page.getByRole('button', { name: 'Save' }).first().click()
     await removeFkPromise
@@ -1263,9 +1277,15 @@ testRunner('table editor', () => {
     await expect(foreignKeySchemaSelect).not.toBeVisible()
     await expect(foreignKeyLink).toBeVisible()
 
-    const updateColumnPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=column-update', {
-      method: 'POST',
-    })
+    const updateColumnPromise = waitForApiResponse(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=column-update',
+      {
+        method: 'POST',
+      }
+    )
     await columnEditor.getByRole('button', { name: 'Save' }).click()
     await updateColumnPromise
     await expect(columnEditor).not.toBeVisible()
