@@ -1,10 +1,8 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'
 import type { ModuleTypes } from '~/features/docs/Reference.typeSpec'
-import {
-  SUPPORTS_NEW_REFERENCE_PROCESS,
-  type AbbrevApiReferenceSection,
-} from '~/features/docs/Reference.utils'
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { parse } from 'yaml'
 
 import { type Json } from '../helpers.types'

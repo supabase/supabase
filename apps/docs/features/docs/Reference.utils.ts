@@ -1,3 +1,8 @@
+import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
+import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
+import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
+import { BASE_PATH } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -5,12 +10,6 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 import type { Metadata, ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
 import { visit } from 'unist-util-visit'
-
-import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
-import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
-import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
-import { BASE_PATH } from '~/lib/constants'
-import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 
@@ -271,4 +270,4 @@ export function normalizeMarkdown(markdownUnescaped: string): string {
   return content
 }
 
-export const SUPPORTS_NEW_REFERENCE_PROCESS = new Set(['javascript-v2'])
+export { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'
