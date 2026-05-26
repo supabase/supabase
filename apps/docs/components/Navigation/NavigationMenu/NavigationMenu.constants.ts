@@ -2496,6 +2496,7 @@ export const security: NavMenuConstant = {
         { name: 'Product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Platform Audit Logs', url: '/guides/security/platform-audit-logs' },
+        { name: 'Securing npm installs', url: '/guides/security/npm-security' },
       ],
     },
     {
