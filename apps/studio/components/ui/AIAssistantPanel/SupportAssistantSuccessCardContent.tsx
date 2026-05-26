@@ -153,11 +153,7 @@ function getAssistantMessageText(message: MessageType) {
   )
 }
 
-function SupportAssistantResponsePreview({
-  chat,
-}: {
-  chat: SupportAssistantPreviewChat
-}) {
+function SupportAssistantResponsePreview({ chat }: { chat: SupportAssistantPreviewChat }) {
   const messages = useChatMessages(chat)
 
   const latestAssistantMessage = [...messages]
