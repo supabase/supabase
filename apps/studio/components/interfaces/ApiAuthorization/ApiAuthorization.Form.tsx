@@ -200,15 +200,15 @@ function PublisherInfoDialog({
           <AlertDialogDescription asChild>
             <div className="space-y-3">
               <p>
-                Make sure you trust the source of{' '}
-                <span className="font-medium text-foreground">{name}</span>. After authorizing, it
-                will be able to access your organization&apos;s projects based on the selected
-                permissions.
+                <span className="font-mono text-[11px]">{domain}</span> is the publisher identity
+                for <span className="font-medium text-foreground">{name}</span>. Only continue if
+                you trust this source.
               </p>
               {redirectUrl && (
                 <p>
-                  Authorizing will redirect you to{' '}
-                  <span className="break-all font-medium text-foreground">{redirectUrl}</span>.
+                  After authorizing, you&apos;ll be redirected to{' '}
+                  <span className="break-all font-medium text-foreground">{redirectUrl}</span> to
+                  complete the connection.
                 </p>
               )}
             </div>
