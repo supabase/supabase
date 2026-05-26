@@ -34,7 +34,7 @@ export const StorageMenuV2 = () => {
   const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
 
   const showAnalytics = IS_PLATFORM && storageAnalytics
-  const showVectors = IS_PLATFORM && storageVectors
+  const showVectors = !IS_PLATFORM || storageVectors
 
   useShortcut(SHORTCUT_IDS.NAV_STORAGE_FILES, () => router.push(`/project/${ref}/storage/files`))
   useShortcut(
