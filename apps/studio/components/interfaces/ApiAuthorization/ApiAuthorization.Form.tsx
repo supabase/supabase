@@ -3,8 +3,6 @@ import { type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
-  Card,
-  CardContent,
   Form,
   FormControl,
   FormField,
@@ -163,19 +161,7 @@ function OrganizationsLoader(): ReactNode {
       <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
         Organization
       </p>
-      <div className="space-y-2">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <Card key={index} className="shadow-none">
-            <CardContent className="flex items-center gap-3 border-none px-4 py-3">
-              <ShimmeringLoader className="size-9 flex-shrink-0 rounded-lg py-0" />
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
-                <ShimmeringLoader className="h-4 w-28 py-0" />
-                <ShimmeringLoader className="h-3 w-20 py-0" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <ShimmeringLoader className="h-[34px] w-full rounded-md py-0" />
     </section>
   )
 }
