@@ -19,6 +19,9 @@ See per-service updates below for details.
 - [Upgrading from PG 15 to 17 (breaking change)](https://github.com/orgs/supabase/discussions/46080)
 - [Switching Studio from `supabase_admin` to `postgres` (breaking change)](https://github.com/orgs/supabase/discussions/46081)
 
+### API gateway
+⚠️ Restricted access to the PostgREST OpenAPI schema root (`/rest/v1/`) to admin keys (`service_role` / `sb_secret_*`). Non-admin callers now receive `403 Forbidden`. The Data API itself (`/rest/v1/<table>`, `/rest/v1/rpc/...`) is unchanged. See [discussion #42949](https://github.com/orgs/supabase/discussions/42949).
+
 ---
 
 ## [2026-04-27]
