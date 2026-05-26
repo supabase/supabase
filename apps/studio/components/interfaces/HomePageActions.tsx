@@ -3,8 +3,9 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Button, ToggleGroup, ToggleGroupItem } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -14,10 +15,13 @@ import {
   PROJECT_LIST_SORT_VALUES,
   type ProjectListSort,
 } from '@/components/interfaces/Home/ProjectList/ProjectListSort.utils'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface HomePageActionsProps {
   slug?: string
@@ -26,6 +30,7 @@ interface HomePageActionsProps {
 
 export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePageActionsProps) => {
   const { slug: urlSlug } = useParams()
+  const router = useRouter()
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const slug = _slug ?? urlSlug
@@ -57,6 +62,12 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
     { placeholderData: keepPreviousData }
   )
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(SHORTCUT_IDS.ORG_PROJECTS_SEARCH, () => {
+    searchInputRef.current?.focus()
+  })
+
   useEffect(() => {
     if (isSuccessFilterStatusStorage && !!slug) setFilterStatus(filterStatusStorage)
   }, [filterStatusStorage, isSuccessFilterStatusStorage, setFilterStatus, slug])
@@ -69,6 +80,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
     <div className="flex flex-wrap items-center justify-between gap-2 w-full">
       <div className="flex flex-col gap-2 min-w-0 flex-1 basis-full md:basis-auto sm:flex-row sm:flex-wrap sm:items-center">
         <Input
+          ref={searchInputRef}
           placeholder="Search for a project"
           icon={<Search />}
           size="tiny"
@@ -134,9 +146,17 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
         )}
 
         {projectCreationEnabled && !hideNewProject && (
-          <Button asChild icon={<Plus />} type="primary" size="tiny">
-            <Link href={`/new/${slug}`}>New project</Link>
-          </Button>
+          <Shortcut
+            id={SHORTCUT_IDS.ORG_PROJECTS_NEW}
+            onTrigger={() => {
+              if (slug) router.push(`/new/${slug}`)
+            }}
+            side="bottom"
+          >
+            <Button asChild icon={<Plus />} type="primary" size="tiny">
+              <Link href={`/new/${slug}`}>New project</Link>
+            </Button>
+          </Shortcut>
         )}
       </div>
     </div>

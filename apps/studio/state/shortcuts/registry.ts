@@ -25,6 +25,13 @@ import {
   OBSERVABILITY_PAGE_SHORTCUT_IDS,
   observabilityPageRegistry,
 } from './registry/observability-page'
+import { ORG_AUDIT_LOGS_SHORTCUT_IDS, orgAuditLogsRegistry } from './registry/org-audit-logs'
+import { ORG_INTEGRATIONS_SHORTCUT_IDS, orgIntegrationsRegistry } from './registry/org-integrations'
+import { ORG_OAUTH_APPS_SHORTCUT_IDS, orgOAuthAppsRegistry } from './registry/org-oauth-apps'
+import { ORG_PRIVATE_APPS_SHORTCUT_IDS, orgPrivateAppsRegistry } from './registry/org-private-apps'
+import { ORG_PROJECTS_SHORTCUT_IDS, orgProjectsRegistry } from './registry/org-projects'
+import { ORG_SETTINGS_NAV_SHORTCUT_IDS, orgSettingsNavRegistry } from './registry/org-settings-nav'
+import { ORG_TEAM_SHORTCUT_IDS, orgTeamRegistry } from './registry/org-team'
 import {
   PLATFORM_WEBHOOKS_SHORTCUT_IDS,
   platformWebhooksRegistry,
@@ -91,6 +98,21 @@ export const SHORTCUT_IDS = {
   NAV_ORG_SETTINGS: 'nav.org-settings',
   SHORTCUTS_OPEN_REFERENCE: 'shortcuts.open-reference',
   CONNECT_OPEN_SHEET: 'connect.open-sheet',
+
+  // Org settings sub-page navigation chords
+  ...ORG_SETTINGS_NAV_SHORTCUT_IDS,
+  // Org OAuth Apps page shortcuts
+  ...ORG_OAUTH_APPS_SHORTCUT_IDS,
+  // Org Team page shortcuts
+  ...ORG_TEAM_SHORTCUT_IDS,
+  // Org Integrations page shortcuts
+  ...ORG_INTEGRATIONS_SHORTCUT_IDS,
+  // Org Projects page shortcuts
+  ...ORG_PROJECTS_SHORTCUT_IDS,
+  // Org Private Apps page shortcuts
+  ...ORG_PRIVATE_APPS_SHORTCUT_IDS,
+  // Org Audit Logs page shortcuts
+  ...ORG_AUDIT_LOGS_SHORTCUT_IDS,
 
   // Table editor shortcuts
   ...TABLE_EDITOR_SHORTCUT_IDS,
@@ -404,7 +426,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   [SHORTCUT_IDS.NAV_ORG_SETTINGS]: {
     id: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     label: 'Go to Organization Settings',
-    sequence: ['G', 'O'],
+    sequence: ['G', ','],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   },
@@ -426,6 +448,21 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
     options: { ignoreInputs: true },
   },
+
+  // Org settings sub-page navigation chord registration
+  ...orgSettingsNavRegistry,
+  // Org OAuth Apps page shortcut registration
+  ...orgOAuthAppsRegistry,
+  // Org Team page shortcut registration
+  ...orgTeamRegistry,
+  // Org Integrations page shortcut registration
+  ...orgIntegrationsRegistry,
+  // Org Projects page shortcut registration
+  ...orgProjectsRegistry,
+  // Org Private Apps page shortcut registration
+  ...orgPrivateAppsRegistry,
+  // Org Audit Logs page shortcut registration
+  ...orgAuditLogsRegistry,
 
   // Table editor shortcut registration
   ...tableEditorRegistry,

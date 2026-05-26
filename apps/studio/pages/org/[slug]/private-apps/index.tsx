@@ -28,11 +28,19 @@ import {
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
 
 function PrivateAppsContent() {
   const { apps, isLoading } = usePrivateApps()
   const [showCreate, setShowCreate] = useState(false)
+
+  // covers the empty-state button, which isn't wrapped in <Shortcut>
+  useShortcut(SHORTCUT_IDS.ORG_PRIVATE_APPS_CREATE, () => setShowCreate(true), {
+    enabled: !isLoading && apps.length === 0 && !showCreate,
+  })
 
   return (
     <>
@@ -58,13 +66,20 @@ function PrivateAppsContent() {
             </PageSectionSummary>
             {!isLoading && apps.length > 0 && (
               <PageSectionAside>
-                <Button
-                  type="primary"
-                  icon={<Plus size={14} />}
-                  onClick={() => setShowCreate(true)}
+                <Shortcut
+                  id={SHORTCUT_IDS.ORG_PRIVATE_APPS_CREATE}
+                  onTrigger={() => setShowCreate(true)}
+                  side="bottom"
+                  tooltipOpen={showCreate ? false : undefined}
                 >
-                  Create app
-                </Button>
+                  <Button
+                    type="primary"
+                    icon={<Plus size={14} />}
+                    onClick={() => setShowCreate(true)}
+                  >
+                    Create app
+                  </Button>
+                </Shortcut>
               </PageSectionAside>
             )}
           </PageSectionMeta>
