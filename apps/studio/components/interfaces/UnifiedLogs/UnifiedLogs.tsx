@@ -390,7 +390,7 @@ export const UnifiedLogs = () => {
             isFilterBarOpen={isFilterBarOpen}
             setIsFilterBarOpen={setIsFilterBarOpen}
             dateRangeDisabled={{ after: new Date() }}
-            beforeFilters={<ConnectionLogsToggle />}
+            afterFilters={<ConnectionLogsToggle />}
           />
           <ResizableHandle withHandle />
           <ResizablePanel
