@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Clock } from 'lucide-react'
 import { useState } from 'react'
-import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import {
   PageHeader,
@@ -14,15 +14,13 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
-import {
-  EDGE_FUNCTION_CHART_INTERVALS,
-  formatShortFromNow,
-  getSegmentedButtonClassName,
-} from './EdgeFunctionOverview.utils'
+import { EDGE_FUNCTION_CHART_INTERVALS, formatShortFromNow } from './EdgeFunctionOverview.utils'
 import CopyButton from '@/components/ui/CopyButton'
+import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 dayjs.extend(relativeTime)
@@ -30,14 +28,19 @@ dayjs.extend(relativeTime)
 interface EdgeFunctionOverviewHeaderProps {
   interval: string
   onIntervalChange: (interval: string) => void
+  showIntervalDropdown?: boolean
+  onIntervalDropdownOpenChange?: (open: boolean) => void
 }
 
 export const EdgeFunctionOverviewHeader = ({
   interval,
   onIntervalChange,
+  showIntervalDropdown,
+  onIntervalDropdownOpenChange,
 }: EdgeFunctionOverviewHeaderProps) => {
   const { ref: projectRef, functionSlug } = useParams()
   const [isTimestampHoverCardOpen, setIsTimestampHoverCardOpen] = useState(false)
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const { data: selectedFunction } = useEdgeFunctionQuery({
     projectRef,
@@ -123,18 +126,16 @@ export const EdgeFunctionOverviewHeader = ({
           </PageHeaderDescription>
         </PageHeaderSummary>
         <PageHeaderAside className="flex-wrap @xl:self-center">
-          <div className="flex items-center">
-            {EDGE_FUNCTION_CHART_INTERVALS.map((item, index) => (
-              <Button
-                key={`function-filter-${item.key}`}
-                type={interval === item.key ? 'secondary' : 'default'}
-                onClick={() => onIntervalChange(item.key)}
-                className={getSegmentedButtonClassName(index, EDGE_FUNCTION_CHART_INTERVALS.length)}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </div>
+          <ChartIntervalDropdown
+            value={interval}
+            onChange={onIntervalChange}
+            intervals={EDGE_FUNCTION_CHART_INTERVALS}
+            organizationSlug={organization?.slug}
+            dropdownAlign="end"
+            tooltipSide="left"
+            open={showIntervalDropdown}
+            onOpenChange={onIntervalDropdownOpenChange}
+          />
         </PageHeaderAside>
       </PageHeaderMeta>
     </PageHeader>

@@ -39,6 +39,7 @@ export const EdgeFunctionOverview = () => {
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const [interval, setInterval] = useState<string>('15min')
+  const [showIntervalDropdown, setShowIntervalDropdown] = useState(false)
   const selectedInterval =
     EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === interval) ||
     EDGE_FUNCTION_CHART_INTERVALS[1]
@@ -153,6 +154,9 @@ export const EdgeFunctionOverview = () => {
 
   useEdgeFunctionOverviewShortcuts({
     onSetInterval: setInterval,
+    onToggleIntervalPicker: () => {
+      setShowIntervalDropdown((open) => !open)
+    },
     onRefresh: () => {
       combinedStatsResults.refetch()
     },
@@ -186,7 +190,12 @@ export const EdgeFunctionOverview = () => {
 
   return (
     <>
-      <EdgeFunctionOverviewHeader interval={interval} onIntervalChange={setInterval} />
+      <EdgeFunctionOverviewHeader
+        interval={interval}
+        onIntervalChange={setInterval}
+        showIntervalDropdown={showIntervalDropdown}
+        onIntervalDropdownOpenChange={setShowIntervalDropdown}
+      />
       <PageContainer size="default">
         <EdgeFunctionInvocationsSection
           selectedInterval={selectedInterval}
