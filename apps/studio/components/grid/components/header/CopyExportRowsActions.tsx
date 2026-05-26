@@ -101,10 +101,6 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
           align="start"
           className="w-40"
           onFocusOutside={(e) => {
-            // When rendered inside a popover with a focused DataGrid (the
-            // linked record peek), the grid grabs focus back as soon as the
-            // menu opens, which closes it. Suppress focus-driven dismissal;
-            // outside pointer-down still closes the menu normally.
             e.preventDefault()
           }}
         >
@@ -130,10 +126,6 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
           align="start"
           className="w-40"
           onFocusOutside={(e) => {
-            // When rendered inside a popover with a focused DataGrid (the
-            // linked record peek), the grid grabs focus back as soon as the
-            // menu opens, which closes it. Suppress focus-driven dismissal;
-            // outside pointer-down still closes the menu normally.
             e.preventDefault()
           }}
         >
