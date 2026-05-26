@@ -1,33 +1,35 @@
 import { cva } from 'class-variance-authority'
 import { ComponentProps, forwardRef, ReactNode } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, cn } from 'ui'
+
+export type AdmonitionType =
+  | 'note'
+  | 'tip'
+  | 'caution'
+  | 'danger'
+  | 'deprecation'
+  | 'default'
+  | 'destructive'
+  | 'success'
+  | 'warning'
 
 export interface AdmonitionProps {
-  type:
-    | 'note'
-    | 'tip'
-    | 'caution'
-    | 'danger'
-    | 'deprecation'
-    | 'default'
-    | 'destructive'
-    | 'warning'
-  label?: string
+  type?: AdmonitionType
   title?: string
-  description?: string | ReactNode
+  description?: ReactNode
+  children?: ReactNode
   showIcon?: boolean
   childProps?: {
-    title?: ComponentProps<typeof AlertTitle_Shadcn_>
-    description?: ComponentProps<typeof AlertDescription_Shadcn_>
+    title?: ComponentProps<typeof AlertTitle>
+    description?: ComponentProps<typeof AlertDescription>
   }
-  layout?: 'horizontal' | 'vertical'
+  layout?: 'horizontal' | 'vertical' | 'responsive'
   actions?: ReactNode
+  icon?: ReactNode
+  className?: string
 }
 
-const admonitionToAlertMapping: Record<
-  AdmonitionProps['type'],
-  'default' | 'destructive' | 'warning'
-> = {
+const admonitionToAlertMapping: Record<AdmonitionType, 'default' | 'destructive' | 'warning'> = {
   note: 'default',
   tip: 'default',
   caution: 'warning',
@@ -36,6 +38,7 @@ const admonitionToAlertMapping: Record<
   default: 'default',
   warning: 'warning',
   destructive: 'destructive',
+  success: 'default',
 }
 
 const InfoIcon = () => (
@@ -53,11 +56,26 @@ const InfoIcon = () => (
   </svg>
 )
 
-const WarningIcon = () => (
+const SuccessIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 21 20"
+    className="w-6 h-6"
+    fill="currentColor"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M10.5 19.5C5.25329 19.5 1 15.2467 1 10C1 4.75329 5.25329 0.5 10.5 0.5C15.7467 0.5 20 4.75329 20 10C20 15.2467 15.7467 19.5 10.5 19.5ZM14.7803 7.78033C15.0732 7.48744 15.0732 7.01256 14.7803 6.71967C14.4874 6.42678 14.0126 6.42678 13.7197 6.71967L9.25 11.1893L7.28033 9.21967C6.98744 8.92678 6.51256 8.92678 6.21967 9.21967C5.92678 9.51256 5.92678 9.98744 6.21967 10.2803L8.71967 12.7803C9.01256 13.0732 9.48744 13.0732 9.78033 12.7803L14.7803 7.78033Z"
+    />
+  </svg>
+)
+
+export const WarningIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 22 20"
-    className="w-6 h-6"
+    className={cn('w-6 h-6', className)}
     fill="currentColor"
   >
     <path
@@ -72,57 +90,61 @@ const admonitionSVG = cva('', {
   variants: {
     type: {
       default: `[&>svg]:bg-foreground-muted`,
+      success: `bg-brand-400/15 dark:bg-brand/10 border-brand-400 dark:border-brand-500 [&>svg]:text-white dark:[&>svg]:text-brand-link [&>svg]:bg-brand dark:[&>svg]:bg-brand-500/50`,
       warning: ``,
       destructive: ``,
     },
   },
 })
 
-const admonitionBase = cva('', {
-  variants: {
-    type: {
-      default: `bg-surface-200/25 border border-default`,
-      warning: `bg-alternative border border-default`,
-      destructive: `bg-alternative border border-default`,
-    },
-  },
-})
+const admonitionBodyClassName =
+  '[&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0 [&_p:only-child]:!mb-0 [&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5'
 
 export const Admonition = forwardRef<
-  React.ElementRef<typeof Alert_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof Alert_Shadcn_> & AdmonitionProps
+  React.ElementRef<typeof Alert>,
+  Omit<React.ComponentPropsWithoutRef<typeof Alert>, keyof AdmonitionProps | 'children'> &
+    AdmonitionProps
 >(
   (
     {
       type = 'note',
       variant,
       showIcon = true,
-      label,
       title,
       description,
       children,
       layout = 'vertical',
       actions,
       childProps = {},
+      icon,
       ...props
     },
     ref
   ) => {
     const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
+    const typeStyle = type === 'success' ? 'success' : typeMapped
+    const heading = title
 
     return (
-      <Alert_Shadcn_
+      <Alert
         ref={ref}
         variant={typeMapped}
         {...props}
         className={cn(
-          'mb-2',
-          admonitionSVG({ type: typeMapped }),
-          admonitionBase({ type: typeMapped }),
+          // Handle occasional background elements
+          'overflow-hidden',
+          // Container query context for responsive layout
+          layout === 'responsive' && '@container',
+          // SVG icon
+          admonitionSVG({ type: typeStyle }),
           props.className
         )}
       >
-        {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+        {!!icon ? (
+          icon
+        ) : showIcon && typeStyle === 'success' ? (
+          <SuccessIcon />
+        ) : showIcon && (typeMapped === 'warning' || typeMapped === 'destructive') ? (
           <WarningIcon />
         ) : showIcon ? (
           <InfoIcon />
@@ -130,44 +152,64 @@ export const Admonition = forwardRef<
         <div
           className={cn(
             'flex',
-            layout === 'vertical' ? 'flex-col' : 'flex-row items-center justify-between gap-x-6'
+            layout === 'vertical' && 'flex-col',
+            layout === 'horizontal' && 'flex-row items-center justify-between gap-x-6 lg:gap-x-8',
+            layout === 'responsive' &&
+              'flex-col @md:flex-row @md:items-center @md:justify-between @md:gap-x-6 @lg:gap-x-8'
           )}
         >
-          {label || title ? (
-            <div>
-              <AlertTitle_Shadcn_
+          <div>
+            {heading && (
+              <AlertTitle
                 {...childProps.title}
                 className={cn(
-                  'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
-                  !label && 'flex-col',
+                  'text mt-0.5 flex flex-col gap-3 text-sm',
                   childProps.title?.className
                 )}
               >
-                {label || title}
-              </AlertTitle_Shadcn_>
-              {description && (
-                <AlertDescription_Shadcn_ className={childProps.description?.className}>
-                  {description}
-                </AlertDescription_Shadcn_>
+                {heading}
+              </AlertTitle>
+            )}
+            {description && (
+              <AlertDescription
+                {...childProps.description}
+                className={cn(
+                  admonitionBodyClassName,
+                  !heading && 'my-0.5',
+                  childProps.description?.className
+                )}
+              >
+                {description}
+              </AlertDescription>
+            )}
+            {/* // children is to handle Docs and MDX issues with children and <p> elements */}
+            {children && (
+              <AlertDescription
+                {...childProps.description}
+                className={cn(
+                  admonitionBodyClassName,
+                  !heading && !description && 'my-0.5',
+                  childProps?.description?.className
+                )}
+              >
+                {children}
+              </AlertDescription>
+            )}
+          </div>
+          {actions && (
+            <div
+              className={cn(
+                'flex flex-row gap-3',
+                layout === 'vertical' && 'mt-3 items-start',
+                layout === 'horizontal' && 'items-center',
+                layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'
               )}
-              {/* // children is to handle Docs and MDX issues with children and <p> elements */}
-              {children && (
-                <AlertDescription_Shadcn_
-                  {...childProps.description}
-                  className={cn('[&_p]:mb-1.5 [&_p]:mt-0', childProps?.description?.className)}
-                >
-                  {children}
-                </AlertDescription_Shadcn_>
-              )}
-            </div>
-          ) : (
-            <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
-              {children}
+            >
+              {actions}
             </div>
           )}
-          {actions}
         </div>
-      </Alert_Shadcn_>
+      </Alert>
     )
   }
 )

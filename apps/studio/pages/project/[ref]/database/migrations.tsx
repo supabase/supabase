@@ -1,9 +1,3 @@
-import Migrations from 'components/interfaces/Database/Migrations/Migrations'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -15,6 +9,13 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
+import Migrations from '@/components/interfaces/Database/Migrations/Migrations'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
+
 const MigrationsPage: NextPageWithLayout = () => {
   return (
     <>
@@ -22,9 +23,7 @@ const MigrationsPage: NextPageWithLayout = () => {
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Migrations</PageHeaderTitle>
-            <PageHeaderDescription>
-              History of migrations that have been run on your database
-            </PageHeaderDescription>
+            <PageHeaderDescription>Track changes to your database over time</PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton

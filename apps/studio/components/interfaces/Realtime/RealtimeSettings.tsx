@@ -1,42 +1,43 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { ToggleSpendCapButton } from 'components/ui/ToggleSpendCapButton'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
-import {
-  REALTIME_DEFAULT_CONFIG,
-  useRealtimeConfigurationQuery,
-} from 'data/realtime/realtime-config-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import Link from 'next/link'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  FormMessage,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import AlertError from '@/components/ui/AlertError'
+import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useRealtimeConfigurationUpdateMutation } from '@/data/realtime/realtime-config-mutation'
+import {
+  REALTIME_DEFAULT_CONFIG,
+  useRealtimeConfigurationQuery,
+} from '@/data/realtime/realtime-config-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'realtime-configuration-form'
 
@@ -44,11 +45,10 @@ export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
-  const {
-    can: canUpdateConfig,
-    isLoading: isLoadingPermissions,
-    isSuccess: isPermissionsLoaded,
-  } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
+  const { can: canUpdateConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.REALTIME_ADMIN_READ,
+    '*'
+  )
 
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
@@ -56,7 +56,7 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data, error, isLoading, isError } = useRealtimeConfigurationQuery({
+  const { data, error, isError } = useRealtimeConfigurationQuery({
     projectRef,
   })
 
@@ -85,23 +85,43 @@ export const RealtimeSettings = () => {
       },
     })
 
-  const FormSchema = z.object({
-    connection_pool: z.coerce
-      .number()
-      .min(1)
-      .max(maxConn?.maxConnections ?? 100),
-    max_concurrent_users: z.coerce.number().min(1).max(50000),
-    max_events_per_second: z.coerce.number().min(1).max(10000),
-    max_presence_events_per_second: z.coerce.number().min(1).max(10000),
-    max_payload_size_in_kb: z.coerce.number().min(1).max(3000),
-    suspend: z.boolean(),
-    // [Joshen] These fields are temporarily hidden from the UI
-    // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
-    // max_channels_per_client: z.coerce.number().min(1).max(10000),
-    // max_joins_per_second: z.coerce.number().min(1).max(5000),
+  const FormSchema = z.discriminatedUnion('suspend', [
+    z.object({
+      suspend: z.literal(true),
+      connection_pool: z.coerce
+        .number()
+        .min(1)
+        .max(maxConn?.maxConnections ?? 100)
+        .optional(),
+      max_concurrent_users: z.coerce.number().min(1).max(50000).optional(),
+      max_events_per_second: z.coerce.number().min(1).max(10000).optional(),
+      max_presence_events_per_second: z.coerce.number().min(1).max(10000).optional(),
+      max_payload_size_in_kb: z.coerce.number().min(1).max(3000).optional(),
+      // [Joshen] These fields are temporarily hidden from the UI
+      // max_bytes_per_second: z.coerce.number().min(1).max(10000000).optional(),
+      // max_channels_per_client: z.coerce.number().min(1).max(10000).optional(),
+      // max_joins_per_second: z.coerce.number().min(1).max(5000).optional(),
 
-    allow_public: z.boolean(),
-  })
+      allow_public: z.boolean().optional(),
+    }),
+    z.object({
+      suspend: z.literal(false),
+      connection_pool: z.coerce
+        .number()
+        .min(1)
+        .max(maxConn?.maxConnections ?? 100),
+      max_concurrent_users: z.coerce.number().min(1).max(50000),
+      max_events_per_second: z.coerce.number().min(1).max(10000),
+      max_presence_events_per_second: z.coerce.number().min(1).max(10000),
+      max_payload_size_in_kb: z.coerce.number().min(1).max(3000),
+      // [Joshen] These fields are temporarily hidden from the UI
+      // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
+      // max_channels_per_client: z.coerce.number().min(1).max(10000),
+      // max_joins_per_second: z.coerce.number().min(1).max(5000),
+
+      allow_public: z.boolean(),
+    }),
+  ])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -120,469 +140,437 @@ export const RealtimeSettings = () => {
   const isDisablingRealtime = !isRealtimeDisabled && suspend
   const isEnablingRealtime = isRealtimeDisabled && !suspend
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (_data) => {
     if (!projectRef) return console.error('Project ref is required')
     setIsConfirmNextModalOpen(true)
   }
 
   const onConfirmSave = () => {
     if (!projectRef) return console.error('Project ref is required')
-    const data = form.getValues()
+    const values = form.getValues()
 
     // [Joshen] Casting to `Number` here as the values are being set as string when edited in the form
     // and returned in form.getValues() - I might be missing some easy util function from RHF though
     updateRealtimeConfig({
       ref: projectRef,
-      private_only: !data.allow_public,
-      connection_pool: Number(data.connection_pool),
-      max_concurrent_users: Number(data.max_concurrent_users),
-      max_events_per_second: Number(data.max_events_per_second),
-      max_presence_events_per_second: Number(data.max_presence_events_per_second),
-      max_payload_size_in_kb: Number(data.max_payload_size_in_kb),
-      suspend: data.suspend,
+      private_only: !values.allow_public,
+      connection_pool: Number(
+        values.connection_pool ?? data?.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool
+      ),
+      max_concurrent_users: Number(
+        values.max_concurrent_users ??
+          data?.max_concurrent_users ??
+          REALTIME_DEFAULT_CONFIG.max_concurrent_users
+      ),
+      max_events_per_second: Number(
+        values.max_events_per_second ??
+          data?.max_events_per_second ??
+          REALTIME_DEFAULT_CONFIG.max_events_per_second
+      ),
+      max_presence_events_per_second: Number(
+        values.max_presence_events_per_second ??
+          data?.max_presence_events_per_second ??
+          REALTIME_DEFAULT_CONFIG.max_presence_events_per_second
+      ),
+      max_payload_size_in_kb: Number(
+        values.max_payload_size_in_kb ??
+          data?.max_payload_size_in_kb ??
+          REALTIME_DEFAULT_CONFIG.max_payload_size_in_kb
+      ),
+      suspend: values.suspend,
     })
   }
 
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <Form_Shadcn_ {...form}>
-          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            {isError ? (
-              <AlertError error={error} subject="Failed to retrieve realtime settings" />
-            ) : (
-              <Card>
-                <CardContent>
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="suspend"
-                    render={({ field }) => (
-                      <FormSection
-                        className="!p-0 !pt-2"
-                        header={<FormSectionLabel>Enable Realtime service</FormSectionLabel>}
+      <Form {...form}>
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+          {isError ? (
+            <AlertError error={error} subject="Failed to retrieve realtime settings" />
+          ) : (
+            <Card>
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="suspend"
+                  render={({ field }) => (
+                    <>
+                      <FormItemLayout
+                        id="suspend"
+                        layout="flex-row-reverse"
+                        label="Enable Realtime service"
+                        description="If disabled, no clients will be able to connect and new connections will be rejected"
                       >
-                        <FormSectionContent
-                          loaders={1}
-                          loading={isLoading || isLoadingPermissions}
-                          className="!gap-y-2"
-                        >
+                        <FormControl>
+                          <Switch
+                            id="suspend"
+                            checked={!field.value}
+                            onCheckedChange={(checked) => field.onChange(!checked)}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                      <FormMessage />
+                    </>
+                  )}
+                />
+                {(isRealtimeDisabled || isDisablingRealtime || isEnablingRealtime) && (
+                  <Admonition
+                    showIcon={false}
+                    type={isDisablingRealtime || isEnablingRealtime ? 'warning' : 'default'}
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <div>
+                        <h5 className="text-foreground mb-1">
+                          {isDisablingRealtime
+                            ? 'Realtime service will be disabled'
+                            : isEnablingRealtime
+                              ? 'Realtime service will be re-enabled'
+                              : isRealtimeDisabled
+                                ? 'Realtime service is disabled'
+                                : null}
+                        </h5>
+                        <p className="text-foreground-light">
+                          {isDisablingRealtime
+                            ? 'Clients will no longer be able to connect to your project’s realtime service once saved'
+                            : isEnablingRealtime
+                              ? "Clients will be able to connect to your project's realtime service again once saved"
+                              : isRealtimeDisabled
+                                ? 'You will need to enable it to continue using Realtime'
+                                : null}
+                        </p>
+                      </div>
+                    </div>
+                  </Admonition>
+                )}
+              </CardContent>
+
+              {!suspend && (
+                <>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="allow_public"
+                      render={({ field }) => (
+                        <>
                           <FormItemLayout
-                            layout="flex"
-                            label="Enable Realtime service"
-                            description="If disabled, no clients will be able to connect and new connections will be rejected"
+                            id="allow_public"
+                            layout="flex-row-reverse"
+                            label="Allow public access to channels"
+                            description="If disabled, only private channels will be allowed"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
-                                checked={!field.value}
-                                onCheckedChange={(checked) => field.onChange(!checked)}
+                                id="allow_public"
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
                                 disabled={!canUpdateConfig}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
-                          <FormMessage_Shadcn_ />
-                          {(isRealtimeDisabled || isDisablingRealtime || isEnablingRealtime) && (
-                            <Admonition
-                              showIcon={false}
-                              type={
-                                isDisablingRealtime || isEnablingRealtime ? 'warning' : 'default'
-                              }
-                            >
-                              <div className="flex items-center gap-x-2">
-                                <div>
-                                  <h5 className="text-foreground mb-1">
-                                    {isDisablingRealtime
-                                      ? 'Realtime service will be disabled'
-                                      : isEnablingRealtime
-                                        ? 'Realtime service will be re-enabled'
-                                        : isRealtimeDisabled
-                                          ? 'Realtime service is disabled'
-                                          : null}
-                                  </h5>
-                                  <p className="text-foreground-light">
-                                    {isDisablingRealtime
-                                      ? 'Clients will no longer be able to connect to your project’s realtime service once saved'
-                                      : isEnablingRealtime
-                                        ? "Clients will be able to connect to your project's realtime service again once saved"
-                                        : isRealtimeDisabled
-                                          ? 'You will need to enable it to continue using Realtime'
-                                          : null}
-                                  </p>
-                                </div>
-                              </div>
-                            </Admonition>
-                          )}
-                        </FormSectionContent>
-                      </FormSection>
-                    )}
-                  />
-                </CardContent>
 
-                {!suspend && (
-                  <>
-                    <CardContent>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="allow_public"
-                        render={({ field }) => (
-                          <FormSection
-                            className="!p-0 !pt-2"
-                            header={<FormSectionLabel>Channel restrictions</FormSectionLabel>}
-                          >
-                            <FormSectionContent
-                              loaders={1}
-                              loading={isLoading || isLoadingPermissions}
-                              className="!gap-y-2"
-                            >
-                              <FormItemLayout
-                                layout="flex"
-                                label="Allow public access"
-                                description="If disabled, only private channels will be allowed"
-                              >
-                                <FormControl_Shadcn_>
-                                  <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    disabled={!canUpdateConfig}
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-
-                              {isSuccessPolicies &&
-                                !hasRealtimeMessagesPolicies &&
-                                !allow_public &&
-                                !isRealtimeDisabled && (
-                                  <Admonition
-                                    showIcon={false}
-                                    type="warning"
-                                    title="No Realtime RLS policies found"
-                                    description={
-                                      <>
-                                        <p className="prose max-w-full text-sm">
-                                          Private mode is {isSettingToPrivate ? 'being ' : ''}
-                                          enabled, but no RLS policies exists on the{' '}
-                                          <code className="text-xs">realtime.messages</code> table.
-                                          No messages will be received by users.
-                                        </p>
-
-                                        <Button asChild type="default" className="mt-2">
-                                          <Link href={`/project/${projectRef}/realtime/policies`}>
-                                            Create policy
-                                          </Link>
-                                        </Button>
-                                      </>
-                                    }
-                                  />
-                                )}
-                            </FormSectionContent>
-                          </FormSection>
-                        )}
-                      />
-                    </CardContent>
-                    <CardContent>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="connection_pool"
-                        render={({ field }) => (
-                          <FormSection
-                            className="!p-0 !py-2"
-                            header={
-                              <FormSectionLabel
+                          {isSuccessPolicies &&
+                            !hasRealtimeMessagesPolicies &&
+                            !allow_public &&
+                            !isRealtimeDisabled && (
+                              <Admonition
+                                showIcon={false}
+                                type="warning"
+                                title="No Realtime RLS policies found"
                                 description={
-                                  <p className="text-foreground-lighter text-sm !mt-1">
-                                    Realtime Authorization uses this database pool to check client
-                                    access
-                                  </p>
+                                  <>
+                                    <p className="prose max-w-full text-sm">
+                                      Private mode is {isSettingToPrivate ? 'being ' : ''}
+                                      enabled, but no RLS policies exists on the{' '}
+                                      <code className="text-code-inline">
+                                        realtime.messages
+                                      </code>{' '}
+                                      table. No messages will be received by users.
+                                    </p>
+
+                                    <Button asChild type="default" className="mt-2">
+                                      <Link href={`/project/${projectRef}/realtime/policies`}>
+                                        Create policy
+                                      </Link>
+                                    </Button>
+                                  </>
                                 }
-                              >
-                                Database connection pool size
-                              </FormSectionLabel>
-                            }
+                              />
+                            )}
+                        </>
+                      )}
+                    />
+                  </CardContent>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="connection_pool"
+                      render={({ field }) => (
+                        <>
+                          <FormItemLayout
+                            id="connection_pool"
+                            layout="flex-row-reverse"
+                            label="Database connection pool size"
+                            description="Realtime Authorization uses this database pool to check client access"
                           >
-                            <FormSectionContent
-                              loaders={1}
-                              loading={isLoading}
-                              className="!gap-y-2"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
+                            <FormControl>
+                              <InputGroup>
+                                <FormInputGroupInput
                                   {...field}
+                                  id="connection_pool"
                                   type="number"
                                   disabled={!canUpdateConfig}
                                   value={field.value || ''}
                                 />
-                              </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
-                              {!!maxConn && field.value > maxConn.maxConnections * 0.5 && (
-                                <Admonition
-                                  showIcon={false}
-                                  type="warning"
-                                  title={`Pool size is greater than 50% of the max connections (${maxConn.maxConnections}) on your database`}
-                                  description="This may result in instability and unreliability with your database connections."
-                                />
-                              )}
-                            </FormSectionContent>
-                          </FormSection>
-                        )}
-                      />
-                    </CardContent>
-                    <CardContent>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="max_concurrent_users"
-                        render={({ field }) => (
-                          <FormSection
-                            className="!p-0 !py-2"
-                            header={
-                              <FormSectionLabel
-                                description={
-                                  <p className="text-foreground-lighter text-sm !mt-1">
-                                    Sets maximum number of concurrent clients that can connect to
-                                    your Realtime service
-                                  </p>
-                                }
-                              >
-                                Max concurrent clients
-                              </FormSectionLabel>
-                            }
-                          >
-                            <FormSectionContent
-                              loaders={1}
-                              loading={isLoading}
-                              className="!gap-y-2"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  type="number"
-                                  disabled={!canUpdateConfig}
-                                  value={field.value || ''}
-                                />
-                              </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
-                            </FormSectionContent>
-                          </FormSection>
-                        )}
-                      />
-                    </CardContent>
-                    <CardContent>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="max_events_per_second"
-                        render={({ field }) => (
-                          <FormSection
-                            className="!p-0 !py-2"
-                            header={
-                              <FormSectionLabel
-                                description={
-                                  <p className="text-foreground-lighter text-sm !mt-1">
-                                    Sets maximum number of events per second that can be sent to
-                                    your Realtime service
-                                  </p>
-                                }
-                              >
-                                Max events per second
-                              </FormSectionLabel>
-                            }
-                          >
-                            <FormSectionContent
-                              loaders={1}
-                              loading={isLoading}
-                              className="!gap-y-2"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  type="number"
-                                  disabled={!isUsageBillingEnabled || !canUpdateConfig}
-                                  value={field.value || ''}
-                                />
-                              </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
-                              {isSuccessOrganization && !isUsageBillingEnabled && (
-                                <Admonition showIcon={false} type="default">
-                                  <div className="flex items-center gap-x-2">
-                                    <div>
-                                      <h5 className="text-foreground mb-1">
-                                        Spend cap needs to be disabled to configure this value
-                                      </h5>
-                                      <p className="text-foreground-light">
-                                        {isFreePlan
-                                          ? 'Upgrade to the Pro plan first to disable spend cap'
-                                          : 'You may adjust this setting in the organization billing settings'}
-                                      </p>
-                                    </div>
-                                    <div className="flex-grow flex items-center justify-end">
-                                      {isFreePlan ? (
-                                        <UpgradePlanButton source="realtimeSettings" plan="Pro" />
-                                      ) : (
-                                        <ToggleSpendCapButton />
-                                      )}
-                                    </div>
-                                  </div>
-                                </Admonition>
-                              )}
-                            </FormSectionContent>
-                          </FormSection>
-                        )}
-                      />
-                    </CardContent>
-                    <CardContent>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="max_presence_events_per_second"
-                        render={({ field }) => (
-                          <FormSection
-                            className="!p-0 !py-2"
-                            header={
-                              <FormSectionLabel
-                                description={
-                                  <p className="text-foreground-lighter text-sm !mt-1">
-                                    Sets maximum number of presence events per second that can be
-                                    sent to your Realtime service
-                                  </p>
-                                }
-                              >
-                                Max presence events per second
-                              </FormSectionLabel>
-                            }
-                          >
-                            <FormSectionContent
-                              loaders={1}
-                              loading={isLoading}
-                              className="!gap-y-2"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  type="number"
-                                  disabled={!isUsageBillingEnabled || !canUpdateConfig}
-                                  value={field.value || ''}
-                                />
-                              </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
-                              {isSuccessOrganization && !isUsageBillingEnabled && (
-                                <Admonition showIcon={false} type="default">
-                                  <div className="flex items-center gap-x-2">
-                                    <div>
-                                      <h5 className="text-foreground mb-1">
-                                        Spend cap needs to be disabled to configure this value
-                                      </h5>
-                                      <p className="text-foreground-light">
-                                        {isFreePlan
-                                          ? 'Upgrade to the Pro plan first to disable spend cap'
-                                          : 'You may adjust this setting in the organization billing settings'}
-                                      </p>
-                                    </div>
-                                    <div className="flex-grow flex items-center justify-end">
-                                      {isFreePlan ? (
-                                        <UpgradePlanButton source="realtimeSettings" plan="Pro" />
-                                      ) : (
-                                        <ToggleSpendCapButton />
-                                      )}
-                                    </div>
-                                  </div>
-                                </Admonition>
-                              )}
-                            </FormSectionContent>
-                          </FormSection>
-                        )}
-                      />
-                    </CardContent>
-                    <CardContent>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="max_payload_size_in_kb"
-                        render={({ field }) => (
-                          <FormSection
-                            className="!p-0 !py-2"
-                            header={
-                              <FormSectionLabel
-                                description={
-                                  <p className="text-foreground-lighter text-sm !mt-1">
-                                    Sets maximum number of payload size in KB that can be sent to
-                                    your Realtime service
-                                  </p>
-                                }
-                              >
-                                Max payload size in KB
-                              </FormSectionLabel>
-                            }
-                          >
-                            <FormSectionContent
-                              loaders={1}
-                              loading={isLoading}
-                              className="!gap-y-2"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  type="number"
-                                  disabled={!isUsageBillingEnabled || !canUpdateConfig}
-                                  value={field.value || ''}
-                                />
-                              </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
-                              {isSuccessOrganization && !isUsageBillingEnabled && (
-                                <Admonition showIcon={false} type="default">
-                                  <div className="flex items-center gap-x-2">
-                                    <div>
-                                      <h5 className="text-foreground mb-1">
-                                        Spend cap needs to be disabled to configure this value
-                                      </h5>
-                                      <p className="text-foreground-light">
-                                        {isFreePlan
-                                          ? 'Upgrade to the Pro plan first to disable spend cap'
-                                          : 'You may adjust this setting in the organization billing settings'}
-                                      </p>
-                                    </div>
-                                    <div className="flex-grow flex items-center justify-end">
-                                      {isFreePlan ? (
-                                        <UpgradePlanButton source="realtimeSettings" plan="Pro" />
-                                      ) : (
-                                        <ToggleSpendCapButton />
-                                      )}
-                                    </div>
-                                  </div>
-                                </Admonition>
-                              )}
-                            </FormSectionContent>
-                          </FormSection>
-                        )}
-                      />
-                    </CardContent>
-                  </>
-                )}
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl>
+                          </FormItemLayout>
+                          {!!maxConn &&
+                            field.value &&
+                            field.value > maxConn.maxConnections * 0.5 && (
+                              <Admonition
+                                showIcon={false}
+                                type="warning"
+                                title={`Pool size is greater than 50% of the max connections (${maxConn.maxConnections}) on your database`}
+                                description="This may result in instability and unreliability with your database connections."
+                              />
+                            )}
+                        </>
+                      )}
+                    />
+                  </CardContent>
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="max_concurrent_users"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          id="max_concurrent_users"
+                          layout="flex-row-reverse"
+                          label="Max concurrent clients"
+                          description="Sets maximum number of concurrent clients that can connect to your Realtime service"
+                        >
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                {...field}
+                                id="max_concurrent_users"
+                                type="number"
+                                disabled={!canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>clients</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </CardContent>
+                  <CardContent className="space-y-2">
+                    <FormField
+                      control={form.control}
+                      name="max_events_per_second"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          id="max_events_per_second"
+                          layout="flex-row-reverse"
+                          label="Max events per second"
+                          description="Sets maximum number of events per second that can be sent to your Realtime service"
+                        >
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                {...field}
+                                id="max_events_per_second"
+                                type="number"
+                                disabled={!isUsageBillingEnabled || !canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                    {isSuccessOrganization && !isUsageBillingEnabled && (
+                      <Admonition showIcon={false} type="default">
+                        <div className="flex items-center gap-x-2">
+                          <div>
+                            <h5 className="text-foreground mb-1">
+                              Spend cap needs to be disabled to configure this value
+                            </h5>
+                            <p className="text-foreground-light">
+                              {isFreePlan
+                                ? 'Upgrade to the Pro plan first to disable spend cap'
+                                : 'You may adjust this setting in the organization billing settings'}
+                            </p>
+                          </div>
+                          <div className="grow flex items-center justify-end">
+                            {isFreePlan ? (
+                              <UpgradePlanButton
+                                source="realtimeSettings"
+                                addon="spendCap"
+                                featureProposition="configure the max events per second parameter of realtime settings"
+                              />
+                            ) : (
+                              <ToggleSpendCapButton />
+                            )}
+                          </div>
+                        </div>
+                      </Admonition>
+                    )}
+                  </CardContent>
+                  <CardContent className="space-y-2">
+                    <FormField
+                      control={form.control}
+                      name="max_presence_events_per_second"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          id="max_presence_events_per_second"
+                          layout="flex-row-reverse"
+                          label="Max presence events per second"
+                          description="Sets maximum number of presence events per second that can be sent to your Realtime service"
+                        >
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                {...field}
+                                id="max_presence_events_per_second"
+                                type="number"
+                                disabled={!isUsageBillingEnabled || !canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                    {isSuccessOrganization && !isUsageBillingEnabled && (
+                      <Admonition showIcon={false} type="default">
+                        <div className="flex items-center gap-x-2">
+                          <div>
+                            <h5 className="text-foreground mb-1">
+                              Spend cap needs to be disabled to configure this value
+                            </h5>
+                            <p className="text-foreground-light">
+                              {isFreePlan
+                                ? 'Upgrade to the Pro plan first to disable spend cap'
+                                : 'You may adjust this setting in the organization billing settings'}
+                            </p>
+                          </div>
+                          <div className="grow flex items-center justify-end">
+                            {isFreePlan ? (
+                              <UpgradePlanButton
+                                source="realtimeSettings"
+                                addon="spendCap"
+                                featureProposition="configure the max presence events per second parameter of realtime settings"
+                              />
+                            ) : (
+                              <ToggleSpendCapButton />
+                            )}
+                          </div>
+                        </div>
+                      </Admonition>
+                    )}
+                  </CardContent>
+                  <CardContent className="space-y-2">
+                    <FormField
+                      control={form.control}
+                      name="max_payload_size_in_kb"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          id="max_payload_size_in_kb"
+                          layout="flex-row-reverse"
+                          label="Max payload size in KB"
+                          description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
+                        >
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                {...field}
+                                id="max_payload_size_in_kb"
+                                type="number"
+                                disabled={!isUsageBillingEnabled || !canUpdateConfig}
+                                value={field.value || ''}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>KB</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                    {isSuccessOrganization && !isUsageBillingEnabled && (
+                      <Admonition showIcon={false} type="default">
+                        <div className="flex items-center gap-x-2">
+                          <div>
+                            <h5 className="text-foreground mb-1">
+                              Spend cap needs to be disabled to configure this value
+                            </h5>
+                            <p className="text-foreground-light">
+                              {isFreePlan
+                                ? 'Upgrade to the Pro plan first to disable spend cap'
+                                : 'You may adjust this setting in the organization billing settings'}
+                            </p>
+                          </div>
+                          <div className="grow flex items-center justify-end">
+                            {isFreePlan ? (
+                              <UpgradePlanButton
+                                addon="spendCap"
+                                source="realtimeSettings"
+                                featureProposition="configure the max payload size parameter of realtime settings"
+                              />
+                            ) : (
+                              <ToggleSpendCapButton />
+                            )}
+                          </div>
+                        </div>
+                      </Admonition>
+                    )}
+                  </CardContent>
+                </>
+              )}
 
-                <CardFooter className="justify-between">
-                  <div>
-                    {isPermissionsLoaded && !canUpdateConfig && (
-                      <p className="text-sm text-foreground-light">
-                        You need additional permissions to update realtime settings
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-x-2">
-                    {form.formState.isDirty && (
-                      <Button type="default" onClick={() => form.reset(data as any)}>
-                        Cancel
-                      </Button>
-                    )}
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      form={formId}
-                      disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
-                      loading={isUpdatingConfig}
-                    >
-                      Save changes
+              <CardFooter className="justify-between">
+                <div>
+                  {isPermissionsLoaded && !canUpdateConfig && (
+                    <p className="text-sm text-foreground-light">
+                      You need additional permissions to update realtime settings
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-x-2">
+                  {form.formState.isDirty && (
+                    <Button type="default" onClick={() => form.reset(data as any)}>
+                      Cancel
                     </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            )}
-          </form>
-        </Form_Shadcn_>
-      </ScaffoldSection>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    form={formId}
+                    disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                    loading={isUpdatingConfig}
+                  >
+                    Save changes
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          )}
+        </form>
+      </Form>
 
       <ConfirmationModal
         visible={isConfirmNextModalOpen}

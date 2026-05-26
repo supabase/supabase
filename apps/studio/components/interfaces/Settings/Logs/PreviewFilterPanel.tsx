@@ -1,24 +1,37 @@
+import { useParams } from 'common'
 import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type RefObject } from 'react'
+import {
+  Button,
+  cn,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
-import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import {
   FILTER_OPTIONS,
   LOG_ROUTES_WITH_REPLICA_SUPPORT,
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from './Logs.constants'
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string
@@ -43,6 +56,7 @@ interface PreviewFilterPanelProps {
   className?: string
   selectedDatePickerValue: DatePickerValue
   setSelectedDatePickerValue: (value: DatePickerValue) => void
+  searchInputRef?: RefObject<HTMLInputElement | null>
 }
 
 /**
@@ -67,10 +81,16 @@ const PreviewFilterPanel = ({
   className,
   selectedDatePickerValue,
   setSelectedDatePickerValue,
+  searchInputRef,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const [search, setSearch] = useState('')
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_DATE_PICKER, () =>
+    setIsDatePickerOpen((prev) => !prev)
+  )
 
   const logName = router.pathname.split('/').pop()
 
@@ -94,7 +114,7 @@ const PreviewFilterPanel = ({
   return (
     <div
       className={cn(
-        'flex w-full items-center justify-between overflow-x-scroll no-scrollbar',
+        'flex w-full items-center justify-between overflow-x-scroll no-scrollbar h-[calc(var(--header-height)-1px)]',
         condensedLayout ? ' p-3' : '',
         className
       )}
@@ -108,78 +128,88 @@ const PreviewFilterPanel = ({
             handleInputSearch(search)
           }}
         >
-          <Input
-            className="w-60"
-            size="tiny"
-            placeholder="Search events"
-            onChange={(e) => setSearch(e.target.value)}
-            onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-              setSearch(e.target.value)
-              handleInputSearch(e.target.value)
-            }}
-            icon={
-              <div className="text-foreground-lighter">
-                <Search size={14} />
-              </div>
-            }
-            value={search}
-            actions={
-              <div className="flex items-center gap-x-1 mr-0.5">
+          <InputGroup className="w-60">
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH}
+              label="Search logs"
+              side="bottom"
+            >
+              <InputGroupInput
+                ref={searchInputRef}
+                size="tiny"
+                placeholder="Search events"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={onSearchInputEscape(search, (next) => {
+                  setSearch(next)
+                  handleInputSearch(next)
+                })}
+                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                  setSearch(e.target.value)
+                  handleInputSearch(e.target.value)
+                }}
+              />
+            </ShortcutTooltip>
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            <InputGroupAddon align="inline-end">
+              <div className="flex items-center gap-x-1">
                 {hasEdits && (
-                  <ButtonTooltip
-                    icon={<span>↲</span>}
-                    type="text"
-                    className="px-1 h-[20px]"
-                    onClick={() => handleInputSearch(search)}
-                    tooltip={{ content: { side: 'bottom', text: 'Search for events' } }}
-                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InputGroupButton type="text" onClick={() => handleInputSearch(search)}>
+                        <span>↲</span>
+                      </InputGroupButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Search for events</TooltipContent>
+                  </Tooltip>
                 )}
 
                 {search.length > 0 && (
-                  <ButtonTooltip
-                    icon={<X />}
-                    type="text"
-                    className="p-[1px] h-[20px]"
-                    onClick={() => handleInputSearch('')}
-                    tooltip={{ content: { side: 'bottom', text: 'Clear search' } }}
-                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InputGroupButton
+                        type="text"
+                        onClick={() => {
+                          setSearch('')
+                          handleInputSearch('')
+                        }}
+                      >
+                        <X />
+                      </InputGroupButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Clear search</TooltipContent>
+                  </Tooltip>
                 )}
               </div>
-            }
-          />
+            </InputGroupAddon>
+          </InputGroup>
         </form>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              title="refresh"
-              type="default"
-              className="px-1.5"
-              icon={
-                <div className="relative">
-                  {newCount > 0 && (
-                    <div className="absolute -top-3 right-3 flex items-center justify-center">
-                      <div className="absolute z-20">
-                        <p style={{ fontSize: '0.6rem' }} className="text-white">
-                          {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                        </p>
-                      </div>
-                      <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
-                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+        <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_REFRESH} side="bottom">
+          <Button
+            title="refresh"
+            type="default"
+            className="px-1.5"
+            icon={
+              <div className="relative">
+                {newCount > 0 && (
+                  <div className="absolute -top-3 -right-3 flex items-center justify-center">
+                    <div className="absolute h-4 w-4 animate-ping rounded-full bg-brand opacity-60"></div>
+                    <div className="relative z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-medium leading-none text-white">
+                      {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                     </div>
-                  )}
-                  <RefreshCw />
-                </div>
-              }
-              loading={isLoading}
-              disabled={isLoading}
-              onClick={onRefresh}
-            />
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="text-xs">
-            Refresh logs
-          </TooltipContent>
-        </Tooltip>
+                  </div>
+                )}
+                <RefreshCw />
+              </div>
+            }
+            loading={isLoading}
+            disabled={isLoading}
+            onClick={onRefresh}
+          />
+        </ShortcutTooltip>
 
         <LogsDatePicker
           helpers={PREVIEWER_DATEPICKER_HELPERS}
@@ -188,6 +218,8 @@ const PreviewFilterPanel = ({
             setSelectedDatePickerValue(vals)
           }}
           value={selectedDatePickerValue}
+          open={isDatePickerOpen}
+          onOpenChange={setIsDatePickerOpen}
         />
 
         {FILTER_OPTIONS[table] !== undefined && (
@@ -223,13 +255,15 @@ const PreviewFilterPanel = ({
           </div>
         )}
         <div className="flex items-center space-x-2">
-          <Button
-            type="default"
-            onClick={() => onToggleEventChart()}
-            icon={isShowingEventChart ? <Eye /> : <EyeOff />}
-          >
-            Chart
-          </Button>
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_CHART} side="bottom">
+            <Button
+              type="default"
+              onClick={() => onToggleEventChart()}
+              icon={isShowingEventChart ? <Eye /> : <EyeOff />}
+            >
+              Chart
+            </Button>
+          </ShortcutTooltip>
         </div>
         {Boolean(csvData) && (
           <DownloadResultsButton

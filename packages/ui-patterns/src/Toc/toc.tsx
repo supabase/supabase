@@ -1,11 +1,12 @@
 'use client'
 
-import type { TOCItemType } from './server/get-toc'
-import * as Primitive from './toc-primitive'
-import { type ComponentProps, Fragment, type HTMLAttributes, type ReactNode, useRef } from 'react'
-import { TocThumb } from './toc-thumb'
+import { Fragment, useRef, type ComponentProps, type HTMLAttributes, type ReactNode } from 'react'
 import { cn, ScrollArea, ScrollViewport } from 'ui'
 import { removeAnchor } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
+
+import type { TOCItemType } from './server/get-toc'
+import * as Primitive from './toc-primitive'
+import { TocThumb } from './toc-thumb'
 
 export interface TOCProps {
   /**
@@ -24,14 +25,14 @@ export function Toc(props: HTMLAttributes<HTMLDivElement>) {
     <div
       id="toc"
       {...props}
-      className={cn('sticky top-[--header-height] h-fit max-md:hidden', props.className)}
+      className={cn('sticky top-(--header-height) h-fit max-md:hidden', props.className)}
       style={
         {
           ...props.style,
         } as object
       }
     >
-      <div className="flex h-fit w-[--toc-width] max-w-full flex-col gap-3 pe-4">
+      <div className="flex h-fit w-(--toc-width) max-w-full flex-col gap-3 pe-4">
         {props.children}
       </div>
     </div>
@@ -73,7 +74,7 @@ export function TOCItems({
     <>
       <TocThumb
         containerRef={containerRef}
-        className="absolute start-0 mt-[--toc-top] h-[--toc-height] w-px bg-foreground transition-all"
+        className="absolute inset-s-0 mt-(--toc-top) h-(--toc-height) w-px bg-foreground transition-all"
       />
       <div
         ref={containerRef}
@@ -131,7 +132,7 @@ function TOCItem({ item }: { item: TOCItemType }) {
     <Primitive.TOCItem
       href={`#${formatSlug(item.url)}`}
       className={cn(
-        'text-foreground-lighter hover:text-brand-link transition-colors py-1 [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-foreground',
+        'text-foreground-lighter hover:text-brand-link transition-colors py-1 wrap-anywhere first:pt-0 last:pb-0 data-[active=true]:text-foreground',
         item.depth <= 2 && 'ps-3',
         item.depth === 3 && 'ps-6',
         item.depth >= 4 && 'ps-8'
@@ -139,11 +140,7 @@ function TOCItem({ item }: { item: TOCItemType }) {
     >
       {formatTOCHeader(removeAnchor(item.title)).map((x, index) => (
         <Fragment key={index}>
-          {x.type === 'code' ? (
-            <code className="text-xs border rounded bg-muted">{x.value}</code>
-          ) : (
-            x.value
-          )}
+          {x.type === 'code' ? <code className="text-code-inline">{x.value}</code> : x.value}
         </Fragment>
       ))}
     </Primitive.TOCItem>

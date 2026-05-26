@@ -1,35 +1,40 @@
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLinkIcon, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
+import { Button } from 'ui'
 
 import {
   NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
-} from 'components/interfaces/Reports/renderers/ApiRenderers'
+} from '@/components/interfaces/Reports/renderers/ApiRenderers'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
-} from 'components/interfaces/Reports/renderers/StorageRenderers'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+} from '@/components/interfaces/Reports/renderers/StorageRenderers'
+import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
+import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
 import {
   DatePickerValue,
   LogsDatePicker,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useStorageReport } from 'data/reports/storage-report-query'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+} from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useStorageReport } from '@/data/reports/storage-report-query'
+import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+import type { NextPageWithLayout } from '@/types'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -58,13 +63,28 @@ export const StorageReport: NextPageWithLayout = () => {
   const handleDatepickerChange = (vals: DatePickerValue) => {
     const promptShown = handleDatePickerChangeFromHook(vals)
     if (!promptShown) {
-      // Update query params for the report
       mergeParams({
-        iso_timestamp_start: vals.from || '',
-        iso_timestamp_end: vals.to || '',
+        iso_timestamp_start: vals.from ?? '',
+        iso_timestamp_end: vals.to ?? '',
       })
     }
   }
+
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatepickerChange,
+    refresh
+  )
+
+  const [showDatePicker, setShowDatePicker] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
+    enabled: !report.isLoading,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
 
   return (
     <ReportPadding>
@@ -73,18 +93,26 @@ export const StorageReport: NextPageWithLayout = () => {
         content={
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <ButtonTooltip
-                type="default"
-                disabled={report.isLoading}
-                icon={<RefreshCw className={report.isLoading ? 'animate-spin' : ''} />}
-                className="w-7"
-                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={() => report.refresh()}
-              />
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+                label="Refresh report"
+                side="bottom"
+              >
+                <Button
+                  type="default"
+                  disabled={report.isLoading}
+                  icon={<RefreshCw className={report.isLoading ? 'animate-spin' : ''} />}
+                  className="w-7"
+                  onClick={onRefreshReport}
+                />
+              </ShortcutTooltip>
               <LogsDatePicker
                 onSubmit={handleDatepickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
               />
               {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
@@ -180,13 +208,16 @@ export const StorageReport: NextPageWithLayout = () => {
           />
         </div>
       </ReportStickyNav>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </ReportPadding>
   )
 }
 
 StorageReport.getLayout = (page) => (
   <DefaultLayout>
-    <ObservabilityLayout>{page}</ObservabilityLayout>
+    <ObservabilityLayout title="Storage">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

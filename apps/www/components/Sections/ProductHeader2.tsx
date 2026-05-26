@@ -1,16 +1,17 @@
-import React from 'react'
-import { Button, cn } from 'ui'
-import Link from 'next/link'
-import ProductIcon from '../ProductIcon'
-import SectionContainer from '../Layouts/SectionContainer'
 import { CTA } from '~/types/common'
+import Link from 'next/link'
+import React, { Children, type ReactNode } from 'react'
+import { Button, cn } from 'ui'
+
+import SectionContainer from '../Layouts/SectionContainer'
+import ProductIcon from '../ProductIcon'
 
 // to do: move types to be global
 // then solutions.types.ts should extend this
 interface Props {
-  label?: string | React.ReactNode
-  h1: string | React.ReactNode
-  subheader?: string[] | React.ReactNode[]
+  label?: ReactNode
+  h1: ReactNode
+  subheader?: ReactNode
   icon?: string
   title?: string
   image?: React.ReactNode
@@ -28,7 +29,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
       props.className
     )}
   >
-    <SectionContainer className={cn('!py-0 grid grid-cols-12', props.sectionContainerClassName)}>
+    <SectionContainer className={cn('py-0! grid grid-cols-12', props.sectionContainerClassName)}>
       <div
         className={cn(
           'relative z-10 col-span-12 lg:col-span-5',
@@ -49,12 +50,12 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
             )}
           </div>
         )}
-        <h1 className="h1 text-3xl md:!text-4xl lg:!text-4xl 2xl:!text-6xl tracking-[-.15px]">
+        <h1 className="h1 text-3xl md:text-4xl! lg:text-4xl! 2xl:text-6xl! tracking-[-.15px]">
           {props.h1}
         </h1>
         {props.subheader && (
           <div className="">
-            {props.subheader.map((subheader, i) => {
+            {Children.map(props.subheader, (subheader, i) => {
               return (
                 <p className="p lg:text-lg max-w-lg lg:max-w-none" key={i}>
                   {subheader}

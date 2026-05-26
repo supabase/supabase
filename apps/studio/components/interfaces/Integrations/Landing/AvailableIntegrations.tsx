@@ -1,14 +1,15 @@
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-
-import AlertError from 'components/ui/AlertError'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { buttonVariants, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
+import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
+import AlertError from '@/components/ui/AlertError'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
 const CATEGORIES = [
@@ -29,14 +30,8 @@ export const AvailableIntegrations = () => {
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
 
-  const {
-    availableIntegrations: allIntegrations,
-    installedIntegrations,
-    error,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useInstalledIntegrations()
+  const { data: allIntegrations = [] } = useAvailableIntegrations()
+  const { installedIntegrations, error, isError, isLoading, isSuccess } = useInstalledIntegrations()
 
   const installedIds = installedIntegrations.map((i) => i.id)
 
@@ -74,7 +69,7 @@ export const AvailableIntegrations = () => {
                   type: selectedCategory === category.key ? 'default' : 'outline',
                 }),
                 selectedCategory === category.key ? 'text-foreground' : 'text-foreground-lighter',
-                '!rounded-full px-3'
+                'rounded-full! px-3'
               )}
             >
               {category.label}
@@ -94,7 +89,7 @@ export const AvailableIntegrations = () => {
               />
             }
             iconContainerClassName="p-0"
-            className="pl-7 rounded-none !border-0 border-transparent bg-transparent !shadow-none !ring-0 !ring-offset-0"
+            className="pl-7 rounded-none border-0! border-transparent bg-transparent shadow-none! ring-0! ring-offset-0!"
             placeholder="Search..."
           />
         </TabsList_Shadcn_>
@@ -102,9 +97,9 @@ export const AvailableIntegrations = () => {
       <div className="p-4 md:p-10 md:py-8 flex flex-col gap-y-5">
         <div className="grid xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-3">
           {isLoading &&
-            new Array(3)
-              .fill(0)
-              .map((_, idx) => <IntegrationLoadingCard key={`integration-loading-${idx}`} />)}
+            Array.from({ length: 3 }).map((_, idx) => (
+              <IntegrationLoadingCard key={`integration-loading-${idx}`} />
+            ))}
           {isError && (
             <AlertError
               className="xl:col-span-3 2xl:col-span-4"

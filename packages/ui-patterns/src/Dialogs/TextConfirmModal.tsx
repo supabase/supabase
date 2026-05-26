@@ -1,28 +1,34 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ReactNode, forwardRef, useEffect } from 'react'
+import { Check, Copy } from 'lucide-react'
+// Required to avoid issue:
+// The inferred type of ConfirmationModal cannot be named without a reference to DialogProps
+import { Dialog as _RadixDialog } from 'radix-ui'
+import { forwardRef, ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
+  cn,
+  copyToClipboard,
   Dialog,
   DialogContent,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  cn,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
 } from 'ui'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
+
 import { Admonition } from './../admonition'
 
 export interface TextConfirmModalProps {
@@ -37,18 +43,19 @@ export interface TextConfirmModalProps {
   text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
-  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
-    base?: React.ComponentProps<typeof Alert_Shadcn_>
+    base?: React.ComponentProps<typeof Alert>
     title?: string
     description?: string | ReactNode
   }
-  input?: React.ComponentProps<typeof Input_Shadcn_>
-  label?: React.ComponentProps<typeof FormLabel_Shadcn_>
-  formMessage?: React.ComponentProps<typeof FormMessage_Shadcn_>
-  description?: React.ComponentProps<typeof FormDescription_Shadcn_>
+  input?: React.ComponentProps<typeof Input>
+  label?: React.ComponentProps<typeof FormLabel>
+  formMessage?: React.ComponentProps<typeof FormMessage>
+  description?: React.ComponentProps<typeof FormDescription>
   blockDeleteButton?: boolean
   errorMessage?: string
+  enableCopy?: boolean
 }
 
 export const TextConfirmModal = forwardRef<
@@ -77,10 +84,13 @@ export const TextConfirmModal = forwardRef<
       blockDeleteButton = true,
       variant = 'default',
       errorMessage = 'Value entered does not match',
+      enableCopy = false,
       ...props
     },
     ref
   ) => {
+    const [showCopied, setShowCopied] = useState(false)
+
     const formSchema = z.object({
       confirmValue: z.preprocess(
         (val) => (typeof val === 'string' ? val.trim() : val),
@@ -102,7 +112,7 @@ export const TextConfirmModal = forwardRef<
     const isFormValid = form.formState.isValid
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    function onSubmit(_values: z.infer<typeof formSchema>) {
       // Do something with the form values.
       // ✅ This will be type-safe and validated.
       onConfirm()
@@ -111,6 +121,15 @@ export const TextConfirmModal = forwardRef<
     useEffect(() => {
       if (confirmString) form.reset()
     }, [confirmString])
+
+    useEffect(() => {
+      if (!showCopied) return
+      const timer = setTimeout(() => setShowCopied(false), 2000)
+      return () => clearTimeout(timer)
+    }, [showCopied])
+
+    const { title: _alertBaseTitle, children: _alertBaseChildren, ...alertBase } = alert?.base ?? {}
+    const alertTitleProps = alert?.title ? { label: alert.title } : {}
 
     return (
       <Dialog
@@ -122,17 +141,17 @@ export const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
+        <DialogContent ref={ref} className="p-0 gap-0 pb-5 block!" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle className="">{title}</DialogTitle>
           </DialogHeader>
           {alert && (
             <Admonition
               type={variant as 'default' | 'destructive' | 'warning'}
-              label={alert.title}
               description={alert.description}
-              className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5 mb-0"
-              {...alert?.base}
+              {...alertTitleProps}
+              className="border-x-0 rounded-none -mt-px"
+              {...alertBase}
             />
           )}
           {children && (
@@ -150,35 +169,51 @@ export const TextConfirmModal = forwardRef<
               <DialogSectionSeparator />
             </>
           )}
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               autoComplete="off"
               onSubmit={form.handleSubmit(onSubmit)}
               className="px-5 flex flex-col gap-y-3 pt-3"
             >
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="confirmValue"
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                    <FormLabel_Shadcn_ {...label} enableSelection>
+                  <FormItem className="flex flex-col gap-y-2">
+                    <FormLabel {...label} enableSelection={!enableCopy}>
                       Type{' '}
-                      <span className="text-foreground break-all whitespace-pre">
-                        {confirmString}
-                      </span>{' '}
+                      {enableCopy ? (
+                        <Button
+                          type="default"
+                          className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
+                          iconRight={
+                            showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
+                          }
+                          onClick={() => {
+                            setShowCopied(true)
+                            copyToClipboard(confirmString)
+                          }}
+                        >
+                          {confirmString}
+                        </Button>
+                      ) : (
+                        <span className="text-foreground break-all whitespace-pre">
+                          {confirmString}
+                        </span>
+                      )}{' '}
                       to confirm.
-                    </FormLabel_Shadcn_>
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    </FormLabel>
+                    <FormControl>
+                      <Input
                         autoComplete="off"
                         placeholder={confirmPlaceholder}
                         {...input}
                         {...field}
                       />
-                    </FormControl_Shadcn_>
-                    {!!description && <FormDescription_Shadcn_ {...description} />}
-                    <FormMessage_Shadcn_ {...formMessage} />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    {!!description && <FormDescription {...description} />}
+                    <FormMessage {...formMessage} />
+                  </FormItem>
                 )}
               />
               <div className="flex gap-2">
@@ -206,7 +241,7 @@ export const TextConfirmModal = forwardRef<
                 </Button>
               </div>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogContent>
       </Dialog>
     )

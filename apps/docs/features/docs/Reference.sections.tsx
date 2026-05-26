@@ -1,13 +1,5 @@
-import { Fragment } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
-
-import { isFeatureEnabled } from 'common'
 import ApiSchema from '~/components/ApiSchema'
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
-import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
-import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   getApiEndpointById,
   getCliSpec,
@@ -16,20 +8,34 @@ import {
   getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
-import { type IApiEndPoint } from './Reference.api.utils'
+import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
+import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
   ApiOperationRequestBodyDetails,
   ApiSchemaParamDetails,
   CollapsibleDetails,
   FnParameterDetails,
   RefSubLayout,
-  RequiredBadge,
   ReturnTypeDetails,
   StickyHeader,
 } from '~/features/docs/Reference.ui'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
+import { isFeatureEnabled } from 'common'
+import { Fragment } from 'react'
+import ReactMarkdown from 'react-markdown'
+import {
+  Badge,
+  cn,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
+
+import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
 import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 
@@ -165,13 +171,9 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader title={command.title} className="col-[1_/_-1]" monoFont={true} />
-      <div className="w-full min-w-0">
-        {command.description && (
-          <ReactMarkdown className="prose w-full break-words mb-8">
-            {command.description}
-          </ReactMarkdown>
-        )}
+      <StickyHeader title={command.title} className="col-span-full" monoFont={true} />
+      <div className="w-full min-w-0 prose wrap-break-word mb-8">
+        {command.description && <ReactMarkdown>{command.description}</ReactMarkdown>}
         {command.usage && (
           <div className="mb-8">
             <h3 className="mb-2 text-base text-foreground">Usage</h3>
@@ -211,12 +213,16 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     <span className="font-mono text-sm font-medium text-foreground">
                       {flag.name}
                     </span>
-                    <RequiredBadge isOptional={!flag.required} />
+                    {flag.required ? (
+                      <Badge variant="warning">Required</Badge>
+                    ) : (
+                      <Badge variant="default">Optional</Badge>
+                    )}
                   </div>
                   {flag.description && (
-                    <ReactMarkdown className="prose break-words text-sm">
-                      {flag.description}
-                    </ReactMarkdown>
+                    <div className="prose wrap-break-word text-sm">
+                      <ReactMarkdown>{flag.description}</ReactMarkdown>
+                    </div>
                   )}
                 </li>
               ))}
@@ -276,6 +282,10 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     : await getApiEndpointById(section.id)
   if (!endpointDetails) return null
 
+  const endpointFgaPermissionGroups =
+    endpointDetails.security
+      ?.filter((sec) => 'fga_permissions' in sec)
+      .map((sec) => sec.fga_permissions) ?? []
   const pathParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'path')
   const queryParameters = (endpointDetails.parameters ?? []).filter((param) => param.in === 'query')
   const bodyParameters =
@@ -304,19 +314,13 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           <>
             {endpointDetails.summary}
             {endpointDetails.deprecated && (
-              <span
-                className="
-                  uppercase
-                  whitespace-nowrap align-middle inline-block -translate-y-0.5
-                  border border-amber-700 bg-amber-300 text-amber-900
-                  rounded-full font-mono font-medium text-xs px-2 py-0.5 ml-2"
-              >
+              <Badge variant="warning" className="ml-2">
                 deprecated
-              </span>
+              </Badge>
             )}
           </>
         }
-        className="col-[1_/_-1]"
+        className="col-span-full"
       />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
@@ -338,9 +342,9 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           </code>
         </div>
         {endpointDetails.description && (
-          <ReactMarkdown className="prose break-words mb-8">
-            {endpointDetails.description}
-          </ReactMarkdown>
+          <div className="prose wrap-break-word mb-8">
+            <ReactMarkdown>{endpointDetails.description}</ReactMarkdown>
+          </div>
         )}
         {endpointDetails['x-oauth-scope'] && (
           <section>
@@ -351,6 +355,27 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
                   {endpointDetails['x-oauth-scope']}
                 </span>
               </li>
+            </ul>
+          </section>
+        )}
+        {endpointFgaPermissionGroups.length > 0 && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              The fine-grained token must include the following permissions to access this endpoint:
+            </h3>
+            <ul>
+              {endpointFgaPermissionGroups.map((group, groupIndex) => (
+                <Fragment key={groupIndex}>
+                  {groupIndex > 0 && (
+                    <li className="my-2 text-foreground-lighter text-sm italic">or</li>
+                  )}
+                  {group.map((perm, permIndex) => (
+                    <li key={permIndex} className="list-['-'] ml-2 pl-2">
+                      <span className="font-mono text-sm font-medium text-foreground">{perm}</span>
+                    </li>
+                  ))}
+                </Fragment>
+              ))}
             </ul>
           </section>
         )}
@@ -431,13 +456,14 @@ async function FunctionSection({
   const fn = fns?.find((fn) => fn.id === section.id)
   if (!fn) return null
 
-  let types: MethodTypes | undefined
+  let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
     types = await getTypeSpec(fn['$ref'] as string)
   }
 
   const fullDescription = [
     types?.comment?.shortText,
+    types?.comment?.text,
     'description' in fn && (fn.description as string),
     'notes' in fn && (fn.notes as string),
   ]
@@ -447,11 +473,11 @@ async function FunctionSection({
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader {...section} className="col-[1_/_-1]" />
+      <StickyHeader {...section} className="col-span-full" />
 
       {/* Display method signature below title */}
-      {types && formatMethodSignature(types) && (
-        <div className="col-[1_/_-1] -mt-2 mb-4">
+      {types && 'params' in types && formatMethodSignature(types) && (
+        <div className="col-span-full -mt-2 mb-4">
           <code className="text-sm text-foreground-muted font-mono">
             {formatMethodSignature(types)}
           </code>
@@ -459,7 +485,7 @@ async function FunctionSection({
       )}
 
       <div className="overflow-hidden flex flex-col gap-8">
-        <div className="prose break-words text-sm">
+        <div className="prose wrap-break-word text-sm">
           <MDXRemoteRefs source={fullDescription} />
         </div>
         <FnParameterDetails
@@ -471,12 +497,18 @@ async function FunctionSection({
                 }))
               : 'params' in fn
                 ? (fn.params as Array<object>).map((param) => ({ ...param, __overwritten: true }))
-                : types?.params
+                : types && 'params' in types
+                  ? types.params
+                  : undefined
           }
-          altParameters={types?.altSignatures?.map(({ params }) => params)}
+          altParameters={
+            types && 'altSignatures' in types
+              ? types.altSignatures?.map(({ params }) => params)
+              : undefined
+          }
           className="max-w-[80ch]"
         />
-        {!!types?.ret && <ReturnTypeDetails returnType={types.ret} />}
+        {types && 'ret' in types && !!types.ret && <ReturnTypeDetails returnType={types.ret} />}
       </div>
       <div className="overflow-auto">
         {(() => {
@@ -514,7 +546,6 @@ async function FunctionSection({
                 <TabsContent_Shadcn_ key={example.id} value={example.id}>
                   <MDXRemoteRefs source={example.code} />
                   <div className="flex flex-col gap-2 mt-2">
-                    {/* Only YAML examples have data/response/description fields */}
                     {'data' in example && !!example.data?.sql && (
                       <CollapsibleDetails title="Data source" content={example.data.sql} />
                     )}

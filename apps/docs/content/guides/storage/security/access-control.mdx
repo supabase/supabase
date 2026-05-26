@@ -16,6 +16,8 @@ By default Storage does not allow any uploads to buckets without RLS policies. Y
 
 You can find the documentation for the storage schema [here](/docs/guides/storage/schema/design) , and to simplify the process of crafting your policies, you can utilize these [helper functions](/docs/guides/storage/schema/helper-functions) .
 
+If you need different `SELECT` policies for different Storage actions, such as listing objects versus reading authenticated objects, use the operation-aware helpers `storage.allow_only_operation()` and `storage.allow_any_operation()` documented in [Storage Helper Functions](/docs/guides/storage/schema/helper-functions).
+
 <Admonition type="note">
 
 The RLS policies required for different operations are documented [here](/docs/reference/javascript/storage-createbucket)
@@ -70,7 +72,7 @@ for insert
 to authenticated
 with check (
   bucket_id = 'my_bucket_id' and
-  (storage.foldername(name))[1] = (select auth.uid()::text)
+  (storage.foldername(name))[1] = (select auth.jwt()->>'sub')
 );
 ```
 
@@ -80,7 +82,7 @@ Allow a user to access a file that was previously uploaded by the same user:
 create policy "Individual user Access"
 on storage.objects for select
 to authenticated
-using ( (select auth.uid()) = owner_id::uuid );
+using ( (select auth.jwt()->>'sub') = owner_id );
 ```
 
 ---

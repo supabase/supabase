@@ -1,7 +1,11 @@
+import { useParams } from 'common'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
+import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { useParams } from 'common'
+import { InviteMemberButton } from './InviteMemberButton'
+import MembersView from './MembersView'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
@@ -10,15 +14,11 @@ import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldTitle,
-} from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { DOCS_URL } from 'lib/constants'
-import { Admonition } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
-import { InviteMemberButton } from './InviteMemberButton'
-import MembersView from './MembersView'
+} from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const TeamSettings = () => {
   const { slug } = useParams()
@@ -33,14 +33,14 @@ export const TeamSettings = () => {
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection isFullWidth className="!py-8 gap-y-8">
+      <ScaffoldSection isFullWidth className="py-8! gap-y-8">
         <ScaffoldTitle>Team</ScaffoldTitle>
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
             <Input
               size="tiny"
               autoComplete="off"
-              icon={<Search size={12} />}
+              icon={<Search />}
               value={searchString}
               onChange={(e: any) => setSearchString(e.target.value)}
               name="email"
@@ -56,7 +56,6 @@ export const TeamSettings = () => {
           {hasProjectScopedRoles && totalCount > threshold && (
             <Admonition
               type="warning"
-              className="mb-0"
               title="This page may not render properly due to the number of projects your account has access to"
               description="We're actively looking into optimizing this page and will make things available as soon as we can!"
             />

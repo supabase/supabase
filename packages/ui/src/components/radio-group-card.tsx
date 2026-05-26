@@ -1,7 +1,7 @@
 'use client'
 
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
 import { Circle } from 'lucide-react'
+import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../lib/utils/cn'
@@ -16,7 +16,7 @@ RadioGroupCard.displayName = RadioGroupPrimitive.Root.displayName
 
 interface RadioGroupCardItemProps {
   image?: React.ReactNode
-  label: string | React.ReactNode
+  label: React.ReactNode
   showIndicator?: boolean
 }
 
@@ -37,10 +37,10 @@ const RadioGroupCardItem = React.forwardRef<
         'p-2',
         // 'hover:bg-selection',
         'hover:border-foreground-muted',
-        'hover:z-[1] focus-visible:z-[1]',
-        'data-[state=checked]:z-[1]',
+        'hover:z-1 focus-visible:z-1',
+        'data-[state=checked]:z-1',
         'data-[state=checked]:ring-2 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-surface-200 dark:data-[state=checked]:bg-surface-300',
+        'data-[state=checked]:bg-surface-300 dark:data-[state=checked]:bg-surface-300',
         'data-[state=checked]:border-foreground/50',
         'transition-colors',
         'group',
@@ -52,13 +52,13 @@ const RadioGroupCardItem = React.forwardRef<
         {showIndicator && (
           <div
             className="
-                aspect-square h-4 w-4 
+                aspect-square h-4 w-4
                 rounded-full border group-data-[state=checked]:border-foreground-muted
                 group-focus:border-foreground-muted
                 group-hover:border-foreground-muted
-                ring-offset-background 
-                group-focus:outline-none 
-                group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 
+                ring-offset-background
+                group-focus:outline-hidden
+                group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2
                 group-disabled:cursor-not-allowed group-disabled:opacity-50
                 flex items-center justify-center
                 transition

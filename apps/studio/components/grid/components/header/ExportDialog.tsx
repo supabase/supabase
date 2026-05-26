@@ -1,17 +1,8 @@
-import { useState } from 'react'
-
 import { useParams } from 'common'
-import { Filter, Sort, SupaTable } from 'components/grid/types'
-import { getConnectionStrings } from 'components/interfaces/Connect/DatabaseSettings.utils'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { getAllTableRowsSql } from 'data/table-rows/table-rows-query'
-import { pluckObjectFields } from 'lib/helpers'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { useState } from 'react'
 import {
   Button,
   cn,
-  CodeBlock,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -25,6 +16,15 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
+import { Filter, Sort, SupaTable } from '@/components/grid/types'
+import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { getAllTableRowsSql } from '@/data/table-rows/table-rows-query'
+import { pluckObjectFields } from '@/lib/helpers'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface ExportDialogProps {
   table?: SupaTable
@@ -66,14 +66,16 @@ export const ExportDialog = ({
 
   const outputName = `${table?.name}_rows`
   const queryChains = !table ? undefined : getAllTableRowsSql({ table, sorts, filters })
-  const query = !!queryChains
+  const queryWithSemicolon = !!queryChains
     ? ignoreRoleImpersonation
-      ? queryChains.toSql()
+      ? queryChains.sql.toSql()
       : wrapWithRoleImpersonation(
-          queryChains.toSql(),
+          queryChains.sql.toSql(),
           roleImpersonationState as RoleImpersonationState
         )
     : ''
+
+  const query = queryWithSemicolon.replace(/;\s*$/, '')
 
   const csvExportCommand = `
 ${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()

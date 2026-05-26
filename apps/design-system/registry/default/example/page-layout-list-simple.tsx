@@ -1,14 +1,10 @@
-import { PageContainer } from 'ui-patterns/PageContainer'
+import Link from 'next/link'
 import {
-  PageHeader,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-  PageHeaderDescription,
-  PageHeaderAside,
-} from 'ui-patterns/PageHeader'
-import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
-import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   DropdownMenu,
@@ -23,6 +19,17 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 export default function PageLayoutListSimple() {
   const items = [
@@ -33,7 +40,21 @@ export default function PageLayoutListSimple() {
 
   return (
     <div className="w-full">
-      <PageHeader size="large">
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/org/demo">Organization</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Projects</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Projects</PageHeaderTitle>
@@ -49,7 +70,7 @@ export default function PageLayoutListSimple() {
         </PageHeaderMeta>
       </PageHeader>
 
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <Card>

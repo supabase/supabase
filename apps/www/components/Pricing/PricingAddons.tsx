@@ -1,8 +1,9 @@
+'use client'
+
 import { ArrowUpRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { FC } from 'react'
 import { Button, cn } from 'ui'
 import CostControlAnimation from './CostControlAnimation'
@@ -63,8 +64,8 @@ const PricingAddons: FC = () => {
 }
 
 const AddonCard = ({ addon }: any) => {
-  const { basePath } = useRouter()
   const { resolvedTheme } = useTheme()
+  const basePath = '' // basePath is empty string in next.config.mjs
 
   const isHighlightCard = addon.id === 'addon-cost-control'
 
@@ -77,7 +78,7 @@ const AddonCard = ({ addon }: any) => {
 
   const HighlightCard = () => (
     <>
-      <div className="relative order-last lg:order-first w-full max-w-full lg:w-auto lg:h-full aspect-[2/1] lg:aspect-[3/2] p-4 pt-0 lg:pt-4 lg:pr-0">
+      <div className="relative order-last lg:order-first w-full max-w-full lg:w-auto lg:h-full aspect-2/1 lg:aspect-3/2 p-4 pt-0 lg:pt-4 lg:pr-0">
         {addon.heroImg}
       </div>
 

@@ -1,20 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { ActionCard } from 'components/layouts/Tabs/ActionCard'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { cn, SQL_ICON } from 'ui'
+
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
+import { SQL_TEMPLATES } from '@/components/interfaces/SQLEditor/SQLEditor.queries'
+import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 const SQLTemplates = () => {
   const router = useRouter()
@@ -48,7 +47,6 @@ const SQLTemplates = () => {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,
@@ -67,12 +65,8 @@ const SQLTemplates = () => {
     <div className="block h-full space-y-8 overflow-y-auto p-6 px-10 bg-dash-sidebar dark:bg-surface-100">
       <div>
         <div className="mb-6">
-          <h2 className="mb-1">Scripts</h2>
-          <p className="text-foreground-light text-sm">Quick scripts to run on your database.</p>
-          <p className="text-foreground-light text-sm">
-            Click on any script to fill the query box, modify the script, then click
-            <span className="text-code">Run</span>.
-          </p>
+          <h2 className="mb-1">Templates</h2>
+          <p className="text-foreground-light text-sm">Reusable SQL snippets for common tasks</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 ">
           {sql.map((x, i) => (

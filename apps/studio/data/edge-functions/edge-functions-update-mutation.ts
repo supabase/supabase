@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
+import { handleError, patch } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
 export type EdgeFunctionsUpdateVariables = {
   projectRef: string
   slug: string

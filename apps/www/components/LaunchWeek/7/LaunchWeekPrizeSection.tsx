@@ -15,16 +15,16 @@ export default function LaunchWeekPrizeSection({
 
   return (
     <div id="lw-7-prizes" className={['scroll-mt-[75px]', className].join(' ')}>
-      <div className="!max-w-[100vw]">
+      <div className="max-w-[100vw]!">
         <div className="text-center relative z-10 text-white">
           <motion.div
-            className="max-w-[38rem] mx-auto flex flex-col items-center gap-4 px-4"
+            className="max-w-152 mx-auto flex flex-col items-center gap-4 px-4"
             initial={{ y: -20, opacity: 0 }}
             whileInView={finalAnimationState}
             viewport={{ once: true, margin: '-150px' }}
             transition={{ type: 'spring', bounce: 0, delay: 0.2 }}
           >
-            <div className="w-[40px] h-[40px] rounded-sm bg-[#32313F] flex items-center justify-center">
+            <div className="w-[40px] h-[40px] rounded-xs bg-[#32313F] flex items-center justify-center">
               <svg
                 width="21"
                 height="22"

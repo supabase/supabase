@@ -1,5 +1,9 @@
 'use client'
 
+import { useDebounce } from '~/hooks/useDebounce'
+import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
+import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -8,23 +12,23 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { McpConfigPanel as McpConfigPanelBase, type McpClient } from 'ui-patterns/McpUrlBuilder'
+import {
+  createMcpCopyHandler,
+  McpConfigPanel as McpConfigPanelBase,
+  type McpClient,
+} from 'ui-patterns/McpUrlBuilder'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { useDebounce } from '~/hooks/useDebounce'
-import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
-import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -86,7 +90,7 @@ function ProjectSelector({
   }, [isLoading, isFetching, isFetchingNextPage, hasNextPage, entry?.isIntersecting, fetchNextPage])
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={open}
       onOpenChange={(open) => {
@@ -106,7 +110,7 @@ function ProjectSelector({
             </Link>
           </Button>
         ) : (
-          <PopoverTrigger_Shadcn_ asChild disabled={isUserLoading || isLoading || isError}>
+          <PopoverTrigger asChild disabled={isUserLoading || isLoading || isError}>
             <Button
               size="small"
               type="default"
@@ -127,12 +131,12 @@ function ProjectSelector({
                       : 'Select a project')}
               </div>
             </Button>
-          </PopoverTrigger_Shadcn_>
+          </PopoverTrigger>
         )}
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 w-56" side="bottom" align="start">
-        <Command_Shadcn_ shouldFilter={false}>
-          <CommandInput_Shadcn_
+      <PopoverContent className="mt-0 p-0 w-56" side="bottom" align="start">
+        <Command shouldFilter={false}>
+          <CommandInput
             placeholder="Search ..."
             className="h-8"
             showResetIcon
@@ -140,8 +144,8 @@ function ProjectSelector({
             onValueChange={setSearch}
             handleReset={() => setSearch('')}
           />
-          <CommandList_Shadcn_>
-            <CommandGroup_Shadcn_>
+          <CommandList>
+            <CommandGroup>
               {isLoading ? (
                 <div className="px-2 py-1 flex flex-col gap-2">
                   <ShimmeringLoader className="w-full" />
@@ -156,7 +160,7 @@ function ProjectSelector({
                   )}
                   <ScrollArea className={projects.length > 7 ? 'h-[210px]' : ''}>
                     {projects?.map((project) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={project.ref}
                         value={project.ref}
                         onSelect={() => {
@@ -174,18 +178,18 @@ function ProjectSelector({
                             project.ref === selectedProject?.ref ? 'opacity-100' : 'opacity-0'
                           )}
                         />
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
                     <div ref={sentinelRef} className="h-1 -mt-1" />
                     {hasNextPage && <ShimmeringLoader className="px-2 py-3" />}
                   </ScrollArea>
                 </>
               )}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -201,13 +205,13 @@ function PlatformSelector({
   const [open, setOpen] = useState(false)
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
       <div className={cn('flex', className)}>
         <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
           Platform
         </span>
 
-        <PopoverTrigger_Shadcn_ asChild>
+        <PopoverTrigger asChild>
           <Button
             size="small"
             type="default"
@@ -223,14 +227,14 @@ function PlatformSelector({
               {PLATFORMS.find((p) => p.value === selectedPlatform)?.label}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
+        </PopoverTrigger>
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
-        <Command_Shadcn_>
-          <CommandList_Shadcn_>
-            <CommandGroup_Shadcn_>
+      <PopoverContent className="mt-0 p-0 max-w-48" side="bottom" align="start">
+        <Command>
+          <CommandList>
+            <CommandGroup>
               {PLATFORMS.map((platform) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={platform.value}
                   value={platform.value}
                   onSelect={() => {
@@ -248,13 +252,13 @@ function PlatformSelector({
                       platform.value === selectedPlatform ? 'opacity-100' : 'opacity-0'
                     )}
                   />
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -262,40 +266,28 @@ export function McpConfigPanel() {
   const [selectedProject, setSelectedProject] = useState<{ ref: string; name: string } | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState<'hosted' | 'local'>('hosted')
   const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   const isPlatform = selectedPlatform === 'hosted'
   const project = isPlatform ? selectedProject : null
 
-  const handleCopy = (type?: 'url' | 'json' | 'command') => {
-    let connectionType: string
-    switch (type) {
-      case 'command':
-        connectionType = 'Command Line'
-        break
-      case 'json':
-        connectionType = 'JSON'
-        break
-      case 'url':
-      default:
-        connectionType = 'MCP URL'
-        break
-    }
-
-    sendTelemetryEvent({
-      action: 'connection_string_copied',
-      properties: {
-        connectionTab: 'MCP',
-        selectedItem: selectedClient?.label,
-        connectionType,
+  const handleCopy = useMemo(
+    () =>
+      createMcpCopyHandler({
+        selectedClient,
         source: 'docs',
-      },
-      groups: {
-        ...(project?.ref && { project: project.ref }),
-      } as any,
-    })
-  }
+        onTrack: (event) => {
+          sendTelemetryEvent({
+            action: event.action,
+            properties: event.properties,
+            groups: (event.groups || {}) as any,
+          })
+        },
+        projectRef: project?.ref,
+      }),
+    [selectedClient, sendTelemetryEvent, project?.ref]
+  )
 
   const handleInstall = () => {
     if (selectedClient?.label) {
@@ -330,10 +322,9 @@ export function McpConfigPanel() {
             : 'Project selection is only available for the hosted platform.'}
         </p>
         <McpConfigPanelBase
-          basePath="/docs"
           className="mt-6"
           projectRef={project?.ref}
-          theme={theme as 'light' | 'dark'}
+          theme={resolvedTheme as 'light' | 'dark'}
           isPlatform={isPlatform}
           onCopyCallback={handleCopy}
           onInstallCallback={handleInstall}

@@ -1,27 +1,30 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Button } from 'ui'
 
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
+import { SharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
+import { useSharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import {
   DatePickerValue,
   LogsDatePicker,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
-import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
-import type { NextPageWithLayout } from 'types'
+} from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+import type { NextPageWithLayout } from '@/types'
 
 const PostgRESTReport: NextPageWithLayout = () => {
   return (
@@ -69,6 +72,7 @@ const PostgrestReport = () => {
   })
 
   const state = useDatabaseSelectorStateSnapshot()
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
   const hasStateSyncedFromUrlRef = useRef(false)
   useEffect(() => {
@@ -95,25 +99,47 @@ const PostgrestReport = () => {
     handleDatePickerChangeFromHook(values)
   }
 
+  const onRefreshReport = useRefreshHandler(
+    datePickerValue,
+    datePickerHelpers,
+    handleDatePickerChange,
+    refetch
+  )
+
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
+    enabled: !isRefetching,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
+
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="PostgREST" />
+      <ReportHeader showDatabaseSelector={false} title="Data API" />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
-              <ButtonTooltip
-                type="default"
-                disabled={isRefetching}
-                icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
-                className="w-7"
-                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={() => refetch()}
-              />
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+                label="Refresh report"
+                side="bottom"
+              >
+                <Button
+                  type="default"
+                  disabled={isRefetching}
+                  icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                  className="w-7"
+                  onClick={onRefreshReport}
+                />
+              </ShortcutTooltip>
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
               />
               <UpgradePrompt
                 show={showUpgradePrompt}
@@ -159,6 +185,9 @@ const PostgrestReport = () => {
           />
         </div>
       </ReportStickyNav>
+      <div className="py-8">
+        <ObservabilityLink />
+      </div>
     </>
   )
 }

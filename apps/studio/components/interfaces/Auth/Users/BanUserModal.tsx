@@ -1,28 +1,28 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
-import { User } from 'data/auth/users-infinite-query'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { useUserUpdateMutation } from '@/data/auth/user-update-mutation'
+import { User } from '@/data/auth/users-infinite-query'
 
 interface BanUserModalProps {
   visible: boolean
@@ -87,45 +87,43 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
       header="Confirm to ban user"
       onCancel={() => onClose()}
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-3">
             <p className="text-sm">
               This will revoke the user's access to your project and prevent them from logging in
               for a specified duration.
             </p>
-            <div className="flex items-start gap-x-2 [&>div:first-child]:flex-grow">
-              <FormField_Shadcn_
+            <div className="flex items-start gap-x-2 [&>div:first-child]:grow">
+              <FormField
                 control={form.control}
                 name="value"
                 render={({ field }) => (
                   <FormItemLayout className="[&>div>div]:mt-0" label="Set a ban duration">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="unit"
                 render={({ field }) => (
                   <FormItemLayout className="[&>div>div]:mt-0 mt-[33px]">
-                    <FormControl_Shadcn_>
-                      <Select_Shadcn_
+                    <FormControl>
+                      <Select
                         {...field}
                         value={field.value}
                         onValueChange={(value) => form.setValue('unit', value as 'hours' | 'days')}
                       >
-                        <SelectTrigger_Shadcn_ className="capitalize w-24">
-                          {field.value}
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectItem_Shadcn_ value="hours">Hours</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="days">Days</SelectItem_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                        <SelectTrigger className="capitalize w-24">{field.value}</SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="hours">Hours</SelectItem>
+                          <SelectItem value="days">Days</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -150,7 +148,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
             </Button>
           </Modal.Content>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </Modal>
   )
 }

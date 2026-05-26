@@ -1,22 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
+import { useParams } from 'common'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-
-import { useParams } from 'common'
-import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -26,23 +12,31 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormMessage,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
+import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const FormSchema = z
   .object({
@@ -85,29 +79,16 @@ const formId = 'create-storage-bucket-form'
 export type CreateBucketForm = z.infer<typeof FormSchema>
 
 interface CreateBucketModalProps {
-  buttonSize?: 'tiny' | 'small'
-  buttonType?: 'default' | 'primary'
-  buttonClassName?: string
-  label?: string
+  open: boolean
+  onOpenChange: (value: boolean) => void
 }
 
-export const CreateBucketModal = ({
-  buttonSize = 'tiny',
-  buttonType = 'default',
-  buttonClassName,
-  label = 'New bucket',
-}: CreateBucketModalProps) => {
+export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const [visible, setVisible] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
-
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
@@ -172,7 +153,7 @@ export const CreateBucketModal = ({
       toast.success(`Successfully created bucket ${values.name}`)
       form.reset()
       setSelectedUnit(StorageSizeUnits.MB)
-      setVisible(false)
+      onOpenChange(false)
     } catch (error: any) {
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''
@@ -196,42 +177,18 @@ export const CreateBucketModal = ({
   const handleClose = () => {
     form.reset()
     setSelectedUnit(StorageSizeUnits.MB)
-    setVisible(false)
+    onOpenChange(false)
   }
 
   return (
     <Dialog
-      open={visible}
+      open={open}
       onOpenChange={(open) => {
         if (!open) {
           handleClose()
         }
       }}
     >
-      <DialogTrigger asChild>
-        <ButtonTooltip
-          block
-          size={buttonSize}
-          type={buttonType}
-          className={buttonClassName}
-          icon={<Plus size={14} />}
-          disabled={!canCreateBuckets}
-          style={{ justifyContent: 'start' }}
-          onClick={() => setVisible(true)}
-          tabIndex={!canCreateBuckets ? -1 : 0}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canCreateBuckets
-                ? 'You need additional permissions to create buckets'
-                : undefined,
-            },
-          }}
-        >
-          {label}
-        </ButtonTooltip>
-      </DialogTrigger>
-
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create file bucket</DialogTitle>
@@ -239,10 +196,10 @@ export const CreateBucketModal = ({
 
         <DialogSectionSeparator />
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="flex flex-col gap-y-2">
-              <FormField_Shadcn_
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -252,8 +209,8 @@ export const CreateBucketModal = ({
                     label="Bucket name"
                     labelOptional="Cannot be changed after creation"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="name"
                         data-1p-ignore
                         data-lpignore="true"
@@ -262,7 +219,7 @@ export const CreateBucketModal = ({
                         {...field}
                         placeholder="Enter bucket name"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -271,7 +228,7 @@ export const CreateBucketModal = ({
             <DialogSectionSeparator />
 
             <DialogSection className="space-y-3">
-              <FormField_Shadcn_
+              <FormField
                 key="public"
                 name="public"
                 control={form.control}
@@ -283,14 +240,14 @@ export const CreateBucketModal = ({
                     description="Allow anyone to read objects without authorization"
                     layout="flex"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Switch
                         id="public"
                         size="large"
                         checked={field.value}
                         onCheckedChange={field.onChange}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -306,7 +263,7 @@ export const CreateBucketModal = ({
             <DialogSectionSeparator />
 
             <DialogSection className="space-y-2">
-              <FormField_Shadcn_
+              <FormField
                 key="has_file_size_limit"
                 name="has_file_size_limit"
                 control={form.control}
@@ -317,21 +274,21 @@ export const CreateBucketModal = ({
                     description="Prevent uploading of files larger than a specified limit"
                     layout="flex"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Switch
                         id="has_file_size_limit"
                         size="large"
                         checked={field.value}
                         onCheckedChange={field.onChange}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
 
               {hasFileSizeLimit && (
                 <div>
-                  <FormField_Shadcn_
+                  <FormField
                     key="formatted_size_limit"
                     name="formatted_size_limit"
                     control={form.control}
@@ -343,8 +300,8 @@ export const CreateBucketModal = ({
                       >
                         <div className="grid grid-cols-12 gap-x-2">
                           <div className="col-span-8">
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
+                            <FormControl>
+                              <Input
                                 id="formatted_size_limit"
                                 aria-label="File size limit"
                                 type="number"
@@ -352,38 +309,38 @@ export const CreateBucketModal = ({
                                 placeholder="0"
                                 {...field}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </div>
                           <div className="col-span-4">
-                            <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
-                              <SelectTrigger_Shadcn_ aria-label="File size limit unit" size="small">
-                                <SelectValue_Shadcn_>{selectedUnit}</SelectValue_Shadcn_>
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
+                            <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+                              <SelectTrigger aria-label="File size limit unit" size="small">
+                                <SelectValue>{selectedUnit}</SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
                                 {Object.values(StorageSizeUnits).map((unit: string) => (
-                                  <SelectItem_Shadcn_ key={unit} value={unit} className="text-xs">
+                                  <SelectItem key={unit} value={unit} className="text-xs">
                                     {unit}
-                                  </SelectItem_Shadcn_>
+                                  </SelectItem>
                                 ))}
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
                       </FormItemLayout>
                     )}
                   />
                   {formattedSizeLimitError?.message === 'exceed_global_limit' && (
-                    <FormMessage_Shadcn_ className="mt-2">
+                    <FormMessage className="mt-2">
                       Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
                       <InlineLink
                         className="text-destructive decoration-destructive-500 hover:decoration-destructive"
                         href={`/project/${ref}/storage/settings`}
-                        onClick={() => setVisible(false)}
+                        onClick={() => onOpenChange(false)}
                       >
                         Storage Settings
                       </InlineLink>{' '}
                       first.
-                    </FormMessage_Shadcn_>
+                    </FormMessage>
                   )}
 
                   {IS_PLATFORM && (
@@ -392,7 +349,7 @@ export const CreateBucketModal = ({
                       <InlineLink
                         className="text-foreground-light hover:text-foreground"
                         href={`/project/${ref}/storage/settings`}
-                        onClick={() => setVisible(false)}
+                        onClick={() => onOpenChange(false)}
                       >
                         global file size limit
                       </InlineLink>{' '}
@@ -412,17 +369,17 @@ export const CreateBucketModal = ({
                 description="Allow only certain types of files to be uploaded"
                 layout="flex"
               >
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Switch
                     id="has_allowed_mime_types"
                     size="large"
                     checked={hasAllowedMimeTypes}
                     onCheckedChange={setHasAllowedMimeTypes}
                   />
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
               {hasAllowedMimeTypes && (
-                <FormField_Shadcn_
+                <FormField
                   key="allowed_mime_types"
                   name="allowed_mime_types"
                   control={form.control}
@@ -433,23 +390,23 @@ export const CreateBucketModal = ({
                       labelOptional="Comma separated values"
                       description="Wildcards are allowed, e.g. image/*."
                     >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
+                      <FormControl>
+                        <Input
                           id="allowed_mime_types"
                           {...field}
                           placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
             </DialogSection>
           </form>
-        </Form_Shadcn_>
+        </Form>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreatingBucket} onClick={() => setVisible(false)}>
+          <Button type="default" disabled={isCreatingBucket} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button

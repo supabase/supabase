@@ -1,0 +1,440 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Form,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
+
+const FormSchema = z.object({
+  API_MAX_REQUEST_DURATION: z.coerce
+    .number()
+    .min(5, 'Must be 5 or larger')
+    .max(30, 'Must be a value no greater than 30'),
+  DB_MAX_POOL_SIZE: z.coerce.number().min(1),
+  DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
+})
+
+export const DatabaseFormSchema = z
+  .object({
+    DB_MAX_POOL_SIZE: z.coerce.number().min(1),
+    DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
+  })
+  .superRefine((data, ctx) => {
+    if (data.DB_MAX_POOL_SIZE_UNIT === 'percent') {
+      if (data.DB_MAX_POOL_SIZE < 1 || data.DB_MAX_POOL_SIZE > 100) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['DB_MAX_POOL_SIZE'],
+          message: 'Percentage must be between 1 and 100',
+        })
+      }
+    }
+  })
+
+export const PerformanceSettingsForm = () => {
+  const { data: project } = useSelectedProjectQuery()
+  const { hasAccess: hasAccessToPerformance, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('auth.performance_settings')
+  const { can: canReadConfig } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_gotrue'
+  )
+
+  const [isUpdatingRequestDurationForm, setIsUpdatingRequestDurationForm] = useState(false)
+  const [isUpdatingDatabaseForm, setIsUpdatingDatabaseForm] = useState(false)
+
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isLoading: isLoadingAuthConfig,
+  } = useAuthConfigQuery({ projectRef: project?.ref })
+
+  const { data: maxConnData, isLoading: isLoadingMaxConns } = useMaxConnectionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const maxConnectionLimit = maxConnData?.maxConnections ?? 60
+
+  const promptUpgrade = IS_PLATFORM && !isLoadingEntitlement && !hasAccessToPerformance
+
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+
+  const requestDurationForm = useForm({
+    resolver: zodResolver(
+      z.object({ API_MAX_REQUEST_DURATION: FormSchema.shape.API_MAX_REQUEST_DURATION })
+    ),
+    defaultValues: { API_MAX_REQUEST_DURATION: 10 },
+  })
+
+  const databaseForm = useForm({
+    resolver: zodResolver(DatabaseFormSchema),
+    defaultValues: {
+      DB_MAX_POOL_SIZE: 10,
+      DB_MAX_POOL_SIZE_UNIT: 'connections',
+    },
+  })
+
+  const chosenUnit = databaseForm.watch('DB_MAX_POOL_SIZE_UNIT')
+
+  const onSubmitRequestDurationForm = (values: any) => {
+    if (!project?.ref) return console.error('Project ref is required')
+    if (!hasAccessToPerformance) return
+
+    setIsUpdatingRequestDurationForm(true)
+
+    updateAuthConfig(
+      { projectRef: project?.ref, config: values },
+      {
+        onError: (error) => {
+          toast.error(`Failed to update request duration settings: ${error?.message}`)
+          setIsUpdatingRequestDurationForm(false)
+        },
+        onSuccess: () => {
+          toast.success('Successfully updated request duration settings')
+          setIsUpdatingRequestDurationForm(false)
+        },
+      }
+    )
+  }
+
+  const onSubmitDatabaseForm = (values: any) => {
+    if (!project?.ref) return console.error('Project ref is required')
+
+    setIsUpdatingDatabaseForm(true)
+
+    const config = {
+      DB_MAX_POOL_SIZE: values.DB_MAX_POOL_SIZE,
+      DB_MAX_POOL_SIZE_UNIT: values.DB_MAX_POOL_SIZE_UNIT,
+    }
+
+    updateAuthConfig(
+      { projectRef: project?.ref, config },
+      {
+        onError: () => {
+          setIsUpdatingDatabaseForm(false)
+        },
+        onSuccess: () => {
+          toast.success('Successfully updated connection settings')
+          setIsUpdatingDatabaseForm(false)
+        },
+      }
+    )
+  }
+
+  useEffect(() => {
+    if (authConfig) {
+      if (!isUpdatingRequestDurationForm) {
+        requestDurationForm.reset({
+          API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION ?? 10,
+        })
+      }
+
+      if (!isUpdatingDatabaseForm) {
+        databaseForm.reset({
+          DB_MAX_POOL_SIZE:
+            authConfig?.DB_MAX_POOL_SIZE !== null ? (authConfig?.DB_MAX_POOL_SIZE ?? 10) : 10,
+          DB_MAX_POOL_SIZE_UNIT:
+            authConfig?.DB_MAX_POOL_SIZE_UNIT !== null
+              ? authConfig?.DB_MAX_POOL_SIZE_UNIT
+              : 'connections',
+        })
+      }
+    }
+  }, [authConfig, isUpdatingRequestDurationForm, isUpdatingDatabaseForm])
+
+  if (isError) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+      </ScaffoldSection>
+    )
+  }
+
+  if (!canReadConfig) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <NoPermission resourceText="view auth configuration settings" />
+      </ScaffoldSection>
+    )
+  }
+
+  if (isLoadingAuthConfig || isLoadingEntitlement) {
+    return (
+      <ScaffoldSection isFullWidth>
+        <GenericSkeletonLoader />
+      </ScaffoldSection>
+    )
+  }
+
+  return (
+    <>
+      <ScaffoldSection isFullWidth>
+        {promptUpgrade && (
+          <UpgradeToPro
+            source="authPerformance"
+            featureProposition="configure advanced Auth server settings"
+            primaryText="Only available on the Pro Plan and above"
+            secondaryText="Upgrade to the Pro Plan to configure Auth server performance settings."
+          />
+        )}
+      </ScaffoldSection>
+
+      <ScaffoldSection isFullWidth>
+        <ScaffoldSectionTitle className="mb-4">Request duration</ScaffoldSectionTitle>
+
+        <Form {...requestDurationForm}>
+          <form onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}>
+            <Card>
+              <CardContent className="pt-6">
+                <FormField
+                  control={requestDurationForm.control}
+                  name="API_MAX_REQUEST_DURATION"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Maximum allowed duration for an Auth request"
+                      description={
+                        <p className="text-balance">
+                          Requests that exceed this time limit are terminated to help manage server
+                          load.
+                        </p>
+                      }
+                    >
+                      <div className="flex flex-col gap-2">
+                        <div className="relative">
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                type="number"
+                                min={5}
+                                max={30}
+                                {...field}
+                                disabled={!canUpdateConfig || promptUpgrade}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </div>
+
+                        <p className="text-xs text-right text-foreground-muted">
+                          10+ seconds recommended
+                        </p>
+                      </div>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+
+              <CardFooter className="justify-end space-x-2">
+                {requestDurationForm.formState.isDirty && (
+                  <Button type="default" onClick={() => requestDurationForm.reset()}>
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type={promptUpgrade ? 'default' : 'primary'}
+                  htmlType="submit"
+                  disabled={
+                    !canUpdateConfig ||
+                    isUpdatingRequestDurationForm ||
+                    !requestDurationForm.formState.isDirty ||
+                    promptUpgrade
+                  }
+                  loading={isUpdatingRequestDurationForm}
+                >
+                  Save changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form>
+      </ScaffoldSection>
+
+      <ScaffoldSection isFullWidth>
+        <ScaffoldSectionTitle className="mb-4">Connection management</ScaffoldSectionTitle>
+
+        <Form {...databaseForm}>
+          <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
+            <Card>
+              <CardContent className="pt-6 flex flex-col gap-4">
+                <FormField
+                  control={databaseForm.control}
+                  name="DB_MAX_POOL_SIZE_UNIT"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Allocation strategy"
+                      description={
+                        <p className="text-balance">
+                          Choose whether to allocate a percentage or a fixed number of connections
+                          to the Auth server. We recommend a percentage, as it scales automatically
+                          with your instance size.
+                        </p>
+                      }
+                    >
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => {
+                            const values = databaseForm.getValues()
+                            field.onChange(value)
+
+                            if (values.DB_MAX_POOL_SIZE_UNIT !== value) {
+                              const currentValue = values.DB_MAX_POOL_SIZE!
+
+                              let preservedPoolSize: number
+                              if (value === 'percent') {
+                                // convert from absolute number to roughly the same percentage
+                                preservedPoolSize = Math.ceil(
+                                  (Math.min(maxConnectionLimit, currentValue) /
+                                    maxConnectionLimit) *
+                                    100
+                                )
+                              } else {
+                                // convert from percentage to roughly the same connection number
+                                preservedPoolSize = Math.floor(
+                                  maxConnectionLimit * (Math.min(100, currentValue) / 100)
+                                )
+                              }
+
+                              databaseForm.setValue('DB_MAX_POOL_SIZE', preservedPoolSize)
+                            }
+                          }}
+                        >
+                          <SelectTrigger size="small" disabled={!canUpdateConfig || promptUpgrade}>
+                            <SelectValue>
+                              {field.value === 'percent' ? 'Percentage' : 'Absolute'}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent align="end">
+                            <SelectItem value="connections" className="text-xs">
+                              Absolute number of connections
+                            </SelectItem>
+                            <SelectItem value="percent" className="text-xs">
+                              Percent of max connections
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+              <CardContent>
+                <FormField
+                  control={databaseForm.control}
+                  name="DB_MAX_POOL_SIZE"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Maximum connections"
+                      description={
+                        <p className="text-balance">
+                          The maximum number of connections the Auth server can use under peak load.{' '}
+                          <em className="text-foreground-light font-medium not-italic">
+                            Connections are not reserved
+                          </em>{' '}
+                          and are returned to Postgres after a short idle period.
+                        </p>
+                      }
+                    >
+                      <div className="flex flex-col gap-2">
+                        <div className="relative">
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                type="number"
+                                {...field}
+                                disabled={!canUpdateConfig || promptUpgrade}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>
+                                  {chosenUnit === 'percent' ? '%' : 'connections'}
+                                </InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </div>
+                        {isLoadingMaxConns ? (
+                          <ShimmeringLoader className="py-2 w-16 ml-auto" />
+                        ) : (
+                          <p className="text-xs text-right text-foreground-muted">
+                            <span className="text-foreground-light">
+                              {chosenUnit === 'percent'
+                                ? Math.floor(
+                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
+                                  ).toString()
+                                : Math.min(maxConnectionLimit, field.value!)}
+                            </span>{' '}
+                            / {maxConnectionLimit}
+                          </p>
+                        )}
+                      </div>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
+
+              <CardFooter className="justify-end space-x-2">
+                {databaseForm.formState.isDirty && (
+                  <Button type="default" onClick={() => databaseForm.reset()}>
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type={promptUpgrade ? 'default' : 'primary'}
+                  htmlType="submit"
+                  disabled={
+                    !canUpdateConfig || isUpdatingDatabaseForm || !databaseForm.formState.isDirty
+                  }
+                  loading={isUpdatingDatabaseForm}
+                >
+                  Save changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form>
+      </ScaffoldSection>
+    </>
+  )
+}

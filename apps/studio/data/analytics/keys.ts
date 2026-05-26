@@ -121,13 +121,53 @@ export const analyticsKeys = {
       'infra-monitoring',
       { attribute, startDate, endDate, interval, databaseIdentifier },
     ] as const,
-  projectMetrics: (projectRef: string | undefined, { interval }: { interval?: string }) =>
-    ['projects', projectRef, 'project.metrics', { interval }] as const,
+  infraMonitoringGroup: (
+    projectRef: string | undefined,
+    {
+      attributes,
+      startDate,
+      endDate,
+      interval,
+      databaseIdentifier,
+    }: {
+      attributes?: string[]
+      startDate?: string
+      endDate?: string
+      interval?: string
+      databaseIdentifier?: string
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'infra-monitoring',
+      'group',
+      {
+        attributes: attributes ? [...attributes].sort() : undefined,
+        startDate,
+        endDate,
+        interval,
+        databaseIdentifier,
+      },
+    ] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
 
   usageApiRequestsCount: (projectRef: string | undefined) =>
     ['projects', projectRef, 'usage.api-requests-count'] as const,
+
+  serviceHealth: (
+    projectRef: string | undefined,
+    {
+      startDate,
+      endDate,
+      granularity,
+    }: {
+      startDate?: string
+      endDate?: string
+      granularity?: string
+    }
+  ) => ['projects', projectRef, 'service-health', { startDate, endDate, granularity }] as const,
 }
 
 function isoDateStringToDate(isoDateString: string | undefined): string | undefined {

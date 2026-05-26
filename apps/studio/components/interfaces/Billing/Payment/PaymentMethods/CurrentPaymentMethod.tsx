@@ -1,29 +1,29 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { CreditCardIcon } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import CreditCard from './CreditCard'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const CurrentPaymentMethod = () => {
   const { slug } = useParams()
 
   const {
     data: subscription,
-    isLoading: isLoadingSubscription,
+    isPending: isLoadingSubscription,
     isError: isErrorSubscription,
   } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
   const {
     data: paymentMethods,
-    isLoading: isLoadingOrganizationPaymentMethods,
+    isPending: isLoadingOrganizationPaymentMethods,
     isError: isErrorOrganizationPaymentMethods,
   } = useOrganizationPaymentMethodsQuery({ slug })
 

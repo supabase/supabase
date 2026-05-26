@@ -1,5 +1,5 @@
-import type { OrgSubscription, PlanId, ProjectSelectedAddon } from 'data/subscriptions/types'
-import { IS_PLATFORM } from 'lib/constants'
+import type { OrgSubscription, PlanId, ProjectSelectedAddon } from '@/data/subscriptions/types'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const getAddons = (selectedAddons: ProjectSelectedAddon[]) => {
   const computeInstance = selectedAddons.find((addon) => addon.type === 'compute_instance')
@@ -45,24 +45,35 @@ export const getPlanChangeType = (
       pro: 'upgrade',
       team: 'upgrade',
       enterprise: 'upgrade',
+      platform: 'upgrade',
     },
     pro: {
       free: 'downgrade',
       pro: 'none',
       team: 'upgrade',
       enterprise: 'upgrade',
+      platform: 'upgrade',
     },
     team: {
       free: 'downgrade',
       pro: 'downgrade',
       team: 'none',
       enterprise: 'upgrade',
+      platform: 'upgrade',
     },
     enterprise: {
       free: 'downgrade',
       pro: 'downgrade',
       team: 'downgrade',
       enterprise: 'none',
+      platform: 'upgrade',
+    },
+    platform: {
+      free: 'downgrade',
+      pro: 'downgrade',
+      team: 'downgrade',
+      enterprise: 'downgrade',
+      platform: 'none',
     },
   }
 

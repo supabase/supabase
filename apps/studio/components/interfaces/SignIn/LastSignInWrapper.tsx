@@ -1,7 +1,7 @@
-import { LastSignInType, useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { ReactNode } from 'react'
-
 import { Badge, cn } from 'ui'
+
+import { LastSignInType, useLastSignIn } from '@/hooks/misc/useLastSignIn'
 
 export function LastSignInWrapper({
   children,
@@ -16,8 +16,8 @@ export function LastSignInWrapper({
     <div className="flex items-center relative">
       {lastSignIn === type && (
         <Badge
-          variant="brand"
-          className="absolute -right-4 -top-3 rounded-full px-2 py-0.5 shadow z-10 bg-brand-400 bg-opacity-100 text-foreground pointer-events-none"
+          variant="success"
+          className="absolute -right-4 -top-3 shadow-sm z-10 bg-brand-400 text-foreground pointer-events-none"
         >
           Last used
         </Badge>

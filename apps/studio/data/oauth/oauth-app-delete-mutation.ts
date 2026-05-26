@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { oauthAppKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppDeleteVariables = {
   id: string

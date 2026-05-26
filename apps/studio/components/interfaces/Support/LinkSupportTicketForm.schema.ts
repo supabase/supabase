@@ -11,7 +11,7 @@ export const LinkSupportTicketFormSchema = z.object({
     .refine((val) => val !== NO_ORG_MARKER, {
       message: 'Please select an organization',
     }),
-  projectRef: z.string().optional(),
+  projectRef: z.string().min(1, 'Please select a project'),
   category: z.enum(
     CATEGORY_OPTIONS.map((opt) => opt.value) as [
       ExtendedSupportCategories,

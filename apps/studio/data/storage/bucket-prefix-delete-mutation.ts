@@ -1,4 +1,6 @@
-import { executeSql } from 'data/sql/execute-sql-query'
+import { getDeleteBucketPrefixSQL } from '@supabase/pg-meta'
+
+import { executeSql } from '@/data/sql/execute-sql-query'
 
 /**
  * [Joshen] JFYI this is solely being used in storage-explorer.tsx and hence doesn't have a useMutation hook
@@ -23,9 +25,7 @@ export const deleteBucketPrefix = async (
   if (!bucketId) throw new Error('bucketId is required')
   if (!prefix) throw new Error('prefix is required')
 
-  const sql = /* SQL */ `
-select storage.delete_prefix('${bucketId}', '${prefix}');
-`.trim()
+  const sql = getDeleteBucketPrefixSQL({ bucketId, prefix })
 
   const { result } = await executeSql(
     { projectRef, connectionString, sql, queryKey: ['delete-bucket-prefix'] },

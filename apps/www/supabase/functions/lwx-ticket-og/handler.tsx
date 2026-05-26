@@ -34,35 +34,33 @@ export async function handler(req: Request) {
     }
 
     const geneartedOGImage = new ImageResponse(
-      (
-        <div
+      <div
+        style={{
+          width: '1200px',
+          height: '628px',
+          position: 'relative',
+          backgroundImage: BG[platinum ? 'PLATINUM' : 'REG'],
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '60px',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {/* Ticket  */}
+        <img
+          width={ticketWidth}
+          height={ticketHeight}
+          src={ticketImg}
           style={{
-            width: '1200px',
-            height: '628px',
-            position: 'relative',
-            backgroundImage: BG[platinum ? 'PLATINUM' : 'REG'],
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '60px',
-            alignItems: 'center',
-            justifyContent: 'center',
+            borderRadius: '26px',
+            boxShadow: '0px 4px 25px rgba(0, 0, 0, 0.2)',
           }}
-        >
-          {/* Ticket  */}
-          <img
-            width={ticketWidth}
-            height={ticketHeight}
-            src={ticketImg}
-            style={{
-              borderRadius: '26px',
-              boxShadow: '0px 4px 25px rgba(0, 0, 0, 0.2)',
-            }}
-          />
-        </div>
-      ),
+        />
+      </div>,
       {
         width: 1200,
         height: 628,

@@ -1,16 +1,14 @@
+import { remarkCodeHike } from '@code-hike/mdx'
 import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 import { withSentryConfig } from '@sentry/nextjs'
-
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import redirects from './lib/redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
-
-import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -51,6 +49,7 @@ const nextConfig = {
     'shared-data',
     'icons',
     'api-types',
+    'marketing',
     // needed to make the octokit packages work in /changelog
     '@octokit/plugin-paginate-graphql',
   ],
@@ -79,39 +78,54 @@ const nextConfig = {
   },
   async headers() {
     return [
-      // Allow CMS preview iframe embedding by omitting X-Frame-Options for blog routes
       {
-        source: '/blog/:slug*',
+        source: '/changelog-rss.xml',
         headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'all',
-          },
-          // No X-Frame-Options header to allow iframe embedding
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
         ],
       },
       {
-        source: '/api-v2/cms/preview',
+        source: '/changelog-rss/:slug.xml',
         headers: [
-          {
-            key: 'content-type',
-            value: 'text/html',
-          },
-          // No X-Frame-Options header to allow iframe embedding
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
         ],
       },
-      // Default X-Frame-Options for all other paths
       {
-        source: '/((?!blog|api-v2/cms/preview).*)',
+        source: '/changelog/:slug.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/changelog.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/',
         headers: [
           {
-            key: 'X-Robots-Tag',
-            value: 'all',
+            key: 'Link',
+            value: '</.well-known/api-catalog>; rel="api-catalog"',
           },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
+        ],
+      },
+      {
+        source: '/.well-known/api-catalog',
+        headers: [
+          { key: 'content-type', value: 'application/linkset+json' },
+          { key: 'access-control-allow-origin', value: '*' },
         ],
       },
       {
@@ -139,13 +153,51 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/(docs|blog)/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+        ],
+      },
+      {
+        source: '/dashboard/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
+        ],
+      },
+      {
+        source: '/enterprise-terms',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
     return rewrites
   },
   async redirects() {
-    return redirects
+    // For /docs/guides/ redirects, auto-generate .md variants so renamed/deleted pages
+    // redirect correctly when fetched as markdown
+    const docsMdRedirects = redirects
+      .filter(
+        (r) =>
+          r.source.startsWith('/docs/guides/') &&
+          typeof r.destination === 'string' &&
+          r.destination.startsWith('/')
+      )
+      .map((r) => ({ ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }))
+
+    return [...docsMdRedirects, ...redirects]
   },
   typescript: {
     // On previews, typechecking is run via GitHub Action only for efficiency

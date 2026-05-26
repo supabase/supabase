@@ -1,20 +1,23 @@
-import { handleError } from 'data/fetchers'
+import { isToolUIPart, type UIMessage } from 'ai'
 import { toast } from 'sonner'
 
-import { authKeys } from 'data/auth/keys'
-import { databaseExtensionsKeys } from 'data/database-extensions/keys'
-import { databaseIndexesKeys } from 'data/database-indexes/keys'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { databaseTriggerKeys } from 'data/database-triggers/keys'
-import { databaseKeys } from 'data/database/keys'
-import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
-import { tableKeys } from 'data/tables/keys'
-import { tryParseJson } from 'lib/helpers'
-import { ResponseError } from 'types'
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
+import { authKeys } from '@/data/auth/keys'
+import { databaseExtensionsKeys } from '@/data/database-extensions/keys'
+import { databaseIndexesKeys } from '@/data/database-indexes/keys'
+import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { databaseTriggerKeys } from '@/data/database-triggers/keys'
+import { databaseKeys } from '@/data/database/keys'
+import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
+import { handleError } from '@/data/fetchers'
+import { tableKeys } from '@/data/tables/keys'
+import { tryParseJson } from '@/lib/helpers'
+import { ResponseError } from '@/types'
+
+export type MutationCategory = 'functions' | 'rls-policies'
 
 // [Joshen] This is just very basic identification, but possible can extend perhaps
-export const identifyQueryType = (query: string) => {
+export const identifyQueryType = (query: string): MutationCategory | undefined => {
   const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')
   if (
     formattedQuery.includes('create function') ||
@@ -24,6 +27,7 @@ export const identifyQueryType = (query: string) => {
   } else if (formattedQuery.includes('create policy') || formattedQuery.includes('alter policy')) {
     return 'rls-policies'
   }
+  return undefined
 }
 
 // Check for function calls that aren't in the safe list
@@ -72,8 +76,38 @@ export const isReadOnlySelect = (query: string): boolean => {
   return true
 }
 
+export const hasPendingToolApproval = (messages: Pick<UIMessage, 'role' | 'parts'>[]) => {
+  return messages.some((message) => {
+    if (message.role !== 'assistant') return false
+
+    return message.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-requested')
+  })
+}
+
+export const resolvePendingToolApprovalsAsDenied = (messages: UIMessage[]): UIMessage[] => {
+  return messages.map((message) => {
+    if (message.role !== 'assistant') return message
+
+    const parts = message.parts?.map((part) => {
+      if (!isToolUIPart(part) || part.state !== 'approval-requested') return part
+
+      return {
+        ...part,
+        state: 'output-denied',
+        approval: {
+          id: part.approval.id,
+          approved: false,
+          reason: 'Skipped because the user sent a follow-up message.',
+        },
+      } as UIMessage['parts'][number]
+    })
+
+    return { ...message, parts } as UIMessage
+  })
+}
+
 const getContextKey = (pathname: string) => {
-  const [_, __, ___, ...rest] = pathname.split('/')
+  const [, , , ...rest] = pathname.split('/')
   const key = rest.join('/')
   return key
 }

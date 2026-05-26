@@ -2,11 +2,17 @@ import 'server-only'
 
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
+import { retry } from '@octokit/plugin-retry'
 import crypto from 'node:crypto'
 
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
+import { OCTOKIT_RETRY_OPTIONS } from './octokit.constants'
 
-let octokitInstance: Octokit
+export { OCTOKIT_RETRY_OPTIONS }
+
+const RetryOctokit = Octokit.plugin(retry)
+
+let octokitInstance: InstanceType<typeof RetryOctokit>
 
 export function octokit() {
   if (!octokitInstance) {
@@ -21,7 +27,7 @@ export function octokit() {
       format: 'pem',
     })
 
-    octokitInstance = new Octokit({
+    octokitInstance = new RetryOctokit({
       authStrategy: createAppAuth,
       auth: {
         appId: process.env.DOCS_GITHUB_APP_ID,
@@ -34,19 +40,13 @@ export function octokit() {
   return octokitInstance
 }
 
-async function getGitHubFileContents({
-  org,
-  repo,
-  path,
-  branch,
-  options: { onError, fetch },
-}: {
+type GithubFileRequest = {
   org: string
   repo: string
   path: string
   branch: string
-  options: {
-    onError: (err?: unknown) => void
+  options?: {
+    onError?: (err?: unknown) => void
     /**
      *
      * A custom fetch implementation to control Next.js caching.
@@ -55,34 +55,59 @@ async function getGitHubFileContents({
      */
     fetch?: (info: RequestInfo, init?: RequestInit) => Promise<Response>
   }
-}) {
+}
+
+export async function getGitHubFileContents({
+  org,
+  repo,
+  path,
+  branch,
+  options: { onError, fetch } = {},
+}: GithubFileRequest) {
   if (path.startsWith('/')) {
     path = path.slice(1)
   }
 
+  const client = octokit()
+  let response: Awaited<
+    ReturnType<typeof client.request<'GET /repos/{owner}/{repo}/contents/{path}'>>
+  >
   try {
-    const response = await octokit().request('GET /repos/{owner}/{repo}/contents/{path}', {
+    response = await client.request('GET /repos/{owner}/{repo}/contents/{path}', {
       owner: org,
       repo: repo,
       path: path,
       ref: branch,
+      request: OCTOKIT_RETRY_OPTIONS,
       options: {
         fetch: fetch ?? fetchRevalidatePerDay,
       },
     })
-    if (response.status !== 200 || !response.data) {
-      throw Error(`Could not find contents of ${path} in ${org}/${repo}`)
-    }
-    if (!('type' in response.data) || response.data.type !== 'file') {
-      throw Error(`${path} in ${org}/${repo} is not a file`)
-    }
-    const content = Buffer.from(response.data.content, 'base64').toString('utf-8')
-    return content
   } catch (err) {
-    console.error('Error fetching GitHub file: %o', err)
-    onError?.(err)
-    return ''
+    const error = new Error(
+      `getGitHubFileContents: request failed for ${org}/${repo}/${path}@${branch}`,
+      { cause: err }
+    )
+    onError?.(error)
+    throw error
   }
+
+  if (Array.isArray(response.data)) {
+    const error = new Error(
+      `getGitHubFileContents: ${path} in ${org}/${repo} is a directory, not a file`
+    )
+    onError?.(error)
+    throw error
+  }
+  if (!('content' in response.data) || response.data.type !== 'file') {
+    const error = new Error(
+      `getGitHubFileContents: unexpected response for ${path} in ${org}/${repo} (type: ${'type' in response.data ? response.data.type : 'unknown'})`
+    )
+    onError?.(error)
+    throw error
+  }
+
+  return Buffer.from(response.data.content, 'base64').toString('utf-8')
 }
 
 export async function getGitHubFileContentsImmutableOnly({
@@ -90,17 +115,8 @@ export async function getGitHubFileContentsImmutableOnly({
   repo,
   branch,
   path,
-  options: { onError, fetch },
-}: {
-  org: string
-  repo: string
-  branch: string
-  path: string
-  options: {
-    onError: (error: unknown) => void
-    fetch: (url: string) => Promise<Response>
-  }
-}): Promise<string> {
+  options: { onError, fetch } = {},
+}: GithubFileRequest): Promise<string> {
   const isImmutableCommit = await checkForImmutableCommit({
     org,
     repo,
@@ -145,6 +161,7 @@ async function checkForImmutableCommit({
       headers: {
         'X-GitHub-Api-Version': '2022-11-28',
       },
+      request: OCTOKIT_RETRY_OPTIONS,
       options: {
         fetch: _fetch,
       },

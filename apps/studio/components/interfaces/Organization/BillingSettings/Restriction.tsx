@@ -1,21 +1,14 @@
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { VIOLATION_TYPE_LABELS } from 'data/usage/constants'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import { usePathname } from 'next/navigation'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  CriticalIcon,
-  WarningIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon, WarningIcon } from 'ui'
+
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { VIOLATION_TYPE_LABELS } from '@/data/usage/constants'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 export const Restriction = () => {
   const { data: org } = useSelectedOrganizationQuery()
@@ -66,13 +59,11 @@ export const Restriction = () => {
   return (
     <>
       {shownAlert === 'exceededLimits' && (
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <CriticalIcon />
 
-          <AlertTitle_Shadcn_>
-            Your organization's usage has exceeded its included quota
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Your organization's usage has exceeded its included quota</AlertTitle>
+          <AlertDescription>
             <p>
               Your projects can become unresponsive or enter read-only mode.{' '}
               {org.plan.id === 'free'
@@ -98,16 +89,16 @@ export const Restriction = () => {
                 <a href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}>About spend cap</a>
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
       {shownAlert === 'gracePeriod' && (
-        <Alert_Shadcn_ variant="warning">
+        <Alert variant="warning">
           <WarningIcon />
-          <AlertTitle_Shadcn_>Your grace period has started.</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Your grace period has started.</AlertTitle>
+          <AlertDescription>
             <p className="leading-tight">
-              Your organization is over its quota
+              Your organization went over its quota in the previous billing cycle
               {violationLabels && ` ${violationLabels}`}. You can continue with your projects until
               your grace period ends on{' '}
               <span className="text-foreground">
@@ -143,20 +134,20 @@ export const Restriction = () => {
                 </a>
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
       {shownAlert === 'gracePeriodOver' && (
-        <Alert_Shadcn_ variant="warning">
+        <Alert variant="warning">
           <WarningIcon />
-          <AlertTitle_Shadcn_>Your grace period is over.</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Your grace period is over.</AlertTitle>
+          <AlertDescription>
             <p>
               Your grace period ended on{' '}
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
-              . Fair Use Policy applies now. Stay below your plan’s quota or{' '}
+              . Fair Use Policy applies now. Stay below your plan's quota or{' '}
               {org.plan.id === 'free' ? 'upgrade your plan' : 'disable spend cap'} if you expect to
               exceed it. If you exceed your quota, requests will respond with a 402 status code.
             </p>
@@ -183,20 +174,22 @@ export const Restriction = () => {
                 </a>
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
       {shownAlert === 'restricted' && (
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <CriticalIcon />
-          <AlertTitle_Shadcn_>All services are restricted.</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>All services are restricted.</AlertTitle>
+          <AlertDescription>
             <p>
               Fair Use Policy applies and your service is restricted. Your projects are not able to
-              serve requests and will respond with a 402 status code. You have exceeded your plan’s
+              serve requests and will respond with a 402 status code. You have exceeded your plan's
               quota{violationLabels && ` ${violationLabels}`}.{' '}
               {org.plan.id === 'free' ? 'Upgrade your plan' : 'Disable spend cap'} to lift
-              restrictions or wait until your quota refills on your next billing period.
+              restrictions immediately, or wait until your quota refills at the start of your next
+              billing period. Note that there may be a short delay after your billing period resets
+              before restrictions are fully lifted.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
@@ -221,8 +214,8 @@ export const Restriction = () => {
                 </a>
               </Button>
             </div>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       )}
     </>
   )

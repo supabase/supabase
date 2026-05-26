@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useParams } from 'common'
+import { Plus, ShieldCheck } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Dialog,
   DialogContent,
@@ -16,17 +18,15 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { useParams } from 'common'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { Plus, ShieldCheck } from 'lucide-react'
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 
 const NAME_SCHEMA = z
   .string()
@@ -45,23 +45,19 @@ const SCHEMA = z.object({
   description: z.string().max(256, "Description shouldn't be too long").trim(),
 })
 
-const CreateSecretAPIKeyDialog = () => {
+export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
-  const [visible, setVisible] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [visible, setVisible] = useQueryState('new', parseAsString)
 
-  const onClose = (value: boolean) => {
-    setVisible(value)
+  const onOpenChange = (value: boolean) => {
+    if (value) setVisible('secret')
+    else setVisible('')
   }
 
+  const defaultValues = { name: '', description: '' }
   const form = useForm<z.infer<typeof SCHEMA>>({
     resolver: zodResolver(SCHEMA),
-    defaultValues: {
-      name: '',
-      description: '',
-    },
+    defaultValues,
   })
 
   const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
@@ -77,14 +73,15 @@ const CreateSecretAPIKeyDialog = () => {
       {
         onSuccess: (data) => {
           toast.success(`Your secret API key ${data.prefix}... is ready.`)
-          onClose(false)
+          form.reset(defaultValues)
+          onOpenChange(false)
         },
       }
     )
   }
 
   return (
-    <Dialog open={visible} onOpenChange={onClose}>
+    <Dialog open={visible === 'secret'} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button type="default" className="mt-2" icon={<Plus />}>
           New secret key
@@ -102,13 +99,13 @@ const CreateSecretAPIKeyDialog = () => {
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               className="flex flex-col gap-4"
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -117,33 +114,33 @@ const CreateSecretAPIKeyDialog = () => {
                     label="Name"
                     description="A short, unique name of lowercased letters, digits and underscore"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="Example: my_super_secret_key_123" />
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Input {...field} placeholder="Example: my_super_secret_key_123" />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 key="description"
                 name="description"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Description" labelOptional="Optional">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         {...field}
                         placeholder="Short notes on how or where this key will be used"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
-          <Alert_Shadcn_ variant="warning">
+          </Form>
+          <Alert variant="warning">
             <ShieldCheck />
-            <AlertTitle_Shadcn_>Securing your API key</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="">
+            <AlertTitle>Securing your API key</AlertTitle>
+            <AlertDescription className="">
               <ul className="list-disc">
                 <li>Keep this key secret.</li>
                 <li>Do not use on the web, in mobile or desktop apps.</li>
@@ -159,8 +156,8 @@ const CreateSecretAPIKeyDialog = () => {
                   immediately.
                 </li>
               </ul>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         </DialogSection>
         <DialogFooter>
           <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
@@ -171,5 +168,3 @@ const CreateSecretAPIKeyDialog = () => {
     </Dialog>
   )
 }
-
-export default CreateSecretAPIKeyDialog

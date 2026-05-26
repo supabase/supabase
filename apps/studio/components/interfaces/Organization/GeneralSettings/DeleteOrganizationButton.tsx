@@ -1,23 +1,94 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button, Form, Input, Modal } from 'ui'
+import { DeleteOrganizationButtonListAck } from './DeleteOrganizationButton.ListAck'
+import { DeleteOrganizationButtonSingleAck } from './DeleteOrganizationButton.SingleAck'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useOrganizationDeleteMutation } from '@/data/organizations/organization-delete-mutation'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+
+const MAX_PROJECT_ACKNOWLEDGEMENTS = 10
 
 export const DeleteOrganizationButton = () => {
   const router = useRouter()
+
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
 
+  const [checkedProjects, setCheckedProjects] = useState<Record<string, boolean>>({})
+  const [acknowledgedAll, setAcknowledgedAll] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  const [value, setValue] = useState('')
+
+  useEffect(() => {
+    setCheckedProjects({})
+    setAcknowledgedAll(false)
+  }, [orgSlug])
+
+  const {
+    data: projectsData,
+    isLoading,
+    isFetching,
+    isError,
+  } = useOrgProjectsInfiniteQuery(
+    {
+      slug: orgSlug,
+      limit: MAX_PROJECT_ACKNOWLEDGEMENTS + 1,
+    },
+    {
+      enabled: isOpen,
+      refetchOnMount: 'always',
+    }
+  )
+
+  // When an organization slug is present but the projects query has not yet
+  // produced any data (and hasn't errored), treat this as a "pending" state
+  // rather than as "no projects". This avoids interpreting lack of data as
+  // an empty list, which could allow deletion to proceed without any project
+  // acknowledgement.
+  const isProjectsDataPending = orgSlug !== undefined && projectsData === undefined && !isError
+
+  const projects =
+    !isProjectsDataPending && projectsData !== undefined
+      ? projectsData.pages.flatMap((page) => page.projects ?? [])
+      : undefined
+
+  const shouldRenderChecklist =
+    projects !== undefined && projects.length > 0 && projects.length <= MAX_PROJECT_ACKNOWLEDGEMENTS
+
+  const exceedsLimit = projects !== undefined && projects.length > MAX_PROJECT_ACKNOWLEDGEMENTS
+
+  const toggleProject = (ref: string, checked?: boolean | 'indeterminate') => {
+    setCheckedProjects((prev) => ({
+      ...prev,
+      [ref]: checked === undefined ? !prev[ref] : checked === true,
+    }))
+  }
+
+  const isDeletionConfirmed = () => {
+    // While project data is pending or unavailable, treat deletion as not confirmed
+    if (!projects) return false
+
+    if (projects.length === 0) return true
+
+    if (shouldRenderChecklist) {
+      return projects.every((p) => checkedProjects[p.ref])
+    }
+
+    if (exceedsLimit) {
+      return acknowledgedAll
+    }
+
+    return false
+  }
+
+  const allChecked = isDeletionConfirmed()
 
   const [_, setLastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -37,22 +108,31 @@ export const DeleteOrganizationButton = () => {
     },
   })
 
-  const onValidate = (values: any) => {
-    const errors: any = {}
-    if (!values.orgName) {
-      errors.orgName = 'Enter the name of the organization.'
-    }
-    if (values.orgName.trim() !== orgSlug?.trim()) {
-      errors.orgName = 'Value entered does not match the value above.'
-    }
-    return errors
-  }
-
-  const onConfirmDelete = async (values: any) => {
+  const onConfirmDelete = () => {
     if (!canDeleteOrganization) {
-      return toast.error('You do not have the required permissions to delete this organization')
+      toast.error('You do not have permission to delete this organization')
+      return
     }
-    if (!orgSlug) return console.error('Org slug is required')
+
+    if (!orgSlug) {
+      console.error('Org slug is required')
+      return
+    }
+
+    if (isLoading || isFetching || isProjectsDataPending) {
+      toast.error('Projects are still loading, please wait')
+      return
+    }
+
+    if (isError) {
+      toast.error('Failed to load projects')
+      return
+    }
+
+    if (!allChecked) {
+      toast.error('Please acknowledge all projects before deleting the organization')
+      return
+    }
 
     deleteOrganization({ slug: orgSlug })
   }
@@ -62,9 +142,13 @@ export const DeleteOrganizationButton = () => {
       <div className="mt-2">
         <ButtonTooltip
           type="danger"
-          disabled={!canDeleteOrganization}
+          disabled={!canDeleteOrganization || !orgSlug}
           loading={!orgSlug}
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setCheckedProjects({})
+            setAcknowledgedAll(false)
+            setIsOpen(true)
+          }}
           tooltip={{
             content: {
               side: 'bottom',
@@ -77,65 +161,46 @@ export const DeleteOrganizationButton = () => {
           Delete organization
         </ButtonTooltip>
       </div>
-      <Modal
-        hideFooter
-        size="small"
+
+      <TextConfirmModal
         visible={isOpen}
+        size="small"
+        variant="destructive"
+        title="Delete organization"
+        loading={isDeleting}
+        confirmString={orgSlug ?? ''}
+        confirmPlaceholder="Enter the string above"
+        confirmLabel="I understand, delete this organization"
+        onConfirm={onConfirmDelete}
         onCancel={() => setIsOpen(false)}
-        header={
-          <div className="flex items-baseline gap-2">
-            <span>Delete organization</span>
-            <span className="text-xs text-foreground-lighter">Are you sure?</span>
-          </div>
-        }
       >
-        <Form
-          validateOnBlur
-          initialValues={{ orgName: '' }}
-          onSubmit={onConfirmDelete}
-          validate={onValidate}
+        {/* ≤ MAX → checklist */}
+        {shouldRenderChecklist && (
+          <DeleteOrganizationButtonListAck
+            projects={projects}
+            checkedProjects={checkedProjects}
+            toggleProject={toggleProject}
+          />
+        )}
+
+        {/* > MAX → single confirmation */}
+        {exceedsLimit && (
+          <DeleteOrganizationButtonSingleAck
+            acknowledgedAll={acknowledgedAll}
+            setAcknowledgedAll={setAcknowledgedAll}
+            max={MAX_PROJECT_ACKNOWLEDGEMENTS}
+          />
+        )}
+
+        {/* Final warning */}
+        <p
+          className={`text-sm text-foreground-lighter ${(projects?.length ?? 0) > 0 ? 'mt-4' : ''}`}
         >
-          {() => (
-            <>
-              <Modal.Content>
-                <p className="text-sm text-foreground-lighter">
-                  This action <span className="text-foreground">cannot</span> be undone. This will
-                  permanently delete the <span className="text-foreground">{orgName}</span>{' '}
-                  organization and remove all of its projects.
-                </p>
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content>
-                <Input
-                  id="orgName"
-                  label={
-                    <span>
-                      Please type <span className="font-bold">{orgSlug}</span> to confirm
-                    </span>
-                  }
-                  onChange={(e) => setValue(e.target.value)}
-                  value={value}
-                  placeholder="Enter the string above"
-                  className="w-full"
-                />
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content>
-                <Button
-                  block
-                  size="small"
-                  type="danger"
-                  htmlType="submit"
-                  loading={isDeleting}
-                  disabled={isDeleting}
-                >
-                  I understand, delete this organization
-                </Button>
-              </Modal.Content>
-            </>
-          )}
-        </Form>
-      </Modal>
+          This action <span className="text-foreground">cannot</span> be undone. This will
+          permanently delete the <span className="text-foreground">{orgName}</span> organization and
+          remove all of its projects.
+        </p>
+      </TextConfirmModal>
     </>
   )
 }

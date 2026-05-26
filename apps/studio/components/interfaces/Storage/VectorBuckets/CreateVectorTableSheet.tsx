@@ -1,26 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { literal, safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Lock, Plus, Trash2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Plus, Trash2 } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useVectorBucketIndexCreateMutation } from 'data/storage/vector-bucket-index-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -34,9 +25,17 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
-import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
+import { useVectorBucketIndexCreateMutation } from '@/data/storage/vector-bucket-index-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const isStagingLocal = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
@@ -78,7 +77,6 @@ const FormSchema = z.object({
         })
       }
     }),
-  bucketName: z.string().default(''),
   dimension: z
     .number()
     .int('Dimension must be an integer')
@@ -114,13 +112,15 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
   const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId: bucketName })
+  const schema = (wrapperInstance?.server_options ?? [])
+    .find((x) => x.startsWith('supabase_target_schema'))
+    ?.split('supabase_target_schema=')[1]
 
   // [Joshen] Can remove this once this restriction is removed
   const showIndexCreationNotice = isStagingLocal && !!project && project?.region !== 'us-east-1'
 
   const defaultValues = {
     name: '',
-    bucketName,
     dimension: undefined,
     distanceMetric: 'cosine' as 'cosine' | 'euclidean',
     metadataKeys: [],
@@ -147,11 +147,12 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
 
   const onSubmit: SubmitHandler<CreateVectorTableForm> = async (values) => {
     if (!project?.ref) return console.error('Project ref is required')
+    if (!bucketName) return console.error('Bucket name is required')
 
     try {
       await createVectorBucketTable({
         projectRef: project.ref,
-        bucketName: values.bucketName,
+        bucketName: bucketName,
         indexName: values.name,
         dataType: 'float32',
         dimension: values.dimension!,
@@ -164,21 +165,21 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     }
 
     try {
-      if (wrapperInstance) {
+      if (wrapperInstance && !!schema) {
         await importForeignSchema({
           projectRef: project.ref,
           connectionString: project?.connectionString,
           serverName: wrapperInstance.server_name,
-          sourceSchema: getVectorBucketFDWSchemaName(values.bucketName),
-          targetSchema: getVectorBucketFDWSchemaName(values.bucketName),
-          schemaOptions: [`bucket_name '${values.bucketName}'`],
+          sourceSchema: schema,
+          targetSchema: schema,
+          schemaOptions: [safeSql`bucket_name ${literal(bucketName)}`],
         })
       }
     } catch (error: any) {
       toast.warning(`Failed to connect vector table to the database: ${error.message}`)
     }
 
-    toast.success(`Successfully created vector table ${values.name}`)
+    toast.success(`Successfully created vector table “${values.name}”`)
     form.reset()
 
     setVisible(false)
@@ -214,7 +215,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         </ButtonTooltip>
       </SheetTrigger>
 
-      <SheetContent size="lg" className="flex flex-col gap-0 p-0">
+      <SheetContent size="default" className="flex flex-col gap-0 p-0">
         <SheetHeader>
           <SheetTitle>Create vector table</SheetTitle>
         </SheetHeader>
@@ -222,20 +223,20 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         {showIndexCreationNotice && (
           <Admonition
             type="warning"
-            className="mb-0 border-x-0 border-t-0 rounded-none"
+            className="border-x-0 border-t-0 rounded-none"
             title="Vector table creation is currently only supported for projects in us-east-1"
             description={`This is only applicable to projects on local/staging (Project is currently in ${project.region})`}
           />
         )}
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id={formId}
             onSubmit={form.handleSubmit(onSubmit)}
-            className="overflow-auto flex-grow px-0"
+            className="overflow-auto grow px-0"
           >
             <SheetSection className="flex flex-col gap-y-4">
-              <FormField_Shadcn_
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -246,8 +247,8 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                     description="Must be between 3–63 characters. Valid characters are a-z, 0-9, hyphens, and periods."
                     layout="horizontal"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="name"
                         data-1p-ignore
                         data-lpignore="true"
@@ -256,32 +257,14 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                         {...field}
                         placeholder="Enter a table name"
                       />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-
-              <FormField_Shadcn_
-                key="bucketName"
-                name="bucketName"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout name="bucketName" label="Bucket name" layout="horizontal">
-                    <FormControl_Shadcn_>
-                      <div className="relative">
-                        <Input_Shadcn_ {...field} value={field.value} disabled className="pr-10" />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <Lock size={14} className="text-foreground-muted" />
-                        </div>
-                      </div>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </SheetSection>
             <Separator />
             <SheetSection className="flex flex-col gap-y-4">
-              <FormField_Shadcn_
+              <FormField
                 key="dimension"
                 name="dimension"
                 control={form.control}
@@ -289,11 +272,11 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                   <FormItemLayout
                     name="dimension"
                     label="Dimension"
-                    description="Must be an integer between 1 and 4096."
+                    description="Must be an integer between 1–4096."
                     layout="horizontal"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="dimension"
                         type="number"
                         placeholder="Enter a numeric value"
@@ -304,12 +287,12 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                         }}
                         value={field.value ?? ''}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
 
-              <FormField_Shadcn_
+              <FormField
                 key="distanceMetric"
                 name="distanceMetric"
                 control={form.control}
@@ -320,7 +303,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                     layout="horizontal"
                     className="gap-1"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <RadioGroupStacked
                         id="distance_metric"
                         name="distance_metric"
@@ -333,19 +316,13 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                             key={metric.value}
                             id={metric.value}
                             value={metric.value}
-                            label=""
-                            showIndicator={false}
-                          >
-                            <div className="flex flex-col gap-y-1">
-                              <p className="text-foreground text-left">{metric.label}</p>
-                              <p className="text-foreground-lighter text-left">
-                                {metric.description}
-                              </p>
-                            </div>
-                          </RadioGroupStackedItem>
+                            label={metric.label}
+                            description={metric.description}
+                            showIndicator={true}
+                          ></RadioGroupStackedItem>
                         ))}
                       </RadioGroupStacked>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -354,58 +331,73 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
             <SheetSection className="space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm text-foreground">Metadata keys</label>
-                <DocsButton href="https://supabase.com/docs/guides/storage/vector" />
+                <DocsButton
+                  href={`${DOCS_URL}/guides/storage/vector/storing-vectors#metadata-best-practices`}
+                />
               </div>
-
               <div className="space-y-2">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-2">
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name={`metadataKeys.${index}.value`}
-                      render={({ field }) => (
-                        <FormItem_Shadcn_ className="flex-1">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              {...field}
-                              value={field.value}
-                              size="small"
-                              className="w-full"
-                              placeholder="Header value"
-                              data-1p-ignore
-                              data-lpignore="true"
-                              data-form-type="other"
-                              data-bwignore
-                            />
-                          </FormControl_Shadcn_>
-                          <FormMessage_Shadcn_ />
-                        </FormItem_Shadcn_>
-                      )}
-                    />
+                    <div className="flex-1">
+                      <FormField
+                        control={form.control}
+                        name={`metadataKeys.${index}.value`}
+                        render={({ field }) => (
+                          <FormItemLayout
+                            name={`metadataKeys.${index}.value`}
+                            description={
+                              index === fields.length - 1
+                                ? 'Must be between 1–63 characters and unique within this table.'
+                                : undefined
+                            }
+                            layout="vertical"
+                          >
+                            <FormControl>
+                              <Input
+                                {...field}
+                                value={field.value}
+                                size="small"
+                                className="w-full"
+                                placeholder="Enter a metadata key name"
+                                data-1p-ignore
+                                data-lpignore="true"
+                                data-form-type="other"
+                                data-bwignore
+                              />
+                            </FormControl>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </div>
                     <Button
-                      type="outline"
-                      className="px-2"
-                      size="small"
-                      icon={<Trash2 className="w-2 h-2" size={12} />}
+                      type="text"
+                      className="w-[34px] h-[34px]" // Match the height of the input
+                      size="tiny"
+                      icon={<Trash2 size={12} />}
                       onClick={() => remove(index)}
                     />
                   </div>
                 ))}
               </div>
-              <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
+              <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
                 <Button type="default" size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>
               </div>
             </SheetSection>
           </form>
-        </Form_Shadcn_>
+        </Form>
 
         <SheetFooter>
           <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isCreating} disabled={isCreating}>
+          <Button
+            form={formId}
+            htmlType="submit"
+            loading={isCreating}
+            disabled={isCreating || !bucketName}
+          >
             Create
           </Button>
         </SheetFooter>

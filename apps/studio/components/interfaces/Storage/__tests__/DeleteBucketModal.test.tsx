@@ -4,12 +4,12 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Bucket } from 'data/storage/buckets-query'
-import { customRender } from 'tests/lib/custom-render'
-import { addAPIMock } from 'tests/lib/msw'
-import { routerMock } from 'tests/lib/route-mock'
 import { DeleteBucketModal } from '../DeleteBucketModal'
+import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
+import { Bucket } from '@/data/storage/buckets-query'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
 
 const bucket: Bucket = {
   id: 'test',
@@ -63,7 +63,7 @@ describe(`DeleteBucketModal`, () => {
         status: 'ACTIVE_HEALTHY',
       },
     })
-    // useBucketsQuery
+    // usePaginatedBucketsQuery
     addAPIMock({
       method: `get`,
       path: `/platform/storage/:ref/buckets`,
@@ -90,12 +90,18 @@ describe(`DeleteBucketModal`, () => {
         },
       ],
     })
-    // useBucketDeleteMutation
+    // useBucketDeleteMutation - empty bucket
     addAPIMock({
       method: `post`,
       path: `/platform/storage/:ref/buckets/:id/empty`,
     })
-    // useDatabasePolicyDeleteMutation
+    // useBucketDeleteMutation - poll for empty bucket
+    addAPIMock({
+      method: `post`,
+      path: `/platform/storage/:ref/buckets/:id/objects/list`,
+      response: [], // Return empty array to indicate bucket is empty
+    })
+    // useBucketDeleteMutation - delete bucket
     addAPIMock({
       method: `delete`,
       path: `/platform/storage/:ref/buckets/:id`,

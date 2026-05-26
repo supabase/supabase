@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react'
-import isEqual from 'lodash/isEqual'
-
 import { useParams } from 'common'
-import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import isEqual from 'lodash/isEqual'
+import { useEffect, useState } from 'react'
 
-import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'
+import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
+import { ReportFilterItem } from '@/components/interfaces/Reports/Reports.types'
+import { getLogsSql, queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
+import type { LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export const useStorageReport = () => {
   const { ref: projectRef } = useParams()
@@ -87,36 +86,46 @@ export const useStorageReport = () => {
 
   useEffect(() => {
     if (totalRequests.changeQuery) {
-      totalRequests.changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(formattedFilters))
+      totalRequests.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.totalRequests, formattedFilters)
+      )
     }
     if (topRoutes.changeQuery) {
-      topRoutes.changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(formattedFilters))
+      topRoutes.changeQuery(getLogsSql(PRESET_CONFIG.api.queries.topRoutes, formattedFilters))
     }
     if (errorCounts.changeQuery) {
-      errorCounts.changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(formattedFilters))
+      errorCounts.changeQuery(getLogsSql(PRESET_CONFIG.api.queries.errorCounts, formattedFilters))
     }
 
     if (topErrorRoutes.changeQuery) {
-      topErrorRoutes.changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(formattedFilters))
+      topErrorRoutes.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.topErrorRoutes, formattedFilters)
+      )
     }
     if (responseSpeed.changeQuery) {
-      responseSpeed.changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(formattedFilters))
+      responseSpeed.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.responseSpeed, formattedFilters)
+      )
     }
 
     if (topSlowRoutes.changeQuery) {
-      topSlowRoutes.changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(formattedFilters))
+      topSlowRoutes.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.topSlowRoutes, formattedFilters)
+      )
     }
 
     if (networkTraffic.changeQuery) {
-      networkTraffic.changeQuery(PRESET_CONFIG.api.queries.networkTraffic.sql(formattedFilters))
+      networkTraffic.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.networkTraffic, formattedFilters)
+      )
     }
 
     if (cacheHitRate.changeQuery) {
-      cacheHitRate.changeQuery(PRESET_CONFIG.storage.queries.cacheHitRate.sql([]))
+      cacheHitRate.changeQuery(getLogsSql(PRESET_CONFIG.storage.queries.cacheHitRate, []))
     }
 
     if (topCacheMisses.changeQuery) {
-      topCacheMisses.changeQuery(PRESET_CONFIG.storage.queries.topCacheMisses.sql([]))
+      topCacheMisses.changeQuery(getLogsSql(PRESET_CONFIG.storage.queries.topCacheMisses, []))
     }
   }, [JSON.stringify(formattedFilters)])
 

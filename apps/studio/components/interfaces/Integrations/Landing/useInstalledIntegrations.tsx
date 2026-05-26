@@ -1,41 +1,86 @@
 import { useMemo } from 'react'
 
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { EMPTY_ARR } from 'lib/void'
-import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
-import { INTEGRATIONS } from './Integrations.constants'
+import {
+  hasMatchingWrapper,
+  hasRequiredExtensions,
+  isOAuthInstalled,
+  isStripeSyncEngineInstalled,
+} from './Landing.utils'
+import { useAvailableIntegrations } from './useAvailableIntegrations'
+import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSecretsQuery } from '@/data/secrets/secrets-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { EMPTY_ARR } from '@/lib/void'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-
-  const allIntegrations = useMemo(() => {
-    if (integrationsWrappers) {
-      return INTEGRATIONS
-    } else {
-      return INTEGRATIONS.filter((integration) => !integration.id.endsWith('_wrapper'))
-    }
-  }, [integrationsWrappers])
 
   const {
-    data,
+    data: allIntegrations = EMPTY_ARR,
+    error: availableIntegrationsError,
+    isPending: isAvailableIntegrationsLoading,
+    isSuccess: isSuccessAvailableIntegrations,
+    isError: isErrorAvailableIntegrations,
+  } = useAvailableIntegrations()
+
+  const hasSecretKeyPrefixIntegration = useMemo(() => {
+    return allIntegrations.some(
+      (integration) =>
+        integration.type === 'oauth' &&
+        integration.installIdentificationMethod === 'secret_key_prefix' &&
+        !!integration.secretKeyPrefix
+    )
+  }, [allIntegrations])
+
+  const hasEdgeFunctionSecretNameIntegration = useMemo(() => {
+    return allIntegrations.some(
+      (integration) =>
+        integration.type === 'oauth' &&
+        integration.installIdentificationMethod === 'edge_function_secret_name' &&
+        !!integration.edgeFunctionSecretName
+    )
+  }, [allIntegrations])
+
+  const {
+    data: apiKeys = EMPTY_ARR,
+    error: apiKeysError,
+    isError: isErrorApiKeys,
+    isLoading: isApiKeysLoading,
+    isSuccess: isSuccessApiKeys,
+  } = useAPIKeysQuery(
+    { projectRef: project?.ref, reveal: false },
+    { enabled: hasSecretKeyPrefixIntegration }
+  )
+
+  const {
+    data: edgeFunctionSecrets = EMPTY_ARR,
+    error: edgeFunctionSecretsError,
+    isError: isErrorEdgeFunctionSecrets,
+    isLoading: isEdgeFunctionSecretsLoading,
+    isSuccess: isSuccessEdgeFunctionSecrets,
+  } = useSecretsQuery(
+    { projectRef: project?.ref },
+    { enabled: hasEdgeFunctionSecretNameIntegration }
+  )
+
+  const {
+    data: wrappers = EMPTY_ARR,
     error: fdwError,
     isError: isErrorFDWs,
-    isLoading: isFDWLoading,
+    isPending: isFDWLoading,
     isSuccess: isSuccessFDWs,
   } = useFDWsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const {
-    data: extensions,
+    data: extensions = EMPTY_ARR,
     error: extensionsError,
     isError: isErrorExtensions,
-    isLoading: isExtensionsLoading,
+    isPending: isExtensionsLoading,
     isSuccess: isSuccessExtensions,
   } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -43,10 +88,10 @@ export const useInstalledIntegrations = () => {
   })
 
   const {
-    data: schemas,
+    data: schemas = EMPTY_ARR,
     error: schemasError,
     isError: isErrorSchemas,
-    isLoading: isSchemasLoading,
+    isPending: isSchemasLoading,
     isSuccess: isSuccessSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,
@@ -54,45 +99,61 @@ export const useInstalledIntegrations = () => {
   })
 
   const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
-  const wrappers = useMemo(() => data ?? EMPTY_ARR, [data])
 
   const installedIntegrations = useMemo(() => {
     return allIntegrations
-      .filter((i) => {
-        // special handling for supabase webhooks
-        if (i.id === 'webhooks') {
-          return isHooksEnabled
+      .filter((integration) => {
+        if (integration.id === 'webhooks') return isHooksEnabled
+        if (integration.id === 'data_api') return true
+        if (integration.id === 'stripe_sync_engine') {
+          return isStripeSyncEngineInstalled(schemas)
         }
-        if (i.type === 'wrapper') {
-          return wrappers.find((w) => wrapperMetaComparator(i.meta, w))
+        if (integration.type === 'wrapper') {
+          return hasMatchingWrapper({ meta: integration.meta, wrappers })
         }
-        if (i.type === 'postgres_extension') {
-          return i.requiredExtensions.every((extName) => {
-            const foundExtension = (extensions ?? []).find((ext) => ext.name === extName)
-            return !!foundExtension?.installed_version
-          })
+        if (integration.type === 'postgres_extension') {
+          return hasRequiredExtensions({ integration, extensions })
+        }
+        if (integration.type === 'oauth') {
+          return isOAuthInstalled({ integration, apiKeys, secrets: edgeFunctionSecrets })
         }
         return false
       })
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [wrappers, extensions, isHooksEnabled])
+  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, apiKeys, edgeFunctionSecrets])
 
-  // available integrations are all integrations that can be installed. If an integration can't be installed (needed
-  // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
-  const availableIntegrations = useMemo(
-    () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
-    []
-  )
-
-  const error = fdwError || extensionsError || schemasError
-  const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading
-  const isError = isErrorFDWs || isErrorExtensions || isErrorSchemas
-  const isSuccess = isSuccessFDWs && isSuccessExtensions && isSuccessSchemas
+  const error =
+    fdwError ||
+    extensionsError ||
+    schemasError ||
+    availableIntegrationsError ||
+    (hasSecretKeyPrefixIntegration ? apiKeysError : null) ||
+    (hasEdgeFunctionSecretNameIntegration ? edgeFunctionSecretsError : null)
+  const isLoading =
+    isSchemasLoading ||
+    isFDWLoading ||
+    isExtensionsLoading ||
+    isAvailableIntegrationsLoading ||
+    (hasSecretKeyPrefixIntegration && isApiKeysLoading) ||
+    (hasEdgeFunctionSecretNameIntegration && isEdgeFunctionSecretsLoading)
+  const isError =
+    isErrorFDWs ||
+    isErrorExtensions ||
+    isErrorSchemas ||
+    isErrorAvailableIntegrations ||
+    (hasSecretKeyPrefixIntegration && isErrorApiKeys) ||
+    (hasEdgeFunctionSecretNameIntegration && isErrorEdgeFunctionSecrets)
+  const isSuccess =
+    isSuccessFDWs &&
+    isSuccessExtensions &&
+    isSuccessSchemas &&
+    isSuccessAvailableIntegrations &&
+    (!hasSecretKeyPrefixIntegration || isSuccessApiKeys) &&
+    (!hasEdgeFunctionSecretNameIntegration || isSuccessEdgeFunctionSecrets)
 
   return {
     // show all integrations at once instead of showing partial results
     installedIntegrations: isLoading ? EMPTY_ARR : installedIntegrations,
-    availableIntegrations: isLoading ? EMPTY_ARR : availableIntegrations,
     error,
     isError,
     isLoading,

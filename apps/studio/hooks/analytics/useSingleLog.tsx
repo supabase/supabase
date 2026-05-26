@@ -1,14 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
-import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
+
+import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type {
   LogData,
   Logs,
   LogsEndpointParams,
   QueryType,
-} from 'components/interfaces/Settings/Logs/Logs.types'
-import { genSingleLogQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get } from 'data/fetchers'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+} from '@/components/interfaces/Settings/Logs/Logs.types'
+import { genSingleLogQuery } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { get } from '@/data/fetchers'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface SingleLogHook {
   data: LogData | undefined
@@ -41,7 +42,7 @@ function useSingleLog({
   const {
     data,
     error: rcError,
-    isLoading,
+    isPending,
     isRefetching,
     refetch,
   } = useQuery({
@@ -73,7 +74,7 @@ function useSingleLog({
     data: !!result
       ? { ...result, metadata: logsMetadata ? result?.metadata : undefined }
       : undefined,
-    isLoading: (enabled && isLoading) || isRefetching,
+    isLoading: (enabled && isPending) || isRefetching,
     error,
     refresh: () => refetch(),
   }

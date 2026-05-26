@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
-import { ThirdPartyAuthForm } from 'components/interfaces/Auth/ThirdPartyAuthForm'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import { AuthProvidersLayout } from 'components/layouts/AuthLayout/AuthProvidersLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+
+import { ThirdPartyAuthForm } from '@/components/interfaces/Auth/ThirdPartyAuthForm'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import { AuthProvidersLayout } from '@/components/layouts/AuthLayout/AuthProvidersLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import NoPermission from '@/components/ui/NoPermission'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
 
 const ThirdPartyPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -23,7 +23,7 @@ const ThirdPartyPage: NextPageWithLayout = () => {
 
   if (!showThirdPartyAuth) {
     return (
-      <AuthLayout>
+      <AuthLayout title="Sign In / Providers">
         <UnknownInterface urlBack={`/project/${ref}/auth/providers`} />
       </AuthLayout>
     )
@@ -34,9 +34,9 @@ const ThirdPartyPage: NextPageWithLayout = () => {
       {isPermissionsLoaded && !canReadAuthSettings ? (
         <NoPermission isFullPage resourceText="access your project's auth provider settings" />
       ) : (
-        <ScaffoldContainer className="pb-16">
+        <PageContainer size="default" className="pb-16">
           <ThirdPartyAuthForm />
-        </ScaffoldContainer>
+        </PageContainer>
       )}
     </AuthProvidersLayout>
   )

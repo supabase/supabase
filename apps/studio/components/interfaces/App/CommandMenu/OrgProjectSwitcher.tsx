@@ -1,11 +1,11 @@
+import { IS_PLATFORM } from 'common'
 import { Building, Forward, Wrench } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { IS_PLATFORM } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'
 const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
@@ -45,7 +45,7 @@ export function useProjectSwitchCommand() {
     [
       {
         id: 'switch-project',
-        name: 'Switch project',
+        name: 'Switch project...',
         value: 'Switch project, Change project, Select project',
         action: () => setPage(PROJECT_SWITCHER_PAGE_NAME),
         icon: () => <Wrench />,
@@ -87,7 +87,7 @@ export function useConfigureOrganizationCommand() {
     [
       {
         id: 'configure-organization',
-        name: 'Configure organization',
+        name: 'Configure organization...',
         value: 'Configure organization, Change organization, Select organization',
         action: () => setPage(ORGANIZATION_SWITCHER_PAGE_NAME),
         icon: () => <Building />,

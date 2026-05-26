@@ -2,6 +2,7 @@
 title = "Why are my Supabase branches empty?"
 topics = [ "branching" ]
 keywords = [ "branching", "migrations" ]
+database_id = "c5dae428-8dd0-4879-b312-df7f7da25986"
 ---
 
 Branching in Supabase (Branching 2.0) relies on the current migration files in your project—**not** a schema dump—when creating environments from `main`. This means if your `main` branch lacks migration history, branching will not fully capture your schema. This is a known limitation highlighted in the [Branching 2.0 documentation](/blog/branching-2-0#current-limitations). Follow the steps below to generate, synchronize, and repair your migration history for smooth branching.
@@ -42,12 +43,14 @@ Update remote migration history table? [Y/n]
 
 Type `Y` to update your remote project’s migration history and ensure it matches your new local migrations.
 
-- If the CLI suggests repairing migration history due to mismatches, you might see:
-  ```
-  Make sure your local git repo is up-to-date. If the error persists, try repairing the migration history table:
-  supabase migration repair --status applied <timestamp>
-  ```
-  Run the exact repair command provided, replacing the timestamp as instructed (example timestamp: 20251006141726). This synchronizes the migration state between local and remote.
+If the CLI suggests repairing migration history due to mismatches, you might see:
+
+```
+Make sure your local git repo is up-to-date. If the error persists, try repairing the migration history table:
+supabase migration repair --status applied TIMESTAMP_OF_MIGRATION_TO_REPAIR
+```
+
+Run the exact repair command provided, replacing the timestamp as instructed (example timestamp: 20251006141726). This synchronizes the migration state between local and remote.
 
 ---
 
@@ -59,4 +62,4 @@ Once your migration history is up to date, continue to use branching features as
 
 #### Additional tips
 
-- If further issues arise (such as schema drift or migration mismatches), review the [troubleshooting documentation](/docs/guides/deployment/branching/troubleshooting#migration-issues), and consider manual repair with `supabase migration repair`(https://supabase.com/docs/reference/cli/supabase-migration-repair).
+If further issues arise (such as schema drift or migration mismatches), review the [troubleshooting documentation](/docs/guides/deployment/branching/troubleshooting#migration-issues), and consider manual repair with [`supabase migration repair`](/docs/reference/cli/supabase-migration-repair).

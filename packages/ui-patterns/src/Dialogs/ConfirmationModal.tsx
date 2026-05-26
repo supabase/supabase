@@ -1,17 +1,21 @@
 'use client'
 
-import { MouseEventHandler, forwardRef, useEffect, useState } from 'react'
+// Required to avoid issue:
+// The inferred type of ConfirmationModal cannot be named without a reference to DialogProps
+import { Dialog as _RadixDialog } from 'radix-ui'
+import { forwardRef, MouseEventHandler, useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  cn,
 } from 'ui'
 import { DialogDescription, DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
+
 import { Admonition } from './../admonition'
 
 export interface ConfirmationModalProps {
@@ -26,12 +30,13 @@ export interface ConfirmationModalProps {
   onConfirm: () => void
   onCancel: () => void
   disabled?: boolean
-  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
-    base?: React.ComponentProps<typeof Alert_Shadcn_>
+    base?: React.ComponentProps<typeof Alert>
     title?: string
     description?: string | React.ReactNode
   }
+  className?: string
 }
 
 export const ConfirmationModal = forwardRef<
@@ -54,6 +59,7 @@ export const ConfirmationModal = forwardRef<
       children,
       variant = 'default',
       disabled,
+      className,
       ...props
     },
     ref
@@ -79,6 +85,9 @@ export const ConfirmationModal = forwardRef<
       if (loading_ !== undefined) setLoading(loading_)
     }, [loading_])
 
+    const { title: _alertBaseTitle, children: _alertBaseChildren, ...alertBase } = alert?.base ?? {}
+    const alertTitleProps = alert?.title ? { label: alert.title } : {}
+
     return (
       <Dialog
         open={visible}
@@ -89,7 +98,12 @@ export const ConfirmationModal = forwardRef<
           }
         }}
       >
-        <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
+        <DialogContent
+          aria-describedby={undefined}
+          ref={ref}
+          className="p-0 gap-0 pb-5 block!"
+          size={size}
+        >
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle>{title}</DialogTitle>
             {description && <DialogDescription>{description}</DialogDescription>}
@@ -97,15 +111,17 @@ export const ConfirmationModal = forwardRef<
           {alert && (
             <Admonition
               type={variant as 'default' | 'destructive' | 'warning'}
-              label={alert.title}
               description={alert.description}
-              className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5 mb-0"
-              {...alert?.base}
+              {...alertTitleProps}
+              className="border-x-0 rounded-none -mt-px"
+              {...alertBase}
             />
           )}
           {children && (
             <>
-              <DialogSection padding={'small'}>{children}</DialogSection>
+              <DialogSection padding="small" className={className}>
+                {children}
+              </DialogSection>
               <DialogSectionSeparator />
             </>
           )}
@@ -132,7 +148,7 @@ export const ConfirmationModal = forwardRef<
               onClick={onSubmit}
               className="truncate"
             >
-              {confirmLabel}
+              {loading && confirmLabelLoading ? confirmLabelLoading : confirmLabel}
             </Button>
           </div>
         </DialogContent>

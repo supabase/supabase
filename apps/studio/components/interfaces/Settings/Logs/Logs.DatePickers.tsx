@@ -1,27 +1,87 @@
-import dayjs from 'dayjs'
-import { Clock, HistoryIcon } from 'lucide-react'
-import type { PropsWithChildren } from 'react'
-import { useCallback, useEffect, useState } from 'react'
-
-import { Badge } from '@ui/components/shadcn/ui/badge'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { TimeSplitInput } from 'components/ui/DatePicker/TimeSplitInput'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import dayjs from 'dayjs'
+import { Clock, HistoryIcon, Lock } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   ButtonProps,
   Calendar,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   cn,
   copyToClipboard,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
+
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TimeSplitInput } from '@/components/ui/DatePicker/TimeSplitInput'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import type { ShortcutId } from '@/state/shortcuts/registry'
+
+type Unit = 'minute' | 'hour' | 'day'
+
+export type ParsedCustomInput =
+  | { type: 'number'; value: number }
+  | { type: 'unit'; value: number; unit: Unit }
+  | { type: 'invalid' }
+
+export const parseCustomInput = (input: string): ParsedCustomInput => {
+  const trimmed = input.trim().toLowerCase()
+  if (!trimmed) return { type: 'invalid' }
+
+  // Try to match "number + optional space + unit prefix"
+  const match = trimmed.match(/^(\d+)\s*([a-z]*)$/)
+  if (!match) return { type: 'invalid' }
+
+  const [, numStr, unitStr] = match
+  const value = parseInt(numStr, 10)
+
+  if (isNaN(value) || value <= 0) return { type: 'invalid' }
+
+  if (!unitStr) {
+    return { type: 'number', value }
+  }
+
+  // Match if unitStr is a prefix of any unit name or its first letter
+  const units: Unit[] = ['minute', 'hour', 'day']
+  const matchedUnit = units.find((u) => u.startsWith(unitStr) || u[0] === unitStr)
+
+  if (!matchedUnit) return { type: 'invalid' }
+
+  return { type: 'unit', value, unit: matchedUnit }
+}
+
+export const generateDynamicHelper = (value: number, unit: Unit): DatetimeHelper => {
+  return {
+    text: `Last ${value} ${unit}${value === 1 ? '' : 's'}`,
+    calcFrom: () => dayjs().subtract(value, unit).toISOString(),
+    calcTo: () => dayjs().toISOString(),
+  }
+}
+
+export const generateDynamicHelpers = (value: number): DatetimeHelper[] => {
+  const units: Unit[] = ['minute', 'hour', 'day']
+  return units.map((unit) => generateDynamicHelper(value, unit))
+}
+
+export const generateHelpersFromInput = (input: string): DatetimeHelper[] | null => {
+  const parsed = parseCustomInput(input)
+
+  switch (parsed.type) {
+    case 'number':
+      return generateDynamicHelpers(parsed.value)
+    case 'unit':
+      return [generateDynamicHelper(parsed.value, parsed.unit)]
+    case 'invalid':
+      return null
+  }
+}
 
 export type DatePickerValue = {
   to: string
@@ -35,9 +95,17 @@ interface LogsDatePickerProps {
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
-  popoverContentProps?: typeof PopoverContent_Shadcn_
+  popoverContentProps?: typeof PopoverContent
   hideWarnings?: boolean
   align?: 'start' | 'end' | 'center'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  /**
+   * Registered shortcut id whose hotkey is shown in a tooltip on the trigger
+   * button. The tooltip hides while the popover is open so it doesn't sit on
+   * top of the picker. Leave undefined to render no tooltip.
+   */
+  shortcutId?: ShortcutId
 }
 
 export const LogsDatePicker = ({
@@ -48,12 +116,29 @@ export const LogsDatePicker = ({
   popoverContentProps,
   hideWarnings,
   align = 'end',
+  open: openProp,
+  onOpenChange,
+  shortcutId,
 }: PropsWithChildren<LogsDatePickerProps>) => {
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = openProp !== undefined
+  const open = isControlled ? openProp : internalOpen
+  const setOpen = (next: boolean) => {
+    if (!isControlled) setInternalOpen(next)
+    onOpenChange?.(next)
+  }
+  const [customValue, setCustomValue] = useState('')
+
+  const displayedHelpers = useMemo(() => {
+    if (!customValue.trim()) return helpers
+    const generated = generateHelpersFromInput(customValue)
+    return generated ?? []
+  }, [customValue, helpers])
 
   // Reset the state when the popover closes
   useEffect(() => {
     if (!open) {
+      setCustomValue('')
       setStartDate(value.from ? new Date(value.from) : null)
       const defaultEndDate = value.to ? new Date(value.to) : new Date()
       setEndDate(defaultEndDate)
@@ -82,7 +167,7 @@ export const LogsDatePicker = ({
   }, [open, value])
 
   const handleHelperChange = (newValue: string) => {
-    const selectedHelper = helpers.find((h) => h.text === newValue)
+    const selectedHelper = displayedHelpers.find((h) => h.text === newValue)
     if (onSubmit && selectedHelper) {
       onSubmit({
         to: selectedHelper.calcTo(),
@@ -243,7 +328,6 @@ export const LogsDatePicker = ({
 
   const showHelperBadge = (helper?: DatetimeHelper) => {
     if (!helper) return false
-    if (!helper.availableIn?.length) return false
     if (!entitledToAuditLogDays) return false
 
     const day = Math.abs(dayjs().diff(dayjs(helper.calcFrom()), 'day'))
@@ -251,61 +335,73 @@ export const LogsDatePicker = ({
     return true
   }
 
+  const triggerButton = (
+    <PopoverTrigger asChild>
+      <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
+        {value.isHelper
+          ? value.text
+          : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
+      </Button>
+    </PopoverTrigger>
+  )
+
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
-          {value.isHelper
-            ? value.text
-            : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
-        </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+    <Popover open={open} onOpenChange={setOpen}>
+      {shortcutId ? (
+        <ShortcutTooltip shortcutId={shortcutId} side="bottom" open={open ? false : undefined}>
+          {triggerButton}
+        </ShortcutTooltip>
+      ) : (
+        triggerButton
+      )}
+      <PopoverContent
         className="flex w-full p-0"
         side="bottom"
         align={align}
-        portal={true}
         {...popoverContentProps}
       >
-        <RadioGroup
-          onValueChange={handleHelperChange}
-          value={value.isHelper ? value.text : ''}
-          className="border-r p-2 flex flex-col gap-px"
-        >
-          {helpers.map((helper) => (
-            <Label
-              key={helper.text}
-              className={cn(
-                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
-                {
-                  'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
-                }
-              )}
-            >
-              <RadioGroupItem
-                hidden
+        <div className="border-r p-2 flex flex-col gap-px">
+          <Input
+            type="text"
+            placeholder="e.g. 2h, 30m, 7d"
+            value={customValue}
+            onChange={(e) => setCustomValue(e.target.value)}
+            className="mb-2 text-xs h-7 rounded-xs"
+          />
+          <RadioGroup
+            onValueChange={handleHelperChange}
+            value={value.isHelper ? value.text : ''}
+            className="flex flex-col gap-px"
+          >
+            {displayedHelpers.map((helper) => (
+              <Label
                 key={helper.text}
-                value={helper.text}
-                disabled={helper.disabled}
-                aria-disabled={helper.disabled}
-              ></RadioGroupItem>
-              {helper.text}
-              {showHelperBadge(helper) ? (
-                <Badge
-                  size="small"
-                  variant="outline"
-                  className="h-5 text-[10px] text-foreground-light capitalize"
-                >
-                  {helper.availableIn?.[0] || ''}
-                </Badge>
-              ) : null}
-            </Label>
-          ))}
-        </RadioGroup>
+                className={cn(
+                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-xs text-xs w-full',
+                  {
+                    'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
+                  }
+                )}
+              >
+                <RadioGroupItem
+                  hidden
+                  key={helper.text}
+                  value={helper.text}
+                  disabled={helper.disabled}
+                  aria-disabled={helper.disabled}
+                ></RadioGroupItem>
+                {helper.text}
+                {showHelperBadge(helper) ? (
+                  <Lock size={12} className="text-foreground-muted" />
+                ) : null}
+              </Label>
+            ))}
+          </RadioGroup>
+        </div>
 
         <div>
           <div className="flex p-2 gap-2 items-center">
-            <div className="flex flex-grow *:flex-grow gap-2 font-mono">
+            <div className="flex grow *:grow gap-2 font-mono">
               <TimeSplitInput
                 type="start"
                 startTime={startTime}
@@ -329,7 +425,7 @@ export const LogsDatePicker = ({
                 endDate={endDate}
               />
             </div>
-            <div className="flex-shrink">
+            <div className="shrink">
               <ButtonTooltip
                 tooltip={{
                   content: {
@@ -391,7 +487,7 @@ export const LogsDatePicker = ({
             <Button onClick={handleApply}>Apply</Button>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

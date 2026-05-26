@@ -1,5 +1,4 @@
 import { useState } from 'react'
-
 import {
   Button,
   Dialog,
@@ -11,9 +10,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-
-import { INTERNAL_SCHEMAS, useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { Admonition } from 'ui-patterns'
+
+import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
   return (
@@ -34,7 +33,7 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
             </code>
           ))}
         </div>
-        <p className="text-sm !mt-4">
+        <p className="text-sm mt-4!">
           These schemas are critical to the functionality of your Supabase project and hence we
           highly recommend not altering them.
         </p>
@@ -68,31 +67,37 @@ export const ProtectedSchemaWarning = ({
 
   if (!isSchemaLocked) return null
 
+  const showLearnMoreDialog =
+    reason !== 'fdw' || (fdwType !== 'iceberg' && fdwType !== 's3_vectors')
+
   return (
     <Admonition
       showIcon={size === 'sm' ? false : true}
+      layout={size === 'sm' ? 'vertical' : 'horizontal'}
       type="note"
       title={
         size === 'sm' ? `Viewing protected schema` : `Viewing ${entity} from a protected schema`
       }
-      className="[&_p]:!m-0"
-    >
-      {reason === 'fdw' && fdwType === 'iceberg' ? (
-        <p>
-          The <code className="text-code-inline">{schema}</code> schema is used by Supabase to
-          connect to analytics buckets and is read-only through the dashboard.
-        </p>
-      ) : reason === 'fdw' && fdwType === 's3_vectors' ? (
-        <p>
-          The <code className="text-xs">{schema}</code> schema is used by Supabase to connect to
-          vector buckets and is read-only through the dashboard.
-        </p>
-      ) : (
-        <>
-          <p className="mb-2">
+      description={
+        reason === 'fdw' && fdwType === 'iceberg' ? (
+          <p>
+            The <code className="text-code-inline">{schema}</code> schema is used by Supabase to
+            connect to analytics buckets and is read-only through the dashboard.
+          </p>
+        ) : reason === 'fdw' && fdwType === 's3_vectors' ? (
+          <p>
+            The <code className="text-code-inline">{schema}</code> schema is used by Supabase to
+            connect to vector buckets and is read-only through the dashboard.
+          </p>
+        ) : (
+          <p>
             The <code className="text-code-inline">{schema}</code> schema is managed by Supabase and
             is read-only through the dashboard.
           </p>
+        )
+      }
+      actions={
+        showLearnMoreDialog && (
           <Dialog open={showModal} onOpenChange={setShowModal}>
             <DialogTrigger asChild>
               <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
@@ -103,8 +108,8 @@ export const ProtectedSchemaWarning = ({
               <ProtectedSchemaDialog onClose={() => setShowModal(false)} />
             </DialogContent>
           </Dialog>
-        </>
-      )}
-    </Admonition>
+        )
+      }
+    />
   )
 }

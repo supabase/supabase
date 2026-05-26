@@ -1,10 +1,10 @@
 import { useParams } from 'common'
-
-import { SimpleCodeBlock } from 'ui'
-import { Markdown } from '../Markdown'
 import { PropsWithChildren } from 'react'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
+import { Markdown } from '../Markdown'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface ContentSnippetProps {
   apikey?: string
@@ -51,9 +51,11 @@ const ContentSnippet = ({
   }
 
   return (
-    <div id={snippet.key} className="space-y-4 py-6 pb-2 last:pb-6">
+    <div className="space-y-4 py-6 pb-2 last:pb-6">
       <div className="px-4 space-y-4">
-        <h2 className="doc-heading">{snippet.title}</h2>
+        <h2 id={snippet.key} tabIndex={-1} className="doc-heading">
+          {snippet.title}
+        </h2>
         {snippet.description !== undefined && (
           <div className="doc-section">
             <article className="text text-sm text-foreground-light">
@@ -68,7 +70,7 @@ const ContentSnippet = ({
       {children}
       {codeSnippet !== undefined && (
         <div className="px-4 codeblock-container">
-          <div className="bg rounded p-2">
+          <div className="bg rounded-sm p-2">
             <SimpleCodeBlock className={selectedLanguage} onCopy={handleCopy}>
               {codeSnippet}
             </SimpleCodeBlock>

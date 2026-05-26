@@ -1,6 +1,7 @@
 ---
 title = "Enabling the IPv4 add-on FAQ"
 topics = [ "database", "platform", "supavisor" ]
+database_id = "02f5f200-3c1c-425e-945f-b80b3fce3ec0"
 ---
 
 Enabling the IPv4 add-on will attach an IPv4 address to your project's compute instance, while preserving the existing IPv6 address. Both DNS records `ref.supabase.co` and `db.ref.supabase.co` will be updated to point to the IPv4 address.
@@ -9,7 +10,7 @@ Enabling the IPv4 add-on will attach an IPv4 address to your project's compute i
 
 Enabling the IPv4 add-on will not cause any downtime since existing connections will not be dropped. New inbound connections (both direct connections on ports 5432 and 6543, as well as PostgREST requests) will use the newly allocated IPv4 address.
 
-## Will the project instance will be restarted?
+## Will the project instance be restarted?
 
 No, the IPv4 add-on will not require a restart of the instance.
 

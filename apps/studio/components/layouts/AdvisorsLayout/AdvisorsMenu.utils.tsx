@@ -1,13 +1,14 @@
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM } from 'lib/constants'
+import { useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 
-export const generateAdvisorsMenu = (
-  project?: Project,
-  features?: { advisorRules: boolean }
-): ProductMenuGroup[] => {
-  const ref = project?.ref ?? 'default'
+import { useIsAdvisorRulesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
+import { IS_PLATFORM } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+export const useGenerateAdvisorsMenu = (): ProductMenuGroup[] => {
+  const { ref } = useParams()
+  const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
 
   return [
     {
@@ -18,12 +19,14 @@ export const generateAdvisorsMenu = (
           key: 'security',
           url: `/project/${ref}/advisors/security`,
           items: [],
+          shortcutId: SHORTCUT_IDS.NAV_ADVISORS_SECURITY,
         },
         {
           name: 'Performance Advisor',
           key: 'performance',
           url: `/project/${ref}/advisors/performance`,
           items: [],
+          shortcutId: SHORTCUT_IDS.NAV_ADVISORS_PERFORMANCE,
         },
         {
           name: 'Query Performance',
@@ -34,7 +37,7 @@ export const generateAdvisorsMenu = (
         },
       ],
     },
-    ...(IS_PLATFORM && features?.advisorRules
+    ...(IS_PLATFORM && isAdvisorRulesEnabled
       ? [
           {
             title: 'Configuration',
@@ -44,6 +47,7 @@ export const generateAdvisorsMenu = (
                 key: 'rules',
                 url: `/project/${ref}/advisors/rules/security`,
                 items: [],
+                shortcutId: SHORTCUT_IDS.NAV_ADVISORS_RULES,
               },
             ],
           },

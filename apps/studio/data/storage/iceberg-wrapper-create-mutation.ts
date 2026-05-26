@@ -1,26 +1,25 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
-import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
+import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
   getAnalyticsBucketFDWName,
   getAnalyticsBucketS3KeyName,
-} from 'components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
+} from '@/components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import {
   getCatalogURI,
   getConnectionURL,
-} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
+} from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useIcebergWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery(
     { projectRef: project?.ref, reveal: true },
     { enabled: canReadAPIKeys }

@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { analyticsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export enum EgressType {
   REST = 'egress_rest',
   AUTH = 'egress_auth',
   STORAGE = 'egress_storage',
   REALTIME = 'egress_realtime',
-  FUNCTIONS = 'egress_functions',
+  FUNCTIONS = 'egress_function',
   SUPAVISOR = 'egress_supavisor',
   LOGDRAIN = 'egress_logdrain',
 }
@@ -42,6 +42,10 @@ export enum PricingMetric {
   LOG_DRAIN_EVENTS = 'LOG_DRAIN_EVENTS',
   AUTH_MFA_PHONE = 'AUTH_MFA_PHONE',
   AUTH_MFA_WEB_AUTHN = 'AUTH_MFA_WEB_AUTHN',
+  ACTIVE_COMPUTE_HOURS = 'ACTIVE_COMPUTE_HOURS',
+  LOG_INGESTION = 'LOG_INGESTION',
+  LOG_QUERYING = 'LOG_QUERYING',
+  LOG_STORAGE = 'LOG_STORAGE',
 }
 
 export enum ComputeUsageMetric {
@@ -133,7 +137,7 @@ export async function getOrgDailyStats(
       query: {
         start: startDate,
         end: endDate,
-        projectRef,
+        project_ref: projectRef,
       },
     },
     signal,

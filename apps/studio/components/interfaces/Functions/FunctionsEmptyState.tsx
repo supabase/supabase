@@ -1,20 +1,9 @@
-import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
+import { useParams } from 'common'
+import { Code, Play, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
-
-import { useParams } from 'common'
-import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import { ResourceItem } from 'components/ui/Resource/ResourceItem'
-import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -23,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
   cn,
-  CodeBlock,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -33,8 +21,20 @@ import {
   DialogTrigger,
   Separator,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
-import { TerminalInstructions } from './TerminalInstructions'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
+import { ResourceList } from '@/components/ui/Resource/ResourceList'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const FunctionsEmptyState = () => {
   const { ref } = useParams()
@@ -44,6 +44,7 @@ export const FunctionsEmptyState = () => {
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { data: org } = useSelectedOrganizationQuery()
+  const [, setCreateMethod] = useQueryState('create', parseAsString)
 
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {
@@ -59,7 +60,7 @@ export const FunctionsEmptyState = () => {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Create your first edge function</CardTitle>
+          <CardTitle>Deploy your first edge function</CardTitle>
         </CardHeader>
         <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
           {/* Editor Option */}
@@ -145,27 +146,19 @@ export const FunctionsEmptyState = () => {
               version control.
             </p>
 
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  type="default"
-                  onClick={() =>
-                    sendEvent({
-                      action: 'edge_function_via_cli_button_clicked',
-                      properties: { origin: 'no_functions_block' },
-                      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                    })
-                  }
-                >
-                  View CLI Instructions
-                </Button>
-              </DialogTrigger>
-              <DialogContent size="large">
-                <DialogSection padding="small">
-                  <TerminalInstructions />
-                </DialogSection>
-              </DialogContent>
-            </Dialog>
+            <Button
+              type="default"
+              onClick={() => {
+                setCreateMethod('cli')
+                sendEvent({
+                  action: 'edge_function_via_cli_button_clicked',
+                  properties: { origin: 'no_functions_block' },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                })
+              }}
+            >
+              View CLI Instructions
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -176,7 +169,7 @@ export const FunctionsEmptyState = () => {
         {templates.map((template) => (
           <ResourceItem
             key={template.name}
-            media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
+            media={<Code strokeWidth={1.5} size={16} className="translate-y-[-9px]" />}
             onClick={() => {
               sendEvent({
                 action: 'edge_function_template_clicked',
@@ -196,7 +189,7 @@ export const FunctionsEmptyState = () => {
   )
 }
 
-export const FunctionsEmptyStateLocal = () => {
+export const FunctionsInstructionsLocal = () => {
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {
     if (showStripeExample) {
@@ -212,7 +205,7 @@ export const FunctionsEmptyStateLocal = () => {
       <div className="flex flex-col gap-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Developing Edge Functions locally</CardTitle>
+            <CardTitle>Developing Edge Functions with the CLI</CardTitle>
           </CardHeader>
           <CardContent
             className={cn(
@@ -248,7 +241,7 @@ export const FunctionsEmptyStateLocal = () => {
             <div className="p-8">
               <div className="flex items-center gap-2">
                 <Play size={20} />
-                <h4 className="text-base text-foreground">Run Edge Functions locally</h4>
+                <h4 className="text-base text-foreground">Run Edge Functions</h4>
               </div>
               <p className="text-sm text-foreground-light mt-1 mb-4 prose [&>code]:text-xs text-sm max-w-full">
                 You can run your Edge Function locally using <code>supabase functions serve</code>.
@@ -273,7 +266,7 @@ supabase functions serve # start the Functions watcher`.trim()}
             <div className="p-8">
               <div className="flex items-center gap-2">
                 <Terminal strokeWidth={1.5} size={20} />
-                <h4 className="text-base text-foreground">Invoke Edge Functions locally</h4>
+                <h4 className="text-base text-foreground">Invoke Edge Functions</h4>
               </div>
               <p className="text-sm text-foreground-light mt-1 mb-4">
                 While serving your local Edge Functions, you can invoke it using cURL or one of the
@@ -302,25 +295,20 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
 
         <Card>
           <CardHeader>
-            <CardTitle>Self-hosting Edge Functions</CardTitle>
+            <CardTitle>Self-hosted Supabase</CardTitle>
           </CardHeader>
           <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
             <div className="p-8">
-              <div className="flex items-center gap-2">
-                <Server size={20} />
-                <h4 className="text-base text-foreground">Self-hosting Edge Functions</h4>
-              </div>
-              <p className="text-sm text-foreground-light mt-1 mb-4 max-w-3xl">
-                Supabase Edge Runtime consists of a web server based on the Deno runtime, capable of
-                running Javascript, Typescript, and WASM services. You may self-host edge functions
-                on providers like Fly.io, Digital Ocean, or AWS.
+              <p className="text-sm text-foreground-light mt-1 mb-4">
+                Edge Functions are available in self-hosted Supabase via Supabase Edge Runtime.
+                Unlike the platform, functions must be added manually — place each function at{' '}
+                <code className="text-code-inline">
+                  volumes/functions/&lt;function-name&gt;/index.ts
+                </code>{' '}
+                and restart the <code className="text-code-inline">functions</code> service to pick
+                up changes. See the guide to learn more about configuration, secrets, and routing.
               </p>
-              <div className="flex items-center gap-x-2">
-                <DocsButton href={`${DOCS_URL}/reference/self-hosting-functions/introduction`} />
-                <Button asChild type="default" icon={<Github />}>
-                  <a href="https://github.com/supabase/edge-runtime/">GitHub</a>
-                </Button>
-              </div>
+              <DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions`} />
             </div>
           </CardContent>
         </Card>
@@ -328,11 +316,11 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
         <ScaffoldSectionTitle className="text-xl mt-12">Explore our templates</ScaffoldSectionTitle>
         <ResourceList>
           {templates.map((template) => (
-            <Dialog>
+            <Dialog key={template.name}>
               <DialogTrigger asChild>
                 <ResourceItem
                   key={template.name}
-                  media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
+                  media={<Code strokeWidth={1.5} size={16} className="translate-y-[-9px]" />}
                 >
                   <div>
                     <p>{template.name}</p>
@@ -346,7 +334,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
                   <DialogDescription>{template.description}</DialogDescription>
                 </DialogHeader>
                 <Separator />
-                <DialogSection className="!p-0">
+                <DialogSection className="p-0!">
                   <CodeBlock
                     language="ts"
                     hideLineNumbers={true}
@@ -367,35 +355,48 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
 
 export const FunctionsSecretsEmptyStateLocal = () => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Managing secrets and environment variables locally</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
-        <div className="p-8">
-          <div className="flex items-center gap-2">
-            <Lock size={20} />
-            <h4 className="text-base text-foreground">Managing secrets</h4>
-          </div>
-          <div className="text-sm text-foreground-light mt-1 mb-4 max-w-3xl">
-            <p>
-              Local secrets and environment variables can be loaded in either of the following two
-              ways
-            </p>
-            <ul className="list-disc pl-6">
-              <li className="prose [&>code]:text-xs text-sm max-w-full">
-                Through an <code>.env</code> file placed at <code>supabase/functions/.env</code>,
-                which is automatically loaded on <code>supabase start</code>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Local development & CLI</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-foreground-light mb-4">
+            <p className="mb-2">Secrets can be loaded in two ways:</p>
+            <ul className="list-disc pl-6 space-y-1">
+              <li>
+                Place a <code className="text-code-inline">.env</code> file at{' '}
+                <code className="text-code-inline">supabase/functions/.env</code> — picked up
+                automatically on <code className="text-code-inline">supabase start</code>.
               </li>
-              <li className="prose [&>code]:text-xs text-sm max-w-full">
-                Through the <code>--env-file</code> option for <code>supabase functions serve</code>
-                , for example: <code>supabase functions serve --env-file ./path/to/.env-file</code>
+              <li>
+                Pass <code className="text-code-inline">--env-file</code> to{' '}
+                <code className="text-code-inline">supabase functions serve</code>, e.g.{' '}
+                <code className="text-code-inline">
+                  supabase functions serve --env-file ./path/to/.env-file
+                </code>
               </li>
             </ul>
           </div>
           <DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Self-Hosted Supabase</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-foreground-light mb-4">
+            Configure secrets in your <code className="text-code-inline">.env</code> file and{' '}
+            <code className="text-code-inline">docker-compose.yml</code> under the{' '}
+            <code className="text-code-inline">functions</code> service.
+          </p>
+          <DocsButton
+            href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions#custom-environment-variables`}
+          />
+        </CardContent>
+      </Card>
+    </>
   )
 }

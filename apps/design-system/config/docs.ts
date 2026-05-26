@@ -1,4 +1,4 @@
-import { MainNavItem, SidebarNavItem } from 'types/nav'
+import { MainNavItem, SidebarNavItem } from '@/types/nav'
 
 interface DocsConfig {
   mainNav?: MainNavItem[]
@@ -9,25 +9,28 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs',
+          priority: true,
           items: [],
         },
         {
-          title: 'Tailwind Classes',
-          href: '/docs/tailwind-classes',
+          title: 'Accessibility',
+          href: '/docs/accessibility',
           items: [],
         },
+
         {
           title: 'Color Usage',
           href: '/docs/color-usage',
           items: [],
         },
         {
-          title: 'Theming',
-          href: '/docs/theming',
+          title: 'Copywriting',
+          href: '/docs/copywriting',
           items: [],
         },
         {
@@ -36,18 +39,45 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
           items: [],
-          href: '/docs/ui-patterns/accessibility',
-          title: 'Accessibility',
+        },
+        {
+          title: 'Theming',
+          href: '/docs/theming',
+          items: [],
+        },
+        {
+          title: 'Typography',
+          href: '/docs/typography',
+          items: [],
         },
       ],
     },
     {
       title: 'UI Patterns',
+      sortOrder: 'alphabetical',
       items: [
         {
-          title: 'Navigation',
-          href: '/docs/ui-patterns/navigation',
+          title: 'Introduction',
+          href: '/docs/ui-patterns/introduction',
+          items: [],
+          priority: true,
+        },
+        {
+          title: 'Charts',
+          href: '/docs/ui-patterns/charts',
+          items: [],
+        },
+        {
+          title: 'Empty States',
+          href: '/docs/ui-patterns/empty-states',
+          items: [],
+        },
+        {
+          title: 'Forms',
+          href: '/docs/ui-patterns/forms',
           items: [],
         },
         {
@@ -56,23 +86,45 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Empty States',
-          href: '/docs/ui-patterns/empty-states',
+          href: '/docs/ui-patterns/modality',
+          title: 'Modality',
+          items: [],
+        },
+        {
+          href: '/docs/ui-patterns/navigation',
+          title: 'Navigation',
+          items: [],
+        },
+        {
+          title: 'Tables',
+          href: '/docs/ui-patterns/tables',
           items: [],
         },
       ],
     },
     {
       title: 'Fragment Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/fragment-components',
+          href: '/docs/fragments/introduction',
           items: [],
+          priority: true,
         },
         {
           title: 'Admonition',
           href: '/docs/fragments/admonition',
+          items: [],
+        },
+        {
+          title: 'Collapsible Alert',
+          href: '/docs/fragments/collapsible-alert',
+          items: [],
+        },
+        {
+          title: 'Collapsible Card Section',
+          href: '/docs/fragments/collapsible-card-section',
           items: [],
         },
         {
@@ -81,13 +133,23 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Modal',
-          href: '/docs/fragments/modal',
+          title: 'Empty State Presentational',
+          href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
         {
           title: 'Page Container',
           href: '/docs/fragments/page-container',
+          items: [],
+        },
+        {
+          title: 'Page Breadcrumbs',
+          href: '/docs/fragments/page-breadcrumbs',
+          items: [],
+        },
+        {
+          title: 'Page Nav',
+          href: '/docs/fragments/page-nav',
           items: [],
         },
         {
@@ -121,6 +183,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Error Display',
+          href: '/docs/fragments/error-display',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
@@ -150,15 +217,37 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/toc',
           items: [],
         },
+        {
+          title: 'Confirmation Modal',
+          href: '/docs/fragments/confirmation-modal',
+          items: [],
+        },
+        {
+          title: 'Status Codes',
+          href: '/docs/fragments/status-codes',
+          items: [],
+        },
+        {
+          title: 'Key/Value Field Array',
+          href: '/docs/fragments/key-value-field-array',
+          items: [],
+        },
+        {
+          title: 'Single Value Field Array',
+          href: '/docs/fragments/single-value-field-array',
+          items: [],
+        },
       ],
     },
     {
       title: 'Atom Components',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/atom-components',
+          href: '/docs/components/introduction',
           items: [],
+          priority: true,
         },
         {
           title: 'Accordion',
@@ -217,11 +306,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Chart',
-          href: '/docs/components/chart',
-          items: [],
-        },
-        {
           title: 'Checkbox',
           href: '/docs/components/checkbox',
           items: [],
@@ -252,11 +336,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Data Table',
-          href: '/docs/components/data-table',
-          items: [],
-        },
-        {
           title: 'Date Picker',
           href: '/docs/components/date-picker',
           items: [],
@@ -274,6 +353,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Dropdown Menu',
           href: '/docs/components/dropdown-menu',
+          items: [],
+        },
+        {
+          title: 'Field',
+          href: '/docs/components/field',
           items: [],
         },
         {
@@ -303,12 +387,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Mermaid',
+          href: '/docs/components/mermaid',
+          items: [],
+          label: 'New',
+        },
+        {
           title: 'Menubar',
           href: '/docs/components/menubar',
           items: [],
         },
         {
-          title: 'NavMenu',
+          title: 'Nav Menu',
           href: '/docs/components/nav-menu',
           items: [],
         },
@@ -435,6 +525,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Expanding Textarea',
           href: '/docs/components/expanding-textarea',
+          items: [],
+        },
+        {
+          title: 'Keyboard Shortcut',
+          href: '/docs/components/keyboard-shortcut',
           items: [],
         },
       ],
