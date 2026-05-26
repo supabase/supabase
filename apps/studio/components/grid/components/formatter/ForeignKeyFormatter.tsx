@@ -94,6 +94,13 @@ export const ForeignKeyFormatter = (props: Props) => {
                 onContextMenu={(e) => {
                   e.stopPropagation()
                 }}
+                onFocusOutside={(e) => {
+                  // The embedded DataGrid and nested portals (DropdownMenu, ContextMenu)
+                  // move focus around as the user interacts; treating those as "outside"
+                  // closes the popover on every click. Only close on real pointer-down
+                  // outside, which Radix still handles by default.
+                  e.preventDefault()
+                }}
               >
                 <ReferenceRecordPeek
                   table={targetTable}
