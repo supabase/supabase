@@ -61,6 +61,9 @@ export const SEARCH_PARAMS_PARSER = {
 
   uuid: parseAsString,
   id: parseAsString,
+
+  // View options
+  hide_connection_logs: parseAsBoolean.withDefault(true),
 }
 
 const POSTGRES_STATUS_CODE_LABELS = {

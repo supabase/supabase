@@ -5,6 +5,7 @@ import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { analyticsLiteral, safeSql } from './safe-analytics-sql'
+import { extractLogMetadata } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
@@ -134,15 +135,17 @@ export async function getUnifiedLogs(
       ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
       : new Date(Number(ts) / 1000)
 
+    const { status, method, pathname } = extractLogMetadata(row)
+
     return {
       id: row.id,
       date,
+      method,
+      pathname,
+      status,
       timestamp: row.timestamp,
       level: row.level as LogLevel,
-      status: row.status || 200,
-      method: row.method,
       host: row.host,
-      pathname: (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.pathname || '',
       event_message: row.event_message || row.body || '',
       headers:
         typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},
