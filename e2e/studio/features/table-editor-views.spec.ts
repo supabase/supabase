@@ -1,6 +1,6 @@
+import crypto from 'node:crypto'
 import { expect, Page } from '@playwright/test'
 
-import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import {
   createMaterializedView,
@@ -10,7 +10,7 @@ import {
   dropTable,
   dropView,
 } from '../utils/db/queries.js'
-import { test, withSetupCleanup } from '../utils/test.js'
+import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
 
@@ -38,42 +38,69 @@ const goToTableEditor = async (page: Page, ref: string) => {
   await tableLoadWait
 }
 
-// Run on platform serially to avoid rate limits; parallel in self-hosted.
-const testRunner = env.IS_PLATFORM ? test.describe.serial : test.describe
+const uniqueSuffix = () => crypto.randomBytes(4).toString('hex')
 
-testRunner('table editor — view context menu', () => {
-  const baseTable = 'pw_view_menu_base'
-  const viewName = 'pw_view_menu_view'
-
-  const setupView = async () => {
-    await createTable(baseTable, 'note', [{ note: 'alpha' }, { note: 'beta' }])
-    await createView(viewName, `SELECT id, note FROM public.${baseTable}`)
+/**
+ * Each test owns its own base table + view so tests can run in parallel without
+ * stomping on each other's DB state. Use with `await using fixture = ...` so
+ * cleanup runs whether the test passes or fails.
+ */
+const setupViewFixture = async (
+  rows: Array<Record<string, string>> = [{ note: 'alpha' }, { note: 'beta' }]
+) => {
+  const suffix = uniqueSuffix()
+  const baseTable = `pw_view_menu_base_${suffix}`
+  const viewName = `pw_view_menu_view_${suffix}`
+  await createTable(baseTable, 'note', rows)
+  await createView(viewName, `SELECT id, note FROM public.${baseTable}`)
+  return {
+    baseTable,
+    viewName,
+    async [Symbol.asyncDispose]() {
+      await dropView(viewName)
+      await dropTable(baseTable)
+    },
   }
+}
 
-  const cleanupView = async () => {
-    await dropView(viewName)
-    await dropTable(baseTable)
+const setupMaterializedViewFixture = async (
+  rows: Array<Record<string, string>> = [{ note: 'alpha' }, { note: 'beta' }]
+) => {
+  const suffix = uniqueSuffix()
+  const baseTable = `pw_mv_menu_base_${suffix}`
+  const mvName = `pw_mv_menu_view_${suffix}`
+  await createTable(baseTable, 'note', rows)
+  await createMaterializedView(mvName, `SELECT id, note FROM public.${baseTable}`)
+  return {
+    baseTable,
+    mvName,
+    async [Symbol.asyncDispose]() {
+      await dropMaterializedView(mvName)
+      await dropTable(baseTable)
+    },
   }
+}
 
+test.describe('table editor — view context menu', () => {
   test('copy name copies the view name to clipboard', async ({ page, ref }) => {
-    await using _ = await withSetupCleanup(setupView, cleanupView)
+    await using fixture = await setupViewFixture()
     await goToTableEditor(page, ref)
 
-    await openEntityContextMenu(page, viewName)
+    await openEntityContextMenu(page, fixture.viewName)
     await page.getByRole('menuitem', { name: 'Copy name' }).click()
     await expect(
       page.getByRole('menuitem', { name: 'Copy name' }),
       'menu should close after Copy name click'
     ).not.toBeVisible()
 
-    await expectClipboardValue({ page, value: viewName, exact: true })
+    await expectClipboardValue({ page, value: fixture.viewName, exact: true })
   })
 
   test('copy view definition copies CREATE VIEW statement to clipboard', async ({ page, ref }) => {
-    await using _ = await withSetupCleanup(setupView, cleanupView)
+    await using fixture = await setupViewFixture()
     await goToTableEditor(page, ref)
 
-    await openEntityContextMenu(page, viewName)
+    await openEntityContextMenu(page, fixture.viewName)
 
     const definitionWait = waitForApiResponse(page, 'pg-meta', ref, 'query?key=view-definition-')
     await page.getByRole('menuitem', { name: 'Copy view definition' }).click()
@@ -86,14 +113,14 @@ testRunner('table editor — view context menu', () => {
 
     const clipboardText: string = await page.evaluate(() => navigator.clipboard.readText())
     expect(clipboardText.toLowerCase()).toContain(`create view`)
-    expect(clipboardText.toLowerCase()).toContain(viewName.toLowerCase())
+    expect(clipboardText.toLowerCase()).toContain(fixture.viewName.toLowerCase())
   })
 
   test('export view as CSV shows confirmation reason and downloads', async ({ page, ref }) => {
-    await using _ = await withSetupCleanup(setupView, cleanupView)
+    await using fixture = await setupViewFixture()
     await goToTableEditor(page, ref)
 
-    await openEntityContextMenu(page, viewName)
+    await openEntityContextMenu(page, fixture.viewName)
     const exportItem = page.getByRole('menuitem', { name: 'Export data' })
     await expect(exportItem).toBeVisible()
     await exportItem.hover()
@@ -118,10 +145,10 @@ testRunner('table editor — view context menu', () => {
   })
 
   test('export view as SQL shows confirmation and downloads', async ({ page, ref }) => {
-    await using _ = await withSetupCleanup(setupView, cleanupView)
+    await using fixture = await setupViewFixture()
     await goToTableEditor(page, ref)
 
-    await openEntityContextMenu(page, viewName)
+    await openEntityContextMenu(page, fixture.viewName)
     const exportItem = page.getByRole('menuitem', { name: 'Export data' })
     await expect(exportItem).toBeVisible()
     await exportItem.hover()
@@ -141,24 +168,14 @@ testRunner('table editor — view context menu', () => {
   })
 
   test('delete view runs DROP VIEW and removes it from the sidebar', async ({ page, ref }) => {
-    // No outer cleanup — the test deletes the view. Just clean the base table at the end.
-    await using _ = await withSetupCleanup(
-      async () => {
-        await createTable(baseTable, 'note', [{ note: 'alpha' }])
-        await createView(viewName, `SELECT id, note FROM public.${baseTable}`)
-      },
-      async () => {
-        await dropView(viewName)
-        await dropTable(baseTable)
-      }
-    )
+    await using fixture = await setupViewFixture([{ note: 'alpha' }])
     await goToTableEditor(page, ref)
 
-    await openEntityContextMenu(page, viewName)
+    await openEntityContextMenu(page, fixture.viewName)
     await page.getByRole('menuitem', { name: 'Delete view' }).click()
 
     await expect(
-      page.getByRole('heading', { name: `Confirm deletion of view "${viewName}"` }),
+      page.getByRole('heading', { name: `Confirm deletion of view "${fixture.viewName}"` }),
       'confirm dialog title should include the view name'
     ).toBeVisible({ timeout: 15000 })
 
@@ -172,46 +189,33 @@ testRunner('table editor — view context menu', () => {
     await expect
       .poll(
         async () =>
-          await page.getByRole('button', { name: `View ${viewName}`, exact: true }).count(),
+          await page.getByRole('button', { name: `View ${fixture.viewName}`, exact: true }).count(),
         { message: 'view should be removed from the sidebar after delete' }
       )
       .toBe(0)
   })
 })
 
-testRunner('table editor — materialized view context menu', () => {
-  const baseTable = 'pw_mv_menu_base'
-  const mvName = 'pw_mv_menu_view'
-
-  const setupMv = async () => {
-    await createTable(baseTable, 'note', [{ note: 'alpha' }, { note: 'beta' }])
-    await createMaterializedView(mvName, `SELECT id, note FROM public.${baseTable}`)
-  }
-
-  const cleanupMv = async () => {
-    await dropMaterializedView(mvName)
-    await dropTable(baseTable)
-  }
-
+test.describe('table editor — materialized view context menu', () => {
   test('copy name copies the materialized view name to clipboard', async ({ page, ref }) => {
-    await using _ = await withSetupCleanup(setupMv, cleanupMv)
+    await using fixture = await setupMaterializedViewFixture()
     await goToTableEditor(page, ref)
 
-    await openEntityContextMenu(page, mvName)
+    await openEntityContextMenu(page, fixture.mvName)
     await page.getByRole('menuitem', { name: 'Copy name' }).click()
     await expect(page.getByRole('menuitem', { name: 'Copy name' })).not.toBeVisible()
 
-    await expectClipboardValue({ page, value: mvName, exact: true })
+    await expectClipboardValue({ page, value: fixture.mvName, exact: true })
   })
 
   test('copy materialized view definition copies CREATE statement to clipboard', async ({
     page,
     ref,
   }) => {
-    await using _ = await withSetupCleanup(setupMv, cleanupMv)
+    await using fixture = await setupMaterializedViewFixture()
     await goToTableEditor(page, ref)
 
-    await openEntityContextMenu(page, mvName)
+    await openEntityContextMenu(page, fixture.mvName)
 
     const definitionWait = waitForApiResponse(page, 'pg-meta', ref, 'query?key=view-definition-')
     await page.getByRole('menuitem', { name: 'Copy materialized view definition' }).click()
@@ -223,17 +227,17 @@ testRunner('table editor — materialized view context menu', () => {
 
     const clipboardText: string = await page.evaluate(() => navigator.clipboard.readText())
     expect(clipboardText.toLowerCase()).toContain('create materialized view')
-    expect(clipboardText.toLowerCase()).toContain(mvName.toLowerCase())
+    expect(clipboardText.toLowerCase()).toContain(fixture.mvName.toLowerCase())
   })
 
   test('export materialized view as CSV shows confirmation and downloads', async ({
     page,
     ref,
   }) => {
-    await using _ = await withSetupCleanup(setupMv, cleanupMv)
+    await using fixture = await setupMaterializedViewFixture()
     await goToTableEditor(page, ref)
 
-    await openEntityContextMenu(page, mvName)
+    await openEntityContextMenu(page, fixture.mvName)
     const exportItem = page.getByRole('menuitem', { name: 'Export data' })
     await expect(exportItem).toBeVisible()
     await exportItem.hover()
@@ -256,15 +260,15 @@ testRunner('table editor — materialized view context menu', () => {
     page,
     ref,
   }) => {
-    await using _ = await withSetupCleanup(setupMv, cleanupMv)
+    await using fixture = await setupMaterializedViewFixture()
     await goToTableEditor(page, ref)
 
-    await openEntityContextMenu(page, mvName)
+    await openEntityContextMenu(page, fixture.mvName)
     await page.getByRole('menuitem', { name: 'Delete materialized view' }).click()
 
     await expect(
       page.getByRole('heading', {
-        name: `Confirm deletion of materialized view "${mvName}"`,
+        name: `Confirm deletion of materialized view "${fixture.mvName}"`,
       })
     ).toBeVisible({ timeout: 15000 })
 
@@ -281,7 +285,8 @@ testRunner('table editor — materialized view context menu', () => {
 
     await expect
       .poll(
-        async () => await page.getByRole('button', { name: `View ${mvName}`, exact: true }).count()
+        async () =>
+          await page.getByRole('button', { name: `View ${fixture.mvName}`, exact: true }).count()
       )
       .toBe(0)
   })

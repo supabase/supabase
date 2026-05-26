@@ -328,7 +328,11 @@ export const EntityListItem = ({
                   }}
                 >
                   <Copy size={12} />
-                  <span>Copy view definition</span>
+                  <span>
+                    Copy{' '}
+                    {entity.type === ENTITY_TYPE.MATERIALIZED_VIEW ? 'materialized view' : 'view'}{' '}
+                    definition
+                  </span>
                 </DropdownMenuItem>
               )}
 
@@ -513,7 +517,7 @@ export const EntityListItem = ({
                     }}
                   >
                     <Trash size={12} />
-                    <span>Delete view</span>
+                    <span>Delete materialized view</span>
                   </DropdownMenuItem>
                 </>
               )}
