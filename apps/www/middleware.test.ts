@@ -155,6 +155,115 @@ describe('www middleware', () => {
     })
   })
 
+  describe('Accept header q-value parsing', () => {
+    it('serves markdown for Cursor-style Accept (markdown preferred, plain fallback)', () => {
+      const req = makeRequest('/auth', {
+        accept: 'text/markdown, text/plain;q=0.9, */*;q=0.8',
+      })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
+    })
+
+    it('serves markdown when md and html have equal q-values', () => {
+      const req = makeRequest('/auth', { accept: 'text/markdown, text/html, */*' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
+    })
+
+    it('serves HTML when html q-value beats markdown q-value', () => {
+      const req = makeRequest('/auth', { accept: 'text/html;q=1.0, text/markdown;q=0.5' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+    })
+
+    it('serves HTML for browser-style Accept (html with */* fallback)', () => {
+      const req = makeRequest('/auth', {
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+      })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+    })
+
+    it('serves markdown when md q-value beats html q-value', () => {
+      const req = makeRequest('/auth', { accept: 'text/html;q=0.5, text/markdown;q=1.0' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
+    })
+
+    it('tolerates OWS around the q parameter (per RFC 9110)', () => {
+      const req = makeRequest('/auth', { accept: 'text/html ; q = 1.0, text/markdown ; q = 0.5' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+    })
+
+    it('ignores out-of-range q-values rather than treating them as preference', () => {
+      const req = makeRequest('/auth', { accept: 'text/html;q=2.0, text/markdown;q=1.0' })
+      const res = middleware(req)
+
+      // text/html's q=2.0 is invalid and falls back to default 1.0; tie -> markdown.
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
+    })
+  })
+
+  describe('406 Not Acceptable', () => {
+    it('returns 406 on MD-eligible page when Accept excludes every type we serve', () => {
+      const req = makeRequest('/pricing', { accept: 'application/x-content-negotiation-probe' })
+      const res = middleware(req)
+
+      expect(res.status).toBe(406)
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+    })
+
+    it('does not return 406 on non-MD pages (no negotiation contract there)', () => {
+      const req = makeRequest('/not-a-page', { accept: 'application/x-content-negotiation-probe' })
+      const res = middleware(req)
+
+      expect(res.status).not.toBe(406)
+    })
+
+    it('does not return 406 when Accept includes */*', () => {
+      const req = makeRequest('/pricing', { accept: '*/*' })
+      const res = middleware(req)
+
+      expect(res.status).not.toBe(406)
+    })
+
+    it('does not return 406 for LLM UAs even with a probe Accept header', () => {
+      const req = makeRequest('/pricing', {
+        accept: 'application/x-content-negotiation-probe',
+        userAgent: 'Claude-User/1.0',
+      })
+      const res = middleware(req)
+
+      expect(res.status).not.toBe(406)
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/pricing')
+    })
+
+    it('returns 406 on changelog entries when Accept excludes every type', () => {
+      const req = makeRequest('/changelog/100', {
+        accept: 'application/x-content-negotiation-probe',
+      })
+      const res = middleware(req)
+
+      expect(res.status).toBe(406)
+    })
+
+    it('sets Cache-Control: no-store and Vary: Accept on 406 responses', () => {
+      const req = makeRequest('/pricing', { accept: 'application/x-content-negotiation-probe' })
+      const res = middleware(req)
+
+      expect(res.status).toBe(406)
+      expect(res.headers.get('Cache-Control')).toBe('no-store')
+      expect(res.headers.get('Vary')).toBe('Accept')
+    })
+  })
+
   describe('LLM user-agent routing', () => {
     it('rewrites for Claude-User', () => {
       const req = makeRequest('/pricing', {

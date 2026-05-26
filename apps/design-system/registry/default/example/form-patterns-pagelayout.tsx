@@ -15,24 +15,24 @@ import {
   FormField,
   FormInputGroupInput,
   FormInputGroupTextArea,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
   Textarea,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -148,7 +148,7 @@ export default function FormPatternsPageLayout() {
                         description="Single-line text entry for short values"
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} placeholder="Enter text" />
+                          <Input {...field} placeholder="Enter text" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -167,7 +167,7 @@ export default function FormPatternsPageLayout() {
                         description="Masked input for secure text entry"
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} type="password" placeholder="Enter password" />
+                          <Input {...field} type="password" placeholder="Enter password" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -186,7 +186,7 @@ export default function FormPatternsPageLayout() {
                         description="Read-only input with copy-to-clipboard functionality"
                       >
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             copy
                             readOnly
                             value={form.getValues('apiKey') || ''}
@@ -211,7 +211,7 @@ export default function FormPatternsPageLayout() {
                         description="Numeric input with min/max validation"
                       >
                         <FormControl>
-                          <Input_Shadcn_
+                          <Input
                             {...field}
                             type="number"
                             min={1}
@@ -439,7 +439,7 @@ export default function FormPatternsPageLayout() {
                                   {uploadedFiles.map((file, idx) => (
                                     <div
                                       key={`${file.name}-${idx}`}
-                                      className="flex items-center justify-between gap-2 p-2 bg rounded border"
+                                      className="flex items-center justify-between gap-2 p-2 bg rounded-sm border"
                                     >
                                       <span className="text-sm text-foreground-light truncate flex-1">
                                         {file.name}
@@ -572,22 +572,16 @@ export default function FormPatternsPageLayout() {
                         description="Single selection from a list of options"
                       >
                         <FormControl>
-                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select an option" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectItem_Shadcn_ value="us-east-1">
-                                US East (N. Virginia)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="us-west-2">
-                                US West (Oregon)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="eu-west-1">
-                                EU West (Ireland)
-                              </SelectItem_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an option" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                              <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                              <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -673,8 +667,8 @@ export default function FormPatternsPageLayout() {
                         description="Date selection with calendar popover"
                       >
                         <FormControl>
-                          <Popover_Shadcn_>
-                            <PopoverTrigger_Shadcn_ asChild>
+                          <Popover>
+                            <PopoverTrigger asChild>
                               <Button
                                 type="outline"
                                 className="bg-control w-full justify-start text-left font-normal px-3 py-4"
@@ -682,16 +676,16 @@ export default function FormPatternsPageLayout() {
                               >
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                               </Button>
-                            </PopoverTrigger_Shadcn_>
-                            <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 initialFocus
                               />
-                            </PopoverContent_Shadcn_>
-                          </Popover_Shadcn_>
+                            </PopoverContent>
+                          </Popover>
                         </FormControl>
                       </FormItemLayout>
                     )}

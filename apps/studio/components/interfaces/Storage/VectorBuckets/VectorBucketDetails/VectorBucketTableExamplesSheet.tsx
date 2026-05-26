@@ -8,13 +8,13 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Sheet,
   SheetContent,
   SheetHeader,
@@ -67,7 +67,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
           <SheetHeader>
             <SheetTitle>
               Insert vectors into{' '}
-              <code className="text-code-inline !text-sm">{index.indexName}</code>
+              <code className="text-code-inline text-sm!">{index.indexName}</code>
             </SheetTitle>
           </SheetHeader>
 
@@ -212,8 +212,8 @@ const result = await index.putVectors({
       </p>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between">
-          <Popover_Shadcn_ modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
+            <PopoverTrigger asChild>
               <div className="flex cursor-pointer">
                 <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
                   Language
@@ -226,30 +226,30 @@ const result = await index.putVectors({
                   {language === 'javascript' ? 'JavaScript' : 'SQL'}
                 </Button>
               </div>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-32" side="bottom" align="end">
-              <Command_Shadcn_>
-                <CommandList_Shadcn_>
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
+            </PopoverTrigger>
+            <PopoverContent className="p-0 w-32" side="bottom" align="end">
+              <Command>
+                <CommandList>
+                  <CommandGroup>
+                    <CommandItem
                       className="cursor-pointer"
                       onSelect={() => onLanguageChange('sql')}
                       onClick={() => onLanguageChange('sql')}
                     >
                       <p>SQL</p>
-                    </CommandItem_Shadcn_>
-                    <CommandItem_Shadcn_
+                    </CommandItem>
+                    <CommandItem
                       className="cursor-pointer"
                       onSelect={() => onLanguageChange('javascript')}
                       onClick={() => onLanguageChange('javascript')}
                     >
                       <p>JavaScript</p>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
 
           <DocsButton
             href={`${DOCS_URL}/guides/storage/vector/storing-vectors?queryGroups=language&language=${language}#basic-vector-insertion`}

@@ -54,7 +54,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const isRestoreDisabled = isPauseStatusSuccess && !pauseStatus.can_restore
 
   return (
-    <Card className="w-full max-w-[40rem] mx-auto">
+    <Card className="w-full max-w-160 mx-auto">
       <CardContent>
         <PauseCircle size={48} strokeWidth={1} className="text-foreground-lighter shrink-0 mb-4" />
         <div className="flex-1">
@@ -99,16 +99,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         ? 'Upgrade to Pro to prevent pauses and unlock features like branching, compute upgrades, and daily backups.'
                         : 'To prevent future pauses, consider upgrading to Pro.'}
                     </p>
-                    {!!pauseStatus.last_paused_on && (
-                      <p className="text-foreground-lighter text-sm">
-                        Project last paused on{' '}
-                        <TimestampInfo
-                          className="text-sm"
-                          labelFormat="DD MMM YYYY"
-                          utcTimestamp={pauseStatus.last_paused_on}
-                        />
-                      </p>
-                    )}
                   </>
                 ) : (
                   <p className="text-sm">

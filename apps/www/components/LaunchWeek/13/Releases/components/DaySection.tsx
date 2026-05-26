@@ -29,7 +29,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
         <div
           className={cn(
             'text-sm inline uppercase font-mono dark:text-foreground-muted tracking-[0.1rem]',
-            day.shipped && '!text-foreground'
+            day.shipped && 'text-foreground!'
           )}
         >
           {day.dd}, {day.date}
@@ -55,12 +55,12 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
               bg-surface-75
               min-h-[210px] group sm:aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               hover:border-strong transition-colors border border-muted
-              rounded-xl text-2xl bg-contain shadow-sm`,
+              rounded-xl text-2xl bg-contain shadow-xs`,
               cssGroup
             )}
           >
             <div className="relative text-foreground-light p-4 sm:px-6 md:py-6 md:px-8 z-20 grow flex flex-col items-start justify-between gap-2 w-full lg:w-1/2 text-left">
-              <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[cubic-bezier(.24,0,.22,.99)] duration-200 group-hover:-translate-x-6 transition-transform">
+              <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 ease-[cubic-bezier(.24,0,.22,.99)]! duration-200 group-hover:-translate-x-6 transition-transform">
                 <Edit className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
                 <span>Blog post</span>
                 <ArrowRightIcon className="w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -69,8 +69,8 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                 {day.description}
               </h2>
             </div>
-            <div className="relative z-10 border-b border-muted/40 sm:border-none w-full order-first aspect-[2/1] sm:aspect-auto sm:absolute sm:inset-0">
-              <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-background-surface-75 from-0% via-background-surface-75 via-20% to-transparent to-75% w-full h-full z-0" />
+            <div className="relative z-10 border-b border-muted/40 sm:border-none w-full order-first aspect-2/1 sm:aspect-auto sm:absolute sm:inset-0">
+              <div className="hidden sm:block absolute inset-0 bg-linear-to-r from-background-surface-75 from-0% via-background-surface-75 via-20% to-transparent to-75% w-full h-full z-0" />
               {day.steps[0]?.bg_layers &&
                 day.steps[0]?.bg_layers?.map((layer, i) => (
                   <>

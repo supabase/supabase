@@ -6,27 +6,30 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Input,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -80,17 +83,17 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Method</FormLabel>
-            <Select_Shadcn_ onValueChange={field.onChange} value={field.value}>
+            <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
-                <SelectTrigger_Shadcn_>
-                  <SelectValue_Shadcn_ placeholder="Select a method for the API call" />
-                </SelectTrigger_Shadcn_>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a method for the API call" />
+                </SelectTrigger>
               </FormControl>
-              <SelectContent_Shadcn_>
-                <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              <SelectContent>
+                <SelectItem value="GET">GET</SelectItem>
+                <SelectItem value="POST">POST</SelectItem>
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}
@@ -104,7 +107,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
               Loading edge functions...
             </Button>
           ) : (
-            <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
+            <div className="px-4 py-4 border rounded-sm bg-surface-300 border-strong flex items-center justify-between space-x-4">
               <p className="text-sm">No edge functions created yet</p>
               <Button asChild>
                 <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
@@ -122,8 +125,8 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
             return (
               <FormItem>
                 <FormLabel>Edge Function</FormLabel>
-                <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger_Shadcn_ asChild>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         type="default"
@@ -147,17 +150,17 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                           : 'Select which edge function to trigger'}
                       </Button>
                     </FormControl>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ id={listboxId} className="p-0" sameWidthAsTrigger>
-                    <Command_Shadcn_>
-                      <CommandInput_Shadcn_ placeholder="Search edge functions..." />
-                      <CommandList_Shadcn_>
-                        <CommandEmpty_Shadcn_>No edge function found.</CommandEmpty_Shadcn_>
-                        <CommandGroup_Shadcn_>
+                  </PopoverTrigger>
+                  <PopoverContent id={listboxId} className="p-0" sameWidthAsTrigger>
+                    <Command>
+                      <CommandInput placeholder="Search edge functions..." />
+                      <CommandList>
+                        <CommandEmpty>No edge function found.</CommandEmpty>
+                        <CommandGroup>
                           <ScrollArea className={edgeFunctions.length > 7 ? 'h-[210px]' : ''}>
                             {edgeFunctions.map((fn) => {
                               return (
-                                <CommandItem_Shadcn_
+                                <CommandItem
                                   value={fn.name}
                                   key={fn.id}
                                   onSelect={() => {
@@ -172,15 +175,15 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                                     )}
                                   />
                                   {fn.name}
-                                </CommandItem_Shadcn_>
+                                </CommandItem>
                               )
                             })}
                           </ScrollArea>
-                        </CommandGroup_Shadcn_>
-                      </CommandList_Shadcn_>
-                    </Command_Shadcn_>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )
@@ -192,12 +195,12 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
         name="values.timeoutMs"
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Timeout" layout="vertical" className="gap-1">
-            <Input
-              {...rest}
-              type="number"
-              placeholder="1000"
-              actions={<p className="text-foreground-light pr-2">ms</p>}
-            />
+            <InputGroup>
+              <InputGroupInput {...rest} type="number" placeholder="1000" />
+              <InputGroupAddon align="inline-end">
+                <InputGroupText> ms</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
           </FormItemLayout>
         )}
       />

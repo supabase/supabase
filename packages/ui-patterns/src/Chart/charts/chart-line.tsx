@@ -154,7 +154,7 @@ export const ChartLine = ({
       data-testid="chart-line"
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
-      <ChartContainer className="!w-full h-full" config={chartConfig}>
+      <ChartContainer className="w-full! h-full" config={chartConfig}>
         <RechartAreaChart
           data={data}
           syncId={syncId}

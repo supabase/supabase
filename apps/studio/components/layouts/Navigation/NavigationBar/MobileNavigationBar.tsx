@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { MobileSheetNav } from 'ui-patterns'
 
-import { HeaderUpgradeButton } from '../LayoutHeader/HeaderUpgradeButton'
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
@@ -52,7 +51,7 @@ const MobileNavigationBar = ({
             <div className="flex items-center justify-center ml-1 flex-0 md:hidden h-full aspect-square">
               <Link
                 href={backToDashboardURL}
-                className="flex items-center justify-center !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px] border text-foreground-lighter hover:text-foreground transition-colors"
+                className="flex items-center justify-center bg-transparent! rounded-md min-w-[30px] w-[30px] h-[30px] border text-foreground-lighter hover:text-foreground transition-colors"
               >
                 <ChevronLeft strokeWidth={1.5} size={16} />
               </Link>
@@ -62,7 +61,7 @@ const MobileNavigationBar = ({
           {isProjectScope ? (
             <>
               <ProjectBranchSelector />
-              <ConnectButton className="[&_span]:hidden h-8 w-8" />
+              <ConnectButton iconOnly className="w-8 h-8" />
             </>
           ) : IS_PLATFORM && showOrgSelection ? (
             <OrgSelector />
@@ -71,13 +70,12 @@ const MobileNavigationBar = ({
           )}
         </div>
         <div className="flex shrink-0 gap-2">
-          {IS_PLATFORM && <HeaderUpgradeButton />}
           {IS_PLATFORM ? <UserDropdown /> : <LocalDropdown />}
           {!hideMobileMenu && (
             <Button
               title="Menu dropdown button"
               type="default"
-              className="flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30"
+              className="flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30"
               icon={<Menu />}
               onClick={() => openMenu()}
             />

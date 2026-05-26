@@ -1,12 +1,15 @@
+import { acceptUntrustedSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { DEPRECATED_REPORTS } from '../Reports.constants'
+import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
+import { UnavailableChartBlock } from './UnavailableChartBlock'
+import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '@/components/ui/QueryBlock/QueryBlock'
@@ -15,6 +18,7 @@ import { useContentIdQuery } from '@/data/content/content-id-query'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import { sqlKeys } from '@/data/sql/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards, SqlSnippets } from '@/types'
 
@@ -47,10 +51,14 @@ export const ReportBlock = ({
 }: ReportBlockProps) => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
+  const { data: project } = useSelectedProjectQuery()
 
   const [isWriteQuery, setIsWriteQuery] = useState(false)
 
   const isSnippet = item.attribute.startsWith('snippet_')
+  const isUnavailableBurstChart =
+    BURSTABLE_IO_METRIC_KEYS.includes(item.attribute) &&
+    !hasBurstableIO(project?.infra_compute_size)
 
   const {
     data,
@@ -70,7 +78,7 @@ export const ReportBlock = ({
     }
   )
 
-  const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.sql : undefined
+  const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
   const snippetMissing = contentError?.message.includes('Content not found')
@@ -104,7 +112,10 @@ export const ReportBlock = ({
       return executeSql({
         projectRef,
         connectionString,
-        sql,
+        // acceptUntrustedSql is usually not allowed in an auto-run position,
+        // but in this case we are explicitly allowing it because adding a block
+        // to a report is an explicit user action.
+        sql: acceptUntrustedSql(sql),
       })
     },
     enabled: !isLoadingContent && contentError == null,
@@ -168,6 +179,21 @@ export const ReportBlock = ({
           onUpdateChartConfig={onUpdateChart}
           onRemoveChart={() => onRemoveChart({ metric: { key: item.attribute } })}
           disabled={isLoadingContent || snippetMissing || !sql}
+        />
+      ) : isUnavailableBurstChart ? (
+        <UnavailableChartBlock
+          label={item.label}
+          actions={
+            !disableUpdate ? (
+              <ButtonTooltip
+                type="text"
+                icon={<X />}
+                className="h-7 w-7"
+                onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+                tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+              />
+            ) : null
+          }
         />
       ) : isDeprecatedChart ? (
         <DeprecatedChartBlock

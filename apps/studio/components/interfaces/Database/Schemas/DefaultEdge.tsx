@@ -8,7 +8,7 @@ import {
   useReactFlow,
 } from '@xyflow/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { Badge, cn } from 'ui'
 
 import { useSchemaGraphContext } from './SchemaGraphContext'
@@ -16,7 +16,7 @@ import { EdgeData } from './Schemas.constants'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
-export const DefaultEdge = ({
+const DefaultEdgeComponent = ({
   id,
   animated,
   data,
@@ -53,7 +53,7 @@ export const DefaultEdge = ({
       <BaseEdge
         id={id}
         path={edgePath}
-        className={cn(selected ? '!stroke-brand' : isDownloading ? '!stroke-black' : undefined)}
+        className={cn(selected ? 'stroke-brand!' : isDownloading ? 'stroke-black!' : undefined)}
         stroke="#000000"
         {...props}
       />
@@ -72,6 +72,8 @@ export const DefaultEdge = ({
     </>
   )
 }
+
+export const DefaultEdge = memo(DefaultEdgeComponent)
 
 const EdgeRelationInfo = ({
   data,

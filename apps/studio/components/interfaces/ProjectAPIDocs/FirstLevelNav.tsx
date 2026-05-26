@@ -23,7 +23,7 @@ type DocsCategory = DocsSection['key']
 type DocsContentRegistry = typeof DOCS_CONTENT
 type DocsSnippet = DocsContentRegistry[keyof DocsContentRegistry]
 
-const Separator = () => <hr className="border-t !mt-3 pb-1 mx-3" />
+const Separator = () => <hr className="border-t mt-3! pb-1 mx-3" />
 
 const MENU_BUTTON_CLASSES = cn(
   'w-full px-4',
@@ -118,7 +118,7 @@ export const FirstLevelNav = (): ReactNode => {
           }
           onClick={() => snap.setShowProjectApiDocs(false)}
         >
-          <Link className="!justify-start" href={`/project/${ref}/integrations/graphiql`}>
+          <Link className="justify-start!" href={`/project/${ref}/integrations/graphiql`}>
             GraphiQL
           </Link>
         </Button>
@@ -127,7 +127,7 @@ export const FirstLevelNav = (): ReactNode => {
             href={`${DOCS_URL}/guides/graphql`}
             target="_blank"
             rel="noreferrer"
-            className="!justify-start"
+            className="justify-start!"
           >
             GraphQL guide
           </Link>
@@ -136,7 +136,7 @@ export const FirstLevelNav = (): ReactNode => {
 
       <div className="px-2 py-4">
         <Button block asChild type="text" size="small" icon={<Book />}>
-          <Link href={`${DOCS_URL}`} target="_blank" rel="noreferrer" className="!justify-start">
+          <Link href={`${DOCS_URL}`} target="_blank" rel="noreferrer" className="justify-start!">
             Documentation
           </Link>
         </Button>
@@ -145,7 +145,7 @@ export const FirstLevelNav = (): ReactNode => {
             href={`${DOCS_URL}/guides/api`}
             target="_blank"
             rel="noreferrer"
-            className="!justify-start"
+            className="justify-start!"
           >
             REST guide
           </Link>

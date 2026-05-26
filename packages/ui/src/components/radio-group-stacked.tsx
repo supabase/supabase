@@ -41,14 +41,14 @@ const RadioGroupStackedItem = React.forwardRef<
         // Base layout and sizing
         'flex flex-col gap-2 w-full',
         // Base styles
-        'bg-overlay/50 border shadow-sm',
+        'bg-overlay/50 border shadow-xs',
         'first-of-type:rounded-t-lg last-of-type:rounded-b-lg',
         // Disabled state
         'disabled:opacity-50 disabled:cursor-not-allowed',
         // Enabled/hover states
         'enabled:cursor-pointer enabled:hover:bg-surface-300 enabled:hover:border-foreground-muted',
         // Z-index for interactions
-        'hover:z-[1] focus-visible:z-[1] data-[state=checked]:z-[1]',
+        'hover:z-1 focus-visible:z-1 data-[state=checked]:z-1',
         // Checked state
         'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
         'data-[state=checked]:bg-surface-300 data-[state=checked]:border-foreground-muted',
@@ -67,7 +67,7 @@ const RadioGroupStackedItem = React.forwardRef<
               'ring-offset-background transition',
               // States
               'group-data-[state=checked]:border-foreground-muted',
-              'group-focus:border-foreground-muted group-focus:outline-none',
+              'group-focus:border-foreground-muted group-focus:outline-hidden',
               'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
               'group-hover:border-foreground-muted'
             )}
@@ -82,7 +82,7 @@ const RadioGroupStackedItem = React.forwardRef<
             htmlFor={props.value}
             className={cn(
               // Base styles
-              'block -mt-[0.15rem] text-sm text-left text-light',
+              'block mt-[-0.15rem] text-sm text-left text-light',
               // Transitions
               'transition-colors',
               // States

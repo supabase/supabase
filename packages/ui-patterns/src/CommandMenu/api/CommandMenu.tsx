@@ -10,7 +10,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import {
   Button,
   cn,
-  Command_Shadcn_,
+  Command,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -50,15 +50,15 @@ function Breadcrumb({ className }: { className?: string }) {
 }
 
 const CommandWrapper = forwardRef<
-  React.ElementRef<typeof Command_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof Command_Shadcn_>
+  React.ElementRef<typeof Command>,
+  React.ComponentPropsWithoutRef<typeof Command>
 >(({ children, className, ...props }, ref) => {
   return (
-    <Command_Shadcn_
+    <Command
       ref={ref}
       className={cn(
         'h-full w-full flex flex-col overflow-hidden',
-        '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+        '**:[[cmdk-group]]:px-2 **:[[cmdk-group]]:bg-transparent! **:[[cmdk-group-heading]]:bg-transparent! **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger **:[[cmdk-input]]:h-12',
         '[&_[cmdk-item]_svg]:h-5',
         '[&_[cmdk-item]_svg]:w-5',
         '[&_[cmdk-item]_svg]:stroke-1',
@@ -71,10 +71,10 @@ const CommandWrapper = forwardRef<
       {...props}
     >
       {children}
-    </Command_Shadcn_>
+    </Command>
   )
 })
-CommandWrapper.displayName = Command_Shadcn_.displayName
+CommandWrapper.displayName = Command.displayName
 
 function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () => void }) {
   return (
@@ -160,7 +160,7 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
       'rounded-md border border-input bg-background',
       'text-sm',
       'hover:bg-accent hover:text-accent-foreground',
-      'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      'ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'disabled:pointer-events-none disabled:opacity-50',
       'transition-colors',
       childFromProps.props.className
@@ -189,7 +189,7 @@ function CommandMenuTriggerInput({
           'flex items-center justify-between',
           'bg-surface-100/75 text-foreground-lighter border',
           'hover:bg-surface-100/100  hover:border-stronger',
-          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-border-strong focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+          'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-border-strong focus-visible:ring-offset-1 focus-visible:ring-offset-background',
           'transition',
           className
         )}
@@ -266,7 +266,7 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         className={cn(
           'relative flex flex-col my-0 mx-auto rounded-t-lg',
           'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
-          '!animate-in !slide-in-from-bottom-[85%] !duration-300',
+          '!animate-in !slide-in-from-bottom-[85%] duration-300!',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
           // Remove defaults set from primitive component
           '!slide-in-from-left-[0%] :!slide-in-from-top-[0%]',

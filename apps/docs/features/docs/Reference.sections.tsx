@@ -171,8 +171,8 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader title={command.title} className="col-[1_/_-1]" monoFont={true} />
-      <div className="w-full min-w-0 prose break-words mb-8">
+      <StickyHeader title={command.title} className="col-span-full" monoFont={true} />
+      <div className="w-full min-w-0 prose wrap-break-word mb-8">
         {command.description && <ReactMarkdown>{command.description}</ReactMarkdown>}
         {command.usage && (
           <div className="mb-8">
@@ -220,7 +220,7 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     )}
                   </div>
                   {flag.description && (
-                    <div className="prose break-words text-sm">
+                    <div className="prose wrap-break-word text-sm">
                       <ReactMarkdown>{flag.description}</ReactMarkdown>
                     </div>
                   )}
@@ -320,7 +320,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
             )}
           </>
         }
-        className="col-[1_/_-1]"
+        className="col-span-full"
       />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
@@ -342,7 +342,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           </code>
         </div>
         {endpointDetails.description && (
-          <div className="prose break-words mb-8">
+          <div className="prose wrap-break-word mb-8">
             <ReactMarkdown>{endpointDetails.description}</ReactMarkdown>
           </div>
         )}
@@ -473,11 +473,11 @@ async function FunctionSection({
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader {...section} className="col-[1_/_-1]" />
+      <StickyHeader {...section} className="col-span-full" />
 
       {/* Display method signature below title */}
       {types && 'params' in types && formatMethodSignature(types) && (
-        <div className="col-[1_/_-1] -mt-2 mb-4">
+        <div className="col-span-full -mt-2 mb-4">
           <code className="text-sm text-foreground-muted font-mono">
             {formatMethodSignature(types)}
           </code>
@@ -485,7 +485,7 @@ async function FunctionSection({
       )}
 
       <div className="overflow-hidden flex flex-col gap-8">
-        <div className="prose break-words text-sm">
+        <div className="prose wrap-break-word text-sm">
           <MDXRemoteRefs source={fullDescription} />
         </div>
         <FnParameterDetails

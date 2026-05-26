@@ -1,5 +1,5 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogBody,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -44,7 +45,8 @@ import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
+import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
 import { useJitDbAccessQuery } from '@/data/jit-db-access/jit-db-access-query'
@@ -62,11 +64,15 @@ export const JitDbAccessConfiguration = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
+  const parentProjectRef = project?.parent_project_ref
+
   const [enabled, setEnabled] = useState(false)
   const [, setShowCreateRuleSheet] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
   const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
   const [showEnableJitDialog, setShowEnableJitDialog] = useState(false)
+  const [enableJitError, setEnableJitError] = useState<string | null>(null)
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<JitUserRule | null>(null)
+  const [deleteRuleError, setDeleteRuleError] = useState<string | null>(null)
 
   const {
     data: jitDbAccessConfiguration,
@@ -101,7 +107,7 @@ export const JitDbAccessConfiguration = () => {
     { resource: { project_id: project?.id } }
   )
 
-  const { mutate: updateJitDbAccess, isPending: isUpdatingJitDbAccess } =
+  const { mutateAsync: updateJitDbAccess, isPending: isUpdatingJitDbAccess } =
     useJitDbAccessUpdateMutation({
       onSuccess: (_, variables) => {
         const nextEnabled = variables.requestedConfig.state === 'enabled'
@@ -116,22 +122,18 @@ export const JitDbAccessConfiguration = () => {
           )
         }
       },
-      onError: (error) => {
-        setEnabled(initialIsEnabled ?? false)
-        toast.error(`Failed to update temporary access: ${error.message}`)
-      },
+      onError: () => {},
     })
 
-  const { mutate: revokeUserAccess, isPending: isRevokingAccess } = useJitDbAccessRevokeMutation({
-    onSuccess: (_, variables) => {
-      toast.success('Successfully revoked user access')
-      setSelectedUserToDelete(null)
-      if (ruleIdToEdit === variables.userId) resetSheetState()
-    },
-    onError: (error) => {
-      toast.error(`Failed to revoke user access: ${error.message}`)
-    },
-  })
+  const { mutateAsync: revokeUserAccess, isPending: isRevokingAccess } =
+    useJitDbAccessRevokeMutation({
+      onSuccess: (_, variables) => {
+        toast.success('Successfully revoked user access')
+        setSelectedUserToDelete(null)
+        if (ruleIdToEdit === variables.userId) resetSheetState()
+      },
+      onError: () => {},
+    })
 
   const isMutating = isUpdatingJitDbAccess || isRevokingAccess
   const disableRuleActions = isMutating || isLoadingDatabaseRoles || isLoadingOrganizationMembers
@@ -198,14 +200,23 @@ export const JitDbAccessConfiguration = () => {
     setRuleIdToEdit(null)
   }
 
-  const submitJitToggle = (nextEnabled: boolean) => {
-    if (!ref) return console.error('Project ref is required')
+  const getErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : 'An unknown error occurred'
+
+  const submitJitToggle = async (nextEnabled: boolean) => {
+    if (!ref) throw new Error('Project ref is required')
 
     setEnabled(nextEnabled)
-    updateJitDbAccess({
-      projectRef: ref,
-      requestedConfig: { state: nextEnabled ? 'enabled' : 'disabled' },
-    })
+
+    try {
+      await updateJitDbAccess({
+        projectRef: ref,
+        requestedConfig: { state: nextEnabled ? 'enabled' : 'disabled' },
+      })
+    } catch (error) {
+      setEnabled(initialIsEnabled ?? false)
+      throw error
+    }
   }
 
   const handleJitToggleChange = (checked: boolean) => {
@@ -213,19 +224,30 @@ export const JitDbAccessConfiguration = () => {
 
     if (checked && !enabled) {
       if (activeRuleCount > 0) {
+        setEnableJitError(null)
         return setShowEnableJitDialog(true)
       }
-      return submitJitToggle(true)
+      return void submitJitToggle(true).catch((error) => {
+        toast.error(`Failed to update temporary access: ${getErrorMessage(error)}`)
+      })
     }
 
     if (!checked && enabled) {
-      submitJitToggle(false)
+      void submitJitToggle(false).catch((error) => {
+        toast.error(`Failed to update temporary access: ${getErrorMessage(error)}`)
+      })
     }
   }
 
-  const handleConfirmEnableJit = () => {
-    setShowEnableJitDialog(false)
-    submitJitToggle(true)
+  const handleConfirmEnableJit = async () => {
+    setEnableJitError(null)
+
+    try {
+      await submitJitToggle(true)
+    } catch (error) {
+      setEnableJitError(getErrorMessage(error))
+      throw error
+    }
   }
 
   const openAddRuleSheet = () => {
@@ -242,13 +264,22 @@ export const JitDbAccessConfiguration = () => {
 
   const openDeleteDialog = (user: JitUserRule) => {
     if (!canUpdateJitDbAccess) return
+    setDeleteRuleError(null)
     setSelectedUserToDelete(user)
   }
 
-  const handleConfirmDelete = () => {
-    if (!ref) return console.error('Project ref is required')
-    if (!selectedUserToDelete) return toast.error('User is required')
-    revokeUserAccess({ projectRef: ref, userId: selectedUserToDelete.memberId })
+  const handleConfirmDelete = async () => {
+    setDeleteRuleError(null)
+
+    try {
+      if (!ref) throw new Error('Project ref is required')
+      if (!selectedUserToDelete) throw new Error('User is required')
+
+      await revokeUserAccess({ projectRef: ref, userId: selectedUserToDelete.memberId })
+    } catch (error) {
+      setDeleteRuleError(getErrorMessage(error))
+      throw error
+    }
   }
 
   const switchDisabled = isLoadingConfiguration || isUpdatingJitDbAccess || !canUpdateJitDbAccess
@@ -290,13 +321,35 @@ export const JitDbAccessConfiguration = () => {
       <PageSection id="jit-db-access-configuration">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Temporary access</PageSectionTitle>
+            <PageSectionTitle>
+              <span className="flex items-center gap-x-4">
+                Temporary access
+                <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS} />
+              </span>
+            </PageSectionTitle>
           </PageSectionSummary>
           <DocsButton href={`${DOCS_URL}/guides/platform/temporary-access`} />
         </PageSectionMeta>
 
         <PageSectionContent className="space-y-4">
-          {isErrorJitDbAccessConfiguration && (
+          {parentProjectRef && (
+            <Admonition
+              type="note"
+              title="Managed in the main branch"
+              description={
+                <>
+                  Temporary access rules are configured in the main branch and apply across all
+                  preview branches. Return to the{' '}
+                  <InlineLink href={`/project/${parentProjectRef}/settings/database`}>
+                    main branch
+                  </InlineLink>{' '}
+                  to manage your access rules.
+                </>
+              }
+            />
+          )}
+
+          {!parentProjectRef && isErrorJitDbAccessConfiguration && (
             <AlertError
               projectRef={ref}
               subject="Failed to load temporary access"
@@ -305,7 +358,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {!isErrorJitDbAccessConfiguration && isJitDbAccessUnavailable && (
+          {!parentProjectRef && !isErrorJitDbAccessConfiguration && isJitDbAccessUnavailable && (
             <Admonition
               type="note"
               layout="responsive"
@@ -341,7 +394,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {!isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
+          {!parentProjectRef && !isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
             <Card>
               <CardContent className="space-y-4">
                 <FormLayout
@@ -402,7 +455,7 @@ export const JitDbAccessConfiguration = () => {
             </Card>
           )}
 
-          {enabled && !isJitDbAccessUnavailable && !isUpdatingJitDbAccess && (
+          {!parentProjectRef && enabled && !isJitDbAccessUnavailable && !isUpdatingJitDbAccess && (
             <>
               {isErrorJitMembers && (
                 <AlertError
@@ -437,7 +490,11 @@ export const JitDbAccessConfiguration = () => {
       <JitDbAccessDeleteDialog
         user={selectedUserToDelete}
         isDeleting={isRevokingAccess}
-        onClose={() => setSelectedUserToDelete(null)}
+        error={deleteRuleError}
+        onClose={() => {
+          setDeleteRuleError(null)
+          setSelectedUserToDelete(null)
+        }}
         onConfirm={handleConfirmDelete}
       />
 
@@ -455,11 +512,20 @@ export const JitDbAccessConfiguration = () => {
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {enableJitError && (
+            <AlertDialogBody>
+              <Admonition
+                type="destructive"
+                title="Unable to enable temporary access"
+                description={enableJitError}
+              />
+            </AlertDialogBody>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isUpdatingJitDbAccess}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               variant="warning"
-              disabled={isUpdatingJitDbAccess}
+              loading={isUpdatingJitDbAccess}
               onClick={handleConfirmEnableJit}
             >
               Enable temporary access

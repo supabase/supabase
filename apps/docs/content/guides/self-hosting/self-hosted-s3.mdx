@@ -88,7 +88,7 @@ Depending on your setup, you may need to adjust these values - for example, to u
 ### Using RustFS
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-An overlay `docker-compose.rustfs.yml` configuration can be added to enable RustFS container and provide an S3-compatible API for Storage backend:
+An override `docker-compose.rustfs.yml` can be added to enable RustFS container and provide an S3-compatible API for Storage backend:
 
 ```sh
 docker compose -f docker-compose.yml -f docker-compose.rustfs.yml up -d
@@ -109,7 +109,7 @@ MinIO no longer publishes open source Docker images or maintains their open sour
 </Admonition>
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-An overlay `docker-compose.s3.yml` configuration can be added to enable MinIO container and provide an S3-compatible API for Storage backend:
+An override `docker-compose.s3.yml` can be added to enable MinIO container and provide an S3-compatible API for Storage backend:
 
 ```sh
 docker compose -f docker-compose.yml -f docker-compose.s3.yml up -d

@@ -14,8 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  PopoverSeparator_Shadcn_,
-  TextArea_Shadcn_,
+  PopoverSeparator,
+  TextArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -180,7 +180,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
           </p>
         </div>
       </div>
-      <PopoverSeparator_Shadcn_ />
+      <PopoverSeparator />
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
         <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
           Get help
@@ -197,7 +197,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   ) : (
     <>
       <div className="p-4">
-        <TextArea_Shadcn_
+        <TextArea
           placeholder="My idea for improving Supabase is..."
           rows={6}
           value={feedback}
@@ -236,7 +236,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
         )}
       </AnimatePresence>
 
-      <PopoverSeparator_Shadcn_ />
+      <PopoverSeparator />
 
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
         <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
@@ -251,7 +251,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
                 const blobUrl = URL.createObjectURL(blob)
                 window.open(blobUrl, '_blank')
               }}
-              className="cursor-pointer rounded h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
+              className="cursor-pointer rounded-sm h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
             >
               <button
                 className={[

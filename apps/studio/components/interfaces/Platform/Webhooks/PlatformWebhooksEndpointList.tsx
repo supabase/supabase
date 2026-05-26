@@ -1,6 +1,6 @@
 import { ChevronRight, Eye, MoreVertical, Plus, Search, Trash2, Webhook } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   Badge,
   Button,
@@ -22,7 +22,11 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { createNavigationHandler } from '@/lib/navigation'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface PlatformWebhooksEndpointListProps {
   filteredEndpoints: WebhookEndpoint[]
@@ -44,6 +48,12 @@ export const PlatformWebhooksEndpointList = ({
   onViewEndpoint,
 }: PlatformWebhooksEndpointListProps) => {
   const router = useRouter()
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, () => searchInputRef.current?.focus(), {
+    label: 'Search endpoints',
+  })
+
   const formatEventCount = (eventTypes: string[]) => {
     if (eventTypes.includes('*')) return 'All events'
     if (eventTypes.length === 1) return '1 event'
@@ -96,17 +106,25 @@ export const PlatformWebhooksEndpointList = ({
 
       <div className="flex items-center justify-between gap-x-2">
         <Input
+          ref={searchInputRef}
           placeholder="Search endpoints"
           size="tiny"
           icon={<Search />}
           value={search}
           className="w-full lg:w-52"
           onChange={(event) => onSearchChange(event.target.value)}
+          onKeyDown={onSearchInputEscape(search, onSearchChange)}
         />
 
-        <Button type="primary" icon={<Plus />} onClick={onCreateEndpoint}>
-          New endpoint
-        </Button>
+        <Shortcut
+          id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+          label="New endpoint"
+          onTrigger={onCreateEndpoint}
+        >
+          <Button type="primary" icon={<Plus />} onClick={onCreateEndpoint}>
+            New endpoint
+          </Button>
+        </Shortcut>
       </div>
 
       {filteredEndpoints.length === 0 ? (

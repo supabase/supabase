@@ -10,7 +10,7 @@ import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer/DrilldownViewer'
 import { JsonCodeEditor } from './JsonCodeEditor'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
@@ -149,7 +149,7 @@ export const JsonEditor = ({
                 options={['view', 'edit']}
                 activeOption={view}
                 borderOverride="border-muted"
-                onClickOption={setView}
+                onClickOption={(value) => setView(value as 'view' | 'edit')}
               />
             </div>
           )}

@@ -28,7 +28,7 @@ export function TextLink({
     <Link
       href={url}
       className={cn(
-        'group/text-link text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-foreground-lighter focus-visible:text-foreground',
+        'group/text-link text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-visible:ring-2 focus-visible:outline-hidden focus-visible:rounded-xs focus-visible:ring-foreground-lighter focus-visible:text-foreground',
         className
       )}
       target={target}

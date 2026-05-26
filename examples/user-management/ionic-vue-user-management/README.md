@@ -25,7 +25,7 @@ This demonstrates how to use:
 
 The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=supabase-ionic-vue&repo-name=supabase-ionic-vue&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&repository-url=https%3A%2F%2Fgithub.com%2Fmhartington%2Fsupabase-ionic-vue%2Ftree%2Fmain&env=VUE_APP_SUPABASE_URL%2CVUE_APP_SUPABASE_KEY)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=supabase-ionic-vue&repo-name=supabase-ionic-vue&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&repository-url=https%3A%2F%2Fgithub.com%2Fmhartington%2Fsupabase-ionic-vue%2Ftree%2Fmain&env=VUE_APP_SUPABASE_URL%2CVUE_APP_SUPABASE_PUBLISHABLE_KEY)
 
 ## Build from scratch
 
@@ -45,7 +45,7 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 ![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
 
-**_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
+**_NOTE_**: The `secret` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
 ### 4. Env vars
 
@@ -55,7 +55,7 @@ Update your environment file `environment.ts`
 export const environment = {
   // ...
   supabaseUrl: "YOUR_SUPABASE_URL",
-  supabaseKey: "YOUR_SUPABASE_KEY"
+  supabasePublishableKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
 };
 ```
 

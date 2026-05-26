@@ -90,7 +90,7 @@ export const PausingState = ({ project }: PausingStateProps) => {
           </div>
         </div>
         <div className="mx-auto mt-8 mb-16 w-full max-w-7xl">
-          <div className="flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded-sm border border-overlay bg-surface-100 p-8">
             <div className="grid w-[380px] gap-4">
               <div className="relative mx-auto max-w-[300px]">
                 <div className="absolute flex h-full w-full items-center justify-center">

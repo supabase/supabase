@@ -1,6 +1,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { SupportLink } from '../Support/SupportLink'
 import type { ResponseError } from '@/types'
@@ -15,11 +16,19 @@ const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
   return (
     <div className="storage-container flex items-center justify-center grow">
       <div>
-        <Alert
-          withIcon
-          variant="warning"
+        <Admonition
+          type="warning"
+          layout="horizontal"
           title="Failed to fetch buckets"
-          actions={[
+          description={
+            <>
+              <p className="mb-1">
+                Please try refreshing your browser, or contact support if the issue persists
+              </p>
+              <p>Error: {(error as any)?.message ?? 'Unknown'}</p>
+            </>
+          }
+          actions={
             <Button key="contact-support" asChild type="default" className="ml-4">
               <SupportLink
                 queryParams={{
@@ -30,14 +39,9 @@ const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
               >
                 Contact support
               </SupportLink>
-            </Button>,
-          ]}
-        >
-          <p className="mb-1">
-            Please try refreshing your browser, or contact support if the issue persists
-          </p>
-          <p>Error: {(error as any)?.message ?? 'Unknown'}</p>
-        </Alert>
+            </Button>
+          }
+        />
       </div>
     </div>
   )

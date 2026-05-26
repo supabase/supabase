@@ -43,7 +43,7 @@ export const ConnectSheetStep = ({
             <p className="text-sm font-medium text-foreground">{title}</p>
             <p className="text-sm text-foreground-light">{description}</p>
           </div>
-          <div className="2xl:col-span-3 [&_pre.code-block]:!bg-surface-75" data-step-content>
+          <div className="2xl:col-span-3 [&_pre.code-block]:bg-surface-75!" data-step-content>
             {children}
           </div>
         </div>

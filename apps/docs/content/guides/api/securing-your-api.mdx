@@ -68,6 +68,10 @@ alter default privileges for role postgres in schema public
   revoke execute on functions from public;
 ```
 
+## Use a dedicated API schema
+
+If you want an extra boundary around your Data API, lock down the `public` schema and expose a dedicated schema, such as `api`, instead. You can control access with grants in any schema, but this can make the surface easier to reason about: objects in `api` represent your Data API, while internal tables and helper functions stay in schemas that are not exposed. See [Using Custom Schemas](/docs/guides/api/using-custom-schemas) for setup steps.
+
 ## Disable the Data API
 
 If your app never uses Supabase client libraries, REST, or GraphQL data endpoints, turn the Data API off:

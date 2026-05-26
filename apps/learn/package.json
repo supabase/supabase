@@ -23,7 +23,7 @@
     "lucide-react": "*",
     "next": "catalog:",
     "next-contentlayer2": "0.4.6",
-    "next-themes": "^0.3.0",
+    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-wrap-balancer": "^1.1.0",
@@ -43,8 +43,9 @@
     "@types/react": "catalog:",
     "config": "workspace:^",
     "mdast-util-toc": "^6.1.1",
+    "shiki": "^1.1.7",
+    "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "tsx": "catalog:",
-    "shiki": "^1.1.7"
+    "tsx": "catalog:"
   }
 }

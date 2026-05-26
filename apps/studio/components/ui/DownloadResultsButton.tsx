@@ -30,6 +30,7 @@ interface DownloadResultsButtonProps {
   align?: 'start' | 'center' | 'end'
   results: any[]
   fileName: string
+  enableCopyShortcuts?: boolean
   onDownloadAsCSV?: () => void
   onCopyAsMarkdown?: () => void
   onCopyAsJSON?: () => void
@@ -43,6 +44,7 @@ export const DownloadResultsButton = ({
   align = 'start',
   results,
   fileName,
+  enableCopyShortcuts = true,
   onDownloadAsCSV,
   onCopyAsMarkdown,
   onCopyAsJSON,
@@ -73,7 +75,7 @@ export const DownloadResultsButton = ({
       return
     }
     copyToClipboard(markdownData, () => {
-      toast.success('Copied markdown to clipboard')
+      toast.success('Copied Markdown to clipboard')
       onCopyAsMarkdown?.()
     })
   }
@@ -103,15 +105,18 @@ export const DownloadResultsButton = ({
   }
 
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, copyAsMarkdown, {
-    enabled: !isEmpty,
+    enabled: !isEmpty && enableCopyShortcuts,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_JSON, copyAsJSON, {
-    enabled: !isEmpty,
+    enabled: !isEmpty && enableCopyShortcuts,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_CSV, copyAsCSV, {
-    enabled: !isEmpty,
+    enabled: !isEmpty && enableCopyShortcuts,
+    conflictBehavior: 'allow',
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV, downloadAsCSV, {

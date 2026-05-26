@@ -3,14 +3,7 @@ import { map as lodashMap, uniqBy } from 'lodash'
 import { HelpCircle, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
-  Button,
-  SidePanel,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, SidePanel } from 'ui'
 
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import InformationBox from '@/components/ui/InformationBox'
@@ -123,7 +116,7 @@ export interface SchemaFunctionGroupProps {
 const SchemaFunctionGroup = ({ schema, functions, selectFunction }: SchemaFunctionGroupProps) => {
   return (
     <div className="space-y-4">
-      <div className="sticky top-0 flex items-center space-x-1 px-6 backdrop-blur backdrop-filter">
+      <div className="sticky top-0 flex items-center space-x-1 px-6 backdrop-blur-sm backdrop-filter">
         <h5 className="text-foreground-light">schema</h5>
         <h5>{schema}</h5>
       </div>
@@ -151,30 +144,30 @@ export interface FunctionProps {
 
 const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
   return (
-    <div className="cursor-pointer rounded p-3 px-6 hover:bg-studio" onClick={() => onClick(id)}>
-      <Accordion_Shadcn_ type="single" collapsible>
-        <AccordionItem_Shadcn_ value="definition" className="border-none">
+    <div className="cursor-pointer rounded-sm p-3 px-6 hover:bg-studio" onClick={() => onClick(id)}>
+      <Accordion type="single" collapsible>
+        <AccordionItem value="definition" className="border-none">
           <div className="flex items-center justify-between space-x-3">
             <div className="flex items-center space-x-3">
-              <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
+              <div className="flex items-center justify-center rounded-sm bg-foreground p-1 text-background">
                 <Terminal strokeWidth={2} size={14} />
               </div>
               <p className="mb-0 text-sm">{name}</p>
             </div>
-            <AccordionTrigger_Shadcn_
+            <AccordionTrigger
               onClick={(e) => e.stopPropagation()}
               className="py-0 text-xs font-normal text-foreground-light hover:no-underline"
             >
               View definition
-            </AccordionTrigger_Shadcn_>
+            </AccordionTrigger>
           </div>
-          <AccordionContent_Shadcn_ className="[&>div]:pb-0" onClick={(e) => e.stopPropagation()}>
+          <AccordionContent className="[&>div]:pb-0" onClick={(e) => e.stopPropagation()}>
             <div className="mt-4 h-64 border border-default">
               <SqlEditor defaultValue={completeStatement} readOnly={true} contextmenu={false} />
             </div>
-          </AccordionContent_Shadcn_>
-        </AccordionItem_Shadcn_>
-      </Accordion_Shadcn_>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   )
 }

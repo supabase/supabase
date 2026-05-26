@@ -10,7 +10,6 @@ You can configure self-hosted Supabase to use the [new API keys](/docs/guides/ge
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
-- Ensure OpenSSL and Node.js 16+ are available on the machine where you will generate new keys
 - Complete the [Docker setup guide](/docs/guides/self-hosting/docker), including running `generate-keys.sh` so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file
 - If you are upgrading an existing self-hosted Supabase environment, make sure to check the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and add/update the following files:
   - `.env.example` (merge new sections into your `.env` file)
@@ -36,13 +35,18 @@ The script reads `JWT_SECRET` from `.env` and includes it as a symmetric key ins
 
 </Admonition>
 
-After updating `.env`, enable new authentication by uncommenting these lines in `docker-compose.yml`:
+The following configuration should be uncommented in the `.env` file for the new authentication to work correctly:
 
 ```yaml name=docker-compose.yml
 auth:
   environment:
     # JSON array of signing JWKs (EC private + legacy symmetric)
     GOTRUE_JWT_KEYS: ${JWT_KEYS:-[]}
+
+rest:
+  environment:
+    # PostgREST accepts a plain-text symmetric secret, a single JWK, or a JWKS.
+    PGRST_JWT_SECRET: ${JWT_JWKS:-${JWT_SECRET}}
 
 realtime:
   environment:
@@ -54,8 +58,6 @@ storage:
     # JWKS for token verification (EC public + legacy symmetric)
     JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
 ```
-
-PostgREST does not need uncommenting - it already uses `PGRST_JWT_SECRET: ${JWT_JWKS:-${JWT_SECRET}}` which automatically picks up `JWT_JWKS` when set.
 
 <Admonition type="caution">
 
@@ -84,14 +86,14 @@ Test with the new publishable key:
 
 ```sh
 curl http://<your-domain>/rest/v1/ \
--H "apikey: your-supabase-publishable-key"
+-H "apikey: your-supabase-secret-key"
 ```
 
 You should receive a valid response from PostgREST. Then verify that the legacy key still works:
 
 ```sh
 curl http://<your-domain>/rest/v1/ \
--H "apikey: your-anon-key"
+-H "apikey: your-service-role-key"
 ```
 
 Both should work and return the same result.

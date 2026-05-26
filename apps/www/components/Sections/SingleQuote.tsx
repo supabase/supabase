@@ -47,7 +47,7 @@ const SingleQuote: FC<Props> = ({
       id={sectionId}
       className={cn('flex flex-col items-center text-center gap-8 md:gap-16', className)}
     >
-      <q className="text-2xl max-w-xs md:text-2xl xl:text-4xl md:!max-w-screen-lg w-full">
+      <q className="text-2xl max-w-xs md:text-2xl xl:text-4xl md:max-w-(--breakpoint-lg)! w-full">
         {quote.text}
       </q>
       <MaybeLink href={quote.link}>

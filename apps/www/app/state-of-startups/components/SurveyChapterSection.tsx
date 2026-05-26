@@ -1,30 +1,36 @@
 'use client'
 
 import { useAccent } from './accent-context'
-import { SurveyStatCard } from './SurveyStatCard'
-import { SurveyWordCloud } from './SurveyWordCloud'
-import { SurveySummarizedAnswer } from './SurveySummarizedAnswer'
+import { AcceleratorParticipationChart } from './charts/AcceleratorParticipationChart'
+import { AICodebasePercentChart } from './charts/AICodebasePercentChart'
+import { AICodingToolsChart } from './charts/AICodingToolsChart'
+import { AIModelsChart } from './charts/AIModelsChart'
+import { AuthProviderChart } from './charts/AuthProviderChart'
+import { BiggestChallengeChart } from './charts/BiggestChallengeChart'
+import { BuildingAgentsChart } from './charts/BuildingAgentsChart'
+import { DatabasesChart } from './charts/DatabasesChart'
+import { FundingStageChart } from './charts/FundingStageChart'
+import { IndustryChart } from './charts/IndustryChart'
+import { InitialPayingCustomersChart } from './charts/InitialPayingCustomersChart'
+import { LocationChart } from './charts/LocationChart'
+import { MCPAdoptionChart } from './charts/MCPAdoptionChart'
+import { NewIdeasChart } from './charts/NewIdeasChart'
+import { PaidSubscriptionsChart } from './charts/PaidSubscriptionsChart'
+import { RegularSocialMediaUseChart } from './charts/RegularSocialMediaUseChart'
+import { RoleChart } from './charts/RoleChart'
+import { SalesToolsChart } from './charts/SalesToolsChart'
+import { WorldOutlookChart } from './charts/WorldOutlookChart'
 import { SurveyRankedAnswersPair } from './SurveyRankedAnswersPair'
 import { SurveySectionBreak } from './SurveySectionBreak'
-import { AcceleratorParticipationChart } from './charts/AcceleratorParticipationChart'
-import { RoleChart } from './charts/RoleChart'
-import { IndustryChart } from './charts/IndustryChart'
-import { FundingStageChart } from './charts/FundingStageChart'
-import { DatabasesChart } from './charts/DatabasesChart'
-import { AIModelsChart } from './charts/AIModelsChart'
-import { LocationChart } from './charts/LocationChart'
-import { SalesToolsChart } from './charts/SalesToolsChart'
-import { AICodingToolsChart } from './charts/AICodingToolsChart'
-import { RegularSocialMediaUseChart } from './charts/RegularSocialMediaUseChart'
-import { NewIdeasChart } from './charts/NewIdeasChart'
-import { InitialPayingCustomersChart } from './charts/InitialPayingCustomersChart'
-import { WorldOutlookChart } from './charts/WorldOutlookChart'
-import { BiggestChallengeChart } from './charts/BiggestChallengeChart'
+import { SurveyStatCard, type SurveyStatSource } from './SurveyStatCard'
+import { SurveySummarizedAnswer } from './SurveySummarizedAnswer'
+import { SurveyWordCloud } from './SurveyWordCloud'
+import { useYear, type SurveyYear } from './year-context'
 
 interface SurveyChapterSectionProps {
   title: string
   description: string
-  stats?: Array<{ percent: number; label: string }>
+  stats?: Array<{ percent: number; label: string; source?: SurveyStatSource }>
   charts?: string[]
 
   wordCloud?: {
@@ -36,6 +42,13 @@ interface SurveyChapterSectionProps {
     answers: string[]
   }
   rankedAnswersPair?: Array<{ label: string; answers: string[] }>
+  /**
+   * Set when an entire section's data first appeared in a given survey year.
+   * If the user toggles the page to an earlier year, the section body is
+   * replaced with a "Not available in <prior year>" placeholder while the
+   * title and description still render.
+   */
+  newInYear?: SurveyYear
   children?: React.ReactNode
 }
 
@@ -47,32 +60,40 @@ export function SurveyChapterSection({
   wordCloud,
   summarizedAnswer,
   rankedAnswersPair,
+  newInYear,
   children,
 }: SurveyChapterSectionProps) {
   const accent = useAccent()
+  const { year } = useYear()
+  const isAvailableForYear = !newInYear || year >= newInYear
 
   const eyebrowColor = 'text-brand-link dark:text-brand'
 
   const chartComponents = {
-    RoleChart,
-    IndustryChart,
-    FundingStageChart,
     AcceleratorParticipationChart,
-    DatabasesChart,
+    AICodebasePercentChart,
     AICodingToolsChart,
     AIModelsChart,
-    RegularSocialMediaUseChart,
-    NewIdeasChart,
+    AuthProviderChart,
+    BiggestChallengeChart,
+    BuildingAgentsChart,
+    DatabasesChart,
+    FundingStageChart,
+    IndustryChart,
     InitialPayingCustomersChart,
+    LocationChart,
+    MCPAdoptionChart,
+    NewIdeasChart,
+    PaidSubscriptionsChart,
+    RegularSocialMediaUseChart,
+    RoleChart,
     SalesToolsChart,
     WorldOutlookChart,
-    BiggestChallengeChart,
-    LocationChart,
   }
 
   return (
     <div id={title.toLowerCase().replace(/\s+/g, '-')} className="">
-      <div className="max-w-[60rem] mx-auto flex flex-col md:border-x border-muted">
+      <div className="max-w-240 mx-auto flex flex-col md:border-x border-muted">
         <header className="grid grid-cols-1 md:grid-cols-3 text-balance">
           <h3
             className={`pt-8 pb-4 px-8 md:border-r border-muted font-mono uppercase tracking-wider text-sm ${eyebrowColor}`}
@@ -84,31 +105,48 @@ export function SurveyChapterSection({
           </p>
         </header>
 
-        {stats && (
-          <aside className="border-t border-muted flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
-            {stats.map((stat, index) => (
-              <SurveyStatCard key={index} percent={stat.percent} label={stat.label} />
-            ))}
-          </aside>
+        {isAvailableForYear ? (
+          <>
+            {stats && (
+              <aside className="border-t border-muted flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
+                {stats.map((stat, index) => (
+                  <SurveyStatCard
+                    key={index}
+                    percent={stat.percent}
+                    label={stat.label}
+                    source={stat.source}
+                  />
+                ))}
+              </aside>
+            )}
+
+            {charts?.map((chartName, index) => {
+              const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
+              return ChartComponent ? <ChartComponent key={index} /> : null
+            })}
+
+            {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
+
+            {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
+
+            {summarizedAnswer && (
+              <SurveySummarizedAnswer
+                label={summarizedAnswer.label}
+                answers={summarizedAnswer.answers}
+              />
+            )}
+
+            {children}
+          </>
+        ) : (
+          <div className="border-t border-muted px-8 py-16 flex flex-col items-center justify-center gap-2 text-center">
+            <p className="text-foreground-light text-balance">Not available in {year}.</p>
+            <p className="text-foreground-lighter text-sm text-balance">
+              This question was added to the {newInYear} survey. Switch the year toggle to{' '}
+              {newInYear} to view.
+            </p>
+          </div>
         )}
-
-        {charts?.map((chartName, index) => {
-          const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
-          return ChartComponent ? <ChartComponent key={index} /> : null
-        })}
-
-        {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
-
-        {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
-
-        {summarizedAnswer && (
-          <SurveySummarizedAnswer
-            label={summarizedAnswer.label}
-            answers={summarizedAnswer.answers}
-          />
-        )}
-
-        {children}
       </div>
 
       <SurveySectionBreak />

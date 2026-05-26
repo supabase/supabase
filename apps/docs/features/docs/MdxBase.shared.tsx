@@ -8,6 +8,7 @@ import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
+import { Mermaid } from '~/components/Mermaid'
 import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
@@ -32,6 +33,7 @@ import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
+import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
@@ -44,6 +46,7 @@ const components = {
   Accordion,
   AccordionItem,
   Admonition: AdmonitionWithMargin,
+  AgentPluginsPanel,
   AiPromptsIndex,
   AiSkillsIndex,
   AuthSmsProviderConfig,
@@ -66,6 +69,7 @@ const components = {
   Image: (props: ImageProps) => <Image className="rounded-md w-full" {...props} />,
   Link,
   McpConfigPanel,
+  Mermaid,
   MetricsStackCards,
   NamedCodeBlock,
   NavData,

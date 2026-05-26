@@ -4,7 +4,7 @@ import { useState } from 'react'
 import {
   Button,
   cn,
-  Input_Shadcn_,
+  Input,
   ResizableHandle,
   ResizablePanel,
   Tabs_Shadcn_,
@@ -81,19 +81,19 @@ export const UserPanel = () => {
               <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
                 <TabsTrigger_Shadcn_
                   value="overview"
-                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
                 >
                   Overview
                 </TabsTrigger_Shadcn_>
                 <TabsTrigger_Shadcn_
                   value="logs"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
                 >
                   Logs
                 </TabsTrigger_Shadcn_>
                 <TabsTrigger_Shadcn_
                   value="raw"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
                 >
                   Raw JSON
                 </TabsTrigger_Shadcn_>
@@ -115,7 +115,7 @@ export const UserPanel = () => {
                 className={cn('mt-0 grow min-h-0 overflow-y-auto', PANEL_PADDING)}
               >
                 <div className="flex items-center mb-2">
-                  <Input_Shadcn_
+                  <Input
                     autoFocus
                     type="text"
                     placeholder="Filter..."

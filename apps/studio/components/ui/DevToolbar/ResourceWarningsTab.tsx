@@ -217,7 +217,7 @@ const SeverityButton = ({ active, variant, onClick, children }: SeverityButtonPr
   <button
     onClick={onClick}
     className={cn(
-      'px-1.5 py-0.5 rounded text-xs font-mono transition border',
+      'px-1.5 py-0.5 rounded-sm text-xs font-mono transition border',
       active
         ? variant === 'off'
           ? 'bg-surface-300 text-foreground border-strong'

@@ -55,7 +55,7 @@ const removeWrappingQuotes = (str: string): string => {
   return str
 }
 
-const AddNewSecretForm = () => {
+export const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
   const [visibleSecrets, setVisibleSecrets] = useState<Set<string>>(new Set())
   const [duplicateSecretName, setDuplicateSecretName] = useState<string>('')
@@ -295,5 +295,3 @@ const AddNewSecretForm = () => {
     </>
   )
 }
-
-export default AddNewSecretForm

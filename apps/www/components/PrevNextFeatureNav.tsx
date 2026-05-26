@@ -23,7 +23,7 @@ interface Props {
 }
 
 const buttonClassName =
-  'relative z-10 flex items-center gap-1 px-2 pointer-events-auto overflow-hidden !h-[30px] !min-w-[30px] !max-w-[30px] py-1 justify-center rounded-full border bg-default hover:bg-surface-100 hover:text-foreground hover:border-foreground-lighter transition-all'
+  'relative z-10 flex items-center gap-1 px-2 pointer-events-auto overflow-hidden h-[30px]! min-w-[30px]! max-w-[30px]! py-1 justify-center rounded-full border bg-default hover:bg-surface-100 hover:text-foreground hover:border-foreground-lighter transition-all'
 const iconClassName = 'className="w-4 h-4 shrink-0'
 
 const PrevNextFeatureNav: React.FC<Props> = ({

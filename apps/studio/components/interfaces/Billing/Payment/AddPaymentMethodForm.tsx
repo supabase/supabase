@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Checkbox, Label_Shadcn_, Modal } from 'ui'
+import { Button, Checkbox, Label, Modal } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -59,14 +59,14 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
 
     if (document !== undefined) {
       // [Joshen] This is to ensure that any 3DS popup from Stripe remains clickable
-      document.body.classList.add('!pointer-events-auto')
+      document.body.classList.add('pointer-events-auto!')
     }
 
     if (isPrimaryBillingAddress && isTaxIdError) {
       toast.error('Unable to load current tax ID. Please try again.')
       setIsSaving(false)
       if (document !== undefined) {
-        document.body.classList.remove('!pointer-events-auto')
+        document.body.classList.remove('pointer-events-auto!')
       }
       return
     }
@@ -80,7 +80,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
     if (isPrimaryBillingAddress && !formValues) {
       setIsSaving(false)
       if (document !== undefined) {
-        document.body.classList.remove('!pointer-events-auto')
+        document.body.classList.remove('pointer-events-auto!')
       }
       return
     }
@@ -98,7 +98,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         toast.error(error instanceof Error ? error.message : 'Failed to validate billing profile')
         setIsSaving(false)
         if (document !== undefined) {
-          document.body.classList.remove('!pointer-events-auto')
+          document.body.classList.remove('pointer-events-auto!')
         }
         return
       }
@@ -171,7 +171,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
     }
 
     if (document !== undefined) {
-      document.body.classList.remove('!pointer-events-auto')
+      document.body.classList.remove('pointer-events-auto!')
     }
   }
 
@@ -214,9 +214,9 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
               }
             }}
           />
-          <Label_Shadcn_ htmlFor="save-as-default" className="text-foreground-light">
+          <Label htmlFor="save-as-default" className="text-foreground-light">
             Save as default payment method
-          </Label_Shadcn_>
+          </Label>
         </div>
 
         <div className="flex items-center gap-x-2 mt-4 mb-2">
@@ -229,9 +229,9 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
               }
             }}
           />
-          <Label_Shadcn_ htmlFor="is-primary-billing-address" className="text-foreground-light">
+          <Label htmlFor="is-primary-billing-address" className="text-foreground-light">
             Use the billing address as my organization's primary address
-          </Label_Shadcn_>
+          </Label>
         </div>
       </Modal.Content>
       <Modal.Separator />

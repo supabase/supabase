@@ -1,3 +1,5 @@
+import { ident, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
+
 import { Hook } from './hooks.constants'
 
 export const extractMethod = (
@@ -34,10 +36,16 @@ export const isValidHook = (h: Hook) => {
  * @param functionName the function name associated with the hook
  * @returns an array of SQL statements to restore the original permissions to the function
  */
-export const getRevokePermissionStatements = (schema: string, functionName: string): string[] => {
+export const getRevokePermissionStatements = (
+  schema: string,
+  functionName: string
+): Array<SafeSqlFragment> => {
   return [
-    `-- Revoke access to function from supabase_auth_admin\nrevoke execute on function ${schema}.${functionName} from supabase_auth_admin;`,
-    `-- Revoke access to schema from supabase_auth_admin\nrevoke usage on schema ${schema} from supabase_auth_admin;`,
-    `-- Restore function permissions to authenticated, anon and public\ngrant execute on function ${schema}.${functionName} to authenticated, anon, public;`,
+    safeSql`-- Revoke access to function from supabase_auth_admin
+revoke execute on function ${ident(schema)}.${ident(functionName)} from supabase_auth_admin;`,
+    safeSql`-- Revoke access to schema from supabase_auth_admin
+revoke usage on schema ${ident(schema)} from supabase_auth_admin;`,
+    safeSql`-- Restore function permissions to authenticated, anon and public
+grant execute on function ${ident(schema)}.${ident(functionName)} to authenticated, anon, public;`,
   ]
 }

@@ -322,7 +322,9 @@
                         "MIGRATIONS_FAILED",
                         "FUNCTIONS_DEPLOYED",
                         "FUNCTIONS_FAILED"
-                      ]
+                      ],
+                      "description": "This field is deprecated. List action runs to get branch status instead.",
+                      "deprecated": true
                     },
                     "created_at": {
                       "type": "string",
@@ -4010,7 +4012,9 @@
                           "MIGRATIONS_FAILED",
                           "FUNCTIONS_DEPLOYED",
                           "FUNCTIONS_FAILED"
-                        ]
+                        ],
+                        "description": "This field is deprecated. List action runs to get branch status instead.",
+                        "deprecated": true
                       },
                       "created_at": {
                         "type": "string",
@@ -4250,7 +4254,9 @@
                         "MIGRATIONS_FAILED",
                         "FUNCTIONS_DEPLOYED",
                         "FUNCTIONS_FAILED"
-                      ]
+                      ],
+                      "description": "This field is deprecated. List action runs to get branch status instead.",
+                      "deprecated": true
                     },
                     "created_at": {
                       "type": "string",
@@ -4469,7 +4475,9 @@
                         "MIGRATIONS_FAILED",
                         "FUNCTIONS_DEPLOYED",
                         "FUNCTIONS_FAILED"
-                      ]
+                      ],
+                      "description": "This field is deprecated. List action runs to get branch status instead.",
+                      "deprecated": true
                     },
                     "created_at": {
                       "type": "string",
@@ -4752,6 +4760,16 @@
               "pattern": "^[a-z]+$",
               "example": "abcdefghijklmnopqrst",
               "type": "string"
+            }
+          },
+          {
+            "name": "remove_addon",
+            "required": false,
+            "in": "query",
+            "description": "If true, also removes the custom domain add-on from the project subscription.",
+            "schema": {
+              "default": "false",
+              "type": "boolean"
             }
           }
         ],
@@ -5380,59 +5398,42 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "user_id": {
-                      "type": "string",
-                      "format": "uuid"
-                    },
-                    "user_roles": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "role": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "expires_at": {
-                            "type": "number"
-                          },
-                          "allowed_networks": {
-                            "type": "object",
-                            "properties": {
-                              "allowed_cidrs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "cidr": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "required": ["cidr"]
-                                }
-                              },
-                              "allowed_cidrs_v6": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "cidr": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "required": ["cidr"]
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "required": ["role"]
-                      }
-                    }
+                  "discriminator": {
+                    "propertyName": "state"
                   },
-                  "required": ["user_id", "user_roles"]
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "type": "string",
+                          "enum": ["enabled", "disabled"]
+                        },
+                        "appliedSuccessfully": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["state"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "type": "string",
+                          "enum": ["unavailable"]
+                        },
+                        "unavailableReason": {
+                          "type": "string",
+                          "enum": [
+                            "manual_migration_required",
+                            "postgres_upgrade_required",
+                            "temporarily_unavailable"
+                          ]
+                        }
+                      },
+                      "required": ["state", "unavailableReason"]
+                    }
+                  ]
                 }
               }
             }
@@ -5512,59 +5513,42 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "user_id": {
-                      "type": "string",
-                      "format": "uuid"
-                    },
-                    "user_roles": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "role": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "expires_at": {
-                            "type": "number"
-                          },
-                          "allowed_networks": {
-                            "type": "object",
-                            "properties": {
-                              "allowed_cidrs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "cidr": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "required": ["cidr"]
-                                }
-                              },
-                              "allowed_cidrs_v6": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "cidr": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "required": ["cidr"]
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "required": ["role"]
-                      }
-                    }
+                  "discriminator": {
+                    "propertyName": "state"
                   },
-                  "required": ["user_id", "user_roles"]
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "type": "string",
+                          "enum": ["enabled", "disabled"]
+                        },
+                        "appliedSuccessfully": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["state"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "state": {
+                          "type": "string",
+                          "enum": ["unavailable"]
+                        },
+                        "unavailableReason": {
+                          "type": "string",
+                          "enum": [
+                            "manual_migration_required",
+                            "postgres_upgrade_required",
+                            "temporarily_unavailable"
+                          ]
+                        }
+                      },
+                      "required": ["state", "unavailableReason"]
+                    }
+                  ]
                 }
               }
             }
@@ -8068,6 +8052,46 @@
                               }
                             },
                             "required": ["type", "slot_name"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["x86_architecture"]
+                              }
+                            },
+                            "required": ["type"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["project_hibernating"]
+                              }
+                            },
+                            "required": ["type"]
+                          }
+                        ]
+                      }
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "discriminator": {
+                          "propertyName": "type"
+                        },
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["pg_graphql_introspection_change"]
+                              }
+                            },
+                            "required": ["type"]
                           }
                         ]
                       }
@@ -8084,7 +8108,8 @@
                     "objects_to_be_dropped",
                     "unsupported_extensions",
                     "user_defined_objects_in_internal_schemas",
-                    "validation_errors"
+                    "validation_errors",
+                    "warnings"
                   ]
                 }
               }
@@ -16478,6 +16503,9 @@
                                 }
                               }
                             }
+                          },
+                          "branches_only": {
+                            "type": "boolean"
                           }
                         },
                         "required": ["role"]
@@ -16614,6 +16642,9 @@
                               }
                             }
                           }
+                        },
+                        "branches_only": {
+                          "type": "boolean"
                         }
                       },
                       "required": ["role"]
@@ -16726,6 +16757,9 @@
                               }
                             }
                           }
+                        },
+                        "branches_only": {
+                          "type": "boolean"
                         }
                       },
                       "required": ["role"]
@@ -16745,7 +16779,8 @@
                             "cidr": "203.0.113.0/24"
                           }
                         ]
-                      }
+                      },
+                      "branches_only": false
                     }
                   ]
                 }
@@ -16805,6 +16840,9 @@
                                 }
                               }
                             }
+                          },
+                          "branches_only": {
+                            "type": "boolean"
                           }
                         },
                         "required": ["role"]
@@ -16918,6 +16956,9 @@
                                       }
                                     }
                                   }
+                                },
+                                "branches_only": {
+                                  "type": "boolean"
                                 }
                               },
                               "required": ["role"]
@@ -21176,6 +21217,9 @@
                       "items": {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
                           "is_physical_backup": {
                             "type": "boolean"
                           },
@@ -21194,7 +21238,7 @@
                             "type": "string"
                           }
                         },
-                        "required": ["is_physical_backup", "status", "inserted_at"]
+                        "required": ["id", "is_physical_backup", "status", "inserted_at"]
                       }
                     },
                     "physical_backup_data": {
@@ -21506,6 +21550,265 @@
         "x-oauth-scope": "database:read"
       }
     },
+    "/v1/projects/{ref}/database/backups/restore": {
+      "post": {
+        "operationId": "v1-restore-physical-backup",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  }
+                },
+                "required": ["id"],
+                "example": {
+                  "id": 12345
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_write"]
+          }
+        ],
+        "summary": "Restores a physical backup for a database",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-internal": true,
+        "x-oauth-scope": "database:write"
+      }
+    },
+    "/v1/projects/{ref}/database/backups/schedule": {
+      "get": {
+        "operationId": "v1-get-backup-schedule",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schedule_for": {
+                      "type": "string",
+                      "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+                      "example": "04:00:00"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Timestamp of when the backup schedule was last updated.",
+                      "example": "2026-05-04T14:40:44+00:00"
+                    }
+                  },
+                  "required": ["schedule_for", "updated_at"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "402": {
+            "description": "Feature requires a higher plan"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "404": {
+            "description": "Project or backup schedule not found"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to retrieve backup schedule"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_read"]
+          }
+        ],
+        "summary": "Gets the backup schedule for a project",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:read"
+      },
+      "patch": {
+        "description": "Sets the time at which the daily backup runs. The change takes effect on the next backup window that includes the new time. If the new time has already passed for today, the first backup at the new time will occur the following day. It can only be updated 3 times per 24 hours.",
+        "operationId": "v1-update-backup-schedule",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schedule_for": {
+                    "type": "string",
+                    "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+                    "example": "04:00:00"
+                  }
+                },
+                "required": ["schedule_for"],
+                "example": {
+                  "schedule_for": "04:00:00"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schedule_for": {
+                      "type": "string",
+                      "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+                      "example": "04:00:00"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Timestamp of when the backup schedule was last updated.",
+                      "example": "2026-05-04T14:40:44+00:00"
+                    }
+                  },
+                  "required": ["schedule_for", "updated_at"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid schedule_for format"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "402": {
+            "description": "Feature requires a higher plan"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "404": {
+            "description": "Project or backup schedule not found"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to update backup schedule"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["backups_write"]
+          }
+        ],
+        "summary": "Updates the backup schedule time for a project",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra"],
+        "x-oauth-scope": "database:write"
+      }
+    },
     "/v1/projects/{ref}/database/backups/undo": {
       "post": {
         "operationId": "v1-undo",
@@ -21638,6 +21941,7 @@
                                   "ipv4",
                                   "pitr.available_variants",
                                   "log_drains",
+                                  "audit_log_drains",
                                   "branching_limit",
                                   "branching_persistent",
                                   "auth.mfa_phone",
@@ -21652,8 +21956,10 @@
                                   "auth.advanced_auth_settings",
                                   "auth.performance_settings",
                                   "auth.password_hibp",
+                                  "auth.custom_oauth.max_providers",
                                   "backup.retention_days",
                                   "backup.restore_to_new_project",
+                                  "backup.schedule",
                                   "function.max_count",
                                   "function.size_limit_mb",
                                   "realtime.max_concurrent_users",
@@ -22592,7 +22898,9 @@
               "MIGRATIONS_FAILED",
               "FUNCTIONS_DEPLOYED",
               "FUNCTIONS_FAILED"
-            ]
+            ],
+            "description": "This field is deprecated. List action runs to get branch status instead.",
+            "deprecated": true
           },
           "created_at": {
             "type": "string",
@@ -24010,60 +24318,43 @@
           "custom_hostname": "docs.example.com"
         }
       },
-      "JitAccessResponse": {
-        "type": "object",
-        "properties": {
-          "user_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "user_roles": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "role": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "expires_at": {
-                  "type": "number"
-                },
-                "allowed_networks": {
-                  "type": "object",
-                  "properties": {
-                    "allowed_cidrs": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "cidr": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["cidr"]
-                      }
-                    },
-                    "allowed_cidrs_v6": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "cidr": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["cidr"]
-                      }
-                    }
-                  }
-                }
-              },
-              "required": ["role"]
-            }
-          }
+      "JitStateResponse": {
+        "discriminator": {
+          "propertyName": "state"
         },
-        "required": ["user_id", "user_roles"]
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string",
+                "enum": ["enabled", "disabled"]
+              },
+              "appliedSuccessfully": {
+                "type": "boolean"
+              }
+            },
+            "required": ["state"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string",
+                "enum": ["unavailable"]
+              },
+              "unavailableReason": {
+                "type": "string",
+                "enum": [
+                  "manual_migration_required",
+                  "postgres_upgrade_required",
+                  "temporarily_unavailable"
+                ]
+              }
+            },
+            "required": ["state", "unavailableReason"]
+          }
+        ]
       },
       "JitAccessRequestRequest": {
         "type": "object",
@@ -24830,6 +25121,46 @@
                     }
                   },
                   "required": ["type", "slot_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["x86_architecture"]
+                    }
+                  },
+                  "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["project_hibernating"]
+                    }
+                  },
+                  "required": ["type"]
+                }
+              ]
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "discriminator": {
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["pg_graphql_introspection_change"]
+                    }
+                  },
+                  "required": ["type"]
                 }
               ]
             }
@@ -24846,7 +25177,8 @@
           "objects_to_be_dropped",
           "unsupported_extensions",
           "user_defined_objects_in_internal_schemas",
-          "validation_errors"
+          "validation_errors",
+          "warnings"
         ]
       },
       "DatabaseUpgradeStatusResponse": {
@@ -28501,6 +28833,64 @@
         },
         "required": ["message"]
       },
+      "JitAccessResponse": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "expires_at": {
+                  "type": "number"
+                },
+                "allowed_networks": {
+                  "type": "object",
+                  "properties": {
+                    "allowed_cidrs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cidr": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["cidr"]
+                      }
+                    },
+                    "allowed_cidrs_v6": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cidr": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["cidr"]
+                      }
+                    }
+                  }
+                },
+                "branches_only": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["role"]
+            }
+          }
+        },
+        "required": ["user_id", "user_roles"]
+      },
       "AuthorizeJitAccessBody": {
         "type": "object",
         "properties": {
@@ -28564,6 +28954,9 @@
                     }
                   }
                 }
+              },
+              "branches_only": {
+                "type": "boolean"
               }
             },
             "required": ["role"]
@@ -28623,6 +29016,9 @@
                             }
                           }
                         }
+                      },
+                      "branches_only": {
+                        "type": "boolean"
                       }
                     },
                     "required": ["role"]
@@ -28683,6 +29079,9 @@
                       }
                     }
                   }
+                },
+                "branches_only": {
+                  "type": "boolean"
                 }
               },
               "required": ["role"]
@@ -28702,7 +29101,8 @@
                     "cidr": "203.0.113.0/24"
                   }
                 ]
-              }
+              },
+              "branches_only": false
             }
           ]
         }
@@ -30657,6 +31057,9 @@
             "items": {
               "type": "object",
               "properties": {
+                "id": {
+                  "type": "integer"
+                },
                 "is_physical_backup": {
                   "type": "boolean"
                 },
@@ -30668,7 +31071,7 @@
                   "type": "string"
                 }
               },
-              "required": ["is_physical_backup", "status", "inserted_at"]
+              "required": ["id", "is_physical_backup", "status", "inserted_at"]
             }
           },
           "physical_backup_data": {
@@ -30730,6 +31133,49 @@
         },
         "required": ["name", "status", "completed_on"]
       },
+      "V1RestoreBackupBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          }
+        },
+        "required": ["id"],
+        "example": {
+          "id": 12345
+        }
+      },
+      "V1BackupScheduleResponse": {
+        "type": "object",
+        "properties": {
+          "schedule_for": {
+            "type": "string",
+            "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+            "example": "04:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of when the backup schedule was last updated.",
+            "example": "2026-05-04T14:40:44+00:00"
+          }
+        },
+        "required": ["schedule_for", "updated_at"]
+      },
+      "V1UpdateBackupScheduleBody": {
+        "type": "object",
+        "properties": {
+          "schedule_for": {
+            "type": "string",
+            "description": "Time of day to schedule daily backups, in UTC. Format: HH:MM:SS.",
+            "example": "04:00:00"
+          }
+        },
+        "required": ["schedule_for"],
+        "example": {
+          "schedule_for": "04:00:00"
+        }
+      },
       "V1UndoBody": {
         "type": "object",
         "properties": {
@@ -30780,6 +31226,7 @@
                         "ipv4",
                         "pitr.available_variants",
                         "log_drains",
+                        "audit_log_drains",
                         "branching_limit",
                         "branching_persistent",
                         "auth.mfa_phone",
@@ -30794,8 +31241,10 @@
                         "auth.advanced_auth_settings",
                         "auth.performance_settings",
                         "auth.password_hibp",
+                        "auth.custom_oauth.max_providers",
                         "backup.retention_days",
                         "backup.restore_to_new_project",
+                        "backup.schedule",
                         "function.max_count",
                         "function.size_limit_mb",
                         "realtime.max_concurrent_users",

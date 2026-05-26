@@ -8,7 +8,7 @@ export const HeaderTitle = ({ isNewRecord, tableName }: HeaderTitleProps) => {
   return (
     <span>
       {header}
-      {tableName && <code className="text-code-inline !text-sm">{tableName}</code>}
+      {tableName && <code className="text-code-inline text-sm!">{tableName}</code>}
     </span>
   )
 }

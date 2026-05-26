@@ -78,7 +78,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Auth size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Authentication</h5>
@@ -94,7 +94,7 @@ export const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -110,7 +110,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Storage size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Storage</h5>
@@ -126,7 +126,7 @@ export const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -142,7 +142,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <EdgeFunctions size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Edge Functions</h5>
@@ -158,7 +158,7 @@ export const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/functions`}>Explore Functions</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -177,7 +177,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-4">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Realtime size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Realtime</h5>
@@ -192,7 +192,7 @@ export const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild

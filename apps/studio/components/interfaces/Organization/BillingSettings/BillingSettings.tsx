@@ -48,7 +48,7 @@ export const BillingSettings = () => {
         <ScaffoldTitle>Billing</ScaffoldTitle>
       </ScaffoldContainerLegacy>
 
-      <ScaffoldContainer id="subscription" className={cn('[&>div]:!pt-0')}>
+      <ScaffoldContainer id="subscription" className={cn('[&>div]:pt-0!')}>
         <Subscription />
       </ScaffoldContainer>
 

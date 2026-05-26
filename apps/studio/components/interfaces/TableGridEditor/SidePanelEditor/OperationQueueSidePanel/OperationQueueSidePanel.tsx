@@ -51,7 +51,7 @@ export const OperationQueueSidePanel = () => {
             <OperationList operations={operations} />
           </SheetSection>
 
-          <SheetFooter className="!justify-between">
+          <SheetFooter className="justify-between!">
             <Button
               type="default"
               onClick={snap.closeSidePanel}

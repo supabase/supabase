@@ -167,7 +167,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
       <div
         ref={containerRef}
-        className="w-full overflow-visible focus:outline-none"
+        className="w-full overflow-visible focus:outline-hidden"
         tabIndex={0}
         role="region"
         aria-roledescription="carousel"

@@ -68,7 +68,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       </TableCell>
       <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-[30rem]">
+          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-120">
             {functionUrl}
           </p>
           <button
@@ -99,18 +99,26 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
         </div>
       </TableCell>
       <TableCell className="hidden 2xl:table-cell whitespace-nowrap">
-        <TimestampInfo
-          className="text-sm text-foreground-light whitespace-nowrap"
-          utcTimestamp={item.created_at}
-          label={dayjs(item.created_at).fromNow()}
-        />
+        {item.created_at ? (
+          <TimestampInfo
+            className="text-sm text-foreground-light whitespace-nowrap"
+            utcTimestamp={item.created_at}
+            label={dayjs(item.created_at).fromNow()}
+          />
+        ) : (
+          <span className="text-sm text-foreground-light">–</span>
+        )}
       </TableCell>
       <TableCell className="lg:table-cell">
-        <TimestampInfo
-          className="text-sm text-foreground-light whitespace-nowrap"
-          utcTimestamp={item.updated_at}
-          label={dayjs(item.updated_at).fromNow()}
-        />
+        {item.updated_at ? (
+          <TimestampInfo
+            className="text-sm text-foreground-light whitespace-nowrap"
+            utcTimestamp={item.updated_at}
+            label={dayjs(item.updated_at).fromNow()}
+          />
+        ) : (
+          <span className="text-sm text-foreground-light">–</span>
+        )}
       </TableCell>
       {showLastHourStats && (
         <>

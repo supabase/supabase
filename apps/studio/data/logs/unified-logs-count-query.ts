@@ -1,35 +1,40 @@
 import { useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
 } from './unified-logs-infinite-query'
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { handleError, post } from '@/data/fetchers'
 import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsCount(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getUnifiedLogsCount')
   }
 
-  const sql = getLogsCountQuery(search)
+  const sql = pickLogsQueryBuilder(useOtel, getLogsCountQuery, getLogsCountQueryBq)(search)
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: { path: { ref: projectRef } },
-    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
+  const endpoint = logsAllEndpointUrl(useOtel)
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: isoTimestampEnd,
     signal,
   })
-
-  if (error) handleError(error)
 
   // Process count results into facets structure
   const facets: Record<string, FacetMetadataSchema> = {}
@@ -83,11 +88,13 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
-) =>
-  useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
-    queryKey: logsKeys.unifiedLogsCount(projectRef, search),
-    queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search }, signal),
+) => {
+  const useOtel = useFlag('otelUnifiedLogs')
+  return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
+    queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
+    queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
   })
+}

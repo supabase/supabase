@@ -26,6 +26,7 @@ import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
+import { MarketplacePreview } from './MarketplacePreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { RLSTesterPreview } from './RLSTesterPreview'
@@ -47,6 +48,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]: <RLSTesterPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <MarketplacePreview />,
 }
 
 export const FeaturePreviewModal = () => {
@@ -96,7 +98,7 @@ export const FeaturePreviewModal = () => {
 
   return (
     <Dialog open={showFeaturePreviewModal} onOpenChange={toggleFeaturePreviewModal}>
-      <DialogContent size="xlarge" className="flex flex-col !max-w-4xl h-[90dvh] md:h-auto">
+      <DialogContent size="xlarge" className="flex flex-col max-w-4xl! h-[90dvh] md:h-auto">
         <DialogHeader>
           <DialogTitle>Dashboard feature previews</DialogTitle>
           <DialogDescription>Get early access to new features and give feedback</DialogDescription>
@@ -104,7 +106,7 @@ export const FeaturePreviewModal = () => {
 
         <DialogSectionSeparator />
 
-        <DialogSection className="!p-0 flex-1 min-h-0 h-full">
+        <DialogSection className="p-0! flex-1 min-h-0 h-full">
           {allFeaturePreviews.length > 0 ? (
             <div className="max-h-full flex-1 min-h-0 h-full flex flex-col gap-y-1 md:gap-y-4 md:flex-row">
               <div>
@@ -136,7 +138,7 @@ export const FeaturePreviewModal = () => {
                       {selectedFeature.isNew && <Badge variant="success">New</Badge>}
                     </div>
                   </SelectTrigger>
-                  <SelectContent className="!p-0 [&>div]:!w-full [&>div]:!p-0 [&>div]:!flex [&>div]:!flex-col w-full flex">
+                  <SelectContent className="p-0! [&>div]:w-full! [&>div]:p-0! [&>div]:flex! [&>div]:flex-col! w-full flex">
                     {allFeaturePreviews.map((feature) => (
                       <SelectItem
                         key={feature.key}
@@ -226,7 +228,7 @@ const FeaturePreviewItem = ({
       key={feature.key}
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(
-        '!w-full flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
+        'w-full! flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
         selectedFeature?.key === feature.key ? 'bg-surface-300' : 'bg-surface-100',
         className
       )}

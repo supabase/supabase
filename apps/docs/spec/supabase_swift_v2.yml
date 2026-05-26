@@ -27,7 +27,7 @@ functions:
           ```swift
           import Supabase
 
-          let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "publishable-or-anon-key")
+          let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "your-publishable-key")
           ```
       - id: initialize-client-custom-options
         name: Initialize Client with custom options
@@ -37,7 +37,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "publishable-or-anon-key",
+            supabaseKey: "your-publishable-key",
             options: SupabaseClientOptions(
               db: .init(
                 schema: "public"
@@ -63,7 +63,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "publishable-or-anon-key",
+            supabaseKey: "your-publishable-key",
             options: SupabaseClientOptions(
               db: .init(
                 // Disable automatic retries for this client
@@ -86,7 +86,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "publishable-or-anon-key",
+            supabaseKey: "your-publishable-key",
             options: SupabaseClientOptions(
               global: SupabaseClientOptions.GlobalOptions(
                 logger: AppLogger()
@@ -102,7 +102,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "publishable-or-anon-key",
+            supabaseKey: "your-publishable-key",
             options: SupabaseClientOptions(
               db: .init(
                 // Provide a custom schema. Defaults to "public".
@@ -174,7 +174,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "publishable-or-anon-key")
+          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "your-publishable-key")
           let auth = supabase.auth
           ```
       - id: create-auth-client-with-custom-storage
@@ -184,7 +184,7 @@ functions:
           ```swift
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "publishable-or-anon-key",
+            supabaseKey: "your-publishable-key",
             options: .init(
               auth: .init(
                 MyCustomLocalStorage()
@@ -1350,8 +1350,8 @@ functions:
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the browser.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
@@ -1362,7 +1362,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: supabaseURL,
-            supabaseKey: serviceRoleKey
+            supabaseKey: secretKey
           )
 
           // Access auth admin api
@@ -1483,7 +1483,7 @@ functions:
     description: |
       List all OAuth clients with optional pagination.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
       - Only works when the OAuth 2.1 server is enabled in your Supabase Auth configuration.
     overwriteParams:
@@ -1515,7 +1515,7 @@ functions:
     description: |
       Create a new OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
       - Only works when the OAuth 2.1 server is enabled in your Supabase Auth configuration.
     overwriteParams:
@@ -1543,7 +1543,7 @@ functions:
     description: |
       Get details of a specific OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
     overwriteParams:
       - name: clientId
@@ -1566,7 +1566,7 @@ functions:
     description: |
       Delete an OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
       - This action cannot be undone.
     overwriteParams:
@@ -1590,7 +1590,7 @@ functions:
     description: |
       Regenerate the secret for an OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
       - The old secret will be immediately invalidated.
       - Make sure to update your application with the new secret.

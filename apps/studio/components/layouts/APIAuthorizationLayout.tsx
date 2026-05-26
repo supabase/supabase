@@ -30,7 +30,7 @@ export const APIAuthorizationLayout = ({
           <div className="mx-auto px-4 sm:px-6">
             <div className="max-w-xl flex justify-between items-center mx-auto py-4">
               <div className="flex justify-start lg:w-0 lg:flex-1 items-center">
-                <Link href="/">
+                <Link href="/" className="inline-flex items-center leading-none">
                   <span className="sr-only">Supabase</span>
                   <Image
                     src={

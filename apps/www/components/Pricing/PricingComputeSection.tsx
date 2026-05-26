@@ -136,12 +136,12 @@ const PricingComputeSection = () => {
           </Button>
         </div>
         <div
-          className="relative w-full overflow-hidden transition-all !ease-[cubic-bezier(.76,0,.23,1)] duration-300"
+          className="relative w-full overflow-hidden transition-all ease-[cubic-bezier(.76,0,.23,1)]! duration-300"
           style={{ height: showTable ? `${height}px` : '200px' }}
         >
           <div
             className={cn(
-              'absolute inset-0 top-auto w-full h-40 bg-gradient-to-t from-background-surface-100 z-20 to-transparent transition-opacity pointer-events-none not-sr-only',
+              'absolute inset-0 top-auto w-full h-40 bg-linear-to-t from-background-surface-100 z-20 to-transparent transition-opacity pointer-events-none not-sr-only',
               showTable ? 'opacity-0 delay-200' : 'opacity-100'
             )}
           />

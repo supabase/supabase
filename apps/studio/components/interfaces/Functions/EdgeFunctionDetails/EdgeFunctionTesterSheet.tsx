@@ -10,16 +10,16 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_ as Input,
-  Label_Shadcn_ as Label,
+  Input,
+  Label,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Select_Shadcn_ as Select,
-  SelectContent_Shadcn_ as SelectContent,
-  SelectItem_Shadcn_ as SelectItem,
-  SelectTrigger_Shadcn_ as SelectTrigger,
-  SelectValue_Shadcn_ as SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -29,7 +29,7 @@ import {
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  TextArea_Shadcn_ as Textarea,
+  Textarea,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -38,6 +38,7 @@ import * as z from 'zod'
 import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
@@ -53,6 +54,8 @@ import {
   RoleImpersonationStateContextProvider,
   useGetImpersonatedRoleState,
 } from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean
@@ -81,7 +84,18 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>
 
-export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
+export const EdgeFunctionTesterSheet = (props: EdgeFunctionTesterSheetProps) => {
+  const { ref: projectRef } = useParams()
+
+  // [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users.
+  return (
+    <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
+      <EdgeFunctionTesterSheetContent {...props} />
+    </RoleImpersonationStateContextProvider>
+  )
+}
+
+const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
   const { data: org } = useSelectedOrganizationQuery()
   const { ref: projectRef, functionSlug } = useParams()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
@@ -161,6 +175,14 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
     }
   }
 
+  useShortcut(
+    SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST,
+    () => {
+      form.handleSubmit(onSubmit)()
+    },
+    { enabled: visible && !isPending }
+  )
+
   const onSubmit = async (values: FormValues) => {
     setError(null)
     setResponse(null)
@@ -239,7 +261,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
       </div>
       <div className="border rounded-md bg-surface-200">
         {(type === 'headers' ? headerFields : queryParamFields).map((field, index) => (
-          <div key={field.id} className="grid grid-cols-[1fr,1fr,32px] border-b last:border-b-0">
+          <div key={field.id} className="grid grid-cols-[1fr_1fr_32px] border-b last:border-b-0">
             <FormField
               control={form.control}
               name={`${type}.${index}.key`}
@@ -250,7 +272,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                     size="tiny"
                     placeholder="Enter key..."
                     disabled={isPending}
-                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r-1 border-t-0 border-b-0 border-border"
+                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r border-t-0 border-b-0 border-border"
                   />
                 </FormControl>
               )}
@@ -414,7 +436,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                             <CodeBlock
                               language="json"
                               hideLineNumbers
-                              className="rounded-md !border-none !px-4 !py-3 h-full"
+                              className="rounded-md border-none! px-4! py-3! h-full"
                               value={prettifyJSON(response.body)}
                             />
                           </TabsContent>
@@ -422,7 +444,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                             <CodeBlock
                               language="json"
                               hideLineNumbers
-                              className="rounded-md !border-none !px-4 !py-3 h-full"
+                              className="rounded-md border-none! px-4! py-3! h-full"
                               value={prettifyJSON(JSON.stringify(response.headers, null, 2))}
                             />
                           </TabsContent>
@@ -446,32 +468,32 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                {/* [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users. */}
-                <RoleImpersonationStateContextProvider
-                  key={`role-impersonation-state-${projectRef}`}
-                >
-                  <RoleImpersonationPopover disallowAuthenticatedOption />
-                </RoleImpersonationStateContextProvider>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isPending}
-                  disabled={isPending}
-                  onClick={() =>
-                    sendEvent({
-                      action: 'edge_function_test_send_button_clicked',
-                      properties: {
-                        httpMethod: method,
-                      },
-                      groups: {
-                        project: projectRef ?? 'Unknown',
-                        organization: org?.slug ?? 'Unknown',
-                      },
-                    })
-                  }
-                >
-                  Send Request
-                </Button>
+                <RoleImpersonationPopover
+                  disallowAuthenticatedOption
+                  header="Run edge function as a role"
+                />
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST} side="top">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isPending}
+                    disabled={isPending}
+                    onClick={() =>
+                      sendEvent({
+                        action: 'edge_function_test_send_button_clicked',
+                        properties: {
+                          httpMethod: method,
+                        },
+                        groups: {
+                          project: projectRef ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
+                      })
+                    }
+                  >
+                    Send Request
+                  </Button>
+                </ShortcutTooltip>
               </div>
             </SheetFooter>
           </form>

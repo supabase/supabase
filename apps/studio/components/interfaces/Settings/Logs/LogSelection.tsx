@@ -168,7 +168,7 @@ function LogDetailEmptyState({
           'flex w-full max-w-sm flex-col items-center justify-center gap-6 text-center transition-all delay-300 duration-500'
         )}
       >
-        <div className="relative flex h-4 w-32 items-center rounded border border-control px-2">
+        <div className="relative flex h-4 w-32 items-center rounded-sm border border-control px-2">
           <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
           <div className="absolute right-1 -bottom-4">
             <MousePointerClick size="24" strokeWidth={1} />

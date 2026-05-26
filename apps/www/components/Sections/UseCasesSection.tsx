@@ -64,7 +64,7 @@ const UseCase = ({
 
   return (
     <m.div initial={initial} animate={isInView ? animate : initial} className="flex">
-      <Panel outerClassName="w-full" innerClassName="p-4 md:p-8 h-full !bg-background">
+      <Panel outerClassName="w-full" innerClassName="p-4 md:p-8 h-full bg-background!">
         <div className="h-full flex flex-col gap-4 items-start justify-between">
           <div className="prose">
             <div className="flex items-center gap-2">

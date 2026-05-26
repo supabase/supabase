@@ -13,7 +13,11 @@ See per-service updates below for details.
 
 ## Unreleased
 
-⚠️ **Upcoming default changes:** In a future release, several defaults will change: Postgres 15 → 17, Kong → Envoy, MinIO → RustFS, Analytics/Vector removed from the default stack, and the new API keys and authentication replacing the "legacy" architecture. Most of these are already available as optional configurations.
+⚠️ **Upcoming changes:** Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates:
+
+- [Making Analytics and Vector opt-in](https://github.com/orgs/supabase/discussions/46084)
+- [Upgrading from PG 15 to 17 (breaking change)](https://github.com/orgs/supabase/discussions/46080)
+- [Switching Studio from `supabase_admin` to `postgres` (breaking change)](https://github.com/orgs/supabase/discussions/46081)
 
 ---
 
@@ -72,7 +76,7 @@ See per-service updates below for details.
 - Updated to `v1.36.1` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.36.1)
 
 ### Postgres
-- ⚠️ Added `docker-compose.pg17.yml` overlay configuration - PR [#44147](https://github.com/supabase/supabase/pull/44147)
+- ⚠️ Added `docker-compose.pg17.yml` override - PR [#44147](https://github.com/supabase/supabase/pull/44147)
 - ⚠️ Added `upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147)
 - ⚠️ Added [documentation](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) explaining the upgrade to Postgres 17
 

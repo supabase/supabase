@@ -55,7 +55,7 @@ export const SmoothstepEdge = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <div
-                className="bg-surface-100 px-1.5 py-0.5 rounded absolute nodrag nopan"
+                className="bg-surface-100 px-1.5 py-0.5 rounded-sm absolute nodrag nopan"
                 style={{
                   transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
                   pointerEvents: 'all',
