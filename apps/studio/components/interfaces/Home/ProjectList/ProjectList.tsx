@@ -173,7 +173,7 @@ export const ProjectList = ({
 
   if (viewMode === 'table') {
     return (
-      <Card className="flex-1 min-h-0 overflow-y-auto mb-8">
+      <Card className="flex-1 min-h-0 overflow-y-auto">
         <Table>
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
           <TableHeader>
@@ -291,7 +291,7 @@ export const ProjectList = ({
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
       ) : (
-        <div className="flex flex-col gap-y-2 md:gap-y-4 pb-6">
+        <div className="flex flex-col gap-y-2 md:gap-y-4">
           <ul
             className={cn(
               'min-h-0 w-full mx-auto',
