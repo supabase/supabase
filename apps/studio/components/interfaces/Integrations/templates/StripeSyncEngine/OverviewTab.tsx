@@ -219,7 +219,6 @@ const StripeSyncContent = () => {
             isUpgrade={upgradeAvailable}
           />
           <IntegrationNotInstalledActions
-            hideInstallCTA
             installing={installing}
             canInstall={canInstall}
             isUninstallRequested={isUninstallRequested}
