@@ -19,7 +19,10 @@ function generateAICodingToolsSQL(activeFilters: Record<string, string>) {
           'None'
         ) THEN technology
         WHEN LOWER(technology) LIKE '%claude%' THEN 'Claude or Claude Code'
-        WHEN LOWER(technology) = 'chatgpt' THEN 'ChatGPT'
+        WHEN LOWER(technology) LIKE '%codex%'
+          OR LOWER(technology) LIKE '%chatgpt%'
+          OR LOWER(technology) LIKE '%chat gpt%'
+          OR LOWER(technology) LIKE '%openai%' THEN 'Codex'
         ELSE 'Other'
       END AS technology_clean
     FROM (
