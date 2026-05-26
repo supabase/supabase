@@ -164,7 +164,6 @@ export function ServiceFlowPanel({
                       icon={Clock}
                       summary={formattedTime ?? undefined}
                     />
-
                     <MemoizedNetworkBlock
                       data={selectedRow}
                       enrichedData={serviceFlowData?.result?.[0]}
@@ -172,7 +171,6 @@ export function ServiceFlowPanel({
                       filterFields={filterFields}
                       table={table}
                     />
-
                     {serviceFlowType === 'auth' ? (
                       <MemoizedGoTrueBlock
                         data={selectedRow}

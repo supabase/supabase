@@ -1,6 +1,7 @@
 import { Table } from '@tanstack/react-table'
-import { Cable, Clock, Database } from 'lucide-react'
+import { Cable, ChevronDown, Clock, Database } from 'lucide-react'
 import { memo } from 'react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
 import { getRowTimestampMs } from '../../../UnifiedLogs.utils'
@@ -77,33 +78,45 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
         summary={formattedTime ?? undefined}
       />
 
-      <DetailSectionHeader title="Postgres" icon={Database} />
+      <Collapsible defaultOpen>
+        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+          <DetailSectionHeader title="Postgres" icon={Database} />
+          <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          {postgresPrimaryFields.map((field) => (
+            <FieldDetailRow
+              key={field.id}
+              config={field}
+              data={data}
+              enrichedData={enrichedData}
+              isLoading={isLoading}
+              filterFields={filterFields}
+              table={table}
+            />
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
 
-      {postgresPrimaryFields.map((field) => (
-        <FieldDetailRow
-          key={field.id}
-          config={field}
-          data={data}
-          enrichedData={enrichedData}
-          isLoading={isLoading}
-          filterFields={filterFields}
-          table={table}
-        />
-      ))}
-
-      <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
-
-      {postgresDetailsFields.map((field) => (
-        <FieldDetailRow
-          key={field.id}
-          config={field}
-          data={data}
-          enrichedData={enrichedData}
-          isLoading={isLoading}
-          filterFields={filterFields}
-          table={table}
-        />
-      ))}
+      <Collapsible defaultOpen>
+        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+          <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
+          <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          {postgresDetailsFields.map((field) => (
+            <FieldDetailRow
+              key={field.id}
+              config={field}
+              data={data}
+              enrichedData={enrichedData}
+              isLoading={isLoading}
+              filterFields={filterFields}
+              table={table}
+            />
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
 
       <DetailSectionHeader
         title="Operation result"
