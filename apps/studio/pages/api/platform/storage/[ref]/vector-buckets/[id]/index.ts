@@ -25,7 +25,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query
   const { data, error } = await supabase.storage.vectors.getBucket(id as string)
   if (error) return res.status(400).json({ error: { message: error.message } })
-  return res.status(200).json(data)
+  return res.status(200).json(data.vectorBucket)
 }
 
 const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
