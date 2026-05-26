@@ -11,7 +11,7 @@ How you connect to your database depends on where you're connecting from:
 - For frontend applications, use the [Data API](#data-apis-and-client-libraries)
 - For Postgres clients, use a connection string
   - **Use the [direct connection string](#direct-connection) for single sessions or Postgres native commands**. For example, database GUIs,  client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html), [migrations](/docs/guides/deployment/database-migrations), [backup-restore](/docs/guides/platform/migrating-within-supabase/backup-restore), or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external). The direct endpoint is on IPv6, or on IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
-  - For application traffic from persistent clients on IPv4-only networks, use [pooler session mode](#pooler-session-mode)
+  - **Use [pooler session mode](#pooler-session-mode)** for application traffic from persistent clients on IPv4-only networks, 
   - For application traffic from temporary clients (for example, serverless or edge functions) use [pooler transaction mode](#pooler-transaction-mode)
 
 The table below summarizes each mode, its host and port, IP version support per project tier, and what it's best used for:
