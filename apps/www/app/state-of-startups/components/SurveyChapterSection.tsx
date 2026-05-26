@@ -20,6 +20,7 @@ import { RegularSocialMediaUseChart } from './charts/RegularSocialMediaUseChart'
 import { RoleChart } from './charts/RoleChart'
 import { SalesToolsChart } from './charts/SalesToolsChart'
 import { WorldOutlookChart } from './charts/WorldOutlookChart'
+import { SurveyPullQuote } from './SurveyPullQuote'
 import { SurveyRankedAnswersPair } from './SurveyRankedAnswersPair'
 import { SurveySectionBreak } from './SurveySectionBreak'
 import { SurveyStatCard, type SurveyStatSource } from './SurveyStatCard'
@@ -42,6 +43,12 @@ interface SurveyChapterSectionProps {
     answers: string[]
   }
   rankedAnswersPair?: Array<{ label: string; answers: string[] }>
+  pullQuote?: {
+    quote: string
+    author: string
+    authorPosition?: string
+    authorAvatar?: string
+  }
   /**
    * Set when an entire section's data first appeared in a given survey year.
    * If the user toggles the page to an earlier year, the section body is
@@ -60,6 +67,7 @@ export function SurveyChapterSection({
   wordCloud,
   summarizedAnswer,
   rankedAnswersPair,
+  pullQuote,
   newInYear,
   children,
 }: SurveyChapterSectionProps) {
@@ -148,6 +156,15 @@ export function SurveyChapterSection({
           </div>
         )}
       </div>
+
+      {pullQuote && isAvailableForYear && (
+        <SurveyPullQuote
+          quote={pullQuote.quote}
+          author={pullQuote.author}
+          authorPosition={pullQuote.authorPosition}
+          authorAvatar={pullQuote.authorAvatar}
+        />
+      )}
 
       <SurveySectionBreak />
     </div>
