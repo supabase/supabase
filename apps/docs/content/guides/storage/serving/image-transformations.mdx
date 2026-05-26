@@ -683,30 +683,118 @@ response = supabase.storage.from_('bucket').download(
 
 ## Self hosting
 
-Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [imgproxy](https://imgproxy.net/)
+Our solution to image resizing and optimization can be self-hosted alongside the rest of your self-hosted Supabase services. Under the hood, Supabase Storage uses [imgproxy](https://imgproxy.net/) to execute transformations.
 
-#### imgproxy configuration:
+When self-hosting Supabase, you have two options depending on your setup:
+1. **Local Development (via Supabase CLI)**: The CLI's default stack includes an internal `imgproxy` container. However, it is not configured for image transformations by default.
+2. **Production Self-Hosting (via Docker Compose / Kubernetes)**: You deploy a standalone `darthsim/imgproxy` container alongside the `storage-api` service.
 
-Deploy an imgproxy container with the following configuration:
+---
+
+### Local development setup (CLI)
+
+If you are developing locally using the [Supabase CLI](/docs/guides/cli), follow these steps to enable and configure local image transformations:
+
+#### 1. Enable image transformation in `config.toml`
+
+Open your local `supabase/config.toml` file and ensure the `[storage.image_transformation]` section is enabled:
+
+```toml
+# Image transformation API configuration
+[storage.image_transformation]
+enabled = true
+```
+
+#### 2. Start the services
+
+Restart your local Supabase stack to apply the configuration:
+
+```bash
+supabase stop
+supabase start
+```
+
+This starts the default internal imgproxy container preconfigured within the Supabase CLI stack.
+
+---
+
+### Production self-hosting setup
+
+For production or custom self-hosted environments (e.g. using Docker Compose), you must deploy a standalone imgproxy instance and link it to the Storage service.
+
+#### 1. Configure the `imgproxy` service
+
+Add `imgproxy` as a service in your `docker-compose.yml` file. Below is a comprehensive configuration with production-ready options:
 
 ```yaml
-imgproxy:
-  image: darthsim/imgproxy
-  environment:
-    - IMGPROXY_ENABLE_WEBP_DETECTION=true
-    - IMGPROXY_JPEG_PROGRESSIVE=true
+services:
+  imgproxy:
+    image: darthsim/imgproxy:v3.30.1
+    container_name: supabase-imgproxy
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - supabase_network
+    environment:
+      # Security settings (strongly recommended for production)
+      # Check imgproxy docs to generate secure keys/salts:
+      # https://docs.imgproxy.net/signing_the_urls
+      IMGPROXY_KEY: ""
+      IMGPROXY_SALT: ""
+
+      # CORS and logging
+      IMGPROXY_ALLOW_ORIGIN: "*"
+      IMGPROXY_LOG_FORMAT: "json"
+
+      # Formats and automatic optimization
+      IMGPROXY_ENABLE_WEBP_DETECTION: "true"
+      IMGPROXY_ENABLE_AVIF_DETECTION: "true"
+      IMGPROXY_JPEG_PROGRESSIVE: "true"
+      IMGPROXY_QUALITY: "80"
+      IMGPROXY_FORMAT_QUALITY: "webp=80,avif=60"
+
+      # Behavior, safety limits, and timeouts
+      IMGPROXY_AUTO_ROTATE: "true"
+      IMGPROXY_STRIP_METADATA: "true"
+      IMGPROXY_MAX_SRC_RESOLUTION: "50" # Max resolution in megapixels
+      IMGPROXY_TIMEOUT: "10"             # Max time to process an image (seconds)
+      IMGPROXY_READ_REQUEST_TIMEOUT: "10"
+      IMGPROXY_WRITE_RESPONSE_TIMEOUT: "10"
+      IMGPROXY_KEEP_ALIVE_TIMEOUT: "10"
 ```
 
-Note: make sure that this service can only be reachable within an internal network and not exposed to the public internet
+<Admonition type="caution">
 
-#### Storage API configuration:
+Ensure that the `imgproxy` service is either kept strictly within your internal network (not exposed to the public internet) or configured with strong `IMGPROXY_KEY` and `IMGPROXY_SALT` values to prevent unauthorized signature/transformation abuse.
 
-Once [imgproxy](https://imgproxy.net/) is deployed we need to configure a couple of environment variables in your self-hosted [`storage-api`](https://github.com/supabase/storage-api) service as follows:
+</Admonition>
 
-```shell
+#### 2. Configure `storage-api` environment variables
+
+To link the newly deployed `imgproxy` container to the self-hosted [`storage-api`](https://github.com/supabase/storage-api) service, set the following environment variables on the `storage` service container in your `docker-compose.yml`:
+
+```env
 ENABLE_IMAGE_TRANSFORMATION=true
-IMGPROXY_URL=yourinternalimgproxyurl.internal.com
+IMGPROXY_URL=http://supabase-imgproxy:8080
 ```
+
+#### 3. Helpful operational commands (Optional)
+
+You can manage and monitor your custom local or self-hosted imgproxy instance using these commands:
+
+* **Start the service**:
+  ```bash
+  docker compose up -d imgproxy
+  ```
+* **Verify health status**:
+  ```bash
+  curl -s -o /dev/null -w "Status: %{http_code}\n" http://localhost:8080/health
+  ```
+* **Stop the service**:
+  ```bash
+  docker compose down imgproxy
+  ```
 
 {/* Finish with a video. This also appears in the Sidebar via the "tocVideo" metadata */}
 
