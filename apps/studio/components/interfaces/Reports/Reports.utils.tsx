@@ -10,6 +10,7 @@ import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
 import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
 import useLogsQuery, { LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
@@ -49,7 +50,7 @@ export const queriesFactory = <T extends string>(
   return hooks
 }
 
-export function getLogsSql(query: ReportQuery, filters: ReportFilterItem[]): string {
+export function getLogsSql(query: ReportQuery, filters: ReportFilterItem[]): SafeLogSqlFragment {
   if (query.queryType !== 'logs') {
     throw new Error(`Expected logs query, got ${query.queryType}`)
   }
