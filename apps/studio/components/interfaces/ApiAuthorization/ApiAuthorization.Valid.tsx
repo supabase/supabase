@@ -382,13 +382,9 @@ function getMockAuthorizationState(mock: ApiAuthorizationMockState): MockAuthori
         approvalState: 'approving',
       }
     case 'ready':
-    case 'mcp':
     default:
       return {
-        requester:
-          mock === 'mcp'
-            ? createMockRequester({ registration_type: 'dynamic' })
-            : createMockRequester({ registration_type: 'static' }),
+        requester: createMockRequester(),
         organizations: { _tag: 'success', organizations: MOCK_ORGANIZATIONS },
       }
   }

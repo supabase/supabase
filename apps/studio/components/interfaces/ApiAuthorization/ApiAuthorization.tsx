@@ -4,7 +4,6 @@ import { ApiAuthorizationValidScreen } from './ApiAuthorization.Valid'
 export const API_AUTHORIZATION_MOCK_STATES = [
   'loading',
   'ready',
-  'mcp',
   'approving',
   'approved',
   'expired',
