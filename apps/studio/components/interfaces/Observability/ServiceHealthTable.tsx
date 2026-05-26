@@ -40,7 +40,7 @@ export type ServiceHealthTableProps = {
 }
 
 const colorClassMap: Record<string, string> = {
-  muted: 'bg-muted',
+  muted: 'bg-gray-500',
   destructive: 'bg-destructive',
   warning: 'bg-warning',
   brand: 'bg-brand',
@@ -93,14 +93,19 @@ const ServiceCell = ({
       href={reportUrl}
       className={cn('group block px-card py-4 hover:bg-surface-200 transition-colors', className)}
     >
-      <div className="flex items-start justify-between mb-3 gap-2">
-        <div className="flex items-center gap-3 min-w-0">
-          <div
-            className={cn('w-1.5 h-1.5 rounded-full shrink-0', colorClassMap[color] || 'bg-muted')}
-          />
-          <div className="flex flex-col min-w-0">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-foreground text-sm font-medium truncate">{service.name}</span>
+      <span className="flex items-start justify-between mb-3 gap-2">
+        <span className="flex items-center justify-between w-full">
+          <span className="flex items-center gap-2 min-w-0">
+            <span className="flex items-center gap-1.5 min-w-0">
+              <span
+                className={cn(
+                  'w-2 h-2 rounded-full shrink-0',
+                  colorClassMap[color] || 'bg-foreground'
+                )}
+              />
+              <h3 className="text-foreground-light font-mono uppercase text-xs truncate">
+                {service.name}
+              </h3>
               {description && (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -110,7 +115,7 @@ const ServiceCell = ({
                       className="text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
                       aria-label={`About ${service.name}`}
                     >
-                      <HelpCircle size={12} />
+                      <HelpCircle size={14} />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs">
@@ -118,19 +123,23 @@ const ServiceCell = ({
                   </TooltipContent>
                 </Tooltip>
               )}
-            </div>
+            </span>
+          </span>
+          <span className="flex items-center gap-1.5">
             {data.isLoading ? (
               <Skeleton className="h-3 w-20 mt-0.5" />
             ) : (
-              <span className="text-foreground-lighter text-xs truncate">{getSubtitle(data)}</span>
+              <span className="text-foreground text-xs tabular-nums truncate">
+                {getSubtitle(data)}
+              </span>
             )}
-          </div>
-        </div>
-        <ChevronRight
-          size={14}
-          className="text-foreground-lighter group-hover:text-foreground transition-colors shrink-0 mt-0.5"
-        />
-      </div>
+            <ChevronRight
+              size={14}
+              className="text-foreground-lighter group-hover:text-foreground transition-colors shrink-0 mt-0.5"
+            />
+          </span>
+        </span>
+      </span>
 
       <div className="h-14" onClick={(e) => e.preventDefault()}>
         <Loading isFullHeight active={data.isLoading}>
