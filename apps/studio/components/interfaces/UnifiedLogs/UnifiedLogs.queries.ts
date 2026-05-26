@@ -13,7 +13,7 @@ import {
 const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
 
 // Special filter parameters that need custom handling
-const SPECIAL_FILTER_PARAMS = ['date'] as const
+const SPECIAL_FILTER_PARAMS = ['date', 'hide_connection_logs'] as const
 
 // Combined list of all parameters to exclude from standard filtering
 const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
@@ -263,6 +263,15 @@ const buildBaseWhere = (
   const parts: SafeLogSqlFragment[] = []
   if (excludeField !== 'log_type') {
     parts.push(logTypeWherePredicate(effectiveLogTypes))
+  }
+  if (search.hide_connection_logs) {
+    parts.push(
+      safeSql`NOT (source = 'postgres_logs' AND (
+        event_message LIKE 'connection received%' OR
+        event_message LIKE 'connection authenticated%' OR
+        event_message LIKE 'connection authorized%'
+      ))`
+    )
   }
   parts.push(...buildPredicates(search, excludeField))
   return parts
