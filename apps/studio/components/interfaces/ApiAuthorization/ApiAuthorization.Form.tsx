@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { Info } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
@@ -21,11 +20,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
 import {
@@ -150,6 +147,7 @@ export function ApiAuthorizationMainView({
                   <FormFooter
                     approvalState={approvalState}
                     requester={requester}
+                    redirectUrl={externalRedirectUrl}
                     onApprove={onApprove}
                     onDecline={onDecline}
                   />
@@ -176,22 +174,12 @@ function PublisherInfoDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            type="button"
-            aria-label="About this publisher"
-            className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1.5 rounded-full border border-muted py-1 pl-2 pr-1.5 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
-            onClick={() => setOpen(true)}
-          >
-            <span>{domain}</span>
-            <Info className="size-3.5 text-foreground-muted transition-colors" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-56 text-xs">
-          About this publisher
-        </TooltipContent>
-      </Tooltip>
+      <div className="mx-auto mt-1.5 flex w-fit items-center gap-1 rounded-full border border-muted py-1 pl-2.5 pr-1.5 font-mono text-[11px] tracking-tight text-foreground-lighter">
+        <span>{domain}</span>
+        <span onClick={() => setOpen(true)}>
+          <InfoTooltip side="bottom">About this publisher</InfoTooltip>
+        </span>
+      </div>
       <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>About this publisher</DialogTitle>
@@ -203,10 +191,13 @@ function PublisherInfoDialog({
                 permissions.
               </p>
               {redirectUrl && (
-                <div className="space-y-1">
-                  <p className="text-xs font-medium text-foreground-light">Redirects to</p>
-                  <p className="break-all font-mono text-[11px] text-foreground">{redirectUrl}</p>
-                </div>
+                <p>
+                  Authorizing will redirect you to{' '}
+                  <span className="break-all font-mono text-[11px] text-foreground">
+                    {redirectUrl}
+                  </span>
+                  .
+                </p>
               )}
             </div>
           </DialogDescription>
@@ -361,6 +352,7 @@ function OrganizationSelector({
 interface FormFooterProps {
   approvalState: ApprovalState
   requester: ApiAuthorizationResponse
+  redirectUrl?: string
   onDecline: () => void
   onApprove: () => void
 }
@@ -368,6 +360,7 @@ interface FormFooterProps {
 function FormFooter({
   approvalState,
   requester,
+  redirectUrl,
   onDecline,
   onApprove,
 }: FormFooterProps): ReactNode {
@@ -388,6 +381,14 @@ function FormFooter({
       >
         Cancel
       </Button>
+      {redirectUrl && (
+        <div className="mt-3 border-t border-muted pt-6">
+          <p className="text-center text-xs text-foreground-lighter">
+            Authorizing {requester.name} will redirect you to{' '}
+            <span className="text-foreground">{redirectUrl}</span>
+          </p>
+        </div>
+      )}
     </div>
   )
 }
