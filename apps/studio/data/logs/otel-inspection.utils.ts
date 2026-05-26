@@ -43,7 +43,7 @@ export function flattenOtelInspectionRow(
   const host = attrs['request.host'] ?? attrs['host'] ?? ''
   // Path key differs across sources: edge_logs uses `request.path`,
   // function_edge_logs uses `request.pathname`. Coalesce.
-  const requestPath = attrs['request.path'] ?? attrs['request.pathname'] ?? ['path']
+  const requestPath = attrs['request.path'] ?? attrs['request.pathname'] ?? attrs['path'] ?? ''
   // Status: HTTP response code for gateway rows, Postgres SQL state code for postgres rows.
   const status =
     row.source === 'postgres_logs' ? attrs['parsed.sql_state_code'] : attrs['response.status_code']

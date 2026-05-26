@@ -158,7 +158,7 @@ export function ServiceFlowPanel({
                     table={table}
                   />
                 ) : (
-                  <div className="[&>*:nth-child(even)]:bg-surface-100/50">
+                  <div>
                     <DetailSectionHeader
                       title="Request started"
                       icon={Clock}

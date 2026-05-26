@@ -83,7 +83,7 @@ export function createBlock(config: BlockConfig) {
               size={14}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent>
+          <CollapsibleContent className="[&>*:nth-child(odd)]:bg-surface-100/50">
             {config.primaryFields?.map((field) => (
               <FieldRow
                 key={field.id}
@@ -124,7 +124,7 @@ export function createBlock(config: BlockConfig) {
                     size={14}
                   />
                 </CollapsibleTrigger>
-                <CollapsibleContent>
+                <CollapsibleContent className="[&>*:nth-child(odd)]:bg-surface-100/50">
                   {section.fields.map((field) => (
                     <FieldRow
                       key={field.id}

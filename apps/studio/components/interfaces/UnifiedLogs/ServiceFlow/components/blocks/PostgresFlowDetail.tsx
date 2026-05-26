@@ -71,7 +71,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
     ((data as Record<string, unknown>)?.error_severity as string | undefined)
 
   return (
-    <div className="[&>*:nth-child(even)]:bg-surface-100/50">
+    <div>
       <DetailSectionHeader
         title="Request started"
         icon={Clock}
@@ -83,7 +83,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
           <DetailSectionHeader title="Postgres" icon={Database} />
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </CollapsibleTrigger>
-        <CollapsibleContent>
+        <CollapsibleContent className="[&>*:nth-child(odd)]:bg-surface-100/50">
           {postgresPrimaryFields.map((field) => (
             <FieldDetailRow
               key={field.id}
@@ -103,7 +103,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
           <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </CollapsibleTrigger>
-        <CollapsibleContent>
+        <CollapsibleContent className="[&>*:nth-child(odd)]:bg-surface-100/50">
           {postgresDetailsFields.map((field) => (
             <FieldDetailRow
               key={field.id}
