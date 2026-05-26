@@ -1,16 +1,10 @@
 import dayjs from 'dayjs'
-import { Info, TriangleAlert } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   Card,
   CardContent,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   Form,
   FormControl,
   FormField,
@@ -21,9 +15,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
@@ -70,8 +61,6 @@ export type OrganizationsState =
   | OrganizationsState_NotMember
   | OrganizationsState_Success
 
-const CURSOR_MCP_PUBLISHER_DOMAIN = 'anysphere.cursor-mcp'
-
 function isExternalRedirectUrl(url: string): boolean {
   try {
     const { hostname } = new URL(url)
@@ -102,9 +91,8 @@ export function ApiAuthorizationMainView({
 }: ApiAuthorizationMainViewProps): ReactNode {
   const isExpired = dayjs().isAfter(dayjs(requester.expires_at))
   const showReadyContent = !isExpired && organizations._tag === 'success'
-  const showPublisherInfo = requester.domain === CURSOR_MCP_PUBLISHER_DOMAIN
   const redirectUrl = requester.redirect_uri ?? requester.website
-  const showRedirectWarning = isExternalRedirectUrl(redirectUrl)
+  const externalRedirectUrl = isExternalRedirectUrl(redirectUrl) ? redirectUrl : undefined
 
   return (
     <InterstitialLayout
@@ -116,13 +104,7 @@ export function ApiAuthorizationMainView({
       }
       title={`Authorize ${requester.name}`}
       description="This application wants to access your Supabase account"
-      subtitle={
-        showPublisherInfo ? (
-          <CursorPublisherInfoDialog domain={requester.domain} />
-        ) : (
-          <InterstitialMetadataPill>{requester.domain}</InterstitialMetadataPill>
-        )
-      }
+      subtitle={<InterstitialMetadataPill>{requester.domain}</InterstitialMetadataPill>}
       subtitleClassName="leading-none"
     >
       <div className="px-6 pb-6">
@@ -155,10 +137,10 @@ export function ApiAuthorizationMainView({
                     domain={requester.domain}
                     scopes={requester.scopes}
                   />
-                  {showRedirectWarning && <ExternalRedirectNotice redirectUrl={redirectUrl} />}
                   <FormFooter
                     approvalState={approvalState}
                     requester={requester}
+                    redirectUrl={externalRedirectUrl}
                     onApprove={onApprove}
                     onDecline={onDecline}
                   />
@@ -169,55 +151,6 @@ export function ApiAuthorizationMainView({
         </div>
       </div>
     </InterstitialLayout>
-  )
-}
-
-function CursorPublisherInfoDialog({ domain }: { domain: string }): ReactNode {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            type="button"
-            aria-label="About this publisher"
-            className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1.5 rounded-full border border-muted pl-2 pr-1.5 py-1 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
-            onClick={() => setOpen(true)}
-          >
-            <span>{domain}</span>
-            <Info className="size-3.5 text-foreground-muted transition-colors" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-56 text-xs">
-          Make sure you trust this publisher
-        </TooltipContent>
-      </Tooltip>
-      <DialogContent size="small">
-        <DialogHeader>
-          <DialogTitle>About this publisher</DialogTitle>
-          <DialogDescription>
-            <code className="text-code-inline">anysphere-mcp</code> is the publisher of the Cursor
-            application. Make sure you trust the author and source of this app. After you authorize,
-            it will be able to view or control your organization's projects based on the selected
-            permissions.
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-function ExternalRedirectNotice({ redirectUrl }: { redirectUrl: string }): ReactNode {
-  return (
-    <div className="flex items-start gap-1.5 text-xs text-foreground-lighter">
-      <TriangleAlert className="mt-px size-3 shrink-0 text-warning-600" />
-      <span>
-        The owner of{' '}
-        <span className="break-all font-mono text-[11px] text-foreground">{redirectUrl}</span> will
-        be granted access. Only continue if you trust this source.
-      </span>
-    </div>
   )
 }
 
@@ -366,6 +299,7 @@ function OrganizationSelector({
 interface FormFooterProps {
   approvalState: ApprovalState
   requester: ApiAuthorizationResponse
+  redirectUrl?: string
   onDecline: () => void
   onApprove: () => void
 }
@@ -373,6 +307,7 @@ interface FormFooterProps {
 function FormFooter({
   approvalState,
   requester,
+  redirectUrl,
   onDecline,
   onApprove,
 }: FormFooterProps): ReactNode {
@@ -393,6 +328,11 @@ function FormFooter({
       >
         Cancel
       </Button>
+      {redirectUrl && (
+        <p className="text-center text-xs text-foreground-lighter">
+          Authorizing will redirect you to {redirectUrl}
+        </p>
+      )}
     </div>
   )
 }
