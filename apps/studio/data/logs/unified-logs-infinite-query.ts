@@ -13,7 +13,6 @@ import {
   QuerySearchParamsType,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError } from '@/data/fetchers'
-import { tryParseJson } from '@/lib/helpers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
