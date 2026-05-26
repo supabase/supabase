@@ -1,10 +1,16 @@
 import dayjs from 'dayjs'
-import { type ReactNode } from 'react'
+import { Info } from 'lucide-react'
+import { useState, type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   Card,
   CardContent,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
   Form,
   FormControl,
   FormField,
@@ -15,6 +21,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
@@ -23,12 +32,7 @@ import {
   AuthorizeRequesterDetails,
   RequesterLogo,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
-import {
-  InterstitialLayout,
-  InterstitialMetadataPill,
-  LogoPair,
-  SupabaseLogo,
-} from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout, LogoPair, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { Organization, ResponseError } from '@/types'
 
@@ -104,7 +108,13 @@ export function ApiAuthorizationMainView({
       }
       title={`Authorize ${requester.name}`}
       description="This application wants to access your Supabase account"
-      subtitle={<InterstitialMetadataPill>{requester.domain}</InterstitialMetadataPill>}
+      subtitle={
+        <PublisherInfoDialog
+          domain={requester.domain}
+          name={requester.name}
+          redirectUrl={externalRedirectUrl}
+        />
+      }
       subtitleClassName="leading-none"
     >
       <div className="px-6 pb-6">
@@ -140,7 +150,6 @@ export function ApiAuthorizationMainView({
                   <FormFooter
                     approvalState={approvalState}
                     requester={requester}
-                    redirectUrl={externalRedirectUrl}
                     onApprove={onApprove}
                     onDecline={onDecline}
                   />
@@ -151,6 +160,59 @@ export function ApiAuthorizationMainView({
         </div>
       </div>
     </InterstitialLayout>
+  )
+}
+
+function PublisherInfoDialog({
+  domain,
+  name,
+  redirectUrl,
+}: {
+  domain: string
+  name: string
+  redirectUrl?: string
+}): ReactNode {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            aria-label="About this publisher"
+            className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1.5 rounded-full border border-muted py-1 pl-2 pr-1.5 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
+            onClick={() => setOpen(true)}
+          >
+            <span>{domain}</span>
+            <Info className="size-3.5 text-foreground-muted transition-colors" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-56 text-xs">
+          About this publisher
+        </TooltipContent>
+      </Tooltip>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>About this publisher</DialogTitle>
+          <DialogDescription asChild>
+            <div className="space-y-3">
+              <p>
+                Make sure you trust the source of <strong>{name}</strong>. After authorizing, it
+                will be able to access your organization&apos;s projects based on the selected
+                permissions.
+              </p>
+              {redirectUrl && (
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-foreground-light">Redirects to</p>
+                  <p className="break-all font-mono text-[11px] text-foreground">{redirectUrl}</p>
+                </div>
+              )}
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -299,7 +361,6 @@ function OrganizationSelector({
 interface FormFooterProps {
   approvalState: ApprovalState
   requester: ApiAuthorizationResponse
-  redirectUrl?: string
   onDecline: () => void
   onApprove: () => void
 }
@@ -307,7 +368,6 @@ interface FormFooterProps {
 function FormFooter({
   approvalState,
   requester,
-  redirectUrl,
   onDecline,
   onApprove,
 }: FormFooterProps): ReactNode {
@@ -328,11 +388,6 @@ function FormFooter({
       >
         Cancel
       </Button>
-      {redirectUrl && (
-        <p className="text-center text-xs text-foreground-lighter">
-          Authorizing will redirect you to {redirectUrl}
-        </p>
-      )}
     </div>
   )
 }
