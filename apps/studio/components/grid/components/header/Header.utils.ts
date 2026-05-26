@@ -86,7 +86,6 @@ export const hydrateTruncatedRows = async ({
   return { status: 'ok', rows: hydrated }
 }
 
-
 export const hasTruncatedCellValues = (rows: Record<string, unknown>[]) =>
   rows.some((row) =>
     Object.values(row).some((value) => typeof value === 'string' && isValueTruncated(value))
