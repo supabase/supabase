@@ -48,10 +48,20 @@ services:
       LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
       LOGFLARE_SINGLE_TENANT: "true"
       LOGFLARE_SUPABASE_MODE: "true"
+      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
 
+      # Comment out the following two variables when switching to
+      # the BigQuery backend for logs
       POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase
       POSTGRES_BACKEND_SCHEMA: _analytics
-      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
+
+      # Uncomment to use the BigQuery backend for logs
+      #GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
+      #GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
+    # Uncomment to use the BigQuery backend for logs (requires gcloud.json
+    # service account key from Google Cloud Console)
+    #volumes:
+    #  - ./gcloud.json:/opt/app/rel/logflare/bin/gcloud.json:ro,z
 
   vector:
     container_name: supabase-vector
