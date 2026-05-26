@@ -104,7 +104,7 @@ export const PolicyEditorPanel = memo(function ({
   const [check, setCheck] = useState<DisplayableSqlFragment | undefined>(undefined)
   const [rolesFragment, setRolesFragment] = useState<SafeSqlFragment>(safeSql`public`)
   const [fieldError, setFieldError] = useState<string>()
-  const [showCheckBlock, setShowCheckBlock] = useState(true)
+  const [showCheckBlock, setShowCheckBlock] = useState(false)
 
   const monacoOneRef = useRef<Monaco | null>(null)
   const editorOneRef = useRef<IStandaloneCodeEditor | null>(null)
@@ -241,11 +241,11 @@ export const PolicyEditorPanel = memo(function ({
         // [Joshen] Cause editor one will be the check statement in this scenario
         if (selectedPolicy.check !== usingVal)
           payload.check =
-            usingVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(usingVal))
+            usingVal ? acceptUntrustedSql(untrustedSql(usingVal)) : undefined
       } else {
         if (selectedPolicy.check !== checkVal)
           payload.check =
-            checkVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(checkVal))
+            checkVal ? acceptUntrustedSql(untrustedSql(checkVal)) : undefined
       }
 
       if (Object.keys(payload).length === 0) return onSelectCancel()
@@ -292,6 +292,8 @@ export const PolicyEditorPanel = memo(function ({
         if (selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
           setCheck(safeSql`  ${selectedPolicy.check}`)
           setShowCheckBlock(true)
+        } else if (!selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
+          setShowCheckBlock(false)
         }
         setRolesFragment(
           roles.length === 1 && roles[0] === 'public'

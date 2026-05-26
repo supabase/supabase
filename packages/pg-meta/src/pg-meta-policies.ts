@@ -151,7 +151,7 @@ function update(
   const definitionSql: SafeSqlFragment =
     definition === undefined ? safeSql`` : safeSql`${alter} USING (${definition});`
   const checkSql: SafeSqlFragment =
-    check === undefined ? safeSql`` : safeSql`${alter} WITH CHECK (${check});`
+    !check ? safeSql`` : safeSql`${alter} WITH CHECK (${check});`
   const rolesSql: SafeSqlFragment =
     roles === undefined
       ? safeSql``
