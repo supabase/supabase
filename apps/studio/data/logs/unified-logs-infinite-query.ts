@@ -30,11 +30,6 @@ export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
 
-const extractLeadingStatus = (s?: string) => {
-  const m = typeof s === 'string' ? s.match(/^(\d{3})\b/) : null
-  return m ? Number(m[1]) : undefined
-}
-
 export const getUnifiedLogsISOStartEnd = (
   search: QuerySearchParamsType,
   endHoursFromNow: number = 1
