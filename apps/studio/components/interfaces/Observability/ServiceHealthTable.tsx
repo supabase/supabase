@@ -1,15 +1,16 @@
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import {
+  Button,
   Card,
   CardContent,
   cn,
-  Loading,
   Skeleton,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { ChartEmptyState, ChartLoadingState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
@@ -59,7 +60,7 @@ const formatPercent = (value: number) =>
   value >= 1 ? `${value.toFixed(1)}%` : `${value.toFixed(2)}%`
 
 const getSubtitle = (data: ServiceData) => {
-  if (data.total === 0) return 'No traffic'
+  if (data.total === 0) return ''
 
   const errorRate = data.errorRate
   const warningRate = data.total > 0 ? (data.warningCount / data.total) * 100 : 0
@@ -91,7 +92,10 @@ const ServiceCell = ({
   return (
     <Link
       href={reportUrl}
-      className={cn('group block px-card py-4 hover:bg-surface-200 transition-colors', className)}
+      className={cn(
+        'group block px-card pt-2 pb-4 hover:bg-surface-200 transition-colors',
+        className
+      )}
     >
       <span className="flex items-start justify-between mb-3 gap-2">
         <span className="flex items-center justify-between w-full">
@@ -99,8 +103,8 @@ const ServiceCell = ({
             <span className="flex items-center gap-1.5 min-w-0">
               <span
                 className={cn(
-                  'w-2 h-2 rounded-full shrink-0',
-                  colorClassMap[color] || 'bg-foreground'
+                  'w-1.5 h-1.5 rounded-full shrink-0',
+                  colorClassMap[color] || 'bg-gray-500'
                 )}
               />
               <h3 className="text-foreground-light font-mono uppercase text-xs truncate">
@@ -115,7 +119,7 @@ const ServiceCell = ({
                       className="text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
                       aria-label={`About ${service.name}`}
                     >
-                      <HelpCircle size={14} />
+                      <HelpCircle size={12} />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs">
@@ -133,29 +137,36 @@ const ServiceCell = ({
                 {getSubtitle(data)}
               </span>
             )}
-            <ChevronRight
-              size={14}
-              className="text-foreground-lighter group-hover:text-foreground transition-colors shrink-0 mt-0.5"
-            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="text"
+                  size="tiny"
+                  className="px-1 text-foreground-lighter group-hover:text-foreground transition-colors shrink-0"
+                  aria-label={`Go to ${service.name} report`}
+                >
+                  <ChevronRight size={14} strokeWidth={1.5} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Go to {service.name} report</TooltipContent>
+            </Tooltip>
           </span>
         </span>
       </span>
 
-      <div className="h-14" onClick={(e) => e.preventDefault()}>
-        <Loading isFullHeight active={data.isLoading}>
-          {data.isLoading ? (
-            <div className="h-full" />
-          ) : (
-            <LogsBarChart
-              isFullHeight
-              hideDateRange
-              data={data.eventChartData}
-              DateTimeFormat={datetimeFormat}
-              onBarClick={onBarClick}
-              EmptyState={null}
-            />
-          )}
-        </Loading>
+      <div className="h-16" onClick={(e) => e.preventDefault()}>
+        {data.isLoading ? (
+          <ChartLoadingState className="h-full" />
+        ) : (
+          <LogsBarChart
+            isFullHeight
+            hideDateRange
+            data={data.eventChartData}
+            DateTimeFormat={datetimeFormat}
+            onBarClick={onBarClick}
+            EmptyState={<ChartEmptyState className="h-full" description="No traffic" />}
+          />
+        )}
       </div>
     </Link>
   )
@@ -172,7 +183,7 @@ export const ServiceHealthTable = ({
   return (
     <div>
       <h2 className="heading-section mb-4">Service Health</h2>
-      <Card>
+      <Card className="overflow-auto">
         <CardContent className="p-0">
           <div className="grid grid-cols-1 md:grid-cols-2">
             {services.map((service, index) => {
