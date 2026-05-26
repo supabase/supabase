@@ -1,5 +1,4 @@
 import { ChevronDown } from 'lucide-react'
-import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -25,9 +24,6 @@ interface CopyExportRowsActionsProps {
 }
 
 export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsActionsProps) => {
-  const [isCopying, setIsCopying] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
-
   const exportParams =
     table && project && rows.length > 0
       ? ({
@@ -63,7 +59,6 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
       )
     }
 
-    setIsCopying(true)
     const formatted = formatRowsForCopy({
       rows,
       table,
@@ -72,15 +67,11 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
       connectionString: project.connectionString,
     })
 
-    copyToClipboard(formatted, () => toast.success('Copied rows to clipboard')).finally(() => {
-      setIsCopying(false)
-    })
+    copyToClipboard(formatted, () => toast.success('Copied rows to clipboard'))
   }
 
   const onExportRows = async (exporter: () => Promise<void>) => {
-    setIsExporting(true)
     await exporter()
-    setIsExporting(false)
   }
 
   return (
@@ -91,7 +82,6 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
             type="default"
             size="tiny"
             iconRight={<ChevronDown />}
-            loading={isCopying}
             disabled={disabled}
           >
             Copy
@@ -116,7 +106,6 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
             type="default"
             size="tiny"
             iconRight={<ChevronDown />}
-            loading={isExporting}
             disabled={disabled}
           >
             Export
