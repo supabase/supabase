@@ -134,7 +134,7 @@ describe('ApiAuthorizationScreen', () => {
         response: () => HttpResponse.json({ message: 'Not found' }, { status: 404 }),
       })
       renderScreen()
-      await screen.findByText('Failed to fetch details for API authorization request')
+      await screen.findByText('Unable to load authorization')
     })
 
     describe('when already approved', () => {
@@ -146,8 +146,8 @@ describe('ApiAuthorizationScreen', () => {
           })
         )
         renderScreen()
-        await screen.findByText('This authorization request has been approved')
-        expect(screen.getByText(/organization "My Org"/)).toBeInTheDocument()
+        await screen.findByText('Authorization approved')
+        expect(screen.getByText(/has access to My Org/)).toBeInTheDocument()
       })
 
       test('shows Unknown when approved organization is not in the user organizations list', async () => {
@@ -158,14 +158,14 @@ describe('ApiAuthorizationScreen', () => {
           })
         )
         renderScreen()
-        await screen.findByText('This authorization request has been approved')
-        expect(screen.getByText(/organization "Unknown"/)).toBeInTheDocument()
+        await screen.findByText('Authorization approved')
+        expect(screen.getByText(/has access to Unknown/)).toBeInTheDocument()
       })
     })
 
     describe('main authorization form', () => {
       describe('organizations states', () => {
-        test('disables action buttons while organizations are being fetched', async () => {
+        test('does not show action buttons while organizations are being fetched', async () => {
           mockAuthEndpoint(createMockAuthResponse())
           addAPIMock({
             method: 'get',
@@ -174,11 +174,13 @@ describe('ApiAuthorizationScreen', () => {
           })
           renderScreen()
           await screen.findByText('Authorize API access for Test App')
-          expect(screen.getByRole('button', { name: 'Decline' })).toBeDisabled()
-          expect(screen.getByRole('button', { name: /Authorize Test App/ })).toBeDisabled()
+          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+          expect(
+            screen.queryByRole('button', { name: /Authorize Test App/ })
+          ).not.toBeInTheDocument()
         })
 
-        test('shows error notice, disables decline button, and hides accept button when organizations query fails', async () => {
+        test('shows error notice and hides action buttons when organizations query fails', async () => {
           mockAuthEndpoint(createMockAuthResponse())
           addAPIMock({
             method: 'get',
@@ -186,8 +188,8 @@ describe('ApiAuthorizationScreen', () => {
             response: () => HttpResponse.json({ message: 'Server error' }, { status: 500 }),
           })
           renderScreen()
-          await screen.findByText('There was an error loading your organizations')
-          expect(screen.getByRole('button', { name: 'Decline' })).toBeDisabled()
+          await screen.findByText('Unable to load organizations')
+          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
           expect(
             screen.queryByRole('button', { name: /Authorize Test App/ })
           ).not.toBeInTheDocument()
@@ -196,9 +198,8 @@ describe('ApiAuthorizationScreen', () => {
         test('shows empty state when user has no organizations', async () => {
           mockBothEndpoints(createMockAuthResponse(), [])
           renderScreen()
-          await screen.findByText(/Your account isn't associated with any organizations/)
-          expect(screen.getByRole('link', { name: 'Create an organization' })).toBeInTheDocument()
-          expect(screen.getByRole('button', { name: 'Decline' })).toBeDisabled()
+          await screen.findByText('No organizations found')
+          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
           expect(
             screen.queryByRole('button', { name: /Authorize Test App/ })
           ).not.toBeInTheDocument()
@@ -208,8 +209,10 @@ describe('ApiAuthorizationScreen', () => {
           mockBothEndpoints()
           renderScreen({ organization_slug: 'nonexistent-org' })
           await screen.findByText(/Your account is not a member of the pre-selected organization/)
-          expect(screen.getByRole('button', { name: 'Decline' })).toBeDisabled()
-          expect(screen.getByRole('button', { name: /Authorize Test App/ })).toBeDisabled()
+          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+          expect(
+            screen.queryByRole('button', { name: /Authorize Test App/ })
+          ).not.toBeInTheDocument()
         })
       })
 
@@ -220,7 +223,7 @@ describe('ApiAuthorizationScreen', () => {
           await screen.findByText('Authorize API access for My OAuth App')
           expect(screen.getByRole('combobox')).toBeInTheDocument()
           expect(screen.getByRole('button', { name: /Authorize My OAuth App/ })).toBeInTheDocument()
-          expect(screen.getByRole('button', { name: 'Decline' })).toBeInTheDocument()
+          expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
         })
 
         test('auto-selects the only organization when no organization_slug is provided', async () => {
@@ -236,45 +239,28 @@ describe('ApiAuthorizationScreen', () => {
           const combobox = await screen.findByRole('combobox')
           expect(combobox).toHaveTextContent('Second Org')
           expect(combobox).not.toHaveTextContent('My Org')
-          expect(
-            screen.getByText('This organization has been pre-selected by Test App.')
-          ).toBeInTheDocument()
-        })
-      })
-
-      describe('MCP client warning', () => {
-        test('shows MCP warning when registration_type is dynamic', async () => {
-          mockBothEndpoints(createMockAuthResponse({ registration_type: 'dynamic' }))
-          renderScreen()
-          await screen.findByText('MCP Client Connection')
-        })
-
-        test('does not show MCP warning for non-dynamic registration type', async () => {
-          mockBothEndpoints()
-          renderScreen()
-          await screen.findByText('Authorize API access for Test App')
-          expect(screen.queryByText('MCP Client Connection')).not.toBeInTheDocument()
+          expect(screen.getByText('Pre-selected by Test App')).toBeInTheDocument()
         })
       })
 
       describe('expiration', () => {
-        test('shows expiration warning and disables buttons when request has expired', async () => {
+        test('shows expiration warning and hides action buttons when request has expired', async () => {
           mockBothEndpoints(
             createMockAuthResponse({ expires_at: dayjs().subtract(1, 'hour').toISOString() })
           )
           renderScreen()
-          await screen.findByText('This authorization request is expired')
-          expect(screen.getByRole('button', { name: 'Decline' })).toBeDisabled()
-          expect(screen.getByRole('button', { name: /Authorize Test App/ })).toBeDisabled()
+          await screen.findByText('Authorization request expired')
+          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+          expect(
+            screen.queryByRole('button', { name: /Authorize Test App/ })
+          ).not.toBeInTheDocument()
         })
 
         test('does not show expiration warning when request has not expired', async () => {
           mockBothEndpoints()
           renderScreen()
           await screen.findByText('Authorize API access for Test App')
-          expect(
-            screen.queryByText('This authorization request is expired')
-          ).not.toBeInTheDocument()
+          expect(screen.queryByText('Authorization request expired')).not.toBeInTheDocument()
         })
       })
 
@@ -298,7 +284,7 @@ describe('ApiAuthorizationScreen', () => {
       })
 
       describe('decline action', () => {
-        test('navigates to /organizations after declining', async () => {
+        test('navigates to /organizations after cancelling', async () => {
           const user = userEvent.setup()
           const declineHandler = vi.fn(() => HttpResponse.json({ id: 'test-auth-id' }))
           mockBothEndpoints()
@@ -308,8 +294,8 @@ describe('ApiAuthorizationScreen', () => {
             response: declineHandler,
           })
           const { navigate } = renderScreen()
-          await screen.findByRole('button', { name: 'Decline' })
-          await user.click(screen.getByRole('button', { name: 'Decline' }))
+          await screen.findByRole('button', { name: 'Cancel' })
+          await user.click(screen.getByRole('button', { name: 'Cancel' }))
           await waitFor(() => expect(declineHandler).toHaveBeenCalled())
           await waitFor(() => expect(navigate).toHaveBeenCalledWith('/organizations'))
         })
