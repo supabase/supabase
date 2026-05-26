@@ -78,12 +78,7 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            type="default"
-            size="tiny"
-            iconRight={<ChevronDown />}
-            disabled={disabled}
-          >
+          <Button type="default" size="tiny" iconRight={<ChevronDown />} disabled={disabled}>
             Copy
           </Button>
         </DropdownMenuTrigger>
@@ -102,12 +97,7 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            type="default"
-            size="tiny"
-            iconRight={<ChevronDown />}
-            disabled={disabled}
-          >
+          <Button type="default" size="tiny" iconRight={<ChevronDown />} disabled={disabled}>
             Export
           </Button>
         </DropdownMenuTrigger>
