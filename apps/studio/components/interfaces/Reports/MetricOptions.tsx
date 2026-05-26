@@ -17,12 +17,14 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { DEPRECATED_REPORTS } from './Reports.constants'
+import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from './Reports.constants'
+import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentQuery } from '@/data/content/content-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { Metric, METRIC_CATEGORIES, METRICS } from '@/lib/constants/metrics'
 import { editorPanelState } from '@/state/editor-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -42,6 +44,7 @@ interface MetricOptionsProps {
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const [search, setSearch] = useState('')
 
@@ -49,6 +52,8 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
     'project_auth:all',
     'project_storage:all',
   ])
+
+  const supportsBurstableIO = hasBurstableIO(project?.infra_compute_size)
 
   const metricCategories = Object.values(METRIC_CATEGORIES).filter(({ key }) => {
     if (key === 'api_auth') return authEnabled
@@ -83,7 +88,9 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
               <DropdownMenuSubContent>
                 {METRICS.filter(
                   (metric) =>
-                    !DEPRECATED_REPORTS.includes(metric.key) && metric?.category?.key === cat.key
+                    !DEPRECATED_REPORTS.includes(metric.key) &&
+                    metric?.category?.key === cat.key &&
+                    (supportsBurstableIO || !BURSTABLE_IO_METRIC_KEYS.includes(metric.key))
                 ).map((metric) => {
                   return (
                     <DropdownMenuCheckboxItem
