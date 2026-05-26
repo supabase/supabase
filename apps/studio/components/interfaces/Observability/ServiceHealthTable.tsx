@@ -90,71 +90,73 @@ const ServiceCell = ({
   const description = SERVICE_DESCRIPTIONS[service.key] || service.description
 
   return (
-    <Link
-      href={reportUrl}
+    <div
       className={cn(
-        'group block px-card pt-2 pb-4 hover:bg-surface-200 transition-colors',
+        'group relative px-card pt-2 pb-4 hover:bg-surface-200 transition-colors',
         className
       )}
     >
-      <span className="flex items-start justify-between mb-3 gap-2">
-        <span className="flex items-center justify-between w-full">
-          <span className="flex items-center gap-2 min-w-0">
-            <span className="flex items-center gap-1.5 min-w-0">
-              <span
-                className={cn(
-                  'w-1.5 h-1.5 rounded-full shrink-0',
-                  colorClassMap[color] || 'bg-gray-500'
-                )}
-              />
-              <h3 className="text-foreground-light font-mono uppercase text-xs truncate">
-                {service.name}
-              </h3>
-              {description && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      onClick={(e) => e.preventDefault()}
-                      className="text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
-                      aria-label={`About ${service.name}`}
-                    >
-                      <HelpCircle size={12} />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="max-w-xs">
-                    <p>{description}</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </span>
-          </span>
-          <span className="flex items-center gap-1.5">
-            {data.isLoading ? (
-              <Skeleton className="h-3 w-20 mt-0.5" />
-            ) : (
-              <span className="text-foreground text-xs tabular-nums truncate">
-                {getSubtitle(data)}
-              </span>
+      <div className="flex items-center justify-between mb-3 gap-2">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <div
+            className={cn(
+              'w-1.5 h-1.5 rounded-full shrink-0',
+              colorClassMap[color] || 'bg-gray-500'
             )}
+          />
+          <h3 className="text-foreground-light font-mono uppercase text-xs truncate m-0">
+            <Link
+              href={reportUrl}
+              className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-foreground-light focus-visible:after:ring-offset-2 focus-visible:after:rounded-sm"
+            >
+              {service.name}
+            </Link>
+          </h3>
+          {description && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  type="text"
-                  size="tiny"
-                  className="px-1 text-foreground-lighter group-hover:text-foreground transition-colors shrink-0"
-                  aria-label={`Go to ${service.name} report`}
+                <button
+                  type="button"
+                  className="relative z-10 text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
+                  aria-label={`About ${service.name}`}
                 >
-                  <ChevronRight size={14} strokeWidth={1.5} />
-                </Button>
+                  <HelpCircle size={12} />
+                </button>
               </TooltipTrigger>
-              <TooltipContent side="top">Go to {service.name} report</TooltipContent>
+              <TooltipContent side="top" className="max-w-xs">
+                <p>{description}</p>
+              </TooltipContent>
             </Tooltip>
-          </span>
-        </span>
-      </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5">
+          {data.isLoading ? (
+            <Skeleton className="h-3 w-20 mt-0.5" />
+          ) : (
+            <span className="text-foreground text-xs tabular-nums truncate">
+              {getSubtitle(data)}
+            </span>
+          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="text"
+                size="tiny"
+                className="relative z-10 px-1 text-foreground-lighter group-hover:text-foreground transition-colors shrink-0"
+                aria-label={`Go to ${service.name} report`}
+                asChild
+              >
+                <Link href={reportUrl}>
+                  <ChevronRight size={14} strokeWidth={1.5} />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="top">Go to {service.name} report</TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
 
-      <div className="h-16" onClick={(e) => e.preventDefault()}>
+      <div className="relative z-10 h-16">
         {data.isLoading ? (
           <ChartLoadingState className="h-full" />
         ) : (
@@ -168,7 +170,7 @@ const ServiceCell = ({
           />
         )}
       </div>
-    </Link>
+    </div>
   )
 }
 
