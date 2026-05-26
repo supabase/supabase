@@ -20,6 +20,7 @@ import { useDatabaseHooksQuery } from '@/data/database-triggers/database-trigger
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
+import { isEdgeFunctionUrl } from '@/lib/edge-functions'
 
 export interface HookListProps {
   schema: string
@@ -38,7 +39,6 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
   const [, setSelectedHookIdToDelete] = useQueryState('delete', parseAsString.withDefault(''))
 
   const restUrl = project?.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const filteredHooks = (hooks ?? []).filter(
     (x) =>
@@ -54,9 +54,6 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
   return (
     <>
       {filteredHooks.map((x) => {
-        const isEdgeFunction = (url: string) =>
-          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
-          url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
         const [url, method] = x.function_args
 
         return (
@@ -66,7 +63,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                 <div>
                   <Image
                     src={
-                      isEdgeFunction(url)
+                      isEdgeFunctionUrl(url, ref, restUrl)
                         ? `${BASE_PATH}/img/function-providers/supabase-severless-function.png`
                         : `${BASE_PATH}/img/function-providers/http-request.png`
                     }
@@ -74,7 +71,9 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                     layout="fixed"
                     width="20"
                     height="20"
-                    title={isEdgeFunction(url) ? 'Supabase Edge Function' : 'HTTP Request'}
+                    title={
+                      isEdgeFunctionUrl(url, ref, restUrl) ? 'Supabase Edge Function' : 'HTTP Request'
+                    }
                   />
                 </div>
                 <p title={x.name} className="truncate">
