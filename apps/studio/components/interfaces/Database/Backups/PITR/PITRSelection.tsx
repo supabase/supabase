@@ -52,11 +52,7 @@ export const PITRSelection = () => {
 
   const hasReadReplicas = (databases ?? []).length > 1
 
-  const {
-    mutateAsync: restoreFromPitr,
-    isPending: isRestoring,
-    isSuccess: isSuccessPITR,
-  } = usePitrRestoreMutation({
+  const { mutateAsync: restoreFromPitr } = usePitrRestoreMutation({
     onSuccess: (_, variables) => {
       setTimeout(() => {
         setShowConfirmation(false)
