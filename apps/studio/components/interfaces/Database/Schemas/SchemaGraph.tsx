@@ -8,6 +8,7 @@ import {
   MiniMap,
   Node,
   OnSelectionChangeParams,
+  Panel,
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
@@ -56,7 +57,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useTablesQuery } from '@/data/tables/tables-query'
+import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
@@ -118,18 +119,23 @@ export const SchemaGraph = () => {
   })
 
   const {
-    data: tables = [],
+    data: tablesData,
     error: errorTables,
     isSuccess: isSuccessTables,
     isPending: isLoadingTables,
     isError: isErrorTables,
-  } = useTablesQuery({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: selectedSchema,
     includeColumns: true,
+    pageSize: 100,
   })
-  const hasNoTables = isSuccessSchemas && tables.length === 0
+  const tables = useMemo(() => tablesData?.pages.flat() ?? [], [tablesData])
+  const hasNoTables = isSuccessTables && isSuccessSchemas && tables.length === 0 && !hasNextPage
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
   const [, setStoredPositions] = useLocalStorage(
@@ -483,6 +489,18 @@ export const SchemaGraph = () => {
                     className="border rounded-md shadow-xs"
                   />
                   <SchemaGraphLegend />
+                  {hasNextPage && (
+                    <Panel position="bottom-center" className="mb-11!">
+                      <Button
+                        type="default"
+                        size="tiny"
+                        loading={isFetchingNextPage}
+                        onClick={() => fetchNextPage()}
+                      >
+                        Load more tables
+                      </Button>
+                    </Panel>
+                  )}
                 </ReactFlow>
               </div>
             </SchemaGraphContextProvider>

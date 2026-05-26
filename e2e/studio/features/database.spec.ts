@@ -10,6 +10,7 @@ import {
   createApiResponseWaiter,
   waitForApiResponse,
   waitForDatabaseToLoad,
+  waitForSchemaVisualizerToLoad,
 } from '../utils/wait-for-response.js'
 
 test.describe('Database', () => {
@@ -25,12 +26,7 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=tables-infinite-public')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
       await wait
 
@@ -69,7 +65,7 @@ test.describe('Database', () => {
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForDatabaseToLoad(page, ref, 'auth')
+      await waitForSchemaVisualizerToLoad(page, ref, 'auth')
       await expect(page.getByText('users', { exact: true })).toBeVisible()
       await expect(page.getByText('sso_providers', { exact: true })).toBeVisible()
       await expect(page.getByText('saml_providers', { exact: true })).toBeVisible()
@@ -86,12 +82,7 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=tables-infinite-public')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
       await wait
 
@@ -154,12 +145,7 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'tables?include_columns=true&included_schemas=public'
-      )
+      const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=tables-infinite-public')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
       await wait
 
