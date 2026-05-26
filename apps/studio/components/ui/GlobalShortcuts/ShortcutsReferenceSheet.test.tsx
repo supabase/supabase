@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ShortcutsReferenceSheet } from './ShortcutsReferenceSheet'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
-import type { ShortcutHotkeyMeta } from '@/state/shortcuts/useShortcut'
+import type { ShortcutHotkeyMeta } from '@/state/shortcuts/types'
 import { customRender } from '@/tests/lib/custom-render'
 
 const { mockUseHotkeyRegistrations } = vi.hoisted(() => ({
