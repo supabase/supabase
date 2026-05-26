@@ -40,6 +40,7 @@ import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectCreateMutation } from '@/data/projects/project-create-mutation'
 import {
+  isInDataApiRevokeTreatment,
   useDataApiRevokeOnCreateDefaultEnabled,
   useTrackDefaultPrivilegesExposure,
 } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
@@ -283,7 +284,9 @@ const CreateProject = () => {
   const track = useTrack()
   const snapshot = useIntegrationInstallationSnapshot()
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
-  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean | string>(
+    'dataApiRevokeOnCreateDefault'
+  )
   const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
     !isDataApiRevokeOnCreateDefault
   )
@@ -292,7 +295,7 @@ const CreateProject = () => {
   useEffect(() => {
     if (dataApiRevokeOnCreateDefaultFlag === undefined) return
     if (hasUserModifiedDataApiDefaultPrivileges.current) return
-    setDataApiDefaultPrivileges(!dataApiRevokeOnCreateDefaultFlag)
+    setDataApiDefaultPrivileges(!isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag))
   }, [dataApiRevokeOnCreateDefaultFlag])
 
   useTrackDefaultPrivilegesExposure({

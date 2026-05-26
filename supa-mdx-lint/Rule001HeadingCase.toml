@@ -159,6 +159,7 @@ may_uppercase = [
     "OpenID Connect",
     "Open ID Connect",
     "OpenMetrics",
+    "OpenTelemetry",
     "OrbStack",
     "OrioleDB",
     "PGAudit",

@@ -1,4 +1,6 @@
 import { SHORTCUT_REFERENCE_GROUPS } from './referenceGroups'
+import { ADVISORS_NAV_SHORTCUT_IDS, advisorsNavRegistry } from './registry/advisors-nav'
+import { ADVISORS_PAGE_SHORTCUT_IDS, advisorsPageRegistry } from './registry/advisors-page'
 import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
 import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
 import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
@@ -15,6 +17,14 @@ import {
 } from './registry/functions-overview'
 import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
 import { LOGS_PREVIEW_SHORTCUT_IDS, logsPreviewRegistry } from './registry/logs-preview'
+import {
+  OBSERVABILITY_NAV_SHORTCUT_IDS,
+  observabilityNavRegistry,
+} from './registry/observability-nav'
+import {
+  OBSERVABILITY_PAGE_SHORTCUT_IDS,
+  observabilityPageRegistry,
+} from './registry/observability-page'
 import {
   PLATFORM_WEBHOOKS_SHORTCUT_IDS,
   platformWebhooksRegistry,
@@ -124,6 +134,15 @@ export const SHORTCUT_IDS = {
   ...REALTIME_NAV_SHORTCUT_IDS,
   // Realtime Inspector page shortcuts
   ...REALTIME_INSPECTOR_SHORTCUT_IDS,
+
+  // Observability sub-page navigation chords
+  ...OBSERVABILITY_NAV_SHORTCUT_IDS,
+  // Observability shared page-action shortcuts
+  ...OBSERVABILITY_PAGE_SHORTCUT_IDS,
+  // Advisors sub-page navigation chords
+  ...ADVISORS_NAV_SHORTCUT_IDS,
+  // Advisors lint page shortcuts (tabs, refresh, close detail)
+  ...ADVISORS_PAGE_SHORTCUT_IDS,
 
   // LogsPreviewer shortcuts (Function Logs, Function Invocations, Logs Explorer)
   ...LOGS_PREVIEW_SHORTCUT_IDS,
@@ -392,7 +411,10 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   [SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE]: {
     id: SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
     label: 'Show all keyboard shortcuts',
-    sequence: ['Mod+/'],
+    // '?' isn't yet in @tanstack/hotkeys' PunctuationKey union (TanStack/hotkeys#19),
+    // but matches correctly at runtime — event.key === '?' regardless of layout.
+    // @ts-expect-error — remove this once upstream adds '?' to PunctuationKey.
+    sequence: ['Shift+?'],
     showInSettings: false,
     options: { ignoreInputs: true },
   },
@@ -447,6 +469,15 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   ...realtimeNavRegistry,
   // Realtime Inspector page shortcut registration
   ...realtimeInspectorRegistry,
+
+  // Observability sub-page navigation chord registration
+  ...observabilityNavRegistry,
+  // Observability shared page-action shortcut registration
+  ...observabilityPageRegistry,
+  // Advisors sub-page navigation chord registration
+  ...advisorsNavRegistry,
+  // Advisors lint page shortcut registration
+  ...advisorsPageRegistry,
 
   // LogsPreviewer shortcut registration
   ...logsPreviewRegistry,

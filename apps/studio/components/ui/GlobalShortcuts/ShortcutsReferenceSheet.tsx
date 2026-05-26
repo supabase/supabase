@@ -42,6 +42,7 @@ interface ShortcutGroup {
 const GROUP_LABELS: Record<string, string> = {
   ...SHORTCUT_REFERENCE_GROUP_LABELS,
   'action-bar': 'Actions',
+  'advisors-page': 'Advisors',
   'ai-assistant': 'AI Assistant',
   'auth-users': 'Auth Users',
   'command-menu': 'Command Menu',
