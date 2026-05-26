@@ -38,6 +38,7 @@ const FormSchema = z.object({
     (val) => {
       try {
         JSON.parse(val)
+        return true
       } catch {
         return false
       }
@@ -149,10 +150,8 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
           </Button>
           <Button
             type="primary"
-            onClick={() => {
-              const values = form.getValues()
-              onSubmit(values)
-            }}
+            htmlType="submit"
+            form={FORM_ID}
             disabled={isPending}
             loading={isPending}
           >
