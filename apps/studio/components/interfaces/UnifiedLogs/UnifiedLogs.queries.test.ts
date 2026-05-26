@@ -179,7 +179,7 @@ describe('UnifiedLogs.queries.bq', () => {
   })
 
   it('rejects keys with non-identifier characters', () => {
-    // A key like "foo; DROP TABLE" fails the bqIdent regex (the `;` is not
+    // A key like "foo; DROP TABLE" fails the quotedIdent regex (the `;` is not
     // in `[A-Za-z_][A-Za-z0-9_]*`), so the predicate is dropped entirely.
     const sql = getUnifiedLogsQueryBQ({ ...baseSearch, 'foo; DROP TABLE x': 'y' } as any)
     expect(sql).not.toContain('DROP TABLE')
