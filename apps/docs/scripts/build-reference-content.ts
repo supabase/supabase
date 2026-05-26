@@ -20,6 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const DOCS_DIR = join(__dirname, '..')
 const SPEC_DIR = join(DOCS_DIR, 'spec/reference')
 const OUTPUT_DIR = join(DOCS_DIR, 'content/reference')
+const REF_DOCS_DIR = join(DOCS_DIR, 'docs/ref')
 
 type ContentPart = { kind: string; text?: string }
 
@@ -63,7 +64,10 @@ interface FunctionEntry {
 
 interface FunctionsEntry {
   id: string
-  $ref: string
+  // Either a `$ref` (points at a typeSpec entry) OR rich inline content
+  // (description, examples, …) shovelled in from a .json partial body.
+  $ref?: string
+  [key: string]: unknown
 }
 
 interface TypeSpecMethod {
@@ -120,6 +124,18 @@ interface PartialEntry {
   name: string
   title: string
   ref?: string
+  /**
+   * `kind` distinguishes how the partial contributes to the build:
+   *   - `markdown`: an `.md`/`.mdx` partial. Rendered as a `type: 'markdown'`
+   *     section (or `type: 'function'` when a frontmatter `ref` is present).
+   *   - `function`: a `.json` partial whose body (description, examples, …)
+   *     is appended to functions.json so the renderer can display it.
+   */
+  kind: 'markdown' | 'function'
+  /** Raw parsed JSON body for `kind === 'function'` partials. */
+  body?: Record<string, unknown>
+  /** Raw frontmatter + body for `kind === 'markdown'` partials. */
+  mdxRaw?: string
 }
 
 /** Lowercases a string and collapses internal whitespace to hyphens for use as a URL slug. */
@@ -139,12 +155,15 @@ function reorder<T>(items: T[], order: string[] | undefined, key: (item: T) => s
 }
 
 /**
- * Builds a bySlug entry for a partial file. When the partial declares a `ref`
- * in its frontmatter, it acts as a named function (linked to TypeDoc-derived
- * code) and is emitted as `type: 'function'`; otherwise it's plain `markdown`.
+ * Builds a bySlug entry for a partial file:
+ *   - `.json` partials always render as `type: 'function'` (their body feeds
+ *     functions.json).
+ *   - `.md`/`.mdx` partials with a frontmatter `ref` render as `type: 'function'`
+ *     (linked to TypeDoc-derived code via the ref).
+ *   - All other `.md`/`.mdx` partials render as plain `type: 'markdown'`.
  */
 const partialEntry = (p: PartialEntry): BySlugMarkdown | BySlugFunction =>
-  p.ref
+  p.kind === 'function' || p.ref
     ? { id: p.name, title: p.title, slug: p.name, type: 'function' }
     : { id: p.name, title: p.title, slug: p.name, type: 'markdown' }
 
@@ -298,9 +317,11 @@ async function readConfig(versionDir: string): Promise<VersionConfig> {
 }
 
 /**
- * Reads every `.mdx` / `.md` file from the `partials/` subdirectory, parses
- * frontmatter for a `title`, and returns the entries sorted alphabetically by
- * file name. Returns `[]` if `partials/` doesn't exist.
+ * Reads every `.mdx` / `.md` / `.json` file from the `partials/` subdirectory.
+ * Markdown partials (`.md`, `.mdx`) have their frontmatter parsed for `title`
+ * and `ref`; JSON partials are parsed as objects and their full body kept so
+ * it can be emitted into functions.json. Returns alphabetically-sorted entries
+ * (case-insensitive); returns `[]` if `partials/` doesn't exist.
  */
 async function readPartials(versionDir: string): Promise<PartialEntry[]> {
   const partialsDir = join(versionDir, 'partials')
@@ -315,13 +336,22 @@ async function readPartials(versionDir: string): Promise<PartialEntry[]> {
   const partials: PartialEntry[] = []
   for (const file of files) {
     const ext = extname(file)
-    if (ext !== '.mdx' && ext !== '.md') continue
-    const raw = await readFile(join(partialsDir, file), 'utf-8')
-    const { data } = matter(raw)
     const name = file.slice(0, -ext.length)
-    const title = typeof data.title === 'string' ? data.title : name
-    const ref = typeof data.ref === 'string' ? data.ref : undefined
-    partials.push({ name, title, ref })
+    const raw = await readFile(join(partialsDir, file), 'utf-8')
+
+    if (ext === '.mdx' || ext === '.md') {
+      // `trimStart()` so frontmatter is parsed even when the file accidentally
+      // starts with blank lines before `---`.
+      const trimmed = raw.trimStart()
+      const { data } = matter(trimmed)
+      const title = typeof data.title === 'string' ? data.title : name
+      const ref = typeof data.ref === 'string' ? data.ref : undefined
+      partials.push({ name, title, ref, kind: 'markdown', mdxRaw: trimmed })
+    } else if (ext === '.json') {
+      const body = JSON.parse(raw) as Record<string, unknown>
+      const title = typeof body.title === 'string' ? body.title : name
+      partials.push({ name, title, kind: 'function', body })
+    }
   }
 
   // Default to alphabetical so `reorder` can place ranked items first and leave
@@ -352,18 +382,40 @@ function buildBySlug(
   const sections: SectionEntry[] = []
   const functionsList: FunctionsEntry[] = []
 
-  for (const p of reorder(partials, config.partialsOrder, (x) => x.name)) {
-    const entry = partialEntry(p)
-    bySlug[p.name] = entry
-    sections.push(entry)
-    if (p.ref) functionsList.push({ id: p.name, $ref: p.ref })
-  }
-
   const excludeCats = new Set(config.excludeCategories ?? [])
   const excludeDefs = new Set(config.excludeDefinitions ?? [])
   const filtered = functions.filter(
     ({ name, category }) => !excludeCats.has(category) && !excludeDefs.has(name)
   )
+
+  // Bucket partials by where they belong. A partial filename that matches a
+  // category title slug (e.g. `database.md`) attaches to that category; one
+  // that matches a subcategory title slug (e.g. `using-filters.json`) attaches
+  // to that subcategory; everything else stays at the top level.
+  const categorySlugs = new Set(filtered.map(({ category }) => slugifyTag(category)))
+  const subcategorySlugs = new Set(
+    filtered.filter((f) => f.subcategory).map((f) => slugifyTag(f.subcategory!))
+  )
+  const partialsByCategory = new Map<string, PartialEntry>()
+  const partialsBySubcategory = new Map<string, PartialEntry>()
+  const topLevelPartials: PartialEntry[] = []
+  for (const p of partials) {
+    if (subcategorySlugs.has(p.name)) partialsBySubcategory.set(p.name, p)
+    else if (categorySlugs.has(p.name)) partialsByCategory.set(p.name, p)
+    else topLevelPartials.push(p)
+  }
+
+  const writePartial = (p: PartialEntry, items: SectionEntry[]) => {
+    const entry = partialEntry(p)
+    bySlug[p.name] = entry
+    items.push(entry)
+    if (p.kind === 'function') functionsList.push({ id: p.name, ...p.body })
+    else if (p.ref) functionsList.push({ id: p.name, $ref: p.ref })
+  }
+
+  for (const p of reorder(topLevelPartials, config.partialsOrder, (x) => x.name)) {
+    writePartial(p, sections)
+  }
 
   type CategoryGroup = {
     title: string
@@ -417,23 +469,58 @@ function buildBySlug(
     bySlug[product] = cat
     sections.push({ ...cat, items: catItems })
 
+    const categoryPartial = partialsByCategory.get(product)
+    if (categoryPartial) writePartial(categoryPartial, catItems)
+
     for (const fn of [...group.withoutSub].sort(byName)) writeFunction(fn, product, catItems)
 
     const sortedSubs = [...group.bySub.entries()].sort(([a], [b]) =>
       a.toLowerCase().localeCompare(b.toLowerCase())
     )
     for (const [subcategory, fns] of sortedSubs) {
-      const subSlug = `${product}-${slugifyTag(subcategory)}`
+      const subKey = slugifyTag(subcategory)
+      const subSlug = `${product}-${subKey}`
       const sub = subcategoryEntry(subSlug, subcategory, product)
       const subItems: SectionEntry[] = []
       bySlug[subSlug] = sub
       catItems.push({ ...sub, items: subItems })
+
+      const subcategoryPartial = partialsBySubcategory.get(subKey)
+      if (subcategoryPartial) writePartial(subcategoryPartial, subItems)
 
       for (const fn of [...fns].sort(byName)) writeFunction(fn, product, subItems)
     }
   }
 
   return { bySlug, sections, functionsList }
+}
+
+/**
+ * For each markdown-kind partial without a `ref`, writes its raw body
+ * (frontmatter + content) to `docs/ref/<library>/<name>.mdx` if that file
+ * does not already exist. The renderer's `getRefMarkdown` loads body text
+ * from this location, so new partials added under `spec/reference/.../partials/`
+ * become renderable without manual file shuffling. Existing files are left
+ * alone to preserve hand-maintained frontmatter (e.g. `hideTitle`).
+ */
+async function writeNewMarkdownPartials(library: string, partials: PartialEntry[]): Promise<void> {
+  const markdownPartials = partials.filter((p) => p.kind === 'markdown' && p.mdxRaw && !p.ref)
+  if (markdownPartials.length === 0) return
+
+  const outDir = join(REF_DOCS_DIR, library)
+  await mkdir(outDir, { recursive: true })
+
+  await Promise.all(
+    markdownPartials.map(async (p) => {
+      const target = join(outDir, `${p.name}.mdx`)
+      try {
+        // `wx` flag fails with EEXIST if the file is already there.
+        await writeFile(target, p.mdxRaw!, { flag: 'wx' })
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code !== 'EEXIST') throw err
+      }
+    })
+  )
 }
 
 /**
@@ -483,6 +570,12 @@ async function processVersion(library: string, version: string): Promise<void> {
     writeFile(join(outputDir, 'functions.json'), JSON.stringify(functionsList)),
     writeFile(join(outputDir, 'typeSpec.json'), JSON.stringify(collected.typeSpec)),
   ])
+
+  // The page renderer's `MarkdownSection` loads body text by id from
+  // `docs/ref/<library>/<id>.mdx`. Seed that file from any markdown partial
+  // whose runtime counterpart doesn't already exist (we don't overwrite
+  // hand-maintained legacy partials like introduction.mdx).
+  await writeNewMarkdownPartials(library, partials)
 
   const typeSpecMethods = Object.keys(collected.typeSpec.methods).length
   const typeSpecVariables = Object.keys(collected.typeSpec.variables).length
