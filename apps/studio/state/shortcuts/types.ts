@@ -136,8 +136,6 @@ export type RegistryDefinations<T extends string> = Record<T, ShortcutDefinition
 /**
  * Shape we store on each registration's `options.meta` so the Keyboard
  * shortcuts reference sheet can read it back via `useHotkeyRegistrations()`.
- * The library's `HotkeyMeta` is open for declaration merging, but we don't
- * own a direct dep on `@tanstack/hotkeys`, so we keep the extension local.
  */
 export interface ShortcutHotkeyMeta extends HotkeyMeta {
   /**
