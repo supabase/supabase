@@ -134,7 +134,12 @@ const ServiceCell = ({
           {data.isLoading ? (
             <Skeleton className="h-3 w-20 mt-0.5" />
           ) : (
-            <span className="text-foreground text-xs tabular-nums truncate">
+            <span
+              className={cn(
+                'text-xs truncate',
+                data.total === 0 ? 'text-foreground-lighter' : 'text-foreground'
+              )}
+            >
               {getSubtitle(data)}
             </span>
           )}
