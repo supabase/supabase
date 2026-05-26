@@ -82,7 +82,7 @@ const BucketPage: NextPageWithLayout = () => {
                 asChild
                 type="outline"
                 size="tiny"
-                icon={<Shield size={14} strokeWidth={1.5} />}
+                icon={<Shield size={14} />}
                 iconRight={
                   policyCount > 0 ? (
                     <span className="w-4 h-4 bg-surface-200 text-foreground-light text-xs rounded-full flex items-center justify-center font-medium">
@@ -99,11 +99,7 @@ const BucketPage: NextPageWithLayout = () => {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    type="outline"
-                    size="tiny"
-                    iconRight={<ChevronDown size={14} strokeWidth={1.5} />}
-                  >
+                  <Button type="outline" size="tiny" iconRight={<ChevronDown size={14} />}>
                     Edit bucket
                   </Button>
                 </DropdownMenuTrigger>
@@ -112,7 +108,7 @@ const BucketPage: NextPageWithLayout = () => {
                     className="flex items-center space-x-2"
                     onClick={() => setShowEditModal(true)}
                   >
-                    <Settings size={12} strokeWidth={1.5} />
+                    <Settings size={12} />
                     <p>Bucket settings</p>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -120,14 +116,14 @@ const BucketPage: NextPageWithLayout = () => {
                     className="flex items-center space-x-2"
                     onClick={() => setShowEmptyModal(true)}
                   >
-                    <FolderOpen size={12} strokeWidth={1.5} />
+                    <FolderOpen size={12} />
                     <p>Empty bucket</p>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="flex items-center space-x-2"
                     onClick={() => setShowDeleteModal(true)}
                   >
-                    <Trash2 size={12} strokeWidth={1.5} />
+                    <Trash2 size={12} />
                     <p>Delete bucket</p>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

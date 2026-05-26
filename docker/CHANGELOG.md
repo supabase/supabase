@@ -13,7 +13,11 @@ See per-service updates below for details.
 
 ## Unreleased
 
-⚠️ **Upcoming default changes:** In a future release, several defaults will change: Postgres 15 → 17, Kong → Envoy, MinIO → RustFS, Analytics/Vector removed from the default stack, and the new API keys and authentication replacing the "legacy" architecture. Most of these are already available as optional configurations.
+⚠️ **Upcoming changes:** Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates:
+
+- [Making Analytics and Vector opt-in](https://github.com/orgs/supabase/discussions/46084)
+- [Upgrading from PG 15 to 17 (breaking change)](https://github.com/orgs/supabase/discussions/46080)
+- [Switching Studio from `supabase_admin` to `postgres` (breaking change)](https://github.com/orgs/supabase/discussions/46081)
 
 ---
 

@@ -68,6 +68,12 @@ export const examples: Registry = [
     files: ['example/collapsible-alert-demo.tsx'],
   },
   {
+    name: 'collapsible-card-section-demo',
+    type: 'components:example',
+    registryDependencies: ['collapsible-card-section'],
+    files: ['example/collapsible-card-section-demo.tsx'],
+  },
+  {
     name: 'alert-dialog-demo',
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],
@@ -78,6 +84,18 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],
     files: ['example/alert-dialog-close-only.tsx'],
+  },
+  {
+    name: 'alert-dialog-async',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button'],
+    files: ['example/alert-dialog-async.tsx'],
+  },
+  {
+    name: 'alert-dialog-async-error',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button', 'admonition'],
+    files: ['example/alert-dialog-async-error.tsx'],
   },
   {
     name: 'alert-dialog-destructive',

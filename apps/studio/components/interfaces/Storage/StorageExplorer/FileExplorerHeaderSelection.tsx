@@ -34,7 +34,7 @@ export const FileExplorerHeaderSelection = () => {
           <Button
             type="default"
             size="tiny"
-            icon={<Download size={12} strokeWidth={1.5} />}
+            icon={<Download size={12} />}
             onClick={async () => {
               if (selectedItems.length === 1) {
                 await downloadFile(selectedItems[0])
@@ -55,7 +55,7 @@ export const FileExplorerHeaderSelection = () => {
           <ButtonTooltip
             type="default"
             size="tiny"
-            icon={<Trash2 size={12} strokeWidth={1.5} />}
+            icon={<Trash2 size={12} />}
             disabled={!canUpdateFiles}
             onClick={() => setSelectedItemsToDelete(selectedItems)}
             tooltip={{
@@ -79,7 +79,7 @@ export const FileExplorerHeaderSelection = () => {
           <ButtonTooltip
             type="default"
             size="tiny"
-            icon={<Move size={12} strokeWidth={1.5} />}
+            icon={<Move size={12} />}
             disabled={!canUpdateFiles}
             onClick={() => setSelectedItemsToMove(selectedItems)}
             tooltip={{
@@ -96,7 +96,7 @@ export const FileExplorerHeaderSelection = () => {
         <Button
           type="text"
           size="tiny"
-          icon={<X size={12} strokeWidth={1.5} />}
+          icon={<X size={12} />}
           title="Clear selection"
           className="px-1.5 text-foreground-lighter hover:text-foreground"
           onClick={() => clearSelectedItems()}

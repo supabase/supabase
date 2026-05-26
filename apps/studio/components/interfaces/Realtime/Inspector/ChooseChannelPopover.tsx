@@ -11,7 +11,10 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -140,25 +143,25 @@ export const ChooseChannelPopover = ({
                       <FormItem className="flex flex-col gap-y-2">
                         <div className="flex flex-col gap-y-1">
                           <label className="text-foreground text-xs">Name of channel</label>
-                          <div className="flex flex-row">
+                          <InputGroup>
                             <FormControl>
-                              <Input
+                              <InputGroupInput
                                 {...field}
                                 autoComplete="off"
                                 className="rounded-r-none text-xs px-2.5 py-1 h-auto"
                                 placeholder="Enter a channel name"
                               />
                             </FormControl>
-
-                            <Button
-                              type="primary"
-                              className="rounded-l-none"
-                              disabled={form.getValues().channel.length === 0}
-                              onClick={() => onSubmit()}
-                            >
-                              Listen to channel
-                            </Button>
-                          </div>
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                type="primary"
+                                disabled={form.getValues().channel.length === 0}
+                                onClick={() => onSubmit()}
+                              >
+                                Listen to channel
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          </InputGroup>
                         </div>
                         <FormDescription className="text-xs text-foreground-lighter">
                           The channel you initialize with the Supabase Realtime client. Learn more

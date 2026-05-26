@@ -170,7 +170,7 @@ export function JitDbAccessRulesTable({
                             aria-label="More actions"
                             type="default"
                             size="tiny"
-                            className="w-7"
+                            className="w-7 hit-area-2"
                             disabled={!canUpdate || disableActions}
                           />
                         </DropdownMenuTrigger>

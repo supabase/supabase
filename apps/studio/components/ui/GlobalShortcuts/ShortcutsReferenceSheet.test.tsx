@@ -74,6 +74,14 @@ const ACTIVE_SURFACE_SHORTCUT_IDS = [
   SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
 ] satisfies ShortcutId[]
 
+const ACTIVE_PLATFORM_WEBHOOKS_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.PLATFORM_WEBHOOKS_EDIT_ENDPOINT,
+  SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_ENDPOINT_URL,
+  SHORTCUT_IDS.PLATFORM_WEBHOOKS_RETRY_DELIVERY,
+  SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_PAYLOAD,
+] satisfies ShortcutId[]
+
 let sequenceIdCounter = 0
 
 const buildSequenceRegistration = (id: ShortcutId): SequenceRegistrationView => {
@@ -240,6 +248,17 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.queryByText('sql-editor')).not.toBeInTheDocument()
     expect(screen.queryByText('storage-buckets')).not.toBeInTheDocument()
     expect(screen.queryByText('storage-explorer')).not.toBeInTheDocument()
+  })
+
+  it('shows the platform webhooks section with human labels when webhooks shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_PLATFORM_WEBHOOKS_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Platform Webhooks')).toBeInTheDocument()
+    expect(screen.getByText('Edit endpoint')).toBeInTheDocument()
+    expect(screen.getByText('Copy endpoint URL')).toBeInTheDocument()
+    expect(screen.getByText('Retry delivery')).toBeInTheDocument()
+    expect(screen.getByText('Copy payload')).toBeInTheDocument()
+    expect(screen.queryByText('platform-webhooks')).not.toBeInTheDocument()
   })
 
   it('does not show inactive database shortcuts in search results', async () => {

@@ -35,7 +35,7 @@ import {
 } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
-import { ExposedSchemaSelector } from './ExposedSchemaSelector'
+import { ExposedSchemaSelector, internalSchemasCannotExpose } from './ExposedSchemaSelector'
 import { HardenAPIModal } from './HardenAPIModal'
 import { ExposedFunctionSelector } from '@/components/interfaces/Settings/API/ExposedFunctionSelector'
 import { ExposedTableSelector } from '@/components/interfaces/Settings/API/ExposedTableSelector'
@@ -264,6 +264,10 @@ export const PostgrestConfig = () => {
     () => watchedDbSchema.filter((schema) => !allSchemas.some((s) => s.name === schema)),
     [allSchemas, watchedDbSchema]
   )
+  const protectedSchemasExposed = useMemo(
+    () => watchedDbSchema.filter((schema) => internalSchemasCannotExpose.has(schema)),
+    [watchedDbSchema]
+  )
 
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
@@ -287,9 +291,6 @@ export const PostgrestConfig = () => {
                       layout="flex-row-reverse"
                       label="Exposed schemas"
                       description="Select schemas to include in the Data API. Schemas must be included before tables can be exposed."
-                      error={
-                        missingExposedSchema.length > 0 ? 'Some exposed schemas are missing' : null
-                      }
                     >
                       <ExposedSchemaSelector
                         selectedSchemas={watchedDbSchema}
@@ -309,6 +310,19 @@ export const PostgrestConfig = () => {
                           }
                         }}
                       />
+                      {protectedSchemasExposed.length > 0 ? (
+                        <p className="mt-1 text-sm text-warning">
+                          {protectedSchemasExposed.length} protected schema
+                          {protectedSchemasExposed.length > 1 ? 's' : ''} is currently exposed and
+                          should be removed
+                        </p>
+                      ) : missingExposedSchema.length > 0 ? (
+                        <p className="mt-1 text-sm text-foreground-lighter">
+                          {missingExposedSchema.length} exposed schema
+                          {missingExposedSchema.length > 1 ? 's' : ''} does not exist — safe to
+                          remove
+                        </p>
+                      ) : null}
                     </FormItemLayout>
 
                     <FormItemLayout

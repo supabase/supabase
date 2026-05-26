@@ -319,10 +319,13 @@ export interface ProjectCreationDefaultPrivilegesExposedEvent {
     dataApiDefaultPrivileges: boolean
     /**
      * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
-     * true = revoke cohort (checkbox defaulted to unchecked)
-     * false = control cohort (checkbox defaulted to checked)
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = revoke cohort (checkbox defaulted to unchecked)
+     * false = outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
      */
-    dataApiRevokeOnCreateDefaultEnabled: boolean
+    dataApiRevokeOnCreateDefaultEnabled: boolean | string
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -381,14 +384,17 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     dataApiDefaultPrivilegesGranted?: boolean
     /**
-     * Whether the dataApiRevokeOnCreateDefault PostHog flag was enabled for this user.
+     * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at submission time.
      * Controls only the default checkbox state of "Automatically expose new tables and functions"
      * at project creation. Tracking it lets us correlate flag cohort with user choice.
-     * true = user is in the staged rollout cohort (checkbox defaulted to unchecked)
+     * Accepts boolean (current rollout shape) or string (post-multivariate-migration
+     * variant name, e.g. 'test' / 'control'). See GROWTH-877 for the migration plan.
+     * true | 'test' = user is in the treatment arm (checkbox defaulted to unchecked)
      * false = user is outside the rollout (checkbox defaulted to checked)
+     * 'control' = in-experiment control arm (checkbox defaulted to checked)
      * omitted = PostHog flags had not loaded at the time of project creation
      */
-    dataApiRevokeOnCreateDefaultEnabled?: boolean
+    dataApiRevokeOnCreateDefaultEnabled?: boolean | string
   }
   groups: TelemetryGroups
 }
@@ -1916,6 +1922,8 @@ export interface HomeConnectActionClickedEvent {
   groups: TelemetryGroups
 }
 
+export type ConnectSheetSource = 'header_button' | 'connect_section' | 'keyboard_shortcut'
+
 /**
  * User opened the ConnectSheet panel.
  *
@@ -1929,7 +1937,7 @@ export interface ConnectSheetOpenedEvent {
     /**
      * Where the sheet was opened from
      */
-    source: 'header_button' | 'connect_section' | 'keyboard_shortcut'
+    source: ConnectSheetSource
   }
   groups: TelemetryGroups
 }

@@ -219,7 +219,7 @@ export const GitHubIntegrationConnectionForm = ({
         workdir: data.supabaseDirectory,
         supabase_changes_only: data.supabaseChangesOnly,
         branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr,
+        new_branch_per_pr: data.new_branch_per_pr ?? false,
       },
     })
 
@@ -268,7 +268,7 @@ export const GitHubIntegrationConnectionForm = ({
         workdir: data.supabaseDirectory,
         supabase_changes_only: data.supabaseChangesOnly,
         branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr,
+        new_branch_per_pr: data.new_branch_per_pr ?? false,
       },
     })
 
@@ -460,7 +460,7 @@ export const GitHubIntegrationConnectionForm = ({
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Deploy to production"
-                            description="Deploy changes to production on push including PR merges"
+                            description="Apply changes to your production database when you merge into your configured production GitHub branch"
                           >
                             <FormControl>
                               <Switch
