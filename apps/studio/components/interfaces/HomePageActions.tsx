@@ -20,6 +20,7 @@ import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infini
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -87,6 +88,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
           className="w-full sm:w-32 md:w-64"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
+          onKeyDown={onSearchInputEscape(search, (v) => setSearch(v))}
           actions={[
             search && (
               <Button

@@ -30,17 +30,11 @@ import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
 
 function PrivateAppsContent() {
   const { apps, isLoading } = usePrivateApps()
   const [showCreate, setShowCreate] = useState(false)
-
-  // covers the empty-state button, which isn't wrapped in <Shortcut>
-  useShortcut(SHORTCUT_IDS.ORG_PRIVATE_APPS_CREATE, () => setShowCreate(true), {
-    enabled: !isLoading && apps.length === 0 && !showCreate,
-  })
 
   return (
     <>
@@ -84,7 +78,10 @@ function PrivateAppsContent() {
             )}
           </PageSectionMeta>
           <PageSectionContent>
-            <AppsList onCreateApp={() => setShowCreate(true)} />
+            <AppsList
+              onCreateApp={() => setShowCreate(true)}
+              createShortcutId={SHORTCUT_IDS.ORG_PRIVATE_APPS_CREATE}
+            />
           </PageSectionContent>
         </PageSection>
       </PageContainer>
