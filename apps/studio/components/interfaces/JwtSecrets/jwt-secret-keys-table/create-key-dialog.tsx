@@ -233,12 +233,17 @@ export const CreateKeyDialog = ({
         <Shortcut
           id={SHORTCUT_IDS.JWT_KEYS_SUBMIT_STANDBY}
           onTrigger={handleAddNewStandbyKey}
-          options={{ enabled: !isPendingMutation && !privateKeyMessage }}
+          options={{
+            enabled:
+              !isPendingMutation && !privateKeyMessage && (!isBYOK || privateKey.trim().length > 0),
+          }}
           side="top"
         >
           <Button
             onClick={() => handleAddNewStandbyKey()}
-            disabled={isPendingMutation || !!privateKeyMessage}
+            disabled={
+              isPendingMutation || !!privateKeyMessage || (isBYOK && privateKey.trim().length === 0)
+            }
             loading={isPendingMutation}
           >
             Create standby key
