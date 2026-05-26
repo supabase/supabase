@@ -1,5 +1,4 @@
 import { type Table as TTable } from '@tanstack/react-table'
-import { capitalize } from 'lodash'
 import { cn } from 'ui'
 
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
