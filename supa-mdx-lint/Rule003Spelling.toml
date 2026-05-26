@@ -186,6 +186,7 @@ allow_list = [
     "Codium",
     "Cognito",
     "Colab",
+    "Corepack",
     "Cyberduck",
     "DBeaver",
     "Database Functions?",

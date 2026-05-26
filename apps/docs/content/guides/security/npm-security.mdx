@@ -278,7 +278,7 @@ Move quickly. Order of operations:
 - **Provenance attestations.** Every release of `@supabase/supabase-js` and its sibling packages ships with a sigstore attestation tying the tarball to its source commit and workflow run. Verify with `npm audit signatures`.
 - **No `postinstall` / `preinstall` scripts** in any of the six core packages (`auth-js`, `postgrest-js`, `realtime-js`, `storage-js`, `functions-js`, `supabase-js`). You can safely install with `--ignore-scripts`.
 - **Fixed-version monorepo releases.** All packages release together with identical versions, so when you pin one, you pin them all.
-- Multi-step approval of releases, with usage of GitHub environments.
+- **Multi-step release approval via GitHub environments.** Stable publishes from `master` run inside a protected GitHub environment that requires explicit approval from a maintainer before the publish job can access npm OIDC credentials.
 
 If something looks wrong with a published `@supabase/*` package, report it via the [Supabase security policy](https://github.com/supabase/supabase-js/security).
 
