@@ -1,16 +1,7 @@
 import dayjs from 'dayjs'
-import { Info } from 'lucide-react'
 import { type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
   Button,
   Card,
   CardContent,
@@ -108,14 +99,6 @@ export function ApiAuthorizationMainView({
       }
       title={`Authorize ${requester.name}`}
       description="This application wants to access your Supabase account"
-      subtitle={
-        <PublisherInfoDialog
-          domain={requester.domain}
-          name={requester.name}
-          redirectUrl={externalRedirectUrl}
-        />
-      }
-      subtitleClassName="leading-none"
     >
       <div className="px-6 pb-6">
         <span className="sr-only">Authorize API access for {requester.name}</span>
@@ -161,54 +144,6 @@ export function ApiAuthorizationMainView({
         </div>
       </div>
     </InterstitialLayout>
-  )
-}
-
-function PublisherInfoDialog({
-  domain,
-  name,
-  redirectUrl,
-}: {
-  domain: string
-  name: string
-  redirectUrl?: string
-}): ReactNode {
-  return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <button
-          type="button"
-          className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1 rounded-full border border-muted py-1 pl-2.5 pr-1.5 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
-        >
-          <span>{domain}</span>
-          <Info aria-hidden className="size-3.5 text-foreground-muted transition-colors" />
-        </button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>About this publisher</AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="space-y-3">
-              <p>
-                <code className="text-code-inline">{domain}</code> is the publisher of{' '}
-                <span className="font-medium text-foreground">{name}</span>. Only continue if you
-                trust this source.
-              </p>
-              {redirectUrl && (
-                <p>
-                  After authorizing, you&apos;ll be redirected to{' '}
-                  <span className="break-all font-medium text-foreground">{redirectUrl}</span> to
-                  complete the connection.
-                </p>
-              )}
-            </div>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogAction>Got it</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   )
 }
 
