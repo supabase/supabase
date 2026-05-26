@@ -249,6 +249,7 @@ export const SchemaGraph = () => {
   })
 
   const isFirstLoad = useRef(true)
+  const fitViewOnNextLayout = useRef(false)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PGSchema
@@ -256,8 +257,9 @@ export const SchemaGraph = () => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
         // Prevent resetting a view after first load to avoid layout changes after editing a column
-        if (isFirstLoad.current) {
+        if (isFirstLoad.current || fitViewOnNextLayout.current) {
           isFirstLoad.current = false
+          fitViewOnNextLayout.current = false
           setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
         }
       })
@@ -495,7 +497,10 @@ export const SchemaGraph = () => {
                         type="default"
                         size="tiny"
                         loading={isFetchingNextPage}
-                        onClick={() => fetchNextPage()}
+                        onClick={() => {
+                          fitViewOnNextLayout.current = true
+                          fetchNextPage()
+                        }}
                       >
                         Load more tables
                       </Button>
