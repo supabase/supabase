@@ -416,7 +416,11 @@ const BURSTABLE_IO_VARIANTS: ReadonlySet<ComputeInstanceAddonVariantId> = new Se
 ])
 
 export const hasBurstableIO = (computeSize: ProjectDetail['infra_compute_size']): boolean => {
-  return BURSTABLE_IO_VARIANTS.has(mapComputeSizeNameToAddonVariantId(computeSize))
+  // Don't fall back to the nano default that mapComputeSizeNameToAddonVariantId
+  // uses: if compute metadata is missing or unrecognized, treat the project as
+  // non-burstable so we don't accidentally surface burst-only charts.
+  if (!computeSize || !isInfraInstanceSize(computeSize)) return false
+  return BURSTABLE_IO_VARIANTS.has(infraToAddonVariant[computeSize])
 }
 
 const addonVariantToComputeSize: Record<ComputeInstanceAddonVariantId, ComputeInstanceSize> = {
