@@ -29,6 +29,7 @@ export const orgSettingsNavRegistry: RegistryDefinations<OrgSettingsNavShortcutI
     sequence: ['S', 'G'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ORG_SETTINGS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_SECURITY]: {
     id: ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_SECURITY,
@@ -36,6 +37,7 @@ export const orgSettingsNavRegistry: RegistryDefinations<OrgSettingsNavShortcutI
     sequence: ['S', 'C'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ORG_SETTINGS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_SSO]: {
     id: ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_SSO,
@@ -43,6 +45,7 @@ export const orgSettingsNavRegistry: RegistryDefinations<OrgSettingsNavShortcutI
     sequence: ['S', 'S'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ORG_SETTINGS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_APPS]: {
     id: ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_APPS,
@@ -50,6 +53,7 @@ export const orgSettingsNavRegistry: RegistryDefinations<OrgSettingsNavShortcutI
     sequence: ['S', 'A'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ORG_SETTINGS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_PRIVATE_APPS]: {
     id: ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_PRIVATE_APPS,
@@ -57,6 +61,7 @@ export const orgSettingsNavRegistry: RegistryDefinations<OrgSettingsNavShortcutI
     sequence: ['S', 'P'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ORG_SETTINGS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_WEBHOOKS]: {
     id: ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_WEBHOOKS,
@@ -64,6 +69,7 @@ export const orgSettingsNavRegistry: RegistryDefinations<OrgSettingsNavShortcutI
     sequence: ['S', 'W'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ORG_SETTINGS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT]: {
     id: ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT,
@@ -71,6 +77,7 @@ export const orgSettingsNavRegistry: RegistryDefinations<OrgSettingsNavShortcutI
     sequence: ['S', 'L'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ORG_SETTINGS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_DOCUMENTS]: {
     id: ORG_SETTINGS_NAV_SHORTCUT_IDS.NAV_ORG_SETTINGS_DOCUMENTS,
@@ -78,5 +85,6 @@ export const orgSettingsNavRegistry: RegistryDefinations<OrgSettingsNavShortcutI
     sequence: ['S', 'D'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ORG_SETTINGS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
 }

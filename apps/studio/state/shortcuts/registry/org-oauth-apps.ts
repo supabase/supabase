@@ -15,6 +15,7 @@ export const orgOAuthAppsRegistry: RegistryDefinations<OrgOAuthAppsShortcutId> =
     label: 'Publish OAuth app',
     sequence: ['Shift+N'],
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.ORG_OAUTH_APPS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_OAUTH_APPS_SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT]: {
     id: ORG_OAUTH_APPS_SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT,

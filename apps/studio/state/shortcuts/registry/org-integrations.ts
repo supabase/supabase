@@ -14,5 +14,6 @@ export const orgIntegrationsRegistry: RegistryDefinations<OrgIntegrationsShortcu
     label: 'Add project connection',
     sequence: ['Shift+N'],
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.ORG_INTEGRATIONS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
 }

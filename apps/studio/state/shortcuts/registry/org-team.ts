@@ -14,6 +14,7 @@ export const orgTeamRegistry: RegistryDefinations<OrgTeamShortcutId> = {
     label: 'Invite members',
     sequence: ['Shift+N'],
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.ORG_TEAM,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_TEAM_SHORTCUT_IDS.ORG_TEAM_INVITE_SUBMIT]: {
     id: ORG_TEAM_SHORTCUT_IDS.ORG_TEAM_INVITE_SUBMIT,

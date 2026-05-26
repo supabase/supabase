@@ -14,5 +14,6 @@ export const orgAuditLogsRegistry: RegistryDefinations<OrgAuditLogsShortcutId> =
     label: 'Refresh audit logs',
     sequence: ['Shift+R'],
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.ORG_AUDIT_LOGS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
 }

@@ -14,5 +14,6 @@ export const orgPrivateAppsRegistry: RegistryDefinations<OrgPrivateAppsShortcutI
     label: 'Create private app',
     sequence: ['Shift+N'],
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.ORG_PRIVATE_APPS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
 }

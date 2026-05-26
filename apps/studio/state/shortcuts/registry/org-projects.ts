@@ -15,6 +15,7 @@ export const orgProjectsRegistry: RegistryDefinations<OrgProjectsShortcutId> = {
     label: 'New project',
     sequence: ['Shift+N'],
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.ORG_PROJECTS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [ORG_PROJECTS_SHORTCUT_IDS.ORG_PROJECTS_SEARCH]: {
     id: ORG_PROJECTS_SHORTCUT_IDS.ORG_PROJECTS_SEARCH,
@@ -22,5 +23,6 @@ export const orgProjectsRegistry: RegistryDefinations<OrgProjectsShortcutId> = {
     sequence: ['Shift+F'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.ORG_PROJECTS,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
 }
