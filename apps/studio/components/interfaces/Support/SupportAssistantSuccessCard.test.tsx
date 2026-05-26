@@ -3,9 +3,9 @@ import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { SupportAssistantSuccessCard } from './SupportAssistantSuccessCard'
 import type { SubmittedSupportRequest } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
+import { SupportAssistantSuccessCardContent as SupportAssistantSuccessCard } from '@/components/ui/AIAssistantPanel/SupportAssistantSuccessCardContent'
 
 const { chatInstances, mockNewChat, mockOpenSidebar, mockSelectChat, mockTrack } = vi.hoisted(
   () => ({
