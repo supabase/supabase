@@ -226,11 +226,7 @@ export const AuthorizeRequesterDetails = ({
             </>
           )}
 
-          <Collapsible
-            open={showDetails}
-            onOpenChange={setShowDetails}
-            className="mt-2 space-y-2"
-          >
+          <Collapsible open={showDetails} onOpenChange={setShowDetails} className="mt-2 space-y-2">
             <CollapsibleTrigger className={PERMISSION_DETAILS_TRIGGER_CLASSNAME}>
               <span>{showDetails ? 'Hide detailed permissions' : 'Show detailed permissions'}</span>
               <ChevronDown

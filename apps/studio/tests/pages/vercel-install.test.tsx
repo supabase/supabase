@@ -80,7 +80,10 @@ describe('VercelInstallScreen', () => {
 
   test.each([
     [{ missingParameters: ['code', 'configurationId'] }, 'Missing install parameters'],
-    [{ isError: true, errorMessage: 'Failed to load organizations' }, 'Unable to load Vercel install'],
+    [
+      { isError: true, errorMessage: 'Failed to load organizations' },
+      'Unable to load Vercel install',
+    ],
     [{ isInstalled: true }, 'Vercel installed'],
   ] satisfies Array<[Partial<Parameters<typeof VercelInstallScreen>[0]>, string]>)(
     'renders %s state',

@@ -4,14 +4,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
-import {
-  Button,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'ui'
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 import {
@@ -453,9 +446,7 @@ const MockProjectConnectionForm = ({ state }: { state: VercelProjectConnectionMo
       >
         <Select value={isLoading ? '' : 'abcd1234'} disabled={isLoading || isConnected}>
           <SelectTrigger size="small" aria-label="Supabase project to connect">
-            <SelectValue
-              placeholder={isLoading ? 'Loading projects' : 'Select a project'}
-            />
+            <SelectValue placeholder={isLoading ? 'Loading projects' : 'Select a project'} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="abcd1234" className="text-xs">
@@ -474,9 +465,7 @@ const MockProjectConnectionForm = ({ state }: { state: VercelProjectConnectionMo
           disabled={isLoading || isEmpty || isConnected}
         >
           <SelectTrigger size="small" aria-label="Vercel project to connect">
-            <SelectValue
-              placeholder={isLoading ? 'Loading projects' : 'Select a project'}
-            />
+            <SelectValue placeholder={isLoading ? 'Loading projects' : 'Select a project'} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="prj_mock_vercel_project" className="text-xs">
