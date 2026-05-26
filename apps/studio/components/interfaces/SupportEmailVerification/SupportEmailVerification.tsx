@@ -2,10 +2,7 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
-import {
-  InterstitialLayout,
-  SupabaseLogo,
-} from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import { useVerifyEmailMutation } from '@/data/support/support-email-verification-mutation'
 
 export const SupportEmailVerification = () => {
