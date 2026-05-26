@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { Info } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   AlertDialog,
@@ -93,7 +93,6 @@ export function ApiAuthorizationMainView({
   onApprove,
   onDecline,
 }: ApiAuthorizationMainViewProps): ReactNode {
-  const [permissionsExpanded, setPermissionsExpanded] = useState(false)
   const isExpired = dayjs().isAfter(dayjs(requester.expires_at))
   const showReadyContent = !isExpired && organizations._tag === 'success'
   const redirectUrl = requester.redirect_uri ?? requester.website
@@ -147,14 +146,11 @@ export function ApiAuthorizationMainView({
                     name={requester.name}
                     domain={requester.domain}
                     scopes={requester.scopes}
-                    showDetails={permissionsExpanded}
-                    onShowDetailsChange={setPermissionsExpanded}
                   />
                   <FormFooter
                     approvalState={approvalState}
                     requester={requester}
                     redirectUrl={externalRedirectUrl}
-                    permissionsExpanded={permissionsExpanded}
                     onApprove={onApprove}
                     onDecline={onDecline}
                   />
@@ -362,7 +358,6 @@ interface FormFooterProps {
   approvalState: ApprovalState
   requester: ApiAuthorizationResponse
   redirectUrl?: string
-  permissionsExpanded?: boolean
   onDecline: () => void
   onApprove: () => void
 }
@@ -371,19 +366,11 @@ function FormFooter({
   approvalState,
   requester,
   redirectUrl,
-  permissionsExpanded = false,
   onDecline,
   onApprove,
 }: FormFooterProps): ReactNode {
   return (
     <div className="flex flex-col gap-2">
-      {redirectUrl && (
-        <div className={permissionsExpanded ? 'mb-2 pt-2' : 'mb-2 border-t border-muted pt-5'}>
-          <p className="text-center text-xs text-foreground-lighter">
-            Authorizing will redirect you to <span className="text-foreground">{redirectUrl}</span>
-          </p>
-        </div>
-      )}
       <ApprovalButton
         disabled={approvalState !== 'indeterminate'}
         approvalState={approvalState}
@@ -399,6 +386,13 @@ function FormFooter({
       >
         Cancel
       </Button>
+      {redirectUrl && (
+        <div className="mt-3 border-t border-muted pt-5">
+          <p className="text-center text-xs text-foreground-lighter">
+            Authorizing will redirect you to <span className="text-foreground">{redirectUrl}</span>
+          </p>
+        </div>
+      )}
     </div>
   )
 }
