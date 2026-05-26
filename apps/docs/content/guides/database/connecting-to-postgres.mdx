@@ -18,7 +18,7 @@ The table below summarizes each mode, its host and port, IP version support per 
 
 | Mode                                            | Host:Port                               | Free | Paid | Paid + IPv4 add-on | Best for                                   |
 | ----------------------------------------------- | --------------------------------------- | ---- | ---- | ------------------ | ------------------------------------------ |
-| Direct                                          | `db.[project-id].supabase.co:5432`      | IPv6 | IPv6 | IPv4               | Migrations, `pg_dump`, long-lived backend  |
+| Direct connection                               | `db.[project-id].supabase.co:5432`      | IPv6 | IPv6 | IPv4               | Migrations, `pg_dump`, long-lived backend  |
 | Shared pooler (Supavisor) - session mode        | `aws-[region].pooler.supabase.com:5432` | IPv4 | IPv4 | IPv4               | Persistent backend on IPv4-only networks   |
 | Shared pooler (Supavisor) - transaction mode    | `aws-[region].pooler.supabase.com:6543` | IPv4 | IPv4 | IPv4               | Serverless and edge functions              |
 | Dedicated pooler (PgBouncer) - transaction mode | `db.[project-id].supabase.co:6543`      | -    | IPv6 | IPv4               | High-performance app traffic on paid tiers |
