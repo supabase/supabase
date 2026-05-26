@@ -60,6 +60,6 @@ export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: stri
 
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
   const { data } = useProjectStorageConfigQuery({ projectRef })
-  const isVectorBucketsEnabled = !!data?.features.vectorBuckets?.enabled
+  const isVectorBucketsEnabled = !IS_PLATFORM || !!data?.features.vectorBuckets?.enabled
   return isVectorBucketsEnabled
 }
