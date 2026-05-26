@@ -6,6 +6,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const useGenerateSettingsMenu = () => {
   const { ref } = useParams()
@@ -30,6 +31,7 @@ export const useGenerateSettingsMenu = () => {
             key: `log-drains`,
             url: `/project/${ref}/settings/log-drains`,
             items: [],
+            shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS,
           },
         ],
       },
@@ -45,6 +47,7 @@ export const useGenerateSettingsMenu = () => {
           key: 'general',
           url: `/project/${ref}/settings/general`,
           items: [],
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL,
         },
         {
           name: 'Compute and Disk',
@@ -52,6 +55,7 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/compute-and-disk`,
           items: [],
           disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK,
         },
         {
           name: 'Infrastructure',
@@ -59,6 +63,7 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/infrastructure`,
           items: [],
           disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INFRASTRUCTURE,
         },
 
         {
@@ -67,6 +72,7 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/integrations`,
           items: [],
           disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INTEGRATIONS,
         },
         ...(platformWebhooksEnabled
           ? [
@@ -76,6 +82,7 @@ export const useGenerateSettingsMenu = () => {
                 url: `/project/${ref}/settings/webhooks`,
                 items: [],
                 disabled: !isProjectActive,
+                shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_WEBHOOKS,
               },
             ]
           : []),
@@ -86,6 +93,7 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/api-keys`,
           items: [],
           disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_API_KEYS,
         },
         {
           name: 'JWT Keys',
@@ -95,6 +103,7 @@ export const useGenerateSettingsMenu = () => {
             : `/project/${ref}/settings/jwt/signing-keys`,
           items: [],
           disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_JWT_KEYS,
         },
 
         {
@@ -103,12 +112,14 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/log-drains`,
           items: [],
           disabled: !isProjectActive,
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS,
         },
         {
           name: 'Add-ons',
           key: 'addons',
           url: `/project/${ref}/settings/addons`,
           items: [],
+          shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_ADDONS,
         },
         ...(showDashboardPreferences
           ? [
@@ -117,6 +128,7 @@ export const useGenerateSettingsMenu = () => {
                 key: 'dashboard',
                 url: `/project/${ref}/settings/dashboard`,
                 items: [],
+                shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_DASHBOARD,
               },
             ]
           : []),
