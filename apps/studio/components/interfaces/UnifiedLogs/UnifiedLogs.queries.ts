@@ -265,11 +265,13 @@ const buildBaseWhere = (
     parts.push(logTypeWherePredicate(effectiveLogTypes))
   }
   if (search.hide_connection_logs) {
+    // De Morgan equivalent of NOT (source='postgres_logs' AND (msg LIKE x OR msg LIKE y OR ...))
+    // Uses only != and NOT LIKE which the OTEL endpoint already handles elsewhere.
     parts.push(
-      safeSql`NOT (source = 'postgres_logs' AND (
-        event_message LIKE 'connection received%' OR
-        event_message LIKE 'connection authenticated%' OR
-        event_message LIKE 'connection authorized%'
+      safeSql`(source != 'postgres_logs' OR (
+        event_message NOT LIKE 'connection received%' AND
+        event_message NOT LIKE 'connection authenticated%' AND
+        event_message NOT LIKE 'connection authorized%'
       ))`
     )
   }

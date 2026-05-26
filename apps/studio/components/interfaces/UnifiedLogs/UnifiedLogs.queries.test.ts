@@ -68,16 +68,15 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
 
     it('excludes connection log messages by default (hide_connection_logs=true)', () => {
       const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: true } as any)
-      expect(sql).toContain("event_message LIKE 'connection received%'")
-      expect(sql).toContain("event_message LIKE 'connection authenticated%'")
-      expect(sql).toContain("event_message LIKE 'connection authorized%'")
-      expect(sql).toContain('NOT (')
+      expect(sql).toContain("source != 'postgres_logs'")
+      expect(sql).toContain("event_message NOT LIKE 'connection received%'")
+      expect(sql).toContain("event_message NOT LIKE 'connection authenticated%'")
+      expect(sql).toContain("event_message NOT LIKE 'connection authorized%'")
     })
 
     it('includes connection log messages when hide_connection_logs=false', () => {
       const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: false } as any)
-      expect(sql).not.toContain("event_message LIKE 'connection received%'")
-      expect(sql).not.toContain('NOT (')
+      expect(sql).not.toContain("event_message NOT LIKE 'connection received%'")
     })
 
     it('does not emit subqueries or CTEs (rejected by the OTEL endpoint)', () => {
