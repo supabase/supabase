@@ -252,7 +252,7 @@ Prevention is only half the job — you also need to find out when something has
 
 ## Edge Functions specifics
 
-If you're using `@supabase/supabase-js` (or any `npm:` specifier) from Deno in a Supabase Edge Function, you don't have the npm-side minimum-release-age gate available at the runtime layer. The practical defenses are:
+If you're using `@supabase/supabase-js` (or any `npm:` specifier) from Deno in a Supabase Edge Function, you don't have the npm-side minimum-release-age gate available at the runtime layer. What you can do instead:
 
 - **Pin to exact versions** in your import map / `deno.json` — avoid floating tags like `latest`.
 - **Vendor critical dependencies** (`deno vendor`) and commit the vendored output. This freezes the dep at a known-good snapshot and removes the runtime fetch entirely.
