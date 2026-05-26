@@ -27,7 +27,7 @@ services:
       retries: 3
       start_period: 20s
     environment:
-      #  Listen on all IPv4 interfaces
+      # Listen on all IPv4 interfaces
       HOSTNAME: "0.0.0.0"
 
       STUDIO_PG_META_URL: http://meta:8080
