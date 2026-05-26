@@ -16,6 +16,8 @@ export const SHORTCUT_REFERENCE_GROUPS = {
   NAVIGATION_REALTIME: 'navigation.realtime',
   NAVIGATION_OBSERVABILITY: 'navigation.observability',
   NAVIGATION_ADVISORS: 'navigation.advisors',
+  NAVIGATION_PROJECT_SETTINGS: 'navigation.project-settings',
+  NAVIGATION_INTEGRATIONS_DETAIL: 'navigation.integrations-detail',
 } as const
 
 export const SHORTCUT_REFERENCE_GROUP_LABELS: Record<string, string> = {
@@ -36,6 +38,8 @@ export const SHORTCUT_REFERENCE_GROUP_LABELS: Record<string, string> = {
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_REALTIME]: 'Realtime Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_OBSERVABILITY]: 'Observability Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ADVISORS]: 'Advisors Navigation',
+  [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_PROJECT_SETTINGS]: 'Project Settings Navigation',
+  [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_INTEGRATIONS_DETAIL]: 'Integration Tabs',
 }
 
 export const SHORTCUT_REFERENCE_GROUP_ORDER = [
@@ -67,6 +71,11 @@ export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   'observability-page',
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ADVISORS,
   'advisors-page',
+  SHORTCUT_REFERENCE_GROUPS.NAVIGATION_PROJECT_SETTINGS,
+  'api-keys',
+  'jwt-keys',
+  'log-drains',
+  SHORTCUT_REFERENCE_GROUPS.NAVIGATION_INTEGRATIONS_DETAIL,
   'logs-preview',
   'nav',
   'ai-assistant',

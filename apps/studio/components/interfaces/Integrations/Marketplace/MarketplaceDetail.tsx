@@ -6,6 +6,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
 import { MarketplaceDetailTopBar } from './MarketplaceDetailTopBar'
 import { OverviewTab } from './OverviewTab'
+import { IntegrationDetailTabShortcuts } from '@/components/interfaces/Integrations/Integration/IntegrationDetailTabShortcuts'
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
@@ -84,6 +85,7 @@ export const MarketplaceDetail = () => {
 
   return (
     <>
+      <IntegrationDetailTabShortcuts tabs={tabs} />
       <MarketplaceDetailTopBar
         title={integration.name}
         isInstalled={isInstalled}

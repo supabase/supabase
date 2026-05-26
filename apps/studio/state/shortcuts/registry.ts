@@ -1,6 +1,7 @@
 import { SHORTCUT_REFERENCE_GROUPS } from './referenceGroups'
 import { ADVISORS_NAV_SHORTCUT_IDS, advisorsNavRegistry } from './registry/advisors-nav'
 import { ADVISORS_PAGE_SHORTCUT_IDS, advisorsPageRegistry } from './registry/advisors-page'
+import { API_KEYS_SHORTCUT_IDS, apiKeysRegistry } from './registry/api-keys'
 import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
 import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
 import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
@@ -15,7 +16,9 @@ import {
   FUNCTIONS_OVERVIEW_SHORTCUT_IDS,
   functionsOverviewRegistry,
 } from './registry/functions-overview'
+import { JWT_KEYS_SHORTCUT_IDS, jwtKeysRegistry } from './registry/jwt-keys'
 import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
+import { LOG_DRAINS_SHORTCUT_IDS, logDrainsRegistry } from './registry/log-drains'
 import { LOGS_PREVIEW_SHORTCUT_IDS, logsPreviewRegistry } from './registry/logs-preview'
 import {
   OBSERVABILITY_NAV_SHORTCUT_IDS,
@@ -36,6 +39,10 @@ import {
   PLATFORM_WEBHOOKS_SHORTCUT_IDS,
   platformWebhooksRegistry,
 } from './registry/platform-webhooks'
+import {
+  PROJECT_SETTINGS_NAV_SHORTCUT_IDS,
+  projectSettingsNavRegistry,
+} from './registry/project-settings-nav'
 import {
   REALTIME_INSPECTOR_SHORTCUT_IDS,
   realtimeInspectorRegistry,
@@ -171,6 +178,12 @@ export const SHORTCUT_IDS = {
 
   // Platform Webhooks page shortcuts (org and project level)
   ...PLATFORM_WEBHOOKS_SHORTCUT_IDS,
+
+  // Project Settings sub-page navigation chords and page actions
+  ...PROJECT_SETTINGS_NAV_SHORTCUT_IDS,
+  ...API_KEYS_SHORTCUT_IDS,
+  ...JWT_KEYS_SHORTCUT_IDS,
+  ...LOG_DRAINS_SHORTCUT_IDS,
 } as const
 
 /**
@@ -521,4 +534,10 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Platform Webhooks page shortcut registration
   ...platformWebhooksRegistry,
+
+  // Project Settings sub-page navigation and page action shortcut registration
+  ...projectSettingsNavRegistry,
+  ...apiKeysRegistry,
+  ...jwtKeysRegistry,
+  ...logDrainsRegistry,
 }

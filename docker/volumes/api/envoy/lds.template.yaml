@@ -590,6 +590,78 @@ resources:
                           end
                         end
                       end
+                      
+                # Returns 401 for missing/invalid API keys on protected API routes.
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local ANON_KEY = "${ANON_KEY}"
+                      local SERVICE_ROLE_KEY = "${SERVICE_ROLE_KEY}"
+                      local SUPABASE_PUBLISHABLE_KEY = "${SUPABASE_PUBLISHABLE_KEY}"
+                      local SUPABASE_SECRET_KEY = "${SUPABASE_SECRET_KEY}"
+                      local ANON_KEY_ASYMMETRIC = "${ANON_KEY_ASYMMETRIC}"
+                      local SERVICE_ROLE_KEY_ASYMMETRIC = "${SERVICE_ROLE_KEY_ASYMMETRIC}"
+                      local TRANSLATION_ENABLED = SUPABASE_SECRET_KEY ~= "" and SUPABASE_PUBLISHABLE_KEY ~= "" and SERVICE_ROLE_KEY_ASYMMETRIC ~= "" and ANON_KEY_ASYMMETRIC ~= ""
+
+                      local PROTECTED_ROUTES = {
+                        ["auth-v1-protected"] = true,
+                        ["rest-v1-protected"] = true,
+                        ["graphql-v1-protected"] = true,
+                        ["realtime-v1-api-protected"] = true,
+                        ["realtime-v1-ws-protected"] = true,
+                        ["pg-protected"] = true,
+                      }
+
+                      local function is_protected_route(route_name)
+                        if route_name == nil or route_name == "" then
+                          return false
+                        end
+
+                        return PROTECTED_ROUTES[route_name] == true
+                      end
+
+                      local function is_valid_apikey(apikey)
+                        if apikey == nil or apikey == "" then
+                          return false
+                        end
+
+                        if SERVICE_ROLE_KEY ~= "" and apikey == SERVICE_ROLE_KEY then
+                          return true
+                        end
+
+                        if ANON_KEY ~= "" and apikey == ANON_KEY then
+                          return true
+                        end
+
+                        if TRANSLATION_ENABLED and apikey == SUPABASE_SECRET_KEY then
+                          return true
+                        end
+
+                        if TRANSLATION_ENABLED and apikey == SUPABASE_PUBLISHABLE_KEY then
+                          return true
+                        end
+
+                        return false
+                      end
+
+                      function envoy_on_request(request_handle)
+                        local headers = request_handle:headers()
+                        local route_name = request_handle:streamInfo():routeName()
+                        if not is_protected_route(route_name) then
+                          return
+                        end
+
+                        if is_valid_apikey(headers:get("apikey")) then
+                          return
+                        end
+
+                        request_handle:respond({
+                          [":status"] = "401",
+                          ["content-type"] = "text/plain",
+                        }, "Unauthorized")
+                      end
 
                 # Translates the query parameter apikey into the matching internal JWT and rewrites the URL so only JWTs propagate downstream.
                 - name: envoy.filters.http.lua
@@ -859,78 +931,6 @@ resources:
                         if authorization_value ~= nil then
                           headers:replace("authorization", authorization_value)
                         end
-                      end
-
-                # Returns 401 for missing/invalid API keys on protected API routes.
-                - name: envoy.filters.http.lua
-                  typed_config:
-                    '@type': >-
-                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
-                    inline_code: |
-                      local ANON_KEY = "${ANON_KEY}"
-                      local SERVICE_ROLE_KEY = "${SERVICE_ROLE_KEY}"
-                      local SUPABASE_PUBLISHABLE_KEY = "${SUPABASE_PUBLISHABLE_KEY}"
-                      local SUPABASE_SECRET_KEY = "${SUPABASE_SECRET_KEY}"
-                      local ANON_KEY_ASYMMETRIC = "${ANON_KEY_ASYMMETRIC}"
-                      local SERVICE_ROLE_KEY_ASYMMETRIC = "${SERVICE_ROLE_KEY_ASYMMETRIC}"
-                      local TRANSLATION_ENABLED = SUPABASE_SECRET_KEY ~= "" and SUPABASE_PUBLISHABLE_KEY ~= "" and SERVICE_ROLE_KEY_ASYMMETRIC ~= "" and ANON_KEY_ASYMMETRIC ~= ""
-
-                      local PROTECTED_ROUTES = {
-                        ["auth-v1-protected"] = true,
-                        ["rest-v1-protected"] = true,
-                        ["graphql-v1-protected"] = true,
-                        ["realtime-v1-api-protected"] = true,
-                        ["realtime-v1-ws-protected"] = true,
-                        ["pg-protected"] = true,
-                      }
-
-                      local function is_protected_route(route_name)
-                        if route_name == nil or route_name == "" then
-                          return false
-                        end
-
-                        return PROTECTED_ROUTES[route_name] == true
-                      end
-
-                      local function is_valid_apikey(apikey)
-                        if apikey == nil or apikey == "" then
-                          return false
-                        end
-
-                        if SERVICE_ROLE_KEY ~= "" and apikey == SERVICE_ROLE_KEY then
-                          return true
-                        end
-
-                        if ANON_KEY ~= "" and apikey == ANON_KEY then
-                          return true
-                        end
-
-                        if TRANSLATION_ENABLED and apikey == SERVICE_ROLE_KEY_ASYMMETRIC then
-                          return true
-                        end
-
-                        if TRANSLATION_ENABLED and apikey == ANON_KEY_ASYMMETRIC then
-                          return true
-                        end
-
-                        return false
-                      end
-
-                      function envoy_on_request(request_handle)
-                        local headers = request_handle:headers()
-                        local route_name = request_handle:streamInfo():routeName()
-                        if not is_protected_route(route_name) then
-                          return
-                        end
-
-                        if is_valid_apikey(headers:get("apikey")) then
-                          return
-                        end
-
-                        request_handle:respond({
-                          [":status"] = "401",
-                          ["content-type"] = "text/plain",
-                        }, "Unauthorized")
                       end
 
                 - name: envoy.filters.http.rbac
