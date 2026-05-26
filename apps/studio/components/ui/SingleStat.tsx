@@ -53,7 +53,7 @@ export const SingleStat = ({
       </div>
       <div className="min-w-0 flex-1">
         <div className="text-left heading-meta text-foreground-light">{label}</div>
-        <div className="text-foreground truncate min-h-[34px] flex items-center capitalize-sentence py-0.5">
+        <div className="text-foreground min-h-[34px] flex items-center capitalize-sentence py-0.5">
           {value}
         </div>
       </div>
