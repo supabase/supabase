@@ -29,7 +29,7 @@ export const PolicyEditor = ({
   const selectedRoles = (policyFormFields?.roles ?? []).filter((role: string) => role !== 'public')
 
   return (
-    <div>
+    <>
       <DialogSection>
         <PolicyName
           name={policyFormFields.name}
@@ -72,6 +72,6 @@ export const PolicyEditor = ({
         onViewTemplates={onViewTemplates}
         onReviewPolicy={onReviewPolicy}
       />
-    </div>
+    </>
   )
 }
