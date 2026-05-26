@@ -57,7 +57,7 @@ This is the lever to reach for when you see a CVE on a transitive you don't dire
 These commands fetch and run a package outside your project's lockfile and outside your minimum-age gate. `npx pkg@latest` is a direct fetch against the registry, and a fresh malicious version will be installed. Two practical mitigations:
 
 - **Pin the version**: `npx pkg@1.2.3` instead of `npx pkg@latest`.
-- **Move the tool into devDependencies** so it's covered by your lockfile and the rest of this guide, then invoke it through `npm exec` / `pnpm exec` / `yarn run`.
+- **Move the tool into `devDependencies`** so it's covered by your lockfile and the rest of this guide, then invoke it through `npm exec` / `pnpm exec` / `yarn run`.
 
 Treat any ad-hoc registry fetch the same way you'd treat `curl … | bash`.
 
@@ -65,7 +65,7 @@ Treat any ad-hoc registry fetch the same way you'd treat `curl … | bash`.
 
 Most npm compromises are detected and remediated within hours. A short quarantine on freshly-published versions is the single highest-leverage setting.
 
-### pnpm (recommended)
+### `pnpm` (recommended)
 
 pnpm v11 turns this on by default (1440 minutes = 1 day). You can raise it. In `pnpm-workspace.yaml` at the repo root (pnpm 10+ reads config from this file with or without workspaces):
 
@@ -88,7 +88,7 @@ trustPolicyExclude:
 trustPolicyIgnoreAfter: '180d' # ignore checks for packages older than 180 days
 ```
 
-### yarn (Berry / v4+)
+### `yarn` (berry / v4+)
 
 In `.yarnrc.yml`:
 
@@ -105,7 +105,7 @@ Two related yarn settings worth knowing about while you're in `.yarnrc.yml`:
 - **`enableScripts: false`** is the default in yarn — postinstall scripts from third-party packages don't run. Workspaces still run their own.
 - **`enableHardenedMode: true`** makes yarn re-query remote registries to confirm that the lockfile content matches what the registry currently serves. Auto-on for GitHub PRs from public repos; worth turning on permanently if your threat model warrants slower installs.
 
-### npm
+### `npm`
 
 Use the [`min-release-age`](https://docs.npmjs.com/cli/configuring-npm/config#min-release-age) config (relative, in days) or [`before`](https://docs.npmjs.com/cli/configuring-npm/config#before) (absolute date). Set in `.npmrc`:
 
