@@ -18,7 +18,7 @@ export const UnavailableChartBlock = ({ label, actions }: UnavailableChartBlockP
       label={label}
       actions={actions}
     >
-      <div className="flex flex-1 flex-col justify-center">
+      <div className="flex flex-1 flex-col justify-center gap-y-1 px-5 py-4">
         <p className="text-xs text-foreground-light">
           This chart isn't available on your current compute size
         </p>
