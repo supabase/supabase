@@ -186,7 +186,7 @@ Default-deny is the goal. Add packages only when you genuinely need their build 
 
 ## Block exotic dependency references
 
-The TanStack/router attack used `optionalDependencies: { "@tanstack/setup": "github:tanstack/router#<sha>" }` to pull payload code from a fork's git object store, bypassing the npm registry entirely. Block this class of ref:
+A transitive dependency that resolves to a non-registry source — for example `optionalDependencies: { "some-helper": "github:attacker/repo#<sha>" }` — pulls code directly from a git object store or arbitrary URL, bypassing the npm registry's signing, provenance, and quarantine guarantees entirely. Block this class of ref:
 
 **pnpm**: in `pnpm-workspace.yaml`:
 
@@ -248,7 +248,7 @@ Prevention is only half the job — you also need to find out when something has
 - **Subscribe to the [GitHub Advisory Database](https://github.com/advisories)** RSS feed (filter by ecosystem: npm) for ambient awareness of new advisories — useful even for packages you don't depend on directly.
 - **Run `npm audit` / `pnpm audit` on a schedule** as a _non-blocking_ CI job. Treat it as a notifier, not a gate (audit is noisy and a blocking gate trains people to ignore it).
 - **Third-party scanners** — Socket, Snyk, Aikido, and similar services often spot compromises faster than the GHSA feed. We don't endorse a specific one; if your org already has a license, plug it in. If not, evaluate based on detection time on past incidents, not feature lists.
-- **Watch the channels your peers watch.** During the TanStack incident, GitHub issue #7383 and a handful of security researcher accounts on X / Bluesky were the canonical signal hours before formal advisories. There is no substitute for a few well-curated follows.
+- **Watch the channels your peers watch.** During past compromises, the upstream GitHub issue and a handful of security-researcher accounts on social media were the canonical signal hours before formal advisories landed. There's no substitute for a few well-curated follows.
 
 ## Edge Functions specifics
 
