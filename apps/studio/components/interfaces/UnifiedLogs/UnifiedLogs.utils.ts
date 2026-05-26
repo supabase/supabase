@@ -137,7 +137,7 @@ export function parseAuthLogEventMessage(value: string | undefined): string | un
       const msg = parsed.msg
       if (typeof msg === 'string' && msg.trim()) {
         const authEvent =
-          'action' in parsed || 'auth_event_action' in parsed
+          'action' in parsed || 'auth_event' in parsed
             ? (parsed.action || parsed.auth_event.action).replaceAll('_', ' ')
             : undefined
         return `${authEvent ? `${authEvent}: ` : ''}${msg}`
