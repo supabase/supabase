@@ -1,4 +1,4 @@
-import { PlanId } from 'data/subscriptions/types'
+import { PlanId } from '@/data/subscriptions/types'
 
 // Disk Storage expands automatically when the database reaches 90% of the disk size
 export const AUTOSCALING_THRESHOLD = 0.9

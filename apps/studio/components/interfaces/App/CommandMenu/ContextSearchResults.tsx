@@ -1,10 +1,11 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-import { Database } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
+import { Database } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+import { EmptyState, SkeletonResults } from './ContextSearchResults.shared'
 import type { SearchContextValue } from './SearchContext.types'
-import { SkeletonResults, EmptyState } from './ContextSearchResults.shared'
 
 const TableSearchResults = dynamic(
   () => import('./TableSearchResults').then((mod) => ({ default: mod.TableSearchResults })),

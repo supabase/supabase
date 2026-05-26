@@ -1,0 +1,7 @@
+{
+  "name": "supabase-ionic-react",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
+
 import PricingContent from './PricingContent'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 
 export const metadata: Metadata = {
   title: 'Pricing & Fees | Supabase',
   description:
     'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.',
+  alternates: {
+    types: {
+      'text/markdown': '/pricing.md',
+    },
+  },
   openGraph: {
     title: 'Pricing & Fees | Supabase',
     description:
@@ -19,5 +27,15 @@ export const metadata: Metadata = {
 }
 
 export default function PricingPage() {
-  return <PricingContent />
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.pricing)),
+        }}
+      />
+      <PricingContent />
+    </>
+  )
 }

@@ -1,4 +1,5 @@
 import { AuthClient, navigatorLock, User } from '@supabase/auth-js'
+import { isBrowser } from './helpers'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 export const AUTH_DEBUG_KEY =
@@ -38,7 +39,7 @@ const shouldDetectSessionInUrl = process.env.NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_
 
 const navigatorLockEnabled = !!(shouldEnableNavigatorLock && globalThis?.navigator?.locks)
 
-if (shouldEnableNavigatorLock && !globalThis?.navigator?.locks) {
+if (isBrowser && shouldEnableNavigatorLock && !globalThis?.navigator?.locks) {
   console.warn('This browser does not support the Navigator Locks API. Please update it.')
 }
 

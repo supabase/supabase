@@ -1,8 +1,8 @@
-import { FilesBuckets } from 'components/interfaces/Storage/FilesBuckets'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { StorageBucketsLayout } from 'components/layouts/StorageLayout/StorageBucketsLayout'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import type { NextPageWithLayout } from 'types'
+import { FilesBuckets } from '@/components/interfaces/Storage/FilesBuckets'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { StorageBucketsLayout } from '@/components/layouts/StorageLayout/StorageBucketsLayout'
+import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const StorageFilesPage: NextPageWithLayout = () => {
   return <FilesBuckets />
@@ -10,7 +10,7 @@ const StorageFilesPage: NextPageWithLayout = () => {
 
 StorageFilesPage.getLayout = (page) => (
   <DefaultLayout>
-    <StorageLayout title="Storage">
+    <StorageLayout title="Files">
       <StorageBucketsLayout>{page}</StorageBucketsLayout>
     </StorageLayout>
   </DefaultLayout>

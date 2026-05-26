@@ -1,25 +1,31 @@
 import type { GoPageInput } from 'marketing'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
+
+import authors from '@/lib/authors.json'
+
+const speaker1 = authors.find((a) => a.author_id === 'deepthi_sigireddi')
+const speaker2 = authors.find((a) => a.author_id === 'sugu_sougoumarane')
 
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'postgresconf-sjc-2026/contest',
   metadata: {
-    title: 'Win an iPhone 17 Pro Max | Supabase at PostgresConf San Jose 2026',
+    title: 'Win a Mac Mini | Supabase at PostgresConf San Jose 2026',
     description:
-      'Sign up for Supabase and enter the contest for a chance to win an iPhone 17 Pro Max. PostgresConf San Jose 2026.',
+      'Sign up for Supabase and enter the contest for a chance to win a Mac Mini. PostgresConf San Jose 2026.',
   },
   hero: {
-    title: 'Win an iPhone 17 Pro Max',
+    title: 'Win a Mac Mini',
     subtitle: 'Supabase at PostgresConf San Jose 2026',
     description:
-      'Supabase is Postgres with batteries included -- auth, storage, edge functions, vectors, and real-time, all built on top of the database you already know. Sign up, load some data, and enter below for a chance to win an iPhone 17 Pro Max.',
+      'Supabase is Postgres with batteries included -- auth, storage, edge functions, vectors, and real-time, all built on top of the database you already know. Sign up, load some data, and enter below for a chance to win a Mac Mini.',
     image: {
-      src: '/images/landing-pages/stripe-sessions/iphone17-pro-max.png',
-      alt: 'Orange iPhone 17 Pro Max',
+      src: '/images/landing-pages/postgresconf-sjc-2026/mac-mini.png',
+      alt: 'Apple Mac Mini',
       width: 400,
-      height: 500,
+      height: 400,
     },
     ctas: [
       {
@@ -30,6 +36,73 @@ const page: GoPageInput = {
     ],
   },
   sections: [
+    {
+      type: 'single-column',
+      title: 'Multigres: One stop PostgreSQL Management and Scaling',
+      description: 'Conference Talk: Thursday, April 23, 2026 2:30pm PDT',
+      children: (
+        <div className="flex flex-col items-center gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl">
+            {speaker1 && (
+              <div className="flex flex-col items-center gap-4">
+                {speaker1.author_image_url && (
+                  <Image
+                    src={speaker1.author_image_url}
+                    alt={speaker1.author}
+                    width={192}
+                    height={192}
+                    className="rounded-full object-cover aspect-square w-48 h-48"
+                  />
+                )}
+                <div className="flex flex-col items-center gap-0">
+                  <p className="text-foreground-light font-medium text-center">
+                    {speaker1.author}
+                    {speaker1.position && `, ${speaker1.position}`}
+                  </p>
+                  <p className="text-foreground-lighter text-sm text-center">Supabase</p>
+                </div>
+              </div>
+            )}
+            {speaker2 && (
+              <div className="flex flex-col items-center gap-4">
+                {speaker2.author_image_url && (
+                  <Image
+                    src={speaker2.author_image_url}
+                    alt={speaker2.author}
+                    width={192}
+                    height={192}
+                    className="rounded-full object-cover aspect-square w-48 h-48"
+                  />
+                )}
+                <div className="flex flex-col items-center gap-0">
+                  <p className="text-foreground-light font-medium text-center">
+                    {speaker2.author}
+                    {speaker2.position && `, ${speaker2.position}`}
+                  </p>
+                  <p className="text-foreground-lighter text-sm text-center">Supabase</p>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button asChild type="primary" size="medium">
+              <Link href="https://www.multigres.com" target="_blank" rel="noopener noreferrer">
+                Learn about Multigres
+              </Link>
+            </Button>
+            <Button asChild type="default" size="medium">
+              <Link
+                href="https://supabase.link/postgresconf-sjc-2026-slides"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Download slides
+              </Link>
+            </Button>
+          </div>
+        </div>
+      ),
+    },
     {
       type: 'single-column',
       id: 'how-to-enter',

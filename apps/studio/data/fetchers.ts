@@ -1,12 +1,14 @@
 import * as Sentry from '@sentry/nextjs'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { IS_PLATFORM, getAccessToken } from 'common'
-import { API_URL } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
+import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
-import { ResponseError } from 'types'
 
 import type { paths } from './api'
+import { ERROR_PATTERNS } from './error-patterns'
+import { API_URL } from '@/lib/constants'
+import { uuidv4 } from '@/lib/helpers'
+import { ResponseError } from '@/types'
+import { UnknownAPIResponseError } from '@/types/api-errors'
 import { ErrorMetadata } from '@/types/base'
 
 // generated from openapi-typescript
@@ -170,16 +172,32 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
       'metadata' in error && typeof error.metadata === 'object' && !!error.metadata
         ? (error.metadata as ErrorMetadata)
         : undefined
+    const formattedError =
+      'formattedError' in error && typeof error.formattedError === 'string'
+        ? error.formattedError
+        : undefined
 
     if (errorMessage) {
-      throw new ResponseError(
-        errorMessage,
-        errorCode,
-        requestId,
-        retryAfter,
-        requestPathname,
-        metadata
-      )
+      const matched = ERROR_PATTERNS.find(({ pattern }) => pattern.test(errorMessage))
+      throw matched
+        ? new matched.ErrorClass(
+            errorMessage,
+            errorCode,
+            requestId,
+            retryAfter,
+            requestPathname,
+            metadata,
+            formattedError
+          )
+        : new UnknownAPIResponseError(
+            errorMessage,
+            errorCode,
+            requestId,
+            retryAfter,
+            requestPathname,
+            metadata,
+            formattedError
+          )
     }
   }
 
@@ -193,7 +211,7 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.
-  throw new ResponseError(undefined)
+  throw new UnknownAPIResponseError(undefined)
 }
 
 // [Joshen] The methods below are brought over from lib/common/fetch because we still need them

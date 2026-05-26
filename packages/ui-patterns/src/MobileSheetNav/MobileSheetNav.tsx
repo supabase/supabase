@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
-import { CommandEmpty_Shadcn_, Sheet, SheetContent } from 'ui'
+import { CommandEmpty, Sheet, SheetContent } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 
 const MobileSheetNav: React.FC<{
@@ -25,12 +25,14 @@ const MobileSheetNav: React.FC<{
   const router = useRouter()
   const { width } = useWindowSize()
 
-  const pathWithoutQuery = router?.asPath?.split('?')?.[0]
+  // Use full asPath (including query) so the sheet closes when navigating to the same path with
+  // different query params (e.g. Integrations submenu: All vs Wrappers vs Postgres Modules).
+  const fullPath = router?.asPath ?? ''
   useEffect(() => {
     if (shouldCloseOnRouteChange) {
       onOpenChange(false)
     }
-  }, [pathWithoutQuery])
+  }, [fullPath])
 
   useEffect(() => {
     if (shouldCloseOnViewportResize) {
@@ -42,6 +44,7 @@ const MobileSheetNav: React.FC<{
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         id="mobile-sheet-content"
+        aria-describedby={undefined}
         showClose={false}
         size="full"
         side="bottom"
@@ -50,7 +53,7 @@ const MobileSheetNav: React.FC<{
           className
         )}
       >
-        <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>{children}</ErrorBoundary>
+        <ErrorBoundary FallbackComponent={() => <CommandEmpty />}>{children}</ErrorBoundary>
       </SheetContent>
     </Sheet>
   )

@@ -1,23 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import { keyword } from '@supabase/pg-meta'
+import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form_Shadcn_, SidePanel } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Button, Form, SidePanel } from 'ui'
 
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
 import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from '@/hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { uuidv4 } from '@/lib/helpers'
 
 export type HTTPArgument = { id: string; name: string; value: string }
@@ -36,7 +36,7 @@ export const isEdgeFunction = ({
 
 const FORM_ID = 'edit-hook-panel-form'
 
-const parseHeaders = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
+const parseHeaders = (selectedHook?: PGTrigger): HTTPArgument[] => {
   if (typeof selectedHook === 'undefined') {
     return [{ id: uuidv4(), name: 'Content-type', value: 'application/json' }]
   }
@@ -56,7 +56,7 @@ const parseHeaders = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
   }))
 }
 
-const parseParameters = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
+const parseParameters = (selectedHook?: PGTrigger): HTTPArgument[] => {
   if (typeof selectedHook === 'undefined') {
     return [{ id: uuidv4(), name: '', value: '' }]
   }
@@ -238,7 +238,7 @@ export const EditHookPanel = () => {
         )
 
       // replacer function with JSON.stringify to handle quotes properly
-      const stringifiedParameters = JSON.stringify(parameters, (key, value) => {
+      const stringifiedParameters = JSON.stringify(parameters, (_key, value) => {
         if (typeof value === 'string') {
           // Return the raw string without any additional escaping
           return value
@@ -275,7 +275,11 @@ export const EditHookPanel = () => {
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           originalTrigger: selectedHook,
-          updatedTrigger: { ...payload, enabled_mode: 'ORIGIN' },
+          updatedTrigger: {
+            ...payload,
+            enabled_mode: 'ORIGIN',
+            events: payload.events.map(keyword),
+          },
         })
       }
     } catch (error) {
@@ -288,7 +292,7 @@ export const EditHookPanel = () => {
 
   // This is intentionally kept outside of the useConfirmOnClose hook to force RHF to update the isDirty state.
   const isDirty = form.formState.isDirty
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => onClose(),
   })
@@ -334,28 +338,13 @@ export const EditHookPanel = () => {
           </div>
         }
       >
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
             <FormContents form={form} selectedHook={selectedHook} />
           </form>
-        </Form_Shadcn_>
+        </Form>
       </SidePanel>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

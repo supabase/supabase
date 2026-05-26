@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildValueItems } from './menuItems'
+import { buildOperatorItems, buildValueItems } from './menuItems'
 import { FilterGroup, FilterProperty } from './types'
 
 const stringProperty: FilterProperty = {
@@ -32,6 +32,50 @@ const booleanProperty: FilterProperty = {
 }
 
 const filterProperties: FilterProperty[] = [stringProperty, booleanProperty]
+
+describe('buildOperatorItems', () => {
+  it('returns matching operators for operator draft text', () => {
+    const filters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'name', operator: '', value: '' }],
+    }
+
+    const items = buildOperatorItems(
+      { type: 'operator', path: [0] },
+      filters,
+      filterProperties,
+      true,
+      'is'
+    )
+
+    expect(items).toEqual([{ value: 'is', label: 'Is', group: 'setNull', operatorSymbol: 'is' }])
+  })
+
+  it('adds an equals fallback when operator draft does not match', () => {
+    const filters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'name', operator: '', value: '' }],
+    }
+
+    const items = buildOperatorItems(
+      { type: 'operator', path: [0] },
+      filters,
+      filterProperties,
+      true,
+      'abc'
+    )
+
+    expect(items).toEqual([
+      {
+        value: '=',
+        label: 'Equals: "abc"',
+        operatorSymbol: '=',
+        isDefaultOperator: true,
+        defaultValue: 'abc',
+      },
+    ])
+  })
+})
 
 describe('buildValueItems', () => {
   it('returns NULL and NOT NULL options when IS operator is selected', () => {

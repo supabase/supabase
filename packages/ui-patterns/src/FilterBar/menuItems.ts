@@ -10,18 +10,19 @@ export function buildOperatorItems(
   activeInput: Extract<ActiveInputState, { type: 'operator' }> | null,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
-  hasTypedSinceFocus: boolean = true
+  hasTypedSinceFocus: boolean = true,
+  inputValue?: string
 ): MenuItem[] {
   if (!activeInput) return []
   const condition = findConditionByPath(activeFilters, activeInput.path)
   const property = filterProperties.find((p) => p.name === condition?.propertyName)
-  const operatorValue = condition?.operator?.toUpperCase() || ''
+  const operatorValue = (inputValue ?? condition?.operator ?? '').toUpperCase()
   const availableOperators = property?.operators || ['=']
 
   // Only filter if user has typed since focusing
   const shouldFilter = hasTypedSinceFocus && operatorValue.length > 0
 
-  return availableOperators
+  const items: MenuItem[] = availableOperators
     .filter((op) => {
       if (!shouldFilter) return true
       if (isFilterOperatorObject(op)) {
@@ -43,6 +44,25 @@ export function buildOperatorItems(
       }
       return { value: op, label: op, operatorSymbol: op }
     })
+
+  if (shouldFilter && items.length === 0) {
+    const equalsOperator = availableOperators.find((op) =>
+      isFilterOperatorObject(op) ? op.value === '=' : op === '='
+    )
+
+    if (equalsOperator) {
+      const equalsLabel = isFilterOperatorObject(equalsOperator) ? equalsOperator.label : 'Equals'
+      items.push({
+        value: '=',
+        label: `${equalsLabel}: "${inputValue ?? condition?.operator ?? ''}"`,
+        operatorSymbol: '=',
+        isDefaultOperator: true,
+        defaultValue: inputValue ?? condition?.operator ?? '',
+      })
+    }
+  }
+
+  return items
 }
 
 export function buildPropertyItems(params: {
@@ -50,9 +70,22 @@ export function buildPropertyItems(params: {
   inputValue: string
   supportsOperators?: boolean
   actions?: FilterBarAction[]
+  freeformDefaultProperty?: FilterProperty
 }): MenuItem[] {
-  const { filterProperties, inputValue, supportsOperators, actions } = params
+  const { filterProperties, inputValue, supportsOperators, actions, freeformDefaultProperty } =
+    params
   const items: MenuItem[] = []
+
+  const trimmedInput = inputValue.trim()
+  if (freeformDefaultProperty && trimmedInput.length > 0) {
+    items.push({
+      value: '__freeform_search__',
+      label: `Search ${freeformDefaultProperty.label.toLowerCase()}: "${trimmedInput}"`,
+      isFreeformSearch: true,
+      freeformPropertyName: freeformDefaultProperty.name,
+      freeformValue: trimmedInput,
+    })
+  }
 
   items.push(
     ...filterProperties
@@ -64,7 +97,6 @@ export function buildPropertyItems(params: {
     items.push({ value: 'group', label: 'New Group' })
   }
 
-  const trimmedInput = inputValue.trim()
   if (actions && trimmedInput.length > 0) {
     actions.forEach((action) => {
       items.push({
@@ -79,6 +111,19 @@ export function buildPropertyItems(params: {
   }
 
   return items
+}
+
+export function buildPropertyChangeItems(params: {
+  filterProperties: FilterProperty[]
+  currentPropertyName: string
+  inputValue: string
+}): MenuItem[] {
+  const { filterProperties, currentPropertyName, inputValue } = params
+
+  return filterProperties
+    .filter((prop) => prop.name !== currentPropertyName)
+    .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
+    .map((prop) => ({ value: prop.name, label: prop.label }))
 }
 
 export function buildValueItems(

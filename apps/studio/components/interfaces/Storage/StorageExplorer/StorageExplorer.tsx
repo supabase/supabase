@@ -1,13 +1,8 @@
-import { compact, get, isEmpty, uniqBy } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
-
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useDebounce } from '@uidotdev/usehooks'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import type { Bucket } from 'data/storage/buckets-query'
-import { useLatest } from 'hooks/misc/useLatest'
-import { IS_PLATFORM } from 'lib/constants'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { useParams } from 'common'
+import { compact, get, isEmpty, uniqBy } from 'lodash'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
@@ -17,19 +12,24 @@ import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
+import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
+import { useStoragePreference } from './useStoragePreference'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import type { Bucket } from '@/data/storage/buckets-query'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const StorageExplorer = () => {
+  const { ref, bucketId } = useParams()
   const storageExplorerRef = useRef(null)
   const {
-    bucketId,
     projectRef,
-    view,
     columns,
     selectedItems,
     openedFolders,
     selectedItemsToMove,
     selectedBucket,
-    openBucket,
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
@@ -41,9 +41,11 @@ export const StorageExplorer = () => {
     clearSelectedItems,
     setSelectedFilePreview,
     setSelectedItemsToMove,
+    setIsSearching,
   } = useStorageExplorerStateSnapshot()
+  const { view } = useStoragePreference(projectRef)
 
-  useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
+  useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
 
   // Detect when transitioning between buckets to avoid showing stale content from the previous bucket.
@@ -54,6 +56,13 @@ export const StorageExplorer = () => {
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
   const [itemSearchString, setItemSearchString] = useState('')
   const debouncedSearchString = useDebounce(itemSearchString, 500)
+
+  const handleClearSearch = useCallback(() => {
+    setIsSearching(false)
+    setItemSearchString('')
+  }, [setIsSearching])
+
+  useStorageExplorerShortcuts({ onClearSearch: handleClearSearch })
 
   const fetchContents = useStaticEffectEvent(async (bucket: Bucket) => {
     if (view === STORAGE_VIEWS.LIST) {
@@ -93,12 +102,7 @@ export const StorageExplorer = () => {
 
   useEffect(() => {
     if (bucket && projectRef) fetchContents(bucket)
-  }, [bucketId, bucket, projectRef, debouncedSearchString, fetchContents])
-
-  const openBucketRef = useLatest(openBucket)
-  useEffect(() => {
-    if (bucket && !!projectRef) openBucketRef.current(bucket)
-  }, [bucketId, bucket, projectRef, openBucketRef])
+  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id, fetchContents])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */
@@ -150,10 +154,7 @@ export const StorageExplorer = () => {
   }
 
   return (
-    <div
-      ref={storageExplorerRef}
-      className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col"
-    >
+    <div ref={storageExplorerRef} className="bg-studio flex h-full w-full flex-col">
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
           itemSearchString={itemSearchString}

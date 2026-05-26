@@ -1,13 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { parseMigrationVersion } from 'lib/migration-utils'
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -28,10 +21,31 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { formatMigrationVersionLabel, parseMigrationVersion } from '@/lib/migration-utils'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search migrations' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setSearch(''))
 
   const { data: project } = useSelectedProjectQuery()
   const {
@@ -47,9 +61,9 @@ const Migrations = () => {
   const migrations =
     search.length === 0
       ? data
-      : data.filter(
+      : (data.filter(
           (migration) => migration.version.includes(search) || migration.name?.includes(search)
-        ) ?? []
+        ) ?? [])
 
   return (
     <>
@@ -96,6 +110,7 @@ const Migrations = () => {
             {data.length > 0 && (
               <div className="flex flex-col gap-y-4">
                 <Input
+                  ref={searchInputRef}
                   size="tiny"
                   placeholder="Search for a migration"
                   value={search}
@@ -119,9 +134,7 @@ const Migrations = () => {
                       {migrations.length > 0 ? (
                         migrations.map((migration) => {
                           const versionDayjs = parseMigrationVersion(migration.version)
-                          const label = versionDayjs
-                            ? versionDayjs.format('DD MMM YYYY, HH:mm:ss')
-                            : 'Unknown'
+                          const label = formatMigrationVersionLabel(migration.version)
                           const insertedAt = versionDayjs ? versionDayjs.toISOString() : undefined
 
                           return (
@@ -129,7 +142,7 @@ const Migrations = () => {
                               <TableCell>{migration.version}</TableCell>
                               <TableCell
                                 className={cn(
-                                  (migration?.name ?? '').length === 0 && '!text-foreground-lighter'
+                                  (migration?.name ?? '').length === 0 && 'text-foreground-lighter!'
                                 )}
                               >
                                 {migration?.name ?? 'Name not available'}
@@ -210,7 +223,10 @@ const Migrations = () => {
               isReadOnly
               id={selectedMigration?.version ?? ''}
               language="pgsql"
-              defaultValue={selectedMigration?.statements?.join('\n')}
+              defaultValue={
+                selectedMigration?.statements?.join(';\n') +
+                (selectedMigration?.statements?.length ? ';' : '')
+              }
             />
           </div>
         </div>

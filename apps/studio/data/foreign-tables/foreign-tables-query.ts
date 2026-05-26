@@ -1,10 +1,10 @@
 import pgMeta from '@supabase/pg-meta'
-import { PostgresView } from '@supabase/postgres-meta'
+import type { PGForeignTable } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { foreignTableKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ForeignTablesVariables = {
   projectRef?: string
@@ -26,7 +26,7 @@ export async function getForeignTables(
     signal
   )
 
-  return result as PostgresView[]
+  return result as PGForeignTable[]
 }
 
 export type ForeignTablesData = Awaited<ReturnType<typeof getForeignTables>>

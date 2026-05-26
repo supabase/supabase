@@ -1,14 +1,6 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import {
-  PROJECT_LIST_SORT_VALUES,
-  type ProjectListSort,
-} from 'components/interfaces/Home/ProjectList/ProjectListSort.utils'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { PROJECT_STATUS } from 'lib/constants'
 import { Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -18,6 +10,14 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { FilterPopover } from '../ui/FilterPopover'
 import { SortDropdown } from '../ui/SortDropdown'
+import {
+  PROJECT_LIST_SORT_VALUES,
+  type ProjectListSort,
+} from '@/components/interfaces/Home/ProjectList/ProjectListSort.utils'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 interface HomePageActionsProps {
   slug?: string
@@ -66,13 +66,13 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
   }, [sortStorage, isSuccessSortStorage, setSort, slug])
 
   return (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-2 w-full">
+      <div className="flex flex-col gap-2 min-w-0 flex-1 basis-full md:basis-auto sm:flex-row sm:flex-wrap sm:items-center">
         <Input
           placeholder="Search for a project"
           icon={<Search />}
           size="tiny"
-          className="w-32 md:w-64"
+          className="w-full sm:w-32 md:w-64"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           actions={[
@@ -89,32 +89,34 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
           ]}
         />
 
-        <FilterPopover
-          name="Status"
-          title="Filter projects by status"
-          options={[
-            { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
-            { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
-          ]}
-          activeOptions={filterStatus}
-          valueKey="key"
-          labelKey="label"
-          onSaveFilters={(options) => setFilterStatusStorage(options)}
-        />
+        <div className="flex items-center gap-2">
+          <FilterPopover
+            name="Status"
+            title="Filter projects by status"
+            options={[
+              { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
+              { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
+            ]}
+            activeOptions={filterStatus}
+            valueKey="key"
+            labelKey="label"
+            onSaveFilters={(options) => setFilterStatusStorage(options)}
+          />
 
-        <SortDropdown
-          options={[
-            { label: 'name', value: 'name' },
-            { label: 'creation date', value: 'created' },
-          ]}
-          value={sort}
-          setValue={(val) => setSortStorage(val as ProjectListSort)}
-        />
+          <SortDropdown
+            options={[
+              { label: 'name', value: 'name' },
+              { label: 'creation date', value: 'created' },
+            ]}
+            value={sort}
+            setValue={(val) => setSortStorage(val as ProjectListSort)}
+          />
 
-        {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
+          {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         {viewMode && setViewMode && (
           <ToggleGroup
             type="single"

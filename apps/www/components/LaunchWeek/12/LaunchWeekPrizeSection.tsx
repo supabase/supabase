@@ -1,8 +1,9 @@
+import Image from 'next/image'
 import React from 'react'
 import { cn } from 'ui'
+
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
-import Image from 'next/image'
 import PrizeActions from './Releases/PrizeActions'
 
 export default function LaunchWeekPrizeSection({ className }: { className?: string }) {
@@ -22,7 +23,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
             contentClassName="flex flex-col justify-between"
             content={
               <div className="w-full h-auto lg:min-h-[400px] flex flex-col lg:flex-row items-stretch rounded-lg overflow-hidden">
-                <div className="relative w-full pl-4 xl:px-4 lg:w-2/3 border-b lg:border-none border-muted aspect-[3/1] top-0 md:-bottom-8 overflow-hidden">
+                <div className="relative w-full pl-4 xl:px-4 lg:w-2/3 border-b lg:border-none border-muted aspect-3/1 top-0 md:-bottom-8 overflow-hidden">
                   <Image
                     src="/images/launchweek/12/lw12-backpack.png"
                     alt="Supabase AirPod Max prize"
@@ -55,10 +56,10 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
           />
           <div className="w-full min-h-[400px] flex flex-col gap-4 items-stretch">
             <LaunchWeekPrizeCard
-              className="relative flex-grow"
+              className="relative grow"
               content={
                 <div className="flex flex-col h-full justify-end">
-                  <div className="relative flex-grow w-full">
+                  <div className="relative grow w-full">
                     <Image
                       src="/images/launchweek/12/world-tour-tshirt.png"
                       alt="Supabase Launch Week 12 World Tour T-Shirt"

@@ -20,6 +20,7 @@
   "authentication:show_manual_linking": true,
   "authentication:show_provider_filter": true,
   "authentication:show_providers": true,
+  "authentication:show_custom_providers": true,
   "authentication:show_send_invitation": true,
   "authentication:show_sort_by_email": true,
   "authentication:show_sort_by_phone": true,
@@ -76,6 +77,7 @@
 
   "infrastructure:read_replicas": true,
 
+  "logs:all": true,
   "logs:templates": true,
   "logs:collections": true,
   "logs:metadata": true,

@@ -1,23 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { getDocument } from 'data/documents/document-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+} from '@/components/layouts/Scaffold'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { getDocument } from '@/data/documents/document-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const SOC2 = () => {
   const { data: organization } = useSelectedOrganizationQuery()
@@ -74,11 +74,12 @@ export const SOC2 = () => {
           <NoPermission resourceText="access our SOC2 Type 2 report" />
         ) : !hasAccessToSoc2Report ? (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button asChild type="default">
-              <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
-                Upgrade to Team
-              </Link>
-            </Button>
+            <UpgradePlanButton
+              variant="default"
+              plan="Team"
+              source="org-documents-soc2"
+              featureProposition="download the SOC2 Type 2report"
+            />
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">

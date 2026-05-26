@@ -44,11 +44,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
       setIsLoading(true)
 
       if (claims) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', claims.sub)
-          .single()
+        const { data } = await supabase.from('profiles').select('*').eq('id', claims.sub).single()
 
         setProfile(data)
       } else {

@@ -4,13 +4,6 @@ import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { DatePicker } from 'components/ui/DatePicker'
-import {
-  useAccessTokenCreateMutation,
-  type NewAccessToken,
-} from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Button,
   Dialog,
@@ -20,25 +13,33 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import {
   CUSTOM_EXPIRY_VALUE,
   EXPIRES_AT_OPTIONS,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../AccessToken.constants'
 import { getExpirationDate } from '../AccessToken.utils'
+import { DatePicker } from '@/components/ui/DatePicker'
+import {
+  useAccessTokenCreateMutation,
+  type NewAccessToken,
+} from '@/data/access-tokens/access-tokens-create-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 const formId = 'new-access-token-form'
 
@@ -71,6 +72,7 @@ export const NewTokenDialog = ({
     defaultValues: { tokenName: '', expiresAt: EXPIRES_AT_OPTIONS['month'].value },
     mode: 'onChange',
   })
+  const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
@@ -86,6 +88,10 @@ export const NewTokenDialog = ({
       { name: values.tokenName, scope: tokenScope, expires_at: expiresAt },
       {
         onSuccess: (data) => {
+          track('access_token_created', {
+            tokenType: 'classic',
+            expiryPreset: values.expiresAt || 'never',
+          })
           toast.success('Access token created successfully')
           onCreateToken(data)
           handleClose()
@@ -170,51 +176,51 @@ export const NewTokenDialog = ({
           />
         )}
         <DialogSection className="flex flex-col gap-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               className="flex flex-col gap-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="tokenName"
                 name="tokenName"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout name="tokenName" label="Name">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="tokenName"
                         {...field}
                         placeholder="Provide a name for your token"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 key="expiresAt"
                 name="expiresAt"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout name="expiresAt" label="Expires in">
                     <div className="flex gap-2">
-                      <FormControl_Shadcn_ className="flex-grow">
-                        <Select_Shadcn_ value={field.value} onValueChange={handleExpiryChange}>
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Expires at" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                      <FormControl className="grow">
+                        <Select value={field.value} onValueChange={handleExpiryChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Expires at" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {Object.values(EXPIRES_AT_OPTIONS).map(
                               (option: { value: string; label: string }) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               )
                             )}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                       {isCustomExpiry && (
                         <DatePicker
                           selectsRange={false}
@@ -241,7 +247,7 @@ export const NewTokenDialog = ({
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           <Button

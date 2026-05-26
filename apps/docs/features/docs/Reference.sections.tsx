@@ -171,13 +171,9 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader title={command.title} className="col-[1_/_-1]" monoFont={true} />
-      <div className="w-full min-w-0">
-        {command.description && (
-          <ReactMarkdown className="prose w-full break-words mb-8">
-            {command.description}
-          </ReactMarkdown>
-        )}
+      <StickyHeader title={command.title} className="col-span-full" monoFont={true} />
+      <div className="w-full min-w-0 prose wrap-break-word mb-8">
+        {command.description && <ReactMarkdown>{command.description}</ReactMarkdown>}
         {command.usage && (
           <div className="mb-8">
             <h3 className="mb-2 text-base text-foreground">Usage</h3>
@@ -224,9 +220,9 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     )}
                   </div>
                   {flag.description && (
-                    <ReactMarkdown className="prose break-words text-sm">
-                      {flag.description}
-                    </ReactMarkdown>
+                    <div className="prose wrap-break-word text-sm">
+                      <ReactMarkdown>{flag.description}</ReactMarkdown>
+                    </div>
                   )}
                 </li>
               ))}
@@ -324,7 +320,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
             )}
           </>
         }
-        className="col-[1_/_-1]"
+        className="col-span-full"
       />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
@@ -346,9 +342,9 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           </code>
         </div>
         {endpointDetails.description && (
-          <ReactMarkdown className="prose break-words mb-8">
-            {endpointDetails.description}
-          </ReactMarkdown>
+          <div className="prose wrap-break-word mb-8">
+            <ReactMarkdown>{endpointDetails.description}</ReactMarkdown>
+          </div>
         )}
         {endpointDetails['x-oauth-scope'] && (
           <section>
@@ -467,6 +463,7 @@ async function FunctionSection({
 
   const fullDescription = [
     types?.comment?.shortText,
+    types?.comment?.text,
     'description' in fn && (fn.description as string),
     'notes' in fn && (fn.notes as string),
   ]
@@ -476,11 +473,11 @@ async function FunctionSection({
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader {...section} className="col-[1_/_-1]" />
+      <StickyHeader {...section} className="col-span-full" />
 
       {/* Display method signature below title */}
       {types && 'params' in types && formatMethodSignature(types) && (
-        <div className="col-[1_/_-1] -mt-2 mb-4">
+        <div className="col-span-full -mt-2 mb-4">
           <code className="text-sm text-foreground-muted font-mono">
             {formatMethodSignature(types)}
           </code>
@@ -488,7 +485,7 @@ async function FunctionSection({
       )}
 
       <div className="overflow-hidden flex flex-col gap-8">
-        <div className="prose break-words text-sm">
+        <div className="prose wrap-break-word text-sm">
           <MDXRemoteRefs source={fullDescription} />
         </div>
         <FnParameterDetails
@@ -549,7 +546,6 @@ async function FunctionSection({
                 <TabsContent_Shadcn_ key={example.id} value={example.id}>
                   <MDXRemoteRefs source={example.code} />
                   <div className="flex flex-col gap-2 mt-2">
-                    {/* Only YAML examples have data/response/description fields */}
                     {'data' in example && !!example.data?.sql && (
                       <CollapsibleDetails title="Data source" content={example.data.sql} />
                     )}

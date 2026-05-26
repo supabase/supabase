@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { subscriptionKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string

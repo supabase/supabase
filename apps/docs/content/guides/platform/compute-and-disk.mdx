@@ -10,7 +10,7 @@ Every project on the Supabase Platform comes with its own dedicated Postgres ins
 
 The following table describes the base instances, Nano (free plan) and Micro (paid plans), with additional compute instance sizes available if you need extra performance when scaling up.
 
-<Admonition type="note" label="Nano instances in paid plan organizations">
+<Admonition type="note" title="Nano instances in paid plan organizations">
 
 In paid organizations, Nano Compute are billed at the same price as Micro Compute. It is recommended to upgrade your Project from Nano Compute to Micro Compute when it's convenient for you. Compute sizes are not auto-upgraded because of the downtime incurred. See [Supabase Pricing](/pricing) for more information. You cannot launch Nano instances on paid plans, only Micro and above - but you might have Nano instances after upgrading from Free Plan.
 
@@ -32,7 +32,9 @@ In paid organizations, Nano Compute are billed at the same price as Micro Comput
 | >16XL        | -                         | [Contact Us](/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes) | Custom                  | Custom       | Custom                        |
 
 [^1]: Database max connections are recommended values and can be [customized via `max_connections`](/docs/guides/database/custom-postgres-config) depending on your use case. Be aware of [these considerations](/docs/guides/troubleshooting/how-to-change-max-database-connections-_BQ8P5) before modifying.
+
 [^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/platform/shared-responsibility-model) for more information.
+
 [^3]: Compute resources on the Free plan are subject to change.
 
 Compute sizes can be changed by first selecting your project in the dashboard [here](/dashboard/project/_/settings/compute-and-disk) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrades).
@@ -54,7 +56,7 @@ We charge hourly for additional compute based on your usage. Read more about [us
 
 ### Dedicated vs shared CPU
 
-All Postgres databases on Supabase run in isolated environments. Compute instances smaller than `Large` compute size have CPUs which can burst to higher performance levels for short periods of time. Instances bigger than `Large` have predictable performance levels and do not exhibit the same burst behavior.
+All Postgres databases on Supabase run in isolated environments. Compute instances `Nano` to `2XL` compute size have CPUs which can burst to higher performance levels for short periods of time. Instances bigger than `Large` have predictable performance levels and do not exhibit the same burst behavior.
 
 ### Compute upgrades [#upgrades]
 
@@ -164,5 +166,5 @@ As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/para
 
 ### Constraints
 
-- After **any** disk attribute change, there is a cooldown period of approximately six hours before you can make further adjustments. During this time, no changes are allowed. If you encounter throttling, you’ll need to wait until the cooldown period concludes before making additional modifications.
+- You can modify disk attributes up to **four times** within a rolling 24-hour window. A new modification can be initiated as soon as the previous one completes. If you reach this limit, you will encounter throttling and must wait for the rolling 24-hour window to permit further adjustments.
 - You can increase disk size but cannot decrease it.

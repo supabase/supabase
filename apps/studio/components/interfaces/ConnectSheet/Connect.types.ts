@@ -1,3 +1,9 @@
+import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
+
+// Re-exported so ConnectSheet consumers can keep importing from Connect.types
+// without reaching across to the hooks tree.
+export type { DeploymentMode }
+
 // ============================================================================
 // Project Keys (existing)
 // ============================================================================
@@ -51,7 +57,8 @@ export type ConditionalValue<T> =
 // Schema Types - Modes
 // ============================================================================
 
-export type ConnectMode = 'framework' | 'direct' | 'orm' | 'mcp'
+export const CONNECT_MODES = ['framework', 'direct', 'orm', 'mcp'] as const
+export type ConnectMode = (typeof CONNECT_MODES)[number]
 
 export interface ModeDefinition {
   id: ConnectMode
@@ -73,8 +80,6 @@ export interface FieldOption {
   icon?: string
   description?: string
 }
-
-type FieldOptionsResolver = (state: ConnectState) => FieldOption[]
 
 interface FieldDefinition {
   id: string
@@ -155,4 +160,5 @@ export interface StepContentProps {
   state: ConnectState
   projectKeys: ProjectKeys
   connectionStringPooler: ConnectionStringPooler
+  deploymentMode: DeploymentMode
 }

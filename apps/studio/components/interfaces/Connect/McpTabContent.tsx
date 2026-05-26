@@ -1,12 +1,12 @@
 import { IS_PLATFORM, useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import { BASE_PATH } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import { createMcpCopyHandler, McpConfigPanel, type McpClient } from 'ui-patterns/McpUrlBuilder'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import type { projectKeys } from './Connect.types'
+import Panel from '@/components/ui/Panel'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const McpTabContent = ({ projectKeys }: { projectKeys: projectKeys }) => {
   const { ref: projectRef } = useParams()
@@ -64,7 +64,6 @@ const McpTabContentInnerLoaded = ({
 
   return (
     <McpConfigPanel
-      basePath={BASE_PATH}
       projectRef={projectRef}
       theme={resolvedTheme as 'light' | 'dark'}
       isPlatform={IS_PLATFORM}

@@ -2,12 +2,10 @@
 
 import React, { forwardRef, useEffect } from 'react'
 
-import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
 import { Button, ButtonVariantProps } from '../Button/Button'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -55,10 +53,9 @@ export interface ModalProps extends React.ComponentProps<typeof DialogContent> {
   closable?: boolean
 }
 
-interface ModalType
-  extends React.ForwardRefExoticComponent<
-    React.ComponentPropsWithoutRef<typeof DialogContent> & ModalProps
-  > {
+interface ModalType extends React.ForwardRefExoticComponent<
+  React.ComponentPropsWithoutRef<typeof DialogContent> & ModalProps
+> {
   Content: React.ComponentType<{ children: React.ReactNode; className?: string }>
   Separator: React.ComponentType
 }

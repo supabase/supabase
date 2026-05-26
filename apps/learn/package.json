@@ -7,24 +7,25 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --port 3007",
     "build": "pnpm run content:build && next build --turbopack",
-    "internal:sync": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/sync-internal-content.mts",
+    "internal:sync": "tsx ./scripts/sync-internal-content.mts",
     "start": "next start",
     "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "content:build": "contentlayer2 build",
     "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo",
-    "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
+    "typecheck": "contentlayer2 build && tsc --noEmit"
   },
   "dependencies": {
     "common": "workspace:*",
     "contentlayer2": "0.4.6",
-    "framer-motion": "^11.0.3",
+    "framer-motion": "^11.18.2",
     "jotai": "^2.8.0",
     "lucide-react": "*",
     "next": "catalog:",
     "next-contentlayer2": "0.4.6",
-    "next-themes": "^0.3.0",
+    "next-themes": "catalog:",
     "react": "catalog:",
+    "react-dom": "catalog:",
     "react-wrap-balancer": "^1.1.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-pretty-code": "^0.9.0",
@@ -42,8 +43,9 @@
     "@types/react": "catalog:",
     "config": "workspace:^",
     "mdast-util-toc": "^6.1.1",
+    "shiki": "^1.1.7",
+    "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "tsx": "catalog:",
-    "shiki": "^1.1.7"
+    "tsx": "catalog:"
   }
 }

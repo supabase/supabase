@@ -1,33 +1,33 @@
-import { Clock, Heart, Server, SquareStack, Telescope } from 'lucide-react'
+import { Clock, Heart, ScrollText, Server, SquareStack, Telescope } from 'lucide-react'
 
 import {
   IconBranching,
-  IconGitHub,
   IconGitBranch,
+  IconGitHub,
+  IconMenuAI,
   IconMenuApi,
   IconMenuAuth,
   IconMenuCli,
   IconMenuCsharp,
   IconMenuDatabase,
-  IconMenuGraphQL,
+  IconMenuDevCli,
   IconMenuEdgeFunctions,
   IconMenuFlutter,
   IconMenuGettingStarted,
+  IconMenuGraphQL,
   IconMenuHome,
   IconMenuIntegrations,
   IconMenuJavascript,
+  IconMenuKotlin,
   IconMenuPlatform,
   IconMenuPython,
   IconMenuRealtime,
   IconMenuResources,
-  IconMenuSelfHosting,
   IconMenuRestApis,
+  IconMenuSelfHosting,
+  IconMenuStatus,
   IconMenuStorage,
   IconMenuSwift,
-  IconMenuStatus,
-  IconMenuKotlin,
-  IconMenuAI,
-  IconMenuDevCli,
   IconSecurity,
   IconSupport,
   IconTroubleshooting,
@@ -98,6 +98,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <Telescope width={width} height={height} className={className} />
     case 'troubleshooting':
       return <IconTroubleshooting width={width} height={height} className={className} />
+    case 'changelog':
+      return <ScrollText width={width} height={height} className={className} />
     case 'contributing':
       return <Heart width={width} height={height} className={className} />
     case 'deployment':

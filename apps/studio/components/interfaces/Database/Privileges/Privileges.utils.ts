@@ -1,28 +1,28 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 
-import { grantColumnPrivileges } from 'data/privileges/column-privileges-grant-mutation'
-import type { ColumnPrivilege } from 'data/privileges/column-privileges-query'
-import {
-  ColumnPrivilegesRevoke,
-  revokeColumnPrivileges,
-} from 'data/privileges/column-privileges-revoke-mutation'
-import { privilegeKeys } from 'data/privileges/keys'
-import {
-  TablePrivilegesGrant,
-  grantTablePrivileges,
-} from 'data/privileges/table-privileges-grant-mutation'
-import type { PgTablePrivileges } from 'data/privileges/table-privileges-query'
-import {
-  TablePrivilegesRevoke,
-  revokeTablePrivileges,
-} from 'data/privileges/table-privileges-revoke-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   ALL_PRIVILEGE_TYPES,
   COLUMN_PRIVILEGE_TYPES,
   ColumnPrivilegeType,
 } from './Privileges.constants'
+import { grantColumnPrivileges } from '@/data/privileges/column-privileges-grant-mutation'
+import type { ColumnPrivilege } from '@/data/privileges/column-privileges-query'
+import {
+  ColumnPrivilegesRevoke,
+  revokeColumnPrivileges,
+} from '@/data/privileges/column-privileges-revoke-mutation'
+import { privilegeKeys } from '@/data/privileges/keys'
+import {
+  grantTablePrivileges,
+  TablePrivilegesGrant,
+} from '@/data/privileges/table-privileges-grant-mutation'
+import type { PgTablePrivileges } from '@/data/privileges/table-privileges-query'
+import {
+  revokeTablePrivileges,
+  TablePrivilegesRevoke,
+} from '@/data/privileges/table-privileges-revoke-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface PrivilegeOperation {
   object: 'table' | 'column'

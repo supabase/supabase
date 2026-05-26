@@ -86,7 +86,7 @@ const ImageGrid = ({
           if (x.link) {
             return (
               <Link href={link}>
-                <div className="scale-100 transform cursor-pointer duration-100 ease-in-out hover:shadow-sm">
+                <div className="scale-100 transform cursor-pointer duration-100 ease-in-out hover:shadow-xs">
                   {children}
                 </div>
               </Link>

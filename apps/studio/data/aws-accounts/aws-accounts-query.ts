@@ -1,10 +1,10 @@
 import type { UseQueryOptions } from '@tanstack/react-query'
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { awsAccountKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { ResponseError } from '@/types'
 
 type AWSAccountsVariables = {
   projectRef?: string

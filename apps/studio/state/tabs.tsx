@@ -110,7 +110,21 @@ function getSavedTabs(ref: string) {
   }
 }
 
-function createTabsState(projectRef: string) {
+const getRecentItemLabel = (tab: Pick<Tab, 'label' | 'metadata'>) =>
+  tab.label || tab.metadata?.name || 'Untitled'
+
+const syncRecentItemWithTab = (item: RecentItem, tab: Pick<Tab, 'label' | 'metadata'>) => {
+  const nextLabel = getRecentItemLabel(tab)
+
+  item.label = nextLabel
+  item.metadata = {
+    ...item.metadata,
+    ...tab.metadata,
+    name: nextLabel,
+  }
+}
+
+export function createTabsState(projectRef: string) {
   const recentItems = getSavedRecentItems(projectRef)
   const { openTabs, activeTab, tabsMap, previewTabId } = getSavedTabs(projectRef)
 
@@ -125,6 +139,7 @@ function createTabsState(projectRef: string) {
       if (existingItem) {
         // If it exists, update its timestamp
         existingItem.timestamp = Date.now()
+        syncRecentItemWithTab(existingItem, tab)
         return // Exit the function
       }
 
@@ -132,7 +147,7 @@ function createTabsState(projectRef: string) {
       const recentItem: RecentItem = {
         id: tab.id, // Set the ID
         type: tab.type, // Set the type
-        label: tab.label || 'Untitled', // Set the label or default to 'Untitled'
+        label: getRecentItemLabel(tab), // Set the label or default to 'Untitled'
         timestamp: Date.now(), // Set the current timestamp
         metadata: tab.metadata, // Set the metadata
       }
@@ -211,6 +226,14 @@ function createTabsState(projectRef: string) {
       if (!!store.tabsMap[id]) {
         if ('label' in updates) {
           store.tabsMap[id].label = updates.label
+          // Keep the persisted name aligned with the visible label so browser titles
+          // and tab state recover cleanly after entity renames.
+          if (typeof updates.label === 'string' && store.tabsMap[id].metadata) {
+            store.tabsMap[id].metadata.name = updates.label
+          }
+
+          const recentItem = store.recentItems.find((item) => item.id === id)
+          if (recentItem) syncRecentItemWithTab(recentItem, store.tabsMap[id])
         }
         if ('scrollTop' in updates && store.tabsMap[id].metadata) {
           store.tabsMap[id].metadata.scrollTop = updates.scrollTop

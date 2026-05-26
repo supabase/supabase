@@ -1,6 +1,6 @@
 import { components } from 'api-types'
 import { Axiom, Datadog, Grafana, Last9, Otlp, Sentry } from 'icons'
-import { BracesIcon, Cloud } from 'lucide-react'
+import { BracesIcon, Cloud, Server } from 'lucide-react'
 
 const iconProps = {
   height: 24,
@@ -21,20 +21,20 @@ export const LOG_DRAIN_TYPES = [
     value: 'otlp',
     name: 'OpenTelemetry Protocol (OTLP)',
     description: 'Send logs to any OpenTelemetry Protocol (OTLP) compatible endpoint',
-    icon: <Otlp {...iconProps} fill="currentColor" strokeWidth={0} />,
+    icon: <Otlp {...iconProps} fill="currentColor" />,
   },
   {
     value: 'datadog',
     name: 'Datadog',
     description: 'Datadog is a monitoring service for cloud-scale applications',
-    icon: <Datadog {...iconProps} fill="currentColor" strokeWidth={0} />,
+    icon: <Datadog {...iconProps} fill="currentColor" />,
   },
   {
     value: 'loki',
     name: 'Loki',
     description:
       'Loki is an open-source log aggregation system designed to store and query logs from multiple sources',
-    icon: <Grafana {...iconProps} fill="currentColor" strokeWidth={0} />,
+    icon: <Grafana {...iconProps} fill="currentColor" />,
   },
   {
     value: 's3',
@@ -47,20 +47,26 @@ export const LOG_DRAIN_TYPES = [
     name: 'Sentry',
     description:
       'Sentry is an application monitoring service that helps developers identify and debug performance issues and errors',
-    icon: <Sentry {...iconProps} fill="currentColor" strokeWidth={0} />,
+    icon: <Sentry {...iconProps} fill="currentColor" />,
   },
   {
     value: 'axiom',
     name: 'Axiom',
     description:
       'Axiom is a data platform designed to efficiently collect, store, and analyze event and telemetry data at massive scale.',
-    icon: <Axiom {...iconProps} fill="currentColor" strokeWidth={0} />,
+    icon: <Axiom {...iconProps} fill="currentColor" />,
   },
   {
     value: 'last9',
     name: 'Last9',
     description: 'Last9 is an observability platform for monitoring and telemetry data',
-    icon: <Last9 {...iconProps} fill="currentColor" strokeWidth={0} />,
+    icon: <Last9 {...iconProps} fill="currentColor" />,
+  },
+  {
+    value: 'syslog',
+    name: 'Syslog',
+    description: 'Forward logs to a remote Syslog receiver using TCP or TLS, adhering to RFC 5424',
+    icon: <Server {...iconProps} />,
   },
 ] as const
 

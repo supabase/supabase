@@ -16,6 +16,8 @@ By default Storage does not allow any uploads to buckets without RLS policies. Y
 
 You can find the documentation for the storage schema [here](/docs/guides/storage/schema/design) , and to simplify the process of crafting your policies, you can utilize these [helper functions](/docs/guides/storage/schema/helper-functions) .
 
+If you need different `SELECT` policies for different Storage actions, such as listing objects versus reading authenticated objects, use the operation-aware helpers `storage.allow_only_operation()` and `storage.allow_any_operation()` documented in [Storage Helper Functions](/docs/guides/storage/schema/helper-functions).
+
 <Admonition type="note">
 
 The RLS policies required for different operations are documented [here](/docs/reference/javascript/storage-createbucket)

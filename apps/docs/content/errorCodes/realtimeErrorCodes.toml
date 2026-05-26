@@ -179,7 +179,7 @@ description = "Unauthorized access to Realtime channel."
 description = "Realtime is currently restarting."
 
 [UnableToProcessListenPayload]
-description = "Payload sent in NOTIFY operation was JSON parsable."
+description = "Payload sent in NOTIFY operation was not JSON parsable."
 
 [UnableToListenToTenantDatabase]
 description = "Unable to LISTEN for notifications against the Tenant Database."
