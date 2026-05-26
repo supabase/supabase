@@ -122,11 +122,6 @@ interface PartialEntry {
   ref?: string
 }
 
-/** Converts a camelCase identifier to kebab-case (e.g. `linkIdentity` → `link-identity`). */
-function camelToKebab(name: string): string {
-  return name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
-}
-
 /** Lowercases a string and collapses internal whitespace to hyphens for use as a URL slug. */
 function slugifyTag(value: string): string {
   return value.toLowerCase().trim().replace(/\s+/g, '-')
@@ -166,10 +161,21 @@ const subcategoryEntry = (slug: string, title: string, product: string): BySlugF
   type: 'function',
 })
 
-/** Builds a function bySlug entry, deriving the slug from `${product}-${name}`. */
+/**
+ * Builds a function bySlug entry. `id` equals `slug`, and the slug includes
+ * the subcategory (if any) so same-named methods on different classes don't
+ * collide — e.g. `createBucket` exists on StorageClient (subcategory
+ * "File Buckets"), StorageAnalyticsClient (subcategory "Analytics Buckets"),
+ * and StorageVectorsClient (subcategory "Vector Buckets"). Without the
+ * subcategory segment they'd all dedupe to one entry, emptying the Analytics
+ * and Vector subcategories. The renderer in `Reference.sections.tsx`
+ * resolves functions via `fns.find(f => f.id === section.id)`, so id and
+ * slug must match.
+ */
 const functionEntry = (fn: FunctionEntry, product: string): BySlugFunction => {
-  const slug = `${product}-${fn.name.toLowerCase()}`
-  return { id: camelToKebab(fn.name), title: fn.name, slug, product, type: 'function' }
+  const sub = fn.subcategory ? `${slugifyTag(fn.subcategory)}-` : ''
+  const slug = `${product}-${sub}${fn.name.toLowerCase()}`
+  return { id: slug, title: fn.name, slug, product, type: 'function' }
 }
 
 /**
@@ -204,34 +210,48 @@ function readTagFromDeclOrSignature(decl: Declaration, tagName: string): string 
   return null
 }
 
+/** Strips redundant `.index.` segments and collapses consecutive dots in a ref. */
+function normalizeRefPath(path: string): string {
+  return path.replace(/\.index(?=\.|$)/g, '').replace(/\.+/g, '.')
+}
+
 /**
  * Recursively walks a TypeDoc declaration tree. Builds two outputs in one pass:
  *   - `functions`: declarations carrying an `@category` tag (with optional
  *     `@subcategory`) plus a constructed `$ref` of the form
- *     `<package>.<class…>.<name>`.
+ *     `<package>.<module…>.<class…>.<name>` (normalized to strip `.index.`).
  *   - `typeSpec`: separate `methods` and `variables` maps keyed by the same
  *     `$ref`. Methods get their first signature's parameters and return type;
  *     variables (kind 32) get their type and `isConst` flag. Not filtered by
  *     category or `excludeDefinitions`, so partials that link to "hidden"
  *     methods (e.g. a constructor) can still resolve.
  *
- * Context is threaded down via `pkg` (the top-level project name) and
- * `classes` (the chain of enclosing class names).
+ * Context is threaded down through container nodes:
+ *   - kind 1 (project) sets the package name and resets the path.
+ *   - kinds 2 (module), 4 (namespace), 128 (class), 256 (interface) all
+ *     append their name to the path. Modules are required because some
+ *     packages (storage-js, supabase-js) wrap each source file in a module
+ *     like `packages/StorageFileApi`, and a class named `default` (TypeDoc's
+ *     fallback for default-exported classes) is ambiguous without the module
+ *     segment. Interfaces hold many of the auth admin APIs whose methods
+ *     would otherwise lack a class segment in the ref.
  */
+const PATH_CONTAINER_KINDS = new Set([2, 4, 128, 256])
+
 function collectFunctions(
   node: Declaration,
   out: { functions: FunctionEntry[]; typeSpec: TypeSpec },
-  ctx: { pkg: string | null; classes: string[] } = { pkg: null, classes: [] }
+  ctx: { pkg: string | null; path: string[] } = { pkg: null, path: [] }
 ): void {
   let nextCtx = ctx
   if (node.kind === 1 && node.name) {
-    nextCtx = { pkg: node.name, classes: [] }
-  } else if (node.kind === 128 && node.name) {
-    nextCtx = { ...ctx, classes: [...ctx.classes, node.name] }
+    nextCtx = { pkg: node.name, path: [] }
+  } else if (node.kind && PATH_CONTAINER_KINDS.has(node.kind) && node.name) {
+    nextCtx = { ...ctx, path: [...ctx.path, node.name] }
   }
 
   if (ctx.pkg && node.name) {
-    const ref = [ctx.pkg, ...ctx.classes, node.name].join('.')
+    const ref = normalizeRefPath([ctx.pkg, ...ctx.path, node.name].join('.'))
     if (node.signatures?.length) {
       const sig = node.signatures[0]
       out.typeSpec.methods[ref] = {
@@ -254,7 +274,7 @@ function collectFunctions(
     const category = readTagFromDeclOrSignature(node, '@category')
     if (category) {
       const subcategory = readTagFromDeclOrSignature(node, '@subcategory')
-      const $ref = [ctx.pkg, ...ctx.classes, node.name].join('.')
+      const $ref = normalizeRefPath([ctx.pkg, ...ctx.path, node.name].join('.'))
       out.functions.push({ name: node.name, category, subcategory, $ref })
     }
   }
@@ -376,7 +396,9 @@ function buildBySlug(
     if (entry.slug in bySlug) return
     bySlug[entry.slug] = entry
     items.push(entry)
-    functionsList.push({ id: entry.slug, $ref: fn.$ref })
+    // functions.json `id` must match the bySlug entry's `id` (not the slug) —
+    // the renderer in Reference.sections.tsx does `fns.find(f => f.id === section.id)`.
+    functionsList.push({ id: entry.id, $ref: fn.$ref })
   }
 
   for (const category of orderedCategories) {
