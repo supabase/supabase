@@ -3,11 +3,10 @@ import { useFlag, useParams } from 'common'
 import { Lock } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
-import Link from 'next/link'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
   Tooltip,
@@ -144,24 +143,24 @@ export const Addons = () => {
 
   if (pitrAlertState === 'hipaa') {
     pitrAlert = (
-      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-        <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
+      <Alert className="rounded-none border-0 border-b px-6">
+        <AlertTitle>PITR cannot be changed with HIPAA</AlertTitle>
+        <AlertDescription>
           All projects should have PITR enabled by default and cannot be changed with HIPAA enabled.
           Contact support for further assistance.
-        </AlertDescription_Shadcn_>
+        </AlertDescription>
         <div className="mt-4">
           <Button type="default" asChild>
             <SupportLink>Contact support</SupportLink>
           </Button>
         </div>
-      </Alert_Shadcn_>
+      </Alert>
     )
   } else if (pitrAlertState === 'legacy-project') {
     pitrAlert = (
-      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-        <AlertTitle_Shadcn_>Your project is too old to enable PITR</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
+      <Alert className="rounded-none border-0 border-b px-6">
+        <AlertTitle>Your project is too old to enable PITR</AlertTitle>
+        <AlertDescription>
           <p className="text-sm leading-normal mb-2">
             Reach out to us via support if you're interested
           </p>
@@ -176,17 +175,15 @@ export const Addons = () => {
               Contact support
             </SupportLink>
           </Button>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        </AlertDescription>
+      </Alert>
     )
   } else if (pitrAlertState === 'orioledb') {
     pitrAlert = (
-      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-        <AlertTitle_Shadcn_>PITR not supported</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
-          Point in time recovery is not supported with OrioleDB
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <Alert className="rounded-none border-0 border-b px-6">
+        <AlertTitle>PITR not supported</AlertTitle>
+        <AlertDescription>Point in time recovery is not supported with OrioleDB</AlertDescription>
+      </Alert>
     )
   }
 
@@ -268,15 +265,13 @@ export const Addons = () => {
                   <p className="m-0 text-foreground-light text-sm">
                     Reserve a dedicated IPv4 address for your project.
                   </p>
-                  <Link
+                  <InlineLink
+                    className="text-foreground-light"
                     href={`${DOCS_URL}/guides/platform/ipv4-address`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-link text-sm"
-                    onClick={(event) => event.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     About IPv4 deprecation
-                  </Link>
+                  </InlineLink>
                 </div>
               </ResourceItem>
             )}
@@ -320,15 +315,13 @@ export const Addons = () => {
                 <p className="m-0 text-foreground-light text-sm">
                   Restore your database to a specific moment in the past.
                 </p>
-                <Link
+                <InlineLink
                   href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-link text-sm"
-                  onClick={(event) => event.stopPropagation()}
+                  className="text-foreground-light"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   About PITR backups
-                </Link>
+                </InlineLink>
               </div>
             </ResourceItem>
 
@@ -378,15 +371,13 @@ export const Addons = () => {
                   <p className="m-0 text-foreground-light text-sm">
                     Serve your project on your own domain name.
                   </p>
-                  <Link
+                  <InlineLink
                     href={`${DOCS_URL}/guides/platform/custom-domains`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-link text-sm"
-                    onClick={(event) => event.stopPropagation()}
+                    className="text-foreground-light"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     About custom domains
-                  </Link>
+                  </InlineLink>
                 </div>
               </ResourceItem>
             )}

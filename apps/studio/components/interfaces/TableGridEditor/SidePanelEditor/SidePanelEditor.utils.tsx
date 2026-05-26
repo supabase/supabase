@@ -12,6 +12,7 @@ import pgMeta, {
   type ForeignKey,
 } from '@supabase/pg-meta'
 import type { PGTablePrimaryKey } from '@supabase/pg-meta'
+import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { Query } from '@supabase/pg-meta/src/query'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
@@ -25,7 +26,7 @@ import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './Si
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import type { SupaRow } from '@/components/grid/types'
-import { GeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
+import { type AcceptedGeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
 import SparkBar from '@/components/ui/SparkBar'
 import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'
@@ -44,12 +45,7 @@ import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { executeWithRetry } from '@/data/table-rows/table-rows-query'
 import { tableKeys } from '@/data/tables/keys'
-import {
-  getTable,
-  getTableQuery,
-  RetrievedTableColumn,
-  RetrieveTableResult,
-} from '@/data/tables/table-retrieve-query'
+import { getTable, getTableQuery, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import {
   UpdateTableBody,
   updateTable as updateTableMutation,
@@ -57,6 +53,7 @@ import {
 import { getTables } from '@/data/tables/tables-query'
 import { sendEvent } from '@/data/telemetry/send-event-mutation'
 import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
 import type { DeepReadonly } from '@/lib/type-helpers'
 import type { SidePanel } from '@/state/table-editor'
 
@@ -173,12 +170,7 @@ const updateForeignKey = async ({
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
-  const query = `
-  ${getRemoveForeignKeySQL({ table, foreignKeys })}
-  ${getAddForeignKeySQL({ table, foreignKeys })}
-  `
-    .replace(/\s+/g, ' ')
-    .trim()
+  const query = safeSql`${getRemoveForeignKeySQL({ table, foreignKeys })} ${getAddForeignKeySQL({ table, foreignKeys })}`
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -283,7 +275,7 @@ export const updateColumn = async ({
 }: {
   projectRef: string
   connectionString?: string | null
-  originalColumn: RetrievedTableColumn
+  originalColumn: DeepReadonly<SafePostgresColumn>
   payload: UpdateColumnPayload
   selectedTable: RetrieveTableResult
   primaryKey?: Constraint
@@ -466,14 +458,14 @@ export const createTable = async ({
   isRLSEnabled: boolean
   importContent?: ImportContent
   organizationSlug?: string
-  generatedPolicies?: GeneratedPolicy[]
+  generatedPolicies?: AcceptedGeneratedPolicy[]
   onCreatePoliciesSuccess?: () => void
 }) => {
   const queryClient = getQueryClient()
 
   // Build all SQL statements for table creation, columns, and constraints
   // to execute in a single transaction for better performance and atomicity
-  const sqlStatements: string[] = []
+  const sqlStatements: Array<SafeSqlFragment> = []
 
   // 1. Create table SQL
   const { sql: createTableSql } = pgMeta.tables.create({ ...payload, no_transaction: true })
@@ -531,8 +523,8 @@ export const createTable = async ({
       table: { schema: payload.schema, name: payload.name },
       foreignKeys: foreignKeyRelations,
     })
-    // Remove trailing semicolon since we join with semicolons
-    sqlStatements.push(fkSql.replace(/;+$/, ''))
+    const fkSqlWithoutTrailingSemicolon = fkSql.replace(/;+$/, '') as SafeSqlFragment
+    sqlStatements.push(fkSqlWithoutTrailingSemicolon)
   }
 
   // Execute all table creation SQL in a single transaction
@@ -545,7 +537,7 @@ export const createTable = async ({
       await executeSql({
         projectRef,
         connectionString,
-        sql: `BEGIN; ${sqlStatements.join(';\n')}; COMMIT;`,
+        sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\n')}; COMMIT;`,
         queryKey: ['table', 'create-with-columns'],
       })
     }
@@ -555,7 +547,7 @@ export const createTable = async ({
   // [Joshen] Possible area for optimization to create all policies in a single query call
   // Can be subsequently added to the table creation SQL as well for a single transaction
 
-  const failedPolicies: GeneratedPolicy[] = []
+  const failedPolicies: AcceptedGeneratedPolicy[] = []
   if (generatedPolicies.length > 0 && isRLSEnabled) {
     await Sentry.startSpan(
       { name: 'create_table.create_policies', op: 'db.policies.create' },
@@ -722,15 +714,16 @@ export const createTable = async ({
         // For identity columns, manually raise the sequences (batched for performance)
         const identityColumns = columns.filter((column) => column.isIdentity)
         if (identityColumns.length > 0) {
-          const updateSequenceSQL = identityColumns
-            .map((column) =>
+          const updateSequenceSQL = joinSqlFragments(
+            identityColumns.map((column) =>
               getUpdateIdentitySequenceSQL({
                 schema: table.schema,
                 table: table.name,
                 column: column.name,
               })
-            )
-            .join(';\n')
+            ),
+            ';\n'
+          )
           await executeSql({
             projectRef,
             connectionString,
@@ -1085,15 +1078,16 @@ export async function insertRowsViaSpreadsheet({
             return
           }
 
-          const updateSequenceSQL = sequenceColumns
-            .map((column) =>
+          const updateSequenceSQL = joinSqlFragments(
+            sequenceColumns.map((column) =>
               getUpdateIdentitySequenceSQL({
                 schema: table.schema,
                 table: table.name,
                 column: column.name,
               })
-            )
-            .join(';\n')
+            ),
+            ';\n'
+          )
 
           executeSql({
             projectRef,
@@ -1185,15 +1179,16 @@ export async function insertTableRows({
     return { error: insertError }
   }
 
-  const updateSequenceSQL = sequenceColumns
-    .map((column) =>
+  const updateSequenceSQL = joinSqlFragments(
+    sequenceColumns.map((column) =>
       getUpdateIdentitySequenceSQL({
         schema: table.schema,
         table: table.name,
         column: column.name,
       })
-    )
-    .join(';\n')
+    ),
+    ';\n'
+  )
 
   try {
     await executeSql({

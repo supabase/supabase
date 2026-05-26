@@ -71,7 +71,6 @@ async function validateDestination(
       s3UrlStyle,
       s3UseSsl,
       metadataSchema,
-      expireSnapshotsOlderThan,
     } = destinationConfig.ducklake
 
     config = {
@@ -86,7 +85,6 @@ async function validateDestination(
         s3_url_style: s3UrlStyle,
         s3_use_ssl: s3UseSsl,
         metadata_schema: metadataSchema,
-        expire_snapshots_older_than: expireSnapshotsOlderThan,
       },
     } as unknown as components['schemas']['ValidateReplicationDestinationBody']['config']
   } else {

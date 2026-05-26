@@ -1,12 +1,11 @@
 import type { ReactNode } from 'react'
-import { Badge, Card } from 'ui'
+import { Card } from 'ui'
 
 export const ActionCard = (card: {
   icon: ReactNode
   title: string
   description: string
   bgColor: string
-  isBeta?: boolean
   onClick?: () => void
 }) => {
   return (
@@ -15,11 +14,6 @@ export const ActionCard = (card: {
       onClick={card.onClick}
     >
       <div className={`relative flex items-start gap-3`}>
-        {card.isBeta && (
-          <Badge className="absolute -right-5 -top-5 bg-surface-300 text-xs text-foreground">
-            Coming soon
-          </Badge>
-        )}
         <div
           className={`rounded-full ${card.bgColor} w-8 h-8 flex items-center justify-center shrink-0`}
         >

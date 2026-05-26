@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal } from 'ui'
+import { Button, Form, FormControl, FormField, Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -71,7 +71,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
               render={({ field }) => (
                 <FormItemLayout layout="vertical" label="User email">
                   <FormControl className="relative col-span-6">
-                    <Input_Shadcn_ {...field} />
+                    <Input {...field} />
                   </FormControl>
                 </FormItemLayout>
               )}

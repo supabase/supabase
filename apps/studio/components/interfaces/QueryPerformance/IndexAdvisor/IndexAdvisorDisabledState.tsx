@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 
 import { Markdown } from '../../Markdown'
 import { getIndexAdvisorExtensions } from './index-advisor.utils'
@@ -52,8 +52,8 @@ export const IndexAdvisorDisabledState = () => {
   }
 
   return (
-    <Alert_Shadcn_ className="mb-6">
-      <AlertTitle_Shadcn_>
+    <Alert className="mb-6">
+      <AlertTitle>
         <Markdown
           className="text-foreground"
           content={
@@ -62,8 +62,8 @@ export const IndexAdvisorDisabledState = () => {
               : 'Postgres extensions `index_advisor` and `hypopg` required'
           }
         />
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
+      </AlertTitle>
+      <AlertDescription>
         <Markdown
           content={
             indexAdvisor === undefined
@@ -71,9 +71,9 @@ export const IndexAdvisorDisabledState = () => {
               : 'These extensions can help in recommending database indexes to reduce the costs of your query.'
           }
         />
-      </AlertDescription_Shadcn_>
+      </AlertDescription>
 
-      <AlertDescription_Shadcn_ className="mt-3">
+      <AlertDescription className="mt-3">
         <div className="flex items-center gap-x-2">
           {indexAdvisor === undefined ? (
             <Button asChild type="default">
@@ -91,7 +91,7 @@ export const IndexAdvisorDisabledState = () => {
           )}
           <DocsButton href={`${DOCS_URL}/guides/database/extensions/index_advisor`} />
         </div>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }

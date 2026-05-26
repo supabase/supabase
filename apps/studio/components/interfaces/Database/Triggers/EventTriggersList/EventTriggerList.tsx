@@ -17,6 +17,7 @@ import {
 
 import type { EventTrigger } from './EventTriggerList.utils'
 import { SUPABASE_ROLES } from '@/components/interfaces/Database/Roles/Roles.constants'
+import { getDatabaseFunctionsHref } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface EventTriggerListProps {
@@ -126,7 +127,11 @@ export const EventTriggerList = ({
             <TableCell className="space-x-2">
               {trigger.function_name ? (
                 <Link
-                  href={`/project/${projectRef}/database/functions?search=${trigger.function_name}&schema=${trigger.function_schema}`}
+                  href={getDatabaseFunctionsHref(
+                    projectRef,
+                    trigger.function_schema,
+                    trigger.function_name
+                  )}
                   className="text-link-table-cell block max-w-40 text-foreground-light"
                 >
                   {trigger.function_name}

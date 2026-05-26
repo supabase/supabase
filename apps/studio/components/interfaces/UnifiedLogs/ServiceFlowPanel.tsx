@@ -36,12 +36,16 @@ import {
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ServiceFlowPanelProps {
+  dock: 'bottom' | 'right'
+  setDock: (value: 'bottom' | 'right') => void
   selectedRow?: ColumnSchema
   selectedRowKey: string
   searchParameters: QuerySearchParamsType
 }
 
 export function ServiceFlowPanel({
+  dock,
+  setDock,
   selectedRow,
   selectedRowKey,
   searchParameters,
@@ -83,9 +87,7 @@ export function ServiceFlowPanel({
       type: serviceFlowType,
       search: searchParameters,
     },
-    {
-      enabled: Boolean(projectRef) && Boolean(selectedRow?.id) && Boolean(serviceFlowType),
-    }
+    { enabled: Boolean(selectedRow?.id) && Boolean(serviceFlowType) }
   )
 
   if (!selectedRowKey || !selectedRow) return null
@@ -111,7 +113,7 @@ export function ServiceFlowPanel({
       <ResizablePanel
         id="log-sidepanel"
         defaultSize={400}
-        minSize={300}
+        minSize={dock === 'bottom' ? 300 : 400}
         className="bg-dash-sidebar"
       >
         <div className="flex h-full flex-col overflow-hidden">
@@ -135,7 +137,8 @@ export function ServiceFlowPanel({
                   Raw JSON
                 </TabsTrigger>
               </TabsList>
-              <ServiceFlowPanelControls />
+
+              <ServiceFlowPanelControls dock={dock} setDock={setDock} />
             </div>
 
             {shouldShowServiceFlow && (

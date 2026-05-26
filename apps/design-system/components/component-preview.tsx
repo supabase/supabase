@@ -2,13 +2,7 @@
 
 import { ChevronRight, Expand } from 'lucide-react'
 import * as React from 'react'
-import {
-  Button,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { Index } from '@/__registry__'
 import { useConfig } from '@/hooks/use-config'
@@ -24,6 +18,7 @@ interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   showDottedGrid?: boolean
   wide?: boolean
   hideCode?: boolean
+  padded?: boolean
 }
 
 export function ComponentPreview({
@@ -38,6 +33,7 @@ export function ComponentPreview({
   showDottedGrid = true,
   wide = false,
   hideCode = false,
+  padded = true,
   ...props
 }: ComponentPreviewProps) {
   const [config] = useConfig()
@@ -47,6 +43,7 @@ export function ComponentPreview({
   const Code = Codes[index]
 
   const [expand, setExpandState] = React.useState(false)
+  const previewClassName = className
 
   const Preview = React.useMemo(() => {
     const Component = Index[config.style][name]?.component
@@ -70,11 +67,16 @@ export function ComponentPreview({
     return (
       <>
         <div
-          className={cn('preview flex min-h-[256px] w-full justify-center p-10', {
-            'items-center': align === 'center',
-            'items-start': align === 'start',
-            'items-end': align === 'end',
-          })}
+          className={cn(
+            'preview flex min-h-[256px] w-full justify-center',
+            padded && 'p-10',
+            {
+              'items-center': align === 'center',
+              'items-start': align === 'start',
+              'items-end': align === 'end',
+            },
+            previewClassName
+          )}
         >
           <React.Suspense
             fallback={
@@ -86,7 +88,7 @@ export function ComponentPreview({
         </div>
       </>
     )
-  }, [Preview, align])
+  }, [Preview, align, padded, previewClassName])
 
   const wideClasses = wide ? '2xl:-ml-20 2xl:-mr-20' : ''
 
@@ -152,20 +154,20 @@ export function ComponentPreview({
         <div className="z-10 relative">{ComponentPreview}</div>
       </div>
       {!hideCode && (
-        <Collapsible_Shadcn_>
-          <CollapsibleTrigger_Shadcn_
+        <Collapsible>
+          <CollapsibleTrigger
             className={`
-              flex 
-              gap-3 items-center 
+              flex
+              gap-3 items-center
               w-full
               font-mono
-              text-xs 
+              text-xs
               text-foreground-light
-              px-4 py-4 
-              border border-r 
+              px-4 py-4
+              border border-r
               group
               data-closed:rounded-bl-md data-closed:rounded-br-md
-              
+
           `}
           >
             <ChevronRight
@@ -173,8 +175,8 @@ export function ComponentPreview({
               size={14}
             />
             View code
-          </CollapsibleTrigger_Shadcn_>
-          <CollapsibleContent_Shadcn_ className="transition-all">
+          </CollapsibleTrigger>
+          <CollapsibleContent className="transition-all">
             <div
               className={cn(
                 'relative',
@@ -186,8 +188,8 @@ export function ComponentPreview({
             >
               {Code}
             </div>
-          </CollapsibleContent_Shadcn_>
-        </Collapsible_Shadcn_>
+          </CollapsibleContent>
+        </Collapsible>
       )}
     </div>
   )

@@ -2,6 +2,8 @@
 
 import antigravityIcon from '../assets/antigravity-icon.svg'
 import claudeIcon from '../assets/claude-icon.svg'
+import copilotDarkIcon from '../assets/copilot-icon-dark.svg'
+import copilotIcon from '../assets/copilot-icon.svg'
 import cursorIcon from '../assets/cursor-icon.svg'
 import factoryDarkIcon from '../assets/factory-icon-dark.svg'
 import factoryIcon from '../assets/factory-icon.svg'
@@ -27,6 +29,7 @@ type McpClientIconAsset = {
 const MCP_CLIENT_ICON_ASSETS = {
   antigravity: { light: antigravityIcon, dark: antigravityIcon },
   claude: { light: claudeIcon, dark: claudeIcon },
+  copilot: { light: copilotIcon, dark: copilotDarkIcon },
   cursor: { light: cursorIcon, dark: cursorIcon },
   factory: { light: factoryIcon, dark: factoryDarkIcon },
   'gemini-cli': { light: geminiCliIcon, dark: geminiCliIcon },

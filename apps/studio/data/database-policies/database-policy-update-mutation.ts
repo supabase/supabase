@@ -1,4 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
+import type { SafeSqlFragment } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -17,8 +18,8 @@ export type DatabasePolicyUpdateVariables = {
   }
   payload: {
     name?: string
-    definition?: string
-    check?: string
+    definition?: SafeSqlFragment
+    check?: SafeSqlFragment
     roles?: string[]
   }
 }

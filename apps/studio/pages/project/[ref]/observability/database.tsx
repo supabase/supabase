@@ -6,7 +6,7 @@ import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, Button } from 'ui'
 
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -26,6 +26,7 @@ import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { analyticsKeys } from '@/data/analytics/keys'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
@@ -43,6 +44,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReport: NextPageWithLayout = () => {
@@ -82,6 +85,7 @@ const DatabaseUsage = () => {
 
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
@@ -191,6 +195,13 @@ const DatabaseUsage = () => {
     }
   )
 
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
+    enabled: !isRefreshing,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
+
   const stateSyncedFromUrlRef = useRef(false)
   useEffect(() => {
     if (stateSyncedFromUrlRef.current) return
@@ -218,20 +229,28 @@ const DatabaseUsage = () => {
       <ReportStickyNav
         content={
           <>
-            <ButtonTooltip
-              type="default"
-              disabled={isRefreshing}
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+              label="Refresh report"
+              side="bottom"
+            >
+              <Button
+                type="default"
+                disabled={isRefreshing}
+                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                className="w-7"
+                onClick={onRefreshReport}
+              />
+            </ShortcutTooltip>
             <ReportSettings chartId="database-charts" />
             <div className="flex items-center gap-3">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
               />
               <UpgradePrompt
                 show={showUpgradePrompt}
@@ -404,8 +423,8 @@ const DatabaseUsage = () => {
           }}
           append={() => (
             <div className="px-6 pb-6">
-              <Alert_Shadcn_ variant="default" className="mt-4">
-                <AlertDescription_Shadcn_>
+              <Alert variant="default" className="mt-4">
+                <AlertDescription>
                   <div className="space-y-2">
                     <p>
                       New Supabase projects have a database size of ~40-60mb. This space includes
@@ -424,8 +443,8 @@ const DatabaseUsage = () => {
                       </Link>
                     </Button>
                   </div>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             </div>
           )}
         />
