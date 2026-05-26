@@ -1,3 +1,9 @@
+import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
+
+// Re-exported so ConnectSheet consumers can keep importing from Connect.types
+// without reaching across to the hooks tree.
+export type { DeploymentMode }
+
 // ============================================================================
 // Project Keys (existing)
 // ============================================================================
@@ -154,4 +160,5 @@ export interface StepContentProps {
   state: ConnectState
   projectKeys: ProjectKeys
   connectionStringPooler: ConnectionStringPooler
+  deploymentMode: DeploymentMode
 }

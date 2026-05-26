@@ -58,7 +58,10 @@ import {
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import {
+  isInDataApiRevokeTreatment,
+  useDataApiRevokeOnCreateDefaultEnabled,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -108,8 +111,11 @@ const Wizard: NextPageWithLayout = () => {
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
-  // PostHog) so we only record true/false when the flag is resolved.
-  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  // PostHog) so we only record an actual value (boolean true/false, or a variant string
+  // like 'test'/'control' post-multivariate migration) once the flag has resolved.
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean | string>(
+    'dataApiRevokeOnCreateDefault'
+  )
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
 
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -174,9 +180,13 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     if (dataApiRevokeOnCreateDefaultFlag === undefined) return
     if (isDataApiDefaultPrivilegesDirty) return
-    setValue('dataApiDefaultPrivileges', !dataApiRevokeOnCreateDefaultFlag, {
-      shouldDirty: false,
-    })
+    setValue(
+      'dataApiDefaultPrivileges',
+      !isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag),
+      {
+        shouldDirty: false,
+      }
+    )
   }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case

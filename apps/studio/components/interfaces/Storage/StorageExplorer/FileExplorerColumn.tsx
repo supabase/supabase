@@ -57,7 +57,7 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
                 className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
                 style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
               >
-                <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
+                <Upload className="text-white pointer-events-none" size={20} />
                 <p className="text-center text-sm  text-white mt-2 pointer-events-none">
                   Drop your files to upload to this folder
                 </p>

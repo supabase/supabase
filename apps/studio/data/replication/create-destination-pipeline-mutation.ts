@@ -46,7 +46,6 @@ export type DucklakeDestinationConfig = {
   s3UrlStyle?: 'path' | 'vhost'
   s3UseSsl?: boolean
   metadataSchema?: string
-  expireSnapshotsOlderThan?: string
 }
 
 export type BatchConfig = {
@@ -137,7 +136,6 @@ async function createDestinationPipeline(
       s3UrlStyle,
       s3UseSsl,
       metadataSchema,
-      expireSnapshotsOlderThan,
     } = destinationConfig.ducklake
 
     destination_config = {
@@ -152,7 +150,6 @@ async function createDestinationPipeline(
         s3_url_style: s3UrlStyle,
         s3_use_ssl: s3UseSsl,
         metadata_schema: metadataSchema,
-        expire_snapshots_older_than: expireSnapshotsOlderThan,
       },
     } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
   } else {

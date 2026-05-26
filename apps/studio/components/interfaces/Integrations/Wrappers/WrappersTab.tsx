@@ -9,6 +9,7 @@ import { wrapperMetaComparator } from './Wrappers.utils'
 import { WrapperTable } from './WrapperTable'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -48,7 +49,7 @@ export const WrappersTab = () => {
 
   const Container = useCallback(
     ({ ...props }: { children: ReactNode } & HTMLProps<HTMLDivElement>) => (
-      <div className="w-full mx-10 py-10 ">
+      <div className="w-full p-10">
         {props.children}
         <Sheet open={!!createWrapperShown} onOpenChange={handleOpenChange}>
           <SheetContent size="lg" tabIndex={undefined}>
@@ -101,6 +102,23 @@ export const WrappersTab = () => {
 
   return (
     <Container>
+      <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
+        <DocsButton href={wrapperMeta.docsUrl} />
+        <ButtonTooltip
+          type="primary"
+          onClick={() => setCreateWrapperShown(true)}
+          disabled={!canCreateWrapper}
+          tooltip={{
+            content: {
+              text: !canCreateWrapper
+                ? 'You need additional permissions to create a foreign data wrapper'
+                : undefined,
+            },
+          }}
+        >
+          Add new wrapper
+        </ButtonTooltip>
+      </div>
       <WrapperTable />
       <DiscardChangesConfirmationDialog {...modalProps} />
     </Container>

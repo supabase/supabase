@@ -745,7 +745,7 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Email (Magic Link or OTP)',
+          name: 'Email (Magic link or OTP)',
           url: '/guides/auth/auth-email-passwordless',
           enabled: allAuthProvidersEnabled,
         },
@@ -2858,6 +2858,10 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Log drains',
           url: '/guides/telemetry/log-drains' as `/${string}`,
+        },
+        {
+          name: 'Tracing with the JS SDK',
+          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
         },
         {
           name: 'Reports',

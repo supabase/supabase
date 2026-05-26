@@ -43,11 +43,7 @@ export const MarketplaceListRow = ({ integration, isInstalled }: MarketplaceList
             </div>
             <div className="relative z-10">
               <MarketplaceSourceBadge source={source} />
-              {integration.status && (
-                <Badge variant="warning" className="capitalize">
-                  {integration.status}
-                </Badge>
-              )}
+              {integration.status && <Badge variant="warning">{integration.status}</Badge>}
             </div>
           </div>
           {integration.description && (

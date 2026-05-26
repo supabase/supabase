@@ -2,6 +2,7 @@ import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  isInDataApiRevokeTreatment,
   useDataApiRevokeOnCreateDefaultEnabled,
   useTrackDefaultPrivilegesExposure,
 } from '../useDataApiRevokeOnCreateDefault'
@@ -25,6 +26,33 @@ vi.mock('@/lib/telemetry/track', () => ({
   useTrack: vi.fn(),
 }))
 
+describe('isInDataApiRevokeTreatment', () => {
+  it('returns true for boolean true (current rollout shape)', () => {
+    expect(isInDataApiRevokeTreatment(true)).toBe(true)
+  })
+
+  it("returns true for the 'test' variant (future multivariate shape)", () => {
+    expect(isInDataApiRevokeTreatment('test')).toBe(true)
+  })
+
+  it('returns false for boolean false', () => {
+    expect(isInDataApiRevokeTreatment(false)).toBe(false)
+  })
+
+  it("returns false for the 'control' variant", () => {
+    expect(isInDataApiRevokeTreatment('control')).toBe(false)
+  })
+
+  it('returns false for undefined (flag not resolved)', () => {
+    expect(isInDataApiRevokeTreatment(undefined)).toBe(false)
+  })
+
+  it('returns false for unrelated string values', () => {
+    expect(isInDataApiRevokeTreatment('something-else')).toBe(false)
+    expect(isInDataApiRevokeTreatment('')).toBe(false)
+  })
+})
+
 describe('useDataApiRevokeOnCreateDefaultEnabled', () => {
   afterEach(() => {
     vi.restoreAllMocks()
@@ -47,6 +75,18 @@ describe('useDataApiRevokeOnCreateDefaultEnabled', () => {
     vi.mocked(usePHFlag).mockReturnValue(true)
     const { result } = renderHook(() => useDataApiRevokeOnCreateDefaultEnabled())
     expect(result.current).toBe(true)
+  })
+
+  it("returns true when the PostHog flag is the 'test' variant string", () => {
+    vi.mocked(usePHFlag).mockReturnValue('test')
+    const { result } = renderHook(() => useDataApiRevokeOnCreateDefaultEnabled())
+    expect(result.current).toBe(true)
+  })
+
+  it("returns false when the PostHog flag is the 'control' variant string", () => {
+    vi.mocked(usePHFlag).mockReturnValue('control')
+    const { result } = renderHook(() => useDataApiRevokeOnCreateDefaultEnabled())
+    expect(result.current).toBe(false)
   })
 
   it('returns false in test env regardless of flag value', () => {
@@ -249,6 +289,55 @@ describe('useTrackDefaultPrivilegesExposure', () => {
     expect(track).toHaveBeenCalledWith(
       'project_creation_default_privileges_exposed',
       expect.objectContaining({ dataApiRevokeOnCreateDefaultEnabled: false }),
+      undefined
+    )
+  })
+
+  // The next two tests cover the future multivariate flag shape (GROWTH-877).
+  // Today the flag returns boolean true/false; post-migration it returns the
+  // variant string. The convergence gate must derive the expected default from
+  // the variant, not from `!flag` directly — `!'control'` is false (truthy
+  // string negation), which would have set the wrong expected default and
+  // either skipped or mis-fired the exposure for control-arm users.
+
+  it("fires for the 'test' variant with the correct convergence default (treatment)", () => {
+    vi.mocked(usePHFlag).mockReturnValue('test')
+    renderHook(() =>
+      useTrackDefaultPrivilegesExposure({
+        surface: 'main',
+        dataApiDefaultPrivileges: false, // expected default for treatment
+        hasUserModified: false,
+      })
+    )
+    expect(track).toHaveBeenCalledTimes(1)
+    expect(track).toHaveBeenCalledWith(
+      'project_creation_default_privileges_exposed',
+      {
+        surface: 'main',
+        dataApiDefaultPrivileges: false,
+        dataApiRevokeOnCreateDefaultEnabled: 'test',
+      },
+      undefined
+    )
+  })
+
+  it("fires for the 'control' variant with the correct convergence default (legacy)", () => {
+    vi.mocked(usePHFlag).mockReturnValue('control')
+    renderHook(() =>
+      useTrackDefaultPrivilegesExposure({
+        surface: 'main',
+        dataApiDefaultPrivileges: true, // expected default for non-treatment
+        hasUserModified: false,
+      })
+    )
+    expect(track).toHaveBeenCalledTimes(1)
+    expect(track).toHaveBeenCalledWith(
+      'project_creation_default_privileges_exposed',
+      {
+        surface: 'main',
+        dataApiDefaultPrivileges: true,
+        dataApiRevokeOnCreateDefaultEnabled: 'control',
+      },
       undefined
     )
   })

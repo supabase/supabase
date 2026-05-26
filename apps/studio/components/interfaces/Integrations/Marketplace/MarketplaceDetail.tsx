@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookOpen, Settings } from 'lucide-react'
+import { ArrowUpRight, BookOpen } from 'lucide-react'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
@@ -70,7 +70,7 @@ export const MarketplaceDetail = () => {
     }
     if (isInstalled) {
       return (
-        <Button type="outline" disabled icon={<Settings size={13} />}>
+        <Button type="outline" disabled>
           Installed
         </Button>
       )
@@ -78,6 +78,8 @@ export const MarketplaceDetail = () => {
     return <InstallIntegrationSheet integration={integration} />
   }
 
+  // For overview route, get the integration-specific overview component if available
+  const OverviewComponent = activeRoute === 'overview' ? Component : null
   const CustomPageComponent = activeRoute !== 'overview' && isKnownRoute ? Component : null
 
   return (
@@ -114,7 +116,9 @@ export const MarketplaceDetail = () => {
 
       {activeRoute === 'overview' ? (
         <div className={centeredContentClass}>
-          <OverviewTab integration={integration} isInstalled={isInstalled} />
+          <OverviewTab integration={integration} isInstalled={isInstalled}>
+            {OverviewComponent && <OverviewComponent />}
+          </OverviewTab>
         </div>
       ) : CustomPageComponent ? (
         layout === 'constrained' ? (

@@ -6,6 +6,13 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Badge,
   Button,
   cn,
@@ -21,7 +28,6 @@ import {
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-  Modal,
   SidePanel,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -424,46 +430,38 @@ export const PublishAppSidePanel = ({
             </SidePanel.Content>
           </div>
 
-          <Modal
-            hideFooter
-            showCloseButton={false}
-            className="max-w-[600px]!"
-            visible={showPreview}
-            onCancel={() => setShowPreview(false)}
-          >
-            <Modal.Content>
-              <div className="flex items-center gap-x-2 justify-between">
-                <p className="truncate">Authorize API access for {name}</p>
-                <Badge variant="success">Preview</Badge>
-              </div>
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content>
-              <AuthorizeRequesterDetails
-                icon={iconUrl || null}
-                name={name}
-                domain={website}
-                scopes={scopes}
-              />
-              <div className="pt-4 space-y-2">
-                <p className="prose text-sm">Select an organization to grant API access to</p>
-                <div className="border border-control text-foreground-light rounded-sm px-4 py-2 text-sm bg-surface-200">
-                  Organizations that you have access to will be listed here
-                </div>
-              </div>
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center justify-between">
+          <AlertDialog open={showPreview} onOpenChange={(open) => setShowPreview(open)}>
+            <AlertDialogContent size="large">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  <div className="flex items-center gap-x-2 justify-between">
+                    <p className="truncate">Authorize API access for {name}</p>
+                    <Badge variant="success">Preview</Badge>
+                  </div>
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  <AuthorizeRequesterDetails
+                    icon={iconUrl || null}
+                    name={name}
+                    domain={website}
+                    scopes={scopes}
+                  />
+                  <div className="pt-4 space-y-2">
+                    <p className="prose text-sm">Select an organization to grant API access to</p>
+                    <div className="border border-control text-foreground-light rounded-sm px-4 py-2 text-sm bg-surface-200">
+                      Organizations that you have access to will be listed here
+                    </div>
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="items-baseline sm:justify-between">
                 <p className="prose text-xs">
                   This is what your users will see when authorizing with your app
                 </p>
-                <Button type="default" onClick={() => setShowPreview(false)}>
-                  Close
-                </Button>
-              </div>
-            </Modal.Content>
-          </Modal>
+                <AlertDialogCancel>Close</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </form>
       </Form>
     </SidePanel>
