@@ -14,7 +14,7 @@ The same attack pattern keeps recurring: a popular npm package is compromised, t
 
 The good news: most of the impact is preventable from the consumer side, regardless of what any one publisher does. This guide is the set of settings and habits we recommend you adopt.
 
-## TL;DR — what to do today
+## What to do today
 
 1. **Commit your lockfile** and install with `--frozen-lockfile` (pnpm/yarn) or `npm ci` (npm) in CI.
 2. **Quarantine new versions.** Set a minimum release age (≥ 7 days) so installs won't pick up a brand-new version while attackers are still in their detection window. npm, pnpm, yarn, and bun all support this natively now.
