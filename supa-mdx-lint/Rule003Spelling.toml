@@ -201,6 +201,7 @@ allow_list = [
     "Database Functions?",
     "Datadog",
     "Deadpool",
+    "Dependabot",
     "DDoS",
     "Deno",
     "Dependabot",
