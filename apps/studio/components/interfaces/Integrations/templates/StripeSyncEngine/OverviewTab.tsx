@@ -51,7 +51,7 @@ const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
 })
 
-const StripeSyncContent = () => {
+const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolean }) => {
   const track = useTrack()
   const hasTrackedInstallFailed = useRef(false)
   const { data: project } = useSelectedProjectQuery()
@@ -219,6 +219,7 @@ const StripeSyncContent = () => {
             isUpgrade={upgradeAvailable}
           />
           <IntegrationNotInstalledActions
+            hideInstallCTA={hideInstallCTA}
             installing={installing}
             canInstall={canInstall}
             isUninstallRequested={isUninstallRequested}
@@ -397,7 +398,7 @@ export const StripeSyncEngineOverviewTab = () => {
     return (
       <>
         <RequiredExtensionsSection />
-        <StripeSyncContent />
+        <StripeSyncContent hideInstallCTA />
       </>
     )
   }
