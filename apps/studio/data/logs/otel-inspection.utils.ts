@@ -40,9 +40,10 @@ export function flattenOtelInspectionRow(
 ): UnifiedLogInspectionEntry & Record<string, unknown> {
   const attrs: Record<string, any> = row.log_attributes ?? {}
 
+  const host = attrs['request.host'] ?? attrs['host'] ?? ''
   // Path key differs across sources: edge_logs uses `request.path`,
   // function_edge_logs uses `request.pathname`. Coalesce.
-  const requestPath = attrs['request.path'] ?? attrs['request.pathname']
+  const requestPath = attrs['request.path'] ?? attrs['request.pathname'] ?? ['path']
   // Status: HTTP response code for gateway rows, Postgres SQL state code for postgres rows.
   const status =
     row.source === 'postgres_logs' ? attrs['parsed.sql_state_code'] : attrs['response.status_code']
@@ -70,9 +71,9 @@ export function flattenOtelInspectionRow(
     level,
 
     // Network -- flat aliases the panel reads as `enrichedData.request_path` etc.
+    host,
     method: attrs['request.method'] ?? '',
     path: requestPath ?? '',
-    host: attrs['request.host'] ?? '',
     status_code: status != null ? String(status) : '',
     request_path: requestPath ?? null,
     request_host: attrs['request.host'] ?? null,

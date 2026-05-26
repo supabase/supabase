@@ -1,6 +1,6 @@
 import { BlockFieldConfig } from '../types'
 import { getStorageMetadata } from '../utils/storageUtils'
-import { formatBytes } from '@/lib/helpers'
+import { formatBytes, tryParseJson } from '@/lib/helpers'
 
 // Helper functions that avoid duplication with existing storage utilities
 const getFileName = (path: string): string => {
@@ -371,28 +371,34 @@ export const postgrestResponseFields: BlockFieldConfig[] = [
 // Primary GoTrue/Auth Fields (Always Visible)
 export const authPrimaryFields: BlockFieldConfig[] = [
   {
-    id: 'auth_path',
-    label: 'Auth Path',
-    getValue: (data, enrichedData) => {
-      return enrichedData?.path || enrichedData?.request_path || data?.path
-    },
-    requiresEnrichedData: true,
-  },
-  {
     id: 'log_id',
     label: 'Log ID',
     getValue: (data, enrichedData) => {
       const logId = data?.id || enrichedData?.id
-      return logId ? `${logId.substring(0, 8)}...` : null
+      return logId ?? null
+    },
+  },
+  {
+    id: 'status',
+    label: 'Status',
+    getValue: (data) => {
+      return data.status
+    },
+  },
+  {
+    id: 'auth_path',
+    label: 'Auth Path',
+    getValue: (data, enrichedData) => {
+      return enrichedData?.path || enrichedData?.request_path || data?.path || data?.pathname
     },
   },
   {
     id: 'referer',
     label: 'Referer',
-    getValue: (_data, enrichedData) => {
-      return enrichedData?.headers_referer || null
+    getValue: (data, enrichedData) => {
+      const eventMessage = tryParseJson(data.event_message)
+      return eventMessage?.referer || enrichedData?.headers_referer || null
     },
-    requiresEnrichedData: true,
   },
 ]
 
