@@ -97,7 +97,17 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
             Copy
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-40">
+        <DropdownMenuContent
+          align="start"
+          className="w-40"
+          onFocusOutside={(e) => {
+            // When rendered inside a popover with a focused DataGrid (the
+            // linked record peek), the grid grabs focus back as soon as the
+            // menu opens, which closes it. Suppress focus-driven dismissal;
+            // outside pointer-down still closes the menu normally.
+            e.preventDefault()
+          }}
+        >
           <DropdownMenuItem onClick={() => onCopyRows('csv')}>Copy as CSV</DropdownMenuItem>
           <DropdownMenuItem onClick={() => onCopyRows('sql')}>Copy as SQL</DropdownMenuItem>
           <DropdownMenuItem onClick={() => onCopyRows('json')}>Copy as JSON</DropdownMenuItem>
@@ -116,7 +126,17 @@ export const CopyExportRowsActions = ({ rows, table, project }: CopyExportRowsAc
             Export
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-40">
+        <DropdownMenuContent
+          align="start"
+          className="w-40"
+          onFocusOutside={(e) => {
+            // When rendered inside a popover with a focused DataGrid (the
+            // linked record peek), the grid grabs focus back as soon as the
+            // menu opens, which closes it. Suppress focus-driven dismissal;
+            // outside pointer-down still closes the menu normally.
+            e.preventDefault()
+          }}
+        >
           <DropdownMenuItem onClick={() => onExportRows(exportCsv)}>Export as CSV</DropdownMenuItem>
           <DropdownMenuItem onClick={() => onExportRows(exportSql)}>Export as SQL</DropdownMenuItem>
           <DropdownMenuItem onClick={() => onExportRows(exportJson)}>
