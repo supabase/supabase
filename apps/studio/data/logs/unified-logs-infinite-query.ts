@@ -5,6 +5,7 @@ import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import { analyticsLiteral, safeSql } from './safe-analytics-sql'
+import { extractLogMetadata } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
@@ -140,20 +141,7 @@ export async function getUnifiedLogs(
       ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
       : new Date(Number(ts) / 1000)
 
-    // [Joshen] For auth logs, these metadata are nested within event_message,
-    // so opting to bring them out at the query level
-    const eventMessage = tryParseJson(row.event_message)
-    const status =
-      row.log_type === 'auth'
-        ? (eventMessage?.status ??
-          extractLeadingStatus(eventMessage?.msg) ??
-          extractLeadingStatus(eventMessage?.error))
-        : (row.status ?? 200)
-    const method = row.log_type === 'auth' ? eventMessage?.method : row.method
-    const pathname =
-      row.log_type === 'auth'
-        ? eventMessage?.path
-        : (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.pathname || ''
+    const { status, method, pathname } = extractLogMetadata(row)
 
     return {
       id: row.id,
