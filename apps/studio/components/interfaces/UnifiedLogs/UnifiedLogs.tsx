@@ -84,7 +84,17 @@ export const UnifiedLogs = () => {
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
-  const { sort, start, size, id, cursor, direction, live, hide_connection_logs: _hideConnectionLogs, ...filter } = search
+  const {
+    sort,
+    start,
+    size,
+    id,
+    cursor,
+    direction,
+    live,
+    hide_connection_logs: _hideConnectionLogs,
+    ...filter
+  } = search
   const defaultColumnSorting = sort ? [sort] : []
   const defaultColumnVisibility = { uuid: false }
   const defaultColumnFilters = Object.entries(filter)
