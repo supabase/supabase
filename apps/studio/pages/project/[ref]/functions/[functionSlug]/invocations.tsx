@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 
-import { getEdgeFunctionDetailsPageLayout } from './layout'
 import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
+import { getEdgeFunctionDetailsPageLayout } from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsPageLayout'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import type { NextPageWithLayout } from '@/types'
 

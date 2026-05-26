@@ -10,9 +10,9 @@ import { Alert, AlertDescription, AlertTitle, Button, LogoLoader, WarningIcon } 
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-import { getEdgeFunctionDetailsPageLayout } from './layout'
 import { EdgeFunctionOverview } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview'
 import { EdgeFunctionRecentInvocations } from '@/components/interfaces/Functions/EdgeFunctionRecentInvocations'
+import { getEdgeFunctionDetailsPageLayout } from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsPageLayout'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
 import AreaChart from '@/components/ui/Charts/AreaChart'
 import StackedBarChart from '@/components/ui/Charts/StackedBarChart'
