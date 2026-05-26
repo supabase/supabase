@@ -13,6 +13,7 @@ export const jwtKeysRegistry: RegistryDefinations<JwtKeysShortcutId> = {
     label: 'Create standby key',
     sequence: ['Shift+N'],
     showInSettings: false,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [JWT_KEYS_SHORTCUT_IDS.JWT_KEYS_SUBMIT_STANDBY]: {
     id: JWT_KEYS_SHORTCUT_IDS.JWT_KEYS_SUBMIT_STANDBY,

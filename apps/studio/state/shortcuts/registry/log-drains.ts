@@ -14,6 +14,7 @@ export const logDrainsRegistry: RegistryDefinations<LogDrainsShortcutId> = {
     label: 'Add destination',
     sequence: ['Shift+N'],
     showInSettings: false,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [LOG_DRAINS_SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION]: {
     id: LOG_DRAINS_SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION,

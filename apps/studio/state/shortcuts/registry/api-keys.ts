@@ -15,12 +15,14 @@ export const apiKeysRegistry: RegistryDefinations<ApiKeysShortcutId> = {
     label: 'New publishable key',
     sequence: ['Shift+P'],
     showInSettings: false,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [API_KEYS_SHORTCUT_IDS.API_KEYS_NEW_SECRET]: {
     id: API_KEYS_SHORTCUT_IDS.API_KEYS_NEW_SECRET,
     label: 'New secret key',
     sequence: ['Shift+S'],
     showInSettings: false,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
   },
   [API_KEYS_SHORTCUT_IDS.API_KEYS_CREATE_PUBLISHABLE]: {
     id: API_KEYS_SHORTCUT_IDS.API_KEYS_CREATE_PUBLISHABLE,
