@@ -19,7 +19,7 @@ import {
   SHORTCUT_REFERENCE_GROUP_ORDER,
   SHORTCUT_REFERENCE_GROUPS,
 } from '@/state/shortcuts/referenceGroups'
-import type { ShortcutHotkeyMeta } from '@/state/shortcuts/useShortcut'
+import type { ShortcutHotkeyMeta } from '@/state/shortcuts/types'
 
 interface ShortcutsReferenceSheetProps {
   open: boolean
