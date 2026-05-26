@@ -75,11 +75,17 @@ export function AppsList({ onCreateApp, createShortcutId }: AppsListProps) {
           title="No private apps yet"
           description="Create a private app to generate scoped access tokens for your organization."
         >
-          <Shortcut id={createShortcutId} onTrigger={onCreateApp} side="bottom">
+          {createShortcutId ? (
+            <Shortcut id={createShortcutId} onTrigger={onCreateApp} side="bottom">
+              <Button type="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
+                Create app
+              </Button>
+            </Shortcut>
+          ) : (
             <Button type="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
               Create app
             </Button>
-          </Shortcut>
+          )}
         </EmptyStatePresentational>
       ) : (
         <AppsListTable
