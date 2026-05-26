@@ -12,6 +12,7 @@ import {
   QuerySearchParamsType,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError } from '@/data/fetchers'
+import { tryParseJson } from '@/lib/helpers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
@@ -28,6 +29,11 @@ export const UNIFIED_LOGS_QUERY_OPTIONS = {
 export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
+
+const extractLeadingStatus = (s?: string) => {
+  const m = typeof s === 'string' ? s.match(/^(\d{3})\b/) : null
+  return m ? Number(m[1]) : undefined
+}
 
 export const getUnifiedLogsISOStartEnd = (
   search: QuerySearchParamsType,
@@ -134,15 +140,30 @@ export async function getUnifiedLogs(
       ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
       : new Date(Number(ts) / 1000)
 
+    // [Joshen] For auth logs, these metadata are nested within event_message,
+    // so opting to bring them out at the query level
+    const eventMessage = tryParseJson(row.event_message)
+    const status =
+      row.log_type === 'auth'
+        ? (eventMessage?.status ??
+          extractLeadingStatus(eventMessage?.msg) ??
+          extractLeadingStatus(eventMessage?.error))
+        : (row.status ?? 200)
+    const method = row.log_type === 'auth' ? eventMessage?.method : row.method
+    const pathname =
+      row.log_type === 'auth'
+        ? eventMessage?.path
+        : (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.pathname || ''
+
     return {
       id: row.id,
       date,
+      method,
+      pathname,
+      status,
       timestamp: row.timestamp,
       level: row.level as LogLevel,
-      status: row.status || 200,
-      method: row.method,
       host: row.host,
-      pathname: (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.pathname || '',
       event_message: row.event_message || row.body || '',
       headers:
         typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},
