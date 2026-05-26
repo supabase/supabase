@@ -87,7 +87,11 @@ using ( (select auth.jwt()->>'sub') = owner_id );
 
 Allow anyone to access objects in the `avatars` bucket via publishable key. The `allow_any_operation()` filter is critical here as without it users would be able to list the bucket contents.
 
-Note: this is not needed for public buckets as they are already publicly accessible
+<Admonition type="note">
+
+This is not needed for public buckets, as they are already publicly accessible
+
+</Admonition>
 
 ```sql
 create policy "Avatar images are publicly accessible." on storage.objects
