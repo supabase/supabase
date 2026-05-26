@@ -45,7 +45,7 @@ export function TemplateBrowser({
 
   return (
     <section className="flex h-full flex-col overflow-hidden">
-      <div className="relative z-10 shrink-0">
+      <div className="relative z-10 shrink-0 bg-background">
         <div className="px-4 pt-4 pb-0">
           <ComposerBreadcrumbs />
           <div className="mt-4 flex items-center gap-2">
@@ -66,13 +66,13 @@ export function TemplateBrowser({
             />
           </div>
         </div>
-      </div>
-
-      <div className="relative min-h-0 flex-1 overflow-y-auto">
         <div
           aria-hidden
-          className="pointer-events-none sticky top-0 z-10 -mb-10 h-10 shrink-0 bg-muted/10 [mask-image:linear-gradient(to_bottom,black,transparent)]"
+          className="pointer-events-none absolute inset-x-0 top-full z-10 h-10 bg-linear-to-b from-background to-transparent"
         />
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="px-4 pb-4 pt-4">
           {categories.length === 0 ? (
             <div className="rounded-lg border border-dashed p-6 text-center text-sm text-foreground-light">

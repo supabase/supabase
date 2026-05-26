@@ -1,19 +1,11 @@
 {
   "id": "mcp-server",
   "name": "MCP Server",
-  "description": "Cursor MCP configuration for local Supabase MCP and hosted project access",
+  "description": "Edge Function MCP server with a tool registry for exposing project capabilities to MCP clients",
   "category": "AI",
   "version": "1.0.0",
-  "tags": [
-    "mcp",
-    "ai",
-    "cursor",
-    "tools"
-  ],
+  "tags": ["mcp", "ai", "tools", "functions"],
   "dependencies": {
-    "required": [
-      "database",
-      "api"
-    ]
+    "required": ["database", "api", "functions"]
   }
 }

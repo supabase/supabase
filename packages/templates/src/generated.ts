@@ -499,32 +499,49 @@ export const templates: Template[] = [
   {
     "id": "mcp-server",
     "name": "MCP Server",
-    "description": "Cursor MCP configuration for local Supabase MCP and hosted project access",
+    "description": "Edge Function MCP server with a tool registry for exposing project capabilities to MCP clients",
     "category": "AI",
     "version": "1.0.0",
     "tags": [
       "mcp",
       "ai",
-      "cursor",
-      "tools"
+      "tools",
+      "functions"
     ],
     "dependencies": {
       "required": [
         "database",
-        "api"
+        "api",
+        "functions"
       ]
     },
     "files": [
       {
-        "path": "supabase/integrations/cursor-mcp.json",
-        "content": "{\n  \"mcpServers\": {\n    \"supabase-local\": {\n      \"url\": \"http://127.0.0.1:54321/mcp\"\n    },\n    \"supabase\": {\n      \"url\": \"https://mcp.supabase.com/mcp\"\n    }\n  }\n}\n"
+        "path": "supabase/functions/mcp-server/index.ts",
+        "content": "import 'jsr:@supabase/functions-js/edge-runtime.d.ts'\n\nimport { createClient } from 'jsr:@supabase/supabase-js@2'\n\nimport { getTool, listTools } from './registry.ts'\n\nimport './tools/index.ts'\n\nconst SERVER_INFO = {\n  name: 'supabase-mcp-server',\n  version: '0.1.0',\n}\n\nconst PROTOCOL_VERSION = '2024-11-05'\n\ntype JsonRpcRequest = {\n  jsonrpc: '2.0'\n  id?: string | number | null\n  method: string\n  params?: Record<string, unknown>\n}\n\nfunction rpcResult(id: JsonRpcRequest['id'], result: unknown) {\n  return Response.json({ jsonrpc: '2.0', id: id ?? null, result })\n}\n\nfunction rpcError(id: JsonRpcRequest['id'], code: number, message: string) {\n  return Response.json({\n    jsonrpc: '2.0',\n    id: id ?? null,\n    error: { code, message },\n  })\n}\n\nDeno.serve(async (req) => {\n  if (req.method !== 'POST') {\n    return new Response('expected POST request', { status: 405 })\n  }\n\n  let body: JsonRpcRequest\n  try {\n    body = await req.json()\n  } catch {\n    return rpcError(null, -32700, 'parse error')\n  }\n\n  const supabase = createClient(\n    Deno.env.get('SUPABASE_URL')!,\n    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!\n  )\n\n  switch (body.method) {\n    case 'initialize':\n      return rpcResult(body.id, {\n        protocolVersion: PROTOCOL_VERSION,\n        serverInfo: SERVER_INFO,\n        capabilities: { tools: {} },\n      })\n\n    case 'tools/list':\n      return rpcResult(body.id, {\n        tools: listTools().map(({ name, description, inputSchema }) => ({\n          name,\n          description,\n          inputSchema,\n        })),\n      })\n\n    case 'tools/call': {\n      const name = String(body.params?.name ?? '')\n      const args = (body.params?.arguments ?? {}) as Record<string, unknown>\n      const tool = getTool(name)\n\n      if (!tool) {\n        return rpcError(body.id, -32601, `unknown tool: ${name}`)\n      }\n\n      try {\n        const result = await tool.handler(args, { supabase, request: req })\n        return rpcResult(body.id, {\n          content: [{ type: 'text', text: JSON.stringify(result) }],\n        })\n      } catch (err) {\n        return rpcResult(body.id, {\n          isError: true,\n          content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],\n        })\n      }\n    }\n\n    default:\n      return rpcError(body.id, -32601, `unknown method: ${body.method}`)\n  }\n})\n"
+      },
+      {
+        "path": "supabase/functions/mcp-server/registry.ts",
+        "content": "import type { SupabaseClient } from 'jsr:@supabase/supabase-js@2'\n\nexport type JsonSchema = {\n  type: 'object'\n  properties?: Record<string, unknown>\n  required?: string[]\n  additionalProperties?: boolean\n}\n\nexport type ToolContext = {\n  supabase: SupabaseClient\n  request: Request\n}\n\nexport type ToolHandler = (args: Record<string, unknown>, ctx: ToolContext) => Promise<unknown>\n\nexport type Tool = {\n  name: string\n  description: string\n  inputSchema: JsonSchema\n  handler: ToolHandler\n}\n\nconst tools = new Map<string, Tool>()\n\nexport function registerTool(tool: Tool): void {\n  if (tools.has(tool.name)) {\n    throw new Error(`tool already registered: ${tool.name}`)\n  }\n  tools.set(tool.name, tool)\n}\n\nexport function getTool(name: string): Tool | undefined {\n  return tools.get(name)\n}\n\nexport function listTools(): Tool[] {\n  return Array.from(tools.values())\n}\n"
+      },
+      {
+        "path": "supabase/functions/mcp-server/tools/echo.ts",
+        "content": "import { registerTool } from '../registry.ts'\n\nregisterTool({\n  name: 'echo',\n  description: 'Echoes the provided message back. Useful for connectivity checks.',\n  inputSchema: {\n    type: 'object',\n    properties: {\n      message: { type: 'string', description: 'Text to echo back.' },\n    },\n    required: ['message'],\n    additionalProperties: false,\n  },\n  async handler(args) {\n    return { message: String(args.message ?? '') }\n  },\n})\n"
+      },
+      {
+        "path": "supabase/functions/mcp-server/tools/index.ts",
+        "content": "// Import each tool module so it self-registers with the registry.\n// To add a new tool: create a file under ./tools and import it below.\nimport './echo.ts'\nimport './list-tables.ts'\n"
+      },
+      {
+        "path": "supabase/functions/mcp-server/tools/list-tables.ts",
+        "content": "import { registerTool } from '../registry.ts'\n\nregisterTool({\n  name: 'list_tables',\n  description: 'List tables in a schema of the connected Supabase database.',\n  inputSchema: {\n    type: 'object',\n    properties: {\n      schema: {\n        type: 'string',\n        description: 'Schema name to inspect. Defaults to \"public\".',\n      },\n    },\n    additionalProperties: false,\n  },\n  async handler(args, { supabase }) {\n    const schema = typeof args.schema === 'string' ? args.schema : 'public'\n\n    const { data, error } = await supabase\n      .schema('information_schema')\n      .from('tables')\n      .select('table_name')\n      .eq('table_schema', schema)\n      .order('table_name')\n\n    if (error) throw new Error(error.message)\n\n    return { schema, tables: data?.map((t) => t.table_name) ?? [] }\n  },\n})\n"
       },
       {
         "path": "supabase/seed.sql",
-        "content": "-- MCP setup notes:\n-- 1. Copy supabase/integrations/cursor-mcp.json to .cursor/mcp.json in your project root.\n-- 2. Local MCP is available at http://127.0.0.1:54321/mcp when running `supabase start`.\n-- 3. Hosted MCP: https://supabase.com/docs/guides/ai-tools/mcp\n"
+        "content": "-- MCP server notes:\n-- 1. The MCP server is implemented as an Edge Function at supabase/functions/mcp-server.\n-- 2. Tools are registered via the registry in functions/mcp-server/registry.ts.\n--    Add new tools under functions/mcp-server/tools/ and import them in tools/index.ts.\n-- 3. Local endpoint: http://127.0.0.1:54321/functions/v1/mcp-server\n-- 4. Configure your MCP client (e.g. Cursor) to point at that URL.\n"
       }
     ],
-    "readme": "# MCP server template\n\nExposes Supabase project capabilities through a Model Context Protocol server integration.\n\n## Includes\n\n- Cursor MCP integration config\n- Seed data for local MCP tooling\n\n## Dependencies\n\nRequires **database**, **api**, and **auth**."
+    "readme": "# MCP server template\n\nScaffolds a Model Context Protocol server as a Supabase Edge Function. The function speaks JSON-RPC over HTTP and exposes tools that are declared through a small registry.\n\n## Includes\n\n- `supabase/functions/mcp-server/index.ts` — JSON-RPC entrypoint handling `initialize`, `tools/list`, and `tools/call`\n- `supabase/functions/mcp-server/registry.ts` — `registerTool` API and tool typings\n- `supabase/functions/mcp-server/tools/` — one file per tool, imported from `tools/index.ts`\n\n## Adding a tool\n\n1. Create a new file under `supabase/functions/mcp-server/tools/`, e.g. `tools/my-tool.ts`.\n2. Call `registerTool({ name, description, inputSchema, handler })` at module scope.\n3. Import the new file from `tools/index.ts` so it self-registers at boot.\n\n## Dependencies\n\nRequires **database**, **api**, and **functions**."
   }
 ]
 
