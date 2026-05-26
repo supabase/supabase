@@ -9,13 +9,13 @@ Enabling temporary access only applies to connections to Postgres and Supavisor 
 
 <Admonition type="note">
 
-Projects need to be at least on Postgres 17.4.0 to enable temporary access. You can find the Postgres version of your project on the [infrastructure settings](/dashboard/project/_/settings/infrastructure) page. If your project is on an older version, you will need to [upgrade](/docs/guides/platform/upgrading) to use this feature.
+Projects need to be at least on Postgres 17.6.1.081 (or higher) to enable temporary access. You can find the Postgres version of your project on the [infrastructure settings](/dashboard/project/_/settings/infrastructure) page. If your project is on an older version, you will need to [upgrade](/docs/guides/platform/upgrading) to use this feature.
 
 </Admonition>
 
 ## Manage temporary access via the dashboard
 
-Temporary access can be configured via the "Enable temporary access" settings section in [Database Settings page](/dashboard/project/_/database/settings) of the dashboard.
+The easiest way to manage temporary access is via the "Enable temporary access" settings section in [Database Settings page](/dashboard/project/_/database/settings) of the dashboard.
 
 ## Manage temporary access via the Management API
 
@@ -23,24 +23,24 @@ You can also manage temporary access using the Management API:
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
-export SUPABASE_ACCESS_TOKEN="your-access-token"
+export SUPABASE_MANAGEMENT_API_TOKEN="your-access-token"
 export PROJECT_REF="your-project-ref"
 
 # Get current temporary access status
-curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN"
 
 # Enable temporary access
-curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "state":"enabled"
   }'
 
 # Disable temporary access
-curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "state":"disabled"
@@ -51,7 +51,7 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
 
 Once temporary access has been enabled, project users must be authorized and mapped to Postgres roles they are allowed to access. Each user can be authorized to "assume" one or more Postgres roles using temporary access.
 
-When a user is authorized to assume a Postgres role, the user's access token (API or dashboard token) will be used as the password for the Postgres role.
+When a user is authorized to assume a Postgres role, the user's access token (Personal Access Token (PAT) or Scoped PAT) will be used as the password for the Postgres role.
 
 <Admonition type="note">
 
@@ -73,13 +73,13 @@ Restrictions can also be applied through the Management API.
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
-export SUPABASE_ACCESS_TOKEN="your-access-token"
+export SUPABASE_MANAGEMENT_API_TOKEN="your-access-token"
 export PROJECT_REF="your-project-ref"
 
 # Restrict temporary access to IPv4 ranges and expiry date
 # user_id is the gotrue_id of the user with access to the project
-curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit" \
+  -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "00000000-1111-2222-3333-444444444444",
