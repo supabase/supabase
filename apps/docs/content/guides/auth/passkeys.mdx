@@ -28,17 +28,17 @@ Registering a passkey requires an existing, confirmed, non-anonymous user. Sign-
 
 ### Dashboard
 
-Open the [Passkeys settings](/dashboard/project/_/auth/passkeys) under **Authentication → Passkeys**, turn on **Enable Passkey authentication**, and fill in the WebAuthn [relying party](https://www.w3.org/TR/webauthn-3/#relying-party) details:
+Open the [Passkeys settings](/dashboard/project/_/auth/passkeys) from the  **Authentication → Passkeys** section of the Dashboard, turn on **Enable Passkey authentication**, and fill in the WebAuthn [relying party](https://www.w3.org/TR/webauthn-3/#relying-party) details:
 
-- **Relying Party Display Name**: a human-readable name for your application shown during the passkey prompt (for example `My App`).
-- **Relying Party ID**: the bare domain name for your application (for example `example.com`). Do not include a scheme, port, or path. This determines which passkeys can be used.
-- **Relying Party Origins**: comma-separated list of allowed origins (for example `https://example.com,https://app.example.com`). HTTPS is required except for loopback addresses (`localhost`, `127.0.0.1`, `[::1]`). Each origin's hostname must match or be a subdomain of the Relying Party ID. Up to 5 origins.
+- **Relying Party Display Name**: a human-readable name for your application shown during the passkey prompt (for example, "My App").
+- **Relying Party ID**: the bare domain name for your application (for example, "example.com"). Do not include a scheme, port, or path. This determines which passkeys can be used.
+- **Relying Party Origins**: comma-separated list of allowed origins (for example "https://example.com,https://app.example.com"). HTTPS is required except for loopback addresses ("localhost", "127.0.0.1", "[::1]"). Each origin's hostname must match or be a subdomain of the Relying Party ID. Up to 5 origins.
 
 The dashboard pre-fills these from your project's Site URL and project name. Adjust them if your production app is served from a different domain.
 
 <Admonition type="caution" title="Changing the Relying Party ID invalidates existing passkeys">
 
-Passkeys are cryptographically bound to the Relying Party ID they were registered against. Changing the RP ID makes every existing passkey unusable for sign-in, and users will need to register a new one. Pick the RP ID carefully before users start enrolling, and keep it stable once they do.
+Passkeys are cryptographically bound to the Relying Party (RP) ID they were registered against. Changing the RP ID makes every existing passkey unusable for sign-in, and users will need to register a new one. Pick the RP ID carefully before users start enrolling, and keep it stable once they do.
 
 </Admonition>
 
@@ -85,8 +85,11 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 ```
 
 ## Enable in the client
+<Admonition type="caution" title="Experimental">
 
-Passkey support is currently experimental and requires explicit opt-in as the API may change without notice:
+Passkey support is currently experimental and requires explicit opt-in as the API may change without notice.
+
+</Admonition>
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
@@ -102,7 +105,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 
 A user must be signed in before they can register a passkey. Typically, you call this from a security settings page, or directly after sign-up.
 
-`auth.registerPasskey()` runs the full WebAuthn ceremony: fetches a challenge, invokes the browser API, and verifies the response with Supabase Auth.
+`auth.registerPasskey()` runs the full WebAuthn ceremony. It fetches a challenge, invokes the browser API, and verifies the response with Supabase Auth.
 
 ```ts
 const { data, error } = await supabase.auth.registerPasskey()
@@ -125,7 +128,7 @@ The returned `data` contains the new passkey's metadata:
 }
 ```
 
-A friendly name is automatically derived from the authenticator's AAGUID (for example `iCloud Keychain`, `Google Password Manager`, `1Password`). Users can rename their passkey afterwards — see [Manage passkeys](#manage-passkeys).
+A friendly name is automatically derived from the authenticator's Authenticator Attestation GUID (AAGUID). For example, `iCloud Keychain`, `Google Password Manager`, `1Password`. Users can rename their passkey afterwards — see [Manage passkeys](#manage-passkeys).
 
 See the [`registerPasskey` reference](/docs/reference/javascript/auth-registerpasskey) for the full API.
 
