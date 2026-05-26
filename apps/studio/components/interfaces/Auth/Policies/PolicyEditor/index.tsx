@@ -1,4 +1,4 @@
-import { Modal } from 'ui'
+import { DialogSection, DialogSectionSeparator } from 'ui'
 
 import PolicyAllowedOperation from './PolicyAllowedOperation'
 import PolicyDefinition from './PolicyDefinition'
@@ -30,33 +30,33 @@ export const PolicyEditor = ({
 
   return (
     <div>
-      <Modal.Content>
+      <DialogSection>
         <PolicyName
           name={policyFormFields.name}
           limit={63}
           onUpdatePolicyName={(name) => onUpdatePolicyFormFields({ name })}
         />
-      </Modal.Content>
-      <Modal.Separator />
+      </DialogSection>
+      <DialogSectionSeparator />
       {isNewPolicy && (
         <>
-          <Modal.Content>
+          <DialogSection>
             <PolicyAllowedOperation
               operation={operation}
               onSelectOperation={(command) => onUpdatePolicyFormFields({ command })}
             />
-          </Modal.Content>
-          <Modal.Separator />
+          </DialogSection>
+          <DialogSectionSeparator />
         </>
       )}
-      <Modal.Content>
+      <DialogSection>
         <PolicyRoles
           selectedRoles={selectedRoles}
           onUpdateSelectedRoles={(roles) => onUpdatePolicyFormFields({ roles })}
         />
-      </Modal.Content>
-      <Modal.Separator />
-      <Modal.Content>
+      </DialogSection>
+      <DialogSectionSeparator />
+      <DialogSection>
         <PolicyDefinition
           operation={operation}
           definition={definition}
@@ -66,7 +66,7 @@ export const PolicyEditor = ({
           }
           onUpdatePolicyCheck={(check: string | undefined) => onUpdatePolicyFormFields({ check })}
         />
-      </Modal.Content>
+      </DialogSection>
       <PolicyEditorFooter
         showTemplates={isNewPolicy}
         onViewTemplates={onViewTemplates}

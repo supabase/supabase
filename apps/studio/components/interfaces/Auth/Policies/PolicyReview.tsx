@@ -1,6 +1,6 @@
 import { isEmpty, noop } from 'lodash'
 import { useState } from 'react'
-import { Button, Modal } from 'ui'
+import { Button, DialogSection } from 'ui'
 
 import type { PolicyForReview } from './Policies.types'
 import SqlEditor from '@/components/ui/SqlEditor'
@@ -26,7 +26,7 @@ export const PolicyReview = ({
 
   return (
     <>
-      <Modal.Content>
+      <DialogSection>
         <div className="space-y-6">
           <div className="flex items-center justify-between space-y-8">
             <div className="flex flex-col">
@@ -52,7 +52,7 @@ export const PolicyReview = ({
             )}
           </div>
         </div>
-      </Modal.Content>
+      </DialogSection>
       <div className="flex w-full items-center justify-end gap-2 border-t px-6 py-4 border-default">
         <Button type="default" onClick={onSelectBack}>
           Back to edit
