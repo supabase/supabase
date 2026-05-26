@@ -29,8 +29,8 @@ import {
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
-import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { ConnectionLogsToggle } from './components/ConnectionLogsToggle'
+import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
