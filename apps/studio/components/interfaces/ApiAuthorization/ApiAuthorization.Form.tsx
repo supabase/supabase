@@ -2,14 +2,16 @@ import dayjs from 'dayjs'
 import { useState, type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
   Card,
   CardContent,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   Form,
   FormControl,
   FormField,
@@ -173,37 +175,40 @@ function PublisherInfoDialog({
   const [open, setOpen] = useState(false)
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <div className="mx-auto mt-1.5 flex w-fit items-center gap-1 rounded-full border border-muted py-1 pl-2.5 pr-1.5 font-mono text-[11px] tracking-tight text-foreground-lighter">
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1 rounded-full border border-muted py-1 pl-2.5 pr-1.5 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
+      >
         <span>{domain}</span>
-        <span onClick={() => setOpen(true)}>
-          <InfoTooltip side="bottom">About this publisher</InfoTooltip>
-        </span>
-      </div>
-      <DialogContent size="small">
-        <DialogHeader>
-          <DialogTitle>About this publisher</DialogTitle>
-          <DialogDescription asChild>
+        <InfoTooltip side="bottom">About this publisher</InfoTooltip>
+      </button>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>About this publisher</AlertDialogTitle>
+          <AlertDialogDescription asChild>
             <div className="space-y-3">
               <p>
-                Make sure you trust the source of <strong>{name}</strong>. After authorizing, it
+                Make sure you trust the source of{' '}
+                <span className="font-medium text-foreground">{name}</span>. After authorizing, it
                 will be able to access your organization&apos;s projects based on the selected
                 permissions.
               </p>
               {redirectUrl && (
                 <p>
                   Authorizing will redirect you to{' '}
-                  <span className="break-all font-mono text-[11px] text-foreground">
-                    {redirectUrl}
-                  </span>
-                  .
+                  <span className="break-all font-medium text-foreground">{redirectUrl}</span>.
                 </p>
               )}
             </div>
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogAction>Got it</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 
@@ -382,7 +387,7 @@ function FormFooter({
         Cancel
       </Button>
       {redirectUrl && (
-        <div className="mt-3 border-t border-muted pt-6">
+        <div className="mt-2 border-t border-muted pt-5">
           <p className="text-center text-xs text-foreground-lighter">
             Authorizing {requester.name} will redirect you to{' '}
             <span className="text-foreground">{redirectUrl}</span>
