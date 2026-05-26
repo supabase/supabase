@@ -5,6 +5,17 @@ import * as React from "react"
 
 export const Index: Record<string, any> = {
   "default": {
+    "CollapsibleCardSection": {
+      name: "CollapsibleCardSection",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/CollapsibleCardSection")),
+      source: "",
+      files: ["registry/default//CollapsibleCardSection.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "ConfirmationModal": {
       name: "ConfirmationModal",
       type: "components:fragment",
@@ -225,6 +236,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "collapsible-card-section-demo": {
+      name: "collapsible-card-section-demo",
+      type: "components:example",
+      registryDependencies: ["collapsible-card-section"],
+      component: React.lazy(() => import("@/registry/default/example/collapsible-card-section-demo")),
+      source: "",
+      files: ["registry/default/example/collapsible-card-section-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "alert-dialog-demo": {
       name: "alert-dialog-demo",
       type: "components:example",
@@ -243,6 +265,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/alert-dialog-close-only")),
       source: "",
       files: ["registry/default/example/alert-dialog-close-only.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-async": {
+      name: "alert-dialog-async",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-async")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-async.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-async-error": {
+      name: "alert-dialog-async-error",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button","admonition"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-async-error")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-async-error.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
