@@ -1,12 +1,7 @@
 ---
 id: 'npm-security'
-<<<<<<< Updated upstream
-title: 'Securing your npm installs'
-description: 'Consumer-side guide to defending your install of @supabase/* npm packages against supply-chain attacks.'
-=======
 title: 'Securing npm installs'
 description: 'Consumer-side guide to hardening your npm installs of Supabase packages against supply-chain attacks.'
->>>>>>> Stashed changes
 ---
 
 A practical guide for anyone installing Supabase packages from npm — the JavaScript client libraries (`@supabase/supabase-js` and friends), the `supabase` CLI, or any other dependency in your tree — on defending against supply-chain attacks. Most of it applies to any npm package, not just Supabase's.
@@ -251,7 +246,7 @@ This is the unglamorous half of supply-chain defence: fewer packages, fewer atta
 
 ## Stay informed
 
-Prevention is only half the job — you also need to find out when something has gone wrong upstream, ideally before the news reaches Twitter.
+Prevention is only half the job — you also need to find out when something has gone wrong upstream, ideally before the news goes wide.
 
 - **Enable [Dependabot alerts](https://docs.github.com/en/code-security/dependabot/dependabot-alerts/about-dependabot-alerts)** on every repository that has a lockfile. Free for both public and private repos. It checks your lockfile against the GitHub Advisory Database and pings you when a transitive becomes a known-vulnerable version.
 - **Subscribe to the [GitHub Advisory Database](https://github.com/advisories)** RSS feed (filter by ecosystem: npm) for ambient awareness of new advisories — useful even for packages you don't depend on directly.
