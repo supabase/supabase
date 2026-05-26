@@ -141,29 +141,6 @@ Bun's age gate only affects new resolutions — existing entries in `bun.lock` a
 
 For Deno-based Edge Functions, see the [Edge Functions specifics](#edge-functions-specifics) section below.
 
-## Use a private registry or mirror
-
-A proxy in front of `registry.npmjs.org` is the strongest layer of defense your org can add. It lets you enforce quarantine, audit, block, and roll back independently of what npmjs.org does.
-
-Common options (we don't endorse any one): [Verdaccio](https://verdaccio.org/), JFrog Artifactory, Sonatype Nexus, AWS CodeArtifact, GitHub Packages.
-
-A minimal `.npmrc` pointing to a private registry:
-
-```ini
-registry=https://npm.your-org.example/
-@supabase:registry=https://npm.your-org.example/
-//npm.your-org.example/:_authToken=${NPM_TOKEN}
-always-auth=true
-```
-
-Notes:
-
-- Never commit the token. Use `${NPM_TOKEN}` from your CI environment (npm 7+ expands env vars in `.npmrc`).
-- **Use short token lifetimes.** It means rotating more often, but it limits the blast radius if a token leaks undetected. Granular Access Tokens with an `expires` window are preferable to long-lived classic tokens.
-- **If you host on GitHub, turn on [secret protection / secret scanning](https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning)** for your repos. Free on public repos and on private repos under GitHub Advanced Security — catches the case where a token (or anything else sensitive) ends up committed by mistake.
-- Scoped registry lines let you point specific scopes at a different upstream.
-- For a per-project `.npmrc`, put it next to `package.json`. For a per-user one, `~/.npmrc`.
-
 ## Verify package provenance
 
 `@supabase/supabase-js`, `@supabase/auth-js`, `@supabase/postgrest-js`, `@supabase/realtime-js`, `@supabase/storage-js`, and `@supabase/functions-js` publish with [sigstore provenance attestations](https://docs.npmjs.com/generating-provenance-statements) via npm OIDC trusted publishing. The attestations cryptographically tie each published tarball to the workflow run, commit, and repository it was built from.
@@ -297,12 +274,11 @@ Move quickly. Order of operations:
 
 ## What Supabase does on its side
 
-You shouldn't have to trust us — that's the whole point of this guide — but for completeness:
-
 - **OIDC trusted publishing.** No long-lived `NPM_TOKEN` secret. Each publish is authenticated against npm using a short-lived OIDC token bound to the release workflow.
 - **Provenance attestations.** Every release of `@supabase/supabase-js` and its sibling packages ships with a sigstore attestation tying the tarball to its source commit and workflow run. Verify with `npm audit signatures`.
 - **No `postinstall` / `preinstall` scripts** in any of the six core packages (`auth-js`, `postgrest-js`, `realtime-js`, `storage-js`, `functions-js`, `supabase-js`). You can safely install with `--ignore-scripts`.
 - **Fixed-version monorepo releases.** All packages release together with identical versions, so when you pin one, you pin them all.
+- Multi-step approval of releases, with usage of GitHub environments.
 
 If something looks wrong with a published `@supabase/*` package, report it via the [Supabase security policy](https://github.com/supabase/supabase-js/security).
 
