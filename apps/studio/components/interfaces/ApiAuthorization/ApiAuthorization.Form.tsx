@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { type ReactNode } from 'react'
+import { Info } from 'lucide-react'
+import { useState, type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   AlertDialog,
@@ -92,6 +93,7 @@ export function ApiAuthorizationMainView({
   onApprove,
   onDecline,
 }: ApiAuthorizationMainViewProps): ReactNode {
+  const [permissionsExpanded, setPermissionsExpanded] = useState(false)
   const isExpired = dayjs().isAfter(dayjs(requester.expires_at))
   const showReadyContent = !isExpired && organizations._tag === 'success'
   const redirectUrl = requester.redirect_uri ?? requester.website
@@ -145,11 +147,14 @@ export function ApiAuthorizationMainView({
                     name={requester.name}
                     domain={requester.domain}
                     scopes={requester.scopes}
+                    showDetails={permissionsExpanded}
+                    onShowDetailsChange={setPermissionsExpanded}
                   />
                   <FormFooter
                     approvalState={approvalState}
                     requester={requester}
                     redirectUrl={externalRedirectUrl}
+                    permissionsExpanded={permissionsExpanded}
                     onApprove={onApprove}
                     onDecline={onDecline}
                   />
@@ -180,18 +185,7 @@ function PublisherInfoDialog({
           className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1 rounded-full border border-muted py-1 pl-2.5 pr-1.5 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
         >
           <span>{domain}</span>
-          <svg
-            aria-hidden
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            className="size-3.5 fill-foreground-muted transition-colors"
-          >
-            <path
-              d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z"
-              fillRule="evenodd"
-              clipRule="evenodd"
-            />
-          </svg>
+          <Info aria-hidden className="size-3.5 text-foreground-muted transition-colors" />
         </button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -200,9 +194,9 @@ function PublisherInfoDialog({
           <AlertDialogDescription asChild>
             <div className="space-y-3">
               <p>
-                <span className="font-mono text-[11px]">{domain}</span> is the publisher identity
-                for <span className="font-medium text-foreground">{name}</span>. Only continue if
-                you trust this source.
+                <code className="text-code-inline">{domain}</code> is the publisher of{' '}
+                <span className="font-medium text-foreground">{name}</span>. Only continue if you
+                trust this source.
               </p>
               {redirectUrl && (
                 <p>
@@ -368,6 +362,7 @@ interface FormFooterProps {
   approvalState: ApprovalState
   requester: ApiAuthorizationResponse
   redirectUrl?: string
+  permissionsExpanded?: boolean
   onDecline: () => void
   onApprove: () => void
 }
@@ -376,11 +371,19 @@ function FormFooter({
   approvalState,
   requester,
   redirectUrl,
+  permissionsExpanded = false,
   onDecline,
   onApprove,
 }: FormFooterProps): ReactNode {
   return (
     <div className="flex flex-col gap-2">
+      {redirectUrl && (
+        <div className={permissionsExpanded ? 'mb-2 pt-2' : 'mb-2 border-t border-muted pt-5'}>
+          <p className="text-center text-xs text-foreground-lighter">
+            Authorizing will redirect you to <span className="text-foreground">{redirectUrl}</span>
+          </p>
+        </div>
+      )}
       <ApprovalButton
         disabled={approvalState !== 'indeterminate'}
         approvalState={approvalState}
@@ -396,14 +399,6 @@ function FormFooter({
       >
         Cancel
       </Button>
-      {redirectUrl && (
-        <div className="mt-2 border-t border-muted pt-5">
-          <p className="text-center text-xs text-foreground-lighter">
-            Authorizing {requester.name} will redirect you to{' '}
-            <span className="text-foreground">{redirectUrl}</span>
-          </p>
-        </div>
-      )}
     </div>
   )
 }

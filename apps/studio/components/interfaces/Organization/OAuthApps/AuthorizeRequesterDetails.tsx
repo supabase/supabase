@@ -27,6 +27,8 @@ export interface AuthorizeRequesterDetailsProps {
   domain: string
   scopes: OAuthScope[]
   showOnlyScopes?: boolean
+  showDetails?: boolean
+  onShowDetailsChange?: (open: boolean) => void
 }
 
 export const ScopeSection = ({
@@ -179,8 +181,12 @@ export const AuthorizeRequesterDetails = ({
   name,
   scopes,
   showOnlyScopes = false,
+  showDetails: showDetailsProp,
+  onShowDetailsChange,
 }: AuthorizeRequesterDetailsProps) => {
-  const [showDetails, setShowDetails] = useState(showOnlyScopes)
+  const [showDetailsInternal, setShowDetailsInternal] = useState(showOnlyScopes)
+  const showDetails = showDetailsProp ?? showDetailsInternal
+  const setShowDetails = onShowDetailsChange ?? setShowDetailsInternal
   const requestedPermissions = useMemo(() => getRequestedPermissions(scopes), [scopes])
   const writablePermissions = requestedPermissions.filter(({ level }) => level !== 'read')
   const readOnlyPermissions = requestedPermissions.filter(({ level }) => level === 'read')
