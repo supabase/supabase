@@ -71,6 +71,7 @@ allow_list = [
     "[Ee]x",
     "[Ee]xecutables?",
     "[Ff]atals",
+    "[Ff]ootguns",
     "[Ff]rontend",
     "[Gg]apless",
     "[Gg]eolocation",
