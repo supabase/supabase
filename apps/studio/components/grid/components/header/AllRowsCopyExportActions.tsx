@@ -53,9 +53,15 @@ export const AllRowsCopyExportActions = ({
 
   const runExport = async (exporter: () => Promise<void>) => {
     if (!project) return toast.error('Project is required')
-    setIsExporting(true)
-    await exporter()
-    setIsExporting(false)
+
+    try {
+      setIsExporting(true)
+      await exporter()
+    } catch (error) {
+      toast.error('Failed to export rows due to error. Please try again later')
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   return (
