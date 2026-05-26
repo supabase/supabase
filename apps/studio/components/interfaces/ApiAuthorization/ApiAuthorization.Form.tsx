@@ -1,16 +1,8 @@
 import dayjs from 'dayjs'
-import { Info } from 'lucide-react'
+import { Info, TriangleAlert } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
   Button,
   Card,
   CardContent,
@@ -108,107 +100,75 @@ export function ApiAuthorizationMainView({
   onApprove,
   onDecline,
 }: ApiAuthorizationMainViewProps): ReactNode {
-  const [showExternalWarning, setShowExternalWarning] = useState(false)
   const isExpired = dayjs().isAfter(dayjs(requester.expires_at))
   const showReadyContent = !isExpired && organizations._tag === 'success'
   const showPublisherInfo = requester.domain === CURSOR_MCP_PUBLISHER_DOMAIN
   const redirectUrl = requester.redirect_uri ?? requester.website
-
-  function handleApproveClick() {
-    if (isExternalRedirectUrl(redirectUrl)) {
-      setShowExternalWarning(true)
-    } else {
-      onApprove()
-    }
-  }
+  const showRedirectWarning = isExternalRedirectUrl(redirectUrl)
 
   return (
-    <>
-      <InterstitialLayout
-        logo={
-          <LogoPair
-            left={<RequesterLogo icon={requester.icon} name={requester.name} />}
-            right={<SupabaseLogo />}
-          />
-        }
-        title={`Authorize ${requester.name}`}
-        description="This application wants to access your Supabase account"
-        subtitle={
-          showPublisherInfo ? (
-            <CursorPublisherInfoDialog domain={requester.domain} />
+    <InterstitialLayout
+      logo={
+        <LogoPair
+          left={<RequesterLogo icon={requester.icon} name={requester.name} />}
+          right={<SupabaseLogo />}
+        />
+      }
+      title={`Authorize ${requester.name}`}
+      description="This application wants to access your Supabase account"
+      subtitle={
+        showPublisherInfo ? (
+          <CursorPublisherInfoDialog domain={requester.domain} />
+        ) : (
+          <InterstitialMetadataPill>{requester.domain}</InterstitialMetadataPill>
+        )
+      }
+      subtitleClassName="leading-none"
+    >
+      <div className="px-6 pb-6">
+        <span className="sr-only">Authorize API access for {requester.name}</span>
+        <div className="flex flex-col gap-5">
+          {isExpired ? (
+            <ExpiredNotice />
           ) : (
-            <InterstitialMetadataPill>{requester.domain}</InterstitialMetadataPill>
-          )
-        }
-        subtitleClassName="leading-none"
-      >
-        <div className="px-6 pb-6">
-          <span className="sr-only">Authorize API access for {requester.name}</span>
-          <div className="flex flex-col gap-5">
-            {isExpired ? (
-              <ExpiredNotice />
-            ) : (
-              <>
-                {organizations._tag === 'loading' && <OrganizationsLoader />}
-                {organizations._tag === 'error' && (
-                  <OrganizationsErrorNotice error={organizations.error} />
-                )}
-                {organizations._tag === 'empty' && <OrganizationsEmptyState />}
-                {organizations._tag === 'not_member' && <NotMemberOfOrganizationNotice />}
-                {organizations._tag === 'success' && (
-                  <OrganizationSelector
-                    form={form}
-                    disabled={!!requestedOrganizationSlug}
-                    requester={requester}
-                    organizations={organizations.organizations}
-                    requestedOrganizationSlug={requestedOrganizationSlug}
+            <>
+              {organizations._tag === 'loading' && <OrganizationsLoader />}
+              {organizations._tag === 'error' && (
+                <OrganizationsErrorNotice error={organizations.error} />
+              )}
+              {organizations._tag === 'empty' && <OrganizationsEmptyState />}
+              {organizations._tag === 'not_member' && <NotMemberOfOrganizationNotice />}
+              {organizations._tag === 'success' && (
+                <OrganizationSelector
+                  form={form}
+                  disabled={!!requestedOrganizationSlug}
+                  requester={requester}
+                  organizations={organizations.organizations}
+                  requestedOrganizationSlug={requestedOrganizationSlug}
+                />
+              )}
+              {showReadyContent && (
+                <>
+                  <AuthorizeRequesterDetails
+                    icon={requester.icon}
+                    name={requester.name}
+                    domain={requester.domain}
+                    scopes={requester.scopes}
                   />
-                )}
-                {showReadyContent && (
-                  <>
-                    <AuthorizeRequesterDetails
-                      icon={requester.icon}
-                      name={requester.name}
-                      domain={requester.domain}
-                      scopes={requester.scopes}
-                    />
-                    <FormFooter
-                      approvalState={approvalState}
-                      requester={requester}
-                      onApprove={handleApproveClick}
-                      onDecline={onDecline}
-                    />
-                  </>
-                )}
-              </>
-            )}
-          </div>
+                  {showRedirectWarning && <ExternalRedirectNotice redirectUrl={redirectUrl} />}
+                  <FormFooter
+                    approvalState={approvalState}
+                    requester={requester}
+                    onApprove={onApprove}
+                    onDecline={onDecline}
+                  />
+                </>
+              )}
+            </>
+          )}
         </div>
-      </InterstitialLayout>
-
-      <AlertDialog open={showExternalWarning} onOpenChange={setShowExternalWarning}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm authorization</AlertDialogTitle>
-            <AlertDialogDescription>
-              The owner of <strong className="text-foreground">{redirectUrl}</strong> will be
-              granted access to your Supabase organization. Only continue if you trust this source.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setShowExternalWarning(false)
-                onApprove()
-              }}
-            >
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+      </div>
+    </InterstitialLayout>
   )
 }
 
@@ -245,6 +205,19 @@ function CursorPublisherInfoDialog({ domain }: { domain: string }): ReactNode {
         </DialogHeader>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function ExternalRedirectNotice({ redirectUrl }: { redirectUrl: string }): ReactNode {
+  return (
+    <div className="flex items-start gap-1.5 text-xs text-foreground-lighter">
+      <TriangleAlert className="mt-px size-3 shrink-0 text-warning-600" />
+      <span>
+        The owner of{' '}
+        <span className="break-all font-mono text-[11px] text-foreground">{redirectUrl}</span> will
+        be granted access. Only continue if you trust this source.
+      </span>
+    </div>
   )
 }
 
