@@ -318,9 +318,9 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
       </div>
 
       <div className="flex flex-col gap-y-1">
-        <p className="text-sm font-medium text-foreground">Maintenance</p>
+        <p className="text-sm font-medium text-foreground">Metadata</p>
         <p className="text-sm text-foreground-light">
-          Optional settings for DuckLake metadata tables and snapshot cleanup.
+          Optional schema setting for DuckLake metadata tables.
         </p>
       </div>
 
@@ -336,22 +336,6 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
             >
               <FormControl>
                 <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="ducklakeExpireSnapshotsOlderThan"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="horizontal"
-              label="Expire snapshots older than"
-              description="Optional snapshot retention interval, for example `7 days`"
-            >
-              <FormControl>
-                <Input {...field} placeholder="7 days" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}

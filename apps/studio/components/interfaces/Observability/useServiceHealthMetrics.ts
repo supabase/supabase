@@ -21,7 +21,14 @@ import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSort
 
 dayjs.extend(utc)
 
-export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'
+export type ServiceKey =
+  | 'db'
+  | 'functions'
+  | 'auth'
+  | 'storage'
+  | 'realtime'
+  | 'data_api'
+  | 'postgrest'
 
 export type ServiceHealthData = {
   total: number
@@ -52,6 +59,7 @@ const SERVICE_RESPONSE_KEY: Record<
   functions: 'function_edge_logs',
   storage: 'storage_logs',
   realtime: 'realtime_logs',
+  data_api: 'edge_logs',
   postgrest: 'postgrest_logs',
 }
 
@@ -154,11 +162,12 @@ export const useServiceHealthMetrics = (
   const functions = useServiceHealthQuery({ ...sharedParams, serviceKey: 'functions' })
   const storage = useServiceHealthQuery({ ...sharedParams, serviceKey: 'storage' })
   const realtime = useServiceHealthQuery({ ...sharedParams, serviceKey: 'realtime' })
+  const data_api = useServiceHealthQuery({ ...sharedParams, serviceKey: 'data_api' })
   const postgrest = useServiceHealthQuery({ ...sharedParams, serviceKey: 'postgrest' })
 
   const services: Record<ServiceKey, ServiceHealthData> = useMemo(
-    () => ({ db, auth, functions, storage, realtime, postgrest }),
-    [db, auth, functions, storage, realtime, postgrest]
+    () => ({ db, auth, functions, storage, realtime, data_api, postgrest }),
+    [db, auth, functions, storage, realtime, data_api, postgrest]
   )
 
   const aggregated = useMemo(() => calculateAggregatedMetrics(Object.values(services)), [services])
