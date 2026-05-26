@@ -18,7 +18,7 @@ The good news: most of the impact is preventable from the consumer side, regardl
 
 1. **Commit your lockfile** and install with `--frozen-lockfile` (pnpm/yarn) or `npm ci` (npm) in CI.
 2. **Quarantine new versions.** Set a minimum release age (≥ 7 days) so installs won't pick up a brand-new version while attackers are still in their detection window. npm, pnpm, yarn, and bun all support this natively now.
-3. **Block exotic transitive deps.** Refuse `github:`, `git+`, and `file:` refs that didn't come from the npm registry.
+3. **Block exotic transitive dependencies.** Refuse `github:`, `git+`, and `file:` refs that didn't come from the npm registry.
 4. **Verify provenance.** Run `npm audit signatures` after install. Supabase packages publish with [sigstore attestations](https://www.sigstore.dev/) (cryptographic proof tying each tarball to the workflow run, commit, and repo it was built from).
 5. **Constrain lifecycle scripts.** Default-deny `postinstall` / `preinstall` / `prepare`; allow per-package.
 6. **Pin a single source of truth for your package manager** (`packageManager` field in `package.json` with a sha512 hash).
@@ -251,8 +251,8 @@ Corepack (bundled with modern Node) and `pnpm/action-setup@v6+` both read this f
 
 Every dependency you don't actually need is attack surface you don't actually need. Two cheap habits:
 
-- Periodically run `npx depcheck` (or the equivalent for your stack) and remove deps that aren't imported anywhere.
-- Look at your direct deps when a CVE lands. Is the dep doing something you could do in 20 lines yourself? Some of the most-exploited packages are tiny utilities that became transitive footguns.
+- Periodically run `npx depcheck` (or the equivalent for your stack) and remove dependencies that aren't imported anywhere.
+- Look at your direct dependencies when a CVE lands. Is the dep doing something you could do in 20 lines yourself? Some of the most-exploited packages are tiny utilities that became transitive footguns.
 
 This is the unglamorous half of supply-chain defence: fewer packages, fewer attackers' chances.
 
