@@ -176,7 +176,6 @@ export const buildDestinationConfigForValidation = ({
         s3UrlStyle: data.ducklakeS3UrlStyle,
         s3UseSsl: data.ducklakeS3UseSsl,
         metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-        expireSnapshotsOlderThan: normalizeOptionalString(data.ducklakeExpireSnapshotsOlderThan),
       },
     }
   } else {
@@ -255,7 +254,6 @@ export const buildDestinationConfig = async ({
       s3UrlStyle: data.ducklakeS3UrlStyle,
       s3UseSsl: data.ducklakeS3UseSsl,
       metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-      expireSnapshotsOlderThan: normalizeOptionalString(data.ducklakeExpireSnapshotsOlderThan),
     }
     destinationConfig = { ducklake: ducklakeConfig }
   }

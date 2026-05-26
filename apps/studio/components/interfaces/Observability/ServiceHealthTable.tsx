@@ -53,6 +53,7 @@ const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   functions: 'Serverless Edge Functions execution',
   storage: 'Object storage for files and assets',
   realtime: 'WebSocket connections and broadcasts',
+  data_api: 'Incoming API requests routed through the edge network',
   postgrest: 'Auto-generated REST API for your database',
 }
 
@@ -180,8 +181,6 @@ export const ServiceHealthTable = ({
   onBarClick,
   datetimeFormat,
 }: ServiceHealthTableProps) => {
-  const total = services.length
-
   return (
     <div>
       <h2 className="heading-section mb-4">Service Health</h2>
@@ -193,8 +192,7 @@ export const ServiceHealthTable = ({
               if (!data) return null
 
               const isLeftColumn = index % 2 === 0
-              const isLastMobileRow = index === total - 1
-              const isLastDesktopRow = index >= total - 2
+              const isLastService = index === services.length - 1
 
               return (
                 <ServiceCell
@@ -204,14 +202,14 @@ export const ServiceHealthTable = ({
                   onBarClick={onBarClick(service.logsUrl)}
                   datetimeFormat={datetimeFormat}
                   className={cn(
-                    'border-default',
-                    !isLastMobileRow && 'border-b',
-                    isLastDesktopRow && 'md:border-b-0',
+                    'border-default border-b',
+                    isLastService && 'md:border-b-0',
                     isLeftColumn && 'md:border-r'
                   )}
                 />
               )
             })}
+            <div className="bg-background/20" aria-hidden="true" />
           </div>
         </CardContent>
       </Card>
