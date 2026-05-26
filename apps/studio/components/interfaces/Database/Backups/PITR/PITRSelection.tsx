@@ -170,7 +170,7 @@ export const PITRSelection = () => {
               </p>
             </DialogSection>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isRestoring || isSuccessPITR}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction variant="warning" onClick={onConfirmRestore}>
                 I understand, begin restore
               </AlertDialogAction>
