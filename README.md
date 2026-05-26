@@ -35,7 +35,7 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 ## Community & Support
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase. For project-specific troubleshooting or support requests, please [open a support ticket](https://supabase.com/dashboard/support/new). Any issues opened about a project-specific problem are closed to keep issues for their intended purpose. 
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase. For project-specific troubleshooting or support requests, please [open a support ticket](https://supabase.com/dashboard/support/new). Any issues opened about a project-specific problem are closed as policy. 
 - [Email Support](https://supabase.com/docs/support#business-support). Best for: problems with your database or infrastructure.
 - [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
 
