@@ -236,7 +236,7 @@ function DynamicTitle() {
   return <title>{appTitle}</title>
 }
 
-const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
   Sentry.withScope(function (scope) {
     scope.setTag('globalErrorBoundary', true)
     const eventId = Sentry.captureException(error)

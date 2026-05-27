@@ -16,5 +16,5 @@ export const Route = createFileRoute('/org/_/$')({
 // router-generator bug that strips the escaped `_` segment when the
 // last segment isn't escaped.
 function OrgWildcardSplatRoute() {
-  return <GenericOrganizationPage dehydratedState={undefined} />
+  return <GenericOrganizationPage />
 }

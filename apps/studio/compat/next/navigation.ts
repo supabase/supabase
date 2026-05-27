@@ -73,7 +73,8 @@ export function useParams<
   // App Router's useParams() returns a flat object of dynamic segments.
   // TanStack's strict-false useParams returns the same shape merged
   // across matches.
-  return useTanStackParams({ strict: false }) as T
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return useTanStackParams({ strict: false } as any) as T
 }
 
 // `useSelectedLayoutSegment(parallelRoute?)` returns the active leaf

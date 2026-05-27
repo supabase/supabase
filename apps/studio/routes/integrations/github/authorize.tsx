@@ -9,5 +9,5 @@ export const Route = createFileRoute('/integrations/github/authorize')({
 // Placed at top-level — the Next page has no getLayout (renders bare),
 // so adding AppLayout/DefaultLayout via _app would be a behaviour change.
 function GitHubAuthorizeRoute() {
-  return <GitHubIntegrationAuthorize dehydratedState={undefined} />
+  return <GitHubIntegrationAuthorize />
 }

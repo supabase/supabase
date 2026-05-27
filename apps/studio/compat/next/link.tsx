@@ -197,7 +197,8 @@ const Link = forwardRef(function Link(
       <TanStackLink
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         to={to as any}
-        search={search}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        search={search as any}
         hash={hash}
         replace={replace}
         preload={preload}
@@ -233,7 +234,8 @@ const Link = forwardRef(function Link(
     <TanStackLink
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       to={to as any}
-      search={search}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      search={search as any}
       hash={hash}
       replace={replace}
       preload={preload}

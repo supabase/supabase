@@ -10,5 +10,5 @@ export const Route = createFileRoute('/project/$ref/functions/$functionSlug/code
 })
 
 function FunctionCodeRoute() {
-  return <CodePage dehydratedState={undefined} />
+  return <CodePage />
 }

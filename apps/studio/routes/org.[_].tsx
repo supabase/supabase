@@ -19,5 +19,5 @@ export const Route = createFileRoute('/org/_')({
 // to `/`). The path-as-filename form keeps the last segment non-index,
 // so the bug branch is skipped.
 function OrgWildcardIndexRoute() {
-  return <GenericOrganizationPage dehydratedState={undefined} />
+  return <GenericOrganizationPage />
 }

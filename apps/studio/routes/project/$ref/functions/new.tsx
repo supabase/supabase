@@ -10,5 +10,5 @@ export const Route = createFileRoute('/project/$ref/functions/new')({
 })
 
 function FunctionsNewRoute() {
-  return <NewFunctionPage dehydratedState={undefined} />
+  return <NewFunctionPage />
 }

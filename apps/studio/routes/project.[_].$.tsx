@@ -16,5 +16,5 @@ export const Route = createFileRoute('/project/_/$')({
 // router-generator bug that strips the escaped `_` segment when the
 // last segment isn't escaped.
 function ProjectWildcardSplatRoute() {
-  return <GenericProjectPage dehydratedState={undefined} />
+  return <GenericProjectPage />
 }

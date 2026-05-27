@@ -8,7 +8,10 @@ import { useEffect, useRef, type ComponentPropsWithoutRef, type ReactNode } from
 
 type Strategy = 'beforeInteractive' | 'afterInteractive' | 'lazyOnload' | 'worker'
 
-interface ScriptProps extends Omit<ComponentPropsWithoutRef<'script'>, 'children'> {
+interface ScriptProps extends Omit<
+  ComponentPropsWithoutRef<'script'>,
+  'children' | 'onLoad' | 'onError'
+> {
   // Accepted-and-dropped in this shim — the browser handles network
   // priority via the regular `<script>` element; we don't reorder.
   strategy?: Strategy
@@ -78,7 +81,6 @@ export default function Script({
         ref={ref}
         onLoad={handleLoad}
         onError={handleError}
-         
         dangerouslySetInnerHTML={{
           __html: typeof children === 'string' ? children : '',
         }}

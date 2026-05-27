@@ -28,7 +28,12 @@ export function getRouter() {
     basepath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
   })
 
-  setupRouterSsrQueryIntegration({ router, queryClient: context.queryClient })
+  // @tanstack/react-router-ssr-query@1.166.12 pulls in @tanstack/query-core@5.100
+  // as a peer, but our app pins react-query to 5.83. The QueryClient class is
+  // structurally identical between the two, but TS treats them as nominally
+  // distinct types because each version has its own `#private` field.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setupRouterSsrQueryIntegration({ router, queryClient: context.queryClient as any })
 
   return router
 }

@@ -1,5 +1,3 @@
-import React from 'react'
-
 // @ts-ignore
 // import SpaceStyles from './Space.module.css'
 

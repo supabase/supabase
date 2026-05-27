@@ -238,7 +238,12 @@ function buildResponse() {
   // We honour `statusCode` and `headers`; `statusMessage` is dropped
   // (Fetch `Response` doesn't preserve a custom HTTP/1 reason phrase
   // when running through TanStack's runtime).
-  ;(res as unknown as { writeHead: (...args: unknown[]) => unknown }).writeHead = (
+  type WriteHead = (
+    code: number,
+    headersOrMessage?: string | Record<string, number | string | readonly string[]>,
+    maybeHeaders?: Record<string, number | string | readonly string[]>
+  ) => unknown
+  ;(res as unknown as { writeHead: WriteHead }).writeHead = (
     code: number,
     headersOrMessage?: string | Record<string, number | string | readonly string[]>,
     maybeHeaders?: Record<string, number | string | readonly string[]>
