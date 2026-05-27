@@ -20,6 +20,7 @@ interface ScriptProps extends Omit<ComponentPropsWithoutRef<'script'>, 'children
   onError?: (e: Event | string) => void
 }
 
+// eslint-disable-next-line no-restricted-exports
 export default function Script({
   strategy: _strategy,
   children,

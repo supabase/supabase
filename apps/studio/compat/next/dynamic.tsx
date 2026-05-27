@@ -25,6 +25,7 @@ function isDefaultExport<P>(
 }
 
  
+// eslint-disable-next-line no-restricted-exports
 export default function dynamic<P extends object = {}>(
   loader: Loader<P>,
   options: DynamicOptions = {}

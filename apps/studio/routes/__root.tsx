@@ -242,7 +242,7 @@ const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     const eventId = Sentry.captureException(error)
     // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
     if (eventId && error && typeof error === 'object') {
-      ;(error as any).sentryId = eventId
+      ;(error as Error & { sentryId?: string }).sentryId = eventId
     }
   })
 
@@ -263,7 +263,7 @@ function ErrorBoundaryRoute({ error }: { error: Error }) {
       scope.setTag('routerErrorComponent', true)
       const eventId = Sentry.captureException(error)
       if (eventId && error && typeof error === 'object') {
-        ;(error as any).sentryId = eventId
+        ;(error as Error & { sentryId?: string }).sentryId = eventId
       }
     })
     console.error(error.stack)

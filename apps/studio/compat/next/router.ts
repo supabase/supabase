@@ -261,4 +261,5 @@ const singletonRouter = {
   },
 }
 
+// eslint-disable-next-line no-restricted-exports
 export default singletonRouter

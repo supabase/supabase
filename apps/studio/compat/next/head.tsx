@@ -25,6 +25,7 @@ import type { ReactNode } from 'react'
 //     We have no such consumers today; if one shows up, swap to a
 //     portal+SSR-collector setup.
 
+// eslint-disable-next-line no-restricted-exports
 export default function Head({ children }: { children?: ReactNode }) {
   return <>{children}</>
 }

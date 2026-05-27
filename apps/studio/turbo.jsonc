@@ -109,6 +109,9 @@
         // Declared here so the studio-package turbo env lint rule passes
         // even though turbo doesn't directly drive `start`.
         "PORT",
+        // Gates the TanStack vs Next path in api/server.js, vercel.ts,
+        // and scripts/dispatch.js (the dev/build/start dispatcher).
+        "STUDIO_FRAMEWORK",
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",

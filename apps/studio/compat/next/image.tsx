@@ -144,4 +144,5 @@ const Image = forwardRef(function Image(
   )
 })
 
+// eslint-disable-next-line no-restricted-exports
 export default Image

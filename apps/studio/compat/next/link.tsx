@@ -246,4 +246,5 @@ const Link = forwardRef(function Link(
   )
 })
 
+// eslint-disable-next-line no-restricted-exports
 export default Link
