@@ -89,6 +89,11 @@ export default function Script({
   }
 
   return (
+    // This shim mirrors next/script for the TanStack build (where vite aliases
+    // `next/script` to this file via nextCompat). Call sites that opt for an
+    // explicit `async`/`defer` already pass it through via {...rest}; we don't
+    // force one here because Next's <Script> doesn't either at this layer.
+    // eslint-disable-next-line @next/next/no-sync-scripts
     <script
       {...rest}
       id={id}
