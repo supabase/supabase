@@ -1,3 +1,15 @@
+// SECURITY MODEL — Proven authorship for analytics SQL
+//
+// Analytics queries (BigQuery for legacy cloud, ClickHouse for self-hosted OTEL)
+// carry the same injection risk as Postgres queries: filter keys, values, and
+// other fragments that originate from URL parameters, UI inputs, or LLM output
+// can be spliced into SQL that is executed on behalf of the project. The pattern
+// here mirrors the pg-meta safe-SQL model described in
+// .claude/skills/safe-sql-execution/SKILL.md: every value that flows from an
+// external source must pass through a sanitization helper before being
+// interpolated, and the wire boundary (`executeAnalyticsSql`) refuses plain
+// strings at compile time.
+//
 // pg-meta's `literal()` and `ident()` are Postgres-specific: `literal()` emits
 // `E'…'` for backslash-bearing strings and `::jsonb` casts for objects;
 // `ident()` quotes identifiers with double-quotes, which BigQuery rejects
@@ -29,7 +41,7 @@
  *
  * Values of this type are either:
  * - Static strings in source code (no interpolation) via `rawSql`
- * - Outputs of `analyticsLiteral`, `bqIdent`, or `clickhouseIdent`
+ * - Outputs of `analyticsLiteral` or `quotedIdent`
  * - Compositions via the `safeSql` template tag (which only accepts
  *   `SafeLogSqlFragment` interpolations)
  * - Compositions via `joinSqlFragments`
@@ -109,18 +121,38 @@ export function analyticsLiteral(value: string | number | boolean): SafeLogSqlFr
 
 const SAFE_IDENT_RE = /^[A-Za-z_][A-Za-z0-9_]*$/
 
-/** Quote an identifier for BigQuery using backticks. */
-export function bqIdent(value: string): SafeLogSqlFragment {
-  if (typeof value !== 'string' || !SAFE_IDENT_RE.test(value)) {
-    throw new Error(`bqIdent: invalid BigQuery identifier "${value}"`)
+/**
+ * Validates `value` against an allow-list of pre-branded fragments and returns
+ * the matching fragment. Use for SQL operators or keywords where the permitted
+ * set is known at compile time (e.g. `keyword(op, [safeSql`AND`, safeSql`OR`])`).
+ * Matching is case-insensitive (SQL keywords are case-insensitive by convention);
+ * the returned value is always the allow-listed fragment, never the raw input.
+ * Throws if `value` does not match any fragment in `allowed`.
+ */
+export function keyword(value: string, allowed: readonly SafeLogSqlFragment[]): SafeLogSqlFragment {
+  const lower = value.toLowerCase()
+  const match = allowed.find((frag) => frag.toLowerCase() === lower)
+  if (match === undefined) {
+    throw new Error(
+      `keyword: "${value}" is not in the allowed list [${allowed.map((s) => `"${s}"`).join(', ')}]`
+    )
   }
-  return rawSql('`' + value + '`')
+  return match
 }
 
-/** Quote an identifier for ClickHouse using double-quotes. */
-export function clickhouseIdent(value: string): SafeLogSqlFragment {
-  if (typeof value !== 'string' || !SAFE_IDENT_RE.test(value)) {
-    throw new Error(`clickhouseIdent: invalid ClickHouse identifier "${value}"`)
+/**
+ * Backtick-quotes each segment of a dotted identifier path, validating each against
+ * `[A-Za-z_][A-Za-z0-9_]*`. Accepts `a`, `a.b`, or `a.b.c`.
+ * Example: `quotedIdent('request.method')` → `` `request`.`method` ``
+ *
+ * Backticks are accepted by both BigQuery and ClickHouse, so this function serves
+ * both engines. Per-segment quoting handles reserved-word segments (e.g. `` `type` ``)
+ * and works for table path references and UNNEST alias field accesses alike.
+ */
+export function quotedIdent(value: string): SafeLogSqlFragment {
+  const segments = value.split('.')
+  if (segments.length === 0 || segments.some((s) => !SAFE_IDENT_RE.test(s))) {
+    throw new Error(`quotedIdent: invalid identifier "${value}"`)
   }
-  return rawSql('"' + value + '"')
+  return rawSql(segments.map((s) => '`' + s + '`').join('.'))
 }

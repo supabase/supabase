@@ -25,6 +25,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     actions,
     variant,
     highlightedConditionPath,
+    freeformDefaultProperty,
     handleInputBlur,
     handleGroupFreeformFocus,
     handleGroupFreeformChange,
@@ -86,6 +87,16 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
     return pathsEqual(conditionPath, highlightedConditionPath)
   }
 
+  // Free-text search only applies to the root group's input — nested groups don't synthesize
+  // a "Search <property>" item.
+  const resolvedFreeformDefaultProperty = useMemo(
+    () =>
+      path.length === 0 && freeformDefaultProperty
+        ? filterProperties.find((p) => p.name === freeformDefaultProperty)
+        : undefined,
+    [path.length, freeformDefaultProperty, filterProperties]
+  )
+
   const items = useMemo(
     () =>
       buildPropertyItems({
@@ -93,8 +104,17 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         inputValue: (isActive ? freeformText : localFreeformValue) || '',
         actions,
         supportsOperators,
+        freeformDefaultProperty: resolvedFreeformDefaultProperty,
       }),
-    [filterProperties, isActive, freeformText, localFreeformValue, actions, supportsOperators]
+    [
+      filterProperties,
+      isActive,
+      freeformText,
+      localFreeformValue,
+      actions,
+      supportsOperators,
+      resolvedFreeformDefaultProperty,
+    ]
   )
 
   const emptyPlaceholder = useMemo(
@@ -220,7 +240,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
             )}
           </PopoverAnchor>
           <PopoverContent
-            className="min-w-[220px] p-0"
+            className="min-w-[220px] max-w-[360px] p-0"
             align="start"
             side="bottom"
             onOpenAutoFocus={(e) => e.preventDefault()}

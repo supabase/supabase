@@ -10,12 +10,12 @@ import {
   AiIconAnimation,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Form,
   FormControl,
   FormField,
@@ -304,13 +304,13 @@ const NewFunctionPage = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent id={templatesListboxId} className="w-[300px] p-0" align="end">
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ placeholder="Search templates..." />
-                <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
-                  <CommandGroup_Shadcn_>
+              <Command>
+                <CommandInput placeholder="Search templates..." />
+                <CommandList>
+                  <CommandEmpty>No templates found.</CommandEmpty>
+                  <CommandGroup>
                     {templates.map((template) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={template.value}
                         value={template.value}
                         onSelect={onSelectTemplate}
@@ -334,11 +334,11 @@ const NewFunctionPage = () => {
                             {template.description}
                           </span>
                         </div>
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
             </PopoverContent>
           </Popover>
           <Button

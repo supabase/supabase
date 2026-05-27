@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import Link from 'next/link'
-import { ReactNode, useEffect, useMemo } from 'react'
+import { ReactNode, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -52,10 +52,12 @@ import {
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -107,10 +109,6 @@ const lokiFormSchema = z.object({
 const lokiSubmitSchema = z.object({
   ...lokiFields,
   headers: headerRecordSchema,
-})
-
-const elasticSchema = z.object({
-  type: z.literal('elastic'),
 })
 
 const postgresSchema = z.object({
@@ -199,8 +197,6 @@ const formUnion = z.discriminatedUnion('type', [
   webhookFormSchema,
   datadogSchema,
   lokiFormSchema,
-  // [Joshen] To fix API types, not supported in the UI
-  elasticSchema,
   postgresSchema,
   bigquerySchema,
   clickhouseSchema,
@@ -216,7 +212,6 @@ const submitUnion = z.discriminatedUnion('type', [
   webhookSubmitSchema,
   datadogSchema,
   lokiSubmitSchema,
-  elasticSchema,
   postgresSchema,
   bigquerySchema,
   clickhouseSchema,
@@ -360,6 +355,7 @@ export function LogDrainDestinationSheetForm({
   })
 
   const track = useTrack()
+  const formRef = useRef<HTMLFormElement>(null)
 
   const formValues = useMemo(() => {
     const config = (defaultValues?.config || {}) as any
@@ -432,6 +428,7 @@ export function LogDrainDestinationSheetForm({
         <SheetSection className="px-0! pb-0!">
           <Form {...form}>
             <form
+              ref={formRef}
               id={FORM_ID}
               onSubmit={(e) => {
                 e.preventDefault()
@@ -1041,9 +1038,16 @@ export function LogDrainDestinationSheetForm({
               </span>
               <TaxDisclaimer />
             </div>
-            <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
-              Save destination
-            </Button>
+            <Shortcut
+              id={SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION}
+              onTrigger={() => formRef.current?.requestSubmit()}
+              options={{ enabled: open && !isLoading }}
+              side="top"
+            >
+              <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
+                Save destination
+              </Button>
+            </Shortcut>
           </SheetFooter>
         </div>
       </SheetContent>

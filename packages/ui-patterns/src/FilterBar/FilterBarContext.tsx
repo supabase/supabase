@@ -71,6 +71,7 @@ export type FilterBarContextValue = {
   variant: FilterBarVariant
   actions?: FilterBarAction[]
   icon?: React.ReactNode
+  freeformDefaultProperty?: string
 
   rootRef: React.RefObject<HTMLDivElement | null>
 }
@@ -98,6 +99,7 @@ export type FilterBarRootProps = {
   supportsOperators?: boolean
   variant?: FilterBarVariant
   icon?: React.ReactNode
+  freeformDefaultProperty?: string
 }
 
 export type FilterBarVariant = 'default' | 'pill'
@@ -120,6 +122,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     supportsOperators = false,
     variant = 'default',
     icon,
+    freeformDefaultProperty,
   }: FilterBarRootProps,
   ref: React.Ref<FilterBarHandle>
 ) {
@@ -395,6 +398,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     variant,
     actions,
     icon,
+    freeformDefaultProperty,
 
     rootRef,
   }

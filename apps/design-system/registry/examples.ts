@@ -68,6 +68,12 @@ export const examples: Registry = [
     files: ['example/collapsible-alert-demo.tsx'],
   },
   {
+    name: 'collapsible-card-section-demo',
+    type: 'components:example',
+    registryDependencies: ['collapsible-card-section'],
+    files: ['example/collapsible-card-section-demo.tsx'],
+  },
+  {
     name: 'alert-dialog-demo',
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],
@@ -78,6 +84,18 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button'],
     files: ['example/alert-dialog-close-only.tsx'],
+  },
+  {
+    name: 'alert-dialog-async',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button'],
+    files: ['example/alert-dialog-async.tsx'],
+  },
+  {
+    name: 'alert-dialog-async-error',
+    type: 'components:example',
+    registryDependencies: ['alert-dialog', 'button', 'admonition'],
+    files: ['example/alert-dialog-async-error.tsx'],
   },
   {
     name: 'alert-dialog-destructive',
@@ -1306,9 +1324,31 @@ export const examples: Registry = [
     files: ['example/page-container-demo.tsx'],
   },
   {
+    name: 'page-breadcrumbs-demo',
+    type: 'components:example',
+    files: ['example/page-breadcrumbs-demo.tsx'],
+  },
+  {
+    name: 'page-nav-demo',
+    type: 'components:example',
+    files: ['example/page-nav-demo.tsx'],
+  },
+  {
     name: 'page-layout-detail',
     type: 'components:example',
     files: ['example/page-layout-detail.tsx'],
+  },
+  {
+    name: 'page-layout-edge-function',
+    type: 'components:example',
+    registryDependencies: ['filter-bar'],
+    files: ['example/page-layout-edge-function.tsx', 'example/page-layout-logs-content.tsx'],
+  },
+  {
+    name: 'page-layout-full-width',
+    type: 'components:example',
+    registryDependencies: ['filter-bar'],
+    files: ['example/page-layout-full-width.tsx', 'example/page-layout-logs-content.tsx'],
   },
   {
     name: 'page-layout-list',
@@ -1324,6 +1364,11 @@ export const examples: Registry = [
     name: 'page-layout-settings',
     type: 'components:example',
     files: ['example/page-layout-settings.tsx'],
+  },
+  {
+    name: 'page-layout-auth-emails',
+    type: 'components:example',
+    files: ['example/page-layout-auth-emails.tsx'],
   },
   {
     name: 'page-header-demo',
@@ -1662,6 +1707,90 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['mermaid'],
     files: ['example/mermaid-basic.tsx'],
+  },
+  {
+    name: 'markdown-full-example',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-full-example.tsx'],
+  },
+  {
+    name: 'markdown-customization',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-customization.tsx'],
+  },
+  {
+    name: 'markdown-headings',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-headings.tsx'],
+  },
+  {
+    name: 'markdown-paragraphs',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-paragraphs.tsx'],
+  },
+  {
+    name: 'markdown-lists',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-lists.tsx'],
+  },
+  {
+    name: 'markdown-links',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-links.tsx'],
+  },
+  {
+    name: 'markdown-inline-code',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-inline-code.tsx'],
+  },
+  {
+    name: 'markdown-blockquotes',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-blockquotes.tsx'],
+  },
+  {
+    name: 'markdown-code-blocks',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-code-blocks.tsx'],
+  },
+  {
+    name: 'markdown-tables',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-tables.tsx'],
+  },
+  {
+    name: 'markdown-images',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-images.tsx'],
+  },
+  {
+    name: 'markdown-horizontal-rules',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-horizontal-rules.tsx'],
+  },
+  {
+    name: 'markdown-quote-component',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-quote-component.tsx'],
+  },
+  {
+    name: 'markdown-avatar-component',
+    type: 'components:example',
+    registryDependencies: ['markdown'],
+    files: ['example/markdown-avatar-component.tsx'],
   },
   {
     name: 'status-code-demo',

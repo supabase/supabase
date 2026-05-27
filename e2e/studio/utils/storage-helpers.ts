@@ -4,6 +4,9 @@ import { dismissToastsIfAny } from './dismiss-toast.js'
 import { toUrl } from './to-url.js'
 import { waitForApiResponse } from './wait-for-response.js'
 
+/** Inline rename/create input in the storage file explorer (not the search box). */
+export const getStorageRowNameInput = (page: Page) => page.locator('.storage-row-input')
+
 /**
  * Navigates to a the storage home view
  * @param page - Playwright page instance
@@ -149,8 +152,8 @@ export const createFolder = async (page: Page, folderName: string) => {
   await expect(createFolderBtn, 'Create folder button should be visible').toBeVisible()
   await createFolderBtn.click()
 
-  // A textbox with "Untitled folder" appears - type the new name
-  const nameInput = page.getByRole('textbox')
+  // Inline folder name input appears (search box is a separate textbox)
+  const nameInput = getStorageRowNameInput(page)
   await expect(nameInput, 'Folder name input should be visible').toBeVisible()
   await nameInput.fill(folderName)
   await nameInput.press('Enter')
@@ -223,8 +226,8 @@ export const renameItem = async (page: Page, oldName: string, newName: string) =
   // Click rename option from context menu
   await page.getByRole('menuitem', { name: 'Rename' }).click()
 
-  // A textbox appears - clear and type new name
-  const nameInput = page.getByRole('textbox')
+  const nameInput = getStorageRowNameInput(page)
+  await expect(nameInput, 'Rename input should be visible').toBeVisible()
   await nameInput.fill(newName)
   await nameInput.press('Enter')
 

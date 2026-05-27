@@ -29,10 +29,12 @@ import {
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
+import { ConnectionLogsToggle } from './components/ConnectionLogsToggle'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
+import { RowSelectionHeader } from './RowSelectionHeader'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
@@ -82,10 +84,19 @@ export const UnifiedLogs = () => {
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
-  const { sort, start, size, id, cursor, direction, live, ...filter } = search
+  const {
+    sort,
+    start,
+    size,
+    id,
+    cursor,
+    direction,
+    live,
+    hide_connection_logs: _hideConnectionLogs,
+    ...filter
+  } = search
   const defaultColumnSorting = sort ? [sort] : []
   const defaultColumnVisibility = { uuid: false }
-  const defaultRowSelection = search.id ? { [search.id]: true } : {}
   const defaultColumnFilters = Object.entries(filter)
     .map(([key, value]) => ({ id: key, value }))
     .filter(({ value }) => value ?? undefined)
@@ -106,7 +117,8 @@ export const UnifiedLogs = () => {
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>(defaultRowSelection)
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [openRowId, setOpenRowId] = useState<string | undefined>(search.id ?? undefined)
 
   const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
     LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK,
@@ -222,7 +234,7 @@ export const UnifiedLogs = () => {
 
   // Generate dynamic columns based on current data
   const { columns: dynamicColumns, columnVisibility: dynamicColumnVisibility } = useMemo(() => {
-    return generateDynamicColumns(flatData)
+    return generateDynamicColumns({ data: flatData })
   }, [flatData])
 
   const table: Table<ColumnSchema> = useReactTable({
@@ -235,7 +247,7 @@ export const UnifiedLogs = () => {
       rowSelection,
       columnOrder,
     },
-    enableMultiRowSelection: false,
+    enableMultiRowSelection: true,
     columnResizeMode: 'onChange',
     filterFns: { inDateRange, arrSome },
     meta: { getRowClassName },
@@ -253,12 +265,10 @@ export const UnifiedLogs = () => {
     getFacetedMinMaxValues: getTTableFacetedMinMaxValues(),
   })
 
-  const selectedRowKey = Object.keys(rowSelection)?.[0]
   const selectedRow = useMemo(() => {
     if ((isLoading || isFetching) && !flatData.length) return
-
-    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
-  }, [isLoading, isFetching, flatData.length, table, selectedRowKey])
+    return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
+  }, [isLoading, isFetching, flatData.length, table, openRowId])
 
   // REMINDER: this is currently needed for the cmdk search
   // [Joshen] This is where facets are getting dynamically loaded
@@ -321,24 +331,20 @@ export const UnifiedLogs = () => {
 
   useEffect(() => {
     if (isLoading || isFetching) return
-    const selectedRowId = Object.keys(rowSelection)?.[0]
 
-    if (selectedRowId && !selectedRow) {
-      // Clear both uuid and logId when no row is selected
+    if (openRowId && !selectedRow) {
+      // Clear both uuid and logId when the open row no longer exists in data
       setSearch({ id: null })
-      setRowSelection({})
-    } else if (selectedRowId && selectedRow) {
-      setSearch({
-        id: selectedRowId,
-      })
+      setOpenRowId(undefined)
+    } else if (openRowId && selectedRow) {
+      setSearch({ id: openRowId })
       track('unified_logs_row_clicked', { logType: selectedRow.original.log_type })
-      // Don't clear rowSelection here - let it persist to maintain the selection
-    } else if (!selectedRowId && search.id) {
-      // Clear the URL parameter when no row is selected
+    } else if (!openRowId && search.id) {
+      // Clear the URL parameter when no row is open
       setSearch({ id: null })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowSelection, selectedRow, isLoading, isFetching])
+  }, [openRowId, selectedRow, isLoading, isFetching])
 
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
@@ -353,6 +359,10 @@ export const UnifiedLogs = () => {
     }
   }, [isMobile])
 
+  useEffect(() => {
+    table.resetRowSelection()
+  }, [searchParameters, table])
+
   return (
     <DataTableProvider
       table={table}
@@ -362,6 +372,8 @@ export const UnifiedLogs = () => {
       columnFilters={columnFilters}
       sorting={sorting}
       rowSelection={rowSelection}
+      openRowId={openRowId}
+      setOpenRowId={setOpenRowId}
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
       searchParameters={searchParameters}
@@ -378,6 +390,7 @@ export const UnifiedLogs = () => {
             isFilterBarOpen={isFilterBarOpen}
             setIsFilterBarOpen={setIsFilterBarOpen}
             dateRangeDisabled={{ after: new Date() }}
+            afterFilters={<ConnectionLogsToggle />}
           />
           <ResizableHandle withHandle />
           <ResizablePanel
@@ -427,9 +440,12 @@ export const UnifiedLogs = () => {
                   isFetchingCharts && 'opacity-60 transition-opacity duration-150'
                 )}
                 columnId="timestamp"
+                filterColumnId="date"
                 chartConfig={filteredChartConfig}
               />
             </div>
+
+            <RowSelectionHeader />
 
             <ResizablePanelGroup
               key="main-logs"
@@ -467,14 +483,14 @@ export const UnifiedLogs = () => {
                 </div>
               </ResizablePanel>
 
-              {!!selectedRow && (
+              {!!openRowId && !!selectedRow && (
                 <>
                   <LogsListPanel selectedRow={selectedRow} />
                   <ServiceFlowPanel
                     dock={dock}
                     setDock={setDock}
                     selectedRow={selectedRow?.original}
-                    selectedRowKey={selectedRowKey}
+                    selectedRowKey={openRowId}
                     searchParameters={searchParameters}
                   />
                 </>

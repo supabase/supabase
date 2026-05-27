@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { MouseEvent, useEffect, useMemo, useState } from 'react'
+import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { LoadingLine } from 'ui'
 
@@ -19,6 +19,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
 import { createNavigationHandler } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const EMPTY_CRON_JOB = { jobname: '', schedule: '', active: true, command: '' }
 
@@ -84,6 +86,19 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(true)
   }
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search cron jobs' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, handleClearSearch)
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, onOpenCreateJobSheet, { label: 'Create cron job' })
+
   // Row click handler
   const handleRowClick = (row: CronJob, event: MouseEvent<HTMLDivElement>) => {
     const { jobid, jobname } = row
@@ -116,6 +131,7 @@ export const CronjobsTab = () => {
           <CronJobsTabHeader
             search={search}
             isRefreshing={grid.isRefetching && !grid.isFetchingNextPage}
+            searchInputRef={searchInputRef}
             onSearchChange={setSearch}
             onSearchSubmit={handleSearchSubmit}
             onClearSearch={handleClearSearch}
