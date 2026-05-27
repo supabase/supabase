@@ -15,6 +15,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
 
   const isPlaying = isActive && isInView
   const INTERVAL = 550 // in milliseconds
+  const MAX_LOGS = 120
 
   const logs = [
     createLog(),
@@ -50,7 +51,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
   useEffect(() => {
     if (isPlaying) {
       const newLog = createLog()
-      setActiveLogs((prev) => [newLog, ...prev])
+      setActiveLogs((prev) => [newLog, ...prev].slice(0, MAX_LOGS))
     }
   }, [isPlaying])
 
@@ -60,7 +61,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
       if (skip) return
 
       const newLog = createLog()
-      setActiveLogs((prev) => [newLog, ...prev])
+      setActiveLogs((prev) => [newLog, ...prev].slice(0, MAX_LOGS))
     },
     isPlaying ? INTERVAL : null
   )

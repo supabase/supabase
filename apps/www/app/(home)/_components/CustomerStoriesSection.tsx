@@ -180,10 +180,18 @@ export function CustomerStoriesSection() {
             const isActive = index === activeIdx
             const isDark = story.textColor === 'dark'
             return (
-              <button
+              <div
                 key={story.slug}
+                role="button"
+                tabIndex={0}
                 onClick={() => setActiveIdx(index)}
-                className="text-left rounded-lg p-5 flex flex-col gap-4 overflow-hidden transition-opacity"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setActiveIdx(index)
+                  }
+                }}
+                className="text-left rounded-lg p-5 flex flex-col gap-4 overflow-hidden transition-opacity cursor-pointer"
                 style={{ background: isActive ? story.bgGradient : story.dimBgColor }}
               >
                 <IconChip story={story} size="sm" />
@@ -234,7 +242,7 @@ export function CustomerStoriesSection() {
                     </Link>
                   </div>
                 )}
-              </button>
+              </div>
             )
           })}
         </div>
@@ -252,11 +260,19 @@ export function CustomerStoriesSection() {
             const isActive = index === activeIdx
             const isDark = story.textColor === 'dark'
             return (
-              <motion.button
+              <motion.div
                 layout
                 key={story.slug}
+                role="button"
+                tabIndex={0}
                 onClick={() => setActiveIdx(index)}
-                className="text-left flex flex-col items-start gap-8 overflow-hidden"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setActiveIdx(index)
+                  }
+                }}
+                className="text-left flex flex-col items-start gap-8 overflow-hidden cursor-pointer"
                 style={{
                   background: story.bgGradient,
                   borderRadius: 8,
@@ -338,7 +354,7 @@ export function CustomerStoriesSection() {
                     </Link>
                   </motion.div>
                 </motion.div>
-              </motion.button>
+              </motion.div>
             )
           })}
         </div>

@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
 import { isBrowser, stripEmojis } from '~/lib/helpers'
+import { useEffect } from 'react'
 
 interface UseActiveAnchorsOptions {
   /** CSS selector for heading elements to track */
@@ -46,31 +46,10 @@ const useActiveAnchors = (options: UseActiveAnchorsOptions = {}): void => {
         const rawHref = link.getAttribute('href') ?? ''
         const sanitizedHref = stripEmojis(decodeURI(rawHref).replace('#', '')).replaceAll('-', '')
         const normalizedId = activeHeadingId.replaceAll('-', '')
-        if (i === 0) {
-          console.log(
-            '[TOC Debug] matching example — href:',
-            rawHref,
-            '→ sanitized:',
-            sanitizedHref,
-            'vs id:',
-            activeHeadingId,
-            '→ normalized:',
-            normalizedId
-          )
-        }
         if (sanitizedHref === normalizedId) {
           activeIndex = i
         }
       })
-
-      console.log(
-        '[TOC Debug] updateToc → activeHeadingId:',
-        activeHeadingId,
-        'activeIndex:',
-        activeIndex,
-        'totalLinks:',
-        links.length
-      )
 
       links.forEach((link, i) => {
         link.classList.remove('toc-animate', 'toc-passed')
@@ -86,27 +65,13 @@ const useActiveAnchors = (options: UseActiveAnchorsOptions = {}): void => {
     // Wait a tick for dynamic content to render
     const timer = setTimeout(() => {
       const headings = document.querySelectorAll<HTMLHeadingElement>(anchorsSelector)
-      const tocLinks = document.querySelectorAll<HTMLAnchorElement>(tocSelector)
 
-      console.log('[TOC Debug] headings found:', headings.length)
-      console.log('[TOC Debug] TOC links found:', tocLinks.length)
-
-      headings.forEach((h) =>
-        console.log('[TOC Debug] heading:', h.tagName, h.id, h.textContent?.slice(0, 50))
-      )
-      tocLinks.forEach((a) => console.log('[TOC Debug] toc link href:', a.getAttribute('href')))
-
-      if (headings.length === 0) {
-        console.log('[TOC Debug] No headings found with selector:', anchorsSelector)
-        return
-      }
+      if (headings.length === 0) return
 
       // Collect all heading IDs in order
       const headingIds = Array.from(headings)
         .map((h) => h.id)
         .filter(Boolean)
-
-      console.log('[TOC Debug] heading IDs:', headingIds)
 
       const observer = new IntersectionObserver(
         (entries) => {
@@ -159,7 +124,6 @@ const useActiveAnchors = (options: UseActiveAnchorsOptions = {}): void => {
 
         if (lastAbove !== activeHeadingId) {
           activeHeadingId = lastAbove
-          console.log('[TOC Debug] scroll → active:', lastAbove)
           updateToc()
         }
       }

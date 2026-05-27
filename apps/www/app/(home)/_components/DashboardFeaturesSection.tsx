@@ -50,7 +50,9 @@ export function DashboardFeaturesSection({
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true })
 
-  const Panel: any = tabs[activeTabIdx]?.panel ?? null
+  if (tabs.length === 0) return null
+
+  const Panel = tabs[activeTabIdx].panel
   const story = dashboardStories[activeTabIdx] ?? dashboardStories[0]
 
   return (
@@ -94,8 +96,8 @@ export function DashboardFeaturesSection({
                 className="relative w-full max-w-full h-full"
               >
                 <Panel
-                  key={resolvedTheme?.includes('dark')}
-                  isDark={resolvedTheme?.includes('dark')}
+                  key={String(resolvedTheme?.includes('dark'))}
+                  isDark={resolvedTheme?.includes('dark') ?? false}
                 />
               </motion.div>
             </AnimatePresence>

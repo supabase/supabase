@@ -23,11 +23,14 @@ export function CommunitySectionV2() {
   const [page, setPage] = useState(0)
 
   useEffect(() => {
+    if (topTweets.length === 0) return
     const interval = setInterval(() => {
       setPage((p) => p + 1)
     }, 10000)
     return () => clearInterval(interval)
   }, [])
+
+  if (topTweets.length === 0) return null
 
   const currentTweets = Array.from({ length: TWEETS_PER_PAGE }, (_, i) => {
     const idx = (page * TWEETS_PER_PAGE + i) % topTweets.length

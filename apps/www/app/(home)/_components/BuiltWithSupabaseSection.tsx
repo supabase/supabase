@@ -127,6 +127,7 @@ export function BuiltWithSupabaseSection() {
                 key={example.title}
                 href={example.repo_url ?? '#'}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="group flex flex-col bg-surface-75 border border-border rounded-lg overflow-hidden hover:bg-surface-100 transition-colors"
               >
                 <div className="px-6 py-5 flex flex-col gap-2.5">
@@ -173,6 +174,7 @@ export function BuiltWithSupabaseSection() {
                 key={example.title}
                 href={example.repo_url ?? '#'}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="group flex flex-col bg-surface-75 border border-border rounded-lg px-6 py-10 hover:bg-surface-100 transition-colors"
               >
                 <div className="flex items-center gap-2 mb-3">
