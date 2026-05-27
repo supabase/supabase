@@ -24,7 +24,6 @@ function isDefaultExport<P>(
   return typeof value === 'object' && value !== null && 'default' in value
 }
 
- 
 // eslint-disable-next-line no-restricted-exports
 export default function dynamic<P extends object = {}>(
   loader: Loader<P>,
