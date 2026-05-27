@@ -116,6 +116,16 @@ automatically. None known at the time of writing.
 above is approved, this row should be updated with the commit and the
 chunk-pin in `vite.config.ts` reverted in the same PR.
 
+**Allowlisted variants.** Rolldown reshuffles chunks across master merges,
+so the same SCC keeps surfacing in different shapes. Each variant lives
+in `KNOWN_CHUNK_CYCLES`:
+
+- `[LoadingLine, TreeView, ui]` — original 3-chunk shape.
+- `[FormLayout, LoadingLine, TreeView, ui, index]` — extended via `index`
+  when FormLayout imports started routing through the entry chunk.
+- `[LoadingLine, TreeView, ui, index]` — same as above but FormLayout
+  got pooled into another chunk so it dropped out of the SCC.
+
 ### 2. `TypeError: e is not a function` in `folder-open-<hash>.js` — `ui` ↔ Lucide icon chunk cycle
 
 **Symptom.** Production runtime (Vercel deploy) shows a blank page and

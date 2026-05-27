@@ -93,7 +93,7 @@ import { Route as AppOrgSlugIndexRouteImport } from './routes/_app/org/$slug/ind
 import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
 import { Route as ProjectRefStorageS3RouteImport } from './routes/project/$ref/storage/s3'
 import { Route as ProjectRefSqlTemplatesRouteImport } from './routes/project/$ref/sql/templates'
-import { Route as ProjectRefSqlQuickstartsRouteImport } from './routes/project/$ref/sql/quickstarts'
+import { Route as ProjectRefSqlExamplesRouteImport } from './routes/project/$ref/sql/examples'
 import { Route as ProjectRefSqlIdRouteImport } from './routes/project/$ref/sql/$id'
 import { Route as ProjectRefSettingsLogDrainsRouteImport } from './routes/project/$ref/settings/log-drains'
 import { Route as ProjectRefSettingsIntegrationsRouteImport } from './routes/project/$ref/settings/integrations'
@@ -731,12 +731,11 @@ const ProjectRefSqlTemplatesRoute = ProjectRefSqlTemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => ProjectRefSqlRoute,
 } as any)
-const ProjectRefSqlQuickstartsRoute =
-  ProjectRefSqlQuickstartsRouteImport.update({
-    id: '/quickstarts',
-    path: '/quickstarts',
-    getParentRoute: () => ProjectRefSqlRoute,
-  } as any)
+const ProjectRefSqlExamplesRoute = ProjectRefSqlExamplesRouteImport.update({
+  id: '/examples',
+  path: '/examples',
+  getParentRoute: () => ProjectRefSqlRoute,
+} as any)
 const ProjectRefSqlIdRoute = ProjectRefSqlIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -2090,7 +2089,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
   '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
-  '/project/$ref/sql/quickstarts': typeof ProjectRefSqlQuickstartsRoute
+  '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/account/tokens/': typeof AppAccountTokensIndexRoute
@@ -2369,7 +2368,7 @@ export interface FileRoutesByTo {
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
   '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
-  '/project/$ref/sql/quickstarts': typeof ProjectRefSqlQuickstartsRoute
+  '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/account/tokens': typeof AppAccountTokensIndexRoute
@@ -2663,7 +2662,7 @@ export interface FileRoutesById {
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
   '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
-  '/project/$ref/sql/quickstarts': typeof ProjectRefSqlQuickstartsRoute
+  '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
@@ -2956,7 +2955,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/integrations'
     | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
-    | '/project/$ref/sql/quickstarts'
+    | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/account/tokens/'
@@ -3235,7 +3234,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/integrations'
     | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
-    | '/project/$ref/sql/quickstarts'
+    | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/account/tokens'
@@ -3528,7 +3527,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/integrations'
     | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
-    | '/project/$ref/sql/quickstarts'
+    | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/_app/account/tokens/'
@@ -4357,11 +4356,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefSqlTemplatesRouteImport
       parentRoute: typeof ProjectRefSqlRoute
     }
-    '/project/$ref/sql/quickstarts': {
-      id: '/project/$ref/sql/quickstarts'
-      path: '/quickstarts'
-      fullPath: '/project/$ref/sql/quickstarts'
-      preLoaderRoute: typeof ProjectRefSqlQuickstartsRouteImport
+    '/project/$ref/sql/examples': {
+      id: '/project/$ref/sql/examples'
+      path: '/examples'
+      fullPath: '/project/$ref/sql/examples'
+      preLoaderRoute: typeof ProjectRefSqlExamplesRouteImport
       parentRoute: typeof ProjectRefSqlRoute
     }
     '/project/$ref/sql/$id': {
@@ -6351,14 +6350,14 @@ const ProjectRefSettingsRouteWithChildren =
 
 interface ProjectRefSqlRouteChildren {
   ProjectRefSqlIdRoute: typeof ProjectRefSqlIdRoute
-  ProjectRefSqlQuickstartsRoute: typeof ProjectRefSqlQuickstartsRoute
+  ProjectRefSqlExamplesRoute: typeof ProjectRefSqlExamplesRoute
   ProjectRefSqlTemplatesRoute: typeof ProjectRefSqlTemplatesRoute
   ProjectRefSqlIndexRoute: typeof ProjectRefSqlIndexRoute
 }
 
 const ProjectRefSqlRouteChildren: ProjectRefSqlRouteChildren = {
   ProjectRefSqlIdRoute: ProjectRefSqlIdRoute,
-  ProjectRefSqlQuickstartsRoute: ProjectRefSqlQuickstartsRoute,
+  ProjectRefSqlExamplesRoute: ProjectRefSqlExamplesRoute,
   ProjectRefSqlTemplatesRoute: ProjectRefSqlTemplatesRoute,
   ProjectRefSqlIndexRoute: ProjectRefSqlIndexRoute,
 }

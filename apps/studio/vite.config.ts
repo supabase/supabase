@@ -147,6 +147,11 @@ const KNOWN_CHUNK_CYCLES: ReadonlyArray<ReadonlyArray<string>> = [
   // via manualChunks); FormLayout imports from `ui` which closes the
   // loop back through the existing LoadingLine/TreeView/ui chain.
   ['FormLayout', 'LoadingLine', 'TreeView', 'ui', 'index'],
+  // Same root cause as #1, extended via `index` after a later master
+  // merge that re-routed some `ui` imports through the top-level
+  // entry chunk. Variant of entry #2 without `FormLayout` — Rolldown
+  // pooled FormLayout into another chunk so it dropped out of the SCC.
+  ['LoadingLine', 'TreeView', 'ui', 'index'],
 ]
 
 function chunkPrefix(name: string): string {
