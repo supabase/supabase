@@ -98,7 +98,7 @@ vi.mock('./EnterpriseCard', () => ({
 }))
 
 vi.mock('./DowngradeModal', () => ({
-  default: () => null,
+  DowngradeModal: () => null,
 }))
 
 vi.mock('./ExitSurveyModal', () => ({
