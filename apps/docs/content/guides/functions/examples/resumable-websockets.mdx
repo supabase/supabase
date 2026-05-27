@@ -188,11 +188,11 @@ Deno.serve(async (req) => {
 
 ## Browser client
 
-The client stores `sessionId` and `lastEventId` in local storage, then reconnects with exponential backoff.
+The client stores `sessionId` and `lastEventId` in session storage, then reconnects with exponential backoff.
 
 ```ts
-let sessionId = localStorage.getItem('ws_session_id')
-let lastEventId = Number(localStorage.getItem('last_event_id') || 0)
+let sessionId = sessionStorage.getItem('ws_session_id')
+let lastEventId = Number(sessionStorage.getItem('last_event_id') || 0)
 
 function connect(token: string) {
   const url =
@@ -208,12 +208,12 @@ function connect(token: string) {
 
     if (msg.event_id) {
       lastEventId = Math.max(lastEventId, msg.event_id)
-      localStorage.setItem('last_event_id', String(lastEventId))
+      sessionStorage.setItem('last_event_id', String(lastEventId))
     }
 
     if (msg.type === 'session_init') {
       sessionId = msg.session_id
-      localStorage.setItem('ws_session_id', sessionId)
+      sessionStorage.setItem('ws_session_id', sessionId)
     }
   }
 }
