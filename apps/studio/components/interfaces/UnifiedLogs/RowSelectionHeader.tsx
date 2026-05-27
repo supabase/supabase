@@ -61,7 +61,7 @@ export const RowSelectionHeader = () => {
               damping: 30,
               mass: 0.4,
             }}
-            className="pl-4 pr-2 flex items-center justify-between border-t absolute top-0 z-99 bg-surface-75 w-full"
+            className="pl-4 pr-2 flex items-center justify-between border-t absolute top-0 z-2 bg-surface-75 w-full"
             style={{ overflow: 'hidden' }}
           >
             <p className="text-xs">
