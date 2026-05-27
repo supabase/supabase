@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  formatHexdump,
-  isBinaryPayload,
-  withBinaryPayloadPlaceholder,
-} from './MessagesFormatters'
+import { formatHexdump, isBinaryPayload, withBinaryPayloadPlaceholder } from './MessagesFormatters'
 
 describe('isBinaryPayload', () => {
   it('returns true for ArrayBuffer', () => {
@@ -66,8 +62,7 @@ describe('formatHexdump', () => {
 
   it('renders two rows for a 17-byte buffer, padding the short last row so the gutter aligns', () => {
     const bytes = new Uint8Array(17).fill(0x41)
-    const row1 =
-      '00000000  41 41 41 41 41 41 41 41  41 41 41 41 41 41 41 41  |AAAAAAAAAAAAAAAA|'
+    const row1 = '00000000  41 41 41 41 41 41 41 41  41 41 41 41 41 41 41 41  |AAAAAAAAAAAAAAAA|'
     const row2 = '00000010  41' + ' '.repeat(21) + '  ' + ' '.repeat(23) + '  |A|'
     expect(formatHexdump(bytes)).toBe(`${row1}\n${row2}`)
   })
@@ -88,8 +83,7 @@ describe('formatHexdump', () => {
     // 0x20 (space) and 0x7e (~) → printable (lowest/highest);
     // 0x7f (DEL), 0x80, 0xff → dot.
     const bytes = new Uint8Array([0x00, 0x1f, 0x20, 0x41, 0x7e, 0x7f, 0x80, 0xff])
-    const expected =
-      '00000000  00 1f 20 41 7e 7f 80 ff  ' + ' '.repeat(23) + '  |.. A~...|'
+    const expected = '00000000  00 1f 20 41 7e 7f 80 ff  ' + ' '.repeat(23) + '  |.. A~...|'
     expect(formatHexdump(bytes)).toBe(expected)
   })
 
