@@ -1,8 +1,8 @@
 # docker-compose.override.yml
 #
-# Enables Prometheus metrics on Auth, Kong, and Vector, and OTel push
-# on Storage. These services do not expose metrics in the default self-hosted
-# configuration.
+# Enables Prometheus metrics on Auth, Kong, PostgREST, imgproxy, and Vector,
+# and OTel push on Storage. These services do not expose metrics in the default
+# self-hosted configuration.
 #
 # Usage:
 #   Copy this file to docker/ alongside docker-compose.yml.
@@ -31,6 +31,19 @@ services:
         request-termination,ip-restriction,post-function,prometheus
       # Kong Admin API binds to 127.0.0.1 by default; this opens it to the Docker network
       KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+
+  rest:
+    environment:
+      # Enables the PostgREST admin server — exposes /metrics on :3001
+      # See: https://docs.postgrest.org/en/v14/references/admin_server.html
+      PGRST_ADMIN_SERVER_PORT: "3001"
+
+  imgproxy:
+    environment:
+      # Enables the imgproxy Prometheus metrics server on :8081
+      # Must differ from the main imgproxy port (8080)
+      # See: https://docs.imgproxy.net/monitoring/prometheus
+      IMGPROXY_PROMETHEUS_BIND: ":8081"
 
   vector:
     # Mount the metrics config alongside the original vector.yml without modifying it

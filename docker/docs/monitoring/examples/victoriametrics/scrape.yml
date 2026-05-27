@@ -77,6 +77,24 @@ scrape_configs:
         labels:
           service: envoy
 
+  # PostgREST — requires PGRST_ADMIN_SERVER_PORT=3001
+  # (see docker-compose.override.yml)
+  - job_name: supabase-rest
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supabase-rest:3001"]
+        labels:
+          service: rest
+
+  # imgproxy — requires IMGPROXY_PROMETHEUS_BIND=:8081
+  # (see docker-compose.override.yml)
+  - job_name: supabase-imgproxy
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supabase-imgproxy:8081"]
+        labels:
+          service: imgproxy
+
   # Vector (log pipeline)
   # Requires vector.metrics.yml mounted alongside vector.yml
   # (see docker-compose.override.yml)

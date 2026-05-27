@@ -37,6 +37,8 @@ categories:
 │                  ──scrapes──► Postgres    postgres-exporter:9187     │
 │                  ──scrapes──► Kong        supabase-kong:8001  (↓)    │
 │                  ──scrapes──► Envoy       supabase-envoy:9901        │
+│                  ──scrapes──► PostgREST   supabase-rest:3001         │
+│                  ──scrapes──► imgproxy    supabase-imgproxy:8081     │
 │                  ──scrapes──► Vector      supabase-vector:9598       │
 │                                                                      │
 │  (↓) Kong will be deprecated soon. Envoy is its replacement.         │
@@ -66,6 +68,8 @@ categories:
 | PostgreSQL | [postgres_exporter](https://github.com/prometheus-community/postgres_exporter) | `:9187/metrics` | ❌ Sidecar needed | None |
 | Kong *(deprecation pending)* | [Kong/kong](https://github.com/Kong/kong) | `:8001/metrics` | ❌ Plugin + env var needed | None |
 | Envoy | [envoyproxy/envoy](https://github.com/envoyproxy/envoy) | `:9901/stats/prometheus` | ❌ Admin bind address needed | None |
+| PostgREST | [PostgREST/postgrest](https://github.com/PostgREST/postgrest) | `:3001/metrics` | ❌ Env var needed | None |
+| imgproxy | [imgproxy/imgproxy](https://github.com/imgproxy/imgproxy) | `:8081/metrics` | ❌ Env var needed | None |
 | Storage | [supabase/storage](https://github.com/supabase/storage) | OTel push only | ❌ Env vars needed | — |
 | Vector | [vectordotdev/vector](https://github.com/vectordotdev/vector) | `:9598/metrics` | ❌ Config file needed | None |
  
@@ -100,6 +104,8 @@ files.
 - **Kong** *(deprecation pending)* — adds `prometheus` to `KONG_PLUGINS` and sets
   `KONG_ADMIN_LISTEN: "0.0.0.0:8001"` to open the Admin API to the Docker
   network. If you are using Envoy instead, this section can be omitted.
+- **PostgREST** — enables the admin server on `:3001` via `PGRST_ADMIN_SERVER_PORT`.
+- **imgproxy** — enables the Prometheus metrics server on `:8081` via `IMGPROXY_PROMETHEUS_BIND`.
 - **Vector** — mounts a second config file (`vector/metrics.yml`) alongside
   the original `vector.yml` to add an internal metrics exporter on `:9598`.
 - **Storage** — enables OTel push via `OTEL_METRICS_ENABLED=true` and points
@@ -171,15 +177,18 @@ Activate metrics on Auth, Vector, and Storage (required regardless of which gate
 docker compose up -d auth vector storage
 ```
  
-_Gateway (choose one):_
+**Gateway — choose one:**
  
-_Option A — Kong (default)_
+> ⚠️ Kong and Envoy both bind to host port `8000` and cannot run simultaneously.
+> If you are switching gateways, stop the currently running one first.
+ 
+### *Option A — Kong (default)*
  
 ```bash
 docker compose up -d kong
 ```
  
-_Option B — Envoy_
+### *Option B — Envoy*
  
 Change the admin bind address in `volumes/api/envoy/envoy.yaml`:
  
@@ -201,14 +210,15 @@ admin:
 > scrape it. See [Metrics Security →](./security.md#envoy) for what this
 > exposes and how to keep it safe.
  
-Then stop Kong (both gateways bind to host port 8000 and cannot run simultaneously)
-and start Envoy:
- 
 ```bash
-docker compose stop kong
 docker compose -f docker-compose.yml -f docker-compose.envoy.yml up -d api-gw
 ```
- 
+
+> If Envoy cannot reach other services after starting, re-run with `--force-recreate`:
+> ```bash
+> docker compose -f docker-compose.yml -f docker-compose.envoy.yml up -d api-gw --force-recreate
+> ```
+
 **Step 3 — Verify each endpoint responds (1st check)**
  
 Confirm the endpoints are reachable inside the Docker network:
@@ -238,6 +248,14 @@ docker run --rm --network supabase_default curlimages/curl:latest \
 docker run --rm --network supabase_default curlimages/curl:latest \
   curl -s http://supabase-envoy:9901/stats/prometheus | head -3
  
+# PostgREST
+docker run --rm --network supabase_default curlimages/curl:latest \
+  curl -s http://supabase-rest:3001/metrics | head -3
+ 
+# imgproxy
+docker run --rm --network supabase_default curlimages/curl:latest \
+  curl -s http://supabase-imgproxy:8081/metrics | head -3
+ 
 # Vector
 docker run --rm --network supabase_default curlimages/curl:latest \
   curl -s http://supabase-vector:9598/metrics | head -3
@@ -245,7 +263,7 @@ docker run --rm --network supabase_default curlimages/curl:latest \
  
 **Step 4 — Bring up VictoriaMetrics, postgres_exporter, and OTel Collector**
  
-_Option A — Kong_
+### *Option A — Kong*
  
 ```bash
 docker compose -f docker-compose.yml \
@@ -253,7 +271,7 @@ docker compose -f docker-compose.yml \
                -f docker-compose.metrics.yml up -d
 ```
  
-_Option B — Envoy_
+### *Option B — Envoy*
  
 ```bash
 docker compose -f docker-compose.yml \
