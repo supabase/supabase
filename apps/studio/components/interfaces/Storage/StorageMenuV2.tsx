@@ -10,6 +10,7 @@ import {
   useIsAnalyticsBucketsEnabled,
   useIsVectorBucketsEnabled,
 } from '@/data/config/project-storage-config-query'
+import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -25,6 +26,9 @@ export const StorageMenuV2 = () => {
   const { ref } = useParams()
   const page = useStorageV2Page()
 
+  const { data } = useCLIReleaseVersionQuery()
+  const isLocalCLI = !!data?.current
+
   const { storageAnalytics, storageVectors } = useIsFeatureEnabled([
     'storage:analytics',
     'storage:vectors',
@@ -34,7 +38,7 @@ export const StorageMenuV2 = () => {
   const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
 
   const showAnalytics = IS_PLATFORM && storageAnalytics
-  const showVectors = !IS_PLATFORM || storageVectors
+  const showVectors = IS_PLATFORM || isLocalCLI || storageVectors
 
   useShortcut(SHORTCUT_IDS.NAV_STORAGE_FILES, () => router.push(`/project/${ref}/storage/files`))
   useShortcut(
