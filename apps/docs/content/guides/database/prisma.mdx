@@ -168,14 +168,17 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
                     postgres://prisma.[PROJECT-REF]...
                     ```
 
-                    In your schema.prisma file, edit your `datasource db` configs to reference your DIRECT_URL
+                    In your schema.prisma file, update your `datasource db` config. In Prisma v7, 
+                    `DATABASE_URL` and `DIRECT_URL` are no longer required in the datasource block:
                     ```text schema.prisma
                     datasource db {
-                      provider  = "postgresql"
-                      url       = env("DATABASE_URL")
-                      directUrl = env("DIRECT_URL")
+                      provider = "postgresql"
                     }
                     ```
+                     > **Note:** If you're using Prisma v6 or earlier, keep the
+                     > `url = env("DATABASE_URL")` and `directUrl = env("DIRECT_URL")`
+                     > fields in your `datasource db` configuration. The simplified format
+                     > above applies to Prisma v7 and later.
 
 
                 </TabPanel>
