@@ -7,6 +7,7 @@ import {
   POSTGRES_PASSWORD,
   POSTGRES_PORT,
   POSTGRES_USER_READ_ONLY,
+  POSTGRES_SSL,
   POSTGRES_USER_READ_WRITE,
 } from './constants'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -26,6 +27,7 @@ export function encryptString(stringToEncrypt: string): string {
 
 export function getConnectionString({ readOnly }: { readOnly: boolean }) {
   const postgresUser = readOnly ? POSTGRES_USER_READ_ONLY : POSTGRES_USER_READ_WRITE
+  const sslParam = POSTGRES_SSL ? `?sslmode=${POSTGRES_SSL}` : ''
 
-  return `postgresql://${postgresUser}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}`
+  return `postgresql://${postgresUser}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}${sslParam}`
 }
