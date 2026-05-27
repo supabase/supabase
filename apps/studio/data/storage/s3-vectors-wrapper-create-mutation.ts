@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM } from 'common'
 
+import { useLocalS3KeysQuery } from '../misc/local-s3-keys-query'
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { getVectorURI } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
@@ -15,6 +17,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useS3VectorsWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
+  const { data: localKeys } = useLocalS3KeysQuery()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
@@ -33,10 +36,26 @@ export const useS3VectorsWrapperCreateMutation = () => {
   const { mutateAsync: createFDW, isPending: isCreatingFDW } = useFDWCreateMutation()
 
   const mutateAsync = async ({ bucketName }: { bucketName: string }) => {
-    const createS3KeyData = await createS3AccessKey({
-      projectRef: project?.ref,
-      description: getVectorBucketS3KeyName(bucketName),
-    })
+    let accessKey: string | undefined
+    let secretKey: string | undefined
+
+    if (IS_PLATFORM) {
+      const createS3KeyData = await createS3AccessKey({
+        projectRef: project?.ref,
+        description: getVectorBucketS3KeyName(bucketName),
+      })
+      accessKey = createS3KeyData.access_key
+      secretKey = createS3KeyData.secret_key
+    } else {
+      accessKey = localKeys?.accessKey
+      secretKey = localKeys?.secretKey
+    }
+
+    if (!accessKey || !secretKey) {
+      throw new Error(
+        IS_PLATFORM ? 'Failed to obtain S3 keys from the API' : 'Local S3 keys are not configured'
+      )
+    }
 
     const wrapperName = getVectorBucketFDWName(bucketName)
     const serverName = getVectorBucketFDWServerName(bucketName)
@@ -48,8 +67,8 @@ export const useS3VectorsWrapperCreateMutation = () => {
       formState: {
         wrapper_name: wrapperName,
         server_name: serverName,
-        vault_access_key_id: createS3KeyData?.access_key,
-        vault_secret_access_key: createS3KeyData?.secret_key,
+        vault_access_key_id: accessKey,
+        vault_secret_access_key: secretKey,
         aws_region: settings!.region,
         endpoint_url: getVectorURI(project?.ref ?? '', protocol, endpoint),
       },
