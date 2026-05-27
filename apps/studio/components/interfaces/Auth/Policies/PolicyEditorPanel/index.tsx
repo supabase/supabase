@@ -13,7 +13,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { memo, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -48,6 +48,7 @@ import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/databa
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
@@ -258,7 +259,7 @@ export const PolicyEditorPanel = memo(function ({
     }
   }
 
-  const resetState = useEffectEvent(() => {
+  const resetStateRef = useLatest(() => {
     if (!visible) {
       editorOneRef.current?.setValue('')
       editorTwoRef.current?.setValue('')
@@ -308,9 +309,8 @@ export const PolicyEditorPanel = memo(function ({
 
   // when the panel is closed, reset all values
   useEffect(() => {
-    resetState()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
-  }, [visible])
+    resetStateRef.current()
+  }, [visible, resetStateRef])
 
   // whenever the deps (current policy details, new error or error panel opens) change, recalculate
   // the height of the editor
