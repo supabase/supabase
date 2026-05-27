@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateRoleSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -10,7 +10,7 @@ function generateRoleSQL(activeFilters: Record<string, string>) {
     ELSE 'Other'
   END AS role, 
   COUNT(*) AS total
-FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+FROM responses_2026${whereClause ? '\n' + whereClause : ''}
 GROUP BY CASE 
     WHEN role = 'Founder / Co-founder' THEN 'Founder'
     WHEN role IN ('Engineer', 'Founder / Co-founder') THEN role

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
 import {
   EmptyStatePresentational,
@@ -36,6 +36,8 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const MARKETPLACE_VIEW_MODE_STORAGE_KEY = 'supabase.marketplace.viewMode'
 
@@ -193,6 +195,18 @@ export const MarketplaceIndex = () => {
     setSearch('')
   }
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search integrations' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, clearAll)
+
   const activeFilters = [category, type, source].filter(Boolean)
   const pageTitle = useMemo(() => {
     if (activeFilters.length !== 1) return 'Integrations Marketplace'
@@ -248,6 +262,7 @@ export const MarketplaceIndex = () => {
             <MarketplaceFilterBar
               resultCount={filtered.length}
               search={search}
+              searchInputRef={searchInputRef}
               onSearchChange={(v) => setSearch(v)}
               category={category}
               onCategoryChange={(v) => setCategory(v)}

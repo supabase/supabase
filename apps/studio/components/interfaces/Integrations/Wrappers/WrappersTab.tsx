@@ -14,6 +14,8 @@ import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const WrappersTab = () => {
   const { id } = useParams()
@@ -24,6 +26,11 @@ export const WrappersTab = () => {
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'wrappers'
   )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setCreateWrapperShown(true), {
+    label: 'Add new wrapper',
+    enabled: canCreateWrapper,
+  })
 
   const { data } = useFDWsQuery({
     projectRef: project?.ref,

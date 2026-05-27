@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { sortBy } from 'lodash'
 import { RefreshCw, Search, X } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 import {
   Button,
@@ -28,6 +28,9 @@ import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { VaultSecret } from '@/types'
 
 export const SecretsManagement = () => {
@@ -78,6 +81,22 @@ export const SecretsManagement = () => {
     if (search !== undefined) setSearchValue(search)
   }, [search])
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search secrets' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setSearchValue(''))
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setShowAddSecretModal(true), {
+    label: 'Add new secret',
+    enabled: canManageSecrets,
+  })
+
   return (
     <>
       <div className="h-full w-full space-y-4">
@@ -85,12 +104,14 @@ export const SecretsManagement = () => {
           <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap">
             <div className="flex items-center gap-2">
               <Input
+                ref={searchInputRef}
                 size="tiny"
                 className="w-52"
                 placeholder="Search by name or key ID"
                 icon={<Search />}
                 value={searchValue ?? ''}
                 onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={onSearchInputEscape(searchValue ?? '', setSearchValue)}
                 actions={[
                   searchValue && (
                     <Button

@@ -2522,6 +2522,7 @@ export const security: NavMenuConstant = {
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
       ],
     },
   ],
@@ -2854,6 +2855,10 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Advanced log filtering',
           url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
+        },
+        {
+          name: 'Logs field reference',
+          url: '/guides/telemetry/log-field-reference' as `/${string}`,
         },
         {
           name: 'Log drains',
