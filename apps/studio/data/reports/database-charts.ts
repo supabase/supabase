@@ -93,6 +93,42 @@ export const getReportAttributesV2: (
       ],
     },
     {
+      id: 'memory-commitment',
+      label: 'Memory commitment',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: true,
+      showGrid: true,
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 75,
+        tickFormatter: (value: number) => formatBytesMinMB(value, 2),
+      },
+      attributes: [
+        {
+          attribute: 'ram_commit_used',
+          provider: 'infra-monitoring',
+          label: 'Committed',
+          tooltip:
+            'Total memory the kernel has promised to processes (RAM plus swap). Sustained values near or above the commit limit indicate overcommitment and a high risk of out-of-memory failures',
+        },
+        {
+          attribute: 'ram_commit_limit',
+          provider: 'infra-monitoring',
+          label: 'Commit limit',
+          isMaxValue: true,
+          omitFromTotal: true,
+          tooltip:
+            'Maximum memory the kernel will commit (RAM plus swap, adjusted by the overcommit ratio). Committed memory approaching this limit puts the database at risk of being killed when the system runs out of memory',
+        },
+      ],
+    },
+    {
       id: 'swap-usage',
       label: 'Swap usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
