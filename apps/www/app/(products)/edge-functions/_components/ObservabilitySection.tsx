@@ -40,13 +40,16 @@ function ObservabilityCard({
 
   return (
     <div
-      className={cn('flex flex-col bg-surface-75 border border-border rounded-lg overflow-hidden ', className)}
+      className={cn(
+        'flex flex-col bg-surface-75 border border-border rounded-lg overflow-hidden ',
+        className
+      )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative flex-1 min-h-[285px] overflow-hidden">{card.render(isHovered)}</div>
-      <div className="flex flex-col gap-1 px-6 py-5">
-        <h4 className="text-foreground text-sm font-medium">{card.label}</h4>
+      <div className="flex flex-col gap-2 px-6 py-5">
+        <h4 className="text-foreground text-base font-medium">{card.label}</h4>
         <p className="text-foreground-lighter text-sm">{card.paragraph}</p>
       </div>
     </div>
@@ -74,10 +77,7 @@ export function ObservabilitySection() {
       <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {cards.map((card) => (
-            <ObservabilityCard
-              key={card.id}
-              card={card}
-            />
+            <ObservabilityCard key={card.id} card={card} />
           ))}
         </div>
       </div>

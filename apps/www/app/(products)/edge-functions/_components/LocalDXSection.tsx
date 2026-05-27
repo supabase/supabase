@@ -21,11 +21,9 @@ function EcosystemCard() {
       <div className="flex-1 relative overflow-hidden min-h-[320px] md:min-h-0">
         <NpmEcosystem isHovered={isHovered} />
       </div>
-      <div className="flex flex-col gap-1 px-6 py-5">
-        <h4 className="text-foreground text-sm font-medium">Use any NPM module</h4>
-        <p className="text-foreground-lighter text-sm">
-          Tap into the 2+ million modules in the Deno and NPM ecosystem
-        </p>
+      <div className="flex flex-col gap-2 px-6 py-5">
+        <h4 className="text-foreground text-base font-medium">Use any NPM module</h4>
+        <p className="text-foreground-lighter text-sm">Tap into the Deno and NPM ecosystem</p>
       </div>
     </div>
   )
@@ -43,8 +41,8 @@ function ParityCard() {
       <div className="aspect-[3/2] w-full flex items-center justify-center overflow-hidden">
         <ParityImage isHovered={isHovered} />
       </div>
-      <div className="flex flex-col gap-1 px-6 py-5">
-        <h4 className="text-foreground text-sm font-medium">Dev and Prod parity</h4>
+      <div className="flex flex-col gap-2 px-6 py-5">
+        <h4 className="text-foreground text-base font-medium">Dev and Prod parity</h4>
         <p className="text-foreground-lighter text-sm">
           The open source{' '}
           <Link
@@ -79,8 +77,8 @@ function CICard() {
       >
         <CI isHovered={isHovered} />
       </div>
-      <div className="flex flex-col gap-1 px-6 py-5">
-        <h4 className="text-foreground text-sm font-medium">Continuous Integration</h4>
+      <div className="flex flex-col gap-2 px-6 py-5">
+        <h4 className="text-foreground text-base font-medium">Continuous Integration</h4>
         <p className="text-foreground-lighter text-sm">
           Use the{' '}
           <Link
@@ -109,8 +107,8 @@ function LocalDXCard() {
       <div className="aspect-[3/2] w-full flex items-center justify-center overflow-hidden">
         <LocalDXImage isHovered={isHovered} />
       </div>
-      <div className="flex flex-col gap-1 px-6 py-5">
-        <h4 className="text-foreground text-sm font-medium">First-class local dev experience</h4>
+      <div className="flex flex-col gap-2 px-6 py-5">
+        <h4 className="text-foreground text-base font-medium">First-class local dev experience</h4>
         <p className="text-foreground-lighter text-sm">
           Write code with hot code reloading, a fast Language server for autocompletion, type
           checking and linting
