@@ -1,5 +1,4 @@
-import supabase from '~/lib/supabaseMisc'
-import type { Partner } from '~/types/partners'
+import { listPartners } from '~/lib/marketplaceDb'
 import type { Metadata } from 'next'
 
 import IntegrationsContent from './IntegrationsContent'
@@ -22,16 +21,11 @@ export const metadata: Metadata = {
 }
 
 export default async function IntegrationPartnersPage() {
-  const { data: partners } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('approved', true)
-    .eq('type', 'technology')
-    .order('title')
+  const partners = await listPartners()
 
   return (
     <IntegrationsContent
-      initialPartners={(partners ?? []) as Partner[]}
+      initialPartners={partners}
       metaTitle={META_TITLE}
       metaDescription={META_DESCRIPTION}
     />

@@ -2,13 +2,13 @@
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import supabase from '~/lib/supabaseMisc'
+import { searchPartners } from '~/lib/marketplaceDb'
 import type { Partner } from '~/types/partners'
 import { ArrowRight, ArrowUpRight, Loader, Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { Button, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import { useEffect, useRef, useState } from 'react'
+import { Badge, Button, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { useDebounce } from 'use-debounce'
 
 interface Props {
@@ -23,46 +23,43 @@ export default function IntegrationsContent({
   metaDescription,
 }: Props) {
   const [partners, setPartners] = useState(initialPartners)
-  const allCategories = Array.from(new Set(initialPartners?.map((p) => p.category)))
+  const allCategories = Array.from(
+    new Set(initialPartners?.flatMap((p) => p.categories.map((c) => c.name)))
+  )
 
   const [search, setSearch] = useState('')
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const searchIdRef = useRef(0)
 
   useEffect(() => {
-    const searchPartners = async () => {
-      setIsSearching(true)
-
-      let query = supabase.from('partners').select('*').eq('approved', true).order('title')
-
-      if (search.trim()) {
-        query = query.textSearch('tsv', `${search.trim()}`, {
-          type: 'websearch',
-          config: 'english',
-        })
-      }
-
-      const { data: partners } = await query
-
-      return partners
-    }
-
-    if (search.trim() === '') {
+    if (debouncedSearchTerm.trim() === '') {
       setIsSearching(false)
       setPartners(initialPartners)
       return
     }
 
-    searchPartners().then((partners) => {
-      if (partners) {
-        setPartners(partners)
-      }
+    setIsSearching(true)
+    const currentSearchId = ++searchIdRef.current
 
-      setIsSearching(false)
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearchTerm])
+    searchPartners(debouncedSearchTerm)
+      .then((results) => {
+        if (currentSearchId === searchIdRef.current) {
+          setPartners(results ?? [])
+        }
+      })
+      .catch(() => {
+        if (currentSearchId === searchIdRef.current) {
+          setPartners([])
+        }
+      })
+      .finally(() => {
+        if (currentSearchId === searchIdRef.current) {
+          setIsSearching(false)
+        }
+      })
+  }, [debouncedSearchTerm, initialPartners])
 
   const featuredPartners = partners.filter((p) => p.featured).slice(0, 6)
   const featuredSlugs = new Set(featuredPartners.map((p) => p.slug))
@@ -72,7 +69,7 @@ export default function IntegrationsContent({
   const listPartners = hasSearchQuery
     ? partners
     : selectedCategory
-      ? partners.filter((p) => p.category === selectedCategory)
+      ? partners.filter((p) => p.categories.some((c) => c.name === selectedCategory))
       : showFeatured
         ? partners.filter((p) => !featuredSlugs.has(p.slug))
         : partners
@@ -167,9 +164,11 @@ export default function IntegrationsContent({
                       <h3 className="text-foreground text-base font-medium tracking-tight">
                         {p.title}
                       </h3>
-                      <span className="text-foreground-lighter font-mono text-xs uppercase tracking-wide rounded-full border px-2 py-0.5">
-                        {p.category}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {p.categories.map((c) => (
+                          <Badge>{c.name}</Badge>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   <p className="text-foreground-lighter text-sm line-clamp-3 text-pretty">
@@ -197,9 +196,11 @@ export default function IntegrationsContent({
                       <span className="text-foreground text-sm font-medium tracking-tight">
                         {p.title}
                       </span>
-                      <span className="text-foreground-lighter font-mono text-xs uppercase tracking-wide rounded-full border px-2 py-0.5">
-                        {p.category}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {p.categories.map((c) => (
+                          <Badge>{c.name}</Badge>
+                        ))}
+                      </div>
                     </div>
                     <p className="text-foreground-lighter text-sm truncate">{p.description}</p>
                   </div>
