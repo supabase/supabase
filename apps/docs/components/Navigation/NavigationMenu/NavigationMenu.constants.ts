@@ -2964,6 +2964,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
         { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
+        { name: 'Logs and Analytics', url: '/guides/self-hosting/logs-and-analytics' },
       ],
     },
     {
