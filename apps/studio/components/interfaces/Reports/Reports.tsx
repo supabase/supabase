@@ -25,13 +25,12 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
 
@@ -42,7 +41,6 @@ const Reports = () => {
   const { id: reportId, ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const queryClient = useQueryClient()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -70,7 +68,7 @@ const Reports = () => {
       if (vars.payload.type === 'report') toast.error(`Failed to update report: ${error.message}`)
     },
   })
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const currentReport = userContents?.content.find((report) => report.id === reportId)
   const currentReportContent = currentReport?.content as Dashboards.Content
@@ -343,10 +341,7 @@ const Reports = () => {
         },
       }
     )
-    sendEvent({
-      action: 'custom_report_assistant_sql_block_added',
-      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
-    })
+    track('custom_report_assistant_sql_block_added')
   }
 
   useEffect(() => {
