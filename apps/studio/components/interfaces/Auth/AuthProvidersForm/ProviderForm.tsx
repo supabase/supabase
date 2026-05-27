@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
-import { useEffect, useEffectEvent, useId, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
@@ -83,7 +83,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const hasEntitlementAccess = useHasEntitlementAccess()
 
-  const getValuesForProvider = useEffectEvent(
+  const getValuesForProvider = useCallback(
     (config: components['schemas']['GoTrueConfigResponse']) => {
       const values: { [x: string]: string | boolean } = {}
       Object.keys(provider.properties).forEach((key) => {
@@ -111,7 +111,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         }
       })
       return values
-    }
+    },
+    [provider]
   )
 
   const INITIAL_VALUES = useMemo(() => {

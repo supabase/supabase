@@ -1,5 +1,5 @@
 import { toPng, toSvg } from 'html-to-image'
-import { useEffectEvent, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 export const useExportSchemaToImage = () => {
@@ -8,7 +8,7 @@ export const useExportSchemaToImage = () => {
   // This improves performance a lot. See https://github.com/bubkoo/html-to-image/issues/542#issuecomment-3249408793
   const allPropertyNames = useMemo(() => getAllPropertyNames(), [])
 
-  const exportSchemaToImage = useEffectEvent(
+  const exportSchemaToImage = useCallback(
     async ({
       element,
       projectRef,
@@ -62,7 +62,8 @@ export const useExportSchemaToImage = () => {
       } finally {
         setIsDownloading(false)
       }
-    }
+    },
+    [allPropertyNames]
   )
 
   return useMemo(

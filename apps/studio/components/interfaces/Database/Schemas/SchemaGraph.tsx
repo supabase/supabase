@@ -14,7 +14,7 @@ import {
 import { Check, ChevronDown, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import '@xyflow/react/dist/style.css'
@@ -164,7 +164,7 @@ export const SchemaGraph = () => {
     saveNodePositions()
   }
 
-  const saveNodePositions = useEffectEvent(() => {
+  const saveNodePositions = useCallback(() => {
     if (schema === undefined) return console.error('Schema is required')
 
     const nodes = reactFlowInstance.getNodes()
@@ -174,10 +174,10 @@ export const SchemaGraph = () => {
       }, {})
       setStoredPositions(nodesPositionData)
     }
-  })
+  }, [schema, reactFlowInstance, setStoredPositions])
 
   const [selectedEdge, setSelectedEdge] = useState<Edge | undefined>(undefined)
-  const handleSelectionChange = useEffectEvent(
+  const handleSelectionChange = useCallback(
     (params: OnSelectionChangeParams<Node<TableNodeData>, Edge<EdgeData>>) => {
       if (params.edges.length === 1) {
         setSelectedEdge(params.edges[0])
@@ -197,7 +197,8 @@ export const SchemaGraph = () => {
         return { ...edge, animated: shouldAnimate }
       })
       if (hasChanges) reactFlowInstance.setEdges(nextEdges)
-    }
+    },
+    [reactFlowInstance, setSelectedEdge]
   )
 
   const downloadImage = async (format: 'png' | 'svg') => {

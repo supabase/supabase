@@ -8,7 +8,7 @@ import {
   useReactFlow,
 } from '@xyflow/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { memo, useEffectEvent, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { Badge, cn } from 'ui'
 
 import { useSchemaGraphContext } from './SchemaGraphContext'
@@ -95,43 +95,46 @@ const EdgeRelationInfo = ({
   const [show, setShow] = useState(false)
   const reactFlowInstance = useReactFlow()
 
-  const checkIfShouldBeDisplayed = useEffectEvent((relationInfoElement: HTMLDivElement | null) => {
-    if (!relationInfoElement) return
-    const sourceNode = reactFlowInstance.getNode(source)
-    const targetNode = reactFlowInstance.getNode(target)
-    if (!sourceNode || !targetNode) return
+  const checkIfShouldBeDisplayed = useCallback(
+    (relationInfoElement: HTMLDivElement | null) => {
+      if (!relationInfoElement) return
+      const sourceNode = reactFlowInstance.getNode(source)
+      const targetNode = reactFlowInstance.getNode(target)
+      if (!sourceNode || !targetNode) return
 
-    const relationInfoRect = relationInfoElement.getBoundingClientRect()
-    // Get the origin position of the relation information badge in the ReactFlow coordinates
-    const relationInfoOriginPositionInReactFlow = reactFlowInstance.screenToFlowPosition({
-      x: relationInfoRect.x,
-      y: relationInfoRect.y,
-    })
-    // Get the end position (origin + dimensions) of the relation information badge in the ReactFlow coordinates
-    const relationInfoTargetPositionInReactFlow = reactFlowInstance.screenToFlowPosition({
-      x: relationInfoRect.x + relationInfoRect.width,
-      y: relationInfoRect.y + relationInfoRect.height,
-    })
-    // Create a ReactFlow Rect from the computed position above
-    const relationInfoReactFlowRect = {
-      x: relationInfoOriginPositionInReactFlow.x,
-      y: relationInfoOriginPositionInReactFlow.y,
-      width: relationInfoTargetPositionInReactFlow.x - relationInfoOriginPositionInReactFlow.x,
-      height: relationInfoTargetPositionInReactFlow.y - relationInfoOriginPositionInReactFlow.y,
-    }
-    // Check whether the relation information badge is intersecting with either the source or target node
-    const isNodeIntersectingWithSource = reactFlowInstance.isNodeIntersecting(
-      sourceNode,
-      relationInfoReactFlowRect
-    )
-    const isNodeIntersectingWithTarget = reactFlowInstance.isNodeIntersecting(
-      targetNode,
-      relationInfoReactFlowRect
-    )
+      const relationInfoRect = relationInfoElement.getBoundingClientRect()
+      // Get the origin position of the relation information badge in the ReactFlow coordinates
+      const relationInfoOriginPositionInReactFlow = reactFlowInstance.screenToFlowPosition({
+        x: relationInfoRect.x,
+        y: relationInfoRect.y,
+      })
+      // Get the end position (origin + dimensions) of the relation information badge in the ReactFlow coordinates
+      const relationInfoTargetPositionInReactFlow = reactFlowInstance.screenToFlowPosition({
+        x: relationInfoRect.x + relationInfoRect.width,
+        y: relationInfoRect.y + relationInfoRect.height,
+      })
+      // Create a ReactFlow Rect from the computed position above
+      const relationInfoReactFlowRect = {
+        x: relationInfoOriginPositionInReactFlow.x,
+        y: relationInfoOriginPositionInReactFlow.y,
+        width: relationInfoTargetPositionInReactFlow.x - relationInfoOriginPositionInReactFlow.x,
+        height: relationInfoTargetPositionInReactFlow.y - relationInfoOriginPositionInReactFlow.y,
+      }
+      // Check whether the relation information badge is intersecting with either the source or target node
+      const isNodeIntersectingWithSource = reactFlowInstance.isNodeIntersecting(
+        sourceNode,
+        relationInfoReactFlowRect
+      )
+      const isNodeIntersectingWithTarget = reactFlowInstance.isNodeIntersecting(
+        targetNode,
+        relationInfoReactFlowRect
+      )
 
-    // If it is, hide it as they are too close
-    setShow(!isNodeIntersectingWithSource && !isNodeIntersectingWithTarget)
-  })
+      // If it is, hide it as they are too close
+      setShow(!isNodeIntersectingWithSource && !isNodeIntersectingWithTarget)
+    },
+    [reactFlowInstance, source, target]
+  )
 
   return (
     <EdgeLabelRenderer>
