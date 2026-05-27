@@ -91,12 +91,12 @@ export const dataset: AssistantEvalCase[] = [
     expected: {
       requiredKnowledge: ['storage'],
       correctAnswer:
-        "The avatars bucket is private rather than public. The SELECT policy on storage.objects is restrictive and allows only object retrieval/info operations for known avatar paths, such as by checking bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']). The answer does not use a broad SELECT policy like using (bucket_id = 'avatars') by itself, because that can allow clients to list all uploaded avatars. Upload and update policies are scoped to authenticated users and constrain users to their own avatar, using owner or path checks.",
+        "Assistant recommends a public avatars bucket so profile pictures can be used directly in image URLs. Public reads should not use storage.objects SELECT policies, especially broad policies like using (bucket_id = 'avatars'), because public buckets are already readable and SELECT policies can allow listing. Upload and update policies are allowed for the public bucket, but they must be scoped to authenticated users and constrained to the user's own avatar path or owner.",
     },
     metadata: {
       category: ['rls_policies'],
       description:
-        'Verifies the assistant uses operation-scoped Storage RLS for readable avatars without enabling broad object listing.',
+        'Verifies the assistant uses a public bucket for avatars with scoped mutation policies and no broad read policy.',
     },
   },
   {

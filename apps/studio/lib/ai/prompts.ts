@@ -163,34 +163,24 @@ export const STORAGE_PROMPT = `
 
 ## Buckets and RLS
 Storage bucket visibility and RLS are separate controls:
-- Public buckets allow anyone with an object URL to retrieve/serve files. Do not add broad \`SELECT\` or \`ALL\` policies just to make public bucket reads work; a broad \`USING (bucket_id = '...')\` policy can allow clients to list bucket contents.
-- Only add Storage RLS policies for public buckets when the user explicitly asks for client-side uploads, updates, deletes, moves, or copies. Do not infer client-side write access from vague ownership or use language like "my team will use/manage it"; create the bucket and ask for the intended upload flow if needed.
-- Private buckets apply RLS to every operation, including downloads. If users should be able to fetch known object URLs, but should not be able to list everything in the bucket, keep the bucket private and use operation-scoped \`SELECT\` policies with \`storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated'])\`.
-- Never implement known-object reads with \`USING (bucket_id = '<bucket>')\` by itself. That permits listing object rows in the bucket. Always include the operation filter for this pattern.
-- For user-owned uploads or updates, constrain writes to authenticated users and a stable owner/path convention, such as \`(storage.foldername(name))[1] = (SELECT auth.uid())::text\`.
+- Public buckets allow anyone with an object URL to retrieve files, and public bucket reads do not need \`SELECT\` policies. Never add \`SELECT\` or \`ALL\` policies to public buckets just to make reads work; broad policies like \`USING (bucket_id = '...')\` can allow clients to list bucket contents.
+- Public profile pictures and website assets should usually use a public bucket. Add Storage RLS policies only for client-side uploads, updates, deletes, moves, or copies, and scope mutations to authenticated users plus a stable owner/path convention.
+- Private buckets apply RLS to every operation, including downloads. Only prefer private buckets when files should not be directly served from public URLs; clients must download through the SDK or use signed URLs.
+- If a private bucket still needs public known-object fetches without list access, use operation-scoped \`SELECT\` policies with \`storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated'])\`. Never use \`USING (bucket_id = '<bucket>')\` by itself for this pattern.
 
 \`\`\`sql
--- Public website assets: public bucket, no read policy needed.
+-- Public assets or avatars: public bucket, no read policy needed.
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('marketing-assets', 'marketing-assets', true)
+VALUES ('avatars', 'avatars', true)
 ON CONFLICT (id) DO UPDATE SET public = true, name = EXCLUDED.name;
 
--- Published documents that are fetchable by URL without list access: private bucket plus operation-scoped reads.
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('published-documents', 'published-documents', false)
-ON CONFLICT (id) DO UPDATE SET public = false, name = EXCLUDED.name;
-
-CREATE POLICY "Published documents can be fetched" ON storage.objects FOR SELECT TO public USING (
-  bucket_id = 'published-documents'
-  AND storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated'])
+CREATE POLICY "Users can upload their own avatar" ON storage.objects FOR INSERT TO authenticated WITH CHECK (
+  bucket_id = 'avatars' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
 );
-
--- Private per-user files where listing a user's own folder is intended.
-CREATE POLICY "User uploads" ON storage.objects FOR INSERT TO authenticated WITH CHECK (
-  bucket_id = 'user-uploads' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
-);
-CREATE POLICY "User file access" ON storage.objects FOR SELECT TO authenticated USING (
-  bucket_id = 'user-uploads' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
+CREATE POLICY "Users can update their own avatar" ON storage.objects FOR UPDATE TO authenticated USING (
+  bucket_id = 'avatars' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
+) WITH CHECK (
+  bucket_id = 'avatars' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
 );
 \`\`\`
 `
