@@ -145,7 +145,7 @@ export async function generateAssistantResponse({
     return streamTextFn({
       model,
       system: systemMessage,
-      stopWhen: stepCountIs(5),
+      stopWhen: stepCountIs(10),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
