@@ -41,7 +41,7 @@ const FaqList = ({ items }: { items: { question: string; answer: string }[] }) =
               onClick={() => setOpenIndex(isOpen ? null : i)}
               aria-expanded={isOpen}
             >
-              <span className="text-foreground font-medium text-base">{item.question}</span>
+              <span className="text-foreground text-base">{item.question}</span>
               <ChevronDown
                 size={16}
                 className={cn(
@@ -78,7 +78,7 @@ const SectionHeading = ({ eyebrow, title, description, align = 'left' }: Section
     {eyebrow && (
       <span className="text-brand font-mono text-sm uppercase tracking-wide">{eyebrow}</span>
     )}
-    <h2 className="text-foreground text-3xl md:text-4xl font-medium tracking-tight max-w-[35ch] text-balance">
+    <h2 className="text-foreground text-3xl md:text-4xl tracking-tight max-w-[35ch] text-balance">
       {title}
     </h2>
     {description && (
@@ -94,7 +94,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
     <DefaultLayout>
       {/* Hero — centered (page entry) */}
       <div className="bg-alternative border-b">
-        <SectionContainer className="!pb-12 md:!pb-16">
+        <SectionContainer>
           <ProductHeaderCentered
             title={heroSection.title}
             h1={heroSection.h1}
@@ -117,9 +117,9 @@ export default function PartnersContent({ featuredPartners }: Props) {
             <Panel
               key={reason.title}
               outerClassName="h-full hover:shadow-none!"
-              innerClassName="flex flex-col gap-3 p-8"
+              innerClassName="flex flex-col gap-3 p-4 lg:p-6"
             >
-              <h3 className="text-foreground text-xl font-medium tracking-tight">{reason.title}</h3>
+              <h3 className="text-foreground text-xl tracking-tight">{reason.title}</h3>
               <p className="text-foreground-lighter text-sm text-pretty">{reason.description}</p>
             </Panel>
           ))}
@@ -141,12 +141,10 @@ export default function PartnersContent({ featuredPartners }: Props) {
                 <Panel
                   key={tier.title}
                   outerClassName="h-full hover:shadow-none!"
-                  innerClassName="flex flex-col gap-6 p-8 h-full"
+                  innerClassName="flex flex-col gap-6 p-4 lg:p-6 h-full"
                 >
                   <div className="flex flex-col gap-3">
-                    <h3 className="text-foreground text-xl font-medium tracking-tight">
-                      {tier.title}
-                    </h3>
+                    <h3 className="text-foreground text-xl tracking-tight">{tier.title}</h3>
                     <p className="text-foreground-lighter text-sm text-pretty">
                       {tier.description}
                     </p>
@@ -195,7 +193,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
           <SectionHeading
             eyebrow="Benefits"
             title={pageData.benefits.title}
-            description="Partnerships open up access to the Supabase community, our product team, and our co-marketing motion."
+            description="Open to companies building real integrations on Postgres."
           />
           <ul role="list" className="flex flex-col gap-3">
             {pageData.benefits.items.map((item) => (
@@ -220,7 +218,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
             <SectionHeading
               eyebrow="Get started"
               title={pageData.howToApply.title}
-              description="Three steps from intro to launch. Most partners hear back within a week."
+              description="Three steps from intro to launch."
             />
             <Button
               asChild
@@ -237,14 +235,12 @@ export default function PartnersContent({ featuredPartners }: Props) {
               <li key={step.title}>
                 <Panel
                   outerClassName="h-full hover:shadow-none!"
-                  innerClassName="flex flex-col gap-3 p-8 h-full"
+                  innerClassName="flex flex-col gap-3 p-4 lg:p-6 h-full"
                 >
                   <span className="text-foreground-lighter font-mono text-sm tabular-nums">
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <h3 className="text-foreground text-xl font-medium tracking-tight">
-                    {step.title}
-                  </h3>
+                  <h3 className="text-foreground text-xl tracking-tight">{step.title}</h3>
                   <p className="text-foreground-lighter text-sm text-pretty">{step.description}</p>
                 </Panel>
               </li>
@@ -260,7 +256,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
             <span className="text-brand font-mono text-sm uppercase tracking-wide">
               Featured partners
             </span>
-            <h2 className="text-foreground text-3xl md:text-4xl font-medium tracking-tight max-w-[35ch] text-balance">
+            <h2 className="text-foreground text-3xl md:text-4xl tracking-tight max-w-[35ch] text-balance">
               {pageData.featuredPartners.title}
             </h2>
             <p className="text-foreground-lighter text-lg max-w-[56ch] text-pretty">
@@ -340,10 +336,8 @@ export default function PartnersContent({ featuredPartners }: Props) {
                   <div className="bg-surface-200 text-foreground flex size-10 shrink-0 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                     {option.icon}
                   </div>
-                  <div className="flex flex-col gap-1.5">
-                    <dt className="text-foreground text-base font-medium tracking-tight">
-                      {option.title}
-                    </dt>
+                  <div className="flex flex-col gap-1.5 text-foreground">
+                    <dt className="text-balance">{option.title}</dt>
                     <dd className="text-foreground-lighter text-sm text-pretty">
                       {option.description}
                     </dd>
@@ -365,7 +359,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
       {/* FAQ — centered title, constrained list width */}
       <SectionContainer>
         <div className="flex flex-col items-center text-center gap-3 mb-12">
-          <h2 className="text-foreground text-2xl sm:text-3xl font-medium tracking-tight max-w-[35ch] text-balance">
+          <h2 className="text-foreground text-2xl sm:text-3xl tracking-tight max-w-[35ch] text-balance">
             {pageData.faq.title}
           </h2>
         </div>
