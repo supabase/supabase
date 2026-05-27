@@ -174,7 +174,10 @@ export function JitDbAccessRuleSheet({
     () => mapJitMembersToUserRules(jitMembers, projectMembers, roleOptions),
     [jitMembers, projectMembers, roleOptions]
   )
-  const user = users.find((x) => x.id === ruleIdToEdit)
+  // When the add sheet is open we deliberately ignore any stale `ruleIdToEdit`
+  // in the URL — otherwise an invite row's id (or a leftover query param) can
+  // pull the sheet into edit mode while the user just clicked "Add rule".
+  const user = isNewRule ? undefined : users.find((x) => x.id === ruleIdToEdit)
   const mode: SheetMode = !!user ? 'edit' : 'add'
 
   const isDataReady = isSuccessDatabaseRoles && isSuccessJitMembers && isSuccessProjectMembers
@@ -252,11 +255,11 @@ export function JitDbAccessRuleSheet({
   }
 
   useEffect(() => {
-    if (!!ruleIdToEdit && isDataReady && !user) {
+    if (!isNewRule && !!ruleIdToEdit && isDataReady && !user) {
       toast('Access rule cannot be found')
       setRuleIdToEdit(null)
     }
-  }, [isDataReady, ruleIdToEdit, setRuleIdToEdit, user])
+  }, [isDataReady, isNewRule, ruleIdToEdit, setRuleIdToEdit, user])
 
   useEffect(() => {
     if (open && isDataReady) form.reset(defaultValues)
