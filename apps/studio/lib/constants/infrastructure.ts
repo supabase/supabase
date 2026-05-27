@@ -16,7 +16,7 @@ export const MANAGED_BY = {
   AWS_MARKETPLACE: 'aws-marketplace',
   STRIPE_PROJECTS: 'stripe-projects',
   SUPABASE: 'supabase',
-}
+} as const
 
 export type ManagedBy = (typeof MANAGED_BY)[keyof typeof MANAGED_BY]
 
