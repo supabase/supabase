@@ -1,4 +1,5 @@
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import { type ConnectSheetSource } from 'common/telemetry-constants'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
 const getInitialState = () => {
@@ -70,8 +71,8 @@ export const appState = proxy({
     appState.mobileMenuOpen = value
   },
 
-  connectSheetSource: 'header_button' as 'header_button' | 'connect_section' | 'keyboard_shortcut',
-  setConnectSheetSource: (value: 'header_button' | 'connect_section' | 'keyboard_shortcut') => {
+  connectSheetSource: 'header_button' as ConnectSheetSource,
+  setConnectSheetSource: (value: ConnectSheetSource) => {
     appState.connectSheetSource = value
   },
 

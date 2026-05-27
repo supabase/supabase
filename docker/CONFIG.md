@@ -1,4 +1,4 @@
-Last updated: 2026-05-19
+Last updated: 2026-05-23
 
 # Self-hosted Supabase configuration reference
 
@@ -57,7 +57,7 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 | Realtime | `supabase/realtime` | [supabase/realtime](https://github.com/supabase/realtime) |
 | Storage | `supabase/storage-api` | [supabase/storage](https://github.com/supabase/storage) |
 | Edge Functions | `supabase/edge-runtime` | [supabase/edge-runtime](https://github.com/supabase/edge-runtime) |
-| Analytics | `logflare/logflare` | [logflare/logflare](https://github.com/logflare/logflare) |
+| Analytics | `supabase/logflare` | [logflare/logflare](https://github.com/logflare/logflare) |
 | Postgres | `supabase/postgres` | [supabase/postgres](https://github.com/supabase/postgres) |
 | Supavisor (Pooler) | `supabase/supavisor` | [supabase/supavisor](https://github.com/supabase/supavisor) |
 
@@ -1049,6 +1049,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `STORAGE_S3_MAX_SOCKETS` | integer |  | Max concurrent sockets for the S3 HTTP agent. | Default: `200` |
 | `STORAGE_S3_PRIVATE_ASSET_ENDPOINT` | URL |  | Endpoint used only when signing private source URLs for internal consumers (e.g. imgproxy). | Optional |
 | `STORAGE_S3_REGION` | string | CLI | AWS region for the S3 backend; falls back to `REGION`. | Required when `STORAGE_BACKEND=s3` |
+| `STORAGE_S3_UPLOAD_PART_SIZE` | integer (bytes) |  | Multipart upload part size in bytes. Values below the 5 MiB S3 minimum are clamped up. | Default: `16777216` (16 MiB); minimum: `5242880` (5 MiB) |
 | `STORAGE_S3_UPLOAD_QUEUE_SIZE` | integer |  | Concurrent part uploads per multipart object. | Default: `2` |
 
 ### File backend

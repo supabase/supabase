@@ -86,13 +86,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          href: '/docs/ui-patterns/modality',
-          title: 'Modality',
+          title: 'Markdown',
+          href: '/docs/ui-patterns/markdown',
           items: [],
         },
         {
-          href: '/docs/ui-patterns/navigation',
+          title: 'Modality',
+          href: '/docs/ui-patterns/modality',
+          items: [],
+        },
+        {
           title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
         {
@@ -120,6 +125,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Collapsible Alert',
           href: '/docs/fragments/collapsible-alert',
+          items: [],
+        },
+        {
+          title: 'Collapsible Card Section',
+          href: '/docs/fragments/collapsible-card-section',
           items: [],
         },
         {
