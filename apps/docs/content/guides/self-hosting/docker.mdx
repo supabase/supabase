@@ -32,14 +32,12 @@ If you're new to these topics, consider starting with the managed [Supabase plat
 You need the following installed on your system:
 
 - [Git](https://git-scm.com/downloads)
-- OpenSSL
 - [Docker](https://docs.docker.com/manuals/):
   - **Linux server/VPS**: Install [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/)
   - **Linux desktop**: Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/linux/)
   - **macOS**: Install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)
   - **Windows**: Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-
 
 ## System requirements
 
@@ -55,7 +53,7 @@ If you don't need specific services, such as Realtime, Storage, imgproxy, or Edg
 
 <Admonition type="tip">
 
-The default configuration does not include [Logs & Analytics](https://supabase.com/features/logs-analytics). You can enable Logflare (Analytics), Vector (log collection), and the Log Explorer in Studio by using an optional `docker-compose` override file. Note that enabling these services will increase resource requirements.
+The default configuration does not include [Logs & Analytics](/features/logs-analytics). You can enable Logflare (Analytics), Vector (log collection), and the Log Explorer in Studio by using an optional `docker-compose` override file. Note that enabling these services will increase resource requirements.
 
 </Admonition>
 
@@ -315,7 +313,7 @@ Each of the APIs is available through the same API gateway:
 - Storage: `http://<your-domain>:8000/storage/v1/`
 - Realtime: `http://<your-domain>:8000/realtime/v1/`
 
-## Enabling Logs & Analytics
+## Enabling analytics
 
 Logs & Analytics are not included in the default configuration. To enable them:
 
