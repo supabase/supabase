@@ -366,8 +366,8 @@ importers:
         specifier: 'catalog:'
         version: 2.106.2
       '@tanstack/react-query':
-        specifier: ^5.100.10
-        version: 5.100.14(react@19.2.6)
+        specifier: ~5.83.0
+        version: 5.83.0(react@19.2.6)
       acorn:
         specifier: ^8.11.3
         version: 8.11.3
@@ -8080,11 +8080,6 @@ packages:
     resolution: {integrity: sha512-vAXJzZuBXtCQtrY3F/yUNJCV4obT/A/n81kb3+YqLbro5Z2+phdAbceO+deU3ywPw8B42oyJlp4FhO0SoivDFQ==}
     peerDependencies:
       '@tanstack/react-query': ^5.90.2
-      react: ^18 || ^19
-
-  '@tanstack/react-query@5.100.14':
-    resolution: {integrity: sha512-oOr6aRdSFEwWhzxEkD/9ZcItM3+LjBSkeVmadWKwUssAHTsqd/7bOjWrX4AbvEkoEhgAxzN0Xk6H/aYzXiYBAw==}
-    peerDependencies:
       react: ^18 || ^19
 
   '@tanstack/react-query@5.83.0':
@@ -24450,11 +24445,6 @@ snapshots:
     dependencies:
       '@tanstack/query-devtools': 5.90.1
       '@tanstack/react-query': 5.83.0(react@19.2.6)
-      react: 19.2.6
-
-  '@tanstack/react-query@5.100.14(react@19.2.6)':
-    dependencies:
-      '@tanstack/query-core': 5.100.14
       react: 19.2.6
 
   '@tanstack/react-query@5.83.0(react@19.2.6)':
