@@ -77,9 +77,9 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
       <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-            Never write an API
+            Never write
             <br />
-            <span className="text-foreground">again</span>
+            <span className="text-foreground">an API again</span>
           </h3>
           <p className="text-foreground-lighter text-sm lg:text-base">
             We introspect your database and provide instant APIs. Focus on building your product,
