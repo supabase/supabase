@@ -182,6 +182,16 @@ CREATE POLICY "Users can update their own avatar" ON storage.objects FOR UPDATE 
 ) WITH CHECK (
   bucket_id = 'avatars' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
 );
+
+-- Private documents fetchable by known URL without bucket listing.
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('published-documents', 'published-documents', false)
+ON CONFLICT (id) DO UPDATE SET public = false, name = EXCLUDED.name;
+
+CREATE POLICY "Published documents can be fetched" ON storage.objects FOR SELECT TO public USING (
+  bucket_id = 'published-documents'
+  AND storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated'])
+);
 \`\`\`
 `
 
