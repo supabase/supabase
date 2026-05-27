@@ -29,7 +29,6 @@ interface JitDbAccessRulesTableProps {
   isLoading?: boolean
   canUpdate: boolean
   disableActions?: boolean
-  allProjectMembersHaveRules?: boolean
   onAddRule: () => void
   onEditRule: (user: JitUserRule) => void
   onDeleteRule: (user: JitUserRule) => void
@@ -40,17 +39,12 @@ export function JitDbAccessRulesTable({
   isLoading = false,
   canUpdate,
   disableActions = false,
-  allProjectMembersHaveRules = false,
   onAddRule,
   onEditRule,
   onDeleteRule,
 }: JitDbAccessRulesTableProps) {
-  const addDisabled = disableActions || !canUpdate || allProjectMembersHaveRules
-  const addRuleTooltip = !canUpdate
-    ? 'Additional permissions required'
-    : allProjectMembersHaveRules
-      ? 'All project members already have temporary access rules'
-      : undefined
+  const addDisabled = disableActions || !canUpdate
+  const addRuleTooltip = !canUpdate ? 'Additional permissions required' : undefined
 
   if (isLoading) {
     return (
@@ -122,7 +116,9 @@ export function JitDbAccessRulesTable({
               users.map((user) => {
                 const statusDisplay = getJitStatusDisplay(user.status)
                 const enabledGrants = user.grants.filter((grant) => grant.enabled)
-                const rowIsInteractive = canUpdate && !disableActions
+                const isInvite = !!user.inviteState
+                const canEdit = !isInvite
+                const rowIsInteractive = canUpdate && !disableActions && canEdit
 
                 return (
                   <TableRow
@@ -150,14 +146,30 @@ export function JitDbAccessRulesTable({
                     tabIndex={rowIsInteractive ? 0 : undefined}
                   >
                     <TableCell className="text-sm">
-                      {user.name && <p>{user.name}</p>}
-                      <p className="text-foreground-lighter">{user.email}</p>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        {user.name ? <span>{user.name}</span> : <span>{user.email}</span>}
+                        {user.isExternal && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="warning">External</Badge>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              Is not a project member and cannot access other project resources
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                      {user.name && <p className="text-foreground-lighter">{user.email}</p>}
                     </TableCell>
                     <TableCell className="text-sm text-foreground-light">
                       {enabledGrants.length} role{enabledGrants.length === 1 ? '' : 's'}
                     </TableCell>
                     <TableCell className="text-sm text-foreground-light">
-                      {statusDisplay.badges.length > 0 ? (
+                      {user.inviteState === 'pending' ? (
+                        <Badge variant="warning">Pending</Badge>
+                      ) : user.inviteState === 'expired' ? (
+                        <Badge variant="destructive">Expired</Badge>
+                      ) : statusDisplay.badges.length > 0 ? (
                         <span className="flex flex-wrap gap-1.5">
                           {statusDisplay.badges.map((badge) => (
                             <Badge key={badge.label} variant={badge.variant}>
@@ -180,18 +192,22 @@ export function JitDbAccessRulesTable({
                           />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" side="bottom" className="w-40">
-                          <DropdownMenuItem
-                            className="gap-x-2"
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              onEditRule(user)
-                            }}
-                            disabled={!canUpdate || disableActions}
-                          >
-                            <Pencil size={14} className="text-foreground-lighter" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
+                          {canEdit && (
+                            <>
+                              <DropdownMenuItem
+                                className="gap-x-2"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  onEditRule(user)
+                                }}
+                                disabled={!canUpdate || disableActions}
+                              >
+                                <Pencil size={14} className="text-foreground-lighter" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                            </>
+                          )}
                           <DropdownMenuItem
                             className="gap-x-2"
                             onClick={(event) => {
@@ -201,7 +217,7 @@ export function JitDbAccessRulesTable({
                             disabled={!canUpdate || disableActions}
                           >
                             <Trash2 size={14} className="text-foreground-lighter" />
-                            Delete
+                            {isInvite ? 'Delete invitation' : 'Delete'}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
