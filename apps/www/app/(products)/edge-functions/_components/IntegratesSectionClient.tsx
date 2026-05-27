@@ -146,13 +146,7 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
                   exit={{ opacity: 0, transition: { duration: 0.05 } }}
                   className="flex flex-col gap-1"
                 >
-                  <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
-                    {(() => {
-                      const Icon = ICONS[active.icon]
-                      return <Icon size={14} strokeWidth={2} />
-                    })()}
-                    {active.label}
-                  </h4>
+                  <h4 className="text-sm font-medium text-foreground">{active.label}</h4>
                   <p className="text-sm text-foreground-lighter">{active.paragraph}</p>
                 </motion.div>
               </AnimatePresence>

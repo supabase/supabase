@@ -11,9 +11,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Dialog,
   DialogContent,
@@ -26,7 +26,7 @@ import {
   DialogTrigger,
   Form,
   FormField,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -331,7 +331,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 name="amount"
                 render={({ field }) => (
                   <FormItemLayout label="Amount (USD)" className="gap-1">
-                    <Input_Shadcn_ {...field} type="number" placeholder="300" />
+                    <Input {...field} type="number" placeholder="300" />
                   </FormItemLayout>
                 )}
               />
@@ -354,36 +354,32 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
               />
 
               {paymentIntentConfirmation && paymentIntentConfirmation.error && (
-                <Alert_Shadcn_ variant="destructive">
+                <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>Error confirming payment</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    {paymentIntentConfirmation.error.message}
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  <AlertTitle>Error confirming payment</AlertTitle>
+                  <AlertDescription>{paymentIntentConfirmation.error.message}</AlertDescription>
+                </Alert>
               )}
 
               {paymentIntentConfirmation?.paymentIntent &&
                 paymentIntentConfirmation.paymentIntent.status === 'processing' && (
-                  <Alert_Shadcn_ variant="default">
+                  <Alert variant="default">
                     <Info className="h-4 w-4" />
-                    <AlertTitle_Shadcn_>Payment processing</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
+                    <AlertTitle>Payment processing</AlertTitle>
+                    <AlertDescription>
                       Your payment is processing and we are waiting for a confirmation from your
                       card issuer. If the payment goes through you'll automatically be credited.
                       Please check back later.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                    </AlertDescription>
+                  </Alert>
                 )}
 
               {errorInitiatingTopUp && (
-                <Alert_Shadcn_ variant="destructive">
+                <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>Error topping up balance</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    {errorInitiatingTopUp.message}
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  <AlertTitle>Error topping up balance</AlertTitle>
+                  <AlertDescription>{errorInitiatingTopUp.message}</AlertDescription>
+                </Alert>
               )}
 
               {!!validAmount && !creditPreviewInitialized && creditPreviewIsFetching && (

@@ -1,4 +1,6 @@
-import { HotkeySequence } from '@tanstack/react-hotkeys'
+import { HotkeyMeta, HotkeySequence } from '@tanstack/react-hotkeys'
+
+import { ShortcutId } from './registry'
 
 export type DisabledShortcuts = Record<string, boolean>
 
@@ -65,6 +67,19 @@ export interface ShortcutOptions {
    * registry default.
    */
   label?: string
+
+  /**
+   * How the hotkey lib should behave when this shortcut's `sequence` is already
+   * registered by another mounted shortcut. Defaults to `'warn'` (the lib's
+   * default) — every duplicate registration logs a console warning.
+   *
+   * Set to `'allow'` for shortcuts that intentionally share a sequence with
+   * sibling shortcuts and are routed by mutually-exclusive `enabled` gates
+   * (e.g. an Escape ladder: clear selection → close preview → close search).
+   * Use `'replace'` only when you actually want the new registration to
+   * supplant the old one — rarely the right choice for our use cases.
+   */
+  conflictBehavior?: 'warn' | 'allow' | 'replace'
 }
 
 /**
@@ -117,3 +132,17 @@ export interface ShortcutDefinition {
 }
 
 export type RegistryDefinations<T extends string> = Record<T, ShortcutDefinition>
+
+/**
+ * Shape we store on each registration's `options.meta` so the Keyboard
+ * shortcuts reference sheet can read it back via `useHotkeyRegistrations()`.
+ */
+export interface ShortcutHotkeyMeta extends HotkeyMeta {
+  /**
+   * Stable identifier for the registration. `useShortcut` always sets this to
+   * a registered `ShortcutId`; `useDynamicShortcut` may pass any string so
+   * runtime-built shortcuts can flow through the same reference sheet.
+   */
+  id: ShortcutId | string
+  referenceGroup?: string
+}

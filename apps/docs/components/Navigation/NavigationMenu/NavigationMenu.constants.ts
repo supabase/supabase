@@ -58,6 +58,8 @@ const {
   'sdk:swift',
 ])
 
+const aiToolsEnabled = true
+
 const jsOnly =
   !sdkCsharpEnabled && !sdkDartEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
 
@@ -148,6 +150,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Build',
       menuItems: [
         [
+          {
+            label: 'AI Tools',
+            icon: 'ai-tools',
+            href: '/guides/ai-tools' as `/${string}`,
+            level: 'ai_tools',
+            enabled: aiToolsEnabled,
+          },
           {
             label: 'Local Development & CLI',
             icon: 'dev-cli',
@@ -327,8 +336,9 @@ export const gettingstarted: NavMenuConstant = {
   title: 'Start with Supabase',
   url: '/guides/getting-started',
   items: [
-    { name: 'Features', url: '/guides/getting-started/features' },
+    { name: 'Build with AI tools', url: '/guides/ai-tools' },
     { name: 'API Keys', url: '/guides/getting-started/api-keys' },
+    { name: 'Local Development', url: '/guides/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
       name: 'Framework Quickstarts',
@@ -493,32 +503,6 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Swift',
           url: '/guides/getting-started/tutorials/with-swift' as `/${string}`,
           enabled: sdkSwiftEnabled,
-        },
-      ],
-    },
-    {
-      name: 'AI Tools',
-      url: undefined,
-      items: [
-        {
-          name: 'Supabase Plugin for AI Coding Agents',
-          url: '/guides/getting-started/plugins' as `/${string}`,
-        },
-        {
-          name: 'Prompts',
-          url: '/guides/getting-started/ai-prompts' as `/${string}`,
-        },
-        {
-          name: 'Agent Skills',
-          url: '/guides/getting-started/ai-skills' as `/${string}`,
-        },
-        {
-          name: 'Supabase MCP server',
-          url: '/guides/getting-started/mcp' as `/${string}`,
-        },
-        {
-          name: 'Deploy MCP servers',
-          url: '/guides/getting-started/byo-mcp' as `/${string}`,
         },
       ],
     },
@@ -761,7 +745,7 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Email (Magic Link or OTP)',
+          name: 'Email (Magic link or OTP)',
           url: '/guides/auth/auth-email-passwordless',
           enabled: allAuthProvidersEnabled,
         },
@@ -1179,18 +1163,24 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'Replication',
-          url: '/guides/database/replication/replication-setup' as `/${string}`,
+          name: 'External replication',
+          url: '/guides/database/replication/external-replication-setup' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/replication-setup' as `/${string}`,
+              url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+              items: [
+                {
+                  name: 'BigQuery',
+                  url: '/guides/database/replication/bigquery' as `/${string}`,
+                },
+              ],
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/external-replication-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/external-replication-faq' },
           ],
         },
         {
@@ -1705,6 +1695,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/auth',
           items: [
             { name: 'Securing your functions', url: '/guides/functions/auth' },
+            { name: 'Authorization headers', url: '/guides/functions/auth-headers' },
             { name: 'Legacy JWT secret', url: '/guides/functions/auth-legacy-jwt' },
           ],
         },
@@ -2307,6 +2298,47 @@ export const ai: NavMenuConstant = {
   ],
 }
 
+export const ai_tools: NavMenuConstant = {
+  icon: 'ai-tools',
+  title: 'AI Tools',
+  url: '/guides/ai-tools',
+  enabled: aiToolsEnabled,
+  items: [
+    { name: 'Overview', url: '/guides/ai-tools' },
+    {
+      name: 'Agent Plugin',
+      url: '/guides/ai-tools/plugins' as `/${string}`,
+    },
+    {
+      name: 'MCP server',
+      url: '/guides/ai-tools/mcp' as `/${string}`,
+    },
+    {
+      name: 'Agent Skills',
+      url: '/guides/ai-tools/ai-skills' as `/${string}`,
+    },
+    {
+      name: 'Prompts',
+      url: '/guides/ai-tools/ai-prompts' as `/${string}`,
+    },
+
+    {
+      name: 'Build AI features',
+      url: undefined,
+      items: [
+        {
+          name: 'Deploy MCP servers',
+          url: '/guides/ai-tools/byo-mcp' as `/${string}`,
+        },
+        {
+          name: 'Vectors / Embeddings ',
+          url: '/guides/ai' as `/${string}`,
+        },
+      ],
+    },
+  ],
+}
+
 export const local_development: NavMenuConstant = {
   icon: 'dev-cli',
   title: 'Local Dev / CLI',
@@ -2490,6 +2522,7 @@ export const security: NavMenuConstant = {
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
       ],
     },
   ],
@@ -2824,8 +2857,16 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
         },
         {
+          name: 'Logs field reference',
+          url: '/guides/telemetry/log-field-reference' as `/${string}`,
+        },
+        {
           name: 'Log drains',
           url: '/guides/telemetry/log-drains' as `/${string}`,
+        },
+        {
+          name: 'Tracing with the JS SDK',
+          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
         },
         {
           name: 'Reports',
@@ -3075,6 +3116,10 @@ export const integrations: NavMenuConstant = {
         {
           name: 'Supabase for Platforms',
           url: '/guides/integrations/supabase-for-platforms',
+        },
+        {
+          name: 'Supabase partner integration guide',
+          url: '/guides/integrations/partner-integration-guide',
         },
       ],
     },

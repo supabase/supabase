@@ -5,13 +5,13 @@ import { Dispatch, forwardRef, SetStateAction } from 'react'
 import {
   Button,
   cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -112,43 +112,43 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
         <Search size={14} />
       </div>
 
-      <Select_Shadcn_
+      <Select
         value={specificFilterColumn}
         onValueChange={(v) => onSelectFilterColumn(v as typeof specificFilterColumn)}
       >
-        <SelectTrigger_Shadcn_
+        <SelectTrigger
           size="tiny"
           className={cn(
             'w-[130px] bg-transparent! rounded-none -ml-px',
             specificFilterColumn === 'freeform' && 'text-warning'
           )}
         >
-          <SelectValue_Shadcn_ />
-        </SelectTrigger_Shadcn_>
-        <SelectContent_Shadcn_>
-          <SelectGroup_Shadcn_>
-            <SelectItem_Shadcn_ value="id" className="text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="id" className="text-xs">
               User ID
-            </SelectItem_Shadcn_>
-            <SelectItem_Shadcn_ value="email" className="text-xs">
+            </SelectItem>
+            <SelectItem value="email" className="text-xs">
               Email address
-            </SelectItem_Shadcn_>
+            </SelectItem>
             {improvedSearchEnabled && (
-              <SelectItem_Shadcn_ value="name" className="text-xs">
+              <SelectItem value="name" className="text-xs">
                 Name
-              </SelectItem_Shadcn_>
+              </SelectItem>
             )}
-            <SelectItem_Shadcn_ value="phone" className="text-xs">
+            <SelectItem value="phone" className="text-xs">
               Phone number
-            </SelectItem_Shadcn_>
+            </SelectItem>
             {!improvedSearchEnabled && (
               <>
-                <SelectSeparator_Shadcn_ />
+                <SelectSeparator />
                 <Tooltip>
                   <TooltipTrigger>
-                    <SelectItem_Shadcn_ value="freeform" className="text-xs">
+                    <SelectItem value="freeform" className="text-xs">
                       Unified search
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="w-64 text-center">
                     Search by all columns at once, including mid-string search. May impact database
@@ -157,9 +157,9 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
                 </Tooltip>
               </>
             )}
-          </SelectGroup_Shadcn_>
-        </SelectContent_Shadcn_>
-      </Select_Shadcn_>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
 
       <Input
         ref={ref}

@@ -5,14 +5,12 @@ import { cn } from 'ui'
 const FEATURES = [
   {
     title: 'Interoperable',
-    description:
-      'Integrates with the rest of Supabase — Auth and Postgres work together seamlessly.',
+    description: 'Integrates with the rest of Supabase — Auth and Postgres work together.',
     visual: InteroperableSkeleton,
   },
   {
     title: 'Lightning fast',
-    description:
-      'Thin API server layer that leverages Postgres permissions and delivers content via global CDN.',
+    description: 'Thin API layer built on Postgres permissions, delivered via global CDN.',
     visual: CDNSkeleton,
   },
   {
@@ -296,11 +294,11 @@ export function FeaturesSection() {
           <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
             Everything you need
             <br />
-            <span className="text-foreground">for object storage</span>
+            <span className="text-foreground">for storage</span>
           </h3>
           <p className="text-foreground-lighter text-sm lg:text-base">
-            S3 compatible object storage with global CDN, image transformations, and fine-grained
-            access controls powered by Postgres RLS.
+            S3 compatible storage with global CDN, image transformations, and fine-grained access
+            controls powered by Postgres RLS.
           </p>
         </div>
       </div>

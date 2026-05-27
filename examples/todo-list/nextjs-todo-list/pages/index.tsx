@@ -1,12 +1,20 @@
-import Head from 'next/head'
-import { supabase } from '@/lib/initSupabase'
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
-import TodoList from '@/components/TodoList'
 import { Session } from '@supabase/supabase-js'
-import { useEffect, useState } from 'react'
+import Head from 'next/head'
+import { FormEvent, useEffect, useState } from 'react'
+
+import TodoList from '@/components/TodoList'
+import { supabase } from '@/lib/initSupabase'
+
+type Mode = 'sign-in' | 'sign-up'
 
 export default function Home() {
   const [session, setSession] = useState<Session | null>(null)
+  const [mode, setMode] = useState<Mode>('sign-in')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
@@ -17,6 +25,31 @@ export default function Home() {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setLoading(true)
+    setError(null)
+    setMessage(null)
+
+    if (mode === 'sign-in') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) setError(error.message)
+    } else {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/` },
+      })
+      if (error) {
+        setError(error.message)
+      } else if (data.user && !data.session) {
+        setMessage('Check your email for a confirmation link to complete sign up.')
+      }
+    }
+
+    setLoading(false)
+  }
 
   return (
     <>
@@ -32,9 +65,55 @@ export default function Home() {
             <div className="w-full h-full flex justify-center items-center p-4">
               <div className="w-full h-full sm:h-auto sm:w-2/5 max-w-sm p-5 bg-white shadow flex flex-col text-base">
                 <span className="font-sans text-4xl text-center pb-2 mb-1 border-b mx-4 align-center">
-                  Login
+                  {mode === 'sign-in' ? 'Sign In' : 'Sign up'}
                 </span>
-                <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
+                <form onSubmit={handleSubmit} className="flex flex-col gap-3 mt-4">
+                  <label className="flex flex-col gap-1 text-sm">
+                    Email
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
+                      className="border rounded px-2 py-1"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1 text-sm">
+                    Password
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
+                      className="border rounded px-2 py-1"
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn-black w-full disabled:opacity-50"
+                  >
+                    {loading ? 'Loading...' : mode === 'sign-in' ? 'Sign in' : 'Sign up'}
+                  </button>
+                </form>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in')
+                    setError(null)
+                    setMessage(null)
+                  }}
+                  className="mt-3 text-sm text-blue-600 underline"
+                >
+                  {mode === 'sign-in'
+                    ? 'Need an account? Sign up'
+                    : 'Already have an account? Sign in'}
+                </button>
+                {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+                {message && <p className="mt-3 text-sm text-gray-700">{message}</p>}
               </div>
             </div>
           </div>

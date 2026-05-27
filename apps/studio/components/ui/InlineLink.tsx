@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
+import { type MouseEvent, type PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
 interface InlineLinkProps {
@@ -8,7 +8,7 @@ interface InlineLinkProps {
   target?: string
   rel?: string
   title?: string
-  onClick?: () => void
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void
 }
 
 export const InlineLinkClassName =

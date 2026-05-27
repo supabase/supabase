@@ -161,7 +161,7 @@ function DatabaseChangesSkeleton() {
                 <col style={{ width: 100 }} />
                 <col />
               </colgroup>
-              <tbody className="[&>tr:last-child>td]:border-b-0">
+              <tbody className="[&>tr:last-child>td]:border-b-0 [&>tr:first-child>td]:border-t-0">
                 {messages.map((msg) => (
                   <tr
                     key={msg.id}
@@ -549,7 +549,7 @@ function BroadcastSkeleton() {
     <div className="relative h-full w-full">
       {/* Source node — top center */}
       <div className="absolute left-1/2 top-5 z-10 -translate-x-1/2">
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-100 px-3 py-2 shadow-sm">
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-100 px-3 py-2 shadow-xs dark:shadow-sm">
           <svg
             width="14"
             height="14"
@@ -614,7 +614,7 @@ function BroadcastSkeleton() {
           <div
             key={i}
             className={cn(
-              'absolute bottom-6 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-xl border bg-surface-100 shadow-sm transition-all duration-300',
+              'absolute bottom-6 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-xl border bg-surface-100 shadow-xs dark:shadow-sm transition-all duration-300',
               isFlashing ? 'border-brand text-brand' : 'border-border text-foreground-muted'
             )}
             style={{ left: `${xPercent}%` }}

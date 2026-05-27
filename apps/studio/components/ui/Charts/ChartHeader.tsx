@@ -8,14 +8,13 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Badge, cn } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
-import { formatBytes } from '@/lib/helpers'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ChartHeaderProps {
   title?: string
@@ -42,6 +41,7 @@ export interface ChartHeaderProps {
   valuePrecision?: number
   shouldFormatBytes?: boolean
   isNetworkChart?: boolean
+  isMemoryChart?: boolean
   attributes?: any[]
   sql?: string
   titleTooltip?: string
@@ -77,6 +77,7 @@ export const ChartHeader = ({
   sql,
   titleTooltip,
   showNewBadge,
+  isMemoryChart,
 }: ChartHeaderProps) => {
   const { ref } = useParams()
   const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
@@ -98,7 +99,9 @@ export const ChartHeader = ({
 
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      return formatBytes(bytesValue, valuePrecision)
+      return isMemoryChart
+        ? formatBytesMinMB(bytesValue, valuePrecision)
+        : formatBytes(bytesValue, valuePrecision)
     }
 
     if (format === '%') {
@@ -187,9 +190,30 @@ export const ChartHeader = ({
         <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
           {title}
         </h3>
-        {titleTooltip && <InfoTooltip>{titleTooltip}</InfoTooltip>}
+        {titleTooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InfoIcon className="w-4 h-4 text-foreground-lighter" />
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              {titleTooltip}
+              {docsUrl && (
+                <>
+                  {' '}
+                  <Link
+                    href={docsUrl}
+                    target="_blank"
+                    className="underline text-foreground hover:text-foreground-light"
+                  >
+                    Read docs
+                  </Link>
+                </>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
-      {docsUrl && (
+      {!titleTooltip && docsUrl && (
         <ButtonTooltip
           type="text"
           className="px-1"

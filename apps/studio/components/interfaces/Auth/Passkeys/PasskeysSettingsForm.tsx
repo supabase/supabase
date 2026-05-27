@@ -11,7 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Switch,
   useWatch,
 } from 'ui'
@@ -334,7 +334,7 @@ export const PasskeysSettingsForm = () => {
                       description="A human-readable name for your application shown during passkey registration."
                     >
                       <FormControl>
-                        <Input_Shadcn_ {...field} placeholder="My project" />
+                        <Input {...field} placeholder="My project" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -351,7 +351,7 @@ export const PasskeysSettingsForm = () => {
                       description='The domain name for your application (e.g. "example.com"). This determines which passkeys can be used.'
                     >
                       <FormControl>
-                        <Input_Shadcn_ {...field} placeholder="example.com" />
+                        <Input {...field} placeholder="example.com" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -368,7 +368,7 @@ export const PasskeysSettingsForm = () => {
                       description='Comma-separated list of allowed origins (e.g. "https://example.com"). HTTPS is required except for localhost.'
                     >
                       <FormControl>
-                        <Input_Shadcn_ {...field} placeholder="https://example.com" />
+                        <Input {...field} placeholder="https://example.com" />
                       </FormControl>
                     </FormItemLayout>
                   )}

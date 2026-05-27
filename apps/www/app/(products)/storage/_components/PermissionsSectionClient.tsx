@@ -98,7 +98,7 @@ export function PermissionsSectionClient({ examples }: { examples: PermissionExa
                       : 'text-foreground-muted hover:text-foreground-light'
                   )}
                 >
-                  <span className="text-2xl font-medium">{example.title}</span>
+                  <span className="text-2xl font-medium tracking-tight">{example.title}</span>
                   <span
                     className={cn(
                       'text-sm transition-colors',
