@@ -131,7 +131,7 @@ const HomePageCover = (props) => {
             <IconBackground>
               <Play aria-hidden="true" className="text-brand-600 w-4" strokeWidth={2} />
             </IconBackground>
-            <h2 className="text-2xl m-0 text-foreground">Getting Started</h2>
+            <h2 className="font-heading text-2xl m-0 text-foreground">Getting Started</h2>
           </div>
           <p className="text-foreground-light text-sm">
             Set up and connect a database in just a few minutes.
@@ -164,7 +164,7 @@ const HomePageCover = (props) => {
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl xl:max-w-132">
           <DocsCoverLogo aria-hidden="true" />
           <div className="flex flex-col">
-            <h1 className="m-0 mb-3 text-2xl sm:text-3xl text-foreground">
+            <h1 className="font-heading m-0 mb-3 text-2xl sm:text-3xl text-foreground">
               {homepageHeading || props.title}
             </h1>
             <p className="m-0 text-foreground-light">

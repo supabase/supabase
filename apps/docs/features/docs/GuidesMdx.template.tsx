@@ -97,7 +97,7 @@ const GuideTemplate = ({
             id="sb-docs-guide-main-article"
             className="prose max-w-none"
           >
-            <h1 className="mb-0 [&>p]:m-0">
+            <h1 className="font-heading mb-0 [&>p]:m-0">
               <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
             </h1>
             {meta?.subtitle && (
