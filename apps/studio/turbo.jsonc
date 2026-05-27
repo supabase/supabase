@@ -112,6 +112,10 @@
         // Gates the TanStack vs Next path in api/server.js, vercel.ts,
         // and scripts/dispatch.js (the dev/build/start dispatcher).
         "STUDIO_FRAMEWORK",
+        // Vite's built-in `import.meta.env.SSR` flag (used in ConnectStepsSection
+        // to gate Vite-only `import.meta.glob`). Not a real process env var
+        // but turbo's `no-undeclared-env-vars` lint flags any `env.SSR` access.
+        "SSR",
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
