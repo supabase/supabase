@@ -20,8 +20,8 @@ export function Hero() {
           </div>
         </div>
         <p className="text-foreground-lighter text-sm lg:text-base">
-          An open source S3 Compatible Object Store with unlimited scalability, for any file type.
-          With custom policies and permissions that are familiar and easy to implement.
+          An open source S3 compatible storage solution with unlimited scalability, for any file
+          type. With custom policies and permissions that are familiar and easy to implement.
         </p>
       </div>
     </div>
