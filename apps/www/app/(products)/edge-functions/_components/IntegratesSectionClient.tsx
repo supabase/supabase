@@ -24,7 +24,7 @@ const INTERVAL_DURATION = 6000 // ms per tab
 export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const [progress, setProgress] = useState(0)
-  const intervalRef = useRef<ReturnType | null>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { ref: inViewRef, inView } = useInView({ threshold: 0.3 })
   const active = useCases[activeIdx]
 

@@ -15,7 +15,7 @@ type ApiExample = {
   icon: IconName
   title: string
   description: string
-  languages: Record
+  languages: Record<string, { darkHtml: string; lightHtml: string }>
 }
 
 const LANGUAGES = ['JavaScript', 'Flutter', 'Python', 'C#', 'Kotlin', 'Swift']
@@ -26,7 +26,7 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const [activeLang, setActiveLang] = useState('JavaScript')
   const [progress, setProgress] = useState(0)
-  const intervalRef = useRef<ReturnType | null>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { ref: inViewRef, inView } = useInView({ threshold: 0.3 })
   const active = examples[activeIdx]
 

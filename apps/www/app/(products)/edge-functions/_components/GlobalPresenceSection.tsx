@@ -31,10 +31,8 @@ export function GlobalPresenceSection() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16">
         <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
           Edge Functions run{' '}
-          <span className="text-foreground">
-            server-side logic geographically close to users
-          </span>
-          , offering low latency and great performance.
+          <span className="text-foreground">server-side logic geographically close to users</span>,
+          offering low latency and great performance.
         </h3>
         <div className="flex flex-col gap-6">
           {features.map((feature) => (

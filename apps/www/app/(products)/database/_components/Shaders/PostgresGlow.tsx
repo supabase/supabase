@@ -125,7 +125,9 @@ export function PostgresGlow({ hovered }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const liveRef = useRef({ hovered: false, hover: 0 })
 
-  useEffect(() => { liveRef.current.hovered = hovered }, [hovered])
+  useEffect(() => {
+    liveRef.current.hovered = hovered
+  }, [hovered])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -134,14 +136,19 @@ export function PostgresGlow({ hovered }: Props) {
     let running = true
     let raf: number
 
-    async function init() {
+    async function init(canvas: HTMLCanvasElement) {
       const { Renderer, Program, Mesh, Triangle, Texture } = await import('ogl')
       if (!running) return
 
       const svgCanvas = await buildSVGCanvas(512)
       if (!running) return
 
-      const renderer = new Renderer({ canvas, alpha: true, premultipliedAlpha: true, dpr: window.devicePixelRatio })
+      const renderer = new Renderer({
+        canvas,
+        alpha: true,
+        premultipliedAlpha: true,
+        dpr: window.devicePixelRatio,
+      })
       const gl = renderer.gl
       gl.clearColor(0, 0, 0, 0)
 
@@ -157,9 +164,9 @@ export function PostgresGlow({ hovered }: Props) {
         vertex: vert,
         fragment: frag,
         uniforms: {
-          tMap:        { value: texture },
-          uHover:      { value: 0 },
-          uTime:       { value: 0 },
+          tMap: { value: texture },
+          uHover: { value: 0 },
+          uTime: { value: 0 },
           uResolution: { value: [canvas.width, canvas.height] },
         },
         transparent: true,
@@ -199,7 +206,9 @@ export function PostgresGlow({ hovered }: Props) {
     }
 
     let cleanupResize: (() => void) | undefined
-    init().then((c) => { cleanupResize = c })
+    init(canvas).then((c) => {
+      cleanupResize = c
+    })
 
     return () => {
       running = false

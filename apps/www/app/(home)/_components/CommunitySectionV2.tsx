@@ -63,10 +63,7 @@ export function CommunitySectionV2() {
           }}
         >
           <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              key={page}
-              className="grid grid-cols-2 md:grid-cols-5 gap-2 -mx-4"
-            >
+            <motion.div key={page} className="grid grid-cols-2 md:grid-cols-5 gap-2 -mx-4">
               {columns.map((col, colIdx) => (
                 <div
                   key={colIdx}

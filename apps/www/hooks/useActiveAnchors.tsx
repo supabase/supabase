@@ -44,19 +44,33 @@ const useActiveAnchors = (options: UseActiveAnchorsOptions = {}): void => {
 
       links.forEach((link, i) => {
         const rawHref = link.getAttribute('href') ?? ''
-        const sanitizedHref = stripEmojis(
-          decodeURI(rawHref).replace('#', '')
-        ).replaceAll('-', '')
+        const sanitizedHref = stripEmojis(decodeURI(rawHref).replace('#', '')).replaceAll('-', '')
         const normalizedId = activeHeadingId.replaceAll('-', '')
         if (i === 0) {
-          console.log('[TOC Debug] matching example — href:', rawHref, '→ sanitized:', sanitizedHref, 'vs id:', activeHeadingId, '→ normalized:', normalizedId)
+          console.log(
+            '[TOC Debug] matching example — href:',
+            rawHref,
+            '→ sanitized:',
+            sanitizedHref,
+            'vs id:',
+            activeHeadingId,
+            '→ normalized:',
+            normalizedId
+          )
         }
         if (sanitizedHref === normalizedId) {
           activeIndex = i
         }
       })
 
-      console.log('[TOC Debug] updateToc → activeHeadingId:', activeHeadingId, 'activeIndex:', activeIndex, 'totalLinks:', links.length)
+      console.log(
+        '[TOC Debug] updateToc → activeHeadingId:',
+        activeHeadingId,
+        'activeIndex:',
+        activeIndex,
+        'totalLinks:',
+        links.length
+      )
 
       links.forEach((link, i) => {
         link.classList.remove('toc-animate', 'toc-passed')
@@ -77,7 +91,9 @@ const useActiveAnchors = (options: UseActiveAnchorsOptions = {}): void => {
       console.log('[TOC Debug] headings found:', headings.length)
       console.log('[TOC Debug] TOC links found:', tocLinks.length)
 
-      headings.forEach((h) => console.log('[TOC Debug] heading:', h.tagName, h.id, h.textContent?.slice(0, 50)))
+      headings.forEach((h) =>
+        console.log('[TOC Debug] heading:', h.tagName, h.id, h.textContent?.slice(0, 50))
+      )
       tocLinks.forEach((a) => console.log('[TOC Debug] toc link href:', a.getAttribute('href')))
 
       if (headings.length === 0) {

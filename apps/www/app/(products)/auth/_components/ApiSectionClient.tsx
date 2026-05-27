@@ -82,8 +82,8 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
             <span className="text-foreground">powerful libraries</span>
           </h3>
           <p className="text-foreground-lighter text-sm lg:text-base">
-            APIs that you can understand. With powerful libraries that work on client and server-side
-            applications.
+            APIs that you can understand. With powerful libraries that work on client and
+            server-side applications.
           </p>
         </div>
       </div>

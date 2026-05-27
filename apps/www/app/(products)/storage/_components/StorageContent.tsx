@@ -26,12 +26,8 @@ export function StorageContent({
       <section className="border-t border-border">
         <BucketTypesSection />
       </section>
-      <section className="border-t border-border">
-        {apiSlot}
-      </section>
-      <section className="border-t border-border">
-        {permissionsSlot}
-      </section>
+      <section className="border-t border-border">{apiSlot}</section>
+      <section className="border-t border-border">{permissionsSlot}</section>
       <section className="border-t border-border">
         <BuiltWithSupabaseSection />
       </section>

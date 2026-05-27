@@ -24,7 +24,7 @@ function TerminalAnimation() {
 
   useEffect(() => {
     if (!inView) return
-    const timeouts: ReturnType[] = []
+    const timeouts: ReturnType<typeof setTimeout>[] = []
     TERMINAL_LINES.forEach((line, i) => {
       timeouts.push(setTimeout(() => setVisibleCount(i + 1), line.delay * 1000))
     })
