@@ -1,10 +1,19 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, Loading } from 'ui'
 import { Row } from 'ui-patterns'
+import {
+  Chart,
+  ChartCard,
+  ChartContent,
+  ChartEmptyState,
+  ChartHeader,
+  ChartLoadingState,
+  ChartMetric,
+} from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import { normalizeChartBuckets } from './ChartDataTransform.utils'
@@ -16,7 +25,6 @@ import {
   sumWarnings,
 } from './ProjectUsage.metrics'
 import { useServiceHealthMetrics } from '@/components/interfaces/Observability/useServiceHealthMetrics'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
@@ -202,87 +210,85 @@ export const ProjectUsageSection = () => {
       </div>
       <Row maxColumns={4} minWidth={280}>
         {enabledServices.map((s) => (
-          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col h-64">
-            <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
-              <div className="flex items-center gap-2">
-                <div className="flex flex-col">
-                  <CardTitle className="text-foreground-light">
-                    {s.href ? (
-                      <Link
-                        href={s.href}
-                        onClick={() => {
-                          if (projectRef && organization?.slug) {
-                            sendEvent({
-                              action: 'home_project_usage_service_clicked',
-                              properties: {
-                                service_type: s.key,
-                                total_requests: s.total || 0,
-                                error_count: s.err || 0,
-                              },
-                              groups: {
-                                project: projectRef,
-                                organization: organization.slug,
-                              },
-                            })
-                          }
-                        }}
-                      >
-                        {s.title}
-                      </Link>
-                    ) : (
-                      s.title
-                    )}
-                  </CardTitle>
-                  <span className="text-foreground text-xl">{(s.total || 0).toLocaleString()}</span>
+          <Chart key={s.key} isLoading={isLoading} className="h-full">
+            <ChartCard className="mb-0 md:mb-0 h-full flex flex-col h-64">
+              <ChartHeader>
+                {s.href ? (
+                  <Link
+                    href={s.href}
+                    onClick={() => {
+                      if (projectRef && organization?.slug) {
+                        sendEvent({
+                          action: 'home_project_usage_service_clicked',
+                          properties: {
+                            service_type: s.key,
+                            total_requests: s.total || 0,
+                            error_count: s.err || 0,
+                          },
+                          groups: {
+                            project: projectRef,
+                            organization: organization.slug,
+                          },
+                        })
+                      }
+                    }}
+                  >
+                    <ChartMetric label={s.title} value={(s.total || 0).toLocaleString()} />
+                  </Link>
+                ) : (
+                  <ChartMetric label={s.title} value={(s.total || 0).toLocaleString()} />
+                )}
+                <div className="flex items-center gap-6">
+                  <ChartMetric
+                    label="Warn"
+                    value={(s.warn || 0).toLocaleString()}
+                    status="warning"
+                    align="end"
+                  />
+                  <ChartMetric
+                    label="Err"
+                    value={(s.err || 0).toLocaleString()}
+                    status="negative"
+                    align="end"
+                  />
                 </div>
-              </div>
-              <div className="flex items-end gap-4 text-foreground-light">
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-warning rounded-full" />
-                    <span className="heading-meta">Warn</span>
-                  </div>
-                  <span className="text-foreground text-xl">{(s.warn || 0).toLocaleString()}</span>
+              </ChartHeader>
+              <ChartContent
+                className="flex-1 overflow-hidden"
+                isEmpty={s.total === 0}
+                emptyState={
+                  <ChartEmptyState
+                    icon={<BarChart2 size={16} />}
+                    title="No data to show"
+                    description="No requests for selected period"
+                    className="h-full min-h-36"
+                  />
+                }
+                loadingState={<ChartLoadingState className="h-full min-h-36" />}
+              >
+                <div className="h-full">
+                  <LogsBarChart
+                    isFullHeight
+                    data={s.data}
+                    DateTimeFormat={datetimeFormat}
+                    onBarClick={handleBarClick(s.route, s.key)}
+                    hideZeroValues={true}
+                    chartConfig={{
+                      error_count: {
+                        label: 'Errors',
+                      },
+                      warning_count: {
+                        label: 'Warnings',
+                      },
+                      ok_count: {
+                        label: 'Requests',
+                      },
+                    }}
+                  />
                 </div>
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
-                    <span className="heading-meta">Err</span>
-                  </div>
-                  <span className="text-foreground text-xl">{(s.err || 0).toLocaleString()}</span>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-card flex-1 h-full overflow-hidden">
-              <Loading isFullHeight active={isLoading}>
-                <LogsBarChart
-                  isFullHeight
-                  data={s.data}
-                  DateTimeFormat={datetimeFormat}
-                  onBarClick={handleBarClick(s.route, s.key)}
-                  hideZeroValues={true}
-                  chartConfig={{
-                    error_count: {
-                      label: 'Errors',
-                    },
-                    warning_count: {
-                      label: 'Warnings',
-                    },
-                    ok_count: {
-                      label: 'Requests',
-                    },
-                  }}
-                  EmptyState={
-                    <NoDataPlaceholder
-                      size="small"
-                      message="No data for selected period"
-                      isFullHeight
-                    />
-                  }
-                />
-              </Loading>
-            </CardContent>
-          </Card>
+              </ChartContent>
+            </ChartCard>
+          </Chart>
         ))}
       </Row>
     </div>
