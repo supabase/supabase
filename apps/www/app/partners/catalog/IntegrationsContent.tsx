@@ -212,7 +212,7 @@ export default function IntegrationsContent({
                   {featuredPartners.map((p) => (
                     <Link
                       key={p.slug}
-                      href={`/partners/integrations/${p.slug}`}
+                      href={`/partners/catalog/${p.slug}`}
                       className="group flex h-full flex-col gap-3 rounded-xl border bg-surface-100 p-5 transition-colors hover:bg-surface-200"
                     >
                       <div className="flex items-center gap-3">
@@ -285,7 +285,7 @@ export default function IntegrationsContent({
                   {listPartners.map((p) => (
                     <Link
                       key={p.slug}
-                      href={`/partners/integrations/${p.slug}`}
+                      href={`/partners/catalog/${p.slug}`}
                       className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
                     >
                       <Panel
@@ -337,7 +337,7 @@ export default function IntegrationsContent({
                   {listPartners.map((p) => (
                     <Link
                       key={p.slug}
-                      href={`/partners/integrations/${p.slug}`}
+                      href={`/partners/catalog/${p.slug}`}
                       className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-100"
                     >
                       <div className="relative size-10 shrink-0 rounded-full overflow-hidden bg-muted">

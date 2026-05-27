@@ -66,7 +66,7 @@ function Partner({ partner, overview }: PartnerData) {
         openGraph={{
           title: `${partner.title} | Works With Supabase`,
           description: partner.description,
-          url: `https://supabase.com/partners/integrations/${partner.slug}`,
+          url: `https://supabase.com/partners/catalog/${partner.slug}`,
           images: [
             {
               url: partner.images ? partner.images[0] : partner.logo,
@@ -108,7 +108,7 @@ function Partner({ partner, overview }: PartnerData) {
           <div className="col-span-12 mx-auto mb-2 max-w-5xl lg:col-span-2">
             {/* Back button */}
             <Link
-              href="/partners/integrations"
+              href="/partners/catalog"
               className="text-foreground hover:text-foreground-lighter flex cursor-pointer items-center transition-colors"
             >
               <ChevronLeft width={14} height={14} />
@@ -286,7 +286,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
             <div key={category.slug} className="flex items-center justify-between py-2">
               <span className="text-lighter">Category</span>
               <Link
-                href={`/partners/integrations#${category.slug}`}
+                href={`/partners/catalog#${category.slug}`}
                 className="text-brand-link hover:underline transition-colors"
               >
                 {category.name}

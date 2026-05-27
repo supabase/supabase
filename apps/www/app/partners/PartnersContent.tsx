@@ -266,7 +266,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
                 {[...row.partners, ...row.partners].map((partner, i) => (
                   <Link
                     key={`${partner.slug}-${i}`}
-                    href={`/partners/integrations/${partner.slug}`}
+                    href={`/partners/catalog/${partner.slug}`}
                     title={partner.title}
                     aria-hidden={i >= row.partners.length ? 'true' : undefined}
                     tabIndex={i >= row.partners.length ? -1 : undefined}
@@ -288,7 +288,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
           </div>
           <div className="mt-8 flex justify-center">
             <Button asChild type="default" size="small" iconRight={<ArrowRight />}>
-              <Link href="/partners/integrations">Browse the Partner Catalog</Link>
+              <Link href="/partners/catalog">Browse the Partner Catalog</Link>
             </Button>
           </div>
         </SectionContainer>

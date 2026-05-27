@@ -20,7 +20,7 @@ export const data = {
         },
         {
           text: 'Integrations',
-          url: '/partners/integrations',
+          url: '/partners/catalog',
           icon: IconIntegrations,
         },
         {

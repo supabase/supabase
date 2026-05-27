@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: META_TITLE,
     description: META_DESCRIPTION,
-    url: 'https://supabase.com/partners/integrations',
+    url: 'https://supabase.com/partners/catalog',
     images: [{ url: 'https://supabase.com/images/og/integrations.png' }],
   },
 }

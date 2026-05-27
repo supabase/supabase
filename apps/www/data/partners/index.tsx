@@ -32,7 +32,7 @@ const partnersPageData = {
     },
     secondaryCta: {
       label: 'Browse the Partner Catalog',
-      link: '/partners/integrations',
+      link: '/partners/catalog',
       icon: <ArrowRight strokeWidth={1.5} />,
     },
   },
@@ -77,7 +77,7 @@ const partnersPageData = {
         timeToLaunch: 'Days',
         cta: {
           label: 'Browse the Partner Catalog',
-          link: '/partners/integrations',
+          link: '/partners/catalog',
           icon: <ArrowRight size={18} strokeWidth={1.5} />,
         },
       },

@@ -81,7 +81,7 @@ const footerData = [
       },
       {
         text: 'Integrations',
-        url: '/partners/integrations',
+        url: '/partners/catalog',
       },
       {
         text: 'Brand Assets',
