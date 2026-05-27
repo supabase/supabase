@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
+import useLatest from '@/hooks/misc/useLatest'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 interface NoFileState {
@@ -211,10 +212,14 @@ export function useSpreadsheetImport({
     },
     [resetAbortController]
   )
-  const processTextStable = useEffectEvent(processText)
+  const processTextRef = useLatest(processText)
   const processTextDebounced = useMemo(
-    () => debounce(processTextStable, debounceDuration),
-    [debounceDuration, processTextStable]
+    () =>
+      debounce(
+        (...args: Parameters<typeof processText>) => processTextRef.current(...args),
+        debounceDuration
+      ),
+    [debounceDuration, processTextRef]
   )
 
   const cleanup = useEffectEvent(function cleanup() {

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import {
+  useCallback,
   useEffect,
   useEffectEvent,
   useRef,
@@ -249,17 +250,17 @@ export const useTableApiAccessHandlerWithHistory = (
   const privileges = innerResult.data?.schemaExposed ? innerResult.data.privileges : undefined
   const previous = usePreviousDistinct(privileges)
 
-  const clearAllPrivileges = useEffectEvent(() => {
+  const clearAllPrivileges = useCallback(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(EMPTY_DATA_API_PRIVILEGES)
-  })
+  }, [innerResult])
 
-  const restorePreviousPrivileges = useEffectEvent(() => {
+  const restorePreviousPrivileges = useCallback(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(previous ?? DEFAULT_DATA_API_PRIVILEGES)
-  })
+  }, [innerResult, previous])
 
   if (!innerResult.isSuccess) {
     return innerResult

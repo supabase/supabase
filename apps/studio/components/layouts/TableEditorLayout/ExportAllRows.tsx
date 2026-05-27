@@ -2,7 +2,7 @@ import { useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
-import { useCallback, useEffectEvent, useState, type ReactNode } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import {
@@ -30,6 +30,7 @@ import { tableEditorKeys } from '@/data/table-editor/keys'
 import { getTableEditor, type TableEditorData } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { fetchAllTableRows } from '@/data/table-rows/table-rows-query'
+import useLatest from '@/hooks/misc/useLatest'
 import { DOCS_URL } from '@/lib/constants'
 import type { RoleImpersonationState } from '@/lib/role-impersonation'
 
@@ -282,7 +283,7 @@ export const useExportAllRowsGeneric = (
 
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null)
 
-  const exportInternal = useEffectEvent(
+  const exportInternalRef = useLatest(
     async ({ bypassConfirmation }: { bypassConfirmation: boolean }): Promise<void> => {
       if (!params.enabled) return
 
@@ -380,6 +381,11 @@ export const useExportAllRowsGeneric = (
 
       markTrackerComplete(entity.id, exportResult.rowsExported)
     }
+  )
+
+  const exportInternal = useCallback(
+    (args: { bypassConfirmation: boolean }) => exportInternalRef.current(args),
+    [exportInternalRef]
   )
 
   const exportInDesiredFormat = useCallback(
