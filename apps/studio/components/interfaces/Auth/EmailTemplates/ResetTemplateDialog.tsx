@@ -40,7 +40,7 @@ export const ResetTemplateDialog = ({
   const { id } = template
   const templateType = getAuthTemplateType(id)
 
-  const { mutate: resetAuthTemplate } = useAuthTemplateResetMutation()
+  const { mutate: resetAuthTemplate, isPending: isResetting } = useAuthTemplateResetMutation()
 
   const resetTemplateToDefault = async () => {
     if (!projectRef) throw new Error('Project ref is required')
@@ -75,7 +75,14 @@ export const ResetTemplateDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="warning" onClick={resetTemplateToDefault}>
+          <AlertDialogAction
+            variant="warning"
+            loading={isResetting}
+            onClick={(e) => {
+              e.preventDefault()
+              resetTemplateToDefault()
+            }}
+          >
             Reset
           </AlertDialogAction>
         </AlertDialogFooter>
