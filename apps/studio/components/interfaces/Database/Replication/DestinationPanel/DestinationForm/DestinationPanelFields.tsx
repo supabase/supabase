@@ -318,9 +318,9 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
       </div>
 
       <div className="flex flex-col gap-y-1">
-        <p className="text-sm font-medium text-foreground">Maintenance</p>
+        <p className="text-sm font-medium text-foreground">Metadata</p>
         <p className="text-sm text-foreground-light">
-          Optional settings for DuckLake metadata tables and snapshot cleanup.
+          Optional schema setting for DuckLake metadata tables.
         </p>
       </div>
 
@@ -336,22 +336,6 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
             >
               <FormControl>
                 <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="ducklakeExpireSnapshotsOlderThan"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="horizontal"
-              label="Expire snapshots older than"
-              description="Optional snapshot retention interval, for example `7 days`"
-            >
-              <FormControl>
-                <Input {...field} placeholder="7 days" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -639,21 +623,26 @@ export const AnalyticsBucketFields = ({
                   </p>
 
                   {isSuccessKeys && keyNoLongerExists && (
-                    <Admonition type="warning" title="Unable to find access key ID in project">
-                      <p className="leading-normal!">
-                        Please select another key or create a new set, as this destination will not
-                        work otherwise. S3 access keys can be managed in your{' '}
-                        <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
-                          storage settings
-                        </InlineLink>
-                      </p>
-                    </Admonition>
+                    <Admonition
+                      type="warning"
+                      title="Unable to find access key ID in project"
+                      description={
+                        <>
+                          Please select another key or create a new set, as this destination will
+                          not work otherwise. S3 access keys can be managed in your{' '}
+                          <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
+                            storage settings
+                          </InlineLink>
+                          .
+                        </>
+                      }
+                    />
                   )}
 
                   {s3AccessKeyId === CREATE_NEW_KEY && (
                     <Admonition
                       type="default"
-                      title="A new set of S3 access keys will be created"
+                      description="A new set of S3 access keys will be created."
                     />
                   )}
                 </div>
@@ -719,7 +708,7 @@ export const AnalyticsBucketFields = ({
                 layout="horizontal"
                 label="S3 Secret Access Key"
                 className="relative"
-                description="The secret key corresponding to your selected access key ID"
+                description="The secret key corresponding to your selected access key ID."
               >
                 <FormControl>
                   <Input

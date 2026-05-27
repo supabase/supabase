@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { IS_PLATFORM, useFeatureFlags, useFlag } from 'common'
+import { IS_PLATFORM, useFeatureFlags } from 'common'
 import { Database } from 'common/marketplace.types'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -18,6 +18,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
 
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   IntegrationCard,
   IntegrationLoadingCard,
@@ -25,8 +26,10 @@ import {
 import { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { useIntegrationFilteringAndSort } from '@/components/interfaces/Integrations/Landing/useIntegrationFilteringAndSort'
+import { MarketplaceIndex } from '@/components/interfaces/Integrations/Marketplace/MarketplaceIndex'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
@@ -146,67 +149,15 @@ function usePageContent(
   return pageContent
 }
 
-// Filters all available integrations first by category,
-// then by the search term and sorts them first by
-// installation status and then alphabetically
-function useFilteredAndSortedIntegrations(
-  availableIntegrations: IntegrationDefinition[],
-  selectedCategory: string,
-  search: string,
-  installedIds: string[]
-) {
-  const filteredAndSortedIntegrations = useMemo(() => {
-    let filtered = availableIntegrations ?? []
-
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(
-        (i) => i.type === selectedCategory || i.categories?.includes(selectedCategory)
-      )
-    }
-
-    if (search.length > 0) {
-      filtered = filtered.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
-    }
-
-    // Sort by installation status, then alphabetically
-    return filtered.sort((a, b) => {
-      const aIsInstalled = installedIds.includes(a.id)
-      const bIsInstalled = installedIds.includes(b.id)
-
-      if (aIsInstalled && !bIsInstalled) return -1
-      if (!aIsInstalled && bIsInstalled) return 1
-
-      return a.name.localeCompare(b.name)
-    })
-  }, [availableIntegrations, selectedCategory, search, installedIds])
-
-  return filteredAndSortedIntegrations
-}
-
-// Returns featured integrations
-function useFeaturedIntegratios(
-  filteredAndSortedIntegrations: IntegrationDefinition[],
-  selectedCategory: string,
-  search: string
-) {
-  const groupedIntegrations = useMemo(() => {
-    if (selectedCategory !== 'all' || search.length > 0) {
-      return null
-    }
-
-    const featured = filteredAndSortedIntegrations.filter(
-      (integration) => FEATURED_INTEGRATIONS.includes(integration.id) || integration.featured
-    )
-
-    return featured
-  }, [filteredAndSortedIntegrations, selectedCategory, search])
-
-  return groupedIntegrations
-}
-
 const IntegrationsPage: NextPageWithLayout = () => {
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
+  if (isMarketplaceEnabled) return <MarketplaceIndex />
+  return <LegacyIntegrationsPage />
+}
+
+const LegacyIntegrationsPage = () => {
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const [search, setSearch] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
@@ -243,18 +194,30 @@ const IntegrationsPage: NextPageWithLayout = () => {
 
   const pageContent = usePageContent(selectedCategory, categories)
 
-  const filteredAndSortedIntegrations = useFilteredAndSortedIntegrations(
-    availableIntegrations,
-    selectedCategory,
-    search,
-    installedIds
-  )
+  const filteredIntegrations = useMemo(() => {
+    let filtered = availableIntegrations ?? []
 
-  const featuredIntegrations = useFeaturedIntegratios(
-    filteredAndSortedIntegrations,
-    selectedCategory,
-    search
-  )
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(
+        (i) => i.type === selectedCategory || i.categories?.includes(selectedCategory)
+      )
+    }
+
+    if (search.length > 0) {
+      filtered = filtered.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
+    }
+
+    return filtered
+  }, [availableIntegrations, selectedCategory, search])
+
+  const hasActiveFilter = selectedCategory !== 'all' || search.length > 0
+
+  const { sorted: filteredAndSortedIntegrations, featured: featuredIntegrations } =
+    useIntegrationFilteringAndSort(filteredIntegrations, availableIntegrations, installedIds, {
+      featuredIds: FEATURED_INTEGRATIONS,
+      hasActiveFilter,
+      includeFeaturedFlag: true,
+    })
 
   return (
     <>
@@ -357,7 +320,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
 
 IntegrationsPage.getLayout = (page) => (
   <DefaultLayout>
-    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
+    <ProjectIntegrationsLayoutDispatch>{page}</ProjectIntegrationsLayoutDispatch>
   </DefaultLayout>
 )
 

@@ -1579,6 +1579,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/auth#understanding-authorization-headers',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/auth#the-verify_jwt-platform-check',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/examples',
     destination: '/docs/guides/functions',
   },
@@ -2417,6 +2427,16 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/integrations/prisma',
     destination: '/partners/integrations/prisma',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/refine_dev',
+    destination: '/partners/integrations/refine',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_stripe',
+    destination: '/partners/integrations/stripe-wrapper',
   },
   {
     permanent: true,

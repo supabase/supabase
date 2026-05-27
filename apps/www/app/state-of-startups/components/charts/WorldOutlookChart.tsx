@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateWorldOutlookSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -6,7 +6,7 @@ function generateWorldOutlookSQL(activeFilters: Record<string, string>) {
   return `SELECT 
   world_outlook, 
   COUNT(*) AS total
-FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+FROM responses_2026${whereClause ? '\n' + whereClause : ''}
 GROUP BY world_outlook
 ORDER BY total DESC;`
 }

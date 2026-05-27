@@ -3,10 +3,10 @@ import { ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Accordion_Shadcn_ as Accordion,
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Button,
   Checkbox,
   cn,
@@ -42,8 +42,10 @@ import type {
 import { generateWebhookEndpointName } from './PlatformWebhooks.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const endpointFormSchema = z
   .object({
@@ -583,9 +585,15 @@ export const PlatformWebhooksEndpointSheet = ({
           <Button type="default" onClick={confirmOnClose}>
             Cancel
           </Button>
-          <Button form="platform-webhook-endpoint-form" htmlType="submit">
-            {mode === 'create' ? 'Create endpoint' : 'Save changes'}
-          </Button>
+          <Shortcut
+            id={SHORTCUT_IDS.ACTION_BAR_SAVE}
+            label={mode === 'create' ? 'Create endpoint' : 'Save changes'}
+            onTrigger={() => form.handleSubmit(onSubmit)()}
+          >
+            <Button form="platform-webhook-endpoint-form" htmlType="submit">
+              {mode === 'create' ? 'Create endpoint' : 'Save changes'}
+            </Button>
+          </Shortcut>
         </SheetFooter>
       </SheetContent>
       <DiscardChangesConfirmationDialog {...discardChangesModalProps} />

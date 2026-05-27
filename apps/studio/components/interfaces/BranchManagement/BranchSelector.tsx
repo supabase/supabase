@@ -1,12 +1,12 @@
 import { Check, GitMerge, Shield } from 'lucide-react'
 import { useState } from 'react'
 import {
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -68,14 +68,14 @@ export const BranchSelector = ({
         </ButtonTooltip>
       </PopoverTrigger>
       <PopoverContent className="p-0 w-80" side="bottom" align="end">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Find branch to review..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No available branches found</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+        <Command>
+          <CommandInput placeholder="Find branch to review..." />
+          <CommandList>
+            <CommandEmpty>No available branches found</CommandEmpty>
+            <CommandGroup>
               <ScrollArea className="max-h-[210px] overflow-y-auto">
                 {availableBranches.map((branch) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={branch.id}
                     value={branch.name.replaceAll('"', '')}
                     className="cursor-pointer w-full flex items-center justify-between"
@@ -93,12 +93,12 @@ export const BranchSelector = ({
                     )}
                     {branch.git_branch && <span>Synced to a Git branch</span>}
                     {branch.review_requested_at && <span>Merge request opened</span>}
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   )

@@ -2,7 +2,19 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, Modal } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+} from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -112,81 +124,78 @@ const ResetDbPassword = ({ disabled = false }) => {
                   existing connections.
                 </p>
               </div>
-
-              <ButtonTooltip
-                type="default"
-                disabled={!canResetDbPassword || !isProjectActive || disabled}
-                onClick={() => setShowResetDbPass(true)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canResetDbPassword
-                      ? 'You need additional permissions to reset the database password'
-                      : !isProjectActive
-                        ? 'Unable to reset database password as project is not active'
-                        : undefined,
-                  },
-                }}
-              >
-                Reset password
-              </ButtonTooltip>
+              <Dialog open={showResetDbPass} onOpenChange={(open) => setShowResetDbPass(open)}>
+                <DialogTrigger asChild>
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canResetDbPassword || !isProjectActive || disabled}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canResetDbPassword
+                          ? 'You need additional permissions to reset the database password'
+                          : !isProjectActive
+                            ? 'Unable to reset database password as project is not active'
+                            : undefined,
+                      },
+                    }}
+                  >
+                    Reset password
+                  </ButtonTooltip>
+                </DialogTrigger>
+                <DialogContent size="medium">
+                  <DialogHeader>
+                    <DialogTitle>Reset database password</DialogTitle>
+                  </DialogHeader>
+                  <DialogSectionSeparator />
+                  <DialogSection className="w-full space-y-8">
+                    <FormItemLayout
+                      layout="vertical"
+                      isReactForm={false}
+                      error={passwordStrengthWarning}
+                      description={
+                        <PasswordStrengthBar
+                          passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
+                          passwordStrengthMessage={passwordStrengthMessage}
+                          password={password}
+                          generateStrongPassword={generatePassword}
+                        />
+                      }
+                    >
+                      <Input
+                        copy={password.length > 0}
+                        aria-invalid={!!passwordStrengthWarning}
+                        type="password"
+                        placeholder="Type in a strong password"
+                        value={password}
+                        autoComplete="off"
+                        onChange={onDbPassChange}
+                      />
+                    </FormItemLayout>
+                  </DialogSection>
+                  <DialogFooter>
+                    <Button
+                      type="default"
+                      disabled={isUpdatingPassword}
+                      onClick={() => setShowResetDbPass(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="primary"
+                      loading={isUpdatingPassword}
+                      disabled={isUpdatingPassword}
+                      onClick={() => confirmResetDbPass()}
+                    >
+                      Reset password
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
         </PageSectionContent>
       </PageSection>
-      <Modal
-        hideFooter
-        header="Reset database password"
-        confirmText="Reset password"
-        size="medium"
-        visible={showResetDbPass}
-        loading={isUpdatingPassword}
-        onCancel={() => setShowResetDbPass(false)}
-      >
-        <Modal.Content className="w-full space-y-8">
-          <FormItemLayout
-            layout="vertical"
-            isReactForm={false}
-            error={passwordStrengthWarning}
-            description={
-              <PasswordStrengthBar
-                passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
-                passwordStrengthMessage={passwordStrengthMessage}
-                password={password}
-                generateStrongPassword={generatePassword}
-              />
-            }
-          >
-            <Input
-              copy={password.length > 0}
-              aria-invalid={!!passwordStrengthWarning}
-              type="password"
-              placeholder="Type in a strong password"
-              value={password}
-              autoComplete="off"
-              onChange={onDbPassChange}
-            />
-          </FormItemLayout>
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content className="flex items-center justify-end space-x-2">
-          <Button
-            type="default"
-            disabled={isUpdatingPassword}
-            onClick={() => setShowResetDbPass(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="primary"
-            loading={isUpdatingPassword}
-            disabled={isUpdatingPassword}
-            onClick={() => confirmResetDbPass()}
-          >
-            Reset password
-          </Button>
-        </Modal.Content>
-      </Modal>
     </>
   )
 }

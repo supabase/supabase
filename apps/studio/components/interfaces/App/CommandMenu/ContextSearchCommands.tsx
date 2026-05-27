@@ -7,7 +7,7 @@ import { useMemo } from 'react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   PageType,
   useQuery,
@@ -74,7 +74,7 @@ function ContextSearchPage({
   return (
     <CommandWrapper>
       <CommandHeader>
-        <CommandInput placeholder={placeholder} />
+        <CommandMenuInput placeholder={placeholder} />
       </CommandHeader>
       <ContextSearchResults context={context} query={query} />
     </CommandWrapper>

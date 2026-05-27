@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    "predev": "node scripts/clean-turbopack-cache.mjs",
     "dev": "node --env-file-if-exists=.env.local scripts/dispatch.js dev",
     "build": "node --env-file-if-exists=.env.local scripts/dispatch.js build",
     "start": "node --env-file-if-exists=.env.local scripts/dispatch.js start",
@@ -17,7 +18,6 @@
     "start:tanstack": "node scripts/serve.js",
     "lint": "eslint .",
     "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rule react-hooks/exhaustive-deps --rule import/no-anonymous-default-export --rule @tanstack/query/exhaustive-deps --rule @typescript-eslint/no-explicit-any --rule no-restricted-imports --rule no-restricted-exports --rule react/no-unstable-nested-components",
-    "lint:ratchet:type-checks": "tsx scripts/ratchet-eslint-rules.ts --rule studio/require-safe-sql-fragment --eslint-args \"--config eslint.type-checks.config.cjs .\"",
     "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
     "test": "vitest --run --coverage",
     "test:watch": "vitest watch",
@@ -194,7 +194,6 @@
     "@types/recharts": "^1.8.23",
     "@types/sqlstring": "^2.3.0",
     "@types/zxcvbn": "^4.4.1",
-    "@typescript-eslint/utils": "8.48.0",
     "@vercel/config": "^0.2.1",
     "@vitejs/plugin-react": "catalog:",
     "@vitest/coverage-v8": "catalog:",
