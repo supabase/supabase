@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useEffectEvent, useMemo, useState, type ReactNode } from 'react'
 import { useForm, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -16,7 +16,6 @@ import { useApiAuthorizationApproveMutation } from '@/data/api-authorization/api
 import { useApiAuthorizationDeclineMutation } from '@/data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from '@/data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import type { Organization } from '@/types'
 
 function getMatchingOrganization(
@@ -90,7 +89,7 @@ function usePrefillFormOnOrganizationsSuccess(
   organizationsState: ReturnType<typeof useOrganizationsState>,
   organization_slug: string | undefined
 ) {
-  const prefillForm = useStaticEffectEvent(() => {
+  const prefillForm = useEffectEvent(() => {
     if (organizationsState._tag === 'success') {
       preselectOrganizationSlug({
         form,

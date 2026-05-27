@@ -6,13 +6,13 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useEffectEvent,
   useMemo,
   useState,
   type PropsWithChildren,
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
@@ -35,7 +35,7 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
     featurePreviews.reduce((a, b) => ({ ...a, [b.key]: false }), {})
   )
 
-  const initializeFlags = useStaticEffectEvent(() => {
+  const initializeFlags = useEffectEvent(() => {
     setFlags(
       featurePreviews.reduce((a, b) => {
         const defaultOptIn = b.isDefaultOptIn

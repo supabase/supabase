@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 import { Alert, AlertTitle } from 'ui'
 import {
   PageSection,
@@ -21,7 +21,6 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export const DataApiProjectUrlCard = () => {
@@ -39,7 +38,7 @@ export const DataApiProjectUrlCard = () => {
   } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
 
-  const syncSelectedDb = useStaticEffectEvent(() => {
+  const syncSelectedDb = useEffectEvent(() => {
     if (querySource && querySource !== state.selectedDatabaseId) {
       state.setSelectedDatabaseId(querySource)
     }

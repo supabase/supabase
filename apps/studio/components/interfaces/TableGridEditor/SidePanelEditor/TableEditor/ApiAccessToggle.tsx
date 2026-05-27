@@ -3,6 +3,7 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import {
   useEffect,
+  useEffectEvent,
   useRef,
   useState,
   type Dispatch,
@@ -23,7 +24,6 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsSchemaExposed } from '@/hooks/misc/useIsSchemaExposed'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import {
   checkDataApiPrivilegesNonEmpty,
   DEFAULT_DATA_API_PRIVILEGES,
@@ -157,7 +157,7 @@ const useTableApiAccessHandler = (
 
   const hasLoadedInitialData = useRef(false)
 
-  const resetState = useStaticEffectEvent(() => {
+  const resetState = useEffectEvent(() => {
     hasLoadedInitialData.current = !shouldReadExistingGrants
     setPrivileges(defaultPrivilegesForNewTable)
   })
@@ -165,7 +165,7 @@ const useTableApiAccessHandler = (
     resetState()
   }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable, resetState])
 
-  const syncDefaultPrivileges = useStaticEffectEvent(() => {
+  const syncDefaultPrivileges = useEffectEvent(() => {
     if (!isNewTable) return
     if (!defaultPrivilegesQuery.isSuccess) return
     setPrivileges(defaultPrivilegesForNewTable)
@@ -174,7 +174,7 @@ const useTableApiAccessHandler = (
     syncDefaultPrivileges()
   }, [defaultPrivilegesQuery.status, syncDefaultPrivileges])
 
-  const syncApiPrivileges = useStaticEffectEvent(() => {
+  const syncApiPrivileges = useEffectEvent(() => {
     if (hasLoadedInitialData.current) return
     if (!apiAccessStatus.isSuccess) return
     if (!privilegesForTable) return
@@ -246,13 +246,13 @@ export const useTableApiAccessHandlerWithHistory = (
   const privileges = innerResult.data?.schemaExposed ? innerResult.data.privileges : undefined
   const previous = usePreviousDistinct(privileges)
 
-  const clearAllPrivileges = useStaticEffectEvent(() => {
+  const clearAllPrivileges = useEffectEvent(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(EMPTY_DATA_API_PRIVILEGES)
   })
 
-  const restorePreviousPrivileges = useStaticEffectEvent(() => {
+  const restorePreviousPrivileges = useEffectEvent(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(previous ?? DEFAULT_DATA_API_PRIVILEGES)

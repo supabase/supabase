@@ -5,7 +5,7 @@ import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { isArray } from 'lodash'
 import { Check, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Button, cn, SidePanel } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -32,7 +32,6 @@ import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-q
 import type { OrgPlan } from '@/data/subscriptions/types'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { formatCurrency } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
@@ -151,7 +150,7 @@ export const PlanUpdateSidePanel = () => {
     // this data from the organization query
     orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
 
-  const onPanelOpened = useStaticEffectEvent(
+  const onPanelOpened = useEffectEvent(
     (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
       track('studio_pricing_side_panel_opened', properties)
     }

@@ -1,6 +1,13 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { ChevronUp, Search, X } from 'lucide-react'
-import { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useEffectEvent,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -19,7 +26,6 @@ import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRo
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { type Bucket } from '@/data/storage/buckets-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 export type SelectBucketPolicyForAction = {
   addPolicy: (bucketName?: string, table?: string) => void
@@ -151,7 +157,7 @@ const BucketsPoliciesVirtualizedList = ({
   const virtualItems = virtualizer.getVirtualItems()
   const lastItem = virtualItems[virtualItems.length - 1]
 
-  const fetchNext = useStaticEffectEvent(() => {
+  const fetchNext = useEffectEvent(() => {
     if (lastItem && lastItem.index >= items.length - 1 && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
     }

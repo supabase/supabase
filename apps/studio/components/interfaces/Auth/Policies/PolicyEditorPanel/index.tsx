@@ -13,7 +13,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -50,7 +50,6 @@ import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sq
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 interface PolicyEditorPanelProps {
   visible: boolean
@@ -259,7 +258,7 @@ export const PolicyEditorPanel = memo(function ({
     }
   }
 
-  const resetState = useStaticEffectEvent(() => {
+  const resetState = useEffectEvent(() => {
     if (!visible) {
       editorOneRef.current?.setValue('')
       editorTwoRef.current?.setValue('')

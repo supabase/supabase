@@ -2,7 +2,7 @@ import { useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
-import { useCallback, useState, type ReactNode } from 'react'
+import { useCallback, useEffectEvent, useState, type ReactNode } from 'react'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import {
@@ -30,7 +30,6 @@ import { tableEditorKeys } from '@/data/table-editor/keys'
 import { getTableEditor, type TableEditorData } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { fetchAllTableRows } from '@/data/table-rows/table-rows-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { DOCS_URL } from '@/lib/constants'
 import type { RoleImpersonationState } from '@/lib/role-impersonation'
 
@@ -283,7 +282,7 @@ export const useExportAllRowsGeneric = (
 
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null)
 
-  const exportInternal = useStaticEffectEvent(
+  const exportInternal = useEffectEvent(
     async ({ bypassConfirmation }: { bypassConfirmation: boolean }): Promise<void> => {
       if (!params.enabled) return
 

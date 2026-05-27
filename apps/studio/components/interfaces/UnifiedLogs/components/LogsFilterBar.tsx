@@ -1,10 +1,9 @@
 import { groupBy } from 'lodash'
 import { LoaderCircle, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { FilterBar, FilterCondition, type FilterGroup, type FilterProperty } from 'ui-patterns'
 
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 const buildFilterGroup = (
   columnFilters: { id: string; value: unknown }[],
@@ -46,7 +45,7 @@ export const LogsFilterBar = () => {
   )
 
   // Read latest filterProperties without making the effect depend on its (per-render) identity.
-  const syncFromColumnFilters = useStaticEffectEvent(() => {
+  const syncFromColumnFilters = useEffectEvent(() => {
     setFilters(buildFilterGroup(columnFilters, new Set(filterProperties.map((p) => p.name))))
   })
 

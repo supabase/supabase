@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
@@ -25,7 +25,6 @@ import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from '@/data/sso/sso-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { DOCS_URL } from '@/lib/constants'
 
 const FormSchema = z
@@ -187,7 +186,7 @@ export const SSOConfig = () => {
     deleteSSOConfig({ slug: organization.slug })
   }
 
-  const syncFormFromConfig = useStaticEffectEvent(() => {
+  const syncFormFromConfig = useEffectEvent(() => {
     if (!organization?.slug) return
 
     // Only reset form if it's not dirty (user hasn't made changes)
@@ -217,7 +216,7 @@ export const SSOConfig = () => {
   }, [ssoConfig, organization?.slug, syncFormFromConfig])
 
   // Automatically add an empty domain field when SP-initiated is enabled
-  const ensureDomainField = useStaticEffectEvent(() => {
+  const ensureDomainField = useEffectEvent(() => {
     const currentDomains = form.getValues('domains')
     if (enableSpInitiated && (!currentDomains || currentDomains.length === 0)) {
       form.setValue('domains', [{ value: '' }], { shouldValidate: false })

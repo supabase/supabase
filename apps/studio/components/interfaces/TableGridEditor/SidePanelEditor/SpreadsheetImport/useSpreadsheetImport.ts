@@ -1,10 +1,9 @@
 import { debounce, noop } from 'lodash'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 interface NoFileState {
@@ -212,13 +211,13 @@ export function useSpreadsheetImport({
     },
     [resetAbortController]
   )
-  const processTextStable = useStaticEffectEvent(processText)
+  const processTextStable = useEffectEvent(processText)
   const processTextDebounced = useMemo(
     () => debounce(processTextStable, debounceDuration),
     [debounceDuration, processTextStable]
   )
 
-  const cleanup = useStaticEffectEvent(function cleanup() {
+  const cleanup = useEffectEvent(function cleanup() {
     processTextDebounced.cancel()
     abortControllerRef.current.abort()
   })
@@ -228,9 +227,9 @@ export function useSpreadsheetImport({
 
   // When the component mounts with a file already in global state (e.g. dropped onto the
   // grid), the useState initializer above sets _tag to 'parsing_file' but does not start
-  // the actual parse. Kick it off here. useStaticEffectEvent ensures we always read the
+  // the actual parse. Kick it off here. useEffectEvent ensures we always read the
   // latest state/treatEmptyAsNull without re-triggering the effect.
-  const processOnMount = useStaticEffectEvent(async function processOnMount() {
+  const processOnMount = useEffectEvent(async function processOnMount() {
     if (state._tag === 'parsing_file') {
       await processFile(state.file, { emptyStringAsNullHeaders: undefined })
     }

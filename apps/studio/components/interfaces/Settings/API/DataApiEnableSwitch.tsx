@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useCallback, useEffect, useReducer } from 'react'
+import { useCallback, useEffect, useEffectEvent, useReducer } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Card } from 'ui'
@@ -20,7 +20,6 @@ import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-p
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 export const DataApiEnableSwitch = () => {
   const { ref: projectRef } = useParams()
@@ -55,7 +54,7 @@ export const DataApiEnableSwitch = () => {
     },
   })
 
-  const syncForm = useStaticEffectEvent(() => {
+  const syncForm = useEffectEvent(() => {
     if (!isEnabledCheckPending) {
       form.reset({ enableDataApi: isEnabled })
     }
