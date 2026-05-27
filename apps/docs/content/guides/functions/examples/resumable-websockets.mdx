@@ -62,11 +62,7 @@ create unlogged table ws_live_connections (
 Use `supabase functions serve --no-verify-jwt` and validate JWT inside the function.
 
 ```ts
-import {
-  verifyCredentials,
-  createContextClient,
-  createAdminClient,
-} from '@supabase/server/core'
+import { createAdminClient, createContextClient, verifyCredentials } from '@supabase/server/core'
 
 const PREEMPTIVE_RESTART_MS = 340_000
 
@@ -81,10 +77,7 @@ Deno.serve(async (req) => {
   const token = url.searchParams.get('token')
   if (!token) return new Response('Missing token', { status: 401 })
 
-  const { data: auth, error } = await verifyCredentials(
-    { token, apikey: null },
-    { auth: 'user' }
-  )
+  const { data: auth, error } = await verifyCredentials({ token, apikey: null }, { auth: 'user' })
   if (error || !auth?.userClaims?.id) {
     return new Response('Unauthorized', { status: 401 })
   }
@@ -112,15 +105,13 @@ Deno.serve(async (req) => {
     const msg = JSON.parse(event.data)
 
     if (msg.type === 'user_message') {
-      const { error: idempotencyError } = await admin
-        .from('ws_idempotency_keys')
-        .upsert(
-          {
-            session_id: sessionId,
-            idempotency_key: msg.idempotency_key,
-          },
-          { onConflict: 'session_id,idempotency_key', ignoreDuplicates: true }
-        )
+      const { error: idempotencyError } = await admin.from('ws_idempotency_keys').upsert(
+        {
+          session_id: sessionId,
+          idempotency_key: msg.idempotency_key,
+        },
+        { onConflict: 'session_id,idempotency_key', ignoreDuplicates: true }
+      )
 
       let userEvent
 
