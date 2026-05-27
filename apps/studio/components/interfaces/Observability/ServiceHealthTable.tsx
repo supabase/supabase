@@ -196,7 +196,8 @@ export const ServiceHealthTable = ({
               const data = serviceData[service.key]
               if (!data) return null
 
-              const isLeftColumn = index % 2 === 0
+              const isFirst = index === 0
+              const isLeftColumn = !isFirst && (index - 1) % 2 === 0
               const isLastService = index === services.length - 1
 
               return (
@@ -208,6 +209,7 @@ export const ServiceHealthTable = ({
                   datetimeFormat={datetimeFormat}
                   className={cn(
                     'border-default border-b',
+                    isFirst && 'md:col-span-2',
                     isLastService && 'md:border-b-0',
                     isLeftColumn && 'md:border-r'
                   )}
