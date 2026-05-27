@@ -34,6 +34,8 @@ export default function IntegrationsContent({
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [partnerOnly, setPartnerOnly] = useState(false)
+  const [oneClickOnly, setOneClickOnly] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const searchIdRef = useRef(0)
 
@@ -62,20 +64,30 @@ export default function IntegrationsContent({
       prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     )
 
-  const HAS_ACTIVE_FILTERS = search.trim() !== '' || selectedCategories.length > 0
+  const OFFICIAL_PARTNER_SLUGS = new Set(['grafana', 'stripe', 'aikido', 'doppler', 'resend'])
+  // Temporary slug list until the DB has an is_marketplace field.
+  // When isUseMarketplaceDb is active, p.isMarketplace handles it automatically.
+  const MARKETPLACE_SLUGS = new Set(['grafana', 'stripe', 'aikido', 'doppler', 'resend'])
+  const isOneClick = (p: Partner) => MARKETPLACE_SLUGS.has(p.slug)
+
+  const HAS_ACTIVE_FILTERS =
+    search.trim() !== '' || selectedCategories.length > 0 || partnerOnly || oneClickOnly
 
   const categoryFiltered =
     selectedCategories.length > 0
       ? partners.filter((p) => p.categories.some((c) => selectedCategories.includes(c.name)))
       : partners
 
-  const featuredPartners = categoryFiltered.filter((p) => p.featured)
+  const partnerFiltered = partnerOnly
+    ? categoryFiltered.filter((p) => OFFICIAL_PARTNER_SLUGS.has(p.slug))
+    : categoryFiltered
+
+  const filtered = oneClickOnly ? partnerFiltered.filter(isOneClick) : partnerFiltered
+
+  const featuredPartners = filtered.filter((p) => p.featured)
   const listPartners = HAS_ACTIVE_FILTERS
-    ? [
-        ...categoryFiltered.filter((p) => p.featured),
-        ...categoryFiltered.filter((p) => !p.featured),
-      ]
-    : categoryFiltered.filter((p) => !p.featured)
+    ? [...filtered.filter((p) => p.featured), ...filtered.filter((p) => !p.featured)]
+    : filtered.filter((p) => !p.featured)
   const showFeatured = !HAS_ACTIVE_FILTERS && featuredPartners.length > 0
   const totalCount = showFeatured
     ? featuredPartners.length + listPartners.length
@@ -106,7 +118,7 @@ export default function IntegrationsContent({
                   size="small"
                   autoComplete="off"
                   type="search"
-                  placeholder="Search integrations"
+                  placeholder="Search partners"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -140,8 +152,33 @@ export default function IntegrationsContent({
                     </div>
                   ))}
                 </div>
-                <div className="text-foreground-muted text-xs">
-                  Integrations shown: {totalCount}
+
+                <div className="border-t border-muted pt-4 flex flex-col gap-2.5">
+                  <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! transition-colors">
+                    <Checkbox
+                      id="partner-only"
+                      checked={partnerOnly}
+                      onCheckedChange={(checked) => setPartnerOnly(!!checked)}
+                      className="[&_input]:m-0"
+                    />
+                    <label
+                      htmlFor="partner-only"
+                      className="text-sm leading-none! flex-1 text-left"
+                    >
+                      Official Partners
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! transition-colors">
+                    <Checkbox
+                      id="one-click"
+                      checked={oneClickOnly}
+                      onCheckedChange={(checked) => setOneClickOnly(!!checked)}
+                      className="[&_input]:m-0"
+                    />
+                    <label htmlFor="one-click" className="text-sm leading-none! flex-1 text-left">
+                      Available in Marketplace
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -151,6 +188,8 @@ export default function IntegrationsContent({
                 type="dashed"
                 onClick={() => {
                   setSelectedCategories([])
+                  setPartnerOnly(false)
+                  setOneClickOnly(false)
                   setSearch('')
                 }}
                 className={cn(
@@ -168,7 +207,7 @@ export default function IntegrationsContent({
             {/* Featured partners */}
             {showFeatured && (
               <div className="flex flex-col gap-4">
-                <h2 className="text-sm text-foreground-lighter">Featured</h2>
+                <h2 className="text-foreground-light">Featured</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {featuredPartners.map((p) => (
                     <Link
@@ -209,7 +248,7 @@ export default function IntegrationsContent({
             {/* Toolbar: count + view toggle */}
             <div className="flex items-center justify-between gap-2">
               <span className="text-foreground-muted text-xs">
-                {listPartners.length} integration{listPartners.length !== 1 ? 's' : ''}
+                {listPartners.length} partner{listPartners.length !== 1 ? 's' : ''}
               </span>
               <div className="flex items-center rounded-lg border border-muted">
                 <button
@@ -287,7 +326,7 @@ export default function IntegrationsContent({
                 </div>
               ) : (
                 <p className="text-foreground-lighter text-sm">
-                  No integrations found with these filters.
+                  No partners found with these filters.
                 </p>
               ))}
 
@@ -337,7 +376,7 @@ export default function IntegrationsContent({
                 </div>
               ) : (
                 <p className="text-foreground-lighter text-sm">
-                  No integrations found with these filters.
+                  No partners found with these filters.
                 </p>
               ))}
           </div>
@@ -349,7 +388,7 @@ export default function IntegrationsContent({
           id="become-a-partner"
           className="mx-auto max-w-2xl flex flex-col items-center gap-6 py-32 px-6 text-center"
         >
-          <h2 className="h2 tracking-[-1px]">Interested in adding your product to the catalog?</h2>
+          <h2 className="h2 text-balance">Interested in adding your product to the catalog?</h2>
           <Button asChild size="medium" iconRight={<ArrowRight />}>
             <Link href="/partners#become-a-partner">Become a partner</Link>
           </Button>

@@ -10,6 +10,7 @@ export type Category = {
 export type Partner = {
   categories: Category[]
   featured: boolean
+  isMarketplace: boolean
   type: 'technology' | 'expert'
   slug: string
   title: string
@@ -44,6 +45,7 @@ export function toPartner(dbPartner: DbPartner): Partner {
   return {
     categories: [{ name: category, slug: category.toLowerCase() }],
     featured: featured ?? false,
+    isMarketplace: false,
     type,
     slug,
     title,

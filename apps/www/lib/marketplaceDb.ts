@@ -30,6 +30,7 @@ function toPartner(listing: Listing): Partner {
   return {
     categories,
     featured,
+    isMarketplace: !!marketplace_url,
     // The view definition only returns tech partners
     type: 'technology',
     slug,
