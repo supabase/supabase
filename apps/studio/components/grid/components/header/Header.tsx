@@ -264,6 +264,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
         type: 'provided_rows',
         table: snap.table,
         rows: allRows.filter((x) => snap.selectedRows.has(x.idx)),
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       } as const)
 
   const { exportCsv, confirmationModal: exportCsvConfirmationModal } = useExportAllRowsAsCsv(
