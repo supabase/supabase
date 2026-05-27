@@ -162,8 +162,10 @@ const BucketsPoliciesVirtualizedList = ({
       fetchNextPage()
     }
   })
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
-  useEffect(fetchNext, [lastItem])
+  useEffect(() => {
+    fetchNext()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [lastItem])
 
   return (
     <div
