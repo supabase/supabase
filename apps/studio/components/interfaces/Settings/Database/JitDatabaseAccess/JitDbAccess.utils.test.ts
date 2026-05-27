@@ -75,6 +75,7 @@ describe('serializeDraftRolesForGrantMutation', () => {
     const expiry = '2026-06-01T12:00:00.000Z'
     const draft: JitUserRuleDraft = {
       memberId: 'user-1',
+      inviteEmail: '',
       grants: [
         {
           ...createEmptyGrant('postgres'),
