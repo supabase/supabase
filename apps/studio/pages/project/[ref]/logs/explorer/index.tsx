@@ -206,6 +206,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     const query = typeof value === 'string' ? value || editorValue : editorValue
     const resolvedParams = buildLogQueryParams(datePickerValue, query)
 
+    setSelectedLog(null)
     setParams((prev) => ({
       ...prev,
       sql: resolvedParams.sql,
@@ -310,6 +311,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     } else {
       setTimeRange(resolvedRange.from || '', resolvedRange.to || '')
     }
+    setSelectedLog(null)
     setParams((prev) => ({
       ...prev,
       iso_timestamp_start: resolvedRange.from,

@@ -2,10 +2,10 @@ import { ChevronDown, Terminal } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -58,26 +58,26 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 w-24" side="bottom" align="end">
-          <Command_Shadcn_>
-            <CommandList_Shadcn_>
-              <CommandGroup_Shadcn_>
-                <CommandItem_Shadcn_
+          <Command>
+            <CommandList>
+              <CommandGroup>
+                <CommandItem
                   className="cursor-pointer"
                   onSelect={() => updateLanguage('js')}
                   onClick={() => updateLanguage('js')}
                 >
                   <p>Javascript</p>
-                </CommandItem_Shadcn_>
-                <CommandItem_Shadcn_
+                </CommandItem>
+                <CommandItem
                   className="cursor-pointer"
                   onSelect={() => updateLanguage('bash')}
                   onClick={() => updateLanguage('bash')}
                 >
                   <p>Bash</p>
-                </CommandItem_Shadcn_>
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
+                </CommandItem>
+              </CommandGroup>
+            </CommandList>
+          </Command>
         </PopoverContent>
       </Popover>
     </div>

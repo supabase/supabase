@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, type ReactNode } from 'react'
 import {
@@ -44,7 +44,7 @@ export const FlyDeprecationBanner = () => {
   const isExpired = Date.now() >= BANNER_EXPIRES_AT.getTime()
   const onSignIn = router.pathname.startsWith('/sign-in')
 
-  const shouldEvaluate = !isExpired && !onSignIn && isSuccess && !acknowledged
+  const shouldEvaluate = IS_PLATFORM && !isExpired && !onSignIn && isSuccess && !acknowledged
 
   const { isReady, primaries, branches } = useFlyDeprecationProjects({ enabled: shouldEvaluate })
 

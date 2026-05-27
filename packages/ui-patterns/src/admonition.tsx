@@ -16,8 +16,6 @@ export type AdmonitionType =
 export interface AdmonitionProps {
   type?: AdmonitionType
   title?: string
-  /** @deprecated Prefer title for new usage. label remains supported for existing MDX content. */
-  label?: string
   description?: ReactNode
   children?: ReactNode
   showIcon?: boolean
@@ -112,7 +110,6 @@ export const Admonition = forwardRef<
       type = 'note',
       variant,
       showIcon = true,
-      label,
       title,
       description,
       children,
@@ -126,7 +123,7 @@ export const Admonition = forwardRef<
   ) => {
     const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
     const typeStyle = type === 'success' ? 'success' : typeMapped
-    const heading = title ?? label
+    const heading = title
 
     return (
       <Alert
@@ -166,8 +163,7 @@ export const Admonition = forwardRef<
               <AlertTitle
                 {...childProps.title}
                 className={cn(
-                  'text mt-0.5 flex gap-3 text-sm',
-                  !label && 'flex-col',
+                  'text mt-0.5 flex flex-col gap-3 text-sm',
                   childProps.title?.className
                 )}
               >

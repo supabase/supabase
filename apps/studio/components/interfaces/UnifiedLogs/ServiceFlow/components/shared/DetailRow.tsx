@@ -48,12 +48,6 @@ export const DetailRow = ({
         wrap ? 'shrink-0' : 'min-w-0 truncate'
       )}
     >
-      <span
-        aria-hidden
-        className="select-none font-mono text-foreground-muted translate-y-0.5 ml-5"
-      >
-        └
-      </span>
       <span className={cn('font-mono', !wrap && 'truncate')}>{label}</span>
     </span>
   )
@@ -80,7 +74,7 @@ export const DetailRow = ({
       label={label}
       className={cn(rowClass, 'rounded-none group w-full cursor-pointer hover:bg-surface-100!')}
     >
-      <div className="flex items-center gap-x-2">
+      <div className="flex items-center gap-x-2 pl-[22px]">
         {labelEl}
         {isFilterable && resolvedFilterValue !== undefined && (
           <Filter size={12} className="text-foreground-lighter" />

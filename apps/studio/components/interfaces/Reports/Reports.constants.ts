@@ -3,6 +3,13 @@ import dayjs from 'dayjs'
 
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import {
+  analyticsLiteral,
+  joinSqlFragments,
+  quotedIdent,
+  safeSql as safeLogSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
 import { PlanId } from '@/data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
@@ -133,13 +140,67 @@ export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true)
   }
 }
 
+// Unlike the legacy `generateRegexpWhere`, this function requires filter values
+// to be raw (unquoted) strings or numbers. `analyticsLiteral` handles all
+// quoting and escaping — callers must NOT pre-wrap values in single quotes.
+export function generateRegexpWhereSafe(
+  filters: ReportFilterItem[],
+  prepend = true
+): SafeLogSqlFragment {
+  if (filters.length === 0) return safeLogSql``
+
+  const conditions = filters
+    .map((filter) => {
+      const splitKey = filter.key.split('.')
+      const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
+      const keyToQuote = filter.key.includes('.') ? normalizedKey : filter.key
+
+      let col: SafeLogSqlFragment
+      try {
+        col = quotedIdent(keyToQuote)
+      } catch {
+        return null
+      }
+
+      const valueIsNumber = !isNaN(Number(filter.value))
+      const lit = valueIsNumber
+        ? analyticsLiteral(Number(filter.value))
+        : analyticsLiteral(String(filter.value).toLowerCase())
+
+      switch (filter.compare) {
+        case 'matches':
+          return safeLogSql`REGEXP_CONTAINS(${col}, ${lit})`
+        case 'is':
+          return safeLogSql`${col} = ${lit}`
+        case '!=':
+          return safeLogSql`${col} != ${lit}`
+        case '>=':
+          return safeLogSql`${col} >= ${lit}`
+        case '<=':
+          return safeLogSql`${col} <= ${lit}`
+        case '>':
+          return safeLogSql`${col} > ${lit}`
+        case '<':
+          return safeLogSql`${col} < ${lit}`
+        default:
+          return safeLogSql`${col} = ${lit}`
+      }
+    })
+    .filter((c) => c !== null)
+
+  if (conditions.length === 0) return safeLogSql``
+
+  const joined = joinSqlFragments(conditions, ' AND ')
+  return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
+}
+
 export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.API]: {
     title: 'API',
     queries: {
       totalRequests: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-total-requests
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -149,7 +210,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -157,7 +218,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       topRoutes: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-top-routes
         select
           request.path as path,
@@ -170,7 +231,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -180,7 +241,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       errorCounts: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-error-counts
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -192,7 +253,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.headers) as headers
         WHERE
           response.status_code >= 400
-        ${generateRegexpWhere(filters, false)}
+        ${generateRegexpWhereSafe(filters, false)}
         GROUP BY
           timestamp
         ORDER BY
@@ -201,7 +262,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       topErrorRoutes: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-top-error-routes
         select
           request.path as path,
@@ -216,7 +277,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.headers) as headers
         where
           response.status_code >= 400
-        ${generateRegexpWhere(filters, false)}
+        ${generateRegexpWhereSafe(filters, false)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -226,7 +287,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       responseSpeed: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-response-speed
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -237,7 +298,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -246,7 +307,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       topSlowRoutes: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-top-slow-routes
         select
           request.path as path,
@@ -260,7 +321,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-        ${generateRegexpWhere(filters)}
+        ${generateRegexpWhereSafe(filters)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -270,7 +331,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       networkTraffic: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-network-traffic
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -299,7 +360,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
           cross join unnest(response.headers) as resp_headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -308,7 +369,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       requestsByCountry: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-requests-by-country
         select
           cf.country as country,
@@ -321,7 +382,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.cf) as cf
         where
           cf.country is not null
-        ${generateRegexpWhere(filters, false)}
+        ${generateRegexpWhereSafe(filters, false)}
         group by
           cf.country
         `,
@@ -338,7 +399,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       cacheHitRate: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-storage-cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
@@ -350,7 +411,7 @@ from edge_logs f
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
 where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
-  ${generateRegexpWhere(filters, false)}
+  ${generateRegexpWhereSafe(filters, false)}
 group by timestamp
 order by timestamp desc
 `,
@@ -358,7 +419,7 @@ order by timestamp desc
       topCacheMisses: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-storage-top-cache-misses
 SELECT
   r.path as path,
@@ -372,7 +433,7 @@ from edge_logs f
 where starts_with(r.path, '/storage/v1/object')
   and r.method = 'GET'
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
-  ${generateRegexpWhere(filters, false)}
+  ${generateRegexpWhereSafe(filters, false)}
 group by path, search
 order by count desc
 limit 12
@@ -729,6 +790,11 @@ SELECT
     },
   },
 }
+
+// Burst-balance-related metric keys. These only apply to compute sizes that
+// have a burst credit pool for disk IO (below 4XL). On 4XL+ disk IO is
+// sustained at baseline, so these charts should be hidden.
+export const BURSTABLE_IO_METRIC_KEYS = ['disk_io_budget', 'disk_io_consumption']
 
 export const DEPRECATED_REPORTS = [
   'total_realtime_ingress',

@@ -9,9 +9,9 @@ import dayjs from 'dayjs'
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import {
-  bqIdent,
   joinSqlFragments,
   analyticsLiteral as lit,
+  quotedIdent,
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
@@ -27,7 +27,7 @@ const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] a
 
 /**
  * Builds WHERE-clause fragments from a search-param map. Identifier-position
- * keys are validated via `bqIdent()` (regex allowlist) and value-position
+ * keys are validated via `quotedIdent()` (regex allowlist) and value-position
  * inputs via `analyticsLiteral` — both throw on disallowed input, in which
  * case we drop the predicate rather than emit unsafe SQL.
  *
@@ -47,11 +47,11 @@ const buildConditions = (
     if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return
 
     try {
-      // `key` is interpolated as a column identifier. `bqIdent()` rejects
+      // `key` is interpolated as a column identifier. `quotedIdent()` rejects
       // anything outside `[A-Za-z_][A-Za-z0-9_]*` (notably no spaces, so a
       // crafted URL key like `level OR id IS NOT NULL` is dropped rather
       // than emitted into the WHERE clause).
-      const col = bqIdent(key)
+      const col = quotedIdent(key)
 
       if (Array.isArray(value) && value.length > 0) {
         const inList = joinSqlFragments(
@@ -70,7 +70,7 @@ const buildConditions = (
         }
       }
     } catch {
-      // bqIdent() or analyticsLiteral() rejected the input — drop the predicate.
+      // quotedIdent() or analyticsLiteral() rejected the input — drop the predicate.
     }
   })
 
@@ -385,17 +385,18 @@ export const getFacetCountCTE = ({
   search,
   facet,
   facetSearch,
+  cteName,
 }: {
   search: QuerySearchParamsType
   facet: string
   facetSearch?: string
+  cteName: SafeLogSqlFragment
 }): SafeLogSqlFragment => {
   const MAX_FACETS_QUANTITY = 20
 
   // `facet` is used both as a column reference and to derive a CTE name;
-  // quote each appropriately with bqIdent() to reject non-identifier inputs.
-  const facetCol = bqIdent(facet)
-  const facetCte = bqIdent(facet + '_count')
+  // quote each appropriately with quotedIdent() to reject non-identifier inputs.
+  const facetCol = quotedIdent(facet)
   const baseConditions = buildConditions(search, facet)
   const facetSearchClause = facetSearch
     ? safeSql`AND ${facetCol} LIKE ${lit('%' + facetSearch + '%')}`
@@ -407,7 +408,7 @@ export const getFacetCountCTE = ({
       : safeSql`WHERE ${facetCol} IS NOT NULL`
 
   return safeSql`
-${facetCte} AS (
+${cteName} AS (
   SELECT ${lit(facet)} as dimension, ${facetCol} as value, COUNT(*) as count
   FROM unified_logs
   ${where}
@@ -552,9 +553,9 @@ level_counts AS (
 ),
 
 -- Variable facets: open-ended values still need GROUP BY
-${getFacetCountCTE({ search, facet: 'method' })},
-${getFacetCountCTE({ search, facet: 'status' })},
-${getFacetCountCTE({ search, facet: 'pathname' })}
+${getFacetCountCTE({ search, facet: 'method', cteName: safeSql`method_count` })},
+${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })},
+${getFacetCountCTE({ search, facet: 'pathname', cteName: safeSql`pathname_count` })}
 
 SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
