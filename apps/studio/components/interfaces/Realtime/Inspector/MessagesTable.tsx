@@ -16,10 +16,9 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import NoPermission from '@/components/ui/NoPermission'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const isErrorLog = (l: LogData) => {
@@ -142,9 +141,7 @@ const MessagesTable = ({
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
 
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   useEffect(() => {
     if (!data) return
@@ -219,13 +216,7 @@ const MessagesTable = ({
                       isRowSelected={false}
                       selectedCellIdx={undefined}
                       onClick={() => {
-                        sendEvent({
-                          action: 'realtime_inspector_message_clicked',
-                          groups: {
-                            project: ref ?? 'Unknown',
-                            organization: org?.slug ?? 'Unknown',
-                          },
-                        })
+                        track('realtime_inspector_message_clicked')
                         setFocusedLog(row)
                       }}
                     />

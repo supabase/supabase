@@ -9,9 +9,10 @@ import { LogoLoader } from 'ui'
 import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import useLatest from '@/hooks/misc/useLatest'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
 import type { NextPageWithLayout } from '@/types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
@@ -24,7 +25,13 @@ const SignInMfaPage: NextPageWithLayout = () => {
   } = useParams()
   const signInMethodRef = useLatest(signInMethod)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
+  const onSignInTracked = useStaticEffectEvent(() => {
+    track('sign_in', {
+      category: 'account',
+      method: signInMethodRef.current,
+    })
+  })
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const [loading, setLoading] = useState(true)
@@ -54,13 +61,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            sendEvent({
-              action: 'sign_in',
-              properties: {
-                category: 'account',
-                method: signInMethodRef.current,
-              },
-            })
+            onSignInTracked()
             addLoginEvent({})
 
             await queryClient.resetQueries()
@@ -85,6 +86,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
         setLoading(false)
         router.push({ pathname: '/sign-in', query: router.query })
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (loading) {

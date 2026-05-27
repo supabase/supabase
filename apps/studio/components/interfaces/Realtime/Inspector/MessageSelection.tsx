@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
@@ -8,8 +7,7 @@ import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
 import CopyButton from '@/components/ui/CopyButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -23,9 +21,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
     return JSON.stringify(log, null, 2)
   }, [log])
 
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const handleCopy = () => {
     if (!log) return
@@ -45,10 +41,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
       type="default"
       title="Copy log to clipboard"
       onClick={() => {
-        sendEvent({
-          action: 'realtime_inspector_copy_message_clicked',
-          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-        })
+        track('realtime_inspector_copy_message_clicked')
       }}
     />
   )

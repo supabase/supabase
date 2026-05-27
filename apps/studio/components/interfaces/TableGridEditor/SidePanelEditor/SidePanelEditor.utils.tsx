@@ -51,14 +51,16 @@ import {
   updateTable as updateTableMutation,
 } from '@/data/tables/table-update-mutation'
 import { getTables } from '@/data/tables/tables-query'
-import { sendEvent } from '@/data/telemetry/send-event-mutation'
 import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
+import type { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly } from '@/lib/type-helpers'
 import type { SidePanel } from '@/state/table-editor'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
+
+type Track = ReturnType<typeof useTrack>
 
 /**
  * Extracts the row data from the current side panel state.
@@ -441,9 +443,9 @@ export const createTable = async ({
   foreignKeyRelations,
   isRLSEnabled,
   importContent,
-  organizationSlug,
   generatedPolicies = [],
   onCreatePoliciesSuccess,
+  track,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -457,9 +459,9 @@ export const createTable = async ({
   foreignKeyRelations: ForeignKey[]
   isRLSEnabled: boolean
   importContent?: ImportContent
-  organizationSlug?: string
   generatedPolicies?: AcceptedGeneratedPolicy[]
   onCreatePoliciesSuccess?: () => void
+  track: Track
 }) => {
   const queryClient = getQueryClient()
 
@@ -583,42 +585,18 @@ export const createTable = async ({
     )
   }
 
-  // Track table creation event (fire-and-forget to avoid blocking)
-  sendEvent({
-    event: {
-      action: 'table_created',
-      properties: {
-        method: 'table_editor',
-        schema_name: payload.schema,
-        table_name: payload.name,
-        has_generated_policies: generatedPolicies.length > 0 && isRLSEnabled,
-      },
-      groups: {
-        project: projectRef,
-        ...(organizationSlug && { organization: organizationSlug }),
-      },
-    },
-  }).catch((error) => {
-    console.error('Failed to track table creation event:', error)
+  track('table_created', {
+    method: 'table_editor',
+    schema_name: payload.schema,
+    table_name: payload.name,
+    has_generated_policies: generatedPolicies.length > 0 && isRLSEnabled,
   })
 
-  // Track RLS enablement event if enabled (fire-and-forget)
   if (isRLSEnabled) {
-    sendEvent({
-      event: {
-        action: 'table_rls_enabled',
-        properties: {
-          method: 'table_editor',
-          schema_name: payload.schema,
-          table_name: payload.name,
-        },
-        groups: {
-          project: projectRef,
-          ...(organizationSlug && { organization: organizationSlug }),
-        },
-      },
-    }).catch((error) => {
-      console.error('Failed to track RLS enablement event:', error)
+    track('table_rls_enabled', {
+      method: 'table_editor',
+      schema_name: payload.schema,
+      table_name: payload.name,
     })
   }
 
@@ -762,7 +740,7 @@ export const updateTable = async ({
   foreignKeyRelations,
   existingForeignKeyRelations,
   primaryKey,
-  organizationSlug,
+  track,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -773,7 +751,7 @@ export const updateTable = async ({
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
-  organizationSlug?: string
+  track: Track
 }) => {
   const queryClient = getQueryClient()
 
@@ -805,26 +783,12 @@ export const updateTable = async ({
     })
   }
 
-  // Track RLS enablement if it's being turned on
   if (payload.rls_enabled === true) {
-    try {
-      await sendEvent({
-        event: {
-          action: 'table_rls_enabled',
-          properties: {
-            method: 'table_editor',
-            schema_name: table.schema,
-            table_name: payload.name ?? table.name,
-          },
-          groups: {
-            project: projectRef,
-            ...(organizationSlug && { organization: organizationSlug }),
-          },
-        },
-      })
-    } catch (error) {
-      console.error('Failed to track RLS enablement event:', error)
-    }
+    track('table_rls_enabled', {
+      method: 'table_editor',
+      schema_name: table.schema,
+      table_name: payload.name ?? table.name,
+    })
   }
 
   const updatedTable = await queryClient.fetchQuery({
