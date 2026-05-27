@@ -4,22 +4,20 @@ import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 // @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
 import type { Popover as PopoverPrimitive } from 'radix-ui'
-import React, { useEffect } from 'react'
+import React, { isValidElement, ReactElement, useEffect } from 'react'
 import {
   Badge,
   cn,
-  Popover_Shadcn_ as Popover,
-  PopoverAnchor_Shadcn_ as PopoverAnchor,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverContentProps_Shadcn_ as PopoverContentProps,
+  Command as Command,
+  CommandEmpty as CommandEmpty,
+  CommandInput as CommandInput,
+  CommandItem as CommandItem,
+  CommandList as CommandList,
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverContentProps,
 } from 'ui'
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from 'ui/src/components/shadcn/ui/command'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {
@@ -46,7 +44,7 @@ const DROPDOWN_GAP = 8
 const commandItemClass = cn(
   'relative text-foreground-lighter text-left px-2 py-1.5 rounded-sm',
   'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
-  'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong'
+  'peer-data-[value=true]:bg-overlay-hover'
 )
 
 function useMultiSelect() {
@@ -511,7 +509,9 @@ const MultiSelectorList = React.forwardRef<
   const options = !!children
     ? Array.isArray(children)
       ? (children as React.ReactNode[])
-      : typeof children === 'object' && 'props' in children
+      : typeof children === 'object' &&
+          'props' in children &&
+          isValidElement<{ children: ReactElement[] }>(children)
         ? children.props.children
         : []
     : []

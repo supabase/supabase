@@ -56,7 +56,7 @@ Here's a visual representation of the complete authorization code flow:
        │     (code_verifier, code_challenge)                            │
        │                              │                                 │
        │  2. Redirect to /oauth/authorize with code_challenge           │
-       ├────────────────────────────────────────────────────────────────>│
+       ├───────────────────────────────────────────────────────────────>│
        │                              │                                 │
        │                              │  3. Validate params & redirect  │
        │                              │     to authorization_path       │
@@ -71,7 +71,7 @@ Here's a visual representation of the complete authorization code flow:
        │                              │                                 │
        │                              │  6. approveAuthorization()      │
        │                              ├────────────────────────────────>│
-       │                              │  Return redirect_to with code   │
+       │                              │  Return redirect_url with code  │
        │                              │<────────────────────────────────┤
        │                              │                                 │
        │  7. Redirect to client callback with code                      │
@@ -79,18 +79,18 @@ Here's a visual representation of the complete authorization code flow:
        │                              │                                 │
        │  8. Exchange code for tokens (POST /oauth/token)               │
        │     with code_verifier                                         │
-       ├────────────────────────────────────────────────────────────────>│
+       ├───────────────────────────────────────────────────────────────>│
        │                              │                                 │
        │  9. Return tokens (access, refresh, ID)                        │
-       │<────────────────────────────────────────────────────────────────┤
+       │<───────────────────────────────────────────────────────────────┤
        │                              │                                 │
        │  10. Access resources with access_token                        │
        │                              │                                 │
        │  11. Refresh tokens (POST /oauth/token with refresh_token)     │
-       ├────────────────────────────────────────────────────────────────>│
+       ├───────────────────────────────────────────────────────────────>│
        │                              │                                 │
        │  12. Return new tokens                                         │
-       │<────────────────────────────────────────────────────────────────┤
+       │<───────────────────────────────────────────────────────────────┤
        │                              │                                 │
 ```
 
@@ -189,7 +189,7 @@ Your frontend application at the authorization path should:
 5. **Handle user decision** - When the user approves or denies:
    - Call `supabase.auth.oauth.approveAuthorization(authorization_id)` to approve
    - Call `supabase.auth.oauth.denyAuthorization(authorization_id)` to deny
-   - Redirect user to the returned `redirect_to` URL
+   - Redirect user to the returned `redirect_url` URL
 
 This is a **frontend implementation** using `supabase-js`. Supabase Auth handles all the backend OAuth logic (generating authorization codes, validating requests, etc.) after you call the approve/deny methods.
 

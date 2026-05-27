@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Button, Checkbox, cn, Modal } from 'ui'
+import { Button, Checkbox, cn, DialogSection, DialogSectionSeparator } from 'ui'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
@@ -160,31 +160,31 @@ const StoragePoliciesEditor = ({
   return (
     <>
       <div className="space-y-4 py-4">
-        <Modal.Content>
+        <DialogSection>
           <PolicyName
             name={policyFormFields.name}
             limit={50}
             onUpdatePolicyName={onUpdatePolicyName}
           />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyAllowedOperations
             allowedOperations={policyFormFields.allowedOperations}
             onToggleOperation={onToggleOperation}
           />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyRoles selectedRoles={selectedRoles} onUpdateSelectedRoles={onUpdatePolicyRoles} />
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content>
+        </DialogSection>
+        <DialogSectionSeparator />
+        <DialogSection>
           <PolicyDefinition
             definition={definition}
             onUpdatePolicyDefinition={onUpdatePolicyDefinition}
           />
-        </Modal.Content>
+        </DialogSection>
       </div>
       <PolicyEditorFooter onViewTemplates={onViewTemplates} onReviewPolicy={onReviewPolicy} />
     </>

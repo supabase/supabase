@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
-import { cloneElement, useState } from 'react'
+import { cloneElement, useState, type ReactElement } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +25,7 @@ import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
 import {
   LogDrainCreateVariables,
   useCreateLogDrainMutation,
@@ -34,6 +35,7 @@ import { useUpdateLogDrainMutation } from '@/data/log-drains/update-log-drain-mu
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import type { NextPageWithLayout } from '@/types'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
@@ -103,6 +105,12 @@ const LogDrainsSettings: NextPageWithLayout = () => {
     setOpen(true)
   }
 
+  function handleAddDestinationClick() {
+    setSelectedLogDrain(null)
+    setMode('create')
+    setOpen(true)
+  }
+
   const content = (
     <ScaffoldSection isFullWidth id="log-drains" className="gap-6">
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
@@ -147,9 +155,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
         {isLoadingPermissions ? (
           <GenericSkeletonLoader />
         ) : !canManageLogDrains ? (
-          <Alert_Shadcn_ variant="default">
-            You do not have permission to manage log drains
-          </Alert_Shadcn_>
+          <Alert variant="default">You do not have permission to manage log drains</Alert>
         ) : (
           <LogDrains onUpdateDrainClick={handleUpdateClick} onNewDrainClick={handleNewClick} />
         )}
@@ -199,18 +205,22 @@ const LogDrainsSettings: NextPageWithLayout = () => {
           <>
             {!(logDrains?.length === 0) && (
               <div className="flex items-center">
-                <Button
-                  disabled={!hasAccessToLogDrains || !canManageLogDrains}
-                  onClick={() => {
-                    setSelectedLogDrain(null)
-                    setMode('create')
-                    setOpen(true)
-                  }}
-                  type="primary"
-                  className="rounded-r-none px-3"
+                <Shortcut
+                  id={SHORTCUT_IDS.LOG_DRAINS_ADD_DESTINATION}
+                  onTrigger={handleAddDestinationClick}
+                  options={{ enabled: hasAccessToLogDrains && canManageLogDrains }}
+                  side="bottom"
+                  tooltipOpen={open ? false : undefined}
                 >
-                  Add destination
-                </Button>
+                  <Button
+                    disabled={!hasAccessToLogDrains || !canManageLogDrains}
+                    onClick={handleAddDestinationClick}
+                    type="primary"
+                    className="rounded-r-none px-3"
+                  >
+                    Add destination
+                  </Button>
+                </Shortcut>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -261,7 +271,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   return content
 }
 
-LogDrainsSettings.getLayout = (page) => (
+LogDrainsSettings.getLayout = (page: ReactElement) => (
   <DefaultLayout>
     <SettingsLayout title="Log Drains">{page}</SettingsLayout>
   </DefaultLayout>

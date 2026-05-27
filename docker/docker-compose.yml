@@ -48,13 +48,15 @@ services:
 
       DEFAULT_ORGANIZATION_NAME: ${STUDIO_DEFAULT_ORGANIZATION}
       DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
 
       SUPABASE_URL: http://kong:8000
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
       AUTH_JWT_SECRET: ${JWT_SECRET}
+      SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY}
+      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY}
 
       # LOGFLARE_API_KEY is deprecated
       LOGFLARE_API_KEY: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
@@ -164,6 +166,8 @@ services:
       # JSON array of signing JWKs (EC private + legacy symmetric)
       # For Podman, use: GOTRUE_JWT_KEYS: ${JWT_KEYS}
       #GOTRUE_JWT_KEYS: ${JWT_KEYS:-[]}
+
+      GOTRUE_JWT_ISSUER: ${API_EXTERNAL_URL}/auth/v1
 
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
       GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: ${ENABLE_ANONYMOUS_USERS}
@@ -480,9 +484,8 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "curl",
-          "http://localhost:4000/health"
+          "CMD-SHELL",
+          "curl -sSfL -o /dev/null http://localhost:4000/health"
         ]
       timeout: 5s
       interval: 5s
@@ -587,6 +590,9 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+    depends_on:
+      analytics:
+        condition: service_healthy
     environment:
       LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
     command:
@@ -628,6 +634,7 @@ services:
     environment:
       PORT: 4000
       POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       DATABASE_URL: ecto://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase

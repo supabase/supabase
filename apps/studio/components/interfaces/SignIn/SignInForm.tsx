@@ -8,17 +8,17 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { captureCriticalError } from '@/lib/error-reporting'
 import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -48,7 +48,7 @@ export const SignInForm = () => {
     setReturnTo(getReturnToPath())
   }, [])
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
   let forgotPasswordUrl = `/forgot-password`
@@ -86,10 +86,7 @@ export const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
-        sendEvent({
-          action: 'sign_in',
-          properties: { category: 'account', method: 'email' },
-        })
+        track('sign_in', { category: 'account', method: 'email' })
         addLoginEvent({})
 
         await queryClient.resetQueries()
@@ -128,7 +125,7 @@ export const SignInForm = () => {
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
               <FormControl>
-                <Input_Shadcn_
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
@@ -150,7 +147,7 @@ export const SignInForm = () => {
               <FormItemLayout name="password" label="Password">
                 <FormControl>
                   <div className="relative">
-                    <Input_Shadcn_
+                    <Input
                       id="password"
                       type={passwordHidden ? 'password' : 'text'}
                       autoComplete="current-password"

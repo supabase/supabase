@@ -42,6 +42,7 @@ import {
   buildSecurityPromptMarkdown,
   formatRlsDescription,
   getTableKey,
+  getTablePoliciesHref,
 } from './ProjectNeedsSecuring.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
@@ -179,7 +180,11 @@ export const ProjectNeedsSecuringView = ({
                   </TableHeader>
                   <TableBody>
                     {tables.map((table) => {
-                      const policiesHref = `/project/${projectRef}/auth/policies?schema=${table.schema}&search=${table.name}`
+                      const policiesHref = getTablePoliciesHref(
+                        projectRef,
+                        table.schema,
+                        table.name
+                      )
                       const handleNavigation = createNavigationHandler(policiesHref, router)
                       const trackViewPolicies = () =>
                         onTrackAction('view_policies', {

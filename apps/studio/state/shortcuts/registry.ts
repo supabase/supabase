@@ -1,13 +1,54 @@
 import { SHORTCUT_REFERENCE_GROUPS } from './referenceGroups'
+import { ADVISORS_NAV_SHORTCUT_IDS, advisorsNavRegistry } from './registry/advisors-nav'
+import { ADVISORS_PAGE_SHORTCUT_IDS, advisorsPageRegistry } from './registry/advisors-page'
+import { API_KEYS_SHORTCUT_IDS, apiKeysRegistry } from './registry/api-keys'
 import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
 import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
 import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
+import { FUNCTIONS_DETAIL_SHORTCUT_IDS, functionsDetailRegistry } from './registry/functions-detail'
+import {
+  FUNCTIONS_DETAIL_NAV_SHORTCUT_IDS,
+  functionsDetailNavRegistry,
+} from './registry/functions-detail-nav'
+import { FUNCTIONS_LIST_SHORTCUT_IDS, functionsListRegistry } from './registry/functions-list'
+import { FUNCTIONS_NAV_SHORTCUT_IDS, functionsNavRegistry } from './registry/functions-nav'
+import {
+  FUNCTIONS_OVERVIEW_SHORTCUT_IDS,
+  functionsOverviewRegistry,
+} from './registry/functions-overview'
+import { JWT_KEYS_SHORTCUT_IDS, jwtKeysRegistry } from './registry/jwt-keys'
 import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
+import { LOG_DRAINS_SHORTCUT_IDS, logDrainsRegistry } from './registry/log-drains'
+import { LOGS_PREVIEW_SHORTCUT_IDS, logsPreviewRegistry } from './registry/logs-preview'
+import {
+  OBSERVABILITY_NAV_SHORTCUT_IDS,
+  observabilityNavRegistry,
+} from './registry/observability-nav'
+import {
+  OBSERVABILITY_PAGE_SHORTCUT_IDS,
+  observabilityPageRegistry,
+} from './registry/observability-page'
+import {
+  PLATFORM_WEBHOOKS_SHORTCUT_IDS,
+  platformWebhooksRegistry,
+} from './registry/platform-webhooks'
+import {
+  PROJECT_SETTINGS_NAV_SHORTCUT_IDS,
+  projectSettingsNavRegistry,
+} from './registry/project-settings-nav'
+import {
+  REALTIME_INSPECTOR_SHORTCUT_IDS,
+  realtimeInspectorRegistry,
+} from './registry/realtime-inspector'
+import { REALTIME_NAV_SHORTCUT_IDS, realtimeNavRegistry } from './registry/realtime-nav'
 import {
   SCHEMA_VISUALIZER_SHORTCUT_IDS,
   schemaVisualizerRegistry,
 } from './registry/schema-visualizer'
 import { SQL_EDITOR_SHORTCUT_IDS, sqlEditorRegistry } from './registry/sql-editor'
+import { STORAGE_BUCKETS_SHORTCUT_IDS, storageBucketsRegistry } from './registry/storage-buckets'
+import { STORAGE_EXPLORER_SHORTCUT_IDS, storageExplorerRegistry } from './registry/storage-explorer'
+import { STORAGE_NAV_SHORTCUT_IDS, storageNavRegistry } from './registry/storage-nav'
 import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
 import { ShortcutDefinition } from './types'
 
@@ -56,6 +97,7 @@ export const SHORTCUT_IDS = {
   NAV_ORG_BILLING: 'nav.org-billing',
   NAV_ORG_SETTINGS: 'nav.org-settings',
   SHORTCUTS_OPEN_REFERENCE: 'shortcuts.open-reference',
+  CONNECT_OPEN_SHEET: 'connect.open-sheet',
 
   // Table editor shortcuts
   ...TABLE_EDITOR_SHORTCUT_IDS,
@@ -76,6 +118,50 @@ export const SHORTCUT_IDS = {
   ...AUTH_USERS_SHORTCUT_IDS,
   // Auth sub-page navigation chords
   ...AUTH_NAV_SHORTCUT_IDS,
+
+  // Storage sub-page navigation chords
+  ...STORAGE_NAV_SHORTCUT_IDS,
+  // Storage Files (bucket list) page shortcuts
+  ...STORAGE_BUCKETS_SHORTCUT_IDS,
+  // Storage Explorer (file browser) shortcuts
+  ...STORAGE_EXPLORER_SHORTCUT_IDS,
+
+  // Edge Functions sub-page navigation chords
+  ...FUNCTIONS_NAV_SHORTCUT_IDS,
+  // Edge Functions overview (list) page shortcuts
+  ...FUNCTIONS_LIST_SHORTCUT_IDS,
+  // Per-function detail layout shortcuts (header actions + test submit)
+  ...FUNCTIONS_DETAIL_SHORTCUT_IDS,
+  // Per-function detail tab navigation (digits)
+  ...FUNCTIONS_DETAIL_NAV_SHORTCUT_IDS,
+  // Per-function Overview tab shortcuts (intervals, refresh, open logs)
+  ...FUNCTIONS_OVERVIEW_SHORTCUT_IDS,
+
+  // Realtime sub-page navigation chords
+  ...REALTIME_NAV_SHORTCUT_IDS,
+  // Realtime Inspector page shortcuts
+  ...REALTIME_INSPECTOR_SHORTCUT_IDS,
+
+  // Observability sub-page navigation chords
+  ...OBSERVABILITY_NAV_SHORTCUT_IDS,
+  // Observability shared page-action shortcuts
+  ...OBSERVABILITY_PAGE_SHORTCUT_IDS,
+  // Advisors sub-page navigation chords
+  ...ADVISORS_NAV_SHORTCUT_IDS,
+  // Advisors lint page shortcuts (tabs, refresh, close detail)
+  ...ADVISORS_PAGE_SHORTCUT_IDS,
+
+  // LogsPreviewer shortcuts (Function Logs, Function Invocations, Logs Explorer)
+  ...LOGS_PREVIEW_SHORTCUT_IDS,
+
+  // Platform Webhooks page shortcuts (org and project level)
+  ...PLATFORM_WEBHOOKS_SHORTCUT_IDS,
+
+  // Project Settings sub-page navigation chords and page actions
+  ...PROJECT_SETTINGS_NAV_SHORTCUT_IDS,
+  ...API_KEYS_SHORTCUT_IDS,
+  ...JWT_KEYS_SHORTCUT_IDS,
+  ...LOG_DRAINS_SHORTCUT_IDS,
 } as const
 
 /**
@@ -114,11 +200,13 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.AI_ASSISTANT_TOGGLE,
     label: 'Toggle AI Assistant panel',
     sequence: ['Mod+I'],
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
   },
   [SHORTCUT_IDS.INLINE_EDITOR_TOGGLE]: {
     id: SHORTCUT_IDS.INLINE_EDITOR_TOGGLE,
     label: 'Toggle inline SQL editor',
     sequence: ['Mod+E'],
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
   },
   [SHORTCUT_IDS.RESULTS_COPY_MARKDOWN]: {
     id: SHORTCUT_IDS.RESULTS_COPY_MARKDOWN,
@@ -336,8 +424,19 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   [SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE]: {
     id: SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
     label: 'Show all keyboard shortcuts',
-    sequence: ['Mod+/'],
+    // '?' isn't yet in @tanstack/hotkeys' PunctuationKey union (TanStack/hotkeys#19),
+    // but matches correctly at runtime — event.key === '?' regardless of layout.
+    // @ts-expect-error — remove this once upstream adds '?' to PunctuationKey.
+    sequence: ['Shift+?'],
     showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [SHORTCUT_IDS.CONNECT_OPEN_SHEET]: {
+    id: SHORTCUT_IDS.CONNECT_OPEN_SHEET,
+    label: 'Open Connect sheet',
+    sequence: ['O', 'C'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.GLOBAL_ACTIONS,
     options: { ignoreInputs: true },
   },
 
@@ -360,4 +459,48 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   ...authUsersRegistry,
   // Auth sub-page navigation chord registration
   ...authNavRegistry,
+
+  // Storage sub-page navigation chord registration
+  ...storageNavRegistry,
+  // Storage Files (bucket list) page shortcut registration
+  ...storageBucketsRegistry,
+  // Storage Explorer (file browser) shortcut registration
+  ...storageExplorerRegistry,
+
+  // Edge Functions sub-page navigation chord registration
+  ...functionsNavRegistry,
+  // Edge Functions overview (list) page shortcut registration
+  ...functionsListRegistry,
+  // Per-function detail layout shortcut registration
+  ...functionsDetailRegistry,
+  // Per-function detail tab navigation registration
+  ...functionsDetailNavRegistry,
+  // Per-function Overview tab shortcut registration
+  ...functionsOverviewRegistry,
+
+  // Realtime sub-page navigation chord registration
+  ...realtimeNavRegistry,
+  // Realtime Inspector page shortcut registration
+  ...realtimeInspectorRegistry,
+
+  // Observability sub-page navigation chord registration
+  ...observabilityNavRegistry,
+  // Observability shared page-action shortcut registration
+  ...observabilityPageRegistry,
+  // Advisors sub-page navigation chord registration
+  ...advisorsNavRegistry,
+  // Advisors lint page shortcut registration
+  ...advisorsPageRegistry,
+
+  // LogsPreviewer shortcut registration
+  ...logsPreviewRegistry,
+
+  // Platform Webhooks page shortcut registration
+  ...platformWebhooksRegistry,
+
+  // Project Settings sub-page navigation and page action shortcut registration
+  ...projectSettingsNavRegistry,
+  ...apiKeysRegistry,
+  ...jwtKeysRegistry,
+  ...logDrainsRegistry,
 }

@@ -18,7 +18,7 @@ You need:
 
 Below are two options for adding a reverse proxy with automatic HTTPS in front of your self-hosted Supabase: **Caddy** (simpler, zero-config TLS) and **Nginx + Let's Encrypt** (more control over proxy settings). Both sit in front of the API gateway and terminate TLS, so internal traffic stays on HTTP.
 
-<Admonition type="tip" label="Using a different reverse proxy?">
+<Admonition type="tip" title="Using a different reverse proxy?">
 
 If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefik.io/), [Nginx Proxy Manager](https://nginxproxymanager.com/), or another reverse proxy for your infrastructure, you can use it instead of Caddy or Nginx above. The key requirements are:
 
@@ -31,7 +31,7 @@ If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefi
 
 </Admonition>
 
-<Admonition type="note" label="Using Envoy instead of Kong?">
+<Admonition type="note" title="Using Envoy instead of Kong?">
 
 Envoy is an optional [API gateway](/docs/guides/self-hosting/self-hosted-envoy), enabled via the `docker-compose.envoy.yml` override. If you already run Envoy instead of Kong, edit `docker-compose.caddy.yml` or `docker-compose.nginx.yml` to comment out the `kong:` block and uncomment the `api-gw:` block (and the matching `depends_on` entry) so the reverse proxy sits in front of Envoy.
 

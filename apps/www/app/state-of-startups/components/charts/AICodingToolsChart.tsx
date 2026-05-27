@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateAICodingToolsSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -18,20 +18,24 @@ function generateAICodingToolsSQL(activeFilters: Record<string, string>) {
           'Tempo',
           'None'
         ) THEN technology
+        WHEN LOWER(technology) LIKE '%antigravity%' THEN 'Antigravity'
         WHEN LOWER(technology) LIKE '%claude%' THEN 'Claude or Claude Code'
-        WHEN LOWER(technology) = 'chatgpt' THEN 'ChatGPT'
-        ELSE 'Other'
+        WHEN LOWER(technology) LIKE '%codex%'
+          OR LOWER(technology) LIKE '%chatgpt%'
+          OR LOWER(technology) LIKE '%chat gpt%'
+          OR LOWER(technology) LIKE '%openai%' THEN 'Codex'
       END AS technology_clean
     FROM (
       SELECT id, unnest(ai_coding_tools) AS technology
-      FROM responses_2025
+      FROM responses_2026
       ${whereClause}
     ) sub
   )
-  SELECT 
+  SELECT
     technology_clean AS technology,
     COUNT(DISTINCT id) AS total
   FROM ai_coding_tools_mapping
+  WHERE technology_clean IS NOT NULL
   GROUP BY technology_clean
   ORDER BY total DESC;`
 }

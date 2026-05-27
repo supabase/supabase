@@ -41,6 +41,15 @@ const PLUGIN_CLIENTS: PluginClient[] = [
     repoUrl: 'https://github.com/supabase-community/gemini-extension',
     docsUrl: 'https://geminicli.com/docs/extensions/',
   },
+  {
+    key: 'github-copilot',
+    label: 'GitHub Copilot',
+    icon: 'copilot',
+    hasDistinctDarkIcon: true,
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl:
+      'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing',
+  },
 ]
 
 function PluginInstructions({ client }: { client: PluginClient }) {
@@ -159,6 +168,34 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           </a>
           .
         </p>
+      </div>
+    )
+  }
+
+  if (client.key === 'github-copilot') {
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">From GitHub</h4>
+          <p className="text-xs text-foreground-lighter">
+            Install the Supabase plugin directly from the{' '}
+            <a
+              href="https://github.com/supabase-community/supabase-plugin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-link hover:underline"
+            >
+              GitHub repository
+            </a>
+            .
+          </p>
+          <CodeBlock
+            value="copilot plugin install supabase-community/supabase-plugin"
+            language="bash"
+            focusable={false}
+            className="block"
+          />
+        </div>
       </div>
     )
   }

@@ -458,7 +458,8 @@ launch week
 */
 
 .launch-week-timeline-border--approaching {
-  border-image: linear-gradient(to bottom, hsl(var(--brand-default)), var(--colors-purple7)) 1 100%;
+  border-image: linear-gradient(to bottom, hsl(var(--brand-default)), var(--color-purple-700)) 1
+    100%;
 }
 
 .video-container {
@@ -759,7 +760,7 @@ launch week
     );
   }
   .gradient-text-100 {
-    background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--colors-green12) 100%);
+    background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--color-green-1200) 100%);
   }
 
   .gradient-text-500 {

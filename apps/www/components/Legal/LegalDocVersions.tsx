@@ -1,13 +1,7 @@
 import { useStaticEffectEvent } from '~/hooks/useStaticEffectEvent'
 import { useRouter } from 'next/router'
 import { ComponentType, useEffect, useState } from 'react'
-import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 export type LegalDocVersion = {
   id: string
@@ -55,18 +49,18 @@ const LegalDocVersions = ({ versions }: Props) => {
         <label htmlFor="legal-doc-version" className="text-foreground-lighter text-sm">
           Version
         </label>
-        <Select_Shadcn_ value={activeId} onValueChange={handleChange}>
-          <SelectTrigger_Shadcn_ id="legal-doc-version" className="w-auto min-w-[260px]">
-            <SelectValue_Shadcn_ />
-          </SelectTrigger_Shadcn_>
-          <SelectContent_Shadcn_>
+        <Select value={activeId} onValueChange={handleChange}>
+          <SelectTrigger id="legal-doc-version" className="w-auto min-w-[260px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
             {versions.map((v) => (
-              <SelectItem_Shadcn_ key={v.id} value={v.id}>
+              <SelectItem key={v.id} value={v.id}>
                 {v.label} — {v.effectiveDate}
-              </SelectItem_Shadcn_>
+              </SelectItem>
             ))}
-          </SelectContent_Shadcn_>
-        </Select_Shadcn_>
+          </SelectContent>
+        </Select>
       </div>
       <ActiveComponent />
     </>

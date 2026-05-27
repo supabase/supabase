@@ -15,10 +15,11 @@ import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 import { DocsButton } from '@/components/ui/DocsButton'
 import NoPermission from '@/components/ui/NoPermission'
 import ShimmerLine from '@/components/ui/ShimmerLine'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'
@@ -38,6 +39,12 @@ const NoResultAlert = ({
   const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
+  )
+
+  const broadcastButton = (
+    <Button type="default" onClick={showSendMessage}>
+      Broadcast a message
+    </Button>
   )
 
   return (
@@ -63,9 +70,13 @@ const NoResultAlert = ({
                 <p className="text-foreground">Create a Broadcast message</p>
                 <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
               </div>
-              <Button type="default" onClick={showSendMessage}>
-                Broadcast a message
-              </Button>
+              {enabled ? (
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
+                  {broadcastButton}
+                </ShortcutTooltip>
+              ) : (
+                broadcastButton
+              )}
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
               <IconPresence
@@ -130,9 +141,7 @@ const MessagesTable = ({
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
 
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   useEffect(() => {
     if (!data) return
@@ -169,13 +178,15 @@ const MessagesTable = ({
                       : `No message found yet...`}
                   </div>
                 </div>
-                <Button
-                  type="default"
-                  onClick={showSendMessage}
-                  icon={<Megaphone strokeWidth={1.5} />}
-                >
-                  <span>Broadcast a message</span>
-                </Button>
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
+                  <Button
+                    type="default"
+                    onClick={showSendMessage}
+                    icon={<Megaphone strokeWidth={1.5} />}
+                  >
+                    <span>Broadcast a message</span>
+                  </Button>
+                </ShortcutTooltip>
               </div>
             )}
 
@@ -205,13 +216,7 @@ const MessagesTable = ({
                       isRowSelected={false}
                       selectedCellIdx={undefined}
                       onClick={() => {
-                        sendEvent({
-                          action: 'realtime_inspector_message_clicked',
-                          groups: {
-                            project: ref ?? 'Unknown',
-                            organization: org?.slug ?? 'Unknown',
-                          },
-                        })
+                        track('realtime_inspector_message_clicked')
                         setFocusedLog(row)
                       }}
                     />

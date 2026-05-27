@@ -1,17 +1,8 @@
 import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useState } from 'react'
-import {
-  cn,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
-  InfoIcon,
-} from 'ui'
+import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getErrorCodeInfo } from './ErrorCodeTooltip.utils'
@@ -62,14 +53,14 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
   }
 
   return (
-    <HoverCard_Shadcn_ open={isOpen} onOpenChange={setIsOpen} openDelay={200} closeDelay={100}>
-      <HoverCardTrigger_Shadcn_ asChild>
+    <HoverCard open={isOpen} onOpenChange={setIsOpen} openDelay={200} closeDelay={100}>
+      <HoverCardTrigger asChild>
         <span className="inline-flex items-center gap-1 cursor-default">
           {children}
           <InfoIcon hideBackground className="w-3.5 h-3.5 shrink-0 fill-foreground-muted" />
         </span>
-      </HoverCardTrigger_Shadcn_>
-      <HoverCardContent_Shadcn_ side="top" align="center" className="w-[360px] p-0 overflow-hidden">
+      </HoverCardTrigger>
+      <HoverCardContent side="top" align="center" className="w-[360px] p-0 overflow-hidden">
         <div className="flex flex-col">
           <div className="px-4 pt-3 pb-2.5 border-b border-border">
             <p className="font-mono text-xs uppercase text-foreground-light truncate max-w-[40ch]">
@@ -117,29 +108,23 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
               </div>
             )}
             <AiAssistantDropdown
+              showExternalAI
               label="Fix with AI"
               buildPrompt={buildPrompt}
               onOpenAssistant={handleOpenAssistant}
               telemetrySource="error_code"
               copyLabel="Copy Markdown"
-              showExternalAI
-              extraDropdownItems={
-                docsUrl ? (
-                  <>
-                    <DropdownMenuItem asChild className="gap-2">
-                      <Link href={docsUrl} target="_blank" rel="noreferrer">
-                        <ExternalLink size={14} />
-                        Go to Docs
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                ) : undefined
-              }
+              additionalDropdownItems={[
+                {
+                  label: 'Go to Docs',
+                  icon: <ExternalLink size={14} />,
+                  href: docsUrl,
+                },
+              ]}
             />
           </div>
         </div>
-      </HoverCardContent_Shadcn_>
-    </HoverCard_Shadcn_>
+      </HoverCardContent>
+    </HoverCard>
   )
 }

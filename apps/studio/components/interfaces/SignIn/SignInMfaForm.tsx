@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
@@ -103,10 +103,18 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       <AlertError
         error={error}
         subject="Error while signing in"
+        hideContactSupport
         additionalActions={
-          <Button asChild type="default">
-            <Link href="/sign-in">Back to sign in</Link>
-          </Button>
+          <>
+            <Button asChild type="default">
+              <Link href="/sign-in">Back to sign in</Link>
+            </Button>
+            <Button asChild type="default">
+              <Link href="https://supabase.com/support" target="_blank" rel="noreferrer">
+                Contact support
+              </Link>
+            </Button>
+          </>
         }
       />
     )
@@ -139,7 +147,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground-light [&_svg]:stroke-[1.5] [&_svg]:h-[20px] [&_svg]:w-[20px]">
                         <Lock />
                       </div>
-                      <Input_Shadcn_
+                      <Input
                         id="code"
                         className="pl-10 font-mono"
                         {...field}

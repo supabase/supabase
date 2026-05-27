@@ -19,7 +19,7 @@ import {
   SHORTCUT_REFERENCE_GROUP_ORDER,
   SHORTCUT_REFERENCE_GROUPS,
 } from '@/state/shortcuts/referenceGroups'
-import type { ShortcutHotkeyMeta } from '@/state/shortcuts/useShortcut'
+import type { ShortcutHotkeyMeta } from '@/state/shortcuts/types'
 
 interface ShortcutsReferenceSheetProps {
   open: boolean
@@ -42,16 +42,30 @@ interface ShortcutGroup {
 const GROUP_LABELS: Record<string, string> = {
   ...SHORTCUT_REFERENCE_GROUP_LABELS,
   'action-bar': 'Actions',
+  'advisors-page': 'Advisors',
   'ai-assistant': 'AI Assistant',
+  'api-keys': 'API Keys',
+  'auth-users': 'Auth Users',
   'command-menu': 'Command Menu',
   'data-table': 'Data Tables',
+  'functions-detail': 'Edge Function Actions',
+  'functions-list': 'Edge Functions',
+  'functions-overview': 'Edge Function Overview',
   'inline-editor': 'Inline Editor',
   'list-page': 'List pages',
+  'platform-webhooks': 'Platform Webhooks',
+  'logs-preview': 'Logs Explorer',
+  'jwt-keys': 'JWT Keys',
+  'log-drains': 'Log Drains',
   nav: 'Navigation',
   'operation-queue': 'Operation Queue',
   results: 'Results',
+  'realtime-inspector': 'Realtime Inspector',
   'schema-visualizer': 'Schema Visualizer',
   shortcuts: 'Shortcuts',
+  'sql-editor': 'SQL Editor',
+  'storage-buckets': 'Storage Buckets',
+  'storage-explorer': 'Storage File Explorer',
   'table-editor': 'Table Editor',
   'unified-logs': 'Logs',
 }

@@ -30,11 +30,12 @@ import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infini
 import { useOrgPlansQuery } from '@/data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import type { OrgPlan } from '@/data/subscriptions/types'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { formatCurrency } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 import { Organization } from '@/types/base'
 
@@ -68,9 +69,9 @@ export const PlanUpdateSidePanel = () => {
   )
   const isStripeManagedOrganization =
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
-  const originalPlanRef = useRef<string>()
+  const originalPlanRef = useRef<string>(undefined)
 
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
@@ -150,6 +151,12 @@ export const PlanUpdateSidePanel = () => {
     // this data from the organization query
     orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
 
+  const onPanelOpened = useStaticEffectEvent(
+    (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
+      track('studio_pricing_side_panel_opened', properties)
+    }
+  )
+
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
@@ -165,11 +172,7 @@ export const PlanUpdateSidePanel = () => {
       if (source) {
         properties.origin = source
       }
-      sendEvent({
-        action: 'studio_pricing_side_panel_opened',
-        properties,
-        groups: { organization: slug ?? 'Unknown' },
-      })
+      onPanelOpened(properties)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
@@ -307,13 +310,14 @@ export const PlanUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
-                    ) : !canUpdateSubscription ? (
+                    ) : !canUpdateSubscription && !isDowngradeOption ? (
                       <RequestUpgradeToBillingOwners block plan={plan.name as 'Pro' | 'Team'} />
                     ) : (
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
+                          (!canUpdateSubscription && isDowngradeOption) ||
                           subscription?.plan?.id === 'enterprise' ||
                           subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
@@ -324,13 +328,9 @@ export const PlanUpdateSidePanel = () => {
                         }
                         onClick={() => {
                           setSelectedTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')
-                          sendEvent({
-                            action: 'studio_pricing_plan_cta_clicked',
-                            properties: {
-                              selectedPlan: plan.name,
-                              currentPlan: subscription?.plan?.name,
-                            },
-                            groups: { organization: slug ?? 'Unknown' },
+                          track('studio_pricing_plan_cta_clicked', {
+                            selectedPlan: plan.name,
+                            currentPlan: subscription?.plan?.name,
                           })
                         }}
                         tooltip={{
@@ -338,14 +338,17 @@ export const PlanUpdateSidePanel = () => {
                             side: 'bottom',
                             className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
-                              subscription?.plan?.id === 'enterprise' ||
-                              subscription?.plan?.id === 'platform'
-                                ? 'Reach out to us via support to update your plan'
-                                : hasOrioleProjects
-                                  ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
-                                  : selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
-                                    ? 'You cannot change the plan for an organization managed by AWS Marketplace'
-                                    : undefined,
+                              !canUpdateSubscription && isDowngradeOption
+                                ? "You need additional permissions to change your organization's plan"
+                                : subscription?.plan?.id === 'enterprise' ||
+                                    subscription?.plan?.id === 'platform'
+                                  ? 'Reach out to us via support to update your plan'
+                                  : hasOrioleProjects
+                                    ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
+                                    : selectedOrganization?.managed_by ===
+                                        MANAGED_BY.AWS_MARKETPLACE
+                                      ? 'You cannot change the plan for an organization managed by AWS Marketplace'
+                                      : undefined,
                           },
                         }}
                       >

@@ -8,7 +8,7 @@ import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
-import { JwtGeneratorSimple } from '~/components/JwtGenerator'
+import { Mermaid } from '~/components/Mermaid'
 import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
@@ -67,9 +67,9 @@ const components = {
   IconPanel,
   IconX: X,
   Image: (props: ImageProps) => <Image className="rounded-md w-full" {...props} />,
-  JwtGeneratorSimple,
   Link,
   McpConfigPanel,
+  Mermaid,
   MetricsStackCards,
   NamedCodeBlock,
   NavData,

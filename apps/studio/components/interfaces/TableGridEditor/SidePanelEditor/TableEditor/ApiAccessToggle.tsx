@@ -3,7 +3,6 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
   type Dispatch,
@@ -15,6 +14,7 @@ import { Button, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
+import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
@@ -370,40 +370,33 @@ const SchemaExposureOptions = ({
 }): ReactNode => {
   const { selectedDatabaseId } = useDatabaseSelectorStateSnapshot()
 
-  const { data: endpoint } = useProjectApiUrl({ projectRef })
+  const { data: resolvedEndpoint } = useProjectApiUrl({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
   const { data: databases } = useReadReplicasQuery({ projectRef })
 
-  const apiEndpoint = useMemo(() => {
-    if (selectedDatabaseId === projectRef) {
-      return endpoint
-    }
-
-    const loadBalancerSelected = selectedDatabaseId === 'load-balancer'
-    if (loadBalancerSelected) {
-      return loadBalancers?.[0]?.endpoint
-    }
-
-    const selectedDatabase = databases?.find((db) => db.identifier === selectedDatabaseId)
-    return selectedDatabase?.restUrl
-  }, [selectedDatabaseId, projectRef, databases, endpoint, loadBalancers])
-
-  const apiBaseUrl = useMemo(() => {
-    if (!apiEndpoint) return undefined
-    return apiEndpoint.endsWith('/') ? apiEndpoint.slice(0, -1) : apiEndpoint
-  }, [apiEndpoint])
+  const selectedDatabase = databases?.find((db) => db.identifier === selectedDatabaseId)
+  const apiBaseUrl = getApiEndpoint({
+    selectedDatabaseId,
+    projectRef,
+    resolvedEndpoint,
+    loadBalancers,
+    selectedDatabase,
+  })
 
   const tablePath = !(schemaName && tableName)
     ? undefined
     : schemaName === 'public'
       ? tableName
       : `${schemaName}.${tableName}`
-  const apiUrl = apiBaseUrl && tablePath ? `${apiBaseUrl}/${tablePath}` : undefined
+  const apiUrl = apiBaseUrl && tablePath ? `${apiBaseUrl}${tablePath}` : undefined
 
   return (
     <>
       {isError && (
-        <Admonition type="warning" title="An error occurred while fetching Data API settings." />
+        <Admonition
+          type="warning"
+          description="An error occurred while fetching Data API settings."
+        />
       )}
 
       {isSchemaExposed && apiUrl && (

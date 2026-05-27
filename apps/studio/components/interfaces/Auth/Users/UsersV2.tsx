@@ -19,20 +19,20 @@ import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -69,13 +69,12 @@ import { useUserDeleteMutation } from '@/data/auth/user-delete-mutation'
 import { useUserIndexStatusesQuery } from '@/data/auth/user-search-indexes-query'
 import { useUsersCountQuery } from '@/data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
@@ -98,13 +97,12 @@ export const UsersV2 = () => {
     isPending: isPendingProject,
     isError: isProjectError,
   } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const gridRef = useRef<DataGridHandle>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const xScroll = useRef<number>(0)
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const {
     authenticationShowProviderFilter: showProviderFilter,
@@ -345,10 +343,6 @@ export const UsersV2 = () => {
     keywords: filterKeywords,
     filter_column: specificFilterColumn === 'freeform' ? undefined : specificFilterColumn,
   }
-  const telemetryGroups = {
-    project: projectRef ?? 'Unknown',
-    organization: selectedOrg?.slug ?? 'Unknown',
-  }
 
   const updateStorageFilter = (value: SpecificFilterColumn) => {
     setLocalStorageFilter(value)
@@ -457,13 +451,9 @@ export const UsersV2 = () => {
 
   const handleRefresh = () => {
     refetch()
-    sendEvent({
-      action: 'auth_users_search_submitted',
-      properties: {
-        trigger: 'refresh_button',
-        ...telemetryProps,
-      },
-      groups: telemetryGroups,
+    track('auth_users_search_submitted', {
+      trigger: 'refresh_button',
+      ...telemetryProps,
     })
   }
 
@@ -534,7 +524,7 @@ export const UsersV2 = () => {
         <FormHeader className="py-4 px-6 mb-0! border-b" title="Users" />
 
         {showImprovedSearchOptIn && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 relative">
+          <Alert className="rounded-none mb-0 border-0 relative">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setImprovedSearchDismissed(true)}
@@ -545,8 +535,8 @@ export const UsersV2 = () => {
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>
             <InfoIcon className="size-4" />
-            <AlertTitle_Shadcn_>Upgrade to an improved search experience</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="flex justify-between items-center">
+            <AlertTitle>Upgrade to an improved search experience</AlertTitle>
+            <AlertDescription className="flex justify-between items-center">
               <div>
                 Enable faster and more reliable searching, sorting, and filtering of your users.
               </div>
@@ -558,15 +548,15 @@ export const UsersV2 = () => {
               >
                 Upgrade search
               </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         {indexWorkerInProgress && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t">
+          <Alert className="rounded-none mb-0 border-0 border-t">
             <InfoIcon className="size-4" />
-            <AlertTitle_Shadcn_>Index creation is in progress</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="flex justify-between items-center">
+            <AlertTitle>Index creation is in progress</AlertTitle>
+            <AlertDescription className="flex justify-between items-center">
               <div>
                 The indexes are currently being created. This process may take some time depending
                 on the number of users in your project.
@@ -580,8 +570,8 @@ export const UsersV2 = () => {
                   View logs
                 </Link>
               </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
@@ -607,7 +597,6 @@ export const UsersV2 = () => {
                   setSearch={setSearch}
                   improvedSearchEnabled={improvedSearchEnabled}
                   telemetryProps={telemetryProps}
-                  telemetryGroups={telemetryGroups}
                   onSelectFilterColumn={(value) => {
                     if (value === 'freeform') {
                       if (isCountWithinThresholdForSortBy) {
@@ -623,47 +612,43 @@ export const UsersV2 = () => {
 
                 {showUserTypeFilter &&
                   (specificFilterColumn === 'freeform' || improvedSearchEnabled) && (
-                    <Select_Shadcn_
+                    <Select
                       value={filterUserType}
                       onValueChange={(val) => {
                         setFilterUserType(val as Filter)
-                        sendEvent({
-                          action: 'auth_users_search_submitted',
-                          properties: {
-                            trigger: 'user_type_filter',
-                            ...telemetryProps,
-                            user_type: val,
-                          },
-                          groups: telemetryGroups,
+                        track('auth_users_search_submitted', {
+                          trigger: 'user_type_filter',
+                          ...telemetryProps,
+                          user_type: val,
                         })
                       }}
                     >
-                      <SelectTrigger_Shadcn_
+                      <SelectTrigger
                         size="tiny"
                         className={cn(
                           'w-[140px] bg-transparent!',
                           filterUserType === 'all' && 'border-dashed'
                         )}
                       >
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectGroup_Shadcn_>
-                          <SelectItem_Shadcn_ value="all" className="text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="all" className="text-xs">
                             All users
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="verified" className="text-xs">
+                          </SelectItem>
+                          <SelectItem value="verified" className="text-xs">
                             Verified users
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                          </SelectItem>
+                          <SelectItem value="unverified" className="text-xs">
                             Unverified users
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                          </SelectItem>
+                          <SelectItem value="anonymous" className="text-xs">
                             Anonymous users
-                          </SelectItem_Shadcn_>
-                        </SelectGroup_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   )}
 
                 {showProviderFilter &&
@@ -680,14 +665,10 @@ export const UsersV2 = () => {
                       className="w-52"
                       onSaveFilters={(providers) => {
                         setSelectedProviders(providers)
-                        sendEvent({
-                          action: 'auth_users_search_submitted',
-                          properties: {
-                            trigger: 'provider_filter',
-                            ...telemetryProps,
-                            providers,
-                          },
-                          groups: telemetryGroups,
+                        track('auth_users_search_submitted', {
+                          trigger: 'provider_filter',
+                          ...telemetryProps,
+                          providers,
                         })
                       }}
                     />
@@ -751,15 +732,11 @@ export const UsersV2 = () => {
                   setSortByValue={(value) => {
                     const [sortColumn, sortOrder] = value.split(':')
                     updateSortByValue(value)
-                    sendEvent({
-                      action: 'auth_users_search_submitted',
-                      properties: {
-                        trigger: 'sort_change',
-                        ...telemetryProps,
-                        sort_column: sortColumn,
-                        sort_order: sortOrder,
-                      },
-                      groups: telemetryGroups,
+                    track('auth_users_search_submitted', {
+                      trigger: 'sort_change',
+                      ...telemetryProps,
+                      sort_column: sortColumn,
+                      sort_order: sortOrder,
                     })
                   }}
                   showSortByEmail={showSortByEmail}
@@ -777,6 +754,7 @@ export const UsersV2 = () => {
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={handleRefresh}
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
+                  aria-label="Refresh"
                 />
                 <AddUserDropdown />
               </div>

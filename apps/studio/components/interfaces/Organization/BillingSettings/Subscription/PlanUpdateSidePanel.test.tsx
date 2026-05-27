@@ -36,8 +36,8 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: mockSelectedOrganization() }),
 }))
 
-vi.mock('@/data/telemetry/send-event-mutation', () => ({
-  useSendEventMutation: () => ({ mutate: vi.fn() }),
+vi.mock('@/lib/telemetry/track', () => ({
+  useTrack: () => vi.fn(),
 }))
 
 vi.mock('@/hooks/misc/useCheckPermissions', () => ({
