@@ -3,7 +3,9 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
+import { PARTNER_INTEGRATION_OVERRIDES } from '~/data/partner-integration-listings'
 import { searchPartners } from '~/lib/marketplaceDb'
+import { ABSORBED_SLUGS } from '~/lib/partnerIntegrationListings'
 import type { Partner } from '~/types/partners'
 import { ArrowRight, ArrowUpRight, LayoutGrid, List, Loader, Search } from 'lucide-react'
 import Image from 'next/image'
@@ -25,9 +27,15 @@ export default function IntegrationsContent({
   metaTitle,
   metaDescription,
 }: Props) {
-  const [partners, setPartners] = useState(initialPartners)
+  const [partners, setPartners] = useState(() =>
+    initialPartners.filter((p) => !ABSORBED_SLUGS.has(p.slug))
+  )
   const allCategories = Array.from(
-    new Set(initialPartners?.flatMap((p) => p.categories.map((c) => c.name)))
+    new Set(
+      initialPartners
+        .filter((p) => !ABSORBED_SLUGS.has(p.slug))
+        .flatMap((p) => p.categories.map((c) => c.name))
+    )
   ).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
 
   const [search, setSearch] = useState('')
@@ -49,7 +57,8 @@ export default function IntegrationsContent({
     const currentSearchId = ++searchIdRef.current
     searchPartners(debouncedSearchTerm)
       .then((results) => {
-        if (currentSearchId === searchIdRef.current) setPartners(results ?? [])
+        if (currentSearchId === searchIdRef.current)
+          setPartners((results ?? []).filter((p) => !ABSORBED_SLUGS.has(p.slug)))
       })
       .catch(() => {
         if (currentSearchId === searchIdRef.current) setPartners([])
@@ -69,6 +78,8 @@ export default function IntegrationsContent({
   // When isUseMarketplaceDb is active, p.isMarketplace handles it automatically.
   const MARKETPLACE_SLUGS = new Set(['grafana', 'stripe', 'aikido', 'doppler', 'resend'])
   const isOneClick = (p: Partner) => MARKETPLACE_SLUGS.has(p.slug)
+  const hasDashboardIntegrations = (p: Partner) =>
+    (PARTNER_INTEGRATION_OVERRIDES[p.slug]?.length ?? 0) > 0
 
   const HAS_ACTIVE_FILTERS =
     search.trim() !== '' || selectedCategories.length > 0 || partnerOnly || oneClickOnly
@@ -233,6 +244,11 @@ export default function IntegrationsContent({
                             {p.categories.map((c) => (
                               <Badge key={c.name}>{c.name}</Badge>
                             ))}
+                            {hasDashboardIntegrations(p) && (
+                              <span className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-brand/10 text-brand border border-brand/20">
+                                Marketplace
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -318,6 +334,11 @@ export default function IntegrationsContent({
                                 {c.name}
                               </span>
                             ))}
+                            {hasDashboardIntegrations(p) && (
+                              <span className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-brand/10 text-brand border border-brand/20">
+                                Dashboard
+                              </span>
+                            )}
                           </div>
                         </div>
                       </Panel>
@@ -363,6 +384,11 @@ export default function IntegrationsContent({
                                 {c.name}
                               </span>
                             ))}
+                            {hasDashboardIntegrations(p) && (
+                              <span className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-brand/10 text-brand border border-brand/20">
+                                Dashboard
+                              </span>
+                            )}
                           </div>
                         </div>
                         <p className="text-foreground-lighter text-sm truncate">{p.description}</p>

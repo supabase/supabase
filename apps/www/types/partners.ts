@@ -25,6 +25,24 @@ export type Partner = {
   youtubeId: string | null
 }
 
+export type IntegrationListingType = 'guide' | 'wrapper' | 'template'
+
+export type IntegrationListing = {
+  slug: string
+  name: string
+  type: IntegrationListingType
+  description?: string
+  // guide-specific
+  content?: string | null
+  images?: string[]
+  youtubeId?: string | null
+  installUrl?: string | null
+  isMarketplace?: boolean
+  docsUrl?: string | null
+  // wrapper / template: links into the Studio dashboard
+  dashboardUrl?: string
+}
+
 export function toPartner(dbPartner: DbPartner): Partner {
   const {
     featured,

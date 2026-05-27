@@ -2312,7 +2312,23 @@ module.exports = [
   {
     permanent: true,
     source: '/partners/integrations/supabase_wrapper_stripe',
-    destination: '/partners/catalog/stripe-wrapper',
+    destination: '/partners/catalog/stripe?tab=stripe-wrapper',
+  },
+  // Legacy direct slugs for FDW pages — now tabs on the partner page
+  {
+    permanent: true,
+    source: '/partners/catalog/stripe-wrapper',
+    destination: '/partners/catalog/stripe?tab=stripe-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/auth0-wrapper',
+    destination: '/partners/catalog/auth0?tab=auth0-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/clerk-wrapper',
+    destination: '/partners/catalog/clerk?tab=clerk-wrapper',
   },
   {
     permanent: true,

@@ -154,12 +154,10 @@ export async function searchPartners(search: string): Promise<Partner[] | null> 
 }
 
 async function getMarketplaceListing(slug: string): Promise<Partner | null> {
-  const { data } = await marketplaceClient
-    .from('listings')
-    .select('*')
-    .eq('slug', slug)
-    .is('publish_marketplace', true)
-    .single()
+  // Do NOT filter by publish_marketplace here — the detail page should be reachable
+  // for any listing by direct URL, even if that listing isn't shown in the catalog list.
+  // publish_marketplace only gates the LIST query (listPartners / listPartnerSlugs).
+  const { data } = await marketplaceClient.from('listings').select('*').eq('slug', slug).single()
 
   return data ? toPartner(data) : null
 }
