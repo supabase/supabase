@@ -1,6 +1,17 @@
-import { ArrowUpRight, Database, FileText, Globe, Key, Plug, Puzzle, Webhook } from 'lucide-react'
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Database,
+  FileText,
+  Globe,
+  Key,
+  Plug,
+  Puzzle,
+  Webhook,
+} from 'lucide-react'
 
-const PARTNER_FORM_URL = '#become-a-partner'
+export const PARTNER_FORM_ANCHOR = '#become-a-partner'
+export const PARTNER_FORM_URL = 'https://share.hsforms.com/1ZSo-7Y0GRfuTdvWusOP13Abvo3m'
 
 const partnersPageData = {
   metaTitle: 'Partner with Supabase',
@@ -17,11 +28,12 @@ const partnersPageData = {
     ),
     cta: {
       label: 'Become a partner',
-      link: PARTNER_FORM_URL,
+      link: PARTNER_FORM_ANCHOR,
     },
     secondaryCta: {
-      label: 'Browse partners',
+      label: 'Browse the Partner Catalog',
       link: '/partners/integrations',
+      icon: <ArrowRight strokeWidth={1.5} />,
     },
   },
   reasonsSection: {
@@ -56,19 +68,18 @@ const partnersPageData = {
         title: 'Partner Catalog',
         description: (
           <>
-            A listing on the{' '}
-            <a
-              href="/partners/integrations"
-              className="text-foreground underline underline-offset-2"
-            >
-              Supabase Partner Catalog
-            </a>
-            , open to anyone with a real integration or a real relationship with Supabase.
+            A listing on the <span className="text-foreground">Supabase Partner Catalog</span>, open
+            to anyone with a real integration or a real relationship with Supabase.
           </>
         ),
         bestFor: 'SaaS, agencies, templates, hosting.',
         whatYouGet: 'Listing, logo, category, outbound link.',
         timeToLaunch: 'Days',
+        cta: {
+          label: 'Browse the Partner Catalog',
+          link: '/partners/integrations',
+          icon: <ArrowRight size={18} strokeWidth={1.5} />,
+        },
       },
       {
         title: 'Supabase Marketplace',
@@ -79,6 +90,11 @@ const partnersPageData = {
         whatYouGet:
           'Everything in the Catalog, plus in-dashboard install, plus joint launch treatment.',
         timeToLaunch: 'Weeks',
+        cta: {
+          label: 'Browse the Supabase Marketplace',
+          link: 'https://supabase.com/dashboard/project/_/integrations',
+          icon: <ArrowRight size={18} strokeWidth={1.5} />,
+        },
       },
       {
         title: 'Strategic partnerships',

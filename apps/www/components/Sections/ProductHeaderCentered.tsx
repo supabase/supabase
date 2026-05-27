@@ -24,10 +24,12 @@ interface Types {
   cta?: {
     label?: string
     link: string
+    icon?: React.ReactNode
   }
   secondaryCta?: {
     label?: string
     link: string
+    icon?: React.ReactNode
   }
   video?: string
 }
@@ -83,7 +85,7 @@ const ProductHeaderCentered = (props: Types) => (
         </div>
         <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
           {props.cta && (
-            <Button size="medium" className="text-white" asChild>
+            <Button size="medium" className="text-white" iconRight={props.cta.icon} asChild>
               <Link href={props.cta.link} as={props.cta.link}>
                 {props.cta.label ?? 'Start for free'}
               </Link>
@@ -97,7 +99,7 @@ const ProductHeaderCentered = (props: Types) => (
             </Button>
           )}
           {props.secondaryCta && (
-            <Button type="default" size="medium" asChild>
+            <Button type="default" size="medium" iconRight={props.secondaryCta.icon} asChild>
               <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
                 {props.secondaryCta.label}
               </Link>
