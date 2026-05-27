@@ -6,9 +6,9 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "predev": "node scripts/clean-turbopack-cache.mjs",
-    "dev": "node --env-file-if-exists=.env.local scripts/dispatch.js dev",
-    "build": "node --env-file-if-exists=.env.local scripts/dispatch.js build",
-    "start": "node --env-file-if-exists=.env.local scripts/dispatch.js start",
+    "dev": "node scripts/dispatch.js dev",
+    "build": "node scripts/dispatch.js build",
+    "start": "node scripts/dispatch.js start",
     "preview": "vite preview --mode ${MODE:-production} --port 8082",
     "dev:next": "next dev -p ${STUDIO_PORT:-8082}",
     "build:next": "next build && if [ \"$SKIP_ASSET_UPLOAD\" != \"1\" ]; then ./../../scripts/upload-static-assets.sh; fi",
