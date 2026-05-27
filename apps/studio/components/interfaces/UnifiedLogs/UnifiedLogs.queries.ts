@@ -13,7 +13,7 @@ import {
 const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
 
 // Special filter parameters that need custom handling
-const SPECIAL_FILTER_PARAMS = ['date'] as const
+const SPECIAL_FILTER_PARAMS = ['date', 'hide_connection_logs'] as const
 
 // Combined list of all parameters to exclude from standard filtering
 const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
@@ -269,10 +269,27 @@ const buildBaseWhere = (
 }
 
 /**
+ * Returns a WHERE predicate that excludes Postgres connection lifecycle messages.
+ * Applied only to the row query and chart query so sidebar facets remain unaffected
+ * (the OTEL endpoint's UNION ALL count query fails silently when this predicate is
+ * included there, returning empty facet data).
+ */
+const connectionLogsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
+  if (!search.hide_connection_logs) return null
+  return safeSql`(source != 'postgres_logs' OR (
+    event_message NOT LIKE 'connection received%' AND
+    event_message NOT LIKE 'connection authenticated%' AND
+    event_message NOT LIKE 'connection authorized%'
+  ))`
+}
+
+/**
  * Unified logs row query — flat SELECT, no subquery wrapper.
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const predicates = buildBaseWhere(search)
+  const connFilter = connectionLogsFilter(search)
+  if (connFilter) predicates.push(connFilter)
   return safeSql`
 SELECT ${rowProjection()}
 FROM logs
@@ -390,6 +407,8 @@ export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   const truncationLevel = calculateChartBucketing(search)
   const truncFn = truncationFunction(truncationLevel)
   const predicates = buildBaseWhere(search)
+  const connFilter = connectionLogsFilter(search)
+  if (connFilter) predicates.push(connFilter)
 
   return safeSql`
 SELECT

@@ -17,7 +17,6 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -54,7 +53,7 @@ export const ProjectCreationFooter = ({
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
   const additionalMonthlySpend = isFreePlan
     ? 0
-    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+    : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =

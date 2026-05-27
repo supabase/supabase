@@ -217,9 +217,11 @@ export const GitHubIntegrationConnectionForm = ({
         project_ref: selectedProject.ref,
         repository_id: Number(selectedRepo.id),
         workdir: data.supabaseDirectory,
-        supabase_changes_only: data.supabaseChangesOnly,
-        branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr ?? false,
+        ...(hasAccessToBranching && {
+          supabase_changes_only: data.supabaseChangesOnly,
+          branch_limit: Number(data.branchLimit),
+          new_branch_per_pr: data.new_branch_per_pr ?? false,
+        }),
       },
     })
 
@@ -266,9 +268,11 @@ export const GitHubIntegrationConnectionForm = ({
       organizationId: selectedOrganization.id,
       connection: {
         workdir: data.supabaseDirectory,
-        supabase_changes_only: data.supabaseChangesOnly,
-        branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr ?? false,
+        ...(hasAccessToBranching && {
+          supabase_changes_only: data.supabaseChangesOnly,
+          branch_limit: Number(data.branchLimit),
+          new_branch_per_pr: data.new_branch_per_pr ?? false,
+        }),
       },
     })
 
