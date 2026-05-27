@@ -1,15 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
-import {
-  analyticsLiteral,
-  bqDottedIdent,
-  bqIdent,
-  clickhouseDottedIdent,
-  clickhouseIdent,
-  keyword,
-  safeSql,
-} from './safe-analytics-sql'
+import { analyticsLiteral, keyword, quotedIdent, safeSql } from './safe-analytics-sql'
 
 describe('keyword', () => {
   it('returns the matching SafeLogSqlFragment from the allow-list', () => {
@@ -35,63 +27,29 @@ describe('keyword', () => {
   })
 })
 
-describe('bqDottedIdent', () => {
-  it('wraps a single-segment identifier in backticks', () => {
-    expect(bqDottedIdent('status')).toBe('`status`')
+describe('quotedIdent', () => {
+  it('backtick-quotes a single-segment identifier', () => {
+    expect(quotedIdent('status')).toBe('`status`')
   })
 
-  it('wraps the entire two-part dotted path in a single pair of backticks', () => {
-    expect(bqDottedIdent('request.method')).toBe('`request.method`')
+  it('backtick-quotes each segment of a two-part dotted path individually', () => {
+    expect(quotedIdent('request.method')).toBe('`request`.`method`')
   })
 
-  it('wraps the entire three-part dotted path in a single pair of backticks', () => {
-    expect(bqDottedIdent('a.b.c')).toBe('`a.b.c`')
+  it('backtick-quotes each segment of a three-part dotted path individually', () => {
+    expect(quotedIdent('a.b.c')).toBe('`a`.`b`.`c`')
   })
 
   it('throws for an empty string', () => {
-    expect(() => bqDottedIdent('')).toThrow('invalid BigQuery dotted identifier')
+    expect(() => quotedIdent('')).toThrow('invalid identifier')
   })
 
   it('throws when a segment contains disallowed characters', () => {
-    expect(() => bqDottedIdent('request.method; DROP TABLE')).toThrow(
-      'invalid BigQuery dotted identifier'
-    )
+    expect(() => quotedIdent('request.method; DROP TABLE')).toThrow('invalid identifier')
   })
 
   it('throws for an empty segment (double dot)', () => {
-    expect(() => bqDottedIdent('a..b')).toThrow('invalid BigQuery dotted identifier')
-  })
-
-  it('produces the same result as bqIdent for a single segment', () => {
-    expect(bqDottedIdent('col')).toBe(bqIdent('col'))
-  })
-})
-
-describe('clickhouseDottedIdent', () => {
-  it('quotes a single-segment identifier with double-quotes', () => {
-    expect(clickhouseDottedIdent('status')).toBe('"status"')
-  })
-
-  it('quotes each segment of a two-part dotted identifier', () => {
-    expect(clickhouseDottedIdent('request.method')).toBe('"request"."method"')
-  })
-
-  it('quotes each segment of a three-part dotted identifier', () => {
-    expect(clickhouseDottedIdent('a.b.c')).toBe('"a"."b"."c"')
-  })
-
-  it('throws for an empty string', () => {
-    expect(() => clickhouseDottedIdent('')).toThrow('invalid ClickHouse dotted identifier')
-  })
-
-  it('throws when a segment contains disallowed characters', () => {
-    expect(() => clickhouseDottedIdent('col OR 1=1')).toThrow(
-      'invalid ClickHouse dotted identifier'
-    )
-  })
-
-  it('produces the same result as clickhouseIdent for a single segment', () => {
-    expect(clickhouseDottedIdent('col')).toBe(clickhouseIdent('col'))
+    expect(() => quotedIdent('a..b')).toThrow('invalid identifier')
   })
 })
 
@@ -150,16 +108,10 @@ describe('safeSql template tag — existing helpers still compose', () => {
     expect(query).toBe("SELECT 'hello'")
   })
 
-  it('bqDottedIdent output is composable via safeSql', () => {
-    const col = bqDottedIdent('request.method')
+  it('quotedIdent output is composable via safeSql', () => {
+    const col = quotedIdent('request.method')
     const query = safeSql`SELECT ${col} FROM logs`
-    expect(query).toBe('SELECT `request.method` FROM logs')
-  })
-
-  it('clickhouseDottedIdent output is composable via safeSql', () => {
-    const col = clickhouseDottedIdent('request.method')
-    const query = safeSql`SELECT ${col} FROM logs`
-    expect(query).toBe('SELECT "request"."method" FROM logs')
+    expect(query).toBe('SELECT `request`.`method` FROM logs')
   })
 
   it('keyword output is composable via safeSql', () => {

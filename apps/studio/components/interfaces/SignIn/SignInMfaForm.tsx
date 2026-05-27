@@ -103,10 +103,18 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       <AlertError
         error={error}
         subject="Error while signing in"
+        hideContactSupport
         additionalActions={
-          <Button asChild type="default">
-            <Link href="/sign-in">Back to sign in</Link>
-          </Button>
+          <>
+            <Button asChild type="default">
+              <Link href="/sign-in">Back to sign in</Link>
+            </Button>
+            <Button asChild type="default">
+              <Link href="https://supabase.com/support" target="_blank" rel="noreferrer">
+                Contact support
+              </Link>
+            </Button>
+          </>
         }
       />
     )
