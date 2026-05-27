@@ -25,14 +25,14 @@ import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
 import CopyButton from '@/components/ui/CopyButton'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export { SupportForm, SupportFormStatusButton } from './SupportSidebarForm'
 
 function useSupportFormTelemetry() {
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return useCallback(
     ({
@@ -44,17 +44,12 @@ function useSupportFormTelemetry() {
       orgSlug: string | undefined
       category: ExtendedSupportCategories
     }) =>
-      sendEvent({
-        action: 'support_ticket_submitted',
-        properties: {
-          ticketCategory: category,
-        },
-        groups: {
-          project: projectRef,
-          organization: orgSlug,
-        },
-      }),
-    [sendEvent]
+      track(
+        'support_ticket_submitted',
+        { ticketCategory: category },
+        { project: projectRef, organization: orgSlug }
+      ),
+    [track]
   )
 }
 
