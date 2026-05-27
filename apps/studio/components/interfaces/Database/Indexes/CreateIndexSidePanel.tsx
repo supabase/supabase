@@ -120,7 +120,7 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
     connectionString: project?.connectionString,
   })
 
-  const { mutate: createIndex, isPending: _isExecuting } = useDatabaseIndexCreateMutation({
+  const { mutate: createIndex, isPending: isExecuting } = useDatabaseIndexCreateMutation({
     onSuccess: () => {
       onClose()
       toast.success(`Successfully created index`)
@@ -546,6 +546,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
         <SheetFooter>
           <Button
             type="default"
+            disabled={isExecuting}
             onClick={() => {
               form.reset()
               onClose()
@@ -553,7 +554,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
           >
             Cancel
           </Button>
-          <Button type="primary" form={formId} htmlType="submit">
+          <Button type="primary" form={formId} htmlType="submit" disabled={isExecuting}>
             Create index
           </Button>
         </SheetFooter>
