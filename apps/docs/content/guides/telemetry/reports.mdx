@@ -84,6 +84,7 @@ The following charts are available for Free and Pro plans:
 | Chart                        | Available Plans | Description                                  | Key Insights                                                   |
 | ---------------------------- | --------------- | -------------------------------------------- | -------------------------------------------------------------- |
 | Memory usage                 | Free, Pro       | RAM usage percentage by the database         | Memory pressure and resource utilization                       |
+| Swap usage                   | Free, Pro       | Swap space in use by the operating system    | Sustained swap usage indicates memory pressure                 |
 | CPU usage                    | Free, Pro       | Average CPU usage percentage                 | CPU-intensive query identification                             |
 | Disk IOPS                    | Free, Pro       | Read/write operations per second with limits | IO bottleneck detection and workload analysis                  |
 | Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                                     |
@@ -136,6 +137,29 @@ Actions you can take:
 | [Optimize queries](/docs/content/guides/database/query-optimization)        | Reduce memory consumption of expensive queries |
 | [Tune Postgres configuration](https://pgtune.leopard.in.ua)                 | Improve memory management settings             |
 | Implement application caching                                               | Add query result caching to reduce memory load |
+
+### Swap usage
+
+Postgres instances on Supabase have a fixed 1 GB of swap allocated. The chart shows the amount of swap space currently in use by the operating system.
+
+| Component | Description                                                                                     |
+| --------- | ----------------------------------------------------------------------------------------------- |
+| **Swap**  | Swap space in use by the operating system. A fixed 1 GB is allocated for all Postgres instances |
+
+How it helps debug issues:
+
+| Issue                     | Description                                                                      |
+| ------------------------- | -------------------------------------------------------------------------------- |
+| Memory pressure detection | Sustained swap usage signals that the database is under memory pressure          |
+| Performance degradation   | Swap is much slower than RAM; high swap usage can significantly slow query times |
+
+Actions you can take:
+
+| Action                                                                      | Description                                                    |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size) | Increase available RAM to reduce reliance on swap              |
+| [Optimize queries](/docs/guides/database/query-optimization)                | Reduce memory consumption of expensive queries                 |
+| [Tune Postgres configuration](https://pgtune.leopard.in.ua)                 | Adjust memory settings such as `work_mem` and `shared_buffers` |
 
 ### CPU usage
 

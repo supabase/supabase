@@ -95,7 +95,7 @@ export const getReportAttributesV2: (
     {
       id: 'swap-usage',
       label: 'Swap usage',
-      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#swap-usage`,
       hide: false,
       showTooltip: true,
       showLegend: false,
