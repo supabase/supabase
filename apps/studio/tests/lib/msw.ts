@@ -46,8 +46,9 @@ export const addAPIMock = <P extends Endpoints | `${Endpoints}?${string}`, M ext
   path,
   response,
 }: SuccessResponse<TrimQueryParams<P>, M> extends never
-  ? // Don't require a mocked response when the API doesn't return one
-    { method: M; path: P; response?: never }
+  ? // Endpoints with no documented JSON response body — resolver is optional, used
+    // when the test needs to assert on the request or override the status.
+    { method: M; path: P; response?: HttpResponseResolver }
   : {
       method: M
       path: P
