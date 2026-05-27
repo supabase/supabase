@@ -1,16 +1,16 @@
 import { CornerRightUp } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { Button, Tabs } from 'ui'
-
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button, cn } from 'ui'
 
 // Import Swiper styles
 import 'swiper/css'
 
 import { useInView } from 'framer-motion'
 import Image from 'next/image'
+
 import TextLink from '../TextLink'
 import ImageCarouselStyles from './ImageCarousel.module.css'
 
@@ -31,7 +31,7 @@ interface ImageCarouselProps {
 }
 
 function ImageCarousel(props: ImageCarouselProps) {
-  const sectionRef = useRef<any>(null)
+  const sectionRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(sectionRef, { margin: '75%', once: true })
   // base path for images
   const { basePath } = useRouter()
@@ -73,27 +73,21 @@ function ImageCarousel(props: ImageCarouselProps) {
     <div className="grid grid-cols-12" ref={sectionRef}>
       <div className="col-span-12 w-full lg:col-span-6">
         <div className="sbui-tabs--alt col-span-12 lg:col-span-7">
-          <div className={props.altTabView ? 'hidden' : 'block'}>
-            <Tabs
-              scrollable
-              type={props.altTabView ? 'underlined' : 'pills'}
-              // @ts-ignore
-              activeId={imageSwiperActiveIndex.toString()}
-              // @ts-ignore
-              onChange={(id: string) => handleImageSwiperNav(Number(id))}
-            >
-              {props.content.map((content: Content, i) => {
+          <div>
+            <div className="flex gap-2 mb-2 flex-nowrap overflow-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {props.content.map((content, i) => {
                 return (
-                  <Tabs.Panel
+                  <Button
+                    type="default"
+                    className={cn('shrink-0', { 'opacity-50': i !== imageSwiperActiveIndex })}
+                    onClick={() => handleImageSwiperNav(i)}
                     key={i}
-                    label={content.label ? content.label : content.title}
-                    id={i.toString()}
                   >
-                    <span></span>
-                  </Tabs.Panel>
+                    {content.label ? content.label : content.title}
+                  </Button>
                 )
               })}
-            </Tabs>
+            </div>
           </div>
           <div
             className={`overflow-hidden rounded-md border border-control bg-border-stronger ${ImageCarouselStyles['gradient-bg']}`}
@@ -141,25 +135,6 @@ function ImageCarousel(props: ImageCarouselProps) {
         </div>
       </div>
       <div className="col-span-12 mt-8 lg:col-span-5 lg:col-start-8 lg:mt-0 xl:col-span-5 xl:col-start-8">
-        <div className={`sbui-tabs--underline-alt ${props.altTabView ? 'block' : 'hidden'} mb-3`}>
-          <Tabs
-            scrollable
-            type="underlined"
-            size="small"
-            activeId={imageSwiperActiveIndex.toString()}
-            onChange={(id: string) => handleImageSwiperNav(Number(id))}
-          >
-            {props.content.map((content: Content, i: number) => {
-              return (
-                <Tabs.Panel
-                  label={content.label ? content.label : content.title}
-                  id={i.toString()}
-                  key={i}
-                />
-              )
-            })}
-          </Tabs>
-        </div>
         <Swiper
           // @ts-ignore
           onSwiper={setSwiperDetails}

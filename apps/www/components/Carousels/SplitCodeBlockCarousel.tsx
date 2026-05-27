@@ -1,14 +1,14 @@
 import { useState } from 'react'
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button, cn, Space } from 'ui'
 
-import { Tabs, Button, Space } from 'ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
-
 // Import Swiper styles
 import 'swiper/css'
-import { Badge } from 'ui'
+
 import Link from 'next/link'
+import { Badge } from 'ui'
 
 interface Content {
   lang: 'js' | 'py' | 'sql'
@@ -42,41 +42,22 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
     swiperDetails.slideTo(e)
   }
 
-  const details = (
-    <div>
-      <p>
-        <span className="mb-8 block text-white">Allow fetch something</span>
-      </p>
-      <p>
-        <p>
-          This would only allow the authenticated user access to a folder that is named after their
-          own account UID. This is useful for things like profile images.
-        </p>
-      </p>
-      <p>
-        <Button type="outline">View documentation</Button>
-      </p>
-    </div>
-  )
-
   return (
     <div className="sbui-tabs--alt col-span-12 space-y-2 lg:col-span-6 lg:col-start-7">
-      <Tabs
-        scrollable
-        // @ts-ignore
-        activeId={apiSwiperActiveIndex.toString()}
-        // @ts-ignore
-        onChange={(id: string) => handleApiSwiperNavChange(Number(id))}
-        type="pills"
-      >
+      <div className="flex gap-2 mb-2 flex-nowrap overflow-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {props.content.map((extension, i) => {
           return (
-            <Tabs.Panel label={extension.title} id={i.toString()} key={i}>
-              <span></span>
-            </Tabs.Panel>
+            <Button
+              type="default"
+              className={cn('shrink-0', { 'opacity-50': i !== apiSwiperActiveIndex })}
+              onClick={() => handleApiSwiperNavChange(i)}
+              key={i}
+            >
+              {extension.title}
+            </Button>
           )
         })}
-      </Tabs>
+      </div>
 
       <Swiper
         // @ts-ignore
