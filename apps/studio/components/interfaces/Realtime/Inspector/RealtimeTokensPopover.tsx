@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
@@ -8,11 +7,11 @@ import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonat
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { IS_PLATFORM } from '@/lib/constants'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface RealtimeTokensPopoverProps {
@@ -21,8 +20,6 @@ interface RealtimeTokensPopoverProps {
 }
 
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
   const snap = useRoleImpersonationStateSnapshot()
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
@@ -42,17 +39,17 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
 
   const jwtSecret = postgrestConfig?.jwt_secret
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
+  const onRoleUpdated = useStaticEffectEvent(() => {
+    track('realtime_inspector_database_role_updated')
+  })
 
   // only send a telemetry event if the user changes the role. Don't send an event during initial render.
   const isMounted = useRef(false)
 
   useEffect(() => {
     if (isMounted.current) {
-      sendEvent({
-        action: 'realtime_inspector_database_role_updated',
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      onRoleUpdated()
     }
     isMounted.current = true
     // eslint-disable-next-line react-hooks/exhaustive-deps
