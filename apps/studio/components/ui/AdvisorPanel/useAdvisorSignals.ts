@@ -42,6 +42,30 @@ const createBannedIPSignalItems = ({
   }))
 }
 
+/**
+ * Lightweight hook that only provides `dismissSignal`.
+ * Use this inside detail views (e.g. `AdvisorSignalDetail`) instead of the
+ * full `useAdvisorSignals` to avoid creating a second `useBannedIPsQuery`
+ * instance and a second pruning effect, which would cause an infinite update
+ * loop when both hooks share the same localStorage query key.
+ */
+export const useAdvisorSignalDismissal = (projectRef?: string) => {
+  const storageKey = projectRef
+    ? createDismissalStorageKey(projectRef)
+    : 'advisor-signal-dismissals:unknown-project'
+
+  const [, setDismissedKeys] = useLocalStorageQuery<string[]>(storageKey, [])
+
+  return useCallback(
+    (dismissalKey: string) => {
+      setDismissedKeys((current) =>
+        current.includes(dismissalKey) ? current : [...current, dismissalKey]
+      )
+    },
+    [setDismissedKeys]
+  )
+}
+
 interface UseAdvisorSignalsOptions {
   projectRef?: string
   enabled?: boolean
@@ -72,25 +96,19 @@ export const useAdvisorSignals = ({ projectRef, enabled = true }: UseAdvisorSign
     [projectRef, data]
   )
 
-  // Prune stale dismissals when the active signal list changes (e.g. an IP was unbanned).
-  // Only call the setter when pruning would actually change something — otherwise we
-  // churn subscribers unnecessarily, which can cause feedback loops when this hook is
-  // mounted in more than one place (AdvisorSection + AdvisorPanel).
+  // Prune stale dismissals when the active signal list changes (e.g. an IP was unbanned)
   useEffect(() => {
     if (!data) return
 
-    const hasStaleBannedIPDismissal = dismissedKeys.some(
-      (key) =>
-        key.startsWith('signal:banned-ip:') &&
-        !signalItems.some((item) => item.dismissalKey === key)
-    )
-    if (!hasStaleBannedIPDismissal) return
-
     const activeKeys = new Set(signalItems.map((item) => item.dismissalKey))
-    setDismissedKeys((current) =>
-      current.filter((key) => (key.startsWith('signal:banned-ip:') ? activeKeys.has(key) : true))
-    )
-  }, [data, signalItems, dismissedKeys, setDismissedKeys])
+
+    setDismissedKeys((current) => {
+      const next = current.filter((key) =>
+        key.startsWith('signal:banned-ip:') ? activeKeys.has(key) : true
+      )
+      return next.length === current.length ? current : next
+    })
+  }, [data, signalItems, setDismissedKeys])
 
   const formattedData = useMemo(
     () => signalItems.filter((item) => !dismissedKeySet.has(item.dismissalKey)),

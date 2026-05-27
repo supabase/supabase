@@ -7,6 +7,7 @@ export interface StudioPageTitleParts {
   brand?: string
 }
 
+// Browser titles use Title Case for page names, joined by this separator.
 export const STUDIO_PAGE_TITLE_SEPARATOR = ' | '
 const MAX_SEGMENT_LENGTH = 60
 

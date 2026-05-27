@@ -12,6 +12,8 @@ interface OrganizationInviteError {
   error?: ResponseError | null
   isError: boolean
   isInvalidInvite?: boolean
+  profileEmail?: string
+  onSignOut?: () => Promise<void> | void
 }
 
 export const OrganizationInviteError = ({
@@ -19,12 +21,20 @@ export const OrganizationInviteError = ({
   error,
   isError,
   isInvalidInvite,
+  profileEmail,
+  onSignOut,
 }: OrganizationInviteError) => {
   const router = useRouter()
   const signOut = useSignOut()
   const { profile } = useProfile()
+  const displayedProfileEmail = profileEmail ?? profile?.primary_email
 
   const handleSignOut = async () => {
+    if (onSignOut) {
+      await onSignOut()
+      return
+    }
+
     await signOut()
     router.reload()
   }
@@ -53,10 +63,10 @@ export const OrganizationInviteError = ({
         <Admonition
           type="warning"
           description={
-            profile?.primary_email ? (
+            displayedProfileEmail ? (
               <>
                 You are signed in as{' '}
-                <span className="font-medium text-foreground">{profile.primary_email}</span>. Sign
+                <span className="font-medium text-foreground">{displayedProfileEmail}</span>. Sign
                 in with the email address that received this invite.
               </>
             ) : (

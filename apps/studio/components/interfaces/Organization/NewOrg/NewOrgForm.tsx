@@ -57,6 +57,7 @@ import { useConfirmPendingSubscriptionCreateMutation } from '@/data/subscription
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { validateReturnTo } from '@/lib/gotrue'
 import { useProfile } from '@/lib/profile'
 
 interface NewOrgFormProps {
@@ -127,6 +128,7 @@ export const NewOrgForm = ({
 
   const [searchParams] = useQueryStates({
     returnTo: parseAsString.withDefault(''),
+    returnToOrgParam: parseAsString.withDefault(''),
     auth_id: parseAsString.withDefault(''),
     token: parseAsString.withDefault(''),
   })
@@ -273,23 +275,42 @@ export const NewOrgForm = ({
     }
   }
 
+  const getReturnToUrl = (org: { slug: string }) => {
+    if (!searchParams.returnTo) return undefined
+
+    const url = new URL(validateReturnTo(searchParams.returnTo), window.location.origin)
+    if (searchParams.returnToOrgParam) {
+      url.searchParams.set(searchParams.returnToOrgParam, org.slug)
+    }
+    if (searchParams.auth_id) {
+      url.searchParams.set('auth_id', searchParams.auth_id)
+    }
+    if (searchParams.token) {
+      url.searchParams.set('token', searchParams.token)
+    }
+
+    return `${url.pathname}${url.search}`
+  }
+
   const onOrganizationCreated = (org: { slug: string }) => {
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
       : 'My Project'
 
-    if (searchParams.returnTo) {
-      const url = new URL(searchParams.returnTo, window.location.origin)
-      if (searchParams.auth_id) {
-        url.searchParams.set('auth_id', searchParams.auth_id)
-      }
-      if (searchParams.token) {
-        url.searchParams.set('token', searchParams.token)
-      }
+    const returnToUrl = getReturnToUrl(org)
 
-      router.push(url.toString(), undefined, { shallow: false })
+    if (returnToUrl) {
+      router.push(returnToUrl, undefined, { shallow: false })
     } else {
       router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
+    }
+  }
+
+  const onCancel = () => {
+    if (!!lastVisitedOrganization) {
+      router.push(`/org/${lastVisitedOrganization}`)
+    } else {
+      router.push('/organizations')
     }
   }
 
@@ -374,10 +395,7 @@ export const NewOrgForm = ({
               <Button
                 type="default"
                 disabled={newOrgLoading || paymentConfirmationLoading}
-                onClick={() => {
-                  if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-                  else router.push('/organizations')
-                }}
+                onClick={onCancel}
               >
                 Cancel
               </Button>

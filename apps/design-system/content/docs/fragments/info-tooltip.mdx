@@ -15,9 +15,15 @@ source:
 ## Usage
 
 ```tsx
-import { InfoTooltip } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 ```
 
 ```tsx
 <InfoTooltip side="top">This is the tooltip content</InfoTooltip>
 ```
+
+Use `InfoTooltip` for short explanatory hover help. Do not use Lucide `Info`,
+`InfoIcon`, or hand-rolled information icons for this pattern; the filled
+`InfoTooltip` glyph is the design-system source of truth. If a surface needs the
+same glyph inside a custom trigger, such as a button that opens a dialog, import
+`InfoTooltipIcon` from `ui-patterns/info-tooltip`.

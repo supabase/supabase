@@ -7,6 +7,7 @@ import { Separator } from 'ui'
 import { Head, type HeadProvider } from '@/components/ui/Head'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { BASE_PATH } from '@/lib/constants'
+import { buildStudioPageTitle } from '@/lib/page-title'
 
 export interface APIAuthorizationLayoutProps {
   HeadProvider: HeadProvider
@@ -23,7 +24,10 @@ export const APIAuthorizationLayout = ({
     <>
       <Head
         HeadProvider={HeadProvider}
-        title={`Authorize API access | ${appTitle || 'Supabase'}`}
+        title={buildStudioPageTitle({
+          section: 'Authorize API Access',
+          brand: appTitle || 'Supabase',
+        })}
       />
       <main className="h-screen flex flex-col w-full h-full overflow-y-auto">
         <div>
