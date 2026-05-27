@@ -92,6 +92,7 @@ CREATE POLICY "Active subscribers" ON premium_content FOR SELECT TO authenticate
 4. **Prefer \`IN\`/\`ANY\` over JOIN:** Subqueries in \`USING\`/\`WITH CHECK\` clauses typically scale better than full JOINs.
 5. **Explicitly specify roles in \`TO\` to limit policy scope.**
 6. **Test as multiple users and measure performance with RLS enabled.**
+7. **Avoid broad public predicates for user data:** Do not expose user/profile rows with a \`SELECT\` policy like \`USING (is_approved = true)\` unless the user explicitly confirms those rows are intentionally public. Prefer ownership, relationship, organization, role, or authenticated-viewer constraints.
 
 ## Pitfalls
 - \`auth.uid()\` returns NULL if the JWT or request context is missing.

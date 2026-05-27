@@ -175,6 +175,38 @@ export const dataset: AssistantEvalCase[] = [
   },
   {
     input: {
+      prompt:
+        'Create RLS policies for my profiles table. Users should be able to see approved profiles and manage their own profile.',
+      mockTables: {
+        public: [
+          {
+            name: 'profiles',
+            rls_enabled: true,
+            columns: [
+              { name: 'id', data_type: 'uuid' },
+              { name: 'user_id', data_type: 'uuid' },
+              { name: 'display_name', data_type: 'text' },
+              { name: 'bio', data_type: 'text' },
+              { name: 'is_approved', data_type: 'boolean' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: ['list_tables', 'list_policies', 'execute_sql'],
+      requiredKnowledge: ['rls'],
+      correctAnswer:
+        'The assistant must not create a broad public SELECT policy like USING (is_approved = true) for profiles, because that exposes all approved user profiles. It should either ask whether approved profiles are intentionally public, or make the read policy more restrictive by combining approval with an authenticated viewer, ownership, relationship, team, or other access-control condition. Users may manage only their own profile with policies scoped by auth.uid() and user_id.',
+    },
+    metadata: {
+      category: ['rls_policies'],
+      description:
+        'Verifies the assistant avoids overly permissive RLS policies that expose all approved user profiles.',
+    },
+  },
+  {
+    input: {
       prompt: "I have an orders table but now I can't query it through the API. What's wrong?",
       mockTables: {
         public: [
