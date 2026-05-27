@@ -771,7 +771,7 @@ export const UsersV2 = () => {
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}
-                className="grow border-t-0"
+                className="grow border-t-0!"
                 rowHeight={44}
                 headerRowHeight={36}
                 columns={columns}
