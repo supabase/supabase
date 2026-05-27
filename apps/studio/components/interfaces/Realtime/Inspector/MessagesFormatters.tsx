@@ -53,12 +53,14 @@ export function isBinaryPayload(value: unknown): value is ArrayBuffer | ArrayBuf
   return value instanceof ArrayBuffer || ArrayBuffer.isView(value)
 }
 
-export function withBinaryPayloadPlaceholder<T>(metadata: T): T | (T & { payload: string }) {
-  const payload = (metadata as any)?.payload
+export function withBinaryPayloadPlaceholder<T>(metadata: T): T {
+  const record = metadata as Record<string, unknown> | null | undefined
+  const payload = record?.payload
   if (!isBinaryPayload(payload)) return metadata
-  const byteLength =
-    payload instanceof ArrayBuffer ? payload.byteLength : (payload as ArrayBufferView).byteLength
-  return { ...(metadata as any), payload: `<binary, ${byteLength} bytes>` }
+  return {
+    ...(record as Record<string, unknown>),
+    payload: `<binary, ${payload.byteLength} bytes>`,
+  } as T
 }
 
 export function formatHexdump(buffer: ArrayBuffer | ArrayBufferView): string {
