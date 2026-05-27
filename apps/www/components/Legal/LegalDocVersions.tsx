@@ -30,7 +30,8 @@ const LegalDocVersions = ({ versions }: Props) => {
   useEffect(() => {
     if (!router.isReady) return
     syncActiveVersion()
-  }, [router.isReady, router.query.version, syncActiveVersion])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [router.isReady, router.query.version])
 
   const active = versions.find((v) => v.id === activeId) ?? latest
   const ActiveComponent = active.Component

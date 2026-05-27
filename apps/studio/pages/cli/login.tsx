@@ -166,7 +166,8 @@ export const CliLoginScreen = ({
     return () => {
       isActive = false
     }
-  }, [deviceCode, isLoggedIn, publicKey, routerReady, sessionId, tokenName, navigate])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [deviceCode, isLoggedIn, publicKey, routerReady, sessionId, tokenName])
 
   if (status._tag === 'loading') {
     return (

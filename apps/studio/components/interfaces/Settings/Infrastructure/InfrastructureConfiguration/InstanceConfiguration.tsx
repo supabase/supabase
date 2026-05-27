@@ -253,7 +253,8 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   })
   useEffect(() => {
     runMeasuredLayout()
-  }, [nodesInitialized, runMeasuredLayout])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [nodesInitialized])
 
   return (
     <div className={cn('nowheel', diagramOnly ? 'h-full' : 'border-y')}>

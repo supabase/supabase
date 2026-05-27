@@ -102,7 +102,8 @@ function usePrefillFormOnOrganizationsSuccess(
     if (organizationsState._tag === 'success') {
       prefillForm()
     }
-  }, [organizationsState._tag, prefillForm])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [organizationsState._tag])
 }
 
 export interface ApiAuthorizationValidScreenProps {

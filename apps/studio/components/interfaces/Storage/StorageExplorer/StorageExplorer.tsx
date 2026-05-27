@@ -101,7 +101,8 @@ export const StorageExplorer = () => {
 
   useEffect(() => {
     if (bucket && projectRef) fetchContents(bucket)
-  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id, fetchContents])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */

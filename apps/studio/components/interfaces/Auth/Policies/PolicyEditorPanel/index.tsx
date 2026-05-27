@@ -307,7 +307,8 @@ export const PolicyEditorPanel = memo(function ({
   })
 
   // when the panel is closed, reset all values
-  useEffect(resetState, [visible, resetState])
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  useEffect(resetState, [visible])
 
   // whenever the deps (current policy details, new error or error panel opens) change, recalculate
   // the height of the editor

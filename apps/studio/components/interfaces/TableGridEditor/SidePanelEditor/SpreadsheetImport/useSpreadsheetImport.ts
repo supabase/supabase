@@ -223,7 +223,8 @@ export function useSpreadsheetImport({
   })
   useEffect(() => {
     return cleanup
-  }, [cleanup])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [])
 
   // When the component mounts with a file already in global state (e.g. dropped onto the
   // grid), the useState initializer above sets _tag to 'parsing_file' but does not start
@@ -236,7 +237,8 @@ export function useSpreadsheetImport({
   })
   useEffect(() => {
     processOnMount()
-  }, [processOnMount])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [])
 
   const processSpreadsheet = useCallback(
     async function processSpreadsheet({

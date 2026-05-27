@@ -213,7 +213,8 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     syncFormFromConfig()
-  }, [ssoConfig, organization?.slug, syncFormFromConfig])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [ssoConfig, organization?.slug])
 
   // Automatically add an empty domain field when SP-initiated is enabled
   const ensureDomainField = useEffectEvent(() => {
@@ -225,7 +226,8 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     ensureDomainField()
-  }, [enableSpInitiated, ensureDomainField])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [enableSpInitiated])
 
   return (
     <ScaffoldContainer size="small" className="px-6 xl:px-10">

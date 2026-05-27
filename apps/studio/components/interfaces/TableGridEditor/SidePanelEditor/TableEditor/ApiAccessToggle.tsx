@@ -163,7 +163,8 @@ const useTableApiAccessHandler = (
   })
   useEffect(() => {
     resetState()
-  }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable, resetState])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable])
 
   const syncDefaultPrivileges = useEffectEvent(() => {
     if (!isNewTable) return
@@ -172,7 +173,8 @@ const useTableApiAccessHandler = (
   })
   useEffect(() => {
     syncDefaultPrivileges()
-  }, [defaultPrivilegesQuery.status, syncDefaultPrivileges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [defaultPrivilegesQuery.status])
 
   const syncApiPrivileges = useEffectEvent(() => {
     if (hasLoadedInitialData.current) return
@@ -192,7 +194,8 @@ const useTableApiAccessHandler = (
   })
   useEffect(() => {
     syncApiPrivileges()
-  }, [apiAccessStatus.status, syncApiPrivileges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [apiAccessStatus.status])
 
   const isPending =
     !enabled ||
