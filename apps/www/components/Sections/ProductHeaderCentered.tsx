@@ -1,10 +1,11 @@
+import styles from '~/styles/animations.module.css'
+import { PlayCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button, cn } from 'ui'
-import styles from '~/styles/animations.module.css'
+
 import AnnouncementBadge from '../Announcement/Badge'
 import ProductIcon from '../ProductIcon'
-import { PlayCircle } from 'lucide-react'
 
 interface Types {
   h1: string | React.ReactNode
@@ -75,10 +76,10 @@ const ProductHeaderCentered = (props: Types) => (
           ) : null}
         </div>
         <div className={cn(styles['appear-from-bottom'])}>
-          <h1 className="h1 text-3xl md:text-4xl tracking-[-1.5px]" key={`h1`}>
+          <h1 className="h1 text-3xl md:text-4xl text-balance" key={`h1`}>
             {props.h1}
           </h1>
-          <p className="p text-foreground-light!">{props.subheader}</p>
+          <p className="p text-foreground-light text-balance">{props.subheader}</p>
         </div>
         <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
           {props.cta && (
