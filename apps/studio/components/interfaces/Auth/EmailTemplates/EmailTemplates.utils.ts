@@ -12,7 +12,7 @@ type AuthConfig = components['schemas']['GoTrueConfigResponse']
  * restriction. Projects created before it are grandfathered and keep editing access.
  * Must stay in sync with FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE in the platform.
  */
-export const FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE = '2026-06-01T00:00:00Z'
+export const FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE = '2026-05-29T00:00:00Z'
 
 /**
  * Convert template title to URL-friendly slug
