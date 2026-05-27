@@ -2,7 +2,13 @@ import type { PGTable } from '@supabase/pg-meta'
 import { noop } from 'lodash'
 import { useCallback, type ChangeEvent, type DragEvent } from 'react'
 import { toast } from 'sonner'
-import { SidePanel, Tabs } from 'ui'
+import {
+  SidePanel,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 
 import { ActionBar } from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
@@ -112,8 +118,12 @@ export const SpreadsheetImport = ({
     >
       <SidePanel.Content>
         <div className="pt-6">
-          <Tabs block type="pills" activeId={tab} onChange={handleSwitchTab}>
-            <Tabs.Panel id="fileUpload" label="Upload CSV">
+          <Tabs_Shadcn_ defaultValue={tab} onValueChange={handleSwitchTab}>
+            <TabsList_Shadcn_ className="grid w-full grid-cols-2">
+              <TabsTrigger_Shadcn_ value="fileUpload">Upload CSV</TabsTrigger_Shadcn_>
+              <TabsTrigger_Shadcn_ value="pasteText">Paste text</TabsTrigger_Shadcn_>
+            </TabsList_Shadcn_>
+            <TabsContent_Shadcn_ value="fileUpload">
               <SpreadsheetFileDropZone
                 file={hasAttachedFile(state) ? state.file : undefined}
                 parseProgress={
@@ -122,14 +132,14 @@ export const SpreadsheetImport = ({
                 onUploadFile={handleUploadFile}
                 onRemoveFile={handleRemoveFile}
               />
-            </Tabs.Panel>
-            <Tabs.Panel id="pasteText" label="Paste text">
+            </TabsContent_Shadcn_>
+            <TabsContent_Shadcn_ value="pasteText">
               <SpreadsheetInputZone
                 text={hasAttachedText(state) ? state.text : ''}
                 onInputChange={handleInputText}
               />
-            </Tabs.Panel>
-          </Tabs>
+            </TabsContent_Shadcn_>
+          </Tabs_Shadcn_>
         </div>
       </SidePanel.Content>
       {isParsedState(state) && state.data.headers.length > 0 && (
