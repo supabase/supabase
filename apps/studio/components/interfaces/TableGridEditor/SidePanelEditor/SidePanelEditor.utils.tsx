@@ -52,7 +52,7 @@ import {
 } from '@/data/tables/table-update-mutation'
 import { getTables } from '@/data/tables/tables-query'
 import { sendEvent } from '@/data/telemetry/send-event-mutation'
-import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
+import { isObject, isObjectContainingKeys, tryParseJson } from '@/lib/helpers'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
 import type { DeepReadonly } from '@/lib/type-helpers'
 import type { SidePanel } from '@/state/table-editor'
@@ -921,13 +921,20 @@ export const updateTable = async ({
   }
 
   // Foreign keys will get updated here accordingly
-  await updateForeignKeys({
-    projectRef,
-    connectionString,
-    table: updatedTable,
-    foreignKeys: foreignKeyRelations,
-    existingForeignKeyRelations,
-  })
+  try {
+    await updateForeignKeys({
+      projectRef,
+      connectionString,
+      table: updatedTable,
+      foreignKeys: foreignKeyRelations,
+      existingForeignKeyRelations,
+    })
+  } catch (error: any) {
+    hasError = true
+    toast.error(
+      `Failed to update foreign key constraints: ${error.message}`
+    )
+  }
 
   await Promise.all([
     queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, table.id) }),
@@ -1135,22 +1142,10 @@ export async function insertTableRows({
 
   const batches = chunk(formattedRows, BATCH_SIZE)
   const tasks = batches.map((batch) => {
-    return () => {
-      return Promise.race([
-        new Promise(async (resolve, reject) => {
-          const insertQuery = new Query().from(table.name, table.schema).insert(batch).toSql()
-          try {
-            await executeSql({ projectRef, connectionString, sql: insertQuery })
-          } catch (error) {
-            insertError = error
-            reject(error)
-          }
-
-          insertProgress = insertProgress + batch.length / rows.length
-          resolve({})
-        }),
-        timeout(30_000),
-      ])
+    return async () => {
+      const insertQuery = new Query().from(table.name, table.schema).insert(batch).toSql()
+      await executeSql({ projectRef, connectionString, sql: insertQuery })
+      insertProgress = insertProgress + batch.length / rows.length
     }
   })
 
