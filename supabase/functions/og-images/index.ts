@@ -1,6 +1,8 @@
-import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
-import { handler } from './handler.tsx'
+/**
+ * Serves the OG Image generation logic.
+ * Uses native Deno.serve to ensure the function boots correctly in offline local environments.
+ */
 
-serve(handler)
+import { handler } from './handler.tsx';
 
-console.log('Serving og-images function')
+Deno.serve(handler);

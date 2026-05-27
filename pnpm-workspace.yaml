@@ -55,9 +55,6 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  # The following are excluded to fix vulnerablities.
-  - mermaid
-  - '@mermaid-js/parser'
 
 onlyBuiltDependencies:
   - node-pty
