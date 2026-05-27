@@ -1,3 +1,5 @@
+import type { ConnectionStringPooler, DeploymentMode } from './Connect.types'
+
 type ConnectionStrings = {
   psql: string
   uri: string
@@ -10,6 +12,86 @@ type ConnectionStrings = {
   sqlalchemy: string
 }
 
+/**
+ * Self-hosted Supavisor pooler strings. User/password are placeholders that
+ * the operator fills in — `POOLER_TENANT_ID` and the postgres password are
+ * defined in the docker-compose env.
+ */
+export const getSelfHostedPoolerStrings = (
+  dbHost: string,
+  port: number | string,
+  dbName: string = 'postgres'
+): ConnectionStrings => {
+  const user = 'postgres.[POOLER_TENANT_ID]'
+  const password = '[YOUR-PASSWORD]'
+
+  const uri = `postgresql://${user}:${password}@${dbHost}:${port}/${dbName}`
+  const psql = `psql 'postgresql://${user}:${password}@${dbHost}:${port}/${dbName}'`
+  const golang = `user=${user}\npassword=${password}\nhost=${dbHost}\nport=${port}\ndbname=${dbName}`
+  const jdbc = `jdbc:postgresql://${dbHost}:${port}/${dbName}?user=${user}&password=${password}`
+  const dotnet = `{
+  "ConnectionStrings": {
+    "DefaultConnection": "User Id=${user};Password=${password};Server=${dbHost};Port=${port};Database=${dbName}"
+  }
+}`
+  const nodejs = `DATABASE_URL=${uri}`
+
+  return {
+    psql,
+    uri,
+    golang,
+    jdbc,
+    dotnet,
+    nodejs,
+    php: golang,
+    python: golang,
+    sqlalchemy: golang,
+  }
+}
+
+/**
+ * Self-hosted direct postgres connection strings. Requires the operator to
+ * have exposed postgres on the host — by default docker-compose does not.
+ */
+export const getSelfHostedDirectStrings = (
+  dbHost: string,
+  port: number | string,
+  dbName: string = 'postgres'
+): ConnectionStrings => {
+  const user = 'postgres'
+  const password = '[YOUR-PASSWORD]'
+
+  const uri = `postgresql://${user}:${password}@${dbHost}:${port}/${dbName}`
+  const psql = `psql 'postgresql://${user}:${password}@${dbHost}:${port}/${dbName}'`
+  const golang = `user=${user}\npassword=${password}\nhost=${dbHost}\nport=${port}\ndbname=${dbName}`
+  const jdbc = `jdbc:postgresql://${dbHost}:${port}/${dbName}?user=${user}&password=${password}`
+  const dotnet = `{
+  "ConnectionStrings": {
+    "DefaultConnection": "User Id=${user};Password=${password};Server=${dbHost};Port=${port};Database=${dbName}"
+  }
+}`
+  const nodejs = `DATABASE_URL=${uri}`
+
+  return {
+    psql,
+    uri,
+    golang,
+    jdbc,
+    dotnet,
+    nodejs,
+    php: golang,
+    python: golang,
+    sqlalchemy: golang,
+  }
+}
+
+/**
+ * Returns `{ direct, pooler }`. `.direct` depends only on `connectionInfo`, so
+ * when callers invoke this twice (once per pooler flavor) as
+ * `connectionStringsShared` / `connectionStringsDedicated`, both `.direct`
+ * fields are identical — the `Shared`/`Dedicated` suffix only describes which
+ * pooler URI you get from `.pooler`.
+ */
 export const getConnectionStrings = ({
   connectionInfo,
   poolingInfo,
@@ -131,5 +213,67 @@ dbname=${poolerName}`
       python: poolerGolangString,
       sqlalchemy: poolerSqlalchemyString,
     },
+  }
+}
+
+/**
+ * Shapes the ConnectionStringPooler "bag" consumed by every connection-string
+ * step. On platform we keep the existing shared/dedicated pooler layout; on
+ * self-hosted we substitute Supavisor placeholder strings on the standard
+ * ports; on CLI we collapse to direct since no pooler is exposed.
+ */
+export const buildConnectionStringPooler = ({
+  deploymentMode,
+  connectionInfo,
+  connectionStringsShared,
+  connectionStringsDedicated,
+  ipv4Addon,
+}: {
+  deploymentMode: DeploymentMode
+  connectionInfo: { db_host: string; db_port: number | string }
+  connectionStringsShared: { direct: ConnectionStrings; pooler: ConnectionStrings }
+  connectionStringsDedicated?: { direct: ConnectionStrings; pooler: ConnectionStrings }
+  ipv4Addon: boolean
+}): ConnectionStringPooler => {
+  if (deploymentMode.isSelfHosted) {
+    const dbHost = connectionInfo.db_host
+    const dbPort = connectionInfo.db_port || 5432
+    const sessionPool = getSelfHostedPoolerStrings(dbHost, dbPort)
+    const transactionPool = getSelfHostedPoolerStrings(dbHost, 6543)
+    const directConn = getSelfHostedDirectStrings(dbHost, dbPort)
+    return {
+      transactionShared: transactionPool.uri,
+      sessionShared: sessionPool.uri,
+      transactionDedicated: undefined,
+      sessionDedicated: undefined,
+      ipv4SupportedForDedicatedPooler: false,
+      direct: directConn.uri,
+    }
+  }
+
+  if (deploymentMode.isCli) {
+    // CLI exposes postgres directly; no pooler is available, so any code path
+    // that reaches for a pooler URI falls back to the direct connection.
+    const directUri = connectionStringsShared.direct.uri
+    return {
+      transactionShared: directUri,
+      sessionShared: directUri,
+      transactionDedicated: undefined,
+      sessionDedicated: undefined,
+      ipv4SupportedForDedicatedPooler: false,
+      direct: directUri,
+    }
+  }
+
+  // Port-swap 6543→5432 derives session from transaction. For shared this is a
+  // real Supavisor session connection; for dedicated it lands on direct Postgres
+  // (PgBouncer has no session mode).
+  return {
+    transactionShared: connectionStringsShared.pooler.uri,
+    sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
+    transactionDedicated: connectionStringsDedicated?.pooler.uri,
+    sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
+    ipv4SupportedForDedicatedPooler: ipv4Addon,
+    direct: connectionStringsShared.direct.uri,
   }
 }

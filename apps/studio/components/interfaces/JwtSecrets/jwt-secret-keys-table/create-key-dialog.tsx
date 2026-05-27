@@ -19,9 +19,11 @@ import {
   Textarea,
 } from 'ui'
 
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-create-mutation'
 import { JWTAlgorithm } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 import { stringToBase64URL } from '@/lib/base64url'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
 const EC_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'y', 'd']
@@ -228,13 +230,25 @@ export const CreateKeyDialog = ({
         </div>
       </DialogSection>
       <DialogFooter>
-        <Button
-          onClick={() => handleAddNewStandbyKey()}
-          disabled={isPendingMutation || !!privateKeyMessage}
-          loading={isPendingMutation}
+        <Shortcut
+          id={SHORTCUT_IDS.JWT_KEYS_SUBMIT_STANDBY}
+          onTrigger={handleAddNewStandbyKey}
+          options={{
+            enabled:
+              !isPendingMutation && !privateKeyMessage && (!isBYOK || privateKey.trim().length > 0),
+          }}
+          side="top"
         >
-          Create standby key
-        </Button>
+          <Button
+            onClick={() => handleAddNewStandbyKey()}
+            disabled={
+              isPendingMutation || !!privateKeyMessage || (isBYOK && privateKey.trim().length === 0)
+            }
+            loading={isPendingMutation}
+          >
+            Create standby key
+          </Button>
+        </Shortcut>
       </DialogFooter>
     </>
   )

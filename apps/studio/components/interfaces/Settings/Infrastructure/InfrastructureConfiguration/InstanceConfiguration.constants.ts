@@ -45,8 +45,19 @@ export type EdgeData = {
 
 // ReactFlow is scaling everything by the factor of 2
 export const NODE_WIDTH = 660
-export const NODE_ROW_HEIGHT = 50
 export const NODE_SEP = 20
+
+// The region wrapper is a static, non-measured sibling node with a fixed size.
+export const REGION_NODE_HEIGHT = 162
+
+// First-paint fallback heights for the dagre layout, only used before React
+// Flow has measured the real nodes. Subsequent layouts use node.measured.height.
+export const NODE_HEIGHT_FALLBACKS: Record<string, number> = {
+  LOAD_BALANCER: 64,
+  PRIMARY: 140,
+  READ_REPLICA: 140,
+  REGION: REGION_NODE_HEIGHT,
+}
 
 export const REPLICA_STATUS: {
   [key: string]: components['schemas']['DatabaseStatusResponse']['status']

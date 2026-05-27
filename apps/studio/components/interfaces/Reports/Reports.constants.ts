@@ -730,6 +730,11 @@ SELECT
   },
 }
 
+// Burst-balance-related metric keys. These only apply to compute sizes that
+// have a burst credit pool for disk IO (below 4XL). On 4XL+ disk IO is
+// sustained at baseline, so these charts should be hidden.
+export const BURSTABLE_IO_METRIC_KEYS = ['disk_io_budget', 'disk_io_consumption']
+
 export const DEPRECATED_REPORTS = [
   'total_realtime_ingress',
   'total_rest_options_requests',

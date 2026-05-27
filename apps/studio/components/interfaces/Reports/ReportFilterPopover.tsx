@@ -4,12 +4,12 @@ import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Input,
   Popover,
   PopoverContent,
@@ -79,8 +79,8 @@ const FilterableInput = ({
 
   return (
     <div className="relative flex-1">
-      <Command_Shadcn_ className="relative overflow-visible bg-transparent">
-        <CommandInput_Shadcn_
+      <Command className="relative overflow-visible bg-transparent">
+        <CommandInput
           placeholder={placeholder}
           value={inputValue}
           onValueChange={handleInputChange}
@@ -96,25 +96,25 @@ const FilterableInput = ({
             isOpen && safeOptions.length > 0 && 'opacity-100 pointer-events-auto'
           )}
         >
-          <CommandList_Shadcn_ className="max-h-60 overflow-auto bg-surface-100 border border-border rounded-md shadow-lg">
-            <CommandEmpty_Shadcn_ className="py-2 px-3 text-sm text-foreground-lighter">
+          <CommandList className="max-h-60 overflow-auto bg-surface-100 border border-border rounded-md shadow-lg">
+            <CommandEmpty className="py-2 px-3 text-sm text-foreground-lighter">
               No matching options found. Press Enter to use "{inputValue}"
-            </CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+            </CommandEmpty>
+            <CommandGroup>
               {safeOptions.map((option, index) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={`${option}-${index}`}
                   value={option}
                   onSelect={() => handleOptionSelect(option)}
                   className="px-3 py-2 text-sm cursor-pointer"
                 >
                   {option}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
+            </CommandGroup>
+          </CommandList>
         </div>
-      </Command_Shadcn_>
+      </Command>
       {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
     </div>
   )

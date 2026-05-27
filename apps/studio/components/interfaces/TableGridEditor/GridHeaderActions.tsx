@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Realtime } from 'icons'
 import { BookOpenText, Lightbulb, Lock, MoreVertical, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
@@ -21,7 +20,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { EnableIndexAdvisorDialog } from '../QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
@@ -31,6 +29,7 @@ import { SecurityDefinerViewPopover } from './SecurityDefinerViewPopover'
 import { ViewEntityAutofixSecurityModal } from './ViewEntityAutofixSecurityModal'
 import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
 import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
 import {
   getEntityLintDetails,
   getTablePoliciesUrl,
@@ -47,10 +46,8 @@ import {
   isView as isTableLikeView,
 } from '@/data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
@@ -64,12 +61,9 @@ export interface GridHeaderActionsProps {
 }
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const track = useTrack()
-  const { ref } = useParams()
   const appSnap = useAppStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [realtimeDialogOpen, setRealtimeDialogOpen] = useState(false)
@@ -98,12 +92,9 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
   const isRealtimeEnabled = useIsTableRealtimeEnabled({ id: table.id })
 
-  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
+  const { mutateAsync: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
-    },
-    onSettled: () => {
-      closeConfirmModal()
     },
   })
 
@@ -155,24 +146,11 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       table.schema
     )
 
-  const closeConfirmModal = () => {
-    setRlsConfirmModalOpen(false)
-  }
-
   const onViewAPIDocs = () => {
     appSnap.setActiveDocsSection(['entities', table.name])
     appSnap.setShowProjectApiDocs(true)
 
-    sendEvent({
-      action: 'api_docs_opened',
-      properties: {
-        source: 'table_editor',
-      },
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('api_docs_opened', { source: 'table_editor' })
   }
 
   const onToggleRLS = async () => {
@@ -181,7 +159,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       rls_enabled: !(isTable && table.rls_enabled),
     }
 
-    updateTable({
+    const updateTablePromise = updateTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
       id: table.id,
@@ -195,6 +173,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       schema_name: table.schema,
       table_name: table.name,
     })
+
+    return updateTablePromise
   }
 
   return (
@@ -397,17 +377,12 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       />
 
       {isTable && (
-        <ConfirmationModal
-          visible={rlsConfirmModalOpen}
-          variant={table.rls_enabled ? 'destructive' : 'default'}
-          title={`${table.rls_enabled ? 'Disable' : 'Enable'} Row Level Security`}
-          description={`Are you sure you want to ${
-            table.rls_enabled ? 'disable' : 'enable'
-          } Row Level Security for this table?`}
-          confirmLabel={`${table.rls_enabled ? 'Disable' : 'Enable'} RLS`}
-          confirmLabelLoading={`${table.rls_enabled ? 'Disabling' : 'Enabling'} RLS`}
-          loading={isUpdatingTable}
-          onCancel={closeConfirmModal}
+        <RLSToggleDialog
+          open={rlsConfirmModalOpen}
+          tableName={table.name}
+          isEnabled={table.rls_enabled}
+          isSubmitting={isUpdatingTable}
+          onOpenChange={setRlsConfirmModalOpen}
           onConfirm={onToggleRLS}
         />
       )}

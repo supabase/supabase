@@ -73,7 +73,12 @@ export async function generateAssistantResponse({
         const cleanedParts = msg.parts
           .filter((part) => {
             if (isToolUIPart(part)) {
-              const invalidStates = ['input-streaming', 'input-available', 'output-error']
+              const invalidStates = [
+                'input-streaming',
+                'input-available',
+                'approval-requested',
+                'output-error',
+              ]
               return !invalidStates.includes(part.state)
             }
             return true

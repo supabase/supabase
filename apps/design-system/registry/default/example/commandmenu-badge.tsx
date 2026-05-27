@@ -1,9 +1,9 @@
 import { Button } from '@ui/components/shadcn/ui/button'
 import {
   BadgeExperimental,
-  CommandInput,
-  CommandList,
   CommandMenu,
+  CommandMenuInput,
+  CommandMenuList,
   CommandProvider,
   useRegisterCommands,
   useSetCommandMenuOpen,
@@ -34,8 +34,8 @@ export default function CommandMenuDemo() {
       <CommandMenuTrigger />
       <Commands />
       <CommandMenu>
-        <CommandInput />
-        <CommandList />
+        <CommandMenuInput />
+        <CommandMenuList />
       </CommandMenu>
     </CommandProvider>
   )

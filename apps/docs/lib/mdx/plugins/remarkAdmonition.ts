@@ -54,7 +54,7 @@ const remarkMkDocsAdmonition = function () {
         if (title) {
           admonitionElement.attributes.push({
             type: 'mdxJsxAttribute',
-            name: 'label',
+            name: 'title',
             value: title,
           })
         }

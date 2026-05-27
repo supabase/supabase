@@ -39,6 +39,7 @@ import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -48,6 +49,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
+  const isProjectActive = useIsProjectActive()
 
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -72,6 +74,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     setSearch,
     sort,
     setSort: setSortQueryParam,
+    canCreateNew: isProjectActive,
     onCreateNew: () => router.push(`/project/${ref}/functions/new`),
     onRefresh: () => {
       refetch()
