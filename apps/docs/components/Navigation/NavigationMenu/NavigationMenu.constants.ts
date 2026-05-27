@@ -2790,6 +2790,18 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/branching' as `/${string}`,
             },
             {
+              name: 'Logs',
+              url: '/guides/platform/manage-your-usage/logs' as `/${string}`,
+            },
+            {
+              name: 'Logs Ingest',
+              url: '/guides/platform/manage-your-usage/logs-ingest' as `/${string}`,
+            },
+            {
+              name: 'Logs Query',
+              url: '/guides/platform/manage-your-usage/logs-query' as `/${string}`,
+            },
+            {
               name: 'Log Drains',
               url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
             },
