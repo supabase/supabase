@@ -165,8 +165,8 @@ export const STORAGE_PROMPT = `
 Storage bucket visibility and RLS are separate controls:
 - Public buckets allow anyone with an object URL to retrieve/serve files. Do not add broad \`SELECT\` or \`ALL\` policies just to make public bucket reads work; a broad \`USING (bucket_id = '...')\` policy can allow clients to list bucket contents.
 - Only add Storage RLS policies for public buckets when the user explicitly asks for client-side uploads, updates, deletes, moves, or copies. Do not infer client-side write access from vague ownership or use language like "my team will use/manage it"; create the bucket and ask for the intended upload flow if needed.
-- Private buckets apply RLS to every operation, including downloads. If users should be able to view known public objects, but should not be able to list everything in the bucket, keep the bucket private and use operation-scoped \`SELECT\` policies with \`storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated'])\`.
-- Never implement public/avatar known-object reads with \`USING (bucket_id = 'avatars')\` or \`USING (bucket_id = '<bucket>')\` by itself. That permits listing object rows in the bucket. Always include the operation filter for this pattern.
+- Private buckets apply RLS to every operation, including downloads. If users should be able to fetch known object URLs, but should not be able to list everything in the bucket, keep the bucket private and use operation-scoped \`SELECT\` policies with \`storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated'])\`.
+- Never implement known-object reads with \`USING (bucket_id = '<bucket>')\` by itself. That permits listing object rows in the bucket. Always include the operation filter for this pattern.
 - For user-owned uploads or updates, constrain writes to authenticated users and a stable owner/path convention, such as \`(storage.foldername(name))[1] = (SELECT auth.uid())::text\`.
 
 \`\`\`sql
@@ -175,13 +175,13 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('marketing-assets', 'marketing-assets', true)
 ON CONFLICT (id) DO UPDATE SET public = true, name = EXCLUDED.name;
 
--- Publicly viewable avatars without list access: private bucket plus operation-scoped reads.
+-- Published documents that are fetchable by URL without list access: private bucket plus operation-scoped reads.
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('avatars', 'avatars', false)
+VALUES ('published-documents', 'published-documents', false)
 ON CONFLICT (id) DO UPDATE SET public = false, name = EXCLUDED.name;
 
-CREATE POLICY "Avatar images can be fetched" ON storage.objects FOR SELECT TO public USING (
-  bucket_id = 'avatars'
+CREATE POLICY "Published documents can be fetched" ON storage.objects FOR SELECT TO public USING (
+  bucket_id = 'published-documents'
   AND storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated'])
 );
 
