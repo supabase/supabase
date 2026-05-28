@@ -2,6 +2,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
+import { isLogsFilterColumnValue } from '../UnifiedLogs.filters'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { parseAuthLogEventMessage } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
@@ -224,6 +225,18 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'event_message',
       header: 'Event message',
+      // event_message intentionally skips server-side filtering (see applyFilterSearch
+      // in UnifiedLogs.tsx). TanStack invokes this filterFn against rows already in
+      // memory; we honour the wrapped { operator, values } shape the FilterBar writes
+      // and do a case-insensitive substring match, with `<>` flipping the result.
+      filterFn: (row, columnId, filterValue) => {
+        if (!isLogsFilterColumnValue(filterValue)) return true
+        const { operator, values } = filterValue
+        if (values.length === 0) return true
+        const haystack = String(row.getValue(columnId) ?? '').toLowerCase()
+        const matches = values.some((v) => haystack.includes(v.toLowerCase()))
+        return operator === '<>' ? !matches : matches
+      },
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
         const logType = row.original.log_type

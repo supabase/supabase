@@ -151,6 +151,10 @@ const translateFilter = (
         values.map((v) => safeSql`log_attributes['request.url'] ${likeOp} ${lit('%' + v + '%')}`),
         joinAndOr
       )})`
+    case 'event_message':
+      // event_message filtering is client-side only (see UnifiedLogs.tsx
+      // applyFilterSearch); defensively drop the predicate if it ever lands here.
+      return null
     default:
       return safeSql`log_attributes[${lit(key)}] ${inOp} ${inList(values)}`
   }

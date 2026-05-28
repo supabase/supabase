@@ -61,6 +61,9 @@ const buildConditions = (
   for (const [key, { operator, values }] of Object.entries(grouped)) {
     if (key === excludeKey) continue
     if (values.length === 0) continue
+    // event_message filtering is client-side only (see UnifiedLogs.tsx
+    // applyFilterSearch); defensively drop the predicate if it ever lands here.
+    if (key === 'event_message') continue
 
     try {
       // `key` is interpolated as a column identifier. `quotedIdent()` rejects
