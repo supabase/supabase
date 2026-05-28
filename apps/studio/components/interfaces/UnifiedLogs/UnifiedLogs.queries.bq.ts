@@ -61,9 +61,6 @@ const buildConditions = (
   for (const [key, { operator, values }] of Object.entries(grouped)) {
     if (key === excludeKey) continue
     if (values.length === 0) continue
-    // event_message filtering is client-side only (see UnifiedLogs.tsx
-    // applyFilterSearch); defensively drop the predicate if it ever lands here.
-    if (key === 'event_message') continue
 
     try {
       // `key` is interpolated as a column identifier. `quotedIdent()` rejects
@@ -76,7 +73,19 @@ const buildConditions = (
       const likeOp = isNeq ? NOT_LIKE_OP : LIKE_OP
       const joinAndOr = isNeq ? ' AND ' : ' OR '
 
-      if (key === 'host' || key === 'pathname') {
+      if (key === 'event_message' && (operator === '~~*' || operator === '!~~*')) {
+        // BigQuery has no ILIKE; emulate via LOWER(col) (NOT) LIKE LOWER('%v%').
+        // Auto-wrap with `%…%` unless the user already included one. Multiple
+        // ILIKE values join with OR; NOT ILIKE joins with AND (row must contain
+        // none of the given substrings).
+        const pattern = (v: string) => (v.includes('%') ? v : '%' + v + '%')
+        const likeKeyword = operator === '!~~*' ? safeSql`NOT LIKE` : safeSql`LIKE`
+        const join = operator === '!~~*' ? ' AND ' : ' OR '
+        const branches = values.map(
+          (v) => safeSql`LOWER(${col}) ${likeKeyword} LOWER(${lit(pattern(v))})`
+        )
+        conditions.push(safeSql`(${joinSqlFragments(branches, join)})`)
+      } else if (key === 'host' || key === 'pathname') {
         const branches = values.map((v) => safeSql`${col} ${likeOp} ${lit('%' + v + '%')}`)
         conditions.push(safeSql`(${joinSqlFragments(branches, joinAndOr)})`)
       } else {

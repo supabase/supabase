@@ -295,17 +295,11 @@ export const UnifiedLogs = () => {
   }, [facets])
 
   // Debounced filter application to avoid too many API calls when user clicks multiple filters quickly.
-  // Equality (eq/neq) column filters serialize into the repeatable `filter` URL param. Slider/timerange
+  // All equality/pattern column filters serialize into the repeatable `filter` URL param. Slider/timerange
   // column filters keep their dedicated per-column URL keys so things like the timeline brush still
-  // round-trip — they have their own range semantics and aren't covered by eq/neq.
-  //
-  // `event_message` is intentionally skipped: the analytics tables don't reliably populate it across
-  // all sources (it's empty for edge/storage/auth on OTEL), so a server-side LIKE returns nothing.
-  // We let TanStack filter the already-fetched rows client-side via the column's custom filterFn.
+  // round-trip — they have their own range semantics and aren't covered by eq/neq/like.
   const applyFilterSearch = () => {
-    const filterEntries = logsFiltersToUrlParams(
-      columnFiltersToLogsFilters(columnFilters).filter((f) => f.column !== 'event_message')
-    )
+    const filterEntries = logsFiltersToUrlParams(columnFiltersToLogsFilters(columnFilters))
     const update: Record<string, unknown> = {
       filter: filterEntries.length > 0 ? filterEntries : null,
     }

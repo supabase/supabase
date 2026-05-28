@@ -1,4 +1,9 @@
-export type LogsFilterOperator = '=' | '<>'
+// Operators mirror PostgREST / Table Editor conventions:
+//   `=` / `<>` — exact equality, available on most columns
+//   `~~*` / `!~~*` — ILIKE / NOT ILIKE (case-insensitive substring
+//                    contains / does-not-contain), wired up only for the
+//                    `event_message` column
+export type LogsFilterOperator = '=' | '<>' | '~~*' | '!~~*'
 
 export interface LogsFilter {
   column: string
@@ -11,16 +16,25 @@ export interface LogsColumnFilterValue {
   values: string[]
 }
 
-export const LOGS_FILTER_OPERATORS = ['=', '<>'] as const satisfies readonly LogsFilterOperator[]
+export const LOGS_FILTER_OPERATORS = [
+  '=',
+  '<>',
+  '~~*',
+  '!~~*',
+] as const satisfies readonly LogsFilterOperator[]
 
 const OPERATOR_TO_ABBREV: Record<LogsFilterOperator, string> = {
   '=': 'eq',
   '<>': 'neq',
+  '~~*': 'ilike',
+  '!~~*': 'notilike',
 }
 
 const ABBREV_TO_OPERATOR: Record<string, LogsFilterOperator> = {
   eq: '=',
   neq: '<>',
+  ilike: '~~*',
+  notilike: '!~~*',
 }
 
 export const isLogsFilterColumnValue = (value: unknown): value is LogsColumnFilterValue => {

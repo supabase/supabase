@@ -76,6 +76,31 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(`log_attributes['request.url'] NOT LIKE '%cdn.foo%'`)
     })
 
+    it('emits ILIKE with auto-wrapped `%…%` for event_message `~~*`', () => {
+      const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:Permission Denied'))
+      expect(sql).toContain(`event_message ILIKE '%Permission Denied%'`)
+    })
+
+    it('emits NOT ILIKE for event_message `!~~*` so rows containing the term are excluded', () => {
+      const sql = getUnifiedLogsQuery(withFilters('event_message:notilike:cron'))
+      expect(sql).toContain(`event_message NOT ILIKE '%cron%'`)
+    })
+
+    it('joins multiple NOT ILIKE values with AND (row must contain none)', () => {
+      const sql = getUnifiedLogsQuery(
+        withFilters('event_message:notilike:cron', 'event_message:notilike:heartbeat')
+      )
+      expect(sql).toMatch(
+        /event_message NOT ILIKE '%cron%' AND event_message NOT ILIKE '%heartbeat%'/
+      )
+    })
+
+    it('passes through user-supplied `%` wildcards on event_message ILIKE without double-wrapping', () => {
+      const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:error%'))
+      expect(sql).toContain(`event_message ILIKE 'error%'`)
+      expect(sql).not.toContain(`'%error%%'`)
+    })
+
     it('excludes connection log messages by default (hide_connection_logs=true)', () => {
       const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: true } as any)
       expect(sql).toContain("source != 'postgres_logs'")
@@ -208,5 +233,18 @@ describe('UnifiedLogs.queries.bq', () => {
     // of the string literal.
     expect(sql).toContain("`method` IN ('GET'' OR ''1''=''1')")
     expect(sql).not.toMatch(/`method` IN \('GET' OR '1'='1'\)/)
+  })
+
+  it('emulates ILIKE with LOWER()/LOWER() since BigQuery has no ILIKE keyword', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('event_message:ilike:Permission Denied'))
+    expect(sql).toContain("LOWER(`event_message`) LIKE LOWER('%Permission Denied%')")
+    // Sanity check: never emit a raw ILIKE keyword for BQ.
+    expect(sql).not.toMatch(/\bILIKE\b/)
+  })
+
+  it('emulates NOT ILIKE with LOWER()/NOT LIKE/LOWER() for event_message `!~~*`', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('event_message:notilike:cron'))
+    expect(sql).toContain("LOWER(`event_message`) NOT LIKE LOWER('%cron%')")
+    expect(sql).not.toMatch(/\bILIKE\b/)
   })
 })

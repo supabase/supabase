@@ -20,6 +20,8 @@ const IN_OP = safeSql`IN`
 const NOT_IN_OP = safeSql`NOT IN`
 const LIKE_OP = safeSql`LIKE`
 const NOT_LIKE_OP = safeSql`NOT LIKE`
+const ILIKE_OP = safeSql`ILIKE`
+const NOT_ILIKE_OP = safeSql`NOT ILIKE`
 
 // Facets the count query is allowed to be invoked for. Reject anything else
 // at the entry point rather than letting an unsupported value reach
@@ -151,10 +153,26 @@ const translateFilter = (
         values.map((v) => safeSql`log_attributes['request.url'] ${likeOp} ${lit('%' + v + '%')}`),
         joinAndOr
       )})`
-    case 'event_message':
-      // event_message filtering is client-side only (see UnifiedLogs.tsx
-      // applyFilterSearch); defensively drop the predicate if it ever lands here.
-      return null
+    case 'event_message': {
+      // event_message is a top-level column, not a log_attributes key. ILIKE/NOT ILIKE
+      // auto-wrap with `%…%` so the user can type "permission denied" as a substring
+      // search; explicit `%`s in the input are passed through unchanged. Multiple
+      // ILIKE values join with OR (match any); multiple NOT ILIKE values join with AND
+      // (the row must contain none of them).
+      if (operator === '~~*' || operator === '!~~*') {
+        const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
+        const join = operator === '!~~*' ? ' AND ' : ' OR '
+        const pattern = (v: string) => (v.includes('%') ? v : '%' + v + '%')
+        return safeSql`(${joinSqlFragments(
+          values.map((v) => safeSql`event_message ${op} ${lit(pattern(v))}`),
+          join
+        )})`
+      }
+      // = / <> still emit exact match against the column — defensive; the
+      // FilterBar doesn't expose them for event_message, but a hand-crafted URL
+      // might.
+      return safeSql`event_message ${inOp} ${inList(values)}`
+    }
     default:
       return safeSql`log_attributes[${lit(key)}] ${inOp} ${inList(values)}`
   }

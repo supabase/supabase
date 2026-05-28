@@ -45,10 +45,16 @@ export const LogsFilterBar = () => {
       name: filter.value,
       type: 'string',
       options: filter.options ?? [],
-      operators: [
-        { label: 'Equals', value: '=', group: 'comparison' },
-        { label: 'Not equal', value: '<>', group: 'comparison' },
-      ],
+      operators:
+        filter.value === 'event_message'
+          ? [
+              { label: 'iLike', value: '~~*', group: 'pattern' },
+              { label: 'Not iLike', value: '!~~*', group: 'pattern' },
+            ]
+          : [
+              { label: 'Equals', value: '=', group: 'comparison' },
+              { label: 'Not equal', value: '<>', group: 'comparison' },
+            ],
     }))
 
   // Local state because the FilterBar carries transient states
