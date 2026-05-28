@@ -105,7 +105,7 @@ export function analyticsLiteral(value: string | number | boolean): SafeLogSqlFr
     return rawSql(String(value))
   }
   if (typeof value === 'boolean') {
-    return rawSql(value ? 'true' : 'false')
+    return value ? safeSql`true` : safeSql`false`
   }
   if (typeof value !== 'string') {
     throw new Error('analyticsLiteral: only string, number, or boolean inputs are supported')
