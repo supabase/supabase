@@ -47,7 +47,7 @@ describe('MyComponent', () => {
       method: 'get',
       path: '/platform/organizations',
       response: () =>
-        HttpResponse.json([
+        HttpResponse.json<OrganizationResponse[]>([
           {
             /* ... */
           },
@@ -93,8 +93,8 @@ which silently breaks `onSuccess` callbacks.
 // ❌ Mutation onSuccess silently never fires
 response: () => new HttpResponse(null, { status: 201 })
 
-// ✅ Works
-response: () => HttpResponse.json({}, { status: 201 })
+// ✅ Works (pass the OpenAPI body shape explicitly — see gotcha #8)
+response: () => HttpResponse.json<MyResponse>({}, { status: 201 })
 ```
 
 ### 3. Submit buttons in Sheets/Modals need `fireEvent.click`
@@ -176,6 +176,33 @@ addAPIMock({
 })
 ```
 
+### 8. Always pass an explicit generic to `HttpResponse.json`
+
+`addAPIMock`'s resolver is typed against the OpenAPI success body (and the
+standard `{ message: string }` error envelope, exported as `APIErrorBody`).
+But MSW's `HttpResponse.json` uses `NoInfer`, so the body type doesn't
+narrow from context. Pass the expected shape explicitly — it doubles as a
+self-documenting contract assertion:
+
+```ts
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+
+response: () => HttpResponse.json<OrganizationResponse[]>([...])
+response: () =>
+  HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 })
+```
+
+A mock that drifts from the contract (wrong envelope, missing fields,
+stale enum values) now fails at compile time, not at runtime. The cost is
+one type annotation per resolver — well worth it.
+
+For mocks at the network boundary, also prefer `createMockOrganizationResponse`
+(returns the raw OpenAPI `OrganizationResponse`) over `createMockOrganization`
+(which extends with frontend-derived `managed_by` / `partner_id` that the
+query layer attaches). Same pattern applies to any type that's a frontend
+extension of an OpenAPI schema: build a `createMockXResponse` helper that
+returns the raw API shape.
+
 ## Prefer asserting on UI state
 
 MSW's own best-practices doc explicitly recommends asserting on what
@@ -196,7 +223,7 @@ addAPIMock({
   path: '/v1/projects/:ref/secrets',
   response: async ({ request, params }) => {
     requests.push({ ref: params.ref as string | undefined, body: await request.json() })
-    return HttpResponse.json({}, { status: 201 })
+    return HttpResponse.json<CreateSecretsResponse>({}, { status: 201 })
   },
 })
 

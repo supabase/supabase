@@ -1,12 +1,16 @@
 import { screen } from '@testing-library/react'
+import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, test } from 'vitest'
 
 import { OrgNotFound } from './OrgNotFound'
 import type { ProfileContextType } from '@/lib/profile'
-import { createMockOrganization } from '@/tests/helpers'
+import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+
+type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
 
 const PROFILE_CONTEXT: ProfileContextType = {
   profile: {
@@ -34,7 +38,7 @@ const mockEmptyProjectsResponse = () => {
     method: 'get',
     path: '/platform/organizations/:slug/projects',
     response: () =>
-      HttpResponse.json({
+      HttpResponse.json<OrganizationProjectsResponse>({
         pagination: { count: 0, limit: 96, offset: 0 },
         projects: [],
       }),
@@ -46,7 +50,7 @@ describe('OrgNotFound', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/organizations',
-      response: () => HttpResponse.json([]),
+      response: () => HttpResponse.json<OrganizationResponse[]>([]),
     })
 
     customRender(<OrgNotFound slug="ghost-org" />, { profileContext: PROFILE_CONTEXT })
@@ -60,9 +64,9 @@ describe('OrgNotFound', () => {
       method: 'get',
       path: '/platform/organizations',
       response: () =>
-        HttpResponse.json([
-          createMockOrganization({ slug: 'acme-prod', name: 'Acme Production' }),
-          createMockOrganization({ slug: 'acme-dev', name: 'Acme Development' }),
+        HttpResponse.json<OrganizationResponse[]>([
+          createMockOrganizationResponse({ slug: 'acme-prod', name: 'Acme Production' }),
+          createMockOrganizationResponse({ slug: 'acme-dev', name: 'Acme Development' }),
         ]),
     })
     mockEmptyProjectsResponse()
@@ -77,7 +81,11 @@ describe('OrgNotFound', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/organizations',
-      response: () => HttpResponse.json({ message: 'Boom from the backend' }, { status: 500 }),
+      response: () =>
+        HttpResponse.json<APIErrorBody>(
+          { message: 'Boom from the backend' },
+          { status: 500 }
+        ),
     })
 
     customRender(<OrgNotFound slug="ghost-org" />, { profileContext: PROFILE_CONTEXT })
