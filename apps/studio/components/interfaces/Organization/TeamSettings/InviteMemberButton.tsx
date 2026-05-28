@@ -44,6 +44,7 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
@@ -58,6 +59,7 @@ import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -244,25 +246,34 @@ export const InviteMemberButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <ButtonTooltip
-          type="primary"
-          disabled={!canInviteMembers}
-          icon={<UserPlus size={14} />}
-          className="pointer-events-auto grow md:grow-0"
-          onClick={() => setIsOpen(true)}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !organizationMembersCreationEnabled
-                ? 'Inviting members is currently disabled'
-                : !canInviteMembers
-                  ? 'You need additional permissions to invite members to this organization'
-                  : undefined,
-            },
+        <Shortcut
+          id={SHORTCUT_IDS.ORG_TEAM_INVITE}
+          onTrigger={() => {
+            if (canInviteMembers) setIsOpen(true)
           }}
+          side="bottom"
+          tooltipOpen={isOpen ? false : undefined}
         >
-          Invite members
-        </ButtonTooltip>
+          <ButtonTooltip
+            type="primary"
+            disabled={!canInviteMembers}
+            icon={<UserPlus size={14} />}
+            className="pointer-events-auto grow md:grow-0"
+            onClick={() => setIsOpen(true)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !organizationMembersCreationEnabled
+                  ? 'Inviting members is currently disabled'
+                  : !canInviteMembers
+                    ? 'You need additional permissions to invite members to this organization'
+                    : undefined,
+              },
+            }}
+          >
+            Invite members
+          </ButtonTooltip>
+        </Shortcut>
       </DialogTrigger>
       <DialogContent size="medium">
         <DialogHeader>
@@ -440,9 +451,16 @@ export const InviteMemberButton = () => {
               <Button type="default" onClick={confirmOnClose}>
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit" loading={isInviting}>
-                {emailCount >= 2 ? 'Send invitations' : 'Send invitation'}
-              </Button>
+              <Shortcut
+                id={SHORTCUT_IDS.ORG_TEAM_INVITE_SUBMIT}
+                onTrigger={() => form.handleSubmit(onInviteMember)()}
+                options={{ enabled: isOpen && !isInviting }}
+                side="top"
+              >
+                <Button type="primary" htmlType="submit" loading={isInviting}>
+                  {emailCount >= 2 ? 'Send invitations' : 'Send invitation'}
+                </Button>
+              </Shortcut>
             </DialogFooter>
           </form>
         </Form>
