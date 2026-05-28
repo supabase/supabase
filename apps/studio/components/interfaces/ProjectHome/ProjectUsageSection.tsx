@@ -209,7 +209,7 @@ export const ProjectUsageSection = () => {
       </div>
       <Row maxColumns={4} minWidth={280}>
         {enabledServices.map((s) => (
-          <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col h-64">
+          <Card key={s.key} className="mb-0 flex flex-col h-64">
             <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
               <div className="flex items-center gap-2">
                 <div className="flex flex-col">
