@@ -70,9 +70,11 @@ export const LogsBarChart = ({
       data-testid="logs-bar-chart"
       className={cn('flex flex-col gap-y-3', isFullHeight ? 'h-full' : 'h-24')}
     >
-      <ChartContainer className="h-full" config={chartConfig ?? defaultChartConfig}>
+      <ChartContainer
+        className="block h-full aspect-auto"
+        config={chartConfig ?? defaultChartConfig}
+      >
         <RechartBarChart
-          height={isFullHeight ? undefined : 100}
           data={data}
           onMouseMove={(e: any) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
