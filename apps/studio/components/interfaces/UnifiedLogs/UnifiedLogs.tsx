@@ -38,6 +38,12 @@ import { RowSelectionHeader } from './RowSelectionHeader'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
+import {
+  columnFiltersToLogsFilters,
+  groupLogsFiltersByColumn,
+  logsFiltersToUrlParams,
+  parseLogsFilterUrlParams,
+} from './UnifiedLogs.filters'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
@@ -84,22 +90,14 @@ export const UnifiedLogs = () => {
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
-  const {
-    sort,
-    start,
-    size,
-    id,
-    cursor,
-    direction,
-    live,
-    hide_connection_logs: _hideConnectionLogs,
-    ...filter
-  } = search
-  const defaultColumnSorting = sort ? [sort] : []
+  const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnVisibility = { uuid: false }
-  const defaultColumnFilters = Object.entries(filter)
-    .map(([key, value]) => ({ id: key, value }))
-    .filter(({ value }) => value ?? undefined)
+  // Column filters are seeded from the repeatable `filter` URL param. Each entry
+  // (`col:opAbbrev:value`) is grouped per column into a wrapped { operator, values }
+  // shape that the query builder reads back.
+  const defaultColumnFilters = Object.entries(
+    groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
+  ).map(([id, value]) => ({ id, value }))
 
   const [topBarHeight, setTopBarHeight] = useState(0)
   const topBarRef = useRef<HTMLDivElement>(null)
@@ -211,15 +209,17 @@ export const UnifiedLogs = () => {
   const facets = counts?.facets
   const totalFetched = flatData?.length
 
-  // Create a filtered version of the chart config based on selected levels
+  // Create a filtered version of the chart config based on level filters in the URL.
   const filteredChartConfig = useMemo(() => {
-    const levelFilter = search.level || LEVELS
+    const levelFilters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'level')
+    const included = levelFilters.filter((f) => f.operator === '=').map((f) => f.value)
+    const excluded = new Set(levelFilters.filter((f) => f.operator === '<>').map((f) => f.value))
+    const baseLevels: readonly string[] = included.length > 0 ? included : LEVELS
+    const activeLevels = baseLevels.filter((l) => !excluded.has(l))
     return Object.fromEntries(
-      Object.entries(CHART_CONFIG).filter(([key]) =>
-        levelFilter.includes(key as (typeof LEVELS)[number])
-      )
+      Object.entries(CHART_CONFIG).filter(([key]) => activeLevels.includes(key))
     ) as ChartConfig
-  }, [search.level])
+  }, [search.filter])
 
   const getRowClassName = <
     TData extends { date: Date; level: (typeof LEVELS)[number]; timestamp: number },
@@ -270,10 +270,6 @@ export const UnifiedLogs = () => {
     return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
   }, [isLoading, isFetching, flatData.length, table, openRowId])
 
-  // REMINDER: this is currently needed for the cmdk search
-  // [Joshen] This is where facets are getting dynamically loaded
-  // TODO: auto search via API when the user changes the filter instead of hardcoded
-
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
@@ -298,24 +294,21 @@ export const UnifiedLogs = () => {
     })
   }, [facets])
 
-  // Debounced filter application to avoid too many API calls when user clicks multiple filters quickly
+  // Debounced filter application to avoid too many API calls when user clicks multiple filters quickly.
+  // All equality/pattern column filters serialize into the repeatable `filter` URL param. Slider/timerange
+  // column filters keep their dedicated per-column URL keys so things like the timeline brush still
+  // round-trip — they have their own range semantics and aren't covered by eq/neq/like.
   const applyFilterSearch = () => {
-    const columnFiltersWithNullable = filterFields.map((field) => {
-      const filterValue = columnFilters.find((filter) => filter.id === field.value)
-      if (!filterValue) return { id: field.value, value: null }
-      return { id: field.value, value: filterValue.value }
-    })
-
-    const search = columnFiltersWithNullable.reduce(
-      (prev, curr) => {
-        // Add to search parameters
-        prev[curr.id as string] = curr.value
-        return prev
-      },
-      {} as Record<string, unknown>
-    )
-
-    setSearch(search)
+    const filterEntries = logsFiltersToUrlParams(columnFiltersToLogsFilters(columnFilters))
+    const update: Record<string, unknown> = {
+      filter: filterEntries.length > 0 ? filterEntries : null,
+    }
+    for (const field of filterFields) {
+      if (field.type !== 'timerange') continue
+      const current = columnFilters.find((c) => c.id === field.value)?.value
+      update[field.value] = current ?? null
+    }
+    setSearch(update)
   }
 
   const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)

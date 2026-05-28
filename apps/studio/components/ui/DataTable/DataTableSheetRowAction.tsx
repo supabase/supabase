@@ -21,6 +21,10 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import {
+  isLogsFilterColumnValue,
+  type LogsColumnFilterValue,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import CopyButton from '@/components/ui/CopyButton'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
@@ -78,12 +82,16 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         return (
           <DropdownMenuItem
             onClick={() => {
-              const filterValue = column?.getFilterValue() as undefined | Array<unknown>
-              const newValue = filterValue?.includes(value)
-                ? filterValue
-                : [...(filterValue || []), value]
-
-              column?.setFilterValue(newValue)
+              // Equality filters use the wrapped { operator, values } shape so the
+              // row action stays compatible with the FilterBar (which writes `=` and `<>`).
+              const current = column?.getFilterValue()
+              const existing: LogsColumnFilterValue = isLogsFilterColumnValue(current)
+                ? current
+                : { operator: '=', values: [] }
+              const next: LogsColumnFilterValue = existing.values.includes(String(value))
+                ? existing
+                : { operator: existing.operator, values: [...existing.values, String(value)] }
+              column?.setFilterValue(next)
             }}
             className="flex items-center gap-2"
           >
@@ -94,7 +102,12 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
       case 'input':
         return (
           <DropdownMenuItem
-            onClick={() => column?.setFilterValue(value)}
+            onClick={() =>
+              column?.setFilterValue({
+                operator: field.value === 'event_message' ? '~~*' : '=',
+                values: [String(value)],
+              } satisfies LogsColumnFilterValue)
+            }
             className="flex items-center gap-2"
           >
             <Filter size={12} />
