@@ -82,10 +82,7 @@ describe('OrgNotFound', () => {
       method: 'get',
       path: '/platform/organizations',
       response: () =>
-        HttpResponse.json<APIErrorBody>(
-          { message: 'Boom from the backend' },
-          { status: 500 }
-        ),
+        HttpResponse.json<APIErrorBody>({ message: 'Boom from the backend' }, { status: 500 }),
     })
 
     customRender(<OrgNotFound slug="ghost-org" />, { profileContext: PROFILE_CONTEXT })

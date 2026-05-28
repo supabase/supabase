@@ -1,10 +1,4 @@
-import {
-  DefaultBodyType,
-  http,
-  HttpResponse,
-  HttpResponseResolver,
-  PathParams,
-} from 'msw'
+import { DefaultBodyType, http, HttpResponse, HttpResponseResolver, PathParams } from 'msw'
 import { setupServer } from 'msw/node'
 
 import type { paths } from '../../data/api'

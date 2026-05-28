@@ -147,8 +147,7 @@ describe('ApiAuthorizationScreen', () => {
       addAPIMock({
         method: 'get',
         path: '/platform/oauth/authorizations/:id',
-        response: () =>
-          HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
+        response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
       })
       renderScreen()
       await screen.findByText('Failed to fetch details for API authorization request')

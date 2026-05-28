@@ -10,12 +10,9 @@ import { SupportForm, SupportFormPage, SupportFormStatusButton } from '../Suppor
 // End of third-party imports
 
 import { API_URL, BASE_PATH } from '@/lib/constants'
-import {
-  createMockOrganizationResponse,
-  createMockProject,
-} from '@/tests/helpers'
+import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody, mswServer } from '@/tests/lib/msw'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
@@ -473,10 +470,7 @@ describe('SupportFormPage', () => {
         const project = mockProjects.projects.find((candidate) => candidate.ref === ref)
         return project
           ? HttpResponse.json<ProjectDetailResponse>(toProjectDetailResponse(project))
-          : HttpResponse.json<APIErrorBody>(
-              { message: 'Project not found' },
-              { status: 404 }
-            )
+          : HttpResponse.json<APIErrorBody>({ message: 'Project not found' }, { status: 404 })
       },
     })
 
@@ -1068,10 +1062,7 @@ describe('SupportFormPage', () => {
         const project = mockProjects.projects.find((candidate) => candidate.ref === ref)
         return project
           ? HttpResponse.json<ProjectDetailResponse>(toProjectDetailResponse(project))
-          : HttpResponse.json<APIErrorBody>(
-              { message: 'Project not found' },
-              { status: 404 }
-            )
+          : HttpResponse.json<APIErrorBody>({ message: 'Project not found' }, { status: 404 })
       },
     })
 
