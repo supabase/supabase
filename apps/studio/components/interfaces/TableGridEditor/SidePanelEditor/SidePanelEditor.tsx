@@ -59,7 +59,6 @@ import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
 import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { getTables } from '@/data/tables/tables-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useUrlState } from '@/hooks/ui/useUrlState'
@@ -196,7 +195,6 @@ export const SidePanelEditor = ({
   const track = useTrack()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
 
@@ -684,9 +682,9 @@ export const SidePanelEditor = ({
                 foreignKeyRelations,
                 isRLSEnabled,
                 importContent,
-                organizationSlug: org?.slug,
                 generatedPolicies: acceptedPolicies,
                 onCreatePoliciesSuccess: () => track('rls_generated_policies_created'),
+                track,
               })
 
               createTableSpan.setAttribute('table.created', 1)
@@ -806,7 +804,7 @@ export const SidePanelEditor = ({
           foreignKeyRelations,
           existingForeignKeyRelations,
           primaryKey,
-          organizationSlug: org?.slug,
+          track,
         })
 
         if (table === undefined) {

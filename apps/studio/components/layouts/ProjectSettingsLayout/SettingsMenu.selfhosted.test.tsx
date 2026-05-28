@@ -2,6 +2,9 @@ import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { useGenerateSettingsMenu } from './SettingsMenu.utils'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+const getShortcutId = (item: unknown) => (item as { shortcutId?: string } | undefined)?.shortcutId
 
 vi.mock('@/lib/constants', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
@@ -40,6 +43,9 @@ describe('useGenerateSettingsMenu (self-hosted)', () => {
     const configGroup = result.current.find((group) => group.title === 'Configuration')
 
     expect(configGroup?.items.some((item) => item.key === 'log-drains')).toBe(true)
+    expect(getShortcutId(configGroup?.items.find((item) => item.key === 'log-drains'))).toBe(
+      SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS
+    )
   })
 
   it('does not include dashboard settings in self-hosted mode', () => {

@@ -28,10 +28,9 @@ import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/d
 import { useS3VectorsWrapperCreateMutation } from '@/data/storage/s3-vectors-wrapper-create-mutation'
 import { useVectorBucketCreateMutation } from '@/data/storage/vector-bucket-create-mutation'
 import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FormSchema = z.object({
   name: z
@@ -89,7 +88,6 @@ export const CreateVectorBucketDialog = ({
   setVisible: (visible: boolean) => void
 }) => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -100,7 +98,7 @@ export const CreateVectorBucketDialog = ({
     defaultValues: { name: '' },
   })
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutateAsync: createVectorBucket } = useVectorBucketCreateMutation({
     onError: () => {},
   })
@@ -156,13 +154,9 @@ export const CreateVectorBucketDialog = ({
         { duration: 8000 }
       )
     }
-    setIsLoading(false)
 
-    sendEvent({
-      action: 'storage_bucket_created',
-      properties: { bucketType: 'vector' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    setIsLoading(false)
+    track('storage_bucket_created', { bucketType: 'vector' })
     form.reset()
     setVisible(false)
   }
