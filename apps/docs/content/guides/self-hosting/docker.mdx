@@ -81,7 +81,7 @@ The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
 - Sparse-clone the `docker/` directory from the main Supabase [repository](https://github.com/supabase/supabase/)
 - Create a project directory (`supabase-project` by default) and copy the configuration files into it
 - Prompt for the main URLs (`SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, `SITE_URL`, `PROXY_DOMAIN`) and write them to `.env`
-- Generate all secrets, including a random `DASHBOARD_PASSWORD`, and the asymmetric JWT signing key pair (runs `generate-keys.sh` and `add-new-auth-keys.sh`, and uncomments the matching entries in `docker-compose.yml`)
+- Generate all secrets, including a random `DASHBOARD_PASSWORD`, and the asymmetric JWT signing key pair (runs `generate-keys.sh` and `add-new-auth-keys.sh`, and enables the matching entries in `docker-compose.yml`)
 - Pull the Docker images
 
 The shortened link points to [setup.sh](https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/docker/setup.sh) - you can inspect it before running. Use `-y` to run non-interactively with default values.
