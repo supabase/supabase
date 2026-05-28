@@ -1,6 +1,8 @@
 import '@code-hike/mdx/styles.css'
 import 'config/code-hike.css'
 import '../styles/globals.css'
+import '../styles/studio-grid.css'
+import 'react-data-grid/lib/styles.css'
 import './launch-week/launchWeek.css'
 
 import {

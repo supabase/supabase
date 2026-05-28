@@ -1,0 +1,131 @@
+@reference "./globals.css";
+
+.sb-grid {
+  @apply flex h-full flex-col;
+}
+
+.sb-grid-fill-container:after {
+  content: '';
+  display: inline-block;
+  width: 100%;
+}
+
+.rdg-cell {
+  @apply flex border-secondary border-r border-b text-foreground;
+  font-size: 14px;
+  padding-inline: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: inherit;
+}
+
+.rdg-cell.rdg-editor-container > * {
+  background-color: inherit;
+}
+
+.rdg-cell[aria-selected='true'] {
+  box-shadow: inset 0 0 0 1px #24b47e;
+}
+
+.rdg:not(:focus-within) .rdg-cell[aria-selected='true'] {
+  box-shadow: none;
+  outline: none;
+}
+
+.rdg {
+  @apply box-border select-none overflow-x-auto overflow-y-scroll bg-dash-canvas border-t border-r-0 border-l-0;
+  contain: strict;
+  font-size: 14px;
+}
+
+.rdg *,
+.rdg ::after,
+.rdg ::before {
+  box-sizing: inherit;
+}
+
+.rdg-header-row {
+  @apply bg-surface-200 select-none border-none;
+  height: var(--header-row-height, 36px);
+  line-height: var(--header-row-height, 36px);
+  top: 0;
+}
+
+.rdg-header-row .rdg-cell {
+  @apply bg-surface-200 border-default border-b;
+}
+
+.rdg-row {
+  @apply bg-dash-sidebar transition-colors hover:bg-surface-200;
+}
+
+.rdg-row[aria-selected='true'] {
+  @apply bg-surface-200;
+}
+
+.sb-grid [type='checkbox'] {
+  appearance: none;
+  display: inline-block;
+  vertical-align: middle;
+  user-select: none;
+  flex-shrink: 0;
+  height: 1rem;
+  width: 1rem;
+  @apply cursor-pointer rounded-sm border border-solid text-foreground border-strong transition-all hover:border-foreground focus:ring-0 focus:outline-hidden bg-control;
+  margin-top: 2px;
+}
+
+.sb-grid [type='checkbox']:checked {
+  @apply bg-foreground;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='hsl(0, 0%, 100%)'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E") !important;
+}
+
+[data-theme='dark'] .sb-grid [type='checkbox']:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='hsl(0, 0%, 0%)'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E") !important;
+}
+
+.null-value {
+  @apply block opacity-50;
+}
+
+.sb-grid-column-header {
+  @apply flex h-full w-full items-center justify-between px-2;
+}
+
+.sb-grid-column-header__inner {
+  @apply flex items-center gap-2 overflow-hidden text-ellipsis;
+}
+
+.sb-grid-column-header__inner__name {
+  @apply text-foreground overflow-hidden text-ellipsis text-xs select-text;
+}
+
+.sb-grid-column-header__inner__format {
+  @apply text-xs overflow-hidden text-ellipsis font-normal text-foreground-light;
+}
+
+.sb-grid-column-header__inner__primary-key {
+  @apply flex rotate-45 transform items-center;
+}
+
+.sb-grid-column-header__inner svg {
+  @apply text-brand;
+}
+
+.sb-grid-text-editor__input {
+  @apply h-full w-full bg-inherit px-2 outline-none;
+  font-size: 14px;
+}
+
+.realtime-hero-cell--remote-focus {
+  position: relative;
+}
+
+.realtime-hero-cell__editor-badge {
+  @apply absolute -top-px right-0 z-10 px-1.5 py-0.5 text-[10px] font-bold text-white rounded-bl-sm pointer-events-none;
+}
+
+.realtime-hero-grid .rdg {
+  overflow-y: hidden;
+}

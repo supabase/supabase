@@ -76,6 +76,7 @@
     "react": "catalog:",
     "react-copy-to-clipboard": "^5.1.0",
     "react-countdown": "^2.3.5",
+    "react-data-grid": "7.0.0-beta.47",
     "react-dom": "catalog:",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.6",
