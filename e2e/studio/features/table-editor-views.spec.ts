@@ -264,7 +264,7 @@ test.describe('table editor — materialized view context menu', () => {
     await goToTableEditor(page, ref)
 
     await openEntityContextMenu(page, fixture.mvName)
-    await page.getByRole('menuitem', { name: 'Delete materialized view' }).click()
+    await page.getByRole('menuitem', { name: 'Delete view' }).click()
 
     await expect(
       page.getByRole('heading', {

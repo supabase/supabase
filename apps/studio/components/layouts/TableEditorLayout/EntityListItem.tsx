@@ -244,7 +244,7 @@ export const EntityListItem = ({
                 onClick={(e) => e.preventDefault()}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="start" className="w-44">
+            <DropdownMenuContent side="bottom" align="start" className="w-52">
               <DropdownMenuItem
                 key="copy-name"
                 className="space-x-2"
@@ -253,7 +253,7 @@ export const EntityListItem = ({
                   copyToClipboard(entity.name)
                 }}
               >
-                <Copy size={12} />
+                <Copy size={12} className="shrink-0" />
                 <span>Copy name</span>
               </DropdownMenuItem>
 
@@ -289,7 +289,7 @@ export const EntityListItem = ({
                     }
                   }}
                 >
-                  <Copy size={12} />
+                  <Copy size={12} className="shrink-0" />
                   <span>Copy table schema</span>
                 </DropdownMenuItem>
               )}
@@ -331,7 +331,7 @@ export const EntityListItem = ({
                     }
                   }}
                 >
-                  <Copy size={12} />
+                  <Copy size={12} className="shrink-0" />
                   <span>Copy definition</span>
                 </DropdownMenuItem>
               )}
@@ -348,7 +348,7 @@ export const EntityListItem = ({
                       snap.onEditTable()
                     }}
                   >
-                    <Edit size={12} />
+                    <Edit size={12} className="shrink-0" />
                     <span>Edit table</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -359,7 +359,7 @@ export const EntityListItem = ({
                       snap.onDuplicateTable()
                     }}
                   >
-                    <Copy size={12} />
+                    <Copy size={12} className="shrink-0" />
                     <span>Duplicate table</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
@@ -367,14 +367,14 @@ export const EntityListItem = ({
                       key="view-policies"
                       href={`/project/${projectRef}/auth/policies?schema=${encodeURIComponent(selectedSchema ?? '')}&search=${encodeURIComponent(String(entity.id))}`}
                     >
-                      <Lock size={12} />
+                      <Lock size={12} className="shrink-0" />
                       <span>View policies</span>
                     </Link>
                   </DropdownMenuItem>
 
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className="gap-x-2">
-                      <Download size={12} />
+                      <Download size={12} className="shrink-0" />
                       Export data
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
@@ -420,7 +420,7 @@ export const EntityListItem = ({
                       snap.onDeleteTable()
                     }}
                   >
-                    <Trash size={12} />
+                    <Trash size={12} className="shrink-0" />
                     <span>Delete table</span>
                   </DropdownMenuItem>
                 </>
@@ -432,7 +432,7 @@ export const EntityListItem = ({
 
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className="gap-x-2">
-                      <Download size={12} />
+                      <Download size={12} className="shrink-0" />
                       Export data
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
@@ -468,7 +468,7 @@ export const EntityListItem = ({
                       snap.onDeleteView()
                     }}
                   >
-                    <Trash size={12} />
+                    <Trash size={12} className="shrink-0" />
                     <span>Delete view</span>
                   </DropdownMenuItem>
                 </>
@@ -480,7 +480,7 @@ export const EntityListItem = ({
 
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className="gap-x-2">
-                      <Download size={12} />
+                      <Download size={12} className="shrink-0" />
                       Export data
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
@@ -516,8 +516,8 @@ export const EntityListItem = ({
                       snap.onDeleteMaterializedView()
                     }}
                   >
-                    <Trash size={12} />
-                    <span>Delete materialized view</span>
+                    <Trash size={12} className="shrink-0" />
+                    <span>Delete view</span>
                   </DropdownMenuItem>
                 </>
               )}
