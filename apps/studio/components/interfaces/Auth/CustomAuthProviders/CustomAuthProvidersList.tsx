@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Edit, MoreVertical, Plus, Power, PowerOff, Search, Trash, X } from 'lucide-react'
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -40,6 +40,7 @@ import { DeleteCustomProviderModal } from './DeleteCustomProviderModal'
 import { DisableCustomProviderModal } from './DisableCustomProviderModal'
 import AlertError from '@/components/ui/AlertError'
 import { FilterPopover } from '@/components/ui/FilterPopover'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
@@ -47,6 +48,9 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthCustomProviderUpdateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
 import { useOAuthCustomProvidersQuery } from '@/data/oauth-custom-providers/oauth-custom-providers-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const CUSTOM_PROVIDERS_SORT_VALUES = [
   'name:asc',
@@ -125,6 +129,7 @@ export const CustomAuthProvidersList = () => {
   const [selectedProviderToDisable, setSelectedProviderToDisable] = useState<string | null>(null)
   const [filteredProviderTypes, setFilteredProviderTypes] = useState<string[]>([])
   const [filteredEnabledStatuses, setFilteredEnabledStatuses] = useState<string[]>([])
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const {
     data: customProviders,
@@ -213,6 +218,17 @@ export const CustomAuthProvidersList = () => {
     setFilteredEnabledStatuses([])
   }
 
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search custom providers' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, handleResetFilters)
+
   const handleSortChange = (column: CustomProvidersSortColumn) => {
     const [currentCol, currentOrder] = sort.split(':') as [
       CustomProvidersSortColumn,
@@ -288,10 +304,12 @@ export const CustomAuthProvidersList = () => {
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
             <InputGroup className="w-full lg:w-52">
               <InputGroupInput
+                ref={searchInputRef}
                 size="tiny"
                 placeholder="Search custom providers"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
               />
               <InputGroupAddon>
                 <Search />
@@ -370,10 +388,22 @@ export const CustomAuthProvidersList = () => {
                 </HoverCardContent>
               </HoverCard>
             ) : (
-              <NewProviderButton
-                canCreateProvider={canCreateProvider}
-                setShowCreateSheet={setShowCreateSheet}
-              />
+              <Shortcut
+                id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                label="Create new provider"
+                onTrigger={() => setShowCreateSheet(true)}
+                side="bottom"
+              >
+                <Button
+                  type="primary"
+                  disabled={!canCreateProvider}
+                  icon={<Plus />}
+                  onClick={() => setShowCreateSheet(true)}
+                  className="grow"
+                >
+                  New Provider
+                </Button>
+              </Shortcut>
             )}
           </div>
         </div>

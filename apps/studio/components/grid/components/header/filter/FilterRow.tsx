@@ -74,7 +74,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       </DropdownControl>
       <Input
         size="tiny"
-        className="w-full"
+        className="bg-control w-full"
         placeholder={placeholder}
         value={filter.value}
         onChange={(event) =>

@@ -1,13 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   cn,
   RadioGroupCard,
   RadioGroupCardItem,
@@ -16,6 +15,7 @@ import {
 
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
@@ -130,23 +130,21 @@ const CustomDomainSidePanel = () => {
           {subscriptionCDOption === undefined &&
             selectedCustomDomain !== undefined &&
             customDomainsDisabledDueToQuota && (
-              <Alert_Shadcn_ variant="default" className="mb-2">
+              <Alert variant="default" className="mb-2">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle_Shadcn_>
-                  Adding new custom domains temporarily disabled
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                <AlertTitle>Adding new custom domains temporarily disabled</AlertTitle>
+                <AlertDescription className="flex flex-col gap-3">
                   We are working with our upstream DNS provider before we are able to sign up new
                   custom domains. Please check back in a few hours.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
-            <Link href={`/project/${projectRef}/settings/general`} className="text-brand">
+            <InlineLink href={`/project/${projectRef}/settings/general#custom-domains`}>
               General Settings
-            </Link>{' '}
+            </InlineLink>{' '}
             page after enabling the add-on.
           </p>
 

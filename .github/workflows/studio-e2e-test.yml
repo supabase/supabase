@@ -103,10 +103,10 @@ jobs:
         if: steps.filter.outputs.studio == 'true'
         run: SKIP_ASSET_UPLOAD=1 NODE_ENV=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
 
-      - name: 🚀 Run Playwright tests against Vercel Preview
+      - name: 🚀 Run Playwright tests against local studio build
         if: steps.filter.outputs.studio == 'true'
         id: playwright
-        run: pnpm e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: PWTEST_SHARD_WEIGHTS=62:38 pnpm e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
       - name: Upload blob report to GitHub Actions Artifacts
         if: always() && steps.filter.outputs.studio == 'true'

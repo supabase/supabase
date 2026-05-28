@@ -39,7 +39,6 @@ import {
   getPipelineDisplayState,
   getStatusName,
   PIPELINE_ACTIONABLE_STATES,
-  PIPELINE_ERROR_MESSAGES,
 } from '../Pipeline.utils'
 import { PipelineStatus } from '../PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
@@ -62,6 +61,7 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 /**
  * Component for displaying replication pipeline status and table replication details.
@@ -232,8 +232,14 @@ export const ReplicationPipelineStatus = () => {
 
   const onPrimaryAction = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    if (!pipeline) return toast.error('No pipeline found')
 
+    const action =
+      statusName === PipelineStatusName.STOPPED
+        ? 'start'
+        : statusName === PipelineStatusName.STARTED
+          ? 'stop'
+          : 'restart'
     try {
       if (statusName === PipelineStatusName.STOPPED) {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
@@ -247,7 +253,7 @@ export const ReplicationPipelineStatus = () => {
       }
     } catch (error) {
       setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+      toast.error(`Failed to ${action} pipeline: ${(error as ResponseError).message}`)
     }
   }
 
@@ -315,7 +321,7 @@ export const ReplicationPipelineStatus = () => {
           </div>
         </div>
         {isPipelineError && (
-          <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
+          <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
         )}
 
         {isStatusError && (

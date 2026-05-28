@@ -5,7 +5,7 @@ import { Check, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
+import { Button, cn, CommandGroup, CommandItem } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -191,8 +191,8 @@ export const Usage = () => {
                       )
                     }}
                     renderActions={() => (
-                      <CommandGroup_Shadcn_>
-                        <CommandItem_Shadcn_
+                      <CommandGroup>
+                        <CommandItem
                           className="cursor-pointer flex items-center justify-between w-full"
                           onSelect={() => {
                             setOpenProjectSelector(false)
@@ -205,8 +205,8 @@ export const Usage = () => {
                         >
                           All projects
                           {!selectedProjectRef && <Check size={16} />}
-                        </CommandItem_Shadcn_>
-                      </CommandGroup_Shadcn_>
+                        </CommandItem>
+                      </CommandGroup>
                     )}
                   />
                 </div>

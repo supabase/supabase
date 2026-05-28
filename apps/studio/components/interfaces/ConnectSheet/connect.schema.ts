@@ -123,13 +123,6 @@ const codexAddServerStep: StepDefinition = {
   content: 'steps/mcp/codex/add-server',
 }
 
-const codexEnableRemoteStep: StepDefinition = {
-  id: 'codex-enable-remote',
-  title: 'Enable remote MCP client support',
-  description: 'Add this to your ~/.codex/config.toml file.',
-  content: 'steps/mcp/codex/enable-remote',
-}
-
 const codexAuthenticateStep: StepDefinition = {
   id: 'codex-authenticate',
   title: 'Authenticate',
@@ -265,7 +258,8 @@ export const connectSchema: ConnectSchema = {
       type: 'radio-list',
       label: 'Connection Method',
       options: { source: 'connectionMethods' },
-      defaultValue: 'direct',
+      // Default is set per deployment mode by useConnectState.setMode('direct'):
+      // platform/CLI → 'direct', self-hosted → 'session'.
     },
     useSharedPooler: {
       id: 'useSharedPooler',
@@ -387,13 +381,7 @@ export const connectSchema: ConnectSchema = {
       orm: [ormInstallStep, ormConfigureStep, skillsInstallStep],
       mcp: {
         mcpClient: {
-          codex: [
-            codexAddServerStep,
-            codexEnableRemoteStep,
-            codexAuthenticateStep,
-            codexVerifyStep,
-            skillsInstallStep,
-          ],
+          codex: [codexAddServerStep, codexAuthenticateStep, codexVerifyStep, skillsInstallStep],
           'claude-code': [claudeAddServerStep, claudeAuthenticateStep, skillsInstallStep],
           DEFAULT: [mcpConfigureStep, skillsInstallStep],
         },

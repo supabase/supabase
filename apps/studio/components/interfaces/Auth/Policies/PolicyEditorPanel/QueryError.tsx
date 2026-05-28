@@ -2,13 +2,13 @@ import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.
 import { initial, last } from 'lodash'
 import { Dispatch, SetStateAction } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertTitle,
   Button,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from 'ui'
 
 import { QueryResponseError } from '@/data/sql/execute-sql-mutation'
@@ -27,7 +27,7 @@ export const QueryError = ({
 
   return (
     <div className="flex flex-col gap-y-3 px-5">
-      <Alert_Shadcn_ variant="destructive">
+      <Alert variant="destructive">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
@@ -41,16 +41,16 @@ export const QueryError = ({
           />
         </svg>
         <div className="flex flex-col gap-3">
-          <AlertTitle_Shadcn_ className="m-0">Error running SQL query</AlertTitle_Shadcn_>
+          <AlertTitle className="m-0">Error running SQL query</AlertTitle>
 
-          <Collapsible_Shadcn_
+          <Collapsible
             defaultOpen
             className="flex flex-col gap-3"
             open={open}
             onOpenChange={() => setOpen(!open)}
           >
             <div className="flex gap-2">
-              <CollapsibleTrigger_Shadcn_ asChild>
+              <CollapsibleTrigger asChild>
                 <Button
                   size="tiny"
                   type="outline"
@@ -58,9 +58,9 @@ export const QueryError = ({
                 >
                   {open ? 'Hide error details' : 'Show error details'}
                 </Button>
-              </CollapsibleTrigger_Shadcn_>
+              </CollapsibleTrigger>
             </div>
-            <CollapsibleContent_Shadcn_ className="overflow-auto">
+            <CollapsibleContent className="overflow-auto">
               {formattedError.length > 0 ? (
                 formattedError.map((x: string, i: number) => (
                   <pre key={`error-${i}`} className="font-mono text-xs whitespace-pre-wrap">
@@ -95,10 +95,10 @@ export const QueryError = ({
               ) : (
                 <p className="font-mono text-xs">{error.error}</p>
               )}
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
-      </Alert_Shadcn_>
+      </Alert>
       <div className="overflow-x-auto"></div>
     </div>
   )

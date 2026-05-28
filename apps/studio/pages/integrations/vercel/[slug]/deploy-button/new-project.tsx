@@ -1,19 +1,19 @@
-import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import {
-  Alert,
   Button,
   Checkbox,
   Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
@@ -28,6 +28,7 @@ import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectCreateMutation } from '@/data/projects/project-create-mutation'
 import {
+  isInDataApiRevokeTreatment,
   useDataApiRevokeOnCreateDefaultEnabled,
   useTrackDefaultPrivilegesExposure,
 } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
@@ -54,11 +55,12 @@ const VercelIntegration: NextPageWithLayout = () => {
             />
           </header>
           <CreateProject />
-          <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
-            <Markdown
-              content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
-            />
-          </Alert>
+          <Admonition
+            type="default"
+            layout="horizontal"
+            title="You can uninstall this Integration at any time."
+            description="You can remove this integration at any time via Vercel or the Supabase dashboard"
+          />
         </ScaffoldColumn>
       </ScaffoldContainer>
     </>
@@ -81,20 +83,34 @@ const CreateProject = () => {
   const track = useTrack()
   const snapshot = useIntegrationInstallationSnapshot()
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
-  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean | string>(
+    'dataApiRevokeOnCreateDefault'
+  )
   const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
     !isDataApiRevokeOnCreateDefault
   )
+  const hasUserModifiedDataApiDefaultPrivileges = useRef(false)
 
-  useTrackDefaultPrivilegesExposure({ surface: 'vercel' })
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (hasUserModifiedDataApiDefaultPrivileges.current) return
+    setDataApiDefaultPrivileges(!isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag))
+  }, [dataApiRevokeOnCreateDefaultFlag])
+
+  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
+
+  useTrackDefaultPrivilegesExposure({
+    surface: 'vercel',
+    orgSlug: slug,
+    dataApiDefaultPrivileges,
+    hasUserModified: hasUserModifiedDataApiDefaultPrivileges.current,
+  })
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
     setPasswordStrengthMessage(message)
   }
-
-  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
   const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
 
@@ -176,15 +192,12 @@ const CreateProject = () => {
 
     snapshot.setLoading(true)
 
-    let dbSqlParts: string[] = []
+    let dbSql: string | undefined
     if (shouldRunMigrations) {
       const id = toast(`Fetching initial migrations from GitHub repo`)
       const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
-      if (migrationSql) dbSqlParts.push(migrationSql)
+      if (migrationSql) dbSql = migrationSql
       toast.success(`Done fetching initial migrations`, { id })
-    }
-    if (!dataApiDefaultPrivileges) {
-      dbSqlParts.push(buildDefaultPrivilegesSql('revoke'))
     }
 
     createProject({
@@ -192,7 +205,8 @@ const CreateProject = () => {
       name: projectName,
       dbPass,
       dbRegion,
-      dbSql: dbSqlParts.length > 0 ? dbSqlParts.join('\n') : undefined,
+      dbSql,
+      dataApiRevokeDefaultPrivileges: !dataApiDefaultPrivileges,
     })
   }
 
@@ -255,27 +269,31 @@ const CreateProject = () => {
     <div>
       <p className="mb-2">Supabase project details</p>
       <div className="py-2">
-        <Input
-          autoFocus
+        <FormItemLayout
           id="projectName"
+          isReactForm={false}
+          layout="vertical"
           label="Project name"
-          type="text"
-          placeholder=""
-          descriptionText=""
-          value={projectName}
-          onChange={onProjectNameChange}
-        />
+          size="tiny"
+        >
+          <Input
+            autoFocus
+            id="projectName"
+            type="text"
+            placeholder=""
+            value={projectName}
+            onChange={onProjectNameChange}
+          />
+        </FormItemLayout>
       </div>
       <div className="py-2">
-        <Input
+        <FormItemLayout
           id="dbPass"
+          isReactForm={false}
+          layout="vertical"
           label="Database password"
-          type="password"
-          placeholder="Type in a strong password"
-          value={dbPass}
-          copy={dbPass.length > 0}
-          onChange={onDbPassChange}
-          descriptionText={
+          size="tiny"
+          description={
             <PasswordStrengthBar
               passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
               password={dbPass}
@@ -283,7 +301,17 @@ const CreateProject = () => {
               generateStrongPassword={generatePassword}
             />
           }
-        />
+        >
+          <PasswordInput
+            id="dbPass"
+            type="password"
+            placeholder="Type in a strong password"
+            value={dbPass}
+            reveal
+            copy={dbPass.length > 0}
+            onChange={onDbPassChange}
+          />
+        </FormItemLayout>
       </div>
       <div className="py-2">
         <div className="mt-1">
@@ -296,15 +324,15 @@ const CreateProject = () => {
             className="gap-[2px]"
             size="tiny"
           >
-            <Select_Shadcn_ value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
-              <SelectTrigger_Shadcn_ id="region">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
+            <Select value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
+              <SelectTrigger id="region">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {Object.keys(AWS_REGIONS).map((option: string, i) => {
                   const label = Object.values(AWS_REGIONS)[i].displayName
                   return (
-                    <SelectItem_Shadcn_ key={option} value={label}>
+                    <SelectItem key={option} value={label}>
                       <div className="flex gap-2">
                         <img
                           alt="region icon"
@@ -313,11 +341,11 @@ const CreateProject = () => {
                         />
                         <span>{label}</span>
                       </div>
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   )
                 })}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              </SelectContent>
+            </Select>
           </FormItemLayout>
         </div>
       </div>
@@ -349,7 +377,10 @@ const CreateProject = () => {
             id="dataApiDefaultPrivileges"
             name="dataApiDefaultPrivileges"
             checked={dataApiDefaultPrivileges}
-            onCheckedChange={(checked) => setDataApiDefaultPrivileges(!!checked)}
+            onCheckedChange={(checked) => {
+              hasUserModifiedDataApiDefaultPrivileges.current = true
+              setDataApiDefaultPrivileges(!!checked)
+            }}
           />
           <div className="grid gap-1.5 leading-none">
             <label

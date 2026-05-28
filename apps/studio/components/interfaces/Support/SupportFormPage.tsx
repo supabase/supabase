@@ -25,12 +25,14 @@ import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
 import CopyButton from '@/components/ui/CopyButton'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+
+export { SupportForm, SupportFormStatusButton } from './SupportSidebarForm'
 
 function useSupportFormTelemetry() {
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return useCallback(
     ({
@@ -42,17 +44,12 @@ function useSupportFormTelemetry() {
       orgSlug: string | undefined
       category: ExtendedSupportCategories
     }) =>
-      sendEvent({
-        action: 'support_ticket_submitted',
-        properties: {
-          ticketCategory: category,
-        },
-        groups: {
-          project: projectRef,
-          organization: orgSlug,
-        },
-      }),
-    [sendEvent]
+      track(
+        'support_ticket_submitted',
+        { ticketCategory: category },
+        { project: projectRef, organization: orgSlug }
+      ),
+    [track]
   )
 }
 
@@ -97,7 +94,6 @@ function SupportFormPageContent() {
 
       <IncidentAdmonition isActive={hasActiveIncidents} />
 
-      {/* Only show AI Assistant and Discord CTAs if there are no active incidents  and the user is still filling out the support form*/}
       {!isSuccess && !hasActiveIncidents && (
         <div className="flex flex-col gap-y-4">
           <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
@@ -134,7 +130,7 @@ function SupportFormHeader() {
   const isIncident = incidents.length > 0
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
+    <div className="flex flex-col items-start justify-between gap-y-2 sm:flex-row sm:items-center">
       <div className="flex items-center space-x-3">
         <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
         <h3 className="m-0 text-lg">Supabase support</h3>

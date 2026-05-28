@@ -1,4 +1,4 @@
-@reference "./main.css";
+@reference "./globals.css";
 
 .monaco-editor {
   @apply relative overflow-visible;

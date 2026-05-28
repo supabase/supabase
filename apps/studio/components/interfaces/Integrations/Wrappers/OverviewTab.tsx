@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -7,12 +7,13 @@ import { Button, Sheet, SheetContent } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
-import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
+import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
 import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -154,10 +155,9 @@ const AddNewWrapperCTA = () => {
   )
 }
 
-export const WrapperOverviewTab = () => {
+export const WrapperContent = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
   const { data: integrations = [] } = useAvailableIntegrations()
   const integration = integrations.find((i) => i.id === id)
@@ -182,24 +182,25 @@ export const WrapperOverviewTab = () => {
     )
   }
 
-  if (isMarketplaceEnabled) {
-    return (
-      <IntegrationOverviewTabV2>
-        {isInstalled && (
-          <>
-            <AddNewWrapperCTA />
-            <WrapperOverviewContent />
-          </>
-        )}
-      </IntegrationOverviewTabV2>
-    )
-  } else {
-    return (
-      <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>
-        <div className="mx-10">
-          <WrapperOverviewContent />
-        </div>
-      </IntegrationOverviewTab>
-    )
-  }
+  return (
+    <>
+      <RequiredExtensionsSection />
+      <AddNewWrapperCTA />
+      {isInstalled && <WrapperOverviewContent />}
+    </>
+  )
+}
+
+export const WrapperOverviewTab = () => {
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
+
+  if (isMarketplaceEnabled) return <RequiredExtensionsSection />
+
+  return (
+    <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>
+      <div className="mx-10">
+        <WrapperOverviewContent />
+      </div>
+    </IntegrationOverviewTab>
+  )
 }

@@ -5,16 +5,16 @@ import { toast } from 'sonner'
 import {
   Button,
   Checkbox,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Sheet,
   SheetContent,
@@ -160,7 +160,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                 disabled={keyRevealed}
               >
                 <FormLayout label="Name" id="app-name">
-                  <Input_Shadcn_
+                  <Input
                     id="app-name"
                     placeholder="My integration"
                     value={name}
@@ -190,12 +190,12 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                           disabled={isLoading}
                         />
                       )}
-                      <Popover_Shadcn_
+                      <Popover
                         open={permissionSearchOpen}
                         onOpenChange={setPermissionSearchOpen}
                         modal
                       >
-                        <PopoverTrigger_Shadcn_ asChild>
+                        <PopoverTrigger asChild>
                           <Button
                             type="default"
                             size="tiny"
@@ -204,16 +204,16 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                           >
                             Add permission
                           </Button>
-                        </PopoverTrigger_Shadcn_>
-                        <PopoverContent_Shadcn_ className="w-[400px] p-0" align="end">
-                          <Command_Shadcn_>
-                            <CommandInput_Shadcn_ placeholder="Search permissions..." />
-                            <CommandList_Shadcn_>
-                              <CommandEmpty_Shadcn_>No permissions found.</CommandEmpty_Shadcn_>
-                              <CommandGroup_Shadcn_ className="[&>div]:text-left">
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[400px] p-0" align="end">
+                          <Command>
+                            <CommandInput placeholder="Search permissions..." />
+                            <CommandList>
+                              <CommandEmpty>No permissions found.</CommandEmpty>
+                              <CommandGroup className="[&>div]:text-left">
                                 <div className="max-h-[210px] overflow-y-auto">
                                   {PERMISSIONS.map((perm) => (
-                                    <CommandItem_Shadcn_
+                                    <CommandItem
                                       key={perm.id}
                                       value={`${perm.id} ${perm.label}`}
                                       onSelect={() => toggle(perm.id)}
@@ -230,14 +230,14 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                                           {perm.label}
                                         </span>
                                       </div>
-                                    </CommandItem_Shadcn_>
+                                    </CommandItem>
                                   ))}
                                 </div>
-                              </CommandGroup_Shadcn_>
-                            </CommandList_Shadcn_>
-                          </Command_Shadcn_>
-                        </PopoverContent_Shadcn_>
-                      </Popover_Shadcn_>
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
 

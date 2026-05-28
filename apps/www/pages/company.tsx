@@ -1,5 +1,6 @@
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
 import { breadcrumbs } from '~/lib/breadcrumbs'
 import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import CTABanner from 'components/CTABanner/index'
@@ -14,7 +15,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, Card_legacy_, Space } from 'ui'
+import { Button, Card, CardContent, CardHeader, CardTitle, Space } from 'ui'
 
 type Props = {}
 
@@ -84,15 +85,13 @@ const Team = () => {
   return (
     <div className="border-t border-default">
       <SectionContainer>
-        <SectionHeader title="Team" paragraph={<div></div>} />
+        <SectionHeader title="Team" />
         <div className="grid grid-cols-2 md:grid-cols-12">
           <div className="col-span-8 ">
-            <p>
-              <p className="text-foreground text-lg">
-                Supabase is fully remote, with a strong affinity for open source maintainers and
-                ex-Founders. Our engineering team is made up of developers from AWS, Google,
-                Palantir, Stripe, and other YC companies.
-              </p>
+            <p className="text-foreground text-lg">
+              Supabase is fully remote, with a strong affinity for open source maintainers and
+              ex-Founders. Our engineering team is made up of developers from AWS, Google, Palantir,
+              Stripe, and other YC companies.
             </p>
           </div>
           <div className=" col-span-4 pt-8 md:mt-0 md:text-right">
@@ -169,12 +168,8 @@ const Investors = () => {
           title="Our investors"
           paragraph={
             <>
-              <p>
-                <p className="text-lg">
-                  We've raised over $116 million in funding, backed by some of the world's leading
-                  investors.
-                </p>
-              </p>
+              We've raised over $116 million in funding, backed by some of the world's leading
+              investors.
             </>
           }
         />
@@ -236,33 +231,55 @@ const Press = () => {
       </div>
       <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
         {PressData.filter((x) => x.type == 'article').map((x) => (
-          <Link href={x.href} key={x.href} target="_blank">
-            <Card_legacy_ key={`press_${x.href}`} hoverable className="h-36">
-              <Space className="h-40 justify-between" direction="vertical">
-                <div>
-                  <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
+          <Link
+            href={x.href}
+            key={x.href}
+            target="_blank"
+            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+          >
+            <Panel
+              hasActiveOnHover
+              outerClassName="h-full"
+              innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+            >
+              <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                <h3 className="text-sm md:text-base text-foreground leading-5!">
+                  {x.type.toUpperCase()}
+                </h3>
+                <div className="flex flex-wrap items-center gap-1 mb-0.5">
                   <p className="text-foreground-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                     {x.title}
                   </p>
                 </div>
-              </Space>
-            </Card_legacy_>
+              </div>
+            </Panel>
           </Link>
         ))}
       </div>
       <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
-          <Link href={x.href} key={x.href} target="_blank">
-            <Card_legacy_ key={`press_${x.href}`} hoverable className="h-36">
-              <Space className="h-40 justify-between" direction="vertical">
-                <div>
-                  <h1 className="text-foreground text-xl">{x.type.toUpperCase()}</h1>
+          <Link
+            href={x.href}
+            key={x.href}
+            target="_blank"
+            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+          >
+            <Panel
+              hasActiveOnHover
+              outerClassName="h-full"
+              innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
+            >
+              <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                <h3 className="text-sm md:text-base text-foreground leading-5!">
+                  {x.type.toUpperCase()}
+                </h3>
+                <div className="flex flex-wrap items-center gap-1 mb-0.5">
                   <p className="text-foreground-light line-clamp block h-12 overflow-hidden text-ellipsis text-base">
                     {x.title}
                   </p>
                 </div>
-              </Space>
-            </Card_legacy_>
+              </div>
+            </Panel>
           </Link>
         ))}
       </div>

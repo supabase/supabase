@@ -10,6 +10,7 @@ import {
   DownloadSaveError,
   FetchRowsError,
   NoConnectionStringError,
+  NoPrimaryKeyForTruncatedRowsError,
   NoRowsToExportError,
   NoTableError,
   OutputConversionError,
@@ -18,6 +19,7 @@ import {
   type ExportAllRowsErrorFamily,
 } from './ExportAllRows.errors'
 import { useProgressToasts } from './ExportAllRows.progress'
+import { hydrateTruncatedRows } from '@/components/grid/components/header/Header.utils'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import type { Filter, Sort, SupaTable } from '@/components/grid/types'
 import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
@@ -287,13 +289,37 @@ export const useExportAllRowsGeneric = (
 
       const { projectRef, connectionString, entity, totalRows } = params
 
-      const exportResult =
+      const exportResult: FetchAllRowsReturn =
         params.type === 'provided_rows'
-          ? convertAndDownload(formatRowsForExport(params.rows, params.table), params.table, {
-              convertToOutputFormat,
-              convertToBlob,
-              save,
-            })
+          ? await (async () => {
+              const hydrated = await hydrateTruncatedRows({
+                rows: params.rows,
+                table: params.table,
+                projectRef,
+                connectionString,
+              })
+              if (hydrated.status === 'no_primary_key') {
+                return {
+                  status: 'error' as const,
+                  error: new NoPrimaryKeyForTruncatedRowsError(params.table.name),
+                }
+              }
+              if (hydrated.status === 'fetch_error') {
+                return {
+                  status: 'error' as const,
+                  error: new FetchRowsError(params.table.name, hydrated.error),
+                }
+              }
+              return convertAndDownload(
+                formatRowsForExport(hydrated.rows, params.table),
+                params.table,
+                {
+                  convertToOutputFormat,
+                  convertToBlob,
+                  save,
+                }
+              )
+            })()
           : await fetchAllRows({
               queryClient,
               projectRef: projectRef,
@@ -336,6 +362,9 @@ export const useExportAllRowsGeneric = (
         }
         if (error instanceof TableTooLargeError) {
           return stopTrackerWithError(entity.id, entity.name, MAX_EXPORT_ROW_COUNT_MESSAGE)
+        }
+        if (error instanceof NoPrimaryKeyForTruncatedRowsError) {
+          return stopTrackerWithError(entity.id, entity.name, error.message)
         }
         console.error(
           `Export All Rows > Error: %s%s%s`,

@@ -5,6 +5,7 @@ interface ConfirmFooterProps {
   message: string
   cancelLabel?: string
   confirmLabel?: string
+  confirmLabelLoading?: string
   isLoading?: boolean
   onCancel?: () => void | Promise<void>
   onConfirm?: () => void | Promise<void>
@@ -14,6 +15,7 @@ export const ConfirmFooter = ({
   message,
   cancelLabel = 'Cancel',
   confirmLabel = 'Confirm',
+  confirmLabelLoading = 'Working...',
   isLoading = false,
   onCancel,
   onConfirm,
@@ -32,7 +34,7 @@ export const ConfirmFooter = ({
           {cancelLabel}
         </Button>
         <Button size="tiny" type="primary" onClick={onConfirm} disabled={isLoading}>
-          {isLoading ? 'Working...' : confirmLabel}
+          {isLoading ? confirmLabelLoading : confirmLabel}
         </Button>
       </div>
     </div>

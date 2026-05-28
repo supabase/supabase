@@ -1,14 +1,12 @@
-import { useParams } from 'common'
 import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const GrafanaPromoBanner = () => (
-  <Alert_Shadcn_ className="relative overflow-hidden">
+  <Alert className="relative overflow-hidden">
     <div className="absolute inset-0 z-0">
       <img
         src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
@@ -37,23 +35,21 @@ const GrafanaPromoBanner = () => (
     </svg>
 
     <div className="flex flex-col md:flex-row gap-2 mt-1">
-      <AlertTitle_Shadcn_ className="grow">Advanced observability</AlertTitle_Shadcn_>
+      <AlertTitle className="grow">Advanced observability</AlertTitle>
       <GrafanaBannerActions className="hidden xl:flex" />
     </div>
-    <AlertDescription_Shadcn_ className="relative flex flex-col xl:flex-row gap-2 md:max-w-lg">
+    <AlertDescription className="relative flex flex-col xl:flex-row gap-2 md:max-w-lg">
       <p className="grow">
         Set up the Supabase Grafana Dashboard to visualize over 200 database performance and health
         metrics on your Supabase project.
       </p>
       <GrafanaBannerActions className="xl:hidden" />
-    </AlertDescription_Shadcn_>
-  </Alert_Shadcn_>
+    </AlertDescription>
+  </Alert>
 )
 
 const GrafanaBannerActions = ({ className }: { className?: string }) => {
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return (
     <div className={cn('flex gap-2', className)}>
@@ -61,12 +57,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
         <Link
           href={`${DOCS_URL}/guides/telemetry/metrics`}
           target="_blank"
-          onClick={() =>
-            sendEvent({
-              action: 'reports_database_grafana_banner_clicked',
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
-          }
+          onClick={() => track('reports_database_grafana_banner_clicked')}
         >
           Docs
         </Link>
@@ -75,12 +66,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
         <Link
           href="https://github.com/supabase/supabase-grafana"
           target="_blank"
-          onClick={() =>
-            sendEvent({
-              action: 'reports_database_grafana_banner_clicked',
-              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-            })
-          }
+          onClick={() => track('reports_database_grafana_banner_clicked')}
         >
           Configure Grafana
         </Link>

@@ -1,8 +1,10 @@
 import { Table } from '@tanstack/react-table'
-import { Cable, Clock, Database } from 'lucide-react'
+import { Cable, ChevronDown, Clock, Database } from 'lucide-react'
 import { memo } from 'react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
+import { getRowTimestampMs } from '../../../UnifiedLogs.utils'
 import { postgresDetailsFields, postgresPrimaryFields } from '../../config/serviceFlowFields'
 import { BlockFieldConfig } from '../../types'
 import { DetailRow } from '../shared/DetailRow'
@@ -61,11 +63,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   filterFields,
   table,
 }: PostgresFlowDetailProps) {
-  const timestampMs = data?.timestamp
-    ? data.timestamp / 1000
-    : data?.date
-      ? data.date.getTime()
-      : null
+  const timestampMs = getRowTimestampMs(data)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   const severity: string | undefined =
@@ -73,40 +71,52 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
     ((data as Record<string, unknown>)?.error_severity as string | undefined)
 
   return (
-    <div className="[&>*:nth-child(even)]:bg-surface-100/50">
+    <div>
       <DetailSectionHeader
-        title="Requested started"
+        title="Request started"
         icon={Clock}
         summary={formattedTime ?? undefined}
       />
 
-      <DetailSectionHeader title="Postgres" icon={Database} />
+      <Collapsible defaultOpen>
+        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+          <DetailSectionHeader title="Postgres" icon={Database} />
+          <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="[&>*:nth-child(odd)]:bg-surface-100/50">
+          {postgresPrimaryFields.map((field) => (
+            <FieldDetailRow
+              key={field.id}
+              config={field}
+              data={data}
+              enrichedData={enrichedData}
+              isLoading={isLoading}
+              filterFields={filterFields}
+              table={table}
+            />
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
 
-      {postgresPrimaryFields.map((field) => (
-        <FieldDetailRow
-          key={field.id}
-          config={field}
-          data={data}
-          enrichedData={enrichedData}
-          isLoading={isLoading}
-          filterFields={filterFields}
-          table={table}
-        />
-      ))}
-
-      <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
-
-      {postgresDetailsFields.map((field) => (
-        <FieldDetailRow
-          key={field.id}
-          config={field}
-          data={data}
-          enrichedData={enrichedData}
-          isLoading={isLoading}
-          filterFields={filterFields}
-          table={table}
-        />
-      ))}
+      <Collapsible defaultOpen>
+        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+          <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
+          <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="[&>*:nth-child(odd)]:bg-surface-100/50">
+          {postgresDetailsFields.map((field) => (
+            <FieldDetailRow
+              key={field.id}
+              config={field}
+              data={data}
+              enrichedData={enrichedData}
+              isLoading={isLoading}
+              filterFields={filterFields}
+              table={table}
+            />
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
 
       <DetailSectionHeader
         title="Operation result"

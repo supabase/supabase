@@ -139,6 +139,18 @@ export type SupportFormUrlKeys = inferParserType<typeof supportFormUrlState>
 
 export const loadSupportFormInitialParams = createLoader(supportFormUrlState)
 
+export function loadSupportFormInitialParamsFromObject(
+  initialParams: Partial<SupportFormUrlKeys>
+): SupportFormUrlKeys {
+  const normalizedParams = Object.fromEntries(
+    Object.entries(initialParams).flatMap(([key, value]) =>
+      value == null ? [] : [[key, String(value)]]
+    )
+  )
+
+  return loadSupportFormInitialParams(normalizedParams)
+}
+
 const serializeSupportFormInitialParams = createSerializer(supportFormUrlState)
 
 export function createSupportFormUrl(initialParams: Partial<SupportFormUrlKeys>) {
