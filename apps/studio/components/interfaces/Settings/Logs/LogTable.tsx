@@ -600,7 +600,7 @@ export const LogTable = ({
             <DataGrid
               role="table"
               style={{ flex: '1 1 0%', minHeight: 0 }}
-              className={cn('border-0', {
+              className={cn('border-t-0! border-b-0!', {
                 'data-grid--simple-logs': queryType,
                 'data-grid--logs-explorer': !queryType,
               })}
