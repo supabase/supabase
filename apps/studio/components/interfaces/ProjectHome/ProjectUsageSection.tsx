@@ -209,7 +209,7 @@ export const ProjectUsageSection = () => {
       </div>
       <Row maxColumns={4} minWidth={280}>
         {enabledServices.map((s) => (
-          <Card key={s.key} className="mb-0 flex flex-col h-64">
+          <Card key={s.key} className="mb-0 flex flex-col">
             <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
               <div className="flex items-center gap-2">
                 <div className="flex flex-col">
@@ -234,34 +234,36 @@ export const ProjectUsageSection = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-card flex-1 h-full overflow-hidden">
-              <Loading isFullHeight active={isLoading}>
-                <LogsBarChart
-                  isFullHeight
-                  data={s.data}
-                  DateTimeFormat={datetimeFormat}
-                  onBarClick={handleBarClick(s.route, s.key)}
-                  hideZeroValues={true}
-                  chartConfig={{
-                    error_count: {
-                      label: 'Errors',
-                    },
-                    warning_count: {
-                      label: 'Warnings',
-                    },
-                    ok_count: {
-                      label: 'Requests',
-                    },
-                  }}
-                  EmptyState={
-                    <NoDataPlaceholder
-                      size="small"
-                      message="No data for selected period"
-                      isFullHeight
-                    />
-                  }
-                />
-              </Loading>
+            <CardContent className="p-card overflow-hidden">
+              <div className="relative h-32">
+                <Loading isFullHeight active={isLoading}>
+                  <LogsBarChart
+                    isFullHeight
+                    data={s.data}
+                    DateTimeFormat={datetimeFormat}
+                    onBarClick={handleBarClick(s.route, s.key)}
+                    hideZeroValues={true}
+                    chartConfig={{
+                      error_count: {
+                        label: 'Errors',
+                      },
+                      warning_count: {
+                        label: 'Warnings',
+                      },
+                      ok_count: {
+                        label: 'Requests',
+                      },
+                    }}
+                    EmptyState={
+                      <NoDataPlaceholder
+                        size="small"
+                        message="No data for selected period"
+                        isFullHeight
+                      />
+                    }
+                  />
+                </Loading>
+              </div>
             </CardContent>
           </Card>
         ))}
