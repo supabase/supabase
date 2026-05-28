@@ -24,8 +24,8 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_ as Label,
+  Input,
+  Label,
   Switch,
   Tooltip,
   TooltipContent,
@@ -54,12 +54,12 @@ import { useGitHubConnectionsQuery } from '@/data/integrations/github-connection
 import { projectKeys } from '@/data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const CreateBranchModal = () => {
@@ -156,7 +156,7 @@ export const CreateBranchModal = () => {
   const branchComputeSize = estimateComputeSize(projectDiskAttributes.size_gb, computeSize)
   const estimatedDiskCost = estimateDiskCost(branchDiskAttributes)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutate: checkGithubBranchValidity, isPending: isCheckingGHBranchValidity } =
     useCheckGithubBranchValidity({
@@ -169,16 +169,9 @@ export const CreateBranchModal = () => {
       if (projectRef) {
         await queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectRef) })
       }
-      sendEvent({
-        action: 'branch_create_button_clicked',
-        properties: {
-          branchType: data.persistent ? 'persistent' : 'preview',
-          gitlessBranching: !data.git_branch,
-        },
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrg?.slug ?? 'Unknown',
-        },
+      track('branch_create_button_clicked', {
+        branchType: data.persistent ? 'persistent' : 'preview',
+        gitlessBranching: !data.git_branch,
       })
 
       setShowCreateBranchModal(false)
@@ -316,7 +309,7 @@ export const CreateBranchModal = () => {
                 render={({ field }) => (
                   <FormItemLayout label="Preview Branch Name">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder="e.g. staging, dev-feature-x"
                         autoComplete="off"
@@ -374,7 +367,7 @@ export const CreateBranchModal = () => {
                       >
                         <div className="relative w-full">
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
                               placeholder="e.g. main, feat/some-feature"
                               autoComplete="off"

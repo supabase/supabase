@@ -10,8 +10,6 @@ export default function styleHandler(target: Keys) {
     theme: { [target]: __styles },
   }: any = useContext(ThemeContext)
 
-  if (!__styles) __styles = defaultTheme.accordion
-
   // console.log(__styles)
 
   // __styles.replace(/\s+/g, ' ')

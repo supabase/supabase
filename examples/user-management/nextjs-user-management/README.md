@@ -1,25 +1,36 @@
 # Supabase Next.js Auth & User Management Starter
 
-This example will set you up for a very common situation: users can sign up or sign in and then update their account with public profile information, including a profile image.
+This example sets you up for a very common situation: users can sign up or sign in and then update their account with public profile information, including a profile image.
 
 This demonstrates how to use:
 
 - User signups using Supabase [Auth](https://supabase.com/auth).
-  - Supabase [SSR Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs).
-  - Supabase [pre-built Auth UI for React](https://supabase.com/docs/guides/auth/auth-ui).
-- User avatar images using Supabase [Storage](https://supabase.com/storage)
-- Public profiles restricted with [Policies](https://supabase.com/docs/guides/auth#policies).
-- Frontend using [Next.js](<[nextjs.org/](https://nextjs.org/)>).
+  - Supabase [SSR Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs) with the Next.js App Router and Server Actions.
+- User avatar images using Supabase [Storage](https://supabase.com/storage).
+- Public profiles restricted with [Row Level Security policies](https://supabase.com/docs/guides/auth/row-level-security).
+- Frontend using [Next.js](https://nextjs.org/) (App Router) with React 19 and Tailwind CSS v4.
 
 ## Technologies used
 
 - Frontend:
-  - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
-  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
-  - Supabase [`@supabase/ssr`](https://supabase.com/docs/guides/auth/server-side/nextjs) for SSR auth.
-  - Supabase [pre-built Auth UI for React](https://supabase.com/docs/guides/auth/auth-ui).
+  - [Next.js](https://github.com/vercel/next.js) (App Router) — a React framework for production.
+  - [`@supabase/ssr`](https://supabase.com/docs/guides/auth/server-side/nextjs) for cookie-based SSR auth, used from both Server Components and Server Actions.
+  - [`@supabase/supabase-js`](https://supabase.com/docs/library/getting-started) for the browser client and realtime data.
+  - [Tailwind CSS v4](https://tailwindcss.com/) for styling.
 - Backend:
-  - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [supabase.com/dashboard](https://supabase.com/dashboard/) — hosted Postgres database with a REST API, Auth, and Storage.
+  - Local development via the [Supabase CLI](https://supabase.com/docs/guides/cli).
+
+## Project structure
+
+- `app/login/` — login and signup form. The form posts to Server Actions in `app/login/actions.ts` that call `supabase.auth.signInWithPassword()` and `supabase.auth.signUp()`.
+- `app/account/` — protected profile page. Uses a Supabase server client to check the session and renders an account form with avatar upload.
+- `app/auth/confirm/route.ts` — handles the email confirmation callback by verifying the OTP token and redirecting.
+- `app/auth/signout/route.ts` — server route that signs the user out.
+- `lib/supabase/client.ts` — browser client (`createBrowserClient`).
+- `lib/supabase/server.ts` — server client (`createServerClient`) wired up to Next.js cookies.
+- `supabase/migrations/` — database schema for the `profiles` table, RLS policies, the `handle_new_user` trigger, and the `avatars` storage bucket.
+- `supabase/config.toml` — local Supabase configuration used by `npx supabase start`.
 
 ## Instant deploy
 
@@ -27,43 +38,79 @@ The Vercel deployment will guide you through creating a Supabase account and pro
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-user-management&project-name=supabase-nextjs-user-management&repository-name=supabase-nextjs-user-management&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-user-management)
 
-### 1. Create new project
+## Run locally
 
-Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+### 1. Install dependencies
 
-### 2. Run "User Management" Quickstart
+Requires Node.js 20+ and `npx` (bundled with npm).
 
-Once your database has started, head over to your project's `SQL Editor` and run the "User Management Starter" quickstart. On the `SQL editor` page, scroll down until you see `User Management Starter: Sets up a public Profiles table which you can access with your API`. Click that, then click `RUN` to execute that query and create a new `profiles` table. When that's finished, head over to the `Table Editor` and see your new `profiles` table.
+```bash
+npm install
+```
 
-### 3. Get the URL and Key
+### 2. Start a local Supabase stack
 
-Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `anon` key, you'll need these in the next step.
+The example includes a `supabase/` directory with the schema and config needed to run a local stack via the Supabase CLI.
 
-The `anon` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token. This enables row level security for your data. Read more about this [below](#postgres-row-level-security).
+```bash
+npx supabase start
+```
 
-![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
+This boots Postgres, Auth, Storage, and Supabase Studio locally and runs the migrations in `supabase/migrations/`. When it finishes, it prints your local API URL and keys.
 
-**_NOTE_**: The `secret` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
+### 3. Configure environment variables
 
-## Supabase details
+Copy the development env template:
 
-### Using a Remote Supabase Project
+```bash
+cp .env.example .env.local
+```
 
-1. Create or select a project on [Supabase Dashboard](https://supabase.com/dashboard).
-2. Copy and fill the dotenv template `cp .env.production.example .env.production`
-3. Link the remote project to your local environment:
+The defaults in `.env.example` already match the local stack (API URL `http://127.0.0.1:54321` and the demo publishable key). Update them if your local ports differ.
+
+### 4. Start the dev server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to use the app.
+
+## Using a remote Supabase project
+
+### 1. Create a project
+
+Sign up at [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+
+### 2. Get the URL and publishable key
+
+Go to the Project Settings (the cog icon), open the API tab, and find your **Project URL** and **publishable key**.
+
+The `publishable` key is your client-side API key. It allows "anonymous access" to your database until the user logs in. Once they log in, the user's own JWT is used, which enables Row Level Security to scope data per user. Read more [below](#postgres-row-level-security).
+
+> **Note:** The `secret` (service role) key has full access to your data and bypasses all security policies. Keep it in server environments only — never expose it to the client or browser.
+
+### 3. Link and push the schema
+
+Copy the production env template and fill it in with your project URL, publishable key, and the URL(s) you want to allow as redirect targets:
+
+```bash
+cp .env.production.example .env.production
+```
+
+Link your local checkout to the remote project:
 
 ```bash
 SUPABASE_ENV=production npx supabase@latest link --project-ref <your-project-ref>
 ```
 
-3. Sync the configuration:
+Push the `supabase/config.toml` settings (Auth site URL, redirect URLs, etc.):
 
 ```bash
 SUPABASE_ENV=production npx supabase@latest config push
 ```
 
-4. Sync the database schema:
+Push the database schema in `supabase/migrations/`:
 
 ```bash
 SUPABASE_ENV=production npx supabase@latest db push
@@ -81,19 +128,19 @@ Supabase integrates seamlessly with Vercel's preview branches, giving each branc
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 3. Create a new branch, make changes (e.g., update `max_frequency`), and push the branch to Git.
-   - Open a pull request to trigger Vercel + Supabase integration.
+   - Open a pull request to trigger the Vercel + Supabase integration.
    - Upon successful deployment, the preview environment reflects the changes.
 
 ![Preview Checks](https://github.com/user-attachments/assets/db688cc2-60fd-4463-bbed-e8ecc11b1a39)
 
-### Postgres Row level security
+## Postgres Row Level Security
 
-This project uses very high-level Authorization using Postgres' Row Level Security.
-When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
+This project uses high-level authorization via Postgres' Row Level Security.
+When you start a Postgres database on Supabase, we populate it with an `auth` schema and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
-This is a trimmed-down schema, with the policies:
+The schema and policies that this example uses (see `supabase/migrations/20221017024722_init.sql`):
 
 ```sql
 -- Create a table for public profiles
@@ -151,21 +198,21 @@ create policy "Anyone can update their own avatar." on storage.objects
   for update using ( auth.uid() = owner ) with check (bucket_id = 'avatars');
 ```
 
-## More Supabase Examples & Resources
+## More Supabase examples & resources
 
-## Examples
+### Examples
 
 These official examples are maintained by the Supabase team:
 
 - [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
 - [Next.js Slack Clone](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone)
-- [Next.js 13 Data Fetching](https://github.com/supabase/supabase/tree/master/examples/caching/with-nextjs-13)
+- [Next.js Data Fetching](https://github.com/supabase/supabase/tree/master/examples/caching/with-nextjs-13)
 - [And more...](https://github.com/supabase/supabase/tree/master/examples)
 
-## Other resources
+### Other resources
 
 - [[Docs] Next.js User Management Quickstart](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs)
-- [[Egghead.io] Build a SaaS product with Next.js, Supabase and Stripe](https://egghead.io/courses/build-a-saas-product-with-next-js-supabase-and-stripe-61f2bc20)
+- [[Docs] Server-Side Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs)
 - [[Blog] Fetching and caching Supabase data in Next.js 13 Server Components](https://supabase.com/blog/fetching-and-caching-supabase-data-in-next-js-server-components)
 
 ## Authors

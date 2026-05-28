@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import Link from 'next/link'
-import { ReactNode, useEffect, useMemo } from 'react'
+import { ReactNode, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -12,16 +12,16 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  Input_Shadcn_,
+  Input,
   RadioGroupCard,
   RadioGroupCardItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectLabel_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -29,7 +29,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  TextArea_Shadcn_,
+  TextArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
@@ -52,10 +52,12 @@ import {
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -107,10 +109,6 @@ const lokiFormSchema = z.object({
 const lokiSubmitSchema = z.object({
   ...lokiFields,
   headers: headerRecordSchema,
-})
-
-const elasticSchema = z.object({
-  type: z.literal('elastic'),
 })
 
 const postgresSchema = z.object({
@@ -199,8 +197,6 @@ const formUnion = z.discriminatedUnion('type', [
   webhookFormSchema,
   datadogSchema,
   lokiFormSchema,
-  // [Joshen] To fix API types, not supported in the UI
-  elasticSchema,
   postgresSchema,
   bigquerySchema,
   clickhouseSchema,
@@ -216,7 +212,6 @@ const submitUnion = z.discriminatedUnion('type', [
   webhookSubmitSchema,
   datadogSchema,
   lokiSubmitSchema,
-  elasticSchema,
   postgresSchema,
   bigquerySchema,
   clickhouseSchema,
@@ -309,7 +304,7 @@ function LogDrainFormItem({
       render={({ field }) => (
         <FormItemLayout layout="horizontal" label={label} description={description || ''}>
           <FormControl>
-            <Input_Shadcn_ type={type || 'text'} placeholder={placeholder} {...field} />
+            <Input type={type || 'text'} placeholder={placeholder} {...field} />
           </FormControl>
         </FormItemLayout>
       )}
@@ -360,6 +355,7 @@ export function LogDrainDestinationSheetForm({
   })
 
   const track = useTrack()
+  const formRef = useRef<HTMLFormElement>(null)
 
   const formValues = useMemo(() => {
     const config = (defaultValues?.config || {}) as any
@@ -432,6 +428,7 @@ export function LogDrainDestinationSheetForm({
         <SheetSection className="px-0! pb-0!">
           <Form {...form}>
             <form
+              ref={formRef}
               id={FORM_ID}
               onSubmit={(e) => {
                 e.preventDefault()
@@ -470,15 +467,15 @@ export function LogDrainDestinationSheetForm({
                     label="Type"
                     description={LOG_DRAIN_TYPES.find((t) => t.value === type)?.description || ''}
                   >
-                    <Select_Shadcn_
+                    <Select
                       defaultValue={defaultType}
                       value={form.getValues('type')}
                       onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                     >
-                      <SelectTrigger_Shadcn_>
+                      <SelectTrigger>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
+                      </SelectTrigger>
+                      <SelectContent>
                         {LOG_DRAIN_TYPES.filter((t) => {
                           if (t.value === 'sentry') return sentryEnabled
                           if (t.value === 's3') return s3Enabled
@@ -488,17 +485,17 @@ export function LogDrainDestinationSheetForm({
                           if (t.value === 'syslog') return syslogEnabled
                           return true
                         }).map((type) => (
-                          <SelectItem_Shadcn_
+                          <SelectItem
                             value={type.value}
                             key={type.value}
                             id={type.value}
                             className="text-left"
                           >
                             {type.name}
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                      </SelectContent>
+                    </Select>
                   </FormItemLayout>
                 )}
               </div>
@@ -604,21 +601,21 @@ export function LogDrainDestinationSheetForm({
                           }
                         >
                           <FormControl>
-                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                              <SelectTrigger_Shadcn_ className="col-span-3">
-                                <SelectValue_Shadcn_ placeholder="Select a region" />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select a region" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Region</SelectLabel>
                                   {DATADOG_REGIONS.map((reg) => (
-                                    <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
+                                    <SelectItem key={reg.value} value={reg.value}>
                                       {reg.label}
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   ))}
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -759,21 +756,21 @@ export function LogDrainDestinationSheetForm({
                             description="Only HTTP with Protocol Buffers is currently supported"
                           >
                             <FormControl>
-                              <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                                <SelectTrigger_Shadcn_ className="col-span-3">
-                                  <SelectValue_Shadcn_ placeholder="Select protocol" />
-                                </SelectTrigger_Shadcn_>
-                                <SelectContent_Shadcn_>
-                                  <SelectGroup_Shadcn_>
-                                    <SelectLabel_Shadcn_>Protocol</SelectLabel_Shadcn_>
+                              <Select value={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger className="col-span-3">
+                                  <SelectValue placeholder="Select protocol" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Protocol</SelectLabel>
                                     {OTLP_PROTOCOLS.map((proto) => (
-                                      <SelectItem_Shadcn_ key={proto.value} value={proto.value}>
+                                      <SelectItem key={proto.value} value={proto.value}>
                                         {proto.label}
-                                      </SelectItem_Shadcn_>
+                                      </SelectItem>
                                     ))}
-                                  </SelectGroup_Shadcn_>
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                           </FormItemLayout>
                         )}
@@ -816,21 +813,21 @@ export function LogDrainDestinationSheetForm({
                           }
                         >
                           <FormControl>
-                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                              <SelectTrigger_Shadcn_ className="col-span-3">
-                                <SelectValue_Shadcn_ placeholder="Select a region" />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select a region" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Region</SelectLabel>
                                   {LAST9_REGIONS.map((reg) => (
-                                    <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
+                                    <SelectItem key={reg.value} value={reg.value}>
                                       {reg.label}
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   ))}
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -918,7 +915,7 @@ export function LogDrainDestinationSheetForm({
                               description="PEM encoded CA certificate for verifying the server. Falls back to the system CA bundle if omitted."
                             >
                               <FormControl>
-                                <TextArea_Shadcn_
+                                <TextArea
                                   className="font-mono text-xs"
                                   placeholder="-----BEGIN CERTIFICATE-----"
                                   rows={4}
@@ -938,7 +935,7 @@ export function LogDrainDestinationSheetForm({
                               description="PEM encoded client certificate for mTLS."
                             >
                               <FormControl>
-                                <TextArea_Shadcn_
+                                <TextArea
                                   className="font-mono text-xs"
                                   placeholder="-----BEGIN CERTIFICATE-----"
                                   rows={4}
@@ -958,7 +955,7 @@ export function LogDrainDestinationSheetForm({
                               description="PEM encoded client private key for mTLS. Required when a client certificate is provided."
                             >
                               <FormControl>
-                                <TextArea_Shadcn_
+                                <TextArea
                                   className="font-mono text-xs"
                                   placeholder="-----BEGIN PRIVATE KEY-----"
                                   rows={4}
@@ -1041,9 +1038,16 @@ export function LogDrainDestinationSheetForm({
               </span>
               <TaxDisclaimer />
             </div>
-            <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
-              Save destination
-            </Button>
+            <Shortcut
+              id={SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION}
+              onTrigger={() => formRef.current?.requestSubmit()}
+              options={{ enabled: open && !isLoading }}
+              side="top"
+            >
+              <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
+                Save destination
+              </Button>
+            </Shortcut>
           </SheetFooter>
         </div>
       </SheetContent>

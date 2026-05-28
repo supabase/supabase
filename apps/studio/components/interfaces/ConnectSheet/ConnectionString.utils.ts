@@ -49,10 +49,20 @@ export const parseConnectionParams = (connectionString: string): ConnectionParam
 
   try {
     const parsed = new URL(connectionString)
+    // The URL parser percent-encodes characters that aren't valid in user-info
+    // (e.g. brackets in the self-hosted `postgres.[POOLER_TENANT_ID]` placeholder).
+    // Decode so the displayed string matches the literal we wrote.
+    const decode = (value: string) => {
+      try {
+        return decodeURIComponent(value)
+      } catch {
+        return value
+      }
+    }
     return {
       host: parsed.hostname || 'hidden',
       port: parsed.port || DEFAULT_PORT,
-      user: parsed.username || 'hidden',
+      user: parsed.username ? decode(parsed.username) : 'hidden',
       database: parsed.pathname?.replace(/^\//, '') || 'hidden',
     }
   } catch (error) {

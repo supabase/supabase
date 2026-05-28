@@ -6,14 +6,7 @@ import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  LogoLoader,
-  WarningIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, LogoLoader, WarningIcon } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
@@ -187,13 +180,13 @@ const LegacyEdgeFunctionOverview = () => {
                 isLoading={combinedStatsResults.isLoading}
                 renderer={(props) => {
                   return isErrorCombinedStats ? (
-                    <Alert_Shadcn_ variant="warning">
+                    <Alert variant="warning">
                       <WarningIcon />
-                      <AlertTitle_Shadcn_>Failed to reterieve execution time</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
+                      <AlertTitle>Failed to reterieve execution time</AlertTitle>
+                      <AlertDescription>
                         {combinedStatsError?.message ?? 'Unknown error'}
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
+                      </AlertDescription>
+                    </Alert>
                   ) : (
                     <div className="space-y-8">
                       <AreaChart
@@ -230,13 +223,13 @@ const LegacyEdgeFunctionOverview = () => {
                 renderer={(props) => {
                   if (isErrorCombinedStats) {
                     return (
-                      <Alert_Shadcn_ variant="warning">
+                      <Alert variant="warning">
                         <WarningIcon />
-                        <AlertTitle_Shadcn_>Failed to reterieve invocations</AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
+                        <AlertTitle>Failed to reterieve invocations</AlertTitle>
+                        <AlertDescription>
                           {combinedStatsError?.message ?? 'Unknown error'}
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
+                        </AlertDescription>
+                      </Alert>
                     )
                   } else {
                     const requestData = props.data
@@ -330,13 +323,13 @@ const LegacyEdgeFunctionOverview = () => {
                 isLoading={combinedStatsResults.isLoading}
                 renderer={(props) => {
                   return isErrorCombinedStats ? (
-                    <Alert_Shadcn_ variant="warning">
+                    <Alert variant="warning">
                       <WarningIcon />
-                      <AlertTitle_Shadcn_>Failed to retrieve CPU time</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
+                      <AlertTitle>Failed to retrieve CPU time</AlertTitle>
+                      <AlertDescription>
                         {combinedStatsError?.message ?? 'Unknown error'}
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
+                      </AlertDescription>
+                    </Alert>
                   ) : (
                     <div className="space-y-8">
                       <AreaChart
@@ -371,13 +364,13 @@ const LegacyEdgeFunctionOverview = () => {
                 renderer={(props) => {
                   if (isErrorCombinedStats) {
                     return (
-                      <Alert_Shadcn_ variant="warning">
+                      <Alert variant="warning">
                         <WarningIcon />
-                        <AlertTitle_Shadcn_>Failed to retrieve memory usage</AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
+                        <AlertTitle>Failed to retrieve memory usage</AlertTitle>
+                        <AlertDescription>
                           {combinedStatsError?.message ?? 'Unknown error'}
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
+                        </AlertDescription>
+                      </Alert>
                     )
                   }
 

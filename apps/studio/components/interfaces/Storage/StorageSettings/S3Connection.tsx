@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
+  Alert,
+  AlertDescription,
   Button,
   Card,
   CardContent,
@@ -243,18 +243,18 @@ export const S3Connection = () => {
                     </CardFooter>
                   </Card>
                 ) : (
-                  <Alert_Shadcn_ variant="warning">
+                  <Alert variant="warning">
                     <WarningIcon />
                     <AlertTitle>Project is paused</AlertTitle>
-                    <AlertDescription_Shadcn_>
+                    <AlertDescription>
                       To connect to your S3 bucket, you need to restore your project.
-                    </AlertDescription_Shadcn_>
+                    </AlertDescription>
                     <div className="mt-3 flex items-center space-x-2">
                       <Button asChild type="default">
                         <Link href={`/project/${projectRef}`}>Restore project</Link>
                       </Button>
                     </div>
-                  </Alert_Shadcn_>
+                  </Alert>
                 )}
               </form>
             </Form>
@@ -280,18 +280,18 @@ export const S3Connection = () => {
             ) : !canReadS3Credentials ? (
               <NoPermission resourceText="view this project's S3 access keys" />
             ) : !isProjectActive ? (
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <WarningIcon />
                 <AlertTitle>Can't fetch S3 access keys</AlertTitle>
-                <AlertDescription_Shadcn_>
+                <AlertDescription>
                   To fetch your S3 access keys, you need to restore your project.
-                </AlertDescription_Shadcn_>
-                <AlertDescription_Shadcn_>
+                </AlertDescription>
+                <AlertDescription>
                   <Button asChild type="default" className="mt-3">
                     <Link href={`/project/${projectRef}`}>Restore project</Link>
                   </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             ) : (
               <>
                 {isLoadingStorageCreds ? (

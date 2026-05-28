@@ -7,7 +7,7 @@ import { type Category, type Partner } from '~/types/partners'
 import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { useDebounce } from 'use-debounce'
 
@@ -28,7 +28,7 @@ interface Props {
 }
 
 function IntegrationPartnersPage(props: Props) {
-  const initialPartners = props.partners ?? []
+  const initialPartners = props.partners
   const [partners, setPartners] = useState(initialPartners)
 
   const categoryMap: { [slug: string]: Category } = {}
@@ -51,27 +51,35 @@ function IntegrationPartnersPage(props: Props) {
   const [search, setSearch] = useState('')
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
+  const searchIdRef = useRef(0)
 
   useEffect(() => {
-    const doSearch = async () => {
-      setIsSearching(true)
-      return await searchPartners(search)
-    }
-
-    if (search.trim() === '') {
+    if (debouncedSearchTerm.trim() === '') {
       setIsSearching(false)
       setPartners(initialPartners)
       return
     }
 
-    doSearch().then((partners) => {
-      if (partners) {
-        setPartners(partners)
-      }
+    setIsSearching(true)
+    const currentSearchId = ++searchIdRef.current
 
-      setIsSearching(false)
-    })
-  }, [debouncedSearchTerm, router])
+    searchPartners(debouncedSearchTerm)
+      .then((results) => {
+        if (currentSearchId === searchIdRef.current) {
+          setPartners(results ?? [])
+        }
+      })
+      .catch(() => {
+        if (currentSearchId === searchIdRef.current) {
+          setPartners([])
+        }
+      })
+      .finally(() => {
+        if (currentSearchId === searchIdRef.current) {
+          setIsSearching(false)
+        }
+      })
+  }, [debouncedSearchTerm, initialPartners])
 
   return (
     <>

@@ -1,7 +1,15 @@
+import { literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import dayjs from 'dayjs'
 
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import {
+  analyticsLiteral,
+  joinSqlFragments,
+  quotedIdent,
+  safeSql as safeLogSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
 import { PlanId } from '@/data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
@@ -78,6 +86,10 @@ export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
 }
 
+function rewriteWhereToAnd(sql: SafeSqlFragment): SafeSqlFragment {
+  return sql.replace(/^WHERE/, 'AND') as SafeSqlFragment
+}
+
 export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
   if (filters.length === 0) return ''
   const conditions = filters
@@ -128,13 +140,67 @@ export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true)
   }
 }
 
+// Unlike the legacy `generateRegexpWhere`, this function requires filter values
+// to be raw (unquoted) strings or numbers. `analyticsLiteral` handles all
+// quoting and escaping — callers must NOT pre-wrap values in single quotes.
+export function generateRegexpWhereSafe(
+  filters: ReportFilterItem[],
+  prepend = true
+): SafeLogSqlFragment {
+  if (filters.length === 0) return safeLogSql``
+
+  const conditions = filters
+    .map((filter) => {
+      const splitKey = filter.key.split('.')
+      const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
+      const keyToQuote = filter.key.includes('.') ? normalizedKey : filter.key
+
+      let col: SafeLogSqlFragment
+      try {
+        col = quotedIdent(keyToQuote)
+      } catch {
+        return null
+      }
+
+      const valueIsNumber = !isNaN(Number(filter.value))
+      const lit = valueIsNumber
+        ? analyticsLiteral(Number(filter.value))
+        : analyticsLiteral(String(filter.value).toLowerCase())
+
+      switch (filter.compare) {
+        case 'matches':
+          return safeLogSql`REGEXP_CONTAINS(${col}, ${lit})`
+        case 'is':
+          return safeLogSql`${col} = ${lit}`
+        case '!=':
+          return safeLogSql`${col} != ${lit}`
+        case '>=':
+          return safeLogSql`${col} >= ${lit}`
+        case '<=':
+          return safeLogSql`${col} <= ${lit}`
+        case '>':
+          return safeLogSql`${col} > ${lit}`
+        case '<':
+          return safeLogSql`${col} < ${lit}`
+        default:
+          return safeLogSql`${col} = ${lit}`
+      }
+    })
+    .filter((c) => c !== null)
+
+  if (conditions.length === 0) return safeLogSql``
+
+  const joined = joinSqlFragments(conditions, ' AND ')
+  return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
+}
+
 export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.API]: {
     title: 'API',
     queries: {
       totalRequests: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-total-requests
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -144,7 +210,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -152,7 +218,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       topRoutes: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-top-routes
         select
           request.path as path,
@@ -165,7 +231,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -175,7 +241,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       errorCounts: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-error-counts
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -187,7 +253,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.headers) as headers
         WHERE
           response.status_code >= 400
-        ${generateRegexpWhere(filters, false)}
+        ${generateRegexpWhereSafe(filters, false)}
         GROUP BY
           timestamp
         ORDER BY
@@ -196,7 +262,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       topErrorRoutes: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-top-error-routes
         select
           request.path as path,
@@ -211,7 +277,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.headers) as headers
         where
           response.status_code >= 400
-        ${generateRegexpWhere(filters, false)}
+        ${generateRegexpWhereSafe(filters, false)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -221,7 +287,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       responseSpeed: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-response-speed
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -232,7 +298,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -241,7 +307,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       topSlowRoutes: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-top-slow-routes
         select
           request.path as path,
@@ -255,7 +321,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-        ${generateRegexpWhere(filters)}
+        ${generateRegexpWhereSafe(filters)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -265,7 +331,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       networkTraffic: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-network-traffic
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -294,7 +360,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
           cross join unnest(response.headers) as resp_headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -303,7 +369,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       requestsByCountry: {
         queryType: 'logs',
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-api-requests-by-country
         select
           cf.country as country,
@@ -316,7 +382,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
           cross join unnest(request.cf) as cf
         where
           cf.country is not null
-        ${generateRegexpWhere(filters, false)}
+        ${generateRegexpWhereSafe(filters, false)}
         group by
           cf.country
         `,
@@ -333,7 +399,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       cacheHitRate: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-storage-cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
@@ -345,7 +411,7 @@ from edge_logs f
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
 where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
-  ${generateRegexpWhere(filters, false)}
+  ${generateRegexpWhereSafe(filters, false)}
 group by timestamp
 order by timestamp desc
 `,
@@ -353,7 +419,7 @@ order by timestamp desc
       topCacheMisses: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (filters) => `
+        sql: (filters) => safeLogSql`
         -- reports-storage-top-cache-misses
 SELECT
   r.path as path,
@@ -367,7 +433,7 @@ from edge_logs f
 where starts_with(r.path, '/storage/v1/object')
   and r.method = 'GET'
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
-  ${generateRegexpWhere(filters, false)}
+  ${generateRegexpWhereSafe(filters, false)}
 group by path, search
 order by count desc
 limit 12
@@ -380,7 +446,13 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
         -- reports-query-performance-most-frequently-invoked
 set search_path to public, extensions;
 
@@ -410,7 +482,7 @@ select
       else 0
     end as cache_hit_rate${
       runIndexAdvisor
-        ? `,
+        ? safeSql`,
     case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
@@ -426,18 +498,24 @@ select
       )
       else null
     end as index_advisor_result`
-        : ''
+        : safeSql``
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   -- skip queries that were never actually executed
-  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-  ${orderBy || 'order by statements.calls desc'}
+  WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+  ${orderBy || safeSql`order by statements.calls desc`}
   limit 20`,
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
+        safeSql: (
+          _,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
         -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
@@ -459,7 +537,7 @@ select
       0
     ) as prop_total_time${
       runIndexAdvisor
-        ? `,
+        ? safeSql`,
     case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
@@ -475,18 +553,24 @@ select
       )
       else null
     end as index_advisor_result`
-        : ''
+        : safeSql``
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   -- skip queries that were never actually executed
-  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-  ${orderBy || 'order by total_time desc'}
+  WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+  ${orderBy || safeSql`order by total_time desc`}
   limit 20`,
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
         -- reports-query-performance-slowest-execution-time
 set search_path to public, extensions;
 
@@ -506,7 +590,7 @@ select
     -- mean_time,
     coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows${
       runIndexAdvisor
-        ? `,
+        ? safeSql`,
     case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
@@ -522,18 +606,18 @@ select
       )
       else null
     end as index_advisor_result`
-        : ''
+        : safeSql``
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   -- skip queries that were never actually executed
-  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-  ${orderBy || 'order by max_time desc'}
+  WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+  ${orderBy || safeSql`order by max_time desc`}
   limit 20`,
       },
       queryHitRate: {
         queryType: 'db',
-        sql: (_params) => `-- reports-query-performance-cache-and-index-hit-rate
+        safeSql: (_params) => safeSql`-- reports-query-performance-cache-and-index-hit-rate
 select
     'index hit rate' as name,
     (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) as ratio
@@ -546,7 +630,7 @@ select
       },
       unified: {
         queryType: 'db',
-        sql: (
+        safeSql: (
           _params,
           where,
           orderBy,
@@ -565,7 +649,7 @@ select
           const baseCteLimit = runIndexAdvisor
             ? Math.min(baseScanTarget, INDEX_ADVISOR_SCAN_CAP)
             : baseScanTarget
-          const baseQuery = `
+          const baseQuery = safeSql`
         -- reports-query-performance-unified
         set search_path to public, extensions;
 
@@ -602,15 +686,15 @@ select
           from pg_stat_statements as statements
             inner join pg_authid as auth on statements.userid = auth.oid
           -- skip queries that were never actually executed
-          WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-          ${orderBy || 'order by total_time desc'}
-          ${baseCteLimit !== null ? `limit ${baseCteLimit}` : ''}
+          WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+          ${orderBy || safeSql`order by total_time desc`}
+          ${baseCteLimit !== null ? safeSql`limit ${literal(baseCteLimit)}` : safeSql``}
         ),
         query_results as (
           select
             base.*${
               runIndexAdvisor
-                ? `,
+                ? safeSql`,
             case
               when (lower(base.query) like 'select%' or lower(base.query) like 'with pgrst%')
               then (
@@ -626,22 +710,22 @@ select
               )
               else null
             end as index_advisor_result`
-                : ''
+                : safeSql``
             }
           from base
         )
         select *
         from query_results
-        ${filterIndexAdvisor && runIndexAdvisor ? `where (index_advisor_result->>'has_suggestion')::boolean = true` : ''}
-        ${orderBy || 'order by total_time desc'}
-        limit ${pageSize} offset ${offset}`
+        ${filterIndexAdvisor && runIndexAdvisor ? safeSql`where (index_advisor_result->>'has_suggestion')::boolean = true` : safeSql``}
+        ${orderBy || safeSql`order by total_time desc`}
+        limit ${literal(pageSize)} offset ${literal(offset)}`
 
           return baseQuery
         },
       },
       slowQueriesCount: {
         queryType: 'db',
-        sql: () => `
+        safeSql: () => safeSql`
         -- reports-query-performance-slow-queries-count
         set search_path to public, extensions;
 
@@ -654,7 +738,13 @@ select
       },
       queryMetrics: {
         queryType: 'db',
-        sql: (_params, where, orderBy, _runIndexAdvisor = false, _filterIndexAdvisor = false) => `
+        safeSql: (
+          _params,
+          where,
+          orderBy,
+          _runIndexAdvisor = false,
+          _filterIndexAdvisor = false
+        ) => safeSql`
         -- reports-query-performance-metrics
         set search_path to public, extensions;
 
@@ -670,8 +760,8 @@ select
           ) || '%' as cache_hit_rate
         FROM pg_stat_statements as statements
         -- skip queries that were never actually executed
-        WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
-        ${orderBy || ''}`,
+        WHERE statements.calls > 0 ${where ? rewriteWhereToAnd(where) : safeSql``}
+        ${orderBy || safeSql``}`,
       },
     },
   },
@@ -680,7 +770,7 @@ select
     queries: {
       largeObjects: {
         queryType: 'db',
-        sql: (_) => `-- reports-database-large-objects
+        safeSql: (_) => safeSql`-- reports-database-large-objects
 SELECT
         SCHEMA_NAME,
         relname,
@@ -700,6 +790,11 @@ SELECT
     },
   },
 }
+
+// Burst-balance-related metric keys. These only apply to compute sizes that
+// have a burst credit pool for disk IO (below 4XL). On 4XL+ disk IO is
+// sustained at baseline, so these charts should be hidden.
+export const BURSTABLE_IO_METRIC_KEYS = ['disk_io_budget', 'disk_io_consumption']
 
 export const DEPRECATED_REPORTS = [
   'total_realtime_ingress',

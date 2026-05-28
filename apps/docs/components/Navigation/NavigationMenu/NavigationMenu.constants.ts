@@ -745,13 +745,19 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Email (Magic Link or OTP)',
+          name: 'Email (Magic link or OTP)',
           url: '/guides/auth/auth-email-passwordless',
           enabled: allAuthProvidersEnabled,
         },
         {
           name: 'Phone Login',
           url: '/guides/auth/phone-login' as `/${string}`,
+          enabled: allAuthProvidersEnabled,
+        },
+
+        {
+          name: 'Passkey',
+          url: '/guides/auth/passkeys',
           enabled: allAuthProvidersEnabled,
         },
 
@@ -1163,18 +1169,24 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'Replication',
-          url: '/guides/database/replication/replication-setup' as `/${string}`,
+          name: 'External replication',
+          url: '/guides/database/replication/external-replication-setup' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/replication-setup' as `/${string}`,
+              url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+              items: [
+                {
+                  name: 'BigQuery',
+                  url: '/guides/database/replication/bigquery' as `/${string}`,
+                },
+              ],
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/external-replication-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/external-replication-faq' },
           ],
         },
         {
@@ -1650,6 +1662,10 @@ export const functions: NavMenuConstant = {
           name: 'Troubleshooting',
           url: '/guides/functions/troubleshooting' as `/${string}`,
         },
+        {
+          name: 'Worker timeouts and WebSocket drops',
+          url: '/troubleshooting/edge-functions-worker-timeouts-and-websocket-drops' as `/${string}`,
+        },
       ],
     },
     {
@@ -1689,6 +1705,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/auth',
           items: [
             { name: 'Securing your functions', url: '/guides/functions/auth' },
+            { name: 'Authorization headers', url: '/guides/functions/auth-headers' },
             { name: 'Legacy JWT secret', url: '/guides/functions/auth-legacy-jwt' },
           ],
         },
@@ -1775,6 +1792,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Image Transformation & Optimization',
           url: '/guides/functions/examples/image-manipulation' as `/${string}`,
+        },
+        {
+          name: 'Resumable WebSockets with replay',
+          url: '/guides/functions/examples/resumable-websockets' as `/${string}`,
         },
       ],
     },
@@ -2515,6 +2536,7 @@ export const security: NavMenuConstant = {
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
       ],
     },
   ],
@@ -2774,6 +2796,18 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/branching' as `/${string}`,
             },
             {
+              name: 'Logs',
+              url: '/guides/platform/manage-your-usage/logs' as `/${string}`,
+            },
+            {
+              name: 'Logs Ingest',
+              url: '/guides/platform/manage-your-usage/logs-ingest' as `/${string}`,
+            },
+            {
+              name: 'Logs Query',
+              url: '/guides/platform/manage-your-usage/logs-query' as `/${string}`,
+            },
+            {
               name: 'Log Drains',
               url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
             },
@@ -2849,8 +2883,16 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
         },
         {
+          name: 'Logs field reference',
+          url: '/guides/telemetry/log-field-reference' as `/${string}`,
+        },
+        {
           name: 'Log drains',
           url: '/guides/telemetry/log-drains' as `/${string}`,
+        },
+        {
+          name: 'Tracing with the JS SDK',
+          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
         },
         {
           name: 'Reports',
@@ -3100,6 +3142,10 @@ export const integrations: NavMenuConstant = {
         {
           name: 'Supabase for Platforms',
           url: '/guides/integrations/supabase-for-platforms',
+        },
+        {
+          name: 'Supabase partner integration guide',
+          url: '/guides/integrations/partner-integration-guide',
         },
       ],
     },

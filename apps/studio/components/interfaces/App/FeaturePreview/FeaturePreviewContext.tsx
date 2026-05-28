@@ -12,7 +12,6 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -28,7 +27,7 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
 
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
-export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
+export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
   const featurePreviews = useFeaturePreviews()
 
@@ -89,17 +88,13 @@ export const useUnifiedLogsPreview = () => {
   const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading: isOrgLoading } =
-    useIsEnterpriseOrSupabaseOrg()
-
-  const isLoading = !flagsHaveLoaded || isOrgLoading
-  const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
+  const isLoading = !flagsHaveLoaded
   const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, isEligible, isLoading, enable, disable }
+  return { isEnabled, isEligible: unifiedLogsEnabled, isLoading, enable, disable }
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
@@ -128,6 +123,12 @@ export const useIsJitDbAccessEnabled = () => {
 export const useIsRLSTesterEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+}
+
+export const useIsMarketplaceEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
 }
 
 export const useFeaturePreviewModal = () => {
