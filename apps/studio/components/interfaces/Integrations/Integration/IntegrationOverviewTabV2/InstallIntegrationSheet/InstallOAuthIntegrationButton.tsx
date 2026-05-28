@@ -85,6 +85,7 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
   }, [
     apiKeys,
     edgeFunctionSecrets,
+    partnerIntegrations,
     integration,
     isApiKeysLoading,
     isEdgeFunctionSecretsLoading,
