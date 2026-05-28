@@ -33,6 +33,7 @@ export const LogsBarChart = ({
   chartConfig,
   hideZeroValues = false,
   hideDateRange = false,
+  hideXAxis = false,
 }: {
   data: LogsBarChartDatum[]
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
@@ -42,6 +43,7 @@ export const LogsBarChart = ({
   chartConfig?: ChartConfig
   hideZeroValues?: boolean
   hideDateRange?: boolean
+  hideXAxis?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -96,6 +98,7 @@ export const LogsBarChart = ({
             tick={false}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
+            {...(hideXAxis ? { height: 1 } : {})}
           />
           <ChartTooltip
             animationDuration={0}
