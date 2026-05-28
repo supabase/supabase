@@ -9,7 +9,6 @@ import { postgresDetailsFields, postgresPrimaryFields } from '../../config/servi
 import { BlockFieldConfig } from '../../types'
 import { DetailRow } from '../shared/DetailRow'
 import { DetailSectionHeader } from '../shared/DetailSection'
-import { FieldValue } from '../shared/FieldValue'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 interface PostgresFlowDetailProps {
@@ -44,14 +43,13 @@ const FieldDetailRow = ({
 
   return (
     <DetailRow
-      label={config.label}
-      value={<FieldValue config={config} value={value} wrap={config.wrap} />}
-      filterId={config.id}
+      config={config}
+      level={data.level}
+      value={value}
       filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
       filterFields={filterFields}
       table={table}
       isLoading={showSkeleton}
-      wrap={config.wrap}
     />
   )
 }
@@ -79,7 +77,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
       />
 
       <Collapsible defaultOpen>
-        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
           <DetailSectionHeader title="Postgres" icon={Database} />
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </CollapsibleTrigger>
@@ -99,7 +97,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
       </Collapsible>
 
       <Collapsible defaultOpen>
-        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
           <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </CollapsibleTrigger>
