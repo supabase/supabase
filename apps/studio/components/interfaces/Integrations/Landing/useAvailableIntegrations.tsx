@@ -34,100 +34,125 @@ export const useAvailableIntegrations = () => {
   const isSuccess = !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!data && !error)))
   const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
 
+  const renderMarketplaceLogo =
+    (listingLogo?: string | null) =>
+    ({ className, ...props }: { className?: string } = {}) => (
+      <div className="relative w-full h-full">
+        {listingLogo ? (
+          <Image
+            fill
+            unoptimized
+            src={fullImageUrl(listingLogo)}
+            alt=""
+            className={cn('p-2', className)}
+            {...props}
+          />
+        ) : (
+          <Boxes className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+        )}
+      </div>
+    )
+
+  const isMarketplaceWrapper = (integration: { categories?: unknown }) =>
+    Array.isArray(integration.categories) &&
+    (integration.categories as Array<{ slug: string }>).some(
+      (c) => c?.slug === 'foreign-data-wrapper'
+    )
+
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
+  // Wrappers from marketplace are excluded here — they are merged into the
+  // hardcoded studio wrappers below as content overrides.
   const marketplaceIntegrations: IntegrationDefinition[] = useMemo(
     () =>
-      (data ?? [])?.map((integration) => {
-        const {
-          id: listingId,
-          slug,
-          categories,
-          featured,
-          title,
-          description,
-          documentation_url: docsUrl,
-          website_url: siteUrl,
-          installation_url: installUrl,
-          installation_url_type: installUrlType,
-          installation_identification_method: installMethod,
-          secret_key_prefix: secretKeyPrefix,
-          edge_function_secret_name: edgeFunctionSecretName,
-          images,
-          content,
-          partner_name: authorName,
-          listing_logo: listingLogo,
-        } = integration
+      (data ?? [])
+        ?.filter((integration) => !isMarketplaceWrapper(integration))
+        .map((integration) => {
+          const {
+            id: listingId,
+            slug,
+            categories,
+            featured,
+            title,
+            description,
+            documentation_url: docsUrl,
+            website_url: siteUrl,
+            installation_url: installUrl,
+            installation_url_type: installUrlType,
+            installation_identification_method: installMethod,
+            secret_key_prefix: secretKeyPrefix,
+            edge_function_secret_name: edgeFunctionSecretName,
+            images,
+            content,
+            partner_name: authorName,
+            listing_logo: listingLogo,
+          } = integration
 
-        const status = undefined
-        const author = { name: authorName ?? '', websiteUrl: '' }
+          const status = undefined
+          const author = { name: authorName ?? '', websiteUrl: '' }
 
-        return {
-          id: slug ?? '',
-          name: title ?? '',
-          status,
-          featured: !!featured,
-          type: 'oauth' as const, // Currently marketplace only supports oauth apps
-          source: 'Partner' as const,
-          categories: Array.isArray(categories)
-            ? (categories as Array<{ slug: string }>).map((x) => x.slug)
-            : [],
-          content,
-          files: images?.map((image) => fullImageUrl(image)),
-          description,
-          docsUrl,
-          siteUrl,
-          installUrl,
-          installUrlType: installUrlType ?? undefined,
-          installIdentificationMethod: installMethod ?? undefined,
-          secretKeyPrefix: secretKeyPrefix ?? undefined,
-          edgeFunctionSecretName: edgeFunctionSecretName ?? undefined,
-          listingId: listingId ?? undefined,
-          author,
-          requiredExtensions: [],
-          icon: ({ className, ...props } = {}) => (
-            <div className="relative w-full h-full">
-              {listingLogo ? (
-                <Image
-                  fill
-                  src={fullImageUrl(listingLogo)}
-                  alt=""
-                  className={cn('p-2', className)}
-                  {...props}
-                />
-              ) : (
-                <Boxes
-                  className={cn('inset-0 p-2 text-black w-full h-full', className)}
-                  {...props}
-                />
-              )}
-            </div>
-          ),
-          navigation: [
-            {
-              route: 'overview',
-              label: 'Overview',
+          return {
+            id: slug ?? '',
+            name: title ?? '',
+            status,
+            featured: !!featured,
+            type: 'oauth' as const, // Currently marketplace only supports oauth apps
+            source: 'Partner' as const,
+            categories: Array.isArray(categories)
+              ? (categories as Array<{ slug: string }>).map((x) => x.slug)
+              : [],
+            content,
+            files: images?.map((image) => fullImageUrl(image)),
+            description,
+            docsUrl,
+            siteUrl,
+            installUrl,
+            installUrlType: installUrlType ?? undefined,
+            installIdentificationMethod: installMethod ?? undefined,
+            secretKeyPrefix: secretKeyPrefix ?? undefined,
+            edgeFunctionSecretName: edgeFunctionSecretName ?? undefined,
+            listingId: listingId ?? undefined,
+            author,
+            requiredExtensions: [],
+            icon: renderMarketplaceLogo(listingLogo),
+            navigation: [
+              {
+                route: 'overview',
+                label: 'Overview',
+              },
+            ],
+            navigate: ({ pageId = 'overview' }) => {
+              switch (pageId) {
+                case 'overview':
+                  return dynamic(
+                    () =>
+                      import('@/components/interfaces/Integrations/Integration/MarketplaceIntegrationOverviewTab').then(
+                        (mod) => mod.MarketplaceIntegrationOverviewTab
+                      ),
+                    {
+                      loading: Loading,
+                    }
+                  )
+              }
+              return null
             },
-          ],
-          navigate: ({ pageId = 'overview' }) => {
-            switch (pageId) {
-              case 'overview':
-                return dynamic(
-                  () =>
-                    import('@/components/interfaces/Integrations/Integration/MarketplaceIntegrationOverviewTab').then(
-                      (mod) => mod.MarketplaceIntegrationOverviewTab
-                    ),
-                  {
-                    loading: Loading,
-                  }
-                )
-            }
-            return null
-          },
-        }
-      }),
+          }
+        }),
     [data]
   )
+
+  // Marketplace wrapper listings keyed by their studio-equivalent id
+  // (marketplace uses dash-separated slugs, studio uses underscore-separated ids).
+  const marketplaceWrappers = useMemo(() => {
+    const map: Record<string, NonNullable<typeof data>[number]> = {}
+    ;(data ?? []).forEach((integration) => {
+      if (!isMarketplaceWrapper(integration)) return
+      const slug = integration.slug
+      if (!slug) return
+      map[slug.replaceAll('-', '_')] = integration
+    })
+    return map
+  }, [data])
 
   // [Joshen] Existing integrations that are defined within studio
   // Available integrations are all integrations that can be installed. If an integration can't be installed (needed
@@ -146,8 +171,37 @@ export const useAvailableIntegrations = () => {
       }
 
       return true
+    }).map((integration) => {
+      const isWrapper = integration.type === 'wrapper' || integration.id.endsWith('_wrapper')
+      if (!isWrapper) return integration
+
+      const marketplaceWrapper = marketplaceWrappers[integration.id]
+      if (!marketplaceWrapper) return integration
+
+      const {
+        title,
+        description,
+        content,
+        documentation_url: docsUrl,
+        website_url: siteUrl,
+        images,
+        partner_name: authorName,
+        listing_logo: listingLogo,
+      } = marketplaceWrapper
+
+      return {
+        ...integration,
+        ...(title ? { name: title } : {}),
+        ...(description ? { description } : {}),
+        ...(content ? { content } : {}),
+        ...(docsUrl ? { docsUrl } : {}),
+        ...(siteUrl ? { siteUrl } : {}),
+        ...(authorName ? { author: { name: authorName, websiteUrl: '' } } : {}),
+        ...(images ? { files: images.map((image) => fullImageUrl(image)) } : {}),
+        ...(listingLogo ? { icon: renderMarketplaceLogo(listingLogo) } : {}),
+      }
     })
-  }, [integrationsWrappers, isCLI])
+  }, [integrationsWrappers, isCLI, marketplaceWrappers])
 
   const dataWithMarketplace = useMemo(() => {
     return [...marketplaceIntegrations, ...allIntegrations].sort((a, b) =>
