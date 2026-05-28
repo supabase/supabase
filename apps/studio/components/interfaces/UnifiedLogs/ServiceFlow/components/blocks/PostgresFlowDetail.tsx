@@ -77,7 +77,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
       />
 
       <Collapsible defaultOpen>
-        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
           <DetailSectionHeader title="Postgres" icon={Database} />
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </CollapsibleTrigger>
@@ -97,7 +97,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
       </Collapsible>
 
       <Collapsible defaultOpen>
-        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+        <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
           <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </CollapsibleTrigger>

@@ -73,7 +73,7 @@ export function createBlock(config: BlockConfig) {
     return (
       <>
         <Collapsible defaultOpen>
-          <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+          <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
             <DetailSectionHeader title={config.title} icon={config.icon} />
             <ChevronDown
               className="transition-transform duration-200"

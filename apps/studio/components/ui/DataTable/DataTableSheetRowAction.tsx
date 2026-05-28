@@ -21,6 +21,8 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import { ButtonTooltip } from '../ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
 
@@ -168,45 +170,47 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
     }
   }
 
-  return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger
-        className={cn(
-          'rounded-md ring-offset-background',
-          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          'relative py-0',
-          className
-        )}
-        onKeyDown={(e) => {
-          if (e.key === 'ArrowDown') {
-            // REMINDER: default behavior is to open the dropdown menu
-            // But because we use it to navigate between rows, we need to prevent it
-            // and only use "Enter" to select the option
-            e.preventDefault()
-          }
-          onKeyDown?.(e)
-        }}
-        {...props}
-      >
-        {children}
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent align="end" side="bottom" className="w-56 -translate-x-4">
-        {!!field && !!column && (
-          <>
-            {renderOptions()}
-            <DropdownMenuSeparator />
-          </>
-        )}
-
-        <DropdownMenuItem
-          onClick={() => copy(String(value), { timeout: 1000 })}
-          className="flex items-center gap-2"
+  if (!!field && !!column) {
+    return (
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger
+          asChild
+          className={cn(
+            'rounded-md ring-offset-background',
+            'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'relative py-0',
+            className
+          )}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowDown') {
+              // REMINDER: default behavior is to open the dropdown menu
+              // But because we use it to navigate between rows, we need to prevent it
+              // and only use "Enter" to select the option
+              e.preventDefault()
+            }
+            onKeyDown?.(e)
+          }}
+          {...props}
         >
-          <Copy size={12} />
-          Copy {label}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
+          {children}
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" side="bottom" className="w-56">
+          {renderOptions()}
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem
+            onClick={() => copy(String(value), { timeout: 1000 })}
+            className="flex items-center gap-2"
+          >
+            <Copy size={12} />
+            Copy {label}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+
+  return <CopyButton iconOnly type="text" text={String(value)} className="px-1" />
 }
