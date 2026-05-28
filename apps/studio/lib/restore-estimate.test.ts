@@ -11,10 +11,10 @@ describe('restore-estimate', () => {
     expect(estimateRestoreTimeFromSizeGb(21_000)).toBeCloseTo(723, 0)
   })
 
-  it('uses a 10 minute floor when size is missing or small', () => {
-    expect(getRestoreLongRunningThresholdMinutes()).toBe(10)
-    expect(getRestoreLongRunningThresholdMinutes(null)).toBe(10)
-    expect(getRestoreLongRunningThresholdMinutes(100)).toBe(10)
+  it('uses a 20 minute floor when size is missing or small', () => {
+    expect(getRestoreLongRunningThresholdMinutes()).toBe(20)
+    expect(getRestoreLongRunningThresholdMinutes(null)).toBe(20)
+    expect(getRestoreLongRunningThresholdMinutes(100)).toBe(20)
   })
 
   it('scales the long-running threshold for larger restores', () => {
