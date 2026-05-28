@@ -149,7 +149,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
     queries: {
       totalRequests: {
         queryType: 'logs',
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-api-total-requests
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -167,7 +167,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       topRoutes: {
         queryType: 'logs',
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-api-top-routes
         select
           request.path as path,
@@ -190,7 +190,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       errorCounts: {
         queryType: 'logs',
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-api-error-counts
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -211,7 +211,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       topErrorRoutes: {
         queryType: 'logs',
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-api-top-error-routes
         select
           request.path as path,
@@ -236,7 +236,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       responseSpeed: {
         queryType: 'logs',
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-api-response-speed
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -256,7 +256,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       topSlowRoutes: {
         queryType: 'logs',
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-api-top-slow-routes
         select
           request.path as path,
@@ -280,7 +280,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       networkTraffic: {
         queryType: 'logs',
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-api-network-traffic
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -318,7 +318,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       },
       requestsByCountry: {
         queryType: 'logs',
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-api-requests-by-country
         select
           cf.country as country,
@@ -348,7 +348,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       cacheHitRate: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-storage-cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
@@ -368,7 +368,7 @@ order by timestamp desc
       topCacheMisses: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (filters) => safeLogSql`
+        safeSql: (filters) => safeLogSql`
         -- reports-storage-top-cache-misses
 SELECT
   r.path as path,
