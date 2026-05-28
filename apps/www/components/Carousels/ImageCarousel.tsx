@@ -10,7 +10,6 @@ import 'swiper/css'
 
 import { useInView } from 'framer-motion'
 import Image from 'next/image'
-import Swiper from 'swiper'
 
 import TextLink from '../TextLink'
 import ImageCarouselStyles from './ImageCarousel.module.css'
