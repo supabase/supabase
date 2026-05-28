@@ -56,7 +56,7 @@ If you don't need specific services, such as Realtime, Storage, imgproxy, or Edg
 
 <Admonition type="tip">
 
-The default configuration does not include [Logs & Analytics](/features/logs-analytics). You can enable Logflare (Analytics), Vector (log collection), and the Log Explorer in Studio by using an optional docker-compose override file. Note that enabling these services will increase resource requirements.
+The default configuration does not include [Logs & Analytics](/features/logs-analytics). You can [enable](#enabling-analytics) Logflare (Analytics), Vector (log collection), and the Log Explorer in Studio by using an optional docker-compose override file. Note that enabling these services will increase resource requirements.
 
 </Admonition>
 
@@ -77,7 +77,7 @@ curl -fsSL https://supabase.link/setup.sh | sh
 
 The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
 
-- Install prerequisites (`git`, `curl`, `openssl`, `jq`) and Docker Engine if not already present
+- Install prerequisites (`git`, `openssl`, `jq`) and Docker Engine if not already present
 - Sparse-clone the `docker/` directory from the main Supabase [repository](https://github.com/supabase/supabase/)
 - Create a project directory (`supabase-project` by default) and copy the configuration files into it
 - Prompt for the main URLs (`SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, `SITE_URL`, `PROXY_DOMAIN`) and write them to `.env`
@@ -293,7 +293,7 @@ sh tests/test-container-logs.sh
 Then try inspecting the Docker logs for a specific container, e.g.,
 
 ```sh
-sh run.sh logs db
+sh run.sh logs storage
 ```
 
 To stop Supabase, use:
