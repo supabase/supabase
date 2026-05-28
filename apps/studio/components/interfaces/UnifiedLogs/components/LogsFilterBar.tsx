@@ -1,5 +1,5 @@
 import { LoaderCircle, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { FilterBar, FilterCondition, type FilterGroup, type FilterProperty } from 'ui-patterns'
 
 import {
@@ -8,7 +8,6 @@ import {
   type LogsFilterOperator,
 } from '../UnifiedLogs.filters'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 const buildFilterGroup = (
   columnFilters: { id: string; value: unknown }[],
@@ -63,7 +62,7 @@ export const LogsFilterBar = () => {
   )
 
   // Read latest filterProperties without making the effect depend on its (per-render) identity.
-  const syncFromColumnFilters = useStaticEffectEvent(() => {
+  const syncFromColumnFilters = useEffectEvent(() => {
     setFilters(buildFilterGroup(columnFilters, new Set(filterProperties.map((p) => p.name))))
   })
 
@@ -109,7 +108,8 @@ export const LogsFilterBar = () => {
 
   useEffect(() => {
     syncFromColumnFilters()
-  }, [columnFilters, syncFromColumnFilters])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [columnFilters])
 
   return (
     <FilterBar
