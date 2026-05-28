@@ -5,13 +5,15 @@ subtitle: "Learn how to configure and deploy Supabase with Docker."
 tocVideo: "FqiQKRKsfZE"
 ---
 
-Docker is the easiest way to get started with self-hosted Supabase. It should take you less than 30 minutes to get up and running.
+Docker is the easiest way to get started with self-hosted Supabase. It should take you less than 15 minutes to get up and running.
 
 ## Contents
 
 1. [Before you begin](#before-you-begin)
 2. [System requirements](#system-requirements)
 3. [Installing Supabase](#installing-supabase)
+   - [Quick start (Linux)](#quick-start-linux)
+   - [Manual installation](#manual-installation)
 4. [Configuring and securing Supabase](#configuring-and-securing-supabase)
 5. [Starting and stopping](#starting-and-stopping)
 6. [Accessing Supabase services](#accessing-supabase-studio-dashboard)
@@ -24,6 +26,7 @@ Docker is the easiest way to get started with self-hosted Supabase. It should ta
 This guide assumes you're comfortable with:
 
 - Linux server administration basics
+- Basic `git` usage
 - Docker and Docker Compose
 - Networking fundamentals (ports, DNS, firewalls)
 
@@ -53,13 +56,56 @@ If you don't need specific services, such as Realtime, Storage, imgproxy, or Edg
 
 <Admonition type="tip">
 
-The default configuration does not include [Logs & Analytics](/features/logs-analytics). You can enable Logflare (Analytics), Vector (log collection), and the Log Explorer in Studio by using an optional `docker-compose` override file. Note that enabling these services will increase resource requirements.
+The default configuration does not include [Logs & Analytics](/features/logs-analytics). You can enable Logflare (Analytics), Vector (log collection), and the Log Explorer in Studio by using an optional docker-compose override file. Note that enabling these services will increase resource requirements.
 
 </Admonition>
 
 ## Installing Supabase
 
-First, copy the Docker configuration files to your project directory. Choose one of the options below:
+The Docker configuration is distributed as part of the [Supabase repository](https://github.com/supabase/supabase/tree/master/docker). There are two paths to get it onto your machine:
+
+- **[Quick start (Linux)](#quick-start-linux)** - one command installs Docker, fetches the configuration, generates all secrets and keys, and prompts for your URLs. Fastest path if you're on a supported Linux distribution.
+- **[Manual installation](#manual-installation)** - clone the repository yourself on any OS, then configure secrets and URLs as described below.
+
+### Quick start (Linux)
+
+Run the automated install script to set up a new project in the current directory:
+
+```sh
+curl -fsSL https://supabase.link/setup.sh | sh
+```
+
+The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
+
+- Install prerequisites (`git`, `curl`, `openssl`, `jq`) and Docker Engine if not already present
+- Sparse-clone the `docker/` directory from the main Supabase [repository](https://github.com/supabase/supabase/)
+- Create a project directory (`supabase-project` by default) and copy the configuration files into it
+- Prompt for the main URLs (`SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, `SITE_URL`, `PROXY_DOMAIN`) and write them to `.env`
+- Generate all secrets, including a random `DASHBOARD_PASSWORD`, and the asymmetric JWT signing key pair (runs `generate-keys.sh` and `add-new-auth-keys.sh`, and uncomments the matching entries in `docker-compose.yml`)
+- Pull the Docker images
+
+The shortened link points to [setup.sh](https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/docker/setup.sh) - you can inspect it before running. Use `-y` to run non-interactively with default values.
+
+After the script finishes, start the stack:
+
+```sh
+cd supabase-project && \
+sh run.sh start
+```
+
+View the generated credentials any time via:
+
+```sh
+sh run.sh secrets
+```
+
+Next, see [Starting and stopping](#starting-and-stopping) for how to check service health and follow logs, then [Accessing Supabase Studio (Dashboard)](#accessing-supabase-studio-dashboard) and the other related sections. To customize the install further, browse [Configuring and securing Supabase](#configuring-and-securing-supabase) and [Advanced topics](#advanced-topics).
+
+Not on Linux, or want to do it manually? See [Manual installation](#manual-installation) below.
+
+### Manual installation
+
+This path gets the Docker Compose configuration onto your server; you'll configure secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase).
 
 <Tabs
 scrollable
@@ -70,6 +116,8 @@ defaultActiveId="gitclone"
 >
 
 <TabPanel id="gitclone" label="GitHub clone">
+
+A shallow clone of the full Supabase repository. Works on any OS with `git` installed and is the simplest manual option.
 
 ```sh
 # Get the code
@@ -86,7 +134,7 @@ mkdir supabase-project
 # Copy the compose files over to your project
 cp -rf supabase/docker/* supabase-project
 
-# Copy the fake env vars
+# Copy the example environment file
 cp supabase/docker/.env.example supabase-project/.env
 
 # Switch to your project directory
@@ -99,6 +147,8 @@ docker compose pull
 </TabPanel>
 
 <TabPanel id="sparseclone" label="Sparse clone">
+
+Only downloads the `docker/` directory from the repository, saving bandwidth and disk space. Requires a few more steps than the shallow GitHub clone.
 
 ```sh
 # Get the code using git sparse checkout
@@ -120,7 +170,7 @@ mkdir supabase-project
 # Copy the compose files over to your project
 cp -rf supabase/docker/* supabase-project
 
-# Copy the fake env vars
+# Copy the example environment file
 cp supabase/docker/.env.example supabase-project/.env
 
 # Switch to your project directory
@@ -142,7 +192,7 @@ docker compose pull
 
 ## Configuring and securing Supabase
 
-While we provided example placeholder passwords and keys in the `.env.example` file, you should NEVER start your self-hosted Supabase using these defaults.
+While we provided example placeholder passwords and keys in the `.env.example` file, you should **never** start your self-hosted Supabase using these defaults.
 
 <Admonition type="danger">
 
@@ -150,7 +200,13 @@ While we provided example placeholder passwords and keys in the `.env.example` f
 
 </Admonition>
 
-### Quick setup
+<Admonition type="note">
+
+  If you used [Quick start (Linux)](#quick-start-linux), these tasks were already done - `setup.sh` configured secrets, keys, URLs, and a random `DASHBOARD_PASSWORD`. You can skip ahead to [Starting and stopping](#starting-and-stopping), or read on to review what was set and how to change it.
+
+</Admonition>
+
+### Generate keys and secrets
 
 To generate secure passwords and secrets, run:
 
@@ -375,7 +431,7 @@ For example, you'd like to update or rollback the Studio image. Follow the steps
 
 <Admonition type="danger">
 
-    Be careful — the following destroys all data, including the database and storage volumes!
+    Be careful - the following destroys all data, including the database and storage volumes!
 
 </Admonition>
 
