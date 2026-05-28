@@ -32,6 +32,7 @@ export const LogsBarChart = ({
   isFullHeight = false,
   chartConfig,
   hideZeroValues = false,
+  hideDateRange = false,
 }: {
   data: LogsBarChartDatum[]
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
@@ -40,6 +41,7 @@ export const LogsBarChart = ({
   isFullHeight?: boolean
   chartConfig?: ChartConfig
   hideZeroValues?: boolean
+  hideDateRange?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -171,7 +173,7 @@ export const LogsBarChart = ({
           </Bar>
         </RechartBarChart>
       </ChartContainer>
-      {data && (
+      {data && !hideDateRange && (
         <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
           <span>{startDate}</span>
           <span>{endDate}</span>

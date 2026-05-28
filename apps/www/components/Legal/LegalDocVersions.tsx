@@ -1,6 +1,5 @@
-import { useStaticEffectEvent } from '~/hooks/useStaticEffectEvent'
 import { useRouter } from 'next/router'
-import { ComponentType, useEffect, useState } from 'react'
+import { ComponentType, useEffect, useEffectEvent, useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 export type LegalDocVersion = {
@@ -19,7 +18,7 @@ const LegalDocVersions = ({ versions }: Props) => {
   const latest = versions[0]
   const [activeId, setActiveId] = useState<string>(latest.id)
 
-  const syncActiveVersion = useStaticEffectEvent(() => {
+  const syncActiveVersion = useEffectEvent(() => {
     const fromQuery = typeof router.query.version === 'string' ? router.query.version : undefined
     if (fromQuery && versions.some((v) => v.id === fromQuery)) {
       setActiveId(fromQuery)
@@ -31,7 +30,8 @@ const LegalDocVersions = ({ versions }: Props) => {
   useEffect(() => {
     if (!router.isReady) return
     syncActiveVersion()
-  }, [router.isReady, router.query.version, syncActiveVersion])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [router.isReady, router.query.version])
 
   const active = versions.find((v) => v.id === activeId) ?? latest
   const ActiveComponent = active.Component

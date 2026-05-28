@@ -1,11 +1,15 @@
 import { useFlag, useParams } from 'common'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useMemo } from 'react'
 
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { SidebarSection } from '@/components/layouts/AccountLayout/AccountLayout.types'
+import { toSubMenuSections } from '@/components/layouts/AccountLayout/AccountLayout.utils'
 import { WithSidebar } from '@/components/layouts/AccountLayout/WithSidebar'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { convertSectionsToProductMenu } from '@/components/ui/ProductMenu/SubMenu.utils'
 import { useCurrentPath } from '@/hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface OrganizationSettingsMenuItemsProps {
   slug?: string
@@ -102,6 +106,7 @@ export const generateOrganizationSettingsSections = ({
       key: 'general',
       label: 'General',
       href: `/org/${slug}/general`,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_GENERAL,
     },
     ...(showSecuritySettings
       ? [
@@ -109,6 +114,7 @@ export const generateOrganizationSettingsSections = ({
             key: 'security',
             label: 'Security',
             href: `/org/${slug}/security`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_SECURITY,
           },
         ]
       : []),
@@ -118,6 +124,7 @@ export const generateOrganizationSettingsSections = ({
             key: 'sso',
             label: 'SSO',
             href: `/org/${slug}/sso`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_SSO,
           },
         ]
       : []),
@@ -128,6 +135,7 @@ export const generateOrganizationSettingsSections = ({
       key: 'apps',
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_APPS,
     },
     ...(showPrivateApps
       ? [
@@ -135,6 +143,7 @@ export const generateOrganizationSettingsSections = ({
             key: 'private-apps',
             label: 'Private Apps',
             href: `/org/${slug}/private-apps`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_PRIVATE_APPS,
           },
         ]
       : []),
@@ -144,6 +153,7 @@ export const generateOrganizationSettingsSections = ({
             key: 'webhooks',
             label: 'Webhooks',
             href: `/org/${slug}/webhooks`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_WEBHOOKS,
           },
         ]
       : []),
@@ -154,6 +164,7 @@ export const generateOrganizationSettingsSections = ({
       key: 'audit',
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT,
     },
     ...(showLegalDocuments
       ? [
@@ -161,6 +172,7 @@ export const generateOrganizationSettingsSections = ({
             key: 'documents',
             label: 'Legal Documents',
             href: `/org/${slug}/documents`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_DOCUMENTS,
           },
         ]
       : []),
@@ -221,18 +233,26 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
     showPrivateApps,
   })
 
+  const orgSettingsMenu = useMemo(
+    () => convertSectionsToProductMenu(toSubMenuSections(sections)),
+    [sections]
+  )
+
   // Browser titles for org settings routes are set by OrganizationLayout.
   return (
-    <WithSidebar
-      title="Organization Settings"
-      sections={sections}
-      header={
-        <div className="border-default flex min-h-(--header-height) items-center border-b px-6">
-          <h4 className="text-lg">Settings</h4>
-        </div>
-      }
-    >
-      {children}
-    </WithSidebar>
+    <>
+      <ProductMenuShortcuts menu={orgSettingsMenu} />
+      <WithSidebar
+        title="Organization Settings"
+        sections={sections}
+        header={
+          <div className="border-default flex min-h-(--header-height) items-center border-b px-6">
+            <h4 className="text-lg">Settings</h4>
+          </div>
+        }
+      >
+        {children}
+      </WithSidebar>
+    </>
   )
 }

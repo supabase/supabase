@@ -47,12 +47,11 @@ import { getDatabaseCronJob } from '@/data/database-cron-jobs/database-cron-job-
 import { useDatabaseCronJobCreateMutation } from '@/data/database-cron-jobs/database-cron-jobs-create-mutation'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { isGreaterThanOrEqual } from '@/lib/semver'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface CreateCronJobSheetProps {
   open: boolean
@@ -89,7 +88,7 @@ const buildCommand = (values: CronJobType) => {
 export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCronJobSheetProps) => {
   const { childId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [isLoadingGetCronJob, setIsLoadingGetCronJob] = useState(false)
 
@@ -109,7 +108,6 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
     ? isGreaterThanOrEqual(pgCronExtension.installed_version, '1.5')
     : false
 
-  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertCronJob, isPending: isUpserting } = useDatabaseCronJobCreateMutation()
   const isLoading = isLoadingGetCronJob || isUpserting
 
@@ -213,29 +211,9 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
           }
 
           if (isEditing) {
-            sendEvent({
-              action: 'cron_job_updated',
-              properties: {
-                type: values.type,
-                schedule: schedule,
-              },
-              groups: {
-                project: project?.ref ?? 'Unknown',
-                organization: org?.slug ?? 'Unknown',
-              },
-            })
+            track('cron_job_updated', { type: values.type, schedule: schedule })
           } else {
-            sendEvent({
-              action: 'cron_job_created',
-              properties: {
-                type: values.type,
-                schedule: schedule,
-              },
-              groups: {
-                project: project?.ref ?? 'Unknown',
-                organization: org?.slug ?? 'Unknown',
-              },
-            })
+            track('cron_job_created', { type: values.type, schedule: schedule })
           }
 
           onClose()

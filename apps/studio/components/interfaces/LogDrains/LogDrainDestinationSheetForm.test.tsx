@@ -4,17 +4,18 @@ import type { ComponentProps } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { render } from '@/tests/helpers'
 
-const { trackMock, useFlagMock, useLogDrainsQueryMock, useParamsMock, useTrackMock } = vi.hoisted(
-  () => ({
+const { mockShortcut, trackMock, useFlagMock, useLogDrainsQueryMock, useParamsMock, useTrackMock } =
+  vi.hoisted(() => ({
+    mockShortcut: vi.fn(({ children }: any) => <div data-testid="shortcut">{children}</div>),
     trackMock: vi.fn(),
     useFlagMock: vi.fn(),
     useLogDrainsQueryMock: vi.fn(),
     useParamsMock: vi.fn(),
     useTrackMock: vi.fn(),
-  })
-)
+  }))
 
 vi.mock(import('common'), async (importOriginal) => {
   const actual = await importOriginal()
@@ -38,6 +39,10 @@ vi.mock(import('@/data/log-drains/log-drains-query'), async (importOriginal) => 
 
 vi.mock('@/lib/telemetry/track', () => ({
   useTrack: useTrackMock,
+}))
+
+vi.mock('@/components/ui/Shortcut', () => ({
+  Shortcut: mockShortcut,
 }))
 
 vi.mock('sonner', () => ({
@@ -86,6 +91,23 @@ describe('LogDrainDestinationSheetForm', () => {
 
     expect(screen.getByDisplayValue('Content-Type')).toBeInTheDocument()
     expect(screen.getByDisplayValue('application/json')).toBeInTheDocument()
+  })
+
+  it('wraps the save button with the save destination shortcut while open', async () => {
+    renderForm()
+
+    await screen.findByRole('dialog')
+
+    expect(mockShortcut).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION,
+        onTrigger: expect.any(Function),
+        options: { enabled: true },
+        side: 'top',
+      }),
+      undefined
+    )
+    expect(screen.getByRole('button', { name: 'Save destination' })).toBeInTheDocument()
   })
 
   it('shows the protobuf content type header for OTLP create mode', async () => {
