@@ -3,8 +3,8 @@ import dayjs from 'dayjs'
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import {
   groupLogsFiltersByColumn,
-  type LogsFilterOperator,
   parseLogsFilterUrlParams,
+  type LogsFilterOperator,
 } from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import {
