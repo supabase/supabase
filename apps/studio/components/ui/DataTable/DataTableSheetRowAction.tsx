@@ -87,7 +87,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
           <DropdownMenuItem
             onClick={() =>
               column?.setFilterValue({
-                operator: '=',
+                operator: field.value === 'event_message' ? '~~*' : '=',
                 values: [String(value)],
               } satisfies LogsColumnFilterValue)
             }
