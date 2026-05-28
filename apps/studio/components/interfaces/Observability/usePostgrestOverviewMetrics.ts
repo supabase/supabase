@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
-import { rawSql, safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 
 type PostgrestMetricsVariables = {
   projectRef: string
@@ -14,13 +14,13 @@ type PostgrestMetricsVariables = {
 function getIntervalTrunc(interval: '1hr' | '1day' | '7day'): SafeLogSqlFragment {
   switch (interval) {
     case '1hr':
-      return rawSql('minute') // 1-minute buckets for 1 hour
+      return safeSql`minute` // 1-minute buckets for 1 hour
     case '1day':
-      return rawSql('hour') // 1-hour buckets for 1 day
+      return safeSql`hour` // 1-hour buckets for 1 day
     case '7day':
-      return rawSql('day') // 1-day buckets for 7 days
+      return safeSql`day` // 1-day buckets for 7 days
     default:
-      return rawSql('hour')
+      return safeSql`hour`
   }
 }
 

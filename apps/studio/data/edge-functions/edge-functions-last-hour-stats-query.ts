@@ -62,6 +62,7 @@ export async function getEdgeFunctionsLastHourStats(
     sql: getEdgeFunctionsLastHourStatsSql(functionIds),
     iso_timestamp_start: startDate,
     iso_timestamp_end: endDate,
+    key: 'last-hour-stats',
     signal,
   })
 
