@@ -14,7 +14,7 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { LOCAL_STORAGE_KEYS, useDebounce, useParams } from 'common'
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -433,16 +433,22 @@ export const UnifiedLogs = () => {
                 </div>
               </div>
 
-              <TimelineChart
-                data={unifiedLogsChart}
-                className={cn(
-                  '-mb-1.5 mt-1.5',
-                  isFetchingCharts && 'opacity-60 transition-opacity duration-150'
-                )}
-                columnId="timestamp"
-                filterColumnId="date"
-                chartConfig={filteredChartConfig}
-              />
+              {isLoading ? (
+                <div className="h-[60px] flex items-center justify-center">
+                  <Loader2 size={14} className="animate-spin text-foreground-lighter" />
+                </div>
+              ) : (
+                <TimelineChart
+                  data={unifiedLogsChart}
+                  className={cn(
+                    '-mb-1.5 mt-1.5',
+                    isFetchingCharts && 'opacity-60 transition-opacity duration-150'
+                  )}
+                  columnId="timestamp"
+                  filterColumnId="date"
+                  chartConfig={filteredChartConfig}
+                />
+              )}
             </div>
 
             <RowSelectionHeader />
