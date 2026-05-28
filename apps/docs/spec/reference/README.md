@@ -1,0 +1,273 @@
+# Reference content pipeline
+
+A new process has been set to break away from big files dependencies for reference documentation updates.
+
+The new setup allows developer to drop files, plus add content via partials and tweak output through configuration.
+
+_For now, it supports only [typedoc](https://typedoc.org/) output, though teams can build their own adapters to match the expected output as a pre-step._
+
+This directory feeds the **new** reference-docs pipeline driven by
+[`scripts/build-reference-content.ts`](../../scripts/build-reference-content.ts).
+The legacy pipeline (`spec/supabase_*_v*.yml` + `spec/common-client-libs-sections.json`
+
+The YAML-driven `features/docs/Reference.generated.script.ts`) still exists for SDKs that haven't migrated yet — see "Routing to the new pipeline" below for how a lib opts in.
+
+## Directory layout
+
+```
+spec/reference/
+└── <library>/                  e.g. javascript
+    └── <version>/              e.g. v2
+        ├── *.json              TypeDoc spec files (the source of truth for declarations)
+        ├── config.json         Optional. Filters and ordering — see below
+        └── partials/           Optional. Per-section content
+            ├── *.mdx | *.md    Markdown partials (with frontmatter)
+            └── *.json          Rich function-type partials (description, examples, …)
+```
+
+Library and version names come straight from the folder names. Anything you drop
+under `spec/reference/<lib>/<ver>/` is picked up automatically by the build
+script — there is no separate manifest to update inside this directory.
+
+The output will be sent to the `content/reference/<lib>/<ver>/` directory.
+
+## Source: TypeDoc JSON specs
+
+Each top-level `.json` file (except `config.json`) is a TypeDoc dump of one
+package. The build walks every declaration and harvests anything tagged with
+`@category` (and optionally `@subcategory`):
+
+```jsonc
+// spec/reference/javascript/v2/gotrue.json (excerpt)
+{
+  "name": "@supabase/auth-js", // ← package name, becomes the $ref prefix
+  "variant": "project",
+  "kind": 1,
+  "children": [
+    {
+      "kind": 128,
+      "name": "GoTrueClient",
+      "children": [
+        {
+          "kind": 2048,
+          "name": "linkIdentity",
+          "comment": {
+            "blockTags": [
+              { "tag": "@category", "content": [{ "kind": "text", "text": "Auth" }] },
+              { "tag": "@subcategory", "content": [{ "kind": "text", "text": "Auth MFA" }] },
+            ],
+          },
+          "signatures": [
+            {
+              /* params + return type */
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+```
+
+Key tags the walker reads:
+
+- `@category` — required for a declaration to appear in the listing. Becomes
+  the `product` and groups items in `sections.json`.
+- `@subcategory` — optional. Nests the declaration under a sub-grouping inside
+  the category, with its own header.
+
+Anything without `@category` is collected into `typeSpec.json` (for cross-reference
+by `$ref`) but does **not** appear in the navigation/section list.
+
+`$ref` values are constructed as `<package>.<module…>.<class…>.<member>`,
+following TypeDoc's module (kind 2), namespace (kind 4), class (kind 128) and
+interface (kind 256) nesting. The `index` module segment is stripped via
+`normalizeRefPath` (so `@supabase/storage-js.index.StorageClient.foo` becomes
+`@supabase/storage-js.StorageClient.foo`).
+
+## Partials
+
+Partials enrich the rendered output with content TypeDoc can't supply
+(intro paragraphs, code examples, etc.). The filename (without extension) is
+the routing key:
+
+- Matches a **subcategory title slug** (e.g. `using-filters.json` for the
+  "Using filters" subcategory) → attached to that subcategory.
+- Matches a **category title slug** (e.g. `auth.json` for the "Auth" category)
+  → attached to that category.
+- Anything else → emitted at the **top of the page**, before any category
+  (this is how `introduction.mdx` / `installing.mdx` work).
+
+The slug check is `title.toLowerCase().replace(/\s+/g, '-')`, so
+`"Auth Admin"` → `auth-admin`, `"File Buckets"` → `file-buckets`, etc.
+
+### `.mdx` / `.md` partials (markdown)
+
+Frontmatter is parsed via `gray-matter`. Only `title` and `ref` are read:
+
+```mdx
+---
+title: Initializing
+ref: '@supabase/supabase-js.SupabaseClient.constructor' # optional — see below
+---
+
+Body content goes here.
+```
+
+- **Without `ref`**: emits a `type: 'markdown'` entry. Its body is also written
+  to `apps/docs/content/reference/<library>/<version>/<name>.mdx` so the
+  renderer's routed loader (`getRefMarkdownForLib`) can serve it.
+- **With `ref`**: emits a `type: 'function'` entry plus a `functions.json` entry
+  `{id: <name>, $ref: <ref>}`. The renderer pairs that with `typeSpec.json` to
+  show the method signature. This is how `initializing.mdx` links to the
+  `SupabaseClient` constructor.
+
+If the filename matches a category/subcategory, the markdown entry is added as
+a **separate** sub-section at the top of that section's items (the subcategory
+header itself is untouched).
+
+### `.json` partials (function-type)
+
+JSON partials carry rich content (description, notes, examples) that gets
+rendered into the page. The full body is poured into `functions.json`:
+
+````json
+// spec/reference/javascript/v2/partials/using-filters.json
+{
+  "id": "using-filters",
+  "title": "Using Filters",
+  "description": "Filters allow you to only return rows that match …",
+  "examples": [{ "id": "applying-filters", "name": "Applying Filters", "code": "```ts\n…\n```" }]
+}
+````
+
+Routing semantics differ from markdown partials:
+
+- **Matches a category/subcategory** → **enriches** that section's header.
+  No separate sub-section is emitted. The entry is keyed in `functions.json`
+  under the matched section's id (e.g. `auth-auth-admin`,
+  `database-using-filters`), so the renderer's
+  `fns.find(f => f.id === section.id)` resolves to the partial body and the
+  subcategory header renders with the description/examples in place.
+- **Top-level (no match)** → emitted as its own `type: 'function'` section.
+
+This is why `auth-admin.json` (matching the `auth-admin` subcategory slug)
+shows up as the _Auth Admin_ heading with notes and examples, instead of as a
+sibling "Overview" block.
+
+## `config.json`
+
+Every option is optional. Default behavior: include everything, in spec order,
+alphabetical-within-section.
+
+```jsonc
+{
+  // Categories (matched on the literal @category text, case-sensitive) to
+  // drop entirely. Functions in these categories are filtered out before
+  // grouping, so they disappear from bySlug / flat / sections / functions.json
+  // (but stay in typeSpec.json — partials may still reference them via $ref).
+  "excludeCategories": ["Initializing"],
+
+  // Declaration names (matched on the source identifier, case-sensitive) to
+  // drop. Useful for hiding noise like `constructor` while still allowing
+  // partials to link to the constructor's $ref.
+  "excludeDefinitions": ["constructor"],
+
+  // Order categories should appear in `sections.json` / `flat.json`. Anything
+  // not listed here keeps its discovery order at the end.
+  "categoryOrder": ["Database", "Auth", "Edge Functions", "Realtime", "Storage"],
+
+  // Order top-level partials. Anything not listed here falls back to
+  // alphabetical order at the end.
+  "partialsOrder": ["introduction", "installing", "typescript-support"],
+}
+```
+
+Within each category, the script always:
+
+1. Emits the category header.
+2. Emits direct functions (no `@subcategory`) alphabetically by name.
+3. Emits each subcategory (alphabetical), each followed by its functions
+   (alphabetical).
+
+So `categoryOrder` lets you sort _across_ categories; within a category, order
+is fixed.
+
+## Outputs
+
+`pnpm tsx scripts/build-reference-content.ts` writes five files per
+`<library>/<version>` to `apps/docs/content/reference/<library>/<version>/`:
+
+| File             | Shape                                  | Used for                                           |
+| ---------------- | -------------------------------------- | -------------------------------------------------- |
+| `bySlug.json`    | `Record<slug, Entry>`                  | Slug → section lookup                              |
+| `flat.json`      | `Entry[]` (`Object.values(bySlug)`)    | Linear iteration in the renderer                   |
+| `sections.json`  | `Entry[]` with nested `items[]`        | Sidebar navigation tree                            |
+| `functions.json` | `Array<{id, $ref?, …}>`                | Rendered description / examples / signature lookup |
+| `typeSpec.json`  | `{methods, variables}` keyed by `$ref` | Parameter and return-type display                  |
+
+The build also writes `<partial-name>.mdx` files for each markdown partial into
+the same per-version output directory — the page renderer's routed loader
+(`getRefMarkdownForLib`) reads those bodies directly, no manual copy needed.
+
+The whole `apps/docs/content/reference/` tree is gitignored — outputs are
+regenerated by `prebuild` (`pnpm codegen:references`).
+
+## Routing to the new pipeline
+
+By default, the runtime in
+[`features/docs/Reference.generated.singleton.ts`](../../features/docs/Reference.generated.singleton.ts)
+keeps reading the legacy `features/docs/generated/<sdk>.<version>.*.json`
+files. To route a lib through the new outputs, add its `${sdk}-${version}` key
+to the constant in
+[`features/docs/Reference.constants.ts`](../../features/docs/Reference.constants.ts):
+
+```ts
+export const SUPPORTS_NEW_REFERENCE_PROCESS = new Set([
+  'javascript-v2',
+  // 'dart-v2',         ← uncomment when ready
+])
+```
+
+The same set drives every runtime read that depends on the new layout:
+
+- The four lib-version-keyed JSON getters in
+  [`Reference.generated.singleton.ts`](../../features/docs/Reference.generated.singleton.ts)
+  (`getFunctionsList`, `getReferenceSections`, `getFlattenedSections`,
+  `getSectionsBySlug`) pick between
+  `features/docs/generated/<sdk>.<version>.*.json` and
+  `content/reference/<sdk>/<version>/*.json`.
+- The MDX loader in [`Reference.mdx.tsx`](../../features/docs/Reference.mdx.tsx)
+  (`getRefMarkdownForLib`) picks between
+  `docs/ref/<libPath>/[<version>/]<id>.mdx` and
+  `content/reference/<libPath>/<version>/<id>.mdx`.
+
+No other call sites need to change.
+
+> ⚠️ Don't move the constant. `Reference.utils.ts` transitively pulls in
+> `next/navigation`, which crashes `tsx --conditions=react-server` (used by
+> `pnpm build:llms`). The constant lives in its own no-dep file
+> (`Reference.constants.ts`) so server-only scripts can import it without
+> dragging the Next runtime in.
+
+## Adding a new lib/version (checklist)
+
+1. **Drop TypeDoc output files** under `spec/reference/<lib>/<ver>/`. One JSON per
+   package is fine — the walker handles multiple files. Make sure every
+   public method has an `@category` tag.
+2. **(Optional) add `config.json`** with `excludeCategories`,
+   `excludeDefinitions`, `categoryOrder`, `partialsOrder`.
+3. **(Optional) add `partials/`** with intro markdown and per-section rich
+   content (see "Partials" above).
+4. **Register the lib/version** in
+   [`features/docs/Reference.constants.ts`](../../features/docs/Reference.constants.ts)'s
+   `SUPPORTS_NEW_REFERENCE_PROCESS` so the runtime reads the new outputs.
+5. **Run the build**:
+   ```bash
+   cd apps/docs && pnpm tsx scripts/build-reference-content.ts
+   ```
+   Inspect the five files under `content/reference/<lib>/<ver>/`. The log line
+   prints declaration / function / subcategory / category counts.
+6. **Verify the rendered page** at `/docs/reference/<lib>/<ver>` in dev. If
+   subcategory bodies are empty, check that the partial filename matches the
+   subcategory title slug exactly (`title.toLowerCase().replace(/\s+/g, '-')`).
