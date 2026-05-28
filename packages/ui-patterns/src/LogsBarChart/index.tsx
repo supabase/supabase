@@ -70,10 +70,7 @@ export const LogsBarChart = ({
       data-testid="logs-bar-chart"
       className={cn('flex flex-col gap-y-3', isFullHeight ? 'h-full' : 'h-24')}
     >
-      <ChartContainer
-        className="block h-full aspect-auto"
-        config={chartConfig ?? defaultChartConfig}
-      >
+      <ChartContainer className="h-full" config={chartConfig ?? defaultChartConfig}>
         <RechartBarChart
           data={data}
           onMouseMove={(e: any) => {
@@ -97,7 +94,6 @@ export const LogsBarChart = ({
             dataKey="timestamp"
             interval={data.length - 2}
             tick={false}
-            height={hideDateRange ? 1 : undefined}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />

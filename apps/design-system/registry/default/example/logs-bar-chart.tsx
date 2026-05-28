@@ -16,8 +16,8 @@ export default function LogsBarChartDemo() {
   }).reverse()
 
   return (
-    <div className="relative w-full h-24">
-      <LogsBarChart isFullHeight data={data} />
+    <div className="w-full h-24">
+      <LogsBarChart data={data} />
     </div>
   )
 }
