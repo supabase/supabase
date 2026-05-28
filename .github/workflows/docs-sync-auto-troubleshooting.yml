@@ -35,13 +35,6 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      - name: Decode the GitHub App Private Key
-        id: decode
-        run: |
-          private_key=$(echo "${{ secrets.DOCS_GITHUB_APP_PRIVATE_KEY }}" | base64 --decode | awk 'BEGIN {ORS="\\n"} {print}' | head -c -2) &> /dev/null
-          echo "::add-mask::$private_key"
-          echo "private-key=$private_key" >> "$GITHUB_OUTPUT"
-
       - name: Create GitHub App token for supabase/troubleshooting
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0

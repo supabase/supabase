@@ -128,7 +128,7 @@ jobs:
           x86_DIGEST: ${{ needs.release_x86.outputs.image_digest }}
           ARM_DIGEST: ${{ needs.release_arm.outputs.image_digest }}
         run: |
-          docker buildx imagetools create -t supabase/studio:${IMAGE_VERION} \
+          docker buildx imagetools create -t supabase/studio:${IMAGE_VERSION} \
           supabase/studio@${x86_DIGEST} \
           supabase/studio@${ARM_DIGEST}
           docker buildx imagetools create -t supabase/studio:latest \

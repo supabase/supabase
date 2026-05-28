@@ -44,6 +44,7 @@ jobs:
           client-id: ${{ vars.GH_AUTOFIX_APP_CLIENT_ID }}
           private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
           permission-contents: write
+          permission-pull-requests: write
 
       - name: Decrease ESLint ratchet baselines and open PR
         env:
