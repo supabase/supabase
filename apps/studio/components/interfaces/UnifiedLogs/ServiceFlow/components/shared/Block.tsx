@@ -8,14 +8,14 @@ import { DetailRow } from './DetailRow'
 import { DetailSectionHeader } from './DetailSection'
 import { FieldValue } from './FieldValue'
 
-export interface BlockSection {
+interface BlockSection {
   title: string
   icon?: LucideIcon
   fields: BlockFieldConfig[]
   collapsible?: boolean
 }
 
-export interface FieldWithSeeMoreSection {
+interface FieldWithSeeMoreSection {
   type: 'fieldWithSeeMore'
   primaryField: BlockFieldConfig
   additionalFields: BlockFieldConfig[]
