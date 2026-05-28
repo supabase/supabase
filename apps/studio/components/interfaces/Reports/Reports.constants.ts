@@ -90,58 +90,7 @@ function rewriteWhereToAnd(sql: SafeSqlFragment): SafeSqlFragment {
   return sql.replace(/^WHERE/, 'AND') as SafeSqlFragment
 }
 
-export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
-  if (filters.length === 0) return ''
-  const conditions = filters
-    .map((filter) => {
-      const splitKey = filter.key.split('.')
-      const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
-      const filterKey = filter.key.includes('.') ? normalizedKey : filter.key
-
-      const hasQuotes =
-        filter.value.toString().includes('"') || filter.value.toString().includes("'")
-
-      const valueIsNumber = !isNaN(Number(filter.value))
-      const valueWithQuotes = !valueIsNumber && hasQuotes ? filter.value : `'${filter.value}'`
-      const lowercaseValue = !valueIsNumber && String(valueWithQuotes).toLowerCase()
-
-      const finalValue = valueIsNumber ? filter.value : lowercaseValue
-
-      // Handle different comparison operators
-      switch (filter.compare) {
-        case 'matches':
-          return `REGEXP_CONTAINS(${filterKey}, ${finalValue})`
-        case 'is':
-          return `${filterKey} = ${finalValue}`
-        case '!=':
-          return `${filterKey} != ${finalValue}`
-        case '>=':
-          return `${filterKey} >= ${finalValue}`
-        case '<=':
-          return `${filterKey} <= ${finalValue}`
-        case '>':
-          return `${filterKey} > ${finalValue}`
-        case '<':
-          return `${filterKey} < ${finalValue}`
-        default:
-          // Fallback to exact match for unknown operators
-          return `${filterKey} = ${finalValue}`
-      }
-    })
-    .filter(Boolean) // Remove any null/undefined conditions
-    .join(' AND ')
-
-  if (conditions === '') return ''
-
-  if (prepend) {
-    return 'WHERE ' + conditions
-  } else {
-    return 'AND ' + conditions
-  }
-}
-
-// Unlike the legacy `generateRegexpWhere`, this function requires filter values
-// to be raw (unquoted) strings or numbers. `analyticsLiteral` handles all
+// Filter values must be raw (unquoted) strings or numbers. `analyticsLiteral` handles all
 // quoting and escaping — callers must NOT pre-wrap values in single quotes.
 export function generateRegexpWhereSafe(
   filters: ReportFilterItem[],
