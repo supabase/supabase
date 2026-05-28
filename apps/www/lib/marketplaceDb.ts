@@ -26,11 +26,13 @@ function toPartner(listing: Listing): Partner {
     listing_logo,
     images,
     youtube_id,
+    publish_dashboard,
   } = listing
   return {
     categories,
     featured,
-    isMarketplace: !!marketplace_url,
+    publishedInCatalog: !!marketplace_url,
+    publishedInMarketplace: !!publish_dashboard,
     // The view definition only returns tech partners
     type: 'technology',
     slug,
@@ -47,7 +49,7 @@ function toPartner(listing: Listing): Partner {
   }
 }
 
-async function getMarketplaceListings(): Promise<Partner[]> {
+async function getPartnerListings(): Promise<Partner[]> {
   const { data } = await marketplaceClient
     .from('listings')
     .select('*')
@@ -61,7 +63,7 @@ async function getMarketplaceListings(): Promise<Partner[]> {
  */
 export async function listPartners(): Promise<Partner[]> {
   if (isUseMarketplaceDb) {
-    return getMarketplaceListings()
+    return getPartnerListings()
   } else {
     const { data } = await supabase
       .from('partners')
@@ -75,7 +77,7 @@ export async function listPartners(): Promise<Partner[]> {
   }
 }
 
-async function getMarketplaceListingSlugs(): Promise<string[]> {
+async function getPartnerListingSlugs(): Promise<string[]> {
   const { data } = await marketplaceClient
     .from('listings')
     .select('slug')
@@ -89,7 +91,7 @@ async function getMarketplaceListingSlugs(): Promise<string[]> {
  */
 export async function listPartnerSlugs(): Promise<string[]> {
   if (isUseMarketplaceDb) {
-    return getMarketplaceListingSlugs()
+    return getPartnerListingSlugs()
   } else {
     const { data } = await supabase
       .from('partners')
@@ -101,7 +103,7 @@ export async function listPartnerSlugs(): Promise<string[]> {
   }
 }
 
-async function searchMarketplaceListings(search: string): Promise<Partner[] | null> {
+async function searchPartnerListings(search: string): Promise<Partner[] | null> {
   const searchTerm = search.trim()
   let query = marketplaceClient.from('listings').select('*').is('publish_marketplace', true)
 
@@ -127,7 +129,7 @@ async function searchMarketplaceListings(search: string): Promise<Partner[] | nu
  */
 export async function searchPartners(search: string): Promise<Partner[] | null> {
   if (isUseMarketplaceDb) {
-    return searchMarketplaceListings(search)
+    return searchPartnerListings(search)
   } else {
     const searchTerm = search.trim()
     let query = supabase
@@ -153,7 +155,7 @@ export async function searchPartners(search: string): Promise<Partner[] | null> 
   }
 }
 
-async function getMarketplaceListing(slug: string): Promise<Partner | null> {
+async function getPartnerListing(slug: string): Promise<Partner | null> {
   const { data } = await marketplaceClient
     .from('listings')
     .select('*')
@@ -169,7 +171,7 @@ async function getMarketplaceListing(slug: string): Promise<Partner | null> {
  */
 export async function getPartner(slug: string): Promise<Partner | null> {
   if (isUseMarketplaceDb) {
-    return getMarketplaceListing(slug)
+    return getPartnerListing(slug)
   } else {
     let { data } = await supabase
       .from('partners')

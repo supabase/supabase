@@ -65,10 +65,7 @@ export default function IntegrationsContent({
     )
 
   const OFFICIAL_PARTNER_SLUGS = new Set(['grafana', 'stripe', 'aikido', 'doppler', 'resend'])
-  // Temporary slug list until the DB has an is_marketplace field.
-  // When isUseMarketplaceDb is active, p.isMarketplace handles it automatically.
-  const MARKETPLACE_SLUGS = new Set(['grafana', 'stripe', 'aikido', 'doppler', 'resend'])
-  const isOneClick = (p: Partner) => MARKETPLACE_SLUGS.has(p.slug)
+  const availableInMarketplace = (p: Partner) => p.publishedInMarketplace
 
   const HAS_ACTIVE_FILTERS =
     search.trim() !== '' || selectedCategories.length > 0 || partnerOnly || oneClickOnly
@@ -82,7 +79,7 @@ export default function IntegrationsContent({
     ? categoryFiltered.filter((p) => OFFICIAL_PARTNER_SLUGS.has(p.slug))
     : categoryFiltered
 
-  const filtered = oneClickOnly ? partnerFiltered.filter(isOneClick) : partnerFiltered
+  const filtered = oneClickOnly ? partnerFiltered.filter(availableInMarketplace) : partnerFiltered
 
   const featuredPartners = filtered.filter((p) => p.featured)
   const listPartners = HAS_ACTIVE_FILTERS
