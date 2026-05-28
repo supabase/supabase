@@ -10,7 +10,7 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Button, cn, SidePanel } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import DowngradeModal from './DowngradeModal'
+import { DowngradeModal } from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
 import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
