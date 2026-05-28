@@ -7,7 +7,8 @@ on:
         required: true
         type: string
     secrets:
-      - PROD_AWS_ROLE
+      PROD_AWS_ROLE:
+        required: true
   workflow_dispatch:
     inputs:
       version:
