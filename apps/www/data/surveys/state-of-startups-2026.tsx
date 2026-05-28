@@ -366,11 +366,11 @@ const stateOfStartupsData = {
         {
           title: 'Primary Database',
           description:
-            'Supabase went from 76% to 82%. Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%. Neon, DynamoDB, and Convex appeared as options for the first time and took small but measurable shares.',
+            'Postgres went from 76% to 82%. Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%. Neon, DynamoDB, and Convex appeared as options for the first time and took small but measurable shares.',
           stats: [
             {
               percent: 82,
-              label: 'Startups using Supabase as a database',
+              label: 'Startups using Postgres as a database',
               source: { column: 'databases', aggregation: 'multi', target: 'Supabase' },
             },
             { percent: 60, label: 'Startups with Node.js in their backend stack' },
