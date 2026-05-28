@@ -22,7 +22,7 @@ function sourceTable(src: string): SafeLogSqlFragment {
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
       safeSql`
         --reports-api-total-requests
         select
@@ -41,7 +41,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   topRoutes: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-top-routes
         select
@@ -65,7 +65,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   errorCounts: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-error-counts
         select
@@ -87,7 +87,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   topErrorRoutes: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-top-error-routes
         select
@@ -113,7 +113,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   responseSpeed: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-response-speed
         select
@@ -134,7 +134,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   topSlowRoutes: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-top-slow-routes
         select
@@ -159,7 +159,7 @@ export const SHARED_API_REPORT_SQL = {
   },
   networkTraffic: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], src = 'edge_logs'): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-network-traffic
         select
@@ -269,7 +269,7 @@ export const useSharedAPIReport = ({
           const data = await executeAnalyticsSql({
             projectRef: ref,
             endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
-            sql: value.sql(allFilters, filterByMapSource[filterBy]),
+            sql: value.safeSql(allFilters, filterByMapSource[filterBy]),
             iso_timestamp_start: start,
             iso_timestamp_end: end,
             method: 'get',
@@ -334,16 +334,25 @@ export const useSharedAPIReport = ({
   const isLoadingData = Object.values(isLoading).some(Boolean)
 
   const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
-    totalRequests: SHARED_API_REPORT_SQL.totalRequests.sql(allFilters, filterByMapSource[filterBy]),
-    topRoutes: SHARED_API_REPORT_SQL.topRoutes.sql(allFilters, filterByMapSource[filterBy]),
-    errorCounts: SHARED_API_REPORT_SQL.errorCounts.sql(allFilters, filterByMapSource[filterBy]),
-    topErrorRoutes: SHARED_API_REPORT_SQL.topErrorRoutes.sql(
+    totalRequests: SHARED_API_REPORT_SQL.totalRequests.safeSql(
       allFilters,
       filterByMapSource[filterBy]
     ),
-    responseSpeed: SHARED_API_REPORT_SQL.responseSpeed.sql(allFilters, filterByMapSource[filterBy]),
-    topSlowRoutes: SHARED_API_REPORT_SQL.topSlowRoutes.sql(allFilters, filterByMapSource[filterBy]),
-    networkTraffic: SHARED_API_REPORT_SQL.networkTraffic.sql(
+    topRoutes: SHARED_API_REPORT_SQL.topRoutes.safeSql(allFilters, filterByMapSource[filterBy]),
+    errorCounts: SHARED_API_REPORT_SQL.errorCounts.safeSql(allFilters, filterByMapSource[filterBy]),
+    topErrorRoutes: SHARED_API_REPORT_SQL.topErrorRoutes.safeSql(
+      allFilters,
+      filterByMapSource[filterBy]
+    ),
+    responseSpeed: SHARED_API_REPORT_SQL.responseSpeed.safeSql(
+      allFilters,
+      filterByMapSource[filterBy]
+    ),
+    topSlowRoutes: SHARED_API_REPORT_SQL.topSlowRoutes.safeSql(
+      allFilters,
+      filterByMapSource[filterBy]
+    ),
+    networkTraffic: SHARED_API_REPORT_SQL.networkTraffic.safeSql(
       allFilters,
       filterByMapSource[filterBy]
     ),
