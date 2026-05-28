@@ -3,6 +3,7 @@ import Papa from 'papaparse'
 import type { SupaTable } from '@/components/grid/types'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { getCellValue } from '@/data/table-rows/get-cell-value-mutation'
+import type { RoleImpersonationState } from '@/lib/role-impersonation'
 
 export const formatRowsForCSV = ({ rows, columns }: { rows: any[]; columns: string[] }) => {
   const formattedRows = rows.map((row) => {
@@ -34,11 +35,13 @@ export const hydrateTruncatedRows = async ({
   table,
   projectRef,
   connectionString,
+  roleImpersonationState,
 }: {
   rows: Record<string, unknown>[]
   table: SupaTable
   projectRef: string
   connectionString: string | null
+  roleImpersonationState?: RoleImpersonationState
 }): Promise<HydrateTruncatedRowsResult> => {
   const jobs: { rowIdx: number; column: string }[] = []
   rows.forEach((row, rowIdx) => {
@@ -73,6 +76,7 @@ export const hydrateTruncatedRows = async ({
           table: { schema: table.schema ?? 'public', name: table.name },
           column,
           pkMatch,
+          roleImpersonationState,
         })
       })
     )

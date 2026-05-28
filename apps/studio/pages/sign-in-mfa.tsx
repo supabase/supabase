@@ -42,9 +42,10 @@ const SignInMfaPage: NextPageWithLayout = () => {
       .initialize()
       .then(async ({ error }) => {
         if (error) {
-          // if there was a problem signing in via the url, don't redirect
-          setLoading(false)
-          return
+          // OAuth/SSO callback failed — bounce back to /sign-in so the error renders under the
+          // correct heading instead of "Two-factor authentication". The error is held in the
+          // shared auth context and surfaces via useAuthError() on /sign-in.
+          return router.replace({ pathname: '/sign-in', query: router.query })
         }
 
         const token = await getAccessToken()
