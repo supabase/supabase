@@ -143,9 +143,17 @@ export const CreateVectorBucketDialog = ({
       }
 
       await createS3VectorsWrapper({ bucketName: values.name })
+      toast.success(`Successfully created vector bucket ${values.name}`)
     } catch (error: any) {
-      toast.warning(
-        `Failed to create vector bucket integration: ${error.message}. The bucket will be created but you will need to manually install the integration.`
+      toast.success(
+        <div>
+          <p>Successfully created vector bucket {values.name}</p>
+          <p className="text-foreground-light text-xs">
+            However, bucket integration will need to be manually installed as we ran into an error:
+          </p>
+          <p className="text-foreground-light text-xs">{error.message}</p>
+        </div>,
+        { duration: 8000 }
       )
     }
     setIsLoading(false)
@@ -155,7 +163,6 @@ export const CreateVectorBucketDialog = ({
       properties: { bucketType: 'vector' },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
-    toast.success(`Successfully created vector bucket ${values.name}`)
     form.reset()
     setVisible(false)
   }
