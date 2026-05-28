@@ -13,8 +13,16 @@ const unescapeSqlLiteral = (value = '', isEscapeString = false) => {
   return isEscapeString ? unescaped.replaceAll('\\\\', '\\') : unescaped
 }
 
-export function buildCronQuery(name: string, schedule: string, command: string): SafeSqlFragment {
+export function buildCronCreateQuery(name: string, schedule: string, command: string): SafeSqlFragment {
   return safeSql`select cron.schedule(${literal(name)}, ${literal(schedule)}, ${literal(command)});`
+}
+
+export function buildCronUpdateQuery(
+  jobId: number,
+  schedule: string,
+  command: string
+): SafeSqlFragment {
+  return safeSql`select cron.alter_job(job_id := ${literal(jobId)}, schedule := ${literal(schedule)}, command := ${literal(command)});`
 }
 
 export const buildHttpRequestCommand = (
