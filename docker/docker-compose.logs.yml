@@ -38,16 +38,22 @@ services:
         condition: service_healthy
     environment:
       LOGFLARE_NODE_HOST: 127.0.0.1
+
       DB_USERNAME: supabase_admin
       DB_DATABASE: _supabase
       DB_HOSTNAME: ${POSTGRES_HOST}
       DB_PORT: ${POSTGRES_PORT}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_SCHEMA: _analytics
+
+      # Enable single-tenant mode for Logflare
+      LOGFLARE_SINGLE_TENANT: "true"
+      # Seed Supabase-related metadata
+      LOGFLARE_SUPABASE_MODE: "true"
+
       LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
       LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
-      LOGFLARE_SINGLE_TENANT: "true"
-      LOGFLARE_SUPABASE_MODE: "true"
+
       LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
 
       # Comment out the following two variables when switching to
