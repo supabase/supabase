@@ -20,11 +20,11 @@ import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useBranchDeleteMutation } from '@/data/branches/branch-delete-mutation'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 import type { NextPageWithLayout } from '@/types'
 
@@ -37,7 +37,7 @@ const BranchesPage: NextPageWithLayout = () => {
 
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -108,18 +108,14 @@ const BranchesPage: NextPageWithLayout = () => {
           if (branchRef === ref) {
             router.push(`/project/${projectRef}/branches`)
           }
-          // Track delete button click
-          sendEvent({
-            action: 'branch_delete_button_clicked',
-            properties: {
+          track(
+            'branch_delete_button_clicked',
+            {
               branchType: persistent ? 'persistent' : 'preview',
               origin: 'branches_page',
             },
-            groups: {
-              project: projectRef ?? 'Unknown',
-              organization: selectedOrg?.slug ?? 'Unknown',
-            },
-          })
+            { project: projectRef }
+          )
         },
       }
     )

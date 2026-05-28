@@ -13,6 +13,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import { isBeforeFreeTierTemplateBlockCutoff } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { OrgSubscription, ProjectAddon } from '@/data/subscriptions/types'
 
@@ -57,7 +58,7 @@ const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon
   )
 }
 
-const DowngradeModal = ({
+export const DowngradeModal = ({
   visible,
   subscription,
   onClose,
@@ -85,6 +86,12 @@ const DowngradeModal = ({
     const computeSize = getComputeSize(project)
     return computeSize === 'micro'
   })
+
+  // Only warn about template reset if at least one project is post-cutoff.
+  // Pre-cutoff projects are grandfathered and keep template editing access after downgrade.
+  const hasPostCutoffProjects = projects.some(
+    (project) => !isBeforeFreeTierTemplateBlockCutoff(project.inserted_at)
+  )
 
   return (
     <AlertDialog open={visible} onOpenChange={onClose}>
@@ -123,6 +130,15 @@ const DowngradeModal = ({
                   </Admonition>
                 )}
               </div>
+
+              {hasPostCutoffProjects && (
+                <Admonition
+                  type="warning"
+                  className="mt-2"
+                  title="Any custom email templates will be reset"
+                  description="Downgrading will reset your custom email templates to their defaults. You won’t be able to edit them unless you set up custom SMTP after downgrading."
+                />
+              )}
 
               <ul className="mt-4 space-y-5 text-sm">
                 <li className="flex items-center gap-3">
@@ -175,5 +191,3 @@ const DowngradeModal = ({
     </AlertDialog>
   )
 }
-
-export default DowngradeModal

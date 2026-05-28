@@ -36,7 +36,7 @@ export interface ProductMenuGroupItem {
 export interface SubMenuSection {
   key: string
   heading?: string
-  links: Array<{ key: string; label: string; href?: string }>
+  links: Array<{ key: string; label: string; href?: string; shortcutId?: ShortcutId }>
 }
 
 export interface SubMenuProps {

@@ -358,6 +358,20 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
             </ul>
           </section>
         )}
+        {endpointDetails['x-allowed-plans'] && (
+          <section>
+            <h3 className="mb-3 text-base text-foreground">
+              This endpoint is only available on the following plans:
+            </h3>
+            <ul>
+              {endpointDetails['x-allowed-plans'].map((plan) => (
+                <li key={plan} className="list-['-'] ml-2 pl-2">
+                  <span className="font-mono text-sm font-medium text-foreground">{plan}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         {endpointFgaPermissionGroups.length > 0 && (
           <section>
             <h3 className="mb-3 text-base text-foreground">

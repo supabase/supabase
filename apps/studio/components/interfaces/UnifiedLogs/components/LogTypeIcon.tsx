@@ -1,6 +1,6 @@
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { Box, Code2, Database } from 'lucide-react'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { type LOG_TYPES } from '../UnifiedLogs.constants'
 
@@ -48,19 +48,5 @@ export const LogTypeIcon = ({
         <div className="text-xs">{type}</div>
       </TooltipContent>
     </Tooltip>
-  )
-}
-
-export const LogTypeIconWithText = ({
-  type,
-  size = 16,
-  strokeWidth = 1.5,
-  className,
-}: LogTypeIconProps) => {
-  return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <LogTypeIcon type={type} size={size} strokeWidth={strokeWidth} />
-      <span>{type}</span>
-    </div>
   )
 }
