@@ -103,7 +103,7 @@ test.describe('table editor — view context menu', () => {
     await openEntityContextMenu(page, fixture.viewName)
 
     const definitionWait = waitForApiResponse(page, 'pg-meta', ref, 'query?key=view-definition-')
-    await page.getByRole('menuitem', { name: 'Copy view definition' }).click()
+    await page.getByRole('menuitem', { name: 'Copy definition' }).click()
     await definitionWait
 
     await expect(
