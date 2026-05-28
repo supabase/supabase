@@ -401,8 +401,8 @@ export const pricing: Pricing = {
         title: 'Storage',
         plans: {
           free: '1 GB included',
-          pro: ['100 GB included', 'then $0.021 per GB'],
-          team: ['100 GB included', 'then $0.021 per GB'],
+          pro: ['100 GB included', 'then $0.0213 per GB'],
+          team: ['100 GB included', 'then $0.0213 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,

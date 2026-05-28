@@ -21,6 +21,14 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { pluralize } from '@/lib/helpers'
 
+/**
+ * [Joshen] This would only affect graphql_public and pgmq_public, given that they're intended
+ * to be public, we can let users expose them via the API, but not let them adjust the schema via the dashboard
+ * */
+export const internalSchemasCannotExpose = new Set(
+  INTERNAL_SCHEMAS.filter((x) => !x.endsWith('_public'))
+)
+
 interface ExposedSchemaSelectorProps {
   disabled?: boolean
   selectedSchemas: string[]
@@ -49,12 +57,14 @@ export const ExposedSchemaSelector = ({
   const schemas = useMemo(
     () =>
       (allSchemas ?? [])
-        .filter((s) => {
-          if (s.name === 'graphql_public') return true
-          return !INTERNAL_SCHEMAS.includes(s.name)
-        })
+        .filter((s) => !internalSchemasCannotExpose.has(s.name))
         .sort((a, b) => a.name.localeCompare(b.name)),
     [allSchemas]
+  )
+
+  const missingExposedSchema = useMemo(
+    () => selectedSchemas.filter((schema) => !schemas.some((s) => s.name === schema)),
+    [schemas, selectedSchemas]
   )
 
   const selectedSet = useMemo(() => new Set(selectedSchemas), [selectedSchemas])
@@ -110,6 +120,32 @@ export const ExposedSchemaSelector = ({
                     </p>
                   </CommandEmpty>
                   <ScrollArea className={schemas.length > 7 ? 'h-[210px]' : ''}>
+                    {missingExposedSchema.map((schema) => (
+                      <CommandItem
+                        key={schema}
+                        value={schema}
+                        className="cursor-pointer w-full"
+                        onSelect={() => {
+                          onToggleSchema(schema)
+                        }}
+                      >
+                        <div className="w-full flex flex-col">
+                          <div className="w-full flex items-center gap-x-2">
+                            <Check size={16} className="text-brand shrink-0" />
+                            <span className="truncate">{schema}</span>
+                          </div>
+                          {internalSchemasCannotExpose.has(schema) ? (
+                            <span className="pl-6 text-warning text-xs tracking-tight">
+                              This schema is protected and should not be exposed
+                            </span>
+                          ) : (
+                            <span className="pl-6 text-foreground-lighter text-xs tracking-tight">
+                              This schema does not exist and can be safely removed
+                            </span>
+                          )}
+                        </div>
+                      </CommandItem>
+                    ))}
                     {schemas.map((schema) => {
                       const isExposed = selectedSet.has(schema.name)
 

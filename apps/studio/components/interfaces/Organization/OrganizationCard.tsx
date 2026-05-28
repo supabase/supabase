@@ -89,23 +89,46 @@ export const OrganizationCard = ({
 export const CreateOrganizationCard = ({
   params = {},
   label = 'Create new organization',
+  onClick,
+  disabled,
 }: {
   params?: { [key: string]: string }
   label?: string
+  onClick?: () => void
+  disabled?: boolean
 }) => {
   const createOrganizationHref = `/new${Object.keys(params).length > 0 ? `?${new URLSearchParams(params).toString()}` : ''}`
+  const card = (
+    <ActionCard
+      bgColor="bg border"
+      className={cn(
+        'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center max-h-min',
+        'border-dashed shadow-none transition-colors group-hover:border-default group-hover:bg-surface-200'
+      )}
+      icon={<Plus size={18} strokeWidth={1} className="text-foreground" />}
+      title={label}
+    />
+  )
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onClick}
+        className={cn(
+          'group block w-full cursor-pointer text-left disabled:cursor-not-allowed disabled:opacity-50',
+          disabled && 'pointer-events-none'
+        )}
+      >
+        {card}
+      </button>
+    )
+  }
 
   return (
-    <Link href={createOrganizationHref}>
-      <ActionCard
-        bgColor="bg border"
-        className={cn(
-          'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center max-h-min',
-          'border-dashed shadow-none transition-colors group-hover:border-default group-hover:bg-surface-200'
-        )}
-        icon={<Plus size={18} strokeWidth={1} className="text-foreground" />}
-        title={label}
-      />
+    <Link href={createOrganizationHref} className="group block">
+      {card}
     </Link>
   )
 }

@@ -37,11 +37,7 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
         <div className="flex items-center justify-between gap-2 pt-2.5">
           <div className="flex flex-wrap items-center gap-1">
             <MarketplaceSourceBadge source={source} />
-            {integration.status && (
-              <Badge variant="warning" className="capitalize">
-                {integration.status}
-              </Badge>
-            )}
+            {integration.status && <Badge variant="warning">{integration.status}</Badge>}
           </div>
           <div className="text-xs flex items-center gap-1 text-foreground-lighter">
             <span>Built by</span>

@@ -101,18 +101,24 @@ export async function listPartnerSlugs(): Promise<string[]> {
 }
 
 async function searchMarketplaceListings(search: string): Promise<Partner[] | null> {
+  const searchTerm = search.trim()
   let query = marketplaceClient.from('listings').select('*').is('publish_marketplace', true)
 
-  if (search.trim()) {
-    query = query.textSearch('listing_tsv', `${search.trim()}`, {
-      type: 'websearch',
-      config: 'english',
-    })
+  if (searchTerm) {
+    const searchPattern = `%${searchTerm}%`
+    query = query.or(
+      `title.ilike.${searchPattern},description.ilike.${searchPattern},partner_name.ilike.${searchPattern}`
+    )
   }
 
-  const { data } = await query
+  const { data, error } = await query
 
-  return data?.map(toPartner) ?? null
+  if (error) {
+    console.error('Marketplace search error:', error)
+    return null
+  }
+
+  return data?.map(toPartner) ?? []
 }
 
 /**
@@ -122,6 +128,7 @@ export async function searchPartners(search: string): Promise<Partner[] | null> 
   if (isUseMarketplaceDb) {
     return searchMarketplaceListings(search)
   } else {
+    const searchTerm = search.trim()
     let query = supabase
       .from('partners')
       .select('*')
@@ -129,16 +136,19 @@ export async function searchPartners(search: string): Promise<Partner[] | null> 
       .order('category')
       .order('title')
 
-    if (search.trim()) {
-      query = query.textSearch('tsv', `${search.trim()}`, {
-        type: 'websearch',
-        config: 'english',
-      })
+    if (searchTerm) {
+      const searchPattern = `%${searchTerm}%`
+      query = query.or(`title.ilike.${searchPattern},description.ilike.${searchPattern}`)
     }
 
-    const { data: partners } = await query
+    const { data: partners, error } = await query
 
-    return partners?.map(miscDbToPartner) ?? null
+    if (error) {
+      console.error('Partners search error:', error)
+      return null
+    }
+
+    return partners?.map(miscDbToPartner) ?? []
   }
 }
 

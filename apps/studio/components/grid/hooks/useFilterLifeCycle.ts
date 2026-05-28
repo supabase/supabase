@@ -1,8 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useEffectEvent, useRef } from 'react'
 
 import { filtersToUrlParams, formatFilterURLParams } from '../SupabaseGrid.utils'
 import { useTableEditorFiltersSort } from '@/hooks/misc/useTableEditorFiltersSort'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 /**
@@ -14,7 +13,7 @@ export function useInitializeFiltersFromUrl() {
   const snap = useTableEditorTableStateSnapshot()
   const { filters: urlFilters } = useTableEditorFiltersSort()
 
-  const initializeFilters = useStaticEffectEvent(() => {
+  const initializeFilters = useEffectEvent(() => {
     const parsedFilters = formatFilterURLParams(urlFilters)
     if (parsedFilters.length > 0) {
       snap.setFilters(parsedFilters)
@@ -23,7 +22,8 @@ export function useInitializeFiltersFromUrl() {
 
   useEffect(() => {
     initializeFilters()
-  }, [initializeFilters])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [])
 }
 
 /**

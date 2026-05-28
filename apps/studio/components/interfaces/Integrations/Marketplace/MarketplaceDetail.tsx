@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookOpen, Settings } from 'lucide-react'
+import { ArrowUpRight, BookOpen } from 'lucide-react'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
@@ -6,6 +6,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
 import { MarketplaceDetailTopBar } from './MarketplaceDetailTopBar'
 import { OverviewTab } from './OverviewTab'
+import { IntegrationDetailTabShortcuts } from '@/components/interfaces/Integrations/Integration/IntegrationDetailTabShortcuts'
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
@@ -70,7 +71,7 @@ export const MarketplaceDetail = () => {
     }
     if (isInstalled) {
       return (
-        <Button type="outline" disabled icon={<Settings size={13} />}>
+        <Button type="outline" disabled>
           Installed
         </Button>
       )
@@ -78,10 +79,13 @@ export const MarketplaceDetail = () => {
     return <InstallIntegrationSheet integration={integration} />
   }
 
+  // For overview route, get the integration-specific overview component if available
+  const OverviewComponent = activeRoute === 'overview' ? Component : null
   const CustomPageComponent = activeRoute !== 'overview' && isKnownRoute ? Component : null
 
   return (
     <>
+      <IntegrationDetailTabShortcuts tabs={tabs} />
       <MarketplaceDetailTopBar
         title={integration.name}
         isInstalled={isInstalled}
@@ -114,7 +118,9 @@ export const MarketplaceDetail = () => {
 
       {activeRoute === 'overview' ? (
         <div className={centeredContentClass}>
-          <OverviewTab integration={integration} isInstalled={isInstalled} />
+          <OverviewTab integration={integration} isInstalled={isInstalled}>
+            {OverviewComponent && <OverviewComponent />}
+          </OverviewTab>
         </div>
       ) : CustomPageComponent ? (
         layout === 'constrained' ? (

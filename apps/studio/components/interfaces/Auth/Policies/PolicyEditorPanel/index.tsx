@@ -48,9 +48,9 @@ import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/databa
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 interface PolicyEditorPanelProps {
   visible: boolean
@@ -259,7 +259,7 @@ export const PolicyEditorPanel = memo(function ({
     }
   }
 
-  const resetState = useStaticEffectEvent(() => {
+  const resetStateRef = useLatest(() => {
     if (!visible) {
       editorOneRef.current?.setValue('')
       editorTwoRef.current?.setValue('')
@@ -308,7 +308,9 @@ export const PolicyEditorPanel = memo(function ({
   })
 
   // when the panel is closed, reset all values
-  useEffect(resetState, [visible, resetState])
+  useEffect(() => {
+    resetStateRef.current()
+  }, [visible, resetStateRef])
 
   // whenever the deps (current policy details, new error or error panel opens) change, recalculate
   // the height of the editor
