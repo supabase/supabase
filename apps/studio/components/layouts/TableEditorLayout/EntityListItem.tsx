@@ -332,11 +332,7 @@ export const EntityListItem = ({
                   }}
                 >
                   <Copy size={12} />
-                  <span>
-                    Copy{' '}
-                    {entity.type === ENTITY_TYPE.MATERIALIZED_VIEW ? 'materialized view' : 'view'}{' '}
-                    definition
-                  </span>
+                  <span>Copy definition</span>
                 </DropdownMenuItem>
               )}
 

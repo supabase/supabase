@@ -218,7 +218,7 @@ test.describe('table editor — materialized view context menu', () => {
     await openEntityContextMenu(page, fixture.mvName)
 
     const definitionWait = waitForApiResponse(page, 'pg-meta', ref, 'query?key=view-definition-')
-    await page.getByRole('menuitem', { name: 'Copy materialized view definition' }).click()
+    await page.getByRole('menuitem', { name: 'Copy definition' }).click()
     await definitionWait
 
     await expect(page.getByText('Materialized view definition copied to clipboard')).toBeVisible({
