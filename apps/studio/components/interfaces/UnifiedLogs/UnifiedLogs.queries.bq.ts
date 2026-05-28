@@ -7,6 +7,7 @@
 import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
+import { groupLogsFiltersByColumn, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import {
   joinSqlFragments,
@@ -16,23 +17,37 @@ import {
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
 
-// Pagination and control parameters
-const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
+// Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
+// pre-brand the keywords we want to switch between.
+const IN_OP = safeSql`IN`
+const NOT_IN_OP = safeSql`NOT IN`
+const LIKE_OP = safeSql`LIKE`
+const NOT_LIKE_OP = safeSql`NOT LIKE`
 
-// Special filter parameters that need custom handling
-const SPECIAL_FILTER_PARAMS = ['date'] as const
-
-// Combined list of all parameters to exclude from standard filtering
-const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
+const ALL_LOG_TYPES = ['edge', 'postgrest', 'storage', 'postgres', 'edge function', 'auth']
 
 /**
- * Builds WHERE-clause fragments from a search-param map. Identifier-position
- * keys are validated via `quotedIdent()` (regex allowlist) and value-position
- * inputs via `analyticsLiteral` — both throw on disallowed input, in which
- * case we drop the predicate rather than emit unsafe SQL.
+ * Computes the log_type set that the CTE should union. With no filter, defaults
+ * to the cheap two-source set. With `=` filters, narrows to those values. With
+ * `<>` filters, excludes them from the full set.
+ */
+const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
+  const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
+  if (filters.length === 0) return [...DEFAULT_LOG_TYPES]
+  const included = filters.filter((f) => f.operator === '=').map((f) => f.value)
+  const excluded = new Set(filters.filter((f) => f.operator === '<>').map((f) => f.value))
+  const base = included.length > 0 ? included : ALL_LOG_TYPES
+  return base.filter((t) => !excluded.has(t))
+}
+
+/**
+ * Builds WHERE-clause fragments from the parsed `filter` URL array. Identifier-
+ * position keys are validated via `quotedIdent()` (regex allowlist) and value-
+ * position inputs via `analyticsLiteral` — both throw on disallowed input, in
+ * which case we drop the predicate rather than emit unsafe SQL.
  *
  * @param search Search params (URL-derived filter values)
- * @param excludeKey Optional key to skip — used by facet-count branches that
+ * @param excludeKey Optional column to skip — used by facet-count branches that
  *                   need every filter applied *except* the one being faceted
  * @returns Array of SafeLogSqlFragment predicates ready to be AND-joined
  */
@@ -41,10 +56,11 @@ const buildConditions = (
   excludeKey?: string
 ): SafeLogSqlFragment[] => {
   const conditions: SafeLogSqlFragment[] = []
+  const grouped = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
 
-  Object.entries(search).forEach(([key, value]) => {
-    if (key === excludeKey) return
-    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return
+  for (const [key, { operator, values }] of Object.entries(grouped)) {
+    if (key === excludeKey) continue
+    if (values.length === 0) continue
 
     try {
       // `key` is interpolated as a column identifier. `quotedIdent()` rejects
@@ -52,27 +68,25 @@ const buildConditions = (
       // crafted URL key like `level OR id IS NOT NULL` is dropped rather
       // than emitted into the WHERE clause).
       const col = quotedIdent(key)
+      const isNeq = operator === '<>'
+      const inOp = isNeq ? NOT_IN_OP : IN_OP
+      const likeOp = isNeq ? NOT_LIKE_OP : LIKE_OP
+      const joinAndOr = isNeq ? ' AND ' : ' OR '
 
-      if (Array.isArray(value) && value.length > 0) {
+      if (key === 'host' || key === 'pathname') {
+        const branches = values.map((v) => safeSql`${col} ${likeOp} ${lit('%' + v + '%')}`)
+        conditions.push(safeSql`(${joinSqlFragments(branches, joinAndOr)})`)
+      } else {
         const inList = joinSqlFragments(
-          value.map((v) => lit(String(v))),
+          values.map((v) => lit(v)),
           ','
         )
-        conditions.push(safeSql`${col} IN (${inList})`)
-        return
-      }
-
-      if (value !== null && value !== undefined) {
-        if (key === 'host' || key === 'pathname') {
-          conditions.push(safeSql`${col} LIKE ${lit('%' + String(value) + '%')}`)
-        } else {
-          conditions.push(safeSql`${col} = ${lit(String(value))}`)
-        }
+        conditions.push(safeSql`${col} ${inOp} (${inList})`)
       }
     } catch {
       // quotedIdent() or analyticsLiteral() rejected the input — drop the predicate.
     }
-  })
+  }
 
   return conditions
 }
@@ -360,7 +374,7 @@ WITH unified_logs AS (
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildConditions(search)
-  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
+  const effectiveLogTypes = getEffectiveLogTypes(search)
 
   return safeSql`
 ${getUnifiedLogsCTE(effectiveLogTypes)}
@@ -513,7 +527,7 @@ WITH unified_logs AS (
   `
 
 export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
-  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
+  const effectiveLogTypes = getEffectiveLogTypes(search)
   const logTypeConditions = buildConditions(search, 'log_type')
   const levelConditions = buildConditions(search, 'level')
   const logTypeWhere: SafeLogSqlFragment =
@@ -580,7 +594,7 @@ UNION ALL SELECT dimension, value, count FROM pathname_count
 export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildConditions(search)
   const truncationLevel = calculateChartBucketing(search)
-  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
+  const effectiveLogTypes = getEffectiveLogTypes(search)
 
   return safeSql`
 ${getUnifiedLogsCTE(effectiveLogTypes)}

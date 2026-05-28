@@ -184,7 +184,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'method',
       header: 'Method',
-      filterFn: 'arrIncludesSome',
+      // Filtering is server-side via the `filter` URL param, like every other
+      // column in this table. The built-in `arrIncludesSome` would receive the
+      // wrapped { operator, values } shape and reject it.
+      filterFn: (_row, _columnId, _filterValue) => true,
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['method']>('method')
         return <span className="text-foreground-lighter">{value}</span>
