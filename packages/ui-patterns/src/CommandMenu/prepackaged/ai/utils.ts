@@ -49,12 +49,18 @@ interface FinalizeWithSourcesAction {
   index: number
 }
 
+interface ReplaceMessagesAction {
+  type: 'replace'
+  messages: Message[]
+}
+
 type MessageAction =
   | NewMessageAction
   | UpdateMessageAction
   | AppendContentAction
   | ResetAction
   | FinalizeWithSourcesAction
+  | ReplaceMessagesAction
 
 export { MessageRole, MessageStatus }
 export type { Message, MessageAction, SourceLink }

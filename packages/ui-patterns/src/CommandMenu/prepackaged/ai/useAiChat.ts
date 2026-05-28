@@ -96,6 +96,10 @@ const messageReducer = (state: Message[], messageAction: MessageAction) => {
       current = []
       break
     }
+    case 'replace': {
+      current = messageAction.messages.map((message) => ({ ...message }))
+      break
+    }
     default: {
       throw new Error(`Unknown message action '${type}'`)
     }
@@ -118,6 +122,23 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
 
   const [currentMessageIndex, setCurrentMessageIndex] = useState(1)
   const [messages, dispatchMessage] = useReducer(messageReducer, [])
+
+  const stopStreaming = useCallback(() => {
+    eventSourceRef.current?.close()
+    eventSourceRef.current = undefined
+    setIsResponding(false)
+    setHasError(false)
+    setIsLoading?.(false)
+  }, [setIsLoading])
+
+  const hydrateMessages = useCallback(
+    (nextMessages: Message[]) => {
+      stopStreaming()
+      setCurrentMessageIndex(Math.max(1, nextMessages.length + 1))
+      dispatchMessage({ type: 'replace', messages: nextMessages })
+    },
+    [stopStreaming]
+  )
 
   const submit = useCallback(
     async (query: string) => {
@@ -221,10 +242,7 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
   )
 
   function reset() {
-    eventSourceRef.current?.close()
-    eventSourceRef.current = undefined
-    setIsResponding(false)
-    setHasError(false)
+    stopStreaming()
     setCurrentMessageIndex(1)
     dispatchMessage({
       type: 'reset',
@@ -234,6 +252,8 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
   return {
     submit,
     reset,
+    hydrateMessages,
+    stopStreaming,
     messages,
     isResponding,
     hasError,

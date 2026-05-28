@@ -3,7 +3,7 @@
 import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { DocsCodeBlock } from '~/features/ai-sidebar'
 import { ClientSelectDropdown, type McpClient } from 'ui-patterns/McpUrlBuilder'
 
 interface PluginClient extends McpClient {
@@ -67,7 +67,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             official Anthropic marketplace
           </a>
         </p>
-        <CodeBlock
+        <DocsCodeBlock
           value={`claude plugin marketplace add anthropics/claude-plugins-official\nclaude plugin install supabase@claude-plugins-official`}
           language="bash"
           focusable={false}
@@ -107,9 +107,9 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         <div className="space-y-2">
           <h4 className="text-sm font-medium">CLI</h4>
           <p className="text-xs text-foreground-lighter">Open the Codex CLI by running</p>
-          <CodeBlock value="codex" language="bash" focusable={false} className="block" />
+          <DocsCodeBlock value="codex" language="bash" focusable={false} className="block" />
           <p className="text-xs text-foreground-lighter">Inside Codex, type:</p>
-          <CodeBlock value="/plugins" language="bash" focusable={false} className="block" />
+          <DocsCodeBlock value="/plugins" language="bash" focusable={false} className="block" />
           <p className="text-xs text-foreground-lighter">
             Search for <strong>Supabase</strong> and select <strong>Install plugin</strong>.
           </p>
@@ -133,7 +133,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           </a>{' '}
           plugin from the Cursor plugin marketplace
         </p>
-        <CodeBlock
+        <DocsCodeBlock
           value="/add-plugin supabase"
           language="bash"
           focusable={false}
@@ -150,7 +150,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           Install the official Supabase extension for Gemini CLI by running the following command in
           your terminal.
         </p>
-        <CodeBlock
+        <DocsCodeBlock
           value="gemini extensions install https://github.com/supabase-community/gemini-extension"
           language="bash"
           focusable={false}
@@ -189,7 +189,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             </a>
             .
           </p>
-          <CodeBlock
+          <DocsCodeBlock
             value="copilot plugin install supabase-community/supabase-plugin"
             language="bash"
             focusable={false}

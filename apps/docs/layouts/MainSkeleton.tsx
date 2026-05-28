@@ -285,6 +285,7 @@ const Container = memo(function Container({
       id={DOCS_CONTENT_CONTAINER_ID}
       className={cn(
         'w-full transition-all ease-out relative',
+        'mr-[var(--docs-ai-sidebar-width,0px)]',
         // desktop override any margin styles
         'lg:ml-0',
         className

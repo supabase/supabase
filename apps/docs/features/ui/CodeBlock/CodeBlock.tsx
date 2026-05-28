@@ -107,7 +107,7 @@ export async function CodeBlock({
           )}
         </code>
       </pre>
-      <CodeBlockControls content={code.trim()} />
+      <CodeBlockControls content={code.trim()} language={lang ?? 'text'} />
     </div>
   )
 }

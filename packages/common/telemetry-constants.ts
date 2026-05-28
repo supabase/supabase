@@ -839,6 +839,31 @@ export interface AskAIEvent {
 }
 
 /**
+ * User clicked the AI button on a code block to open the docs AI sidebar.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface CodeBlockAiClickedEvent {
+  action: 'code_block_ai_clicked'
+  properties: {
+    language: string
+    page_path: string
+    line_count: number
+  }
+}
+
+/**
+ * User copied the AI sidebar conversation context for use in an external agent.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface CopyAiContextClickedEvent {
+  action: 'copy_ai_context_clicked'
+}
+
+/**
  * User clicked the framework quickstart card on the homepage, leading to the specific framework documentation.
  *
  * @group Events
@@ -3345,6 +3370,8 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownEvent
   | AskAIEvent
+  | CodeBlockAiClickedEvent
+  | CopyAiContextClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
