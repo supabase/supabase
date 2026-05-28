@@ -235,35 +235,28 @@ export const ProjectUsageSection = () => {
               </div>
             </CardHeader>
             <CardContent className="p-card overflow-hidden">
-              <div className="relative h-32">
-                <Loading isFullHeight active={isLoading}>
-                  <LogsBarChart
-                    isFullHeight
-                    data={s.data}
-                    DateTimeFormat={datetimeFormat}
-                    onBarClick={handleBarClick(s.route, s.key)}
-                    hideZeroValues={true}
-                    chartConfig={{
-                      error_count: {
-                        label: 'Errors',
-                      },
-                      warning_count: {
-                        label: 'Warnings',
-                      },
-                      ok_count: {
-                        label: 'Requests',
-                      },
-                    }}
-                    EmptyState={
-                      <NoDataPlaceholder
-                        size="small"
-                        message="No data for selected period"
-                        isFullHeight
-                      />
-                    }
-                  />
-                </Loading>
-              </div>
+              <Loading active={isLoading}>
+                <LogsBarChart
+                  data={s.data}
+                  DateTimeFormat={datetimeFormat}
+                  onBarClick={handleBarClick(s.route, s.key)}
+                  hideZeroValues={true}
+                  chartConfig={{
+                    error_count: {
+                      label: 'Errors',
+                    },
+                    warning_count: {
+                      label: 'Warnings',
+                    },
+                    ok_count: {
+                      label: 'Requests',
+                    },
+                  }}
+                  EmptyState={
+                    <NoDataPlaceholder size="small" message="No data for selected period" />
+                  }
+                />
+              </Loading>
             </CardContent>
           </Card>
         ))}
