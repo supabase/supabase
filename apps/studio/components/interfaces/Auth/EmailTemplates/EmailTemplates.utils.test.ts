@@ -71,7 +71,7 @@ describe('EmailTemplates.utils', () => {
   })
 
   it('uses the correct cutoff date', () => {
-    expect(FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE).toBe('2026-05-29T00:00:00Z')
+    expect(FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE).toBe('2026-06-03T00:00:00Z')
   })
 
   it('allows paid projects that use the built-in email sender', () => {
