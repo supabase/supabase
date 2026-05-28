@@ -4,7 +4,7 @@ import 'swiper/css'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react'
 import { Button, cn } from 'ui'
 
 import CodeBlock, { LANG } from '../CodeBlock/CodeBlock'
@@ -29,12 +29,12 @@ interface Props {
 
 function APISection(props: Props) {
   // store API swiper instance
-  const [apiSwiper, setApiSwiper] = useState(undefined)
+  const [apiSwiper, setApiSwiper] = useState<SwiperClass | undefined>(undefined)
   const [apiSwiperActiveIndex, setApiSwiperActiveIndex] = useState(0)
 
   function handleApiSwiperNavChange(e: number) {
     setApiSwiperActiveIndex(e)
-    // @ts-ignore
+    if (!apiSwiper) return
     apiSwiper.slideTo(e)
   }
 
@@ -61,6 +61,7 @@ function APISection(props: Props) {
                 className={cn('shrink-0', { 'opacity-50': i !== apiSwiperActiveIndex })}
                 onClick={() => handleApiSwiperNavChange(i)}
                 key={i}
+                disabled={!apiSwiper}
               >
                 {extension.title}
               </Button>
@@ -69,7 +70,6 @@ function APISection(props: Props) {
         </div>
         <div className="overflow-hidden">
           <Swiper
-            // @ts-ignore
             onSwiper={setApiSwiper}
             style={{ zIndex: 0, marginRight: '1px' }}
             initialSlide={apiSwiperActiveIndex}

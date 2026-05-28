@@ -2,7 +2,7 @@ import { CornerRightUp } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 // Import Swiper React components
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react'
 import { Button, cn } from 'ui'
 
 // Import Swiper styles
@@ -10,6 +10,7 @@ import 'swiper/css'
 
 import { useInView } from 'framer-motion'
 import Image from 'next/image'
+import Swiper from 'swiper'
 
 import TextLink from '../TextLink'
 import ImageCarouselStyles from './ImageCarousel.module.css'
@@ -37,16 +38,15 @@ function ImageCarousel(props: ImageCarouselProps) {
   const { basePath } = useRouter()
 
   // store API swiper instance
-  const [imageSwiper, setImageSwiper] = useState(undefined)
-  const [swiperDetails, setSwiperDetails] = useState(undefined)
+  const [imageSwiper, setImageSwiper] = useState<SwiperClass | undefined>(undefined)
+  const [swiperDetails, setSwiperDetails] = useState<SwiperClass | undefined>(undefined)
 
   const [imageSwiperActiveIndex, setImageSwiperActiveIndex] = useState(0)
 
   function handleImageSwiperNav(e: number) {
     setImageSwiperActiveIndex(e)
-    // @ts-ignore
+    if (!imageSwiper || !swiperDetails) return
     imageSwiper.slideTo(e)
-    // @ts-ignore
     swiperDetails.slideTo(e)
   }
 
@@ -82,6 +82,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                     className={cn('shrink-0', { 'opacity-50': i !== imageSwiperActiveIndex })}
                     onClick={() => handleImageSwiperNav(i)}
                     key={i}
+                    disabled={!imageSwiper || !swiperDetails}
                   >
                     {content.label ? content.label : content.title}
                   </Button>
@@ -93,7 +94,6 @@ function ImageCarousel(props: ImageCarouselProps) {
             className={`overflow-hidden rounded-md border border-control bg-border-stronger ${ImageCarouselStyles['gradient-bg']}`}
           >
             <Swiper
-              // @ts-ignore
               onSwiper={setImageSwiper}
               style={{ zIndex: 0, overflow: 'auto', overflowX: 'hidden' }}
               initialSlide={0}
@@ -136,7 +136,6 @@ function ImageCarousel(props: ImageCarouselProps) {
       </div>
       <div className="col-span-12 mt-8 lg:col-span-5 lg:col-start-8 lg:mt-0 xl:col-span-5 xl:col-start-8">
         <Swiper
-          // @ts-ignore
           onSwiper={setSwiperDetails}
           initialSlide={0}
           speed={300}

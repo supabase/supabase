@@ -1,6 +1,6 @@
 import { useState } from 'react'
 // Import Swiper React components
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react'
 import { Button, cn, Space } from 'ui'
 
 import CodeBlock from '../CodeBlock/CodeBlock'
@@ -29,16 +29,15 @@ interface SplitCodeBlockCarousel {
 
 function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   // store API swiper instance
-  const [apiSwiper, setApiSwiper] = useState(undefined)
-  const [swiperDetails, setSwiperDetails] = useState(undefined)
+  const [apiSwiper, setApiSwiper] = useState<SwiperClass | undefined>(undefined)
+  const [swiperDetails, setSwiperDetails] = useState<SwiperClass | undefined>(undefined)
 
   const [apiSwiperActiveIndex, setApiSwiperActiveIndex] = useState(0)
 
   function handleApiSwiperNavChange(e: number) {
     setApiSwiperActiveIndex(e)
-    // @ts-ignore
+    if (!apiSwiper || !swiperDetails) return
     apiSwiper.slideTo(e)
-    // @ts-ignore
     swiperDetails.slideTo(e)
   }
 
@@ -52,6 +51,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
               className={cn('shrink-0', { 'opacity-50': i !== apiSwiperActiveIndex })}
               onClick={() => handleApiSwiperNavChange(i)}
               key={i}
+              disabled={!apiSwiper || !swiperDetails}
             >
               {extension.title}
             </Button>
@@ -60,7 +60,6 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
       </div>
 
       <Swiper
-        // @ts-ignore
         onSwiper={setApiSwiper}
         style={{ zIndex: 0 }}
         initialSlide={apiSwiperActiveIndex}
@@ -83,7 +82,6 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
 
       <div className="bg-surface-100 border-default overflow-hidden rounded-md border p-8">
         <Swiper
-          // @ts-ignore
           onSwiper={setSwiperDetails}
           style={{ zIndex: 0 }}
           initialSlide={0}
