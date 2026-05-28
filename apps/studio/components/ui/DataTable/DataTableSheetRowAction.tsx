@@ -21,7 +21,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { ButtonTooltip } from '../ButtonTooltip'
 import CopyButton from '@/components/ui/CopyButton'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
