@@ -4,22 +4,6 @@ import { cn } from 'ui'
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 
-export const logEventBus = {
-  listeners: new Map<string, Set<(rowId: string) => void>>(),
-
-  on(event: 'selectTraceTab', callback: (rowId: string) => void) {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set())
-    }
-    this.listeners.get(event)?.add(callback)
-    return () => this.listeners.get(event)?.delete(callback)
-  },
-
-  emit(event: 'selectTraceTab', rowId: string) {
-    this.listeners.get(event)?.forEach((callback) => callback(rowId))
-  },
-}
-
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {
     return new Map(facets?.[columnId]?.rows?.map(({ value, total }) => [value, total]) || [])

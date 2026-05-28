@@ -7,14 +7,14 @@ import { BlockFieldConfig, BlockFieldProps, ServiceFlowBlockProps } from '../../
 import { DetailRow } from './DetailRow'
 import { DetailSectionHeader } from './DetailSection'
 
-export interface BlockSection {
+interface BlockSection {
   title: string
   icon?: LucideIcon
   fields: BlockFieldConfig[]
   collapsible?: boolean
 }
 
-export interface FieldWithSeeMoreSection {
+interface FieldWithSeeMoreSection {
   type: 'fieldWithSeeMore'
   primaryField: BlockFieldConfig
   additionalFields: BlockFieldConfig[]

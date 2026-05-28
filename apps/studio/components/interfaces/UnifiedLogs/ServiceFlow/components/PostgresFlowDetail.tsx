@@ -3,12 +3,12 @@ import { Cable, ChevronDown, Clock, Database } from 'lucide-react'
 import { memo } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
-import { ColumnSchema } from '../../../UnifiedLogs.schema'
-import { getRowTimestampMs } from '../../../UnifiedLogs.utils'
-import { postgresDetailsFields, postgresPrimaryFields } from '../../config/serviceFlowFields'
-import { BlockFieldConfig } from '../../types'
-import { DetailRow } from '../shared/DetailRow'
-import { DetailSectionHeader } from '../shared/DetailSection'
+import { ColumnSchema } from '../../UnifiedLogs.schema'
+import { getRowTimestampMs } from '../../UnifiedLogs.utils'
+import { postgresDetailsFields, postgresPrimaryFields } from '../config/serviceFlowFields'
+import { BlockFieldConfig } from '../types'
+import { DetailRow } from './shared/DetailRow'
+import { DetailSectionHeader } from './shared/DetailSection'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 interface PostgresFlowDetailProps {
