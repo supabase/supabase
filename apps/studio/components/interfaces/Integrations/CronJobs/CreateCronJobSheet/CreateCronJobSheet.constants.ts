@@ -103,10 +103,7 @@ const sqlSnippetSchema = z.object({
 
 export const FormSchema = z
   .object({
-    // A name is required when creating a job, but existing jobs may have been scheduled without
-    // one (e.g. directly via SQL). Those can still be edited, so the "required" check is enforced
-    // on create in the submit handler rather than here.
-    name: z.string().trim(),
+    name: z.string().trim().min(1, 'Please provide a name for your cron job'),
     supportsSeconds: z.boolean(),
     schedule: z
       .string()

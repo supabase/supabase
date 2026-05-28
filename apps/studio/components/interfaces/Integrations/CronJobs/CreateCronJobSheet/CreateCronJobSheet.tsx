@@ -170,14 +170,6 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
     if (!project) return console.error('Project is required')
 
     if (!isEditing) {
-      if (!name) {
-        return form.setError(
-          'name',
-          { type: 'manual', message: 'Please provide a name for your cron job' },
-          { shouldFocus: true }
-        )
-      }
-
       try {
         setIsLoadingGetCronJob(true)
         const checkExistingJob = await getDatabaseCronJob({
