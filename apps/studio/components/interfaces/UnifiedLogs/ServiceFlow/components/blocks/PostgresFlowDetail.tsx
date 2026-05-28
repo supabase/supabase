@@ -45,7 +45,7 @@ const FieldDetailRow = ({
   return (
     <DetailRow
       label={config.label}
-      value={<FieldValue config={config} value={value} wrap={config.wrap} />}
+      value={<FieldValue config={config} value={value} wrap={config.wrap} level={data?.level} />}
       filterId={config.id}
       filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
       filterFields={filterFields}
