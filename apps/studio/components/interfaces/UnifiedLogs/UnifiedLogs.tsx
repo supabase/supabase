@@ -211,9 +211,7 @@ export const UnifiedLogs = () => {
 
   // Create a filtered version of the chart config based on level filters in the URL.
   const filteredChartConfig = useMemo(() => {
-    const levelFilters = parseLogsFilterUrlParams(search.filter).filter(
-      (f) => f.column === 'level'
-    )
+    const levelFilters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'level')
     const included = levelFilters.filter((f) => f.operator === '=').map((f) => f.value)
     const excluded = new Set(levelFilters.filter((f) => f.operator === '<>').map((f) => f.value))
     const baseLevels: readonly string[] = included.length > 0 ? included : LEVELS
@@ -271,10 +269,6 @@ export const UnifiedLogs = () => {
     if ((isLoading || isFetching) && !flatData.length) return
     return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
   }, [isLoading, isFetching, flatData.length, table, openRowId])
-
-  // REMINDER: this is currently needed for the cmdk search
-  // [Joshen] This is where facets are getting dynamically loaded
-  // TODO: auto search via API when the user changes the filter instead of hardcoded
 
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
