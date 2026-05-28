@@ -179,7 +179,7 @@ export const SecretsManagement = () => {
             </div>
           ) : (
             <DataGrid
-              className="grow border-t-0"
+              className="grow border-t-0! border-b-0!"
               rowHeight={52}
               headerRowHeight={36}
               columns={columns}

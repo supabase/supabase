@@ -1,5 +1,6 @@
 import type { SafeSqlFragment } from '@supabase/pg-meta'
 
+import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import type { ResponseError } from '@/types'
 
 export enum Presets {
@@ -31,7 +32,7 @@ export interface ReportQueryLogs {
     filterIndexAdvisor?: boolean,
     page?: number,
     pageSize?: number
-  ) => string
+  ) => SafeLogSqlFragment
 }
 
 export interface ReportQueryDb {

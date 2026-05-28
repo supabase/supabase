@@ -29,10 +29,10 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   enforceMfa: z.boolean(),
@@ -51,7 +51,7 @@ export const SecuritySettings = () => {
     PermissionAction.UPDATE,
     'organizations'
   )
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { hasAccess: hasAccessToEnforceMfa, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('security.enforce_mfa')
@@ -71,15 +71,7 @@ export const SecuritySettings = () => {
     },
     onSuccess: (data) => {
       toast.success('Successfully updated organization MFA settings')
-      sendEvent({
-        action: 'organization_mfa_enforcement_updated',
-        properties: {
-          mfaEnforced: data.enforced,
-        },
-        groups: {
-          organization: slug ?? 'Unknown',
-        },
-      })
+      track('organization_mfa_enforcement_updated', { mfaEnforced: data.enforced })
     },
   })
 

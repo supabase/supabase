@@ -49,11 +49,10 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 dayjs.extend(relativeTime)
@@ -67,9 +66,8 @@ const EdgeFunctionDetailsLayout = ({
   children,
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const { functionSlug, ref } = useParams()
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
@@ -244,13 +242,7 @@ const EdgeFunctionDetailsLayout = ({
     if (!functionSlug) return
     setIsOpen(true)
     if (IS_PLATFORM) {
-      sendEvent({
-        action: 'edge_function_test_side_panel_opened',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: org?.slug ?? 'Unknown',
-        },
-      })
+      track('edge_function_test_side_panel_opened')
     }
   }
 

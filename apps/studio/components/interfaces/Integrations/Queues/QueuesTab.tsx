@@ -124,7 +124,7 @@ export const QueuesTab = () => {
           <LoadingLine loading={isLoading || isRefetching} />
 
           <DataGrid
-            className="grow border-t-0"
+            className="grow border-t-0! border-b-0!"
             rowHeight={44}
             headerRowHeight={36}
             columns={columns}
