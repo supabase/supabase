@@ -15,7 +15,6 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -25,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
+  Textarea,
   WarningIcon,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -47,6 +47,10 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  normalizeSmsTemplateFieldsInPayload,
+  readSmsTemplateFromConfig,
+} from '@/lib/auth-sms-template'
 import { IS_PLATFORM } from '@/lib/constants'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
@@ -200,7 +204,10 @@ export const MfaAuthSettingsForm = () => {
               authConfig?.MFA_PHONE_ENROLL_ENABLED || false
             ) || 'Disabled',
           MFA_PHONE_OTP_LENGTH: authConfig?.MFA_PHONE_OTP_LENGTH || 6,
-          MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_TEMPLATE || 'Your code is {{ .Code }}',
+          MFA_PHONE_TEMPLATE: readSmsTemplateFromConfig(
+            authConfig?.MFA_PHONE_TEMPLATE,
+            'Your code is {{ .Code }}'
+          ),
         })
       }
 
@@ -282,10 +289,12 @@ export const MfaAuthSettingsForm = () => {
       }
     }
 
+    const configPayload = normalizeSmsTemplateFieldsInPayload(payload)
+
     setIsUpdatingPhoneForm(true)
 
     updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+      { projectRef: projectRef!, config: configPayload },
       {
         onError: (error) => {
           toast.error(`Failed to update phone MFA settings: ${error?.message}`)
@@ -542,9 +551,10 @@ export const MfaAuthSettingsForm = () => {
                         description="To format the OTP code use `{{ .Code }}`"
                       >
                         <FormControl>
-                          <Input
-                            type="text"
+                          <Textarea
                             {...field}
+                            rows={4}
+                            className="resize-none"
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                             data-1p-ignore // 1Password
                             data-lpignore="true" // LastPass

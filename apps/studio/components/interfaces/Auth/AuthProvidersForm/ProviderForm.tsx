@@ -36,6 +36,11 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  isSmsTemplateConfigKey,
+  normalizeSmsTemplateFieldsInPayload,
+  normalizeSmsTemplateNewlines,
+} from '@/lib/auth-sms-template'
 import { BASE_PATH } from '@/lib/constants'
 
 interface ProviderFormProps {
@@ -102,11 +107,15 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             values[key] = !(config as any)[key]
           } else {
             const configValue = (config as any)[key]
-            values[key] = configValue
-              ? configValue
-              : provider.properties[key].type === 'boolean'
-                ? false
-                : ''
+            if (isSmsTemplateConfigKey(key) && typeof configValue === 'string') {
+              values[key] = normalizeSmsTemplateNewlines(configValue)
+            } else {
+              values[key] = configValue
+                ? configValue
+                : provider.properties[key].type === 'boolean'
+                  ? false
+                  : ''
+            }
           }
         }
       })
@@ -135,8 +144,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       payload.PASSWORD_REQUIRED_CHARACTERS = ''
     }
 
+    const configPayload = normalizeSmsTemplateFieldsInPayload(payload)
+
     updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+      { projectRef: projectRef!, config: configPayload },
       {
         onSuccess: (newValues) => {
           setOpen(false)
