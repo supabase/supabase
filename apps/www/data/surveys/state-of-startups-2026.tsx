@@ -24,7 +24,7 @@ const stateOfStartupsData = {
         'The respondent base got older, more European, more solo, and less self-described-technical. Experienced operators with AI in their pocket are starting companies again.',
       pullQuote: {
         quote:
-          'I am a brand developer unfamiliar with coding. This opens up an entire realm of possibilities in what I am able to build for clients.',
+          'I am a brand [new] developer unfamiliar with coding. This opens up an entire realm of possibilities in what I am able to build for clients.',
         author: 'Anonymous respondent',
         authorPosition: 'North America',
       },
