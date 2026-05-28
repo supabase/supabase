@@ -10,7 +10,7 @@ import {
   Equal,
   Filter,
 } from 'lucide-react'
-import { ComponentPropsWithRef } from 'react'
+import { ComponentPropsWithRef, useEffect, useState } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -47,6 +47,22 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
   const { copy } = useCopyToClipboard()
+  const [open, setOpen] = useState(false)
+
+  /**
+   * [Joshen] This imo is just a temporary solution and needs to be addressed at the
+   * UI component level RE how we want to handle DropdownContent when scrolling, as its
+   * not specific to unified logs.
+   *
+   * DropdownMenuContent here exceeds the scrolling parent as its portalled. Opting to
+   * close the dropdown menu here when scrolling as a workaround.
+   */
+  useEffect(() => {
+    if (!open) return
+    const onScroll = () => setOpen(false)
+    document.addEventListener('scroll', onScroll, true)
+    return () => document.removeEventListener('scroll', onScroll, true)
+  }, [open])
 
   const field = !!fieldValue ? filterFields.find((f) => f.value === fieldValue) : undefined
   const column =
@@ -153,10 +169,11 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger
         className={cn(
-          'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'rounded-md ring-offset-background',
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'relative py-0',
           className
         )}
