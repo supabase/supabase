@@ -38,23 +38,17 @@ Deleting objects via the Supabase Dashboard or Storage API has a hard limit of 2
 
 The recommended approach for emptying large buckets is to use the AWS CLI with Supabase's S3 protocol support. You can delete all objects by using the `sync` command to sync your bucket with an empty local directory, which will safely delete all objects.
 
-1. Install the AWS CLI
+1. **Install the AWS CLI**: Follow the [AWS CLI installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) for your operating system.
 
-Follow the [AWS CLI installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) for your operating system.
+2. **Set up S3 credentials in Supabase**: Generate your S3 access credentials by following the [Supabase S3 authentication guide](/docs/guides/storage/s3/authentication?queryGroups=language&language=credentials).
 
-2. Set up S3 credentials in Supabase
-
-Generate your S3 access credentials by following the [Supabase S3 authentication guide](/docs/guides/storage/s3/authentication?queryGroups=language&language=credentials).
-
-3. Configure an AWS profile
-
-Run the following command and paste in the credentials you created in Supabase. The profile name `supabase-s3` can be anything you want, as long as it matches the value you use in the sync command.
+3. **Configure an AWS profile**: Run the following command and paste in the credentials you created in Supabase. The profile name `supabase-s3` can be anything you want, as long as it matches the value you use in the sync command.
 
 ```bash
 aws configure --profile supabase-s3
 ```
 
-4. Create an empty directory and sync it to your bucket
+4. **Create an empty directory and sync it to your bucket**:
 
 ```bash
 # Create a local empty directory
@@ -69,7 +63,7 @@ Replace `your-bucket-name`, `<project-ref>`, and `<your-region>` with your actua
 
 <Admonition type="note">
 
-  The `--profile` value must match the profile name you configured in Step 3. The correct endpoint URL and region can be found in your project's [Storage Settings](/dashboard/project/_/storage/settings).
+The `--profile` value must match the profile name you configured in Step 3. The correct endpoint URL and region can be found in your project's [Storage Settings](/dashboard/project/_/storage/settings).
 
 </Admonition>
 
