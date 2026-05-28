@@ -46,7 +46,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
-  const { copy, isCopied } = useCopyToClipboard()
+  const { copy } = useCopyToClipboard()
 
   const field = !!fieldValue ? filterFields.find((f) => f.value === fieldValue) : undefined
   const column =
@@ -157,7 +157,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
       <DropdownMenuTrigger
         className={cn(
           'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          'relative',
+          'relative py-0',
           className
         )}
         onKeyDown={(e) => {
@@ -172,14 +172,9 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         {...props}
       >
         {children}
-        {isCopied ? (
-          <div className="absolute inset-0 flex items-center justify-center rounded-md bg-surface-100/80 backdrop-blur-sm animate-in fade-in duration-150">
-            <span className="font-mono text-xs text-foreground-light">Copied</span>
-          </div>
-        ) : null}
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" side="bottom" className="w-48 -translate-x-4">
+      <DropdownMenuContent align="end" side="bottom" className="w-56 -translate-x-4">
         {!!field && !!column && (
           <>
             {renderOptions()}

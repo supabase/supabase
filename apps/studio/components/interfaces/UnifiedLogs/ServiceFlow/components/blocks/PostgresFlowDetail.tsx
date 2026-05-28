@@ -9,7 +9,6 @@ import { postgresDetailsFields, postgresPrimaryFields } from '../../config/servi
 import { BlockFieldConfig } from '../../types'
 import { DetailRow } from '../shared/DetailRow'
 import { DetailSectionHeader } from '../shared/DetailSection'
-import { FieldValue } from '../shared/FieldValue'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 interface PostgresFlowDetailProps {
@@ -44,14 +43,13 @@ const FieldDetailRow = ({
 
   return (
     <DetailRow
-      label={config.label}
-      value={<FieldValue config={config} value={value} wrap={config.wrap} level={data?.level} />}
-      filterId={config.id}
+      config={config}
+      level={data.level}
+      value={value}
       filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
       filterFields={filterFields}
       table={table}
       isLoading={showSkeleton}
-      wrap={config.wrap}
     />
   )
 }

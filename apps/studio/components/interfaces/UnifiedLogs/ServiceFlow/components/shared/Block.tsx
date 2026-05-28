@@ -6,7 +6,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { BlockFieldConfig, BlockFieldProps, ServiceFlowBlockProps } from '../../types'
 import { DetailRow } from './DetailRow'
 import { DetailSectionHeader } from './DetailSection'
-import { FieldValue } from './FieldValue'
 
 export interface BlockSection {
   title: string
@@ -41,14 +40,13 @@ const FieldRow = ({
   const showSkeleton = !!config.requiresEnrichedData && !!isLoading && !value
   return (
     <DetailRow
-      label={config.label}
-      value={<FieldValue config={config} value={value} wrap={config.wrap} level={data?.level} />}
-      filterId={config.id}
+      config={config}
+      level={data.level}
+      value={value}
       filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
       filterFields={filterFields}
       table={table}
       isLoading={showSkeleton}
-      wrap={config.wrap}
     />
   )
 }
