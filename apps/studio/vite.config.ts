@@ -137,20 +137,17 @@ function ssrStubGraphiql(): Plugin {
 // `assets/` directory and the `-<hash>.js` suffix), so the allowlist
 // stays stable across builds even as Rolldown reassigns hashes.
 const KNOWN_CHUNK_CYCLES: ReadonlyArray<ReadonlyArray<string>> = [
-  // Entry #1 in CIRCULAR_IMPORTS.md — the `cva`/TreeView/ui cycle.
+  // `ui` ↔ `TreeView` chunk cycle. `cva` lives in the `ui` chunk
+  // (Rolldown pools it there because many ui files use it), TreeView
+  // imports `cva` back from `ui` while `ui`'s barrel re-exports
+  // TreeView — runtime crash is "cva is not a function" at SSR.
   // Worked around via the `class-variance-authority` manualChunks
-  // pin; the chunk graph still surfaces the cycle even though the
-  // top-level `cva(...)` call inside TreeView is no longer broken.
+  // pin below; the chunk graph still surfaces the SCC even though
+  // the top-level `cva(...)` call inside TreeView no longer crashes.
+  // The variants below are the same SCC in different shapes — they
+  // shuffle as Rolldown re-chunks across merges.
   ['LoadingLine', 'TreeView', 'ui'],
-  // Same root cause as #1, extended via FormLayout/index after the
-  // master merge. The cycle stays a chunk-graph artifact (cva pinned
-  // via manualChunks); FormLayout imports from `ui` which closes the
-  // loop back through the existing LoadingLine/TreeView/ui chain.
   ['FormLayout', 'LoadingLine', 'TreeView', 'ui', 'index'],
-  // Same root cause as #1, extended via `index` after a later master
-  // merge that re-routed some `ui` imports through the top-level
-  // entry chunk. Variant of entry #2 without `FormLayout` — Rolldown
-  // pooled FormLayout into another chunk so it dropped out of the SCC.
   ['LoadingLine', 'TreeView', 'ui', 'index'],
 ]
 
@@ -229,7 +226,7 @@ function assertNoChunkCycles(): Plugin {
         `studio-assert-no-chunk-cycles: detected ${unexpected.length} new chunk-level cycle(s) in the client bundle.\n` +
         `These cause "X is not a function" runtime errors at module-load time. ` +
         `Either restructure the modules involved or add the cycle to KNOWN_CHUNK_CYCLES ` +
-        `in apps/studio/vite.config.ts (and document it in CIRCULAR_IMPORTS.md).\n\n` +
+        `in apps/studio/vite.config.ts.\n\n` +
         summary
       this.error(msg)
     },
@@ -345,8 +342,6 @@ export default defineConfig(({ mode }) => {
     //   with `c is not a function` because its `styleHandler` import
     //   came in through the now-too-large `lucide-react` chunk). Pin
     //   React explicitly so it stays a leaf vendor chunk.
-    //
-    // See CIRCULAR_IMPORTS.md — slated to be lifted into a separate PR.
     build: {
       rollupOptions: {
         output: {
