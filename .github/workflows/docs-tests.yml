@@ -46,6 +46,14 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
+      - name: Download JS reference TypeDoc dumps
+        # The source dumps under apps/docs/spec/reference/<lib>/<ver>/*.json are
+        # gitignored — `make download.tsdoc.v2` re-fetches them from
+        # supabase.github.io so the reference-content snapshot test has
+        # something to walk.
+        working-directory: apps/docs/spec
+        run: make download.tsdoc.v2
+
       - name: Run tests
         run: |
           touch .env
