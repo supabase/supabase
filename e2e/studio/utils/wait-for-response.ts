@@ -119,6 +119,6 @@ export async function waitForSchemaVisualizerToLoad(page: Page, ref: string, sch
     page,
     'pg-meta',
     ref,
-    `query?key=tables-infinite-${databaseSchema}`
+    `query?key=project:default-schema:${schema ?? 'public'}-infinite_tables`
   )
 }

@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
 
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
@@ -13,6 +13,12 @@ import {
   waitForSchemaVisualizerToLoad,
 } from '../utils/wait-for-response.js'
 
+async function focusTableInVisualizer(page: Page, tableName: string) {
+  await page.getByTestId('find-table-selector').click()
+  await page.getByPlaceholder('Find table…').fill(tableName)
+  await page.getByRole('option', { name: tableName, exact: true }).click()
+}
+
 test.describe('Database', () => {
   test.describe('Schema Visualizer', () => {
     test('actions works as expected', async ({ page, ref }) => {
@@ -26,9 +32,18 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=tables-infinite-public')
+
+      const wait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'query?key=project:default-schema:public-infinite_tables'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
       await wait
+
+      // focus the test table so it mounts inside the viewport
+      await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
@@ -66,9 +81,11 @@ test.describe('Database', () => {
       await page.getByTestId('schema-selector').click()
       await page.getByRole('option', { name: 'auth' }).click()
       await waitForSchemaVisualizerToLoad(page, ref, 'auth')
-      await expect(page.getByText('users', { exact: true })).toBeVisible()
-      await expect(page.getByText('sso_providers', { exact: true })).toBeVisible()
-      await expect(page.getByText('saml_providers', { exact: true })).toBeVisible()
+
+      for (const tableName of ['users', 'sso_providers', 'saml_providers']) {
+        await focusTableInVisualizer(page, tableName)
+        await expect(page.getByText(tableName, { exact: true })).toBeVisible()
+      }
     })
 
     test('table actions work as expected', async ({ page, ref }) => {
@@ -82,9 +99,17 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=tables-infinite-public')
+      const wait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'query?key=project:default-schema:public-infinite_tables'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
       await wait
+
+      // focus the test table so it mounts inside the viewport
+      await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
@@ -145,9 +170,17 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=tables-infinite-public')
+      const wait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'query?key=project:default-schema:public-infinite_tables'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
       await wait
+
+      // focus the test table so it mounts inside the viewport
+      await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
