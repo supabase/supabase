@@ -1,4 +1,9 @@
-import { toPartner as miscDbToPartner, Partner, type Category } from '~/types/partners'
+import {
+  ListingDetail,
+  toPartner as miscDbToPartner,
+  Partner,
+  type Category,
+} from '~/types/partners'
 import { createMarketplaceClient, fullImageUrl, type Listing } from 'common/marketplace-client'
 
 import supabase from './supabaseMisc'
@@ -6,10 +11,21 @@ import supabase from './supabaseMisc'
 // Switch between new Marketplace DB and legacy Supabase Misc DB by updating the environment var
 // in the Vercel deployment and redeploying, as that will take effect more quickly than flipping a
 // feature flag in ConfigCat and waiting for the revalidate timeout.
-const isUseMarketplaceDb =
+export const isUseMarketplaceDb =
   process.env.NEXT_PUBLIC_INTEGRATIONS_MARKETPLACE_DB?.toLowerCase() === 'true'
 
 const marketplaceClient = createMarketplaceClient()
+
+// Supabase-owned listings that are remapped to appear as independent partners in the catalog.
+// The key is the listing slug; the value is the partner name to display.
+const SUPABASE_PARTNER_SLUG = 'supabase'
+const SUPABASE_LISTING_OVERRIDES: Record<string, string> = {
+  'bigquery-wrapper': 'BigQuery',
+  'firebase-wrapper': 'Firebase',
+  'stripe-wrapper': 'Stripe',
+  vercel: 'Vercel',
+  cyberduck: 'Cyberduck',
+}
 
 /** Deduplicates and merges categories from across all of a partner's listings. */
 function aggregateCategories(listings: Listing[]): Category[] {
@@ -77,38 +93,123 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
 
   if (!partnersData?.length) return []
 
+  // Diagnostic: log all listing slugs so mismatches with SUPABASE_LISTING_OVERRIDES are obvious.
+  // Remove once the correct slugs are confirmed.
+  console.log('[catalog] listing slugs from DB:', (listingsData ?? []).map((l) => l.slug).sort())
+
+  // Check listing.slug first so the override works regardless of what partner_slug the DB has.
+  const overriddenListings = new Map<string, Listing>()
   const byPartnerSlug = new Map<string, Listing[]>()
+
   for (const listing of listingsData ?? []) {
+    if (listing.slug in SUPABASE_LISTING_OVERRIDES) {
+      overriddenListings.set(listing.slug, listing)
+      continue
+    }
+
     const slug = listing.partner_slug
-    if (!slug) continue
+    if (!slug || slug === SUPABASE_PARTNER_SLUG) continue
+
     const arr = byPartnerSlug.get(slug) ?? []
     arr.push(listing)
     byPartnerSlug.set(slug, arr)
   }
 
-  return partnersData.flatMap((p) => {
-    const slug = p.slug
-    if (!slug) return []
-    return [
-      buildPartner(
-        {
-          slug,
-          name: p.name,
-          description: p.description,
-          logo: p.logo,
-          website: p.website,
-          type: p.type,
-        },
-        byPartnerSlug.get(slug) ?? []
-      ),
-    ]
-  })
+  // Exclude 'supabase' and any slug that is itself an overridden listing (prevents duplicates).
+  const regularPartners = partnersData
+    .filter(
+      (p) => p.slug && p.slug !== SUPABASE_PARTNER_SLUG && !(p.slug in SUPABASE_LISTING_OVERRIDES)
+    )
+    .flatMap((p) => {
+      const slug = p.slug
+      if (!slug) return []
+      return [
+        buildPartner(
+          {
+            slug,
+            name: p.name,
+            description: p.description,
+            logo: p.logo,
+            website: p.website,
+            type: p.type,
+          },
+          byPartnerSlug.get(slug) ?? []
+        ),
+      ]
+    })
+
+  const virtualPartners = Array.from(overriddenListings.values()).map((listing) =>
+    buildPartner(
+      {
+        slug: listing.slug,
+        name: SUPABASE_LISTING_OVERRIDES[listing.slug],
+        description: listing.description,
+        logo: listing.listing_logo,
+        website: listing.website_url,
+        type: 'technology',
+      },
+      [listing]
+    )
+  )
+
+  return [...regularPartners, ...virtualPartners]
 }
 
 /**
- * Marketplace DB: get a single partner by partner slug
+ * Derives a human-readable tab label from a listing's metadata.
+ * Priority: one-click install → Foreign Data Wrapper → plain integration → guide/overview.
+ */
+function getLabelForListing(listing: Listing): string {
+  if (listing.publish_dashboard) return 'Marketplace Integration'
+  const t = listing.title.toLowerCase()
+  if (t.includes('foreign data wrapper') || /\bfdw\b/.test(t)) return 'Foreign Data Wrapper'
+  if (listing.marketplace_url) return 'Integration'
+  return 'Guide'
+}
+
+/**
+ * Marketplace DB: get a single partner by partner slug, including all their listings as tabs.
  */
 async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> {
+  // 'supabase' never appears directly as a catalog partner
+  if (slug === SUPABASE_PARTNER_SLUG) return null
+
+  // Supabase-owned listings that are remapped to independent partners
+  if (slug in SUPABASE_LISTING_OVERRIDES) {
+    const { data: listing } = await marketplaceClient
+      .from('listings')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (!listing) return null
+
+    return {
+      ...buildPartner(
+        {
+          slug: listing.slug,
+          name: SUPABASE_LISTING_OVERRIDES[slug],
+          description: listing.description,
+          logo: listing.listing_logo,
+          website: listing.website_url,
+          type: 'technology',
+        },
+        [listing]
+      ),
+      listings: [
+        {
+          slug: listing.slug,
+          label: getLabelForListing(listing),
+          content: listing.content,
+          installUrl: listing.marketplace_url ?? null,
+          docsUrl: listing.documentation_url || null,
+          images: listing.images?.map(fullImageUrl) ?? [],
+          youtubeId: listing.youtube_id ?? null,
+        },
+      ],
+    }
+  }
+
   const [{ data: partnerData }, { data: listingsData }] = await Promise.all([
     marketplaceClient.from('partners').select('*').eq('slug', slug).maybeSingle(),
     marketplaceClient.from('listings').select('*').eq('partner_slug', slug),
@@ -117,25 +218,55 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
   const partnerSlug = partnerData?.slug
   if (!partnerSlug) return null
 
-  return buildPartner(
-    {
-      slug: partnerSlug,
-      name: partnerData.name,
-      description: partnerData.description,
-      logo: partnerData.logo,
-      website: partnerData.website,
-      type: partnerData.type,
-    },
-    listingsData ?? []
-  )
+  const listings = listingsData ?? []
+
+  const listingDetails: ListingDetail[] = listings.map((listing) => ({
+    slug: listing.slug,
+    label: getLabelForListing(listing),
+    content: listing.content,
+    installUrl: listing.marketplace_url ?? null,
+    docsUrl: listing.documentation_url || null,
+    images: listing.images?.map(fullImageUrl) ?? [],
+    youtubeId: listing.youtube_id ?? null,
+  }))
+
+  return {
+    ...buildPartner(
+      {
+        slug: partnerSlug,
+        name: partnerData.name,
+        description: partnerData.description,
+        logo: partnerData.logo,
+        website: partnerData.website,
+        type: partnerData.type,
+      },
+      listings
+    ),
+    listings: listingDetails,
+  }
 }
 
 /**
- * Marketplace DB: list all partner slugs (for static path generation)
+ * Marketplace DB: list all partner slugs (for static path generation).
+ * Excludes 'supabase'; adds the remapped listing slugs instead.
  */
 async function getPartnerSlugsFromMarketplace(): Promise<string[]> {
-  const { data } = await marketplaceClient.from('partners').select('slug')
-  return data?.flatMap((row) => (row.slug ? [row.slug] : [])) ?? []
+  const [{ data: partnerRows }, { data: overriddenRows }] = await Promise.all([
+    marketplaceClient.from('partners').select('slug').neq('slug', SUPABASE_PARTNER_SLUG),
+    // Fetch overridden listing slugs directly by listing slug (not by partner_slug).
+    marketplaceClient
+      .from('listings')
+      .select('slug')
+      .in('slug', Object.keys(SUPABASE_LISTING_OVERRIDES)),
+  ])
+
+  // Exclude any partner slug that is also an overridden listing slug to prevent duplicates.
+  const partnerSlugs =
+    partnerRows?.flatMap((row) =>
+      row.slug && !(row.slug in SUPABASE_LISTING_OVERRIDES) ? [row.slug] : []
+    ) ?? []
+  const overriddenSlugs = overriddenRows?.flatMap((row) => (row.slug ? [row.slug] : [])) ?? []
+  return [...partnerSlugs, ...overriddenSlugs]
 }
 
 /**
@@ -159,24 +290,31 @@ async function searchPartnersFromMarketplace(search: string): Promise<Partner[] 
     return null
   }
 
-  // Group matched listings by partner, then build one Partner per company
+  // Check listing.slug first so the override works regardless of partner_slug in the DB.
   const byPartnerSlug = new Map<string, Listing[]>()
   for (const listing of data ?? []) {
+    if (listing.slug in SUPABASE_LISTING_OVERRIDES) {
+      byPartnerSlug.set(listing.slug, [listing])
+      continue
+    }
+
     const slug = listing.partner_slug
-    if (!slug) continue
+    if (!slug || slug === SUPABASE_PARTNER_SLUG) continue
+
     const arr = byPartnerSlug.get(slug) ?? []
     arr.push(listing)
     byPartnerSlug.set(slug, arr)
   }
 
-  return Array.from(byPartnerSlug.entries()).map(([slug, listings]) => {
+  return Array.from(byPartnerSlug.entries()).map(([partnerSlug, listings]) => {
     const first = listings[0]
+    const isOverridden = partnerSlug in SUPABASE_LISTING_OVERRIDES
     return buildPartner(
       {
-        slug,
-        name: first.partner_name,
+        slug: partnerSlug,
+        name: isOverridden ? SUPABASE_LISTING_OVERRIDES[partnerSlug] : first.partner_name,
         description: first.description,
-        logo: first.partner_logo ?? first.listing_logo,
+        logo: isOverridden ? first.listing_logo : (first.partner_logo ?? first.listing_logo),
         website: first.website_url,
         type: 'technology',
       },
@@ -186,7 +324,18 @@ async function searchPartnersFromMarketplace(search: string): Promise<Partner[] 
 }
 
 // ---------------------------------------------------------------------------
-// Public API
+// Catalog API — always uses the marketplace DB directly, independent of isUseMarketplaceDb.
+// The Partner Catalog is a marketplace-specific feature; the legacy misc DB does not carry
+// the listings (BigQuery/Firebase/Stripe FDW integrations, etc.) that the catalog needs.
+// ---------------------------------------------------------------------------
+
+export const listCatalogPartners = getPartnersFromMarketplace
+export const searchCatalogPartners = searchPartnersFromMarketplace
+export const getCatalogPartner = getPartnerFromMarketplace
+export const listCatalogPartnerSlugs = getPartnerSlugsFromMarketplace
+
+// ---------------------------------------------------------------------------
+// Public API — respects isUseMarketplaceDb for non-catalog pages (e.g. /partners/integrations).
 // ---------------------------------------------------------------------------
 
 /**

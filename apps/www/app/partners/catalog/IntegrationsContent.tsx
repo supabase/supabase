@@ -3,7 +3,7 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
-import { searchPartners } from '~/lib/marketplaceDb'
+import { searchCatalogPartners } from '~/lib/marketplaceDb'
 import type { Partner } from '~/types/partners'
 import { ArrowRight, ArrowUpRight, LayoutGrid, List, Loader, Search } from 'lucide-react'
 import Image from 'next/image'
@@ -47,7 +47,7 @@ export default function IntegrationsContent({
     }
     setIsSearching(true)
     const currentSearchId = ++searchIdRef.current
-    searchPartners(debouncedSearchTerm)
+    searchCatalogPartners(debouncedSearchTerm)
       .then((results) => {
         if (currentSearchId === searchIdRef.current) setPartners(results ?? [])
       })

@@ -1,4 +1,4 @@
-import { listPartners } from '~/lib/marketplaceDb'
+import { isUseMarketplaceDb, listCatalogPartners } from '~/lib/marketplaceDb'
 import type { Metadata } from 'next'
 
 import IntegrationsContent from './IntegrationsContent'
@@ -21,7 +21,17 @@ export const metadata: Metadata = {
 }
 
 export default async function IntegrationPartnersPage() {
-  const partners = await listPartners()
+  const partners = await listCatalogPartners()
+
+  console.log('isUseMarketplaceDb', isUseMarketplaceDb)
+  console.log(
+    'partners',
+    partners.map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      publishedInMarketplace: p.publishedInMarketplace,
+    }))
+  )
 
   return (
     <IntegrationsContent

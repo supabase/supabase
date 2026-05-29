@@ -16,47 +16,58 @@ import 'swiper/css'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { getPartner, listPartnerSlugs } from '~/lib/marketplaceDb'
-import { type Partner } from '~/types/partners'
+import { getCatalogPartner, listCatalogPartnerSlugs } from '~/lib/marketplaceDb'
+import { type ListingDetail, type Partner } from '~/types/partners'
 import { useBreakpoint } from 'common'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 import Error404 from '../../404'
 
-/**
- * Returns custom components so that the markdown converts to a nice looking html.
- */
 function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
-  const components = {
+  return {
     CH,
     Admonition,
-    /**
-     * Returns a custom img element which has a bound onClick listener. When the image is clicked, it will open a modal showing that particular image.
-     */
     img: (
       props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
-    ) => {
-      return <img {...props} onClick={() => callback(props.src!.toString())} />
-    },
+    ) => <img {...props} onClick={() => callback(props.src!.toString())} />,
   }
-
-  return components
 }
 
 type PartnerData = {
   partner: Partner
-  overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
+  serializedListings: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>[]
 }
 
-function Partner({ partner, overview }: PartnerData) {
+function PartnerPage({ partner, serializedListings }: PartnerData) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState(0)
   const isNarrow = useBreakpoint('lg')
 
   if (!partner) return <Error404 />
+
+  // For marketplace DB, partner.listings has per-listing content.
+  // For legacy DB, synthesise a single tab from the top-level partner data.
+  const allListings: ListingDetail[] = partner.listings?.length
+    ? partner.listings
+    : [
+        {
+          slug: partner.slug,
+          label: 'Overview',
+          content: partner.content,
+          installUrl: partner.installUrl,
+          docsUrl: partner.docsUrl,
+          images: partner.images,
+          youtubeId: partner.youtubeId,
+        },
+      ]
+
+  const safeTab = Math.min(activeTab, allListings.length - 1)
+  const activeListing = allListings[safeTab]
+  const activeOverview = serializedListings[safeTab] ?? serializedListings[0]
 
   return (
     <>
@@ -67,11 +78,7 @@ function Partner({ partner, overview }: PartnerData) {
           title: `${partner.title} | Works With Supabase`,
           description: partner.description,
           url: `https://supabase.com/partners/catalog/${partner.slug}`,
-          images: [
-            {
-              url: partner.images ? partner.images[0] : partner.logo,
-            },
-          ],
+          images: [{ url: partner.images?.[0] ?? partner.logo }],
         }}
       />
 
@@ -103,6 +110,7 @@ function Partner({ partner, overview }: PartnerData) {
           </motion.div>
         )}
       </AnimatePresence>
+
       <DefaultLayout>
         <SectionContainer>
           <div className="col-span-12 mx-auto mb-2 max-w-5xl lg:col-span-2">
@@ -115,13 +123,14 @@ function Partner({ partner, overview }: PartnerData) {
               Back
             </Link>
 
+            {/* Partner header */}
             <div className="flex mt-6 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center space-x-4">
                 <Image
                   layout="fixed"
                   width={56}
                   height={56}
-                  className="bg-surface-200 shrink-f0 h-14 w-14 rounded-full border"
+                  className="bg-surface-200 shrink-0 h-14 w-14 rounded-full border"
                   src={partner.logo}
                   alt={partner.title}
                 />
@@ -129,21 +138,49 @@ function Partner({ partner, overview }: PartnerData) {
                   {partner.title}
                 </h1>
               </div>
-              {partner.installUrl && (
+              {activeListing.installUrl && (
                 <Button asChild size="medium">
-                  <a href={partner.installUrl} target="_blank" rel="noreferrer">
+                  <a href={activeListing.installUrl} target="_blank" rel="noreferrer">
                     Add integration
                   </a>
                 </Button>
               )}
             </div>
 
+            {/* Full-width tab bar */}
             <div
-              className="bg-linear-to-t from-background-alternative to-background border-b p-6 [&_.swiper]:!overflow-visible [&_.swiper-wrapper]:!overflow-visible"
+              className="border-b mt-6"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
-              {(partner.images?.length ?? 0) > 0 && (
-                <SectionContainer className="py-0! px-3! lg:px-12! xl:p-0! mx-auto max-w-5xl mt-32">
+              <div className="mx-auto max-w-5xl px-3 lg:px-12 xl:px-0 flex">
+                {allListings.map((listing, i) => (
+                  <button
+                    key={listing.slug}
+                    type="button"
+                    onClick={() => {
+                      setActiveTab(i)
+                      setFocusedImage(null)
+                    }}
+                    className={cn(
+                      'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap',
+                      safeTab === i
+                        ? 'border-foreground text-foreground'
+                        : 'border-transparent text-foreground-lighter hover:text-foreground'
+                    )}
+                  >
+                    {listing.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Images for active listing */}
+            {(activeListing.images?.length ?? 0) > 0 && (
+              <div
+                className="bg-linear-to-t from-background-alternative to-background border-b p-6 [&_.swiper]:overflow-visible! [&_.swiper-wrapper]:overflow-visible!"
+                style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
+              >
+                <SectionContainer className="py-0! px-3! lg:px-12! xl:p-0! mx-auto max-w-5xl">
                   <Swiper
                     initialSlide={0}
                     spaceBetween={20}
@@ -153,64 +190,48 @@ function Partner({ partner, overview }: PartnerData) {
                     centeredSlides={false}
                     centerInsufficientSlides={false}
                     breakpoints={{
-                      320: {
-                        slidesPerView: 1.15,
-                        centeredSlides: false,
-                        spaceBetween: 10,
-                      },
-                      720: {
-                        slidesPerView: 1.75,
-                        centeredSlides: false,
-                        spaceBetween: 10,
-                      },
-                      920: {
-                        slidesPerView: 2.5,
-                        centeredSlides: false,
-                      },
-                      1024: {
-                        slidesPerView: 3,
-                      },
-                      1280: {
-                        slidesPerView: 4,
-                      },
+                      320: { slidesPerView: 1.15, centeredSlides: false, spaceBetween: 10 },
+                      720: { slidesPerView: 1.75, centeredSlides: false, spaceBetween: 10 },
+                      920: { slidesPerView: 2.5, centeredSlides: false },
+                      1024: { slidesPerView: 3 },
+                      1280: { slidesPerView: 4 },
                     }}
                   >
-                    {partner.images?.map((image: any, i: number) => {
-                      return (
-                        <SwiperSlide key={i}>
-                          <div className="relative aspect-[16/8]">
-                            <AnimatePresence>
-                              {focusedImage !== image && (
-                                <motion.div
-                                  key={`thumb-${image}`}
-                                  layoutId={`partner-image-${image}`}
-                                  transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-                                  className="absolute inset-0 cursor-zoom-in rounded-md border bg-muted"
-                                  onClick={() => setFocusedImage(image)}
-                                >
-                                  <Image
-                                    placeholder="blur"
-                                    blurDataURL="/images/blur.png"
-                                    fill
-                                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 920px) 40vw, (min-width: 720px) 60vw, 90vw"
-                                    src={image}
-                                    alt={partner.title}
-                                    className="rounded-md object-cover"
-                                  />
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        </SwiperSlide>
-                      )
-                    })}
+                    {activeListing.images?.map((image, i) => (
+                      <SwiperSlide key={i}>
+                        <div className="relative aspect-16/8">
+                          <AnimatePresence>
+                            {focusedImage !== image && (
+                              <motion.div
+                                key={`thumb-${image}`}
+                                layoutId={`partner-image-${image}`}
+                                transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+                                className="absolute inset-0 cursor-zoom-in rounded-md border bg-muted"
+                                onClick={() => setFocusedImage(image)}
+                              >
+                                <Image
+                                  placeholder="blur"
+                                  blurDataURL="/images/blur.png"
+                                  fill
+                                  sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 920px) 40vw, (min-width: 720px) 60vw, 90vw"
+                                  src={image}
+                                  alt={partner.title}
+                                  className="rounded-md object-cover"
+                                />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </SwiperSlide>
+                    ))}
                   </Swiper>
                 </SectionContainer>
-              )}
-            </div>
+              </div>
+            )}
 
+            {/* Main content */}
             <div className="grid gap-y-12 lg:grid-cols-8 lg:gap-x-20 mt-16">
-              {isNarrow && <PartnerDetails partner={partner} />}
+              {isNarrow && <PartnerDetails partner={partner} activeListing={activeListing} />}
 
               <div className="lg:col-span-5 overflow-hidden">
                 <h2
@@ -221,24 +242,25 @@ function Partner({ partner, overview }: PartnerData) {
                 </h2>
 
                 <div className="prose">
-                  {'error' in overview ? (
-                    <p>Error rendering integration page: {overview.error.message}</p>
+                  {'error' in activeOverview ? (
+                    <p>Error rendering integration page: {activeOverview.error.message}</p>
                   ) : (
-                    // @ts-expect-error: Gildas - This is because CodeHide put its components under the CH namespace. It works but the MDXClient types are stricter
-                    <MDXClient {...overview} components={mdxComponents(setFocusedImage)} />
+                    // @ts-expect-error: CodeHike puts its components under the CH namespace
+                    <MDXClient {...activeOverview} components={mdxComponents(setFocusedImage)} />
                   )}
                 </div>
               </div>
 
-              {!isNarrow && <PartnerDetails partner={partner} />}
+              {!isNarrow && <PartnerDetails partner={partner} activeListing={activeListing} />}
             </div>
-            {partner.installUrl && (
+
+            {activeListing.installUrl && (
               <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-xs max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl self-center">
                     Get started with {partner.title} and Supabase.
                   </h1>
-                  <a href={partner.installUrl} target="_blank" rel="noreferrer">
+                  <a href={activeListing.installUrl} target="_blank" rel="noreferrer">
                     <Button size="medium" type="secondary">
                       Add integration
                     </Button>
@@ -253,11 +275,13 @@ function Partner({ partner, overview }: PartnerData) {
   )
 }
 
-const PartnerDetails = ({ partner }: { partner: Partner }) => {
-  const videoThumbnail = partner.youtubeId
-    ? `https://img.youtube.com/vi/${partner.youtubeId}/0.jpg`
-    : undefined
-
+const PartnerDetails = ({
+  partner,
+  activeListing,
+}: {
+  partner: Partner
+  activeListing: ListingDetail
+}) => {
   return (
     <div className="lg:col-span-3">
       <div className="sticky top-20 flex flex-col gap-4">
@@ -265,10 +289,9 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
           Details
         </h2>
 
-        {partner.youtubeId && (
+        {activeListing.youtubeId && (
           <ExpandableVideo
-            videoId={partner.youtubeId}
-            // imgUrl={videoThumbnail}
+            videoId={activeListing.youtubeId}
             imgOverlayText="Watch an introductory video"
             triggerContainerClassName="w-full"
           />
@@ -306,11 +329,11 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
             </a>
           </div>
 
-          {partner.type === 'technology' && partner.docsUrl && (
+          {partner.type === 'technology' && activeListing.docsUrl && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Documentation</span>
               <a
-                href={partner.docsUrl}
+                href={activeListing.docsUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="text-brand-link hover:underline transition-colors"
@@ -331,34 +354,19 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
   )
 }
 
-// This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const slugs = await listPartnerSlugs()
+  const slugs = await listCatalogPartnerSlugs()
 
-  const paths: {
-    params: { slug: string }
-    locale?: string | undefined
-  }[] =
-    slugs?.map((slug) => ({
-      params: {
-        slug,
-      },
-    })) ?? []
+  const paths = slugs?.map((slug) => ({ params: { slug } })) ?? []
 
-  return {
-    paths,
-    fallback: 'blocking',
-  }
+  return { paths, fallback: 'blocking' }
 }
 
-// This also gets called at build time
 export const getStaticProps: GetStaticProps<PartnerData> = async ({ params }) => {
-  const partner = await getPartner(params!.slug as string)
+  const partner = await getCatalogPartner(params!.slug as string)
 
   if (!partner) {
-    return {
-      notFound: true,
-    }
+    return { notFound: true }
   }
 
   const codeHikeOptions: CodeHikeConfig = {
@@ -369,20 +377,39 @@ export const getStaticProps: GetStaticProps<PartnerData> = async ({ params }) =>
     autoImport: false,
   }
 
-  // Parse markdown
-  const overview = await serialize({
-    source: partner.content,
-    options: {
-      mdxOptions: {
-        remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
-      },
-    },
-  })
+  // For marketplace DB, partner.listings has all per-listing content.
+  // For legacy DB, fall back to a single synthetic listing from partner-level data.
+  const listingsForTabs: ListingDetail[] = partner.listings?.length
+    ? partner.listings
+    : [
+        {
+          slug: partner.slug,
+          label: 'Overview',
+          content: partner.content,
+          installUrl: partner.installUrl,
+          docsUrl: partner.docsUrl,
+          images: partner.images,
+          youtubeId: partner.youtubeId,
+        },
+      ]
+
+  const serializedListings = await Promise.all(
+    listingsForTabs.map((listing) =>
+      serialize({
+        source: listing.content,
+        options: {
+          mdxOptions: {
+            remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+          },
+        },
+      })
+    )
+  )
 
   return {
-    props: { partner, overview },
-    revalidate: 1800, // 30 minutes
+    props: { partner, serializedListings },
+    revalidate: 1800,
   }
 }
 
-export default Partner
+export default PartnerPage

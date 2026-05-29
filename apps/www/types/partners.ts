@@ -7,6 +7,16 @@ export type Category = {
   slug: string
 }
 
+export type ListingDetail = {
+  slug: string
+  label: string
+  content: string
+  installUrl: string | null
+  docsUrl: string | null
+  images: string[]
+  youtubeId: string | null
+}
+
 export type Partner = {
   categories: Category[]
   featured: boolean
@@ -24,6 +34,7 @@ export type Partner = {
   logo: string
   images: string[]
   youtubeId: string | null
+  listings?: ListingDetail[]
 }
 
 export function toPartner(dbPartner: DbPartner): Partner {
