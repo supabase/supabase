@@ -296,13 +296,13 @@ export default function PartnersContent({ featuredPartners }: Props) {
 
       {/* Ways you can integrate with Supabase — left-aligned, dl */}
       <div className="bg-alternative border-y">
-        <SectionContainer>
+        <SectionContainer className="max-w-6xl">
           <SectionHeading
             eyebrow="Integration points"
             title={pageData.integrationOptions.title}
             description={pageData.integrationOptions.description}
           />
-          <dl className="mt-12 grid gap-6 md:grid-cols-2">
+          <dl className="mt-12 grid gap-4 md:grid-cols-2">
             {pageData.integrationOptions.options.map((option) => (
               <Link
                 key={option.title}
@@ -313,7 +313,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
               >
                 <Panel
                   outerClassName="h-full"
-                  innerClassName="flex items-start gap-4 p-6 h-full"
+                  innerClassName="flex items-start gap-4 p-4 h-full"
                   hasActiveOnHover
                 >
                   <div className="bg-surface-200 text-foreground flex size-10 shrink-0 items-center justify-center rounded-md border transition-all group-hover:scale-105">
