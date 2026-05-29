@@ -95,7 +95,7 @@ export const useAvailableIntegrations = () => {
             featured: !!featured,
             type: 'oauth' as const, // Currently marketplace only supports oauth apps
             source: 'Partner' as const,
-            categories: Array.isArray(categories) ? categories.map((x) => x.slug) : [],
+            categories: categories.map((x) => x.slug),
             content,
             files: images?.map((image) => fullImageUrl(image)),
             description,
@@ -142,9 +142,7 @@ export const useAvailableIntegrations = () => {
     const map: Record<string, MarketplaceIntegration> = {}
     ;(data ?? []).forEach((integration) => {
       if (!isForeignDataWrapper(integration)) return
-      const slug = integration.slug
-      if (!slug) return
-      map[slug.replaceAll('-', '_')] = integration
+      map[integration.slug.replaceAll('-', '_')] = integration
     })
     return map
   }, [data])
@@ -154,10 +152,7 @@ export const useAvailableIntegrations = () => {
   // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
   const allIntegrations = useMemo(() => {
     return INTEGRATIONS.filter((integration) => {
-      if (
-        !integrationsWrappers &&
-        (integration.type === 'wrapper' || integration.id.endsWith('_wrapper'))
-      ) {
+      if (!integrationsWrappers && integration.type === 'wrapper') {
         return false
       }
 
@@ -167,7 +162,7 @@ export const useAvailableIntegrations = () => {
 
       return true
     }).map((integration) => {
-      const isWrapper = integration.type === 'wrapper' || integration.id.endsWith('_wrapper')
+      const isWrapper = integration.type === 'wrapper'
       if (!isWrapper) return integration
 
       const marketplaceWrapper = marketplaceWrappers[integration.id]
@@ -184,16 +179,20 @@ export const useAvailableIntegrations = () => {
         listing_logo: listingLogo,
       } = marketplaceWrapper
 
+      const overrides = {
+        name: title,
+        description,
+        content,
+        docsUrl,
+        siteUrl,
+        author: authorName ? { name: authorName, websiteUrl: '' } : undefined,
+        files: images?.map((image) => fullImageUrl(image)),
+        icon: listingLogo ? renderMarketplaceLogo(listingLogo) : undefined,
+      }
+
       return {
         ...integration,
-        ...(title ? { name: title } : {}),
-        ...(description ? { description } : {}),
-        ...(content ? { content } : {}),
-        ...(docsUrl ? { docsUrl } : {}),
-        ...(siteUrl ? { siteUrl } : {}),
-        ...(authorName ? { author: { name: authorName, websiteUrl: '' } } : {}),
-        ...(images ? { files: images.map((image) => fullImageUrl(image)) } : {}),
-        ...(listingLogo ? { icon: renderMarketplaceLogo(listingLogo) } : {}),
+        ...Object.fromEntries(Object.entries(overrides).filter(([, v]) => v !== undefined)),
       }
     })
   }, [integrationsWrappers, isCLI, marketplaceWrappers])
