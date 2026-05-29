@@ -303,6 +303,7 @@ export const LOG_TABLE_SQL: Record<LogsTableName, SafeLogSqlFragment> = {
   [LogsTableName.PG_UPGRADE]: safeSql`pg_upgrade_logs`,
   [LogsTableName.PG_CRON]: safeSql`pg_cron_logs`,
   [LogsTableName.ETL]: safeSql`etl_replication_logs`,
+  [LogsTableName.MULTIGRES]: safeSql`multigres_logs`,
 }
 
 /**
@@ -830,6 +831,7 @@ const QUERY_TYPE_LABELS: Record<QueryType, string> = {
   pg_cron: 'pg_cron',
   pgbouncer: 'PgBouncer',
   etl: 'ETL',
+  multigres: 'Multigres',
 }
 
 const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
@@ -847,6 +849,7 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
   pg_upgrade_logs: 'Postgres upgrade',
   pg_cron_logs: 'pg_cron',
   etl_replication_logs: 'ETL',
+  multigres_logs: 'Multigres',
 }
 
 const isLogsTableName = (value: string): value is LogsTableName =>
