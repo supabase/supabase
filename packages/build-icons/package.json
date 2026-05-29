@@ -20,7 +20,6 @@
   "license": "ISC",
   "devDependencies": {
     "minimist": "^1.2.7",
-    "prettier": "3.2.4",
     "svgson": "^5.2.1"
   }
 }

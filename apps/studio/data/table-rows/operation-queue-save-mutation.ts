@@ -1,18 +1,18 @@
+import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import { wrapWithTransaction } from 'data/sql/utils/transaction'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import {
-  EditCellContentPayload,
-  QueuedOperation,
-  QueuedOperationType,
-} from 'state/table-editor-operation-queue.types'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableRowKeys } from './keys'
+import { getTableRowCreateSql } from './table-row-create-mutation'
+import { getTableRowDeleteSql } from './table-row-delete-mutation'
 import { getTableRowUpdateSql } from './table-row-update-mutation'
+import type { PendingAddRow } from '@/components/grid/types'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import { QueuedOperation, QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OperationQueueSaveVariables = {
   projectRef: string
@@ -25,10 +25,10 @@ export type OperationQueueSaveVariables = {
  * Generates SQL for a single queued operation.
  * Extend this function as new operation types are added.
  */
-function getOperationSql(operation: QueuedOperation): string {
+function getOperationSql(operation: QueuedOperation): SafeSqlFragment {
   switch (operation.type) {
     case QueuedOperationType.EDIT_CELL_CONTENT: {
-      const payload = operation.payload as EditCellContentPayload
+      const { payload } = operation
       return getTableRowUpdateSql({
         table: {
           id: payload.table.id,
@@ -41,9 +41,44 @@ function getOperationSql(operation: QueuedOperation): string {
         returning: false,
       })
     }
-    default:
-      throw new Error(`Unknown operation type: ${(operation as QueuedOperation).type}`)
+    case QueuedOperationType.ADD_ROW: {
+      const { payload } = operation
+      // Clean internal fields before SQL generation
+      const { __tempId, idx, ...cleanRowData } = payload.rowData as PendingAddRow
+      return getTableRowCreateSql({
+        table: { id: payload.table.id, name: payload.table.name, schema: payload.table.schema },
+        payload: cleanRowData,
+        enumArrayColumns: payload.enumArrayColumns ?? [],
+        returning: false,
+      })
+    }
+    case QueuedOperationType.DELETE_ROW: {
+      const { payload } = operation
+      // Create a mock row with the row identifiers for the delete SQL
+      const mockRow = { idx: 0, ...payload.rowIdentifiers }
+      return getTableRowDeleteSql({
+        table: payload.table,
+        rows: [mockRow],
+      })
+    }
+    default: {
+      // Error should never happen, but we'll handle it anyway. cast to never for exhaustive check.
+      const _exhaustiveCheck: never = operation
+      throw new Error(`Unknown operation: ${(_exhaustiveCheck as { type: string }).type}`)
+    }
   }
+}
+
+function sortOperations(operations: readonly QueuedOperation[]): QueuedOperation[] {
+  const operationOrder: Record<QueuedOperationType, number> = {
+    [QueuedOperationType.DELETE_ROW]: 0,
+    [QueuedOperationType.ADD_ROW]: 1,
+    [QueuedOperationType.EDIT_CELL_CONTENT]: 2,
+  }
+
+  return [...operations].sort((a, b) => {
+    return operationOrder[a.type] - operationOrder[b.type]
+  })
 }
 
 /**
@@ -60,16 +95,14 @@ export async function saveOperationQueue({
     return { result: [] }
   }
 
-  // Generate SQL for each operation, stripping trailing semicolons to avoid double semicolons when joining
-  const statements = operations.map((op) => {
+  const sortedOperations = sortOperations(operations)
+  const statements: Array<SafeSqlFragment> = sortedOperations.map((op) => {
     const sql = getOperationSql(op)
-    return sql.endsWith(';') ? sql.slice(0, -1) : sql
+    return (sql.endsWith(';') ? sql.slice(0, -1) : sql) as SafeSqlFragment
   })
 
-  // Combine all statements into a single transaction
-  const transactionSql = wrapWithTransaction(statements.join(';\n') + ';')
+  const transactionSql = wrapWithTransaction(safeSql`${joinSqlFragments(statements, ';\n')};`)
 
-  // Wrap with role impersonation if enabled
   const sql = wrapWithRoleImpersonation(transactionSql, roleImpersonationState)
 
   const { result } = await executeSql({

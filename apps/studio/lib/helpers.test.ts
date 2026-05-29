@@ -139,7 +139,7 @@ describe('propsAreEqual', () => {
   })
 
   it('should return false if the props are not equal', () => {
-    const result = propsAreEqual({ a: 1, b: 2 }, { a: 1, b: 3 })
+    propsAreEqual({ a: 1, b: 2 }, { a: 1, b: 3 })
   })
 })
 
@@ -206,8 +206,9 @@ describe('copyToClipboard', () => {
   })
 
   it('uses clipboard.write if available', async () => {
-    await copyToClipboard('hello')
+    const promise = copyToClipboard('hello')
     vi.runAllTimers()
+    await promise
     expect(writeMock).toHaveBeenCalled()
   })
 

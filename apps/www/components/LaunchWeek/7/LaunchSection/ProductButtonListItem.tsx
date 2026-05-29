@@ -12,7 +12,7 @@ export const ProductButtonListItem = (props: Article) => {
           group
           flex items-start gap-3 bg-transparent
           transition
-          drop-shadow-sm"
+          drop-shadow-xs"
         >
           <div className="w-5">
             <SparklesIcon strokeWidth={1} />

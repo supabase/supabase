@@ -168,7 +168,7 @@ Your authorization UI should:
 4. **Display consent screen** - Show the user what app is requesting access and what scopes/permissions are being requested
 5. **Handle user decision** - Call either `approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)` based on user choice
 
-The authorization details include a `scopes` field that contains the scopes requested by the client (e.g., `["openid", "email", "profile"]`). You should display these scopes to the user so they understand what information will be shared.
+The authorization details include a `scope` field (singular) containing a space-separated string of scopes requested by the client (e.g., `"openid email profile"`). You should display these scopes to the user so they understand what information will be shared.
 
 <Admonition type="note">
 
@@ -208,11 +208,11 @@ export default async function ConsentPage({
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll: async () => (await cookies()).getAll(),
-        setAll: async (cookiesToSet) => {
+        setAll: async (cookiesToSet, _headers) => {
           const cookieStore = await cookies()
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         },
@@ -238,6 +238,11 @@ export default async function ConsentPage({
     return <div>Error: {error?.message || 'Invalid authorization request'}</div>
   }
 
+  // if no authorization_id returned, user has previously consented, redirect them
+  if (!('authorization_id' in authDetails)) {
+    redirect(authDetails['redirect_url'])
+  }
+
   return (
     <div>
       <h1>Authorize {authDetails.client.name}</h1>
@@ -250,12 +255,12 @@ export default async function ConsentPage({
         <p>
           <strong>Redirect URI:</strong> {authDetails.redirect_uri}
         </p>
-        {authDetails.scopes && authDetails.scopes.length > 0 && (
+        {authDetails.scope && authDetails.scope.trim() && (
           <div>
             <strong>Requested permissions:</strong>
             <ul>
-              {authDetails.scopes.map((scope) => (
-                <li key={scope}>{scope}</li>
+              {authDetails.scope.split(' ').map((scopeItem) => (
+                <li key={scopeItem}>{scopeItem}</li>
               ))}
             </ul>
           </div>
@@ -293,11 +298,11 @@ export async function POST(request: Request) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll: async () => (await cookies()).getAll(),
-        setAll: async (cookiesToSet) => {
+        setAll: async (cookiesToSet, _headers) => {
           const cookieStore = await cookies()
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         },
@@ -313,7 +318,7 @@ export async function POST(request: Request) {
     }
 
     // Redirect back to the client with authorization code
-    return NextResponse.redirect(data.redirect_to)
+    return NextResponse.redirect(data.redirect_url)
   } else {
     const { data, error } = await supabase.auth.oauth.denyAuthorization(authorizationId)
 
@@ -322,7 +327,7 @@ export async function POST(request: Request) {
     }
 
     // Redirect back to the client with error
-    return NextResponse.redirect(data.redirect_to)
+    return NextResponse.redirect(data.redirect_url)
   }
 }
 ```
@@ -334,6 +339,7 @@ export async function POST(request: Request) {
 // src/pages/OAuthConsent.tsx
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+
 import { supabase } from './supabaseClient'
 
 export function OAuthConsent() {
@@ -387,7 +393,7 @@ export function OAuthConsent() {
       setError(error.message)
     } else {
       // Redirect to client app
-      window.location.href = data.redirect_to
+      window.location.href = data.redirect_url
     }
   }
 
@@ -400,7 +406,7 @@ export function OAuthConsent() {
       setError(error.message)
     } else {
       // Redirect to client app with error
-      window.location.href = data.redirect_to
+      window.location.href = data.redirect_url
     }
   }
 
@@ -420,12 +426,12 @@ export function OAuthConsent() {
         <p>
           <strong>Redirect URI:</strong> {authDetails.redirect_uri}
         </p>
-        {authDetails.scopes && authDetails.scopes.length > 0 && (
+        {authDetails.scope && authDetails.scope.trim() && (
           <div>
             <strong>Requested permissions:</strong>
             <ul>
-              {authDetails.scopes.map((scope) => (
-                <li key={scope}>{scope}</li>
+              {authDetails.scope.split(' ').map((scopeItem) => (
+                <li key={scopeItem}>{scopeItem}</li>
               ))}
             </ul>
           </div>
@@ -454,8 +460,8 @@ export function OAuthConsent() {
 6. **Handle decision** - When the user clicks approve/deny:
    - Call `supabase.auth.oauth.approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)`
    - These methods handle all OAuth logic internally (generating authorization codes, etc.)
-   - They return a `redirect_to` URL
-7. **Redirect back** - Redirect the user to the `redirect_to` URL, which sends them back to the third-party app with either an authorization code (approved) or error (denied)
+   - They return a `redirect_url` URL
+7. **Redirect back** - Redirect the user to the `redirect_url` URL, which sends them back to the third-party app with either an authorization code (approved) or error (denied)
 
 ## Register an OAuth client
 
@@ -491,6 +497,22 @@ Store the client secret securely. It will only be shown once. If you lose it, yo
 
 </Admonition>
 
+#### Token endpoint authentication method
+
+When a client exchanges an authorization code or refreshes a token, it must authenticate with the token endpoint. The `token_endpoint_auth_method` controls how this authentication happens:
+
+| Method                | Description                                                                                                                                               | Used by                   |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `none`                | No client authentication. Only `client_id` is sent in the request body.                                                                                   | Public clients (required) |
+| `client_secret_basic` | Client credentials sent via HTTP Basic auth (`Authorization: Basic <base64(client_id:client_secret)>`). **This is the default for confidential clients.** | Confidential clients      |
+| `client_secret_post`  | Client credentials sent in the request body (`client_id` and `client_secret` as form parameters).                                                         | Confidential clients      |
+
+**Defaults:** Public clients default to `none`. Confidential clients default to `client_secret_basic` (per [RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591#section-2)).
+
+**Constraints:** Public clients must use `none`. Confidential clients cannot use `none`.
+
+You can set this when registering a client via the dashboard or programmatically. See [OAuth Flows](/docs/guides/auth/oauth-server/oauth-flows#step-5-token-exchange) for examples of each method in action.
+
 </TabPanel>
 <TabPanel id="programmatically" label="Programmatically">
 
@@ -509,8 +531,8 @@ You can register clients programmatically using the SDK admin endpoints or by ca
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  'https://your-project.supabase.co',
-  'your-service-role-key' // Use service_role key for admin operations
+  'https://your-project-id.supabase.co',
+  'sb_secret_...' // Use the secret key for admin operations
 )
 
 // Create an OAuth client
@@ -518,6 +540,8 @@ const { data, error } = await supabase.auth.admin.oauth.createClient({
   name: 'My Third-Party App',
   redirect_uris: ['https://my-app.com/auth/callback', 'https://my-app.com/auth/silent-callback'],
   client_type: 'confidential',
+  // Optional: defaults to 'client_secret_basic' for confidential, 'none' for public
+  token_endpoint_auth_method: 'client_secret_basic',
 })
 
 if (error) {
@@ -537,8 +561,8 @@ if (error) {
 from supabase import create_client
 
 supabase = create_client(
-    'https://your-project.supabase.co',
-    'your-service-role-key'  # Use service_role key for admin operations
+    'https://your-project-id.supabase.co',
+    'sb_secret_...'  # Use the secret key for admin operations
 )
 
 # Create an OAuth client
@@ -548,7 +572,9 @@ response = supabase.auth.admin.oauth.create_client({
         'https://my-app.com/auth/callback',
         'https://my-app.com/auth/silent-callback'
     ],
-    'client_type': 'confidential'
+    'client_type': 'confidential',
+    # Optional: defaults to 'client_secret_basic' for confidential, 'none' for public
+    'token_endpoint_auth_method': 'client_secret_basic'
 })
 
 print('Client created:', response)
@@ -572,7 +598,8 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/admin/oauth/clients' \
       "https://my-app.com/auth/callback",
       "https://my-app.com/auth/silent-callback"
     ],
-    "client_type": "confidential"
+    "client_type": "confidential",
+    "token_endpoint_auth_method": "client_secret_basic"
   }'
 ```
 
@@ -585,7 +612,8 @@ curl -X POST 'http://localhost:54321/auth/v1/admin/oauth/clients' \
   -d '{
     "name": "Local Dev App",
     "redirect_uris": ["http://localhost:3000/auth/callback"],
-    "client_type": "confidential"
+    "client_type": "confidential",
+    "token_endpoint_auth_method": "client_secret_post"
   }'
 ```
 
@@ -598,6 +626,7 @@ Response:
   "name": "My Third-Party App",
   "redirect_uris": ["https://my-app.com/auth/callback", "https://my-app.com/auth/silent-callback"],
   "client_type": "confidential",
+  "token_endpoint_auth_method": "client_secret_basic",
   "created_at": "2025-01-15T10:30:00.000Z"
 }
 ```
@@ -670,7 +699,7 @@ curl 'http://localhost:54321/auth/v1/admin/oauth/clients' \
 
 ## Customizing tokens (optional)
 
-By default, OAuth access tokens include standard claims like `user_id`, `role`, and `client_id`. If you need to customize tokens—for example, to set a specific `audience` claim for third-party validation or add client-specific metadata—use [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/access-token-hook).
+By default, OAuth access tokens include standard claims like `user_id`, `role`, and `client_id`. If you need to customize tokens—for example, to set a specific `audience` claim for third-party validation or add client-specific metadata—use [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/custom-access-token-hook).
 
 Custom Access Token Hooks are triggered for all token issuance, including OAuth flows. You can use the `client_id` parameter to customize tokens based on which OAuth client is requesting them.
 

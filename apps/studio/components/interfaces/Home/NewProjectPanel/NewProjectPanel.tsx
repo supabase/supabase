@@ -1,17 +1,17 @@
+import { useParams } from 'common'
+import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { ExternalLink, Settings } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
+
 import { APIKeys } from './APIKeys'
 import { GetStartedHero } from './GetStartedHero'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export const NewProjectPanel = () => {
   const { ref } = useParams()
@@ -78,12 +78,12 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Auth size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Authentication</h5>
                     </div>
-                    <div className="flex flex-grow md:min-h-[50px] xl:min-h-[75px]">
+                    <div className="flex grow md:min-h-[50px] xl:min-h-[75px]">
                       <p className="text-sm text-foreground-light">
                         A complete user management system that works without any additional tools.
                       </p>
@@ -94,7 +94,7 @@ export const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -110,7 +110,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Storage size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Storage</h5>
@@ -126,7 +126,7 @@ export const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -142,7 +142,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <EdgeFunctions size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Edge Functions</h5>
@@ -158,7 +158,7 @@ export const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/functions`}>Explore Functions</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -177,7 +177,7 @@ export const NewProjectPanel = () => {
                 <Panel>
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-4">
-                      <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                      <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                         <Realtime size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Realtime</h5>
@@ -192,7 +192,7 @@ export const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -222,7 +222,7 @@ export const NewProjectPanel = () => {
           </div>
           <div className="flex items-center space-x-2">
             <Button asChild type="default" icon={<Settings size={16} strokeWidth={1.5} />}>
-              <Link href={`/project/${ref}/settings/api`}>API settings</Link>
+              <Link href={`/project/${ref}/settings/api-keys`}>API Keys settings</Link>
             </Button>
             <DocsButton href={`${DOCS_URL}/guides/database/api`} />
           </div>

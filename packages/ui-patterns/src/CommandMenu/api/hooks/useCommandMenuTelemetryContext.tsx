@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext } from 'react'
+
 import type { CommandMenuTelemetryCallback } from './useCommandMenuTelemetry'
 
 interface CommandMenuTelemetryContextValue {

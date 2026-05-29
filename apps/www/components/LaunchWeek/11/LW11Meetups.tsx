@@ -110,8 +110,8 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                     title={liveNow ? 'Live now' : undefined}
                     className={cn(
                       'h-10 group inline-flex md:hidden items-center flex-wrap text-3xl',
-                      'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                      meetup.id === activeMeetup?.id && '!text-foreground',
+                      'text-foreground-muted hover:text-foreground! leading-none! transition-colors',
+                      meetup.id === activeMeetup?.id && 'text-foreground!',
                       liveNow && 'text-foreground-light'
                     )}
                   >
@@ -130,8 +130,8 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                     title={liveNow ? 'Live now' : undefined}
                     className={cn(
                       'hidden h-10 group md:inline-flex items-center flex-wrap text-4xl',
-                      'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                      meetup.id === activeMeetup?.id && '!text-foreground',
+                      'text-foreground-muted hover:text-foreground! leading-none! transition-colors',
+                      meetup.id === activeMeetup?.id && 'text-foreground!',
                       liveNow && 'text-foreground-light'
                     )}
                   >

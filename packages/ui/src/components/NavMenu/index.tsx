@@ -1,4 +1,5 @@
-import { HTMLAttributes, PropsWithChildren, forwardRef } from 'react'
+import { forwardRef, HTMLAttributes, PropsWithChildren } from 'react'
+
 import { cn } from '../../lib/utils/cn'
 
 interface NavMenuProps extends HTMLAttributes<HTMLDivElement> {}
@@ -20,11 +21,10 @@ export const NavMenu = forwardRef<HTMLDivElement, NavMenuProps>(
   }
 )
 
-interface NavMenuItemProps
-  extends PropsWithChildren<{
-    className?: string
-    active: boolean
-  }> {}
+interface NavMenuItemProps extends PropsWithChildren<{
+  className?: string
+  active: boolean
+}> {}
 
 export const NavMenuItem = forwardRef<HTMLLIElement, NavMenuItemProps>(
   ({ children, className, active, ...props }, ref) => (
@@ -33,7 +33,7 @@ export const NavMenuItem = forwardRef<HTMLLIElement, NavMenuItemProps>(
       aria-selected={active ? 'true' : 'false'}
       data-state={active ? 'active' : 'inactive'}
       className={cn(
-        'inline-flex items-center justify-center whitespace-nowrap text-sm ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground text-foreground-lighter hover:text-foreground data-[state=active]:border-foreground border-b-2 border-transparent *:py-1.5',
+        'inline-flex items-center justify-center whitespace-nowrap text-sm ring-offset-background transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground text-foreground-lighter hover:text-foreground data-[state=active]:border-foreground border-b-2 border-transparent *:py-1.5',
         className
       )}
       {...props}

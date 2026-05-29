@@ -1,5 +1,5 @@
-import * as _ from 'lodash'
 import * as fs from 'fs'
+import * as _ from 'lodash'
 
 export const slugify = (text: string) => {
   return text

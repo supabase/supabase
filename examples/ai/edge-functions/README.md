@@ -24,7 +24,7 @@ Run a search via curl POST request:
 
 ```bash
 curl -i --location --request POST 'https://<PROJECT-REF>.supabase.co/functions/v1/search' \
-    --header 'Authorization: Bearer <SUPABASE_ANON_KEY>' \
+    --header 'apikey: <SUPABASE_PUBLISHABLE_KEY>' \
     --header 'Content-Type: application/json' \
     --data '{"search":"vehicles"}'
 ```

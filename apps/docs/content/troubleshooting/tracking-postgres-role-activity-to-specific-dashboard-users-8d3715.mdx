@@ -1,0 +1,134 @@
+---
+title = "Identifying Dashboard SQL Editor Activity by User"
+topics = [ "database" ]
+keywords = []
+---
+
+When team members run SQL queries from the Dashboard SQL Editor, and if that query is logged in the Postgres Logs, it's not immediately clear who executed which query. This guide shows you how to track queries back to the specific team member who ran them.
+
+### **Understanding Dashboard query execution**
+
+First, it helps to understand how Dashboard queries are executed. When someone runs a query from the SQL editor, it's routed through the `postgres` role at the database level. The Supabase Dashboard automatically appends metadata comments to queries, specifically `-- user: [UUID]`, `-- source: dashboard`, and `-- date`.
+
+By default, that role has `log_statement` set to `ddl`, which means Postgres logs only schema-level changes such as `CREATE`, `ALTER`, and `DROP`. It does not log data-modifying statements such as `INSERT`, `UPDATE`, `DELETE` or `TRUNCATE`.
+
+So, if someone truncates a table, and you're relying on the default logging, you won't see it.
+
+### **Enabling data modification logging**
+
+To make those operations visible, you can increase the logging level for the `postgres` role:
+
+```sql
+ALTER ROLE postgres SET log_statement='mod';
+```
+
+**Note:** This step is only necessary if you need to track data-modifying statements like `INSERT`, `UPDATE`, `DELETE`, or `TRUNCATE`. If you're only looking to track DDL statements (such as `CREATE`, `ALTER`, `DROP`), the default `log_statement='ddl'` setting is already sufficient.
+
+Setting it to `mod` tells Postgres to log all data-modifying statements. Once that's in place, try running something like a `TRUNCATE` from the Dashboard. In the logs, you'll see an entry similar to:
+
+```
+statement: TRUNCATE TABLE public.data;
+-- source: dashboard
+-- user: f8c2e1a9-3b4d-4f7e-8c9a-1d2e3f4a5b6c
+-- date: 2026-04-02T11:41:22.158Z
+```
+
+Notice that the log includes:
+
+- The full statement
+- The timestamp
+- A `user` field, which is actually the Supabase user UUID
+- The source (dashboard)
+
+That UUID corresponds to the team member who logged in via the Supabase Dashboard and executed queries in the [SQL Editor](/dashboard/project/_/sql/new). But at this point, it's just an ID - not yet a name or email.
+
+### **Mapping UUIDs to team members**
+
+To map the UUID, you'll need to query the Management API. The process looks like this:
+
+**1. Create a Personal Access Token (PAT)**
+
+Generate a token from your [account settings](/dashboard/account/tokens).
+
+**2. Call the Organization Members Endpoint**
+
+```bash
+curl -X GET "https://api.supabase.com/v1/organizations/your-org-slug/members" \
+  -H "Authorization: Bearer YOUR_PERSONAL_ACCESS_TOKEN"
+```
+
+**3. Match the UUID**
+
+The response will include entries like:
+
+```json
+{
+  "user_id": "f8c2e1a9-3b4d-4f7e-8c9a-1d2e3f4a5b6c",
+  "user_name": "john@supabase.io",
+  "email": "john@supabase.io",
+  "role_name": "Administrator"
+}
+```
+
+Now you can directly match `user_id` values from the Postgres logs to the corresponding team members.
+
+### **Querying logs for specific operations**
+
+Navigate to the [Logs Explorer](/dashboard/project/_/logs/explorer) and query `postgres_logs`. Here's an example query that searches for data-modifying operations and maps user IDs to team members:
+
+```sql
+SELECT
+  DATETIME(postgres_logs.timestamp) AS time,
+  parsed.session_id,
+  postgres_logs.identifier,
+  parsed.user_name AS db_role,
+  CASE
+    WHEN REGEXP_CONTAINS(postgres_logs.event_message, 'f8c2e1a9-3b4d-4f7e-8c9a-1d2e3f4a5b6c')
+      THEN 'john@example.com'
+    WHEN REGEXP_CONTAINS(postgres_logs.event_message, 'insert another-uuid-here')
+      THEN 'jane@example.io'
+    ELSE 'unknown'
+  END AS detected_user,
+  parsed.error_severity,
+  postgres_logs.event_message
+FROM postgres_logs
+CROSS JOIN UNNEST(metadata) AS metadata
+CROSS JOIN UNNEST(parsed) AS parsed
+WHERE postgres_logs.timestamp > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 7 DAY)
+  AND (
+    REGEXP_CONTAINS(postgres_logs.event_message, '(?i)DELETE|TRUNCATE|UPDATE|ALTER|DROP')
+    OR REGEXP_CONTAINS(parsed.query, '(?i)DELETE|TRUNCATE|UPDATE|ALTER|DROP')
+  )
+ORDER BY postgres_logs.timestamp DESC
+LIMIT 500;
+```
+
+This query:
+
+- Searches the last 7 days of logs
+- Filters for common data-modifying operations (`DELETE`, `TRUNCATE`, `UPDATE`, `ALTER`, `DROP`)
+- Uses a `CASE` statement to map known UUIDs to team member emails
+- Returns results ordered by timestamp (most recent first)
+
+**Example Output:**
+| db_role | detected_user | error_severity | event_message | identifier |
+| -------- | ------------- | -------------- | -------------------------------------------------------------------------------- | ---------- |
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+| postgres | support | LOG | statement: TRUNCATE TABLE public.data; -- source: dashboard -- user: f8c2e1a9... | ... |
+
+You can further refine your search by filtering for specific commands like `TRUNCATE` or `DELETE` where `parsed.user_name = 'postgres'`.
+
+### **Tracking external tools**
+
+For external tools like n8n or other applications connecting to your database, you can identify the source of database changes by appending `?application_name=example_app_name` to your connection string. This ensures the source is clearly identified in the logs, making it easier to distinguish between Dashboard operations and external tool operations.
+
+### **Additional logging levels**
+
+Postgres supports these `log_statement` values:
+
+- `none`: No statements are logged
+- `ddl`: Log data definition statements (`CREATE`, `ALTER`, `DROP`) - this is the default for the `postgres` role
+- `mod`: Log data modification statements plus all DDL (includes `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`)
+- `all`: Log all statements (including `SELECT` queries)
+
+**Note:** Setting to `all` can generate very large log volumes. Use it only when necessary and for limited periods. Test the performance impact of `log_statement='mod'` in your specific environment, as the impact depends on your query volume and workload.

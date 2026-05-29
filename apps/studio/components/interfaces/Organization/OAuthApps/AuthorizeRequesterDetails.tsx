@@ -99,6 +99,11 @@ export const AuthorizeRequesterDetails = ({
             hasWriteScope={scopes.includes(OAuthScope.ANALYTICS_WRITE)}
           />
           <ScopeSection
+            description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
+            hasReadScope={scopes.includes(OAuthScope.ANALYTICS_CONFIG_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.ANALYTICS_CONFIG_WRITE)}
+          />
+          <ScopeSection
             description={PERMISSIONS_DESCRIPTIONS.AUTH}
             hasReadScope={scopes.includes(OAuthScope.AUTH_READ)}
             hasWriteScope={scopes.includes(OAuthScope.AUTH_WRITE)}

@@ -45,7 +45,7 @@ Access tokens are standard Supabase JWTs that include `user_id`, `role`, and `cl
 OAuth 2.1 Server works seamlessly with your existing Supabase Auth configuration:
 
 - Users can authenticate using any enabled method (password, magic link, social providers, MFA, phone)
-- [Custom Access Token Hooks](/guides/auth/auth-hooks/access-token-hook) apply to OAuth tokens, allowing you to customize claims like `audience` or add client-specific permissions
+- [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/custom-access-token-hook) apply to OAuth tokens, allowing you to customize claims like `audience` or add client-specific permissions
 - Row Level Security policies control data access using the `client_id` claim in tokens
 - All standard Supabase features (email templates, hooks, rate limiting) continue to work
 

@@ -22,6 +22,19 @@ For a complete run-down on how all of our tools work together, see the main DEVE
 4. Visit http://localhost:3001/docs in your browser - don't forget to append the `/docs` to the end
 5. Your local site should look exactly like [https://supabase.com/docs](https://supabase.com/docs)
 
+## AI friendly documentation
+
+This project generates Markdown files for each page under `/docs/guides/..` path.
+
+To test locally, within the `apps/docs` directory:
+
+1. Run `pnpm build:guides-markdown`
+2. Run `pnpm dev`
+
+This creates Markdown files for all routes under the `public/docs/guides` directory, ignored by Git.
+
+For production this setup runs as a `prebuild` task to allow Vercel to bundle these files with middleware and functions.
+
 ## Contributing
 
 For repo organization and style guide, see the [contributing guide](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md).

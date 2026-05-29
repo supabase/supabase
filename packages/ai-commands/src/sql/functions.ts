@@ -2,6 +2,7 @@ import { SchemaBuilder } from '@serafin/schema-builder'
 import { codeBlock, stripIndent } from 'common-tags'
 import { jsonrepair } from 'jsonrepair'
 import type OpenAI from 'openai'
+
 import { ContextLengthError, EmptyResponseError, EmptySqlError } from '../errors'
 
 const debugSqlSchema = SchemaBuilder.emptySchema()

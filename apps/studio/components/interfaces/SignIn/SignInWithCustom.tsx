@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { BASE_PATH } from 'lib/constants'
-import { captureCriticalError } from 'lib/error-reporting'
-import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
+
+import { BASE_PATH } from '@/lib/constants'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, buildPathWithParams } from '@/lib/gotrue'
 
 interface SignInWithCustomProps {
   providerName: string

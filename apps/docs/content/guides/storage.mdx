@@ -71,7 +71,7 @@ Specialized storage for vector embeddings and similarity search operations. Desi
 Check out all of the Storage [templates and examples](https://github.com/supabase/supabase/tree/master/examples/storage) in our GitHub repository.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {examples.map((x) => (
+  {storageExamples.map((x) => (
     <div className="col-span-12" key={x.href}>
       <Link href={x.href} passHref>
         <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
@@ -81,15 +81,6 @@ Check out all of the Storage [templates and examples](https://github.com/supabas
     </div>
   ))}
 </div>
-
-export const examples = [
-  {
-    name: 'Resumable Uploads with Uppy',
-    description:
-      'Use Uppy to upload files to Supabase Storage using the TUS protocol (resumable uploads).',
-    href: 'https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy',
-  },
-]
 
 ## Resources
 

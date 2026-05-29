@@ -1,7 +1,7 @@
 export * from './api/Badges'
 export { CommandHeader } from './api/CommandHeader'
-export { CommandInput } from './api/CommandInput'
-export { CommandList } from './api/CommandList'
+export { CommandMenuInput } from './api/CommandMenuInput'
+export { CommandMenuList } from './api/CommandMenuList'
 export {
   Breadcrumb,
   CommandMenu,
@@ -20,6 +20,7 @@ export {
   useCommandMenuOpenedTelemetry,
   useCommandMenuTelemetry,
 } from './api/hooks/useCommandMenuTelemetry'
+export { useCommandMenuTelemetryContext } from './api/hooks/useCommandMenuTelemetryContext'
 export { useHistoryKeys } from './api/hooks/useHistoryKeys'
 export * from './api/hooks/viewHooks'
 export * from './api/utils'

@@ -82,7 +82,7 @@ const Metrics = ({ isActive }: { isActive?: boolean }) => {
         isActive && 'opacity-100'
       )}
     >
-      <div className="relative rounded-md w-full h-full border border-overlay shadow p-4 !min-w-[300px]">
+      <div className="relative rounded-md w-full h-full border border-overlay shadow-sm p-4 min-w-[300px]!">
         <p className="text-foreground text-sm mb-2">Execution time</p>
         <p className="text-foreground text-base mb-4">
           {displayValue ? data[displayValue]?.pv : highlightedValue}ms {displayValue ? '' : '(Avg)'}

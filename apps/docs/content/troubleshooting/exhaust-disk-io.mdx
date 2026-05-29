@@ -7,7 +7,7 @@ database_id = "4844905d-1456-44a1-858e-7a4995e5054c"
 
 ## Understanding disk IO and disk IO budget
 
-Disk IO refers to two metrics: throughput in Megabits per Second and IOPS which are Input/Output Operations per Second. Depending on the compute add-on of your instance you will have [different baseline performances](/docs/guides/platform/compute-add-ons#compute-size).
+Disk IO refers to two metrics: throughput in Megabytes per second (MB/s) and IOPS which are Input/Output Operations per Second. Throughput measures how much data you can move each second, while IOPS measures how many read/write operations you can perform each second. Depending on the compute add-on of your instance you will have [different baseline performances](/docs/guides/platform/compute-add-ons#compute-size).
 
 Smaller compute instances can burst and exceed their baseline performance for a short period of time every day. This is represented as your Disk IO Budget and once your Disk IO Budget is consumed, your instance reverts back to its baseline performance. Learn more about [choosing the right compute instance for consistent disk performance](/docs/guides/platform/compute-add-ons#choosing-the-right-compute-instance-for-consistent-disk-performance).
 

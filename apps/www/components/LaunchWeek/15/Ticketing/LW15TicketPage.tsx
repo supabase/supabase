@@ -117,7 +117,7 @@ const LW15TicketPage = ({
   const handleClaimTicket = () => register.signIn()
 
   return (
-    <SectionContainer className="flex flex-col lg:grid lg:grid-cols-2 gap-6 !py-8 md:!py-10 h-full !min-h-[calc(100dvh-66px)]">
+    <SectionContainer className="flex flex-col lg:grid lg:grid-cols-2 gap-6 py-8! md:py-10! h-full min-h-[calc(100dvh-66px)]!">
       <div className="flex flex-col h-full justify-between gap-6 lg:gap-20">
         <div className="grid grid-cols-6 gap-4">
           <div className="col-span-full w-full hidden lg:flex items-center justify-between h-[60px] md:h-[90px] lg:h-[120px] gap-4">

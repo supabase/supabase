@@ -22,7 +22,7 @@ export const MigrateToPostgres = () => (
       },
     }}
   >
-    <div className="absolute inset-0 bg-gradient-to-r from-background-surface-200 via-background-surface-200 to-transparent"></div>
+    <div className="absolute inset-0 bg-linear-to-r from-background-surface-200 via-background-surface-200 to-transparent"></div>
     <div className="relative z-10 px-5 py-4 h-full flex gap-5 items-center justify-between">
       <div className="flex flex-col gap-3">
         <div className="flex gap-4">
