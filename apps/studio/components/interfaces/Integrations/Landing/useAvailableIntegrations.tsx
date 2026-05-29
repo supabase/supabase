@@ -34,14 +34,12 @@ export const useAvailableIntegrations = () => {
   const isSuccess = !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!data && !error)))
   const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
 
-  const renderMarketplaceLogo =
-    (listingLogo?: string | null) =>
-    ({ className, ...props }: { className?: string } = {}) => (
+  const renderMarketplaceLogo = (listingLogo?: string | null) => {
+    const MarketplaceLogo = ({ className, ...props }: { className?: string } = {}) => (
       <div className="relative w-full h-full">
         {listingLogo ? (
           <Image
             fill
-            unoptimized
             src={fullImageUrl(listingLogo)}
             alt=""
             className={cn('p-2', className)}
@@ -52,6 +50,9 @@ export const useAvailableIntegrations = () => {
         )}
       </div>
     )
+    MarketplaceLogo.displayName = 'MarketplaceLogo'
+    return MarketplaceLogo
+  }
 
   const isMarketplaceWrapper = (integration: { categories?: unknown }) =>
     Array.isArray(integration.categories) &&
