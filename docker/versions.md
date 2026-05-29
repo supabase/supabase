@@ -1,5 +1,16 @@
 # Docker Image Versions
 
+## 2026-06-01
+- supabase/studio:2026.06.xx-sha-xxxxxxx (prev supabase/studio:2026.04.27-sha-5f60601)
+- supabase/gotrue:v2.189.0 (prev supabase/gotrue:v2.186.0)
+- postgrest/postgrest:v14.12 (prev postgrest/postgrest:v14.8)
+- supabase/realtime:v2.102.0 (prev supabase/realtime:v2.76.5)
+- supabase/storage-api:v1.60.2 (prev supabase/storage-api:v1.48.26)
+- supabase/postgres-meta:v0.96.6 (prev supabase/postgres-meta:v0.96.3)
+- supabase/edge-runtime:v1.74.0 (prev supabase/edge-runtime:v1.71.2)
+- supabase/supavisor:2.9.5 (prev supabase/supavisor:2.7.4)
+- supabase/logflare:1.42.0 (prev supabase/logflare:1.36.1)
+
 ## 2026-04-27
 - supabase/studio:2026.04.27-sha-5f60601 (prev supabase/studio:2026.04.08-sha-205cbe7)
 
