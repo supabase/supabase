@@ -18,6 +18,7 @@ const ORG_SETTINGS_ROUTES: string[] = [
   'general',
   'apps',
   'audit',
+  'audit-log-drains',
   'documents',
   'security',
   'sso',

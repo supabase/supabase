@@ -76,6 +76,11 @@ export const generateOrganizationSettingsMenuItems = ({
     label: 'Audit Logs',
     href: `/org/${slug}/audit`,
   },
+  {
+    key: 'audit-log-drains',
+    label: 'Audit Log Drains',
+    href: `/org/${slug}/audit-log-drains`,
+  },
   ...(showLegalDocuments
     ? [
         {
@@ -165,6 +170,12 @@ export const generateOrganizationSettingsSections = ({
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
       shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT,
+    },
+    {
+      key: 'audit-log-drains',
+      label: 'Audit Log Drains',
+      href: `/org/${slug}/audit-log-drains`,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT_LOG_DRAINS,
     },
     ...(showLegalDocuments
       ? [

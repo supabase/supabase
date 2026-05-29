@@ -2,6 +2,10 @@ import { SHORTCUT_REFERENCE_GROUPS } from './referenceGroups'
 import { ADVISORS_NAV_SHORTCUT_IDS, advisorsNavRegistry } from './registry/advisors-nav'
 import { ADVISORS_PAGE_SHORTCUT_IDS, advisorsPageRegistry } from './registry/advisors-page'
 import { API_KEYS_SHORTCUT_IDS, apiKeysRegistry } from './registry/api-keys'
+import {
+  AUDIT_LOG_DRAINS_SHORTCUT_IDS,
+  auditLogDrainsRegistry,
+} from './registry/audit-log-drains'
 import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
 import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
 import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
@@ -184,6 +188,7 @@ export const SHORTCUT_IDS = {
   ...API_KEYS_SHORTCUT_IDS,
   ...JWT_KEYS_SHORTCUT_IDS,
   ...LOG_DRAINS_SHORTCUT_IDS,
+  ...AUDIT_LOG_DRAINS_SHORTCUT_IDS,
 } as const
 
 /**
@@ -540,4 +545,5 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   ...apiKeysRegistry,
   ...jwtKeysRegistry,
   ...logDrainsRegistry,
+  ...auditLogDrainsRegistry,
 }

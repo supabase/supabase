@@ -43,6 +43,7 @@ describe('OrganizationSettingsLayout helpers', () => {
       'OAuth Apps',
       'Webhooks',
       'Audit Logs',
+      'Audit Log Drains',
       'Legal Documents',
     ])
     expect(
@@ -70,6 +71,7 @@ describe('OrganizationSettingsLayout helpers', () => {
       'OAuth Apps',
       'Webhooks',
       'Audit Logs',
+      'Audit Log Drains',
     ])
   })
 
@@ -108,6 +110,9 @@ describe('OrganizationSettingsLayout helpers', () => {
     expect(linkByKey('apps')?.shortcutId).toBe(SHORTCUT_IDS.NAV_ORG_SETTINGS_APPS)
     expect(linkByKey('webhooks')?.shortcutId).toBe(SHORTCUT_IDS.NAV_ORG_SETTINGS_WEBHOOKS)
     expect(linkByKey('audit')?.shortcutId).toBe(SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT)
+    expect(linkByKey('audit-log-drains')?.shortcutId).toBe(
+      SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT_LOG_DRAINS
+    )
     expect(linkByKey('documents')?.shortcutId).toBe(SHORTCUT_IDS.NAV_ORG_SETTINGS_DOCUMENTS)
   })
 
