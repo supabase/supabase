@@ -61,9 +61,7 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   })
 
   const populatedCategoryIds = new Set(
-    listings.flatMap((listing) =>
-      Array.isArray(listing.categories) ? listing.categories.map((c) => c.id) : []
-    )
+    listings.flatMap((listing) => listing.categories.map((c) => c.id))
   )
   const nonEmptyCategories = categories.filter(
     (category) => category.id && populatedCategoryIds.has(category.id)
