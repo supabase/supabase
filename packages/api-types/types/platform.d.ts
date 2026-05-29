@@ -687,6 +687,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/partners/{ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists installed marketplace integrations for the given project. */
+    get: operations['PartnerIntegrationsController_listIntegrations']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/partners/{ref}/{listing_slug}': {
     parameters: {
       query?: never
@@ -694,7 +711,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Gets the installation status of the given marketplace integration for the given project. */
+    get: operations['PartnerIntegrationsController_getIntegration']
     put?: never
     /** Creates a partner integration and returns the redirect URL */
     post: operations['PartnerIntegrationsController_createIntegration']
@@ -8337,6 +8355,21 @@ export interface components {
       organization_id: number
       overdue_invoice_count: number
     }
+    PartnerIntegrationListResponse: {
+      integrations: {
+        listing_slug: string
+        partner_links?: {
+          dashboard?: string
+          manage?: string
+        }
+        /** @enum {string} */
+        status: 'installing' | 'ready' | 'error'
+        user_alert?: {
+          message: string
+        }
+        version?: string
+      }[]
+    }
     PartnerIntegrationsResponse: {
       /**
        * Format: date-time
@@ -8353,6 +8386,21 @@ export interface components {
        * @description URL to redirect the user's browser to
        */
       redirectUrl: string
+    }
+    PartnerIntegrationStatusResponse: {
+      install_state?: {
+        partner_links?: {
+          dashboard?: string
+          manage?: string
+        }
+        /** @enum {string} */
+        status: 'installing' | 'ready' | 'error'
+        user_alert?: {
+          message: string
+        }
+        version?: string
+      }
+      installed: boolean
     }
     PauseStatusResponse: {
       can_restore: boolean
@@ -14073,6 +14121,108 @@ export interface operations {
       }
       /** @description Failed to get GitHub repository branch */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PartnerIntegrationsController_listIntegrations: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationListResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PartnerIntegrationsController_getIntegration: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The slug of the listing in the marketplace database */
+        listing_slug: string
+        /** @description Supabase project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationStatusResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }

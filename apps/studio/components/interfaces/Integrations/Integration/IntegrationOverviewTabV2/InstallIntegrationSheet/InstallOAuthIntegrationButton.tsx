@@ -6,6 +6,7 @@ import { Button } from 'ui'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useInstallOAuthIntegrationMutation } from '@/data/marketplace/install-oauth-integration-mutation'
+import { usePartnerIntegrationsQuery } from '@/data/partners/integration-status-query'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -24,6 +25,9 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
     integration.installIdentificationMethod === 'edge_function_secret_name' &&
     !!integration.edgeFunctionSecretName
 
+  const requiresPartnerIntegrationsCheck =
+    integration.installIdentificationMethod === 'callback_status'
+
   const { data: apiKeys, isLoading: isApiKeysLoading } = useAPIKeysQuery(
     { projectRef, reveal: false },
     { enabled: requiresApiKeysCheck }
@@ -33,6 +37,9 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
     { projectRef },
     { enabled: requiresEdgeFunctionSecretsCheck }
   )
+
+  const { data: partnerIntegrations, isPending: isPartnerIntegrationsLoading } =
+    usePartnerIntegrationsQuery({ projectRef }, { enabled: requiresPartnerIntegrationsCheck })
 
   const { mutate: installOAuthIntegration, isPending: isInstalling } =
     useInstallOAuthIntegrationMutation({
@@ -51,7 +58,8 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
 
   const isLoading =
     (requiresApiKeysCheck && isApiKeysLoading) ||
-    (requiresEdgeFunctionSecretsCheck && isEdgeFunctionSecretsLoading)
+    (requiresEdgeFunctionSecretsCheck && isEdgeFunctionSecretsLoading) ||
+    (requiresPartnerIntegrationsCheck && isPartnerIntegrationsLoading)
 
   const isIntegrationInstalled = useMemo(() => {
     if (!integration) return false
@@ -68,8 +76,23 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
       return edgeFunctionSecrets.some((secret) => secret.name === secretName)
     }
 
+    if (integration.installIdentificationMethod === 'callback_status') {
+      if (isPartnerIntegrationsLoading || !partnerIntegrations) return false
+      return partnerIntegrations.some(
+        (i) => i.listing_slug === integration.id && i.status === 'ready'
+      )
+    }
+
     return false
-  }, [apiKeys, edgeFunctionSecrets, integration, isApiKeysLoading, isEdgeFunctionSecretsLoading])
+  }, [
+    apiKeys,
+    edgeFunctionSecrets,
+    partnerIntegrations,
+    integration,
+    isApiKeysLoading,
+    isEdgeFunctionSecretsLoading,
+    isPartnerIntegrationsLoading,
+  ])
 
   const handleInstallClick = async () => {
     if (!integration || !projectRef) return

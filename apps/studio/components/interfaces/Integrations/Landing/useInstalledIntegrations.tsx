@@ -9,8 +9,9 @@ import {
 import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { usePartnerIntegrationsQuery } from '@/data/partners/integration-status-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from '@/lib/void'
@@ -44,6 +45,14 @@ export const useInstalledIntegrations = () => {
     )
   }, [allIntegrations])
 
+  const hasCallbackStatusIntegration = useMemo(() => {
+    return allIntegrations.some(
+      (integration) =>
+        integration.type === 'oauth' &&
+        integration.installIdentificationMethod === 'callback_status'
+    )
+  }, [allIntegrations])
+
   const {
     data: apiKeys = EMPTY_ARR,
     error: apiKeysError,
@@ -64,6 +73,17 @@ export const useInstalledIntegrations = () => {
   } = useSecretsQuery(
     { projectRef: project?.ref },
     { enabled: hasEdgeFunctionSecretNameIntegration }
+  )
+
+  const {
+    data: partnerIntegrations = EMPTY_ARR,
+    error: partnerIntegrationsError,
+    isError: isErrorPartnerIntegrations,
+    isLoading: isPartnerIntegrationsLoading,
+    isSuccess: isSuccessPartnerIntegrations,
+  } = usePartnerIntegrationsQuery(
+    { projectRef: project?.ref },
+    { enabled: hasCallbackStatusIntegration }
   )
 
   const {
@@ -115,12 +135,26 @@ export const useInstalledIntegrations = () => {
           return hasRequiredExtensions({ integration, extensions })
         }
         if (integration.type === 'oauth') {
-          return isOAuthInstalled({ integration, apiKeys, secrets: edgeFunctionSecrets })
+          return isOAuthInstalled({
+            integration,
+            apiKeys,
+            partnerIntegrations,
+            secrets: edgeFunctionSecrets,
+          })
         }
         return false
       })
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, apiKeys, edgeFunctionSecrets])
+  }, [
+    allIntegrations,
+    wrappers,
+    extensions,
+    schemas,
+    isHooksEnabled,
+    apiKeys,
+    edgeFunctionSecrets,
+    partnerIntegrations,
+  ])
 
   const error =
     fdwError ||
@@ -128,28 +162,32 @@ export const useInstalledIntegrations = () => {
     schemasError ||
     availableIntegrationsError ||
     (hasSecretKeyPrefixIntegration ? apiKeysError : null) ||
-    (hasEdgeFunctionSecretNameIntegration ? edgeFunctionSecretsError : null)
+    (hasEdgeFunctionSecretNameIntegration ? edgeFunctionSecretsError : null) ||
+    (hasCallbackStatusIntegration ? partnerIntegrationsError : null)
   const isLoading =
     isSchemasLoading ||
     isFDWLoading ||
     isExtensionsLoading ||
     isAvailableIntegrationsLoading ||
     (hasSecretKeyPrefixIntegration && isApiKeysLoading) ||
-    (hasEdgeFunctionSecretNameIntegration && isEdgeFunctionSecretsLoading)
+    (hasEdgeFunctionSecretNameIntegration && isEdgeFunctionSecretsLoading) ||
+    (hasCallbackStatusIntegration && isPartnerIntegrationsLoading)
   const isError =
     isErrorFDWs ||
     isErrorExtensions ||
     isErrorSchemas ||
     isErrorAvailableIntegrations ||
     (hasSecretKeyPrefixIntegration && isErrorApiKeys) ||
-    (hasEdgeFunctionSecretNameIntegration && isErrorEdgeFunctionSecrets)
+    (hasEdgeFunctionSecretNameIntegration && isErrorEdgeFunctionSecrets) ||
+    (hasCallbackStatusIntegration && isErrorPartnerIntegrations)
   const isSuccess =
     isSuccessFDWs &&
     isSuccessExtensions &&
     isSuccessSchemas &&
     isSuccessAvailableIntegrations &&
     (!hasSecretKeyPrefixIntegration || isSuccessApiKeys) &&
-    (!hasEdgeFunctionSecretNameIntegration || isSuccessEdgeFunctionSecrets)
+    (!hasEdgeFunctionSecretNameIntegration || isSuccessEdgeFunctionSecrets) &&
+    (!hasCallbackStatusIntegration || isSuccessPartnerIntegrations)
 
   return {
     // show all integrations at once instead of showing partial results
