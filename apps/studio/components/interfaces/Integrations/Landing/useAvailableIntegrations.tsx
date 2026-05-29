@@ -15,6 +15,29 @@ import {
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
+const renderMarketplaceLogo = (listingLogo?: string | null) => {
+  const MarketplaceLogo = ({ className, ...props }: { className?: string } = {}) => (
+    <div className="relative w-full h-full">
+      {listingLogo ? (
+        <Image
+          fill
+          src={fullImageUrl(listingLogo)}
+          alt=""
+          className={cn('p-2', className)}
+          {...props}
+        />
+      ) : (
+        <Boxes className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      )}
+    </div>
+  )
+  return MarketplaceLogo
+}
+
+function isForeignDataWrapper(integration: MarketplaceIntegration) {
+  return integration.categories.some((c) => c?.slug === 'foreign-data-wrapper')
+}
+
 /**
  * [Joshen] Returns a combination of
  * - Marketplace integrations retrieved remotely (Only if feature flag enabled)
@@ -32,29 +55,6 @@ export const useAvailableIntegrations = () => {
   const isPending = IS_PLATFORM && (!hasLoaded || (isMarketplaceEnabled && !data && !error))
   const isSuccess = !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!data && !error)))
   const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
-
-  const renderMarketplaceLogo = (listingLogo?: string | null) => {
-    const MarketplaceLogo = ({ className, ...props }: { className?: string } = {}) => (
-      <div className="relative w-full h-full">
-        {listingLogo ? (
-          <Image
-            fill
-            src={fullImageUrl(listingLogo)}
-            alt=""
-            className={cn('p-2', className)}
-            {...props}
-          />
-        ) : (
-          <Boxes className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
-        )}
-      </div>
-    )
-    MarketplaceLogo.displayName = 'MarketplaceLogo'
-    return MarketplaceLogo
-  }
-
-  const isForeignDataWrapper = (integration: MarketplaceIntegration) =>
-    integration.categories.some((c) => c?.slug === 'foreign-data-wrapper')
 
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
