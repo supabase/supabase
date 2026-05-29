@@ -47,6 +47,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
         {
           slug: partner.slug,
           label: 'Overview',
+          publishedInMarketplace: false,
           content: partner.content,
           installUrl: partner.installUrl,
           docsUrl: partner.docsUrl,
@@ -63,8 +64,10 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
   const activeListing = allListings.find((l) => l.slug === activeSlug) ?? allListings[0]
   const activeTabIndex = allListings.indexOf(activeListing)
   const activeOverview = serializedListings[activeTabIndex] ?? serializedListings[0]
-  // Prefer the Supabase dashboard integration URL for marketplace integrations.
-  const installHref = activeListing.dashboardUrl ?? activeListing.installUrl
+  // Marketplace integrations link to the Supabase dashboard; others use installUrl if provided.
+  const installHref = activeListing.publishedInMarketplace
+    ? activeListing.dashboardUrl
+    : activeListing.installUrl
 
   return (
     <>
@@ -127,7 +130,9 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
               {installHref && (
                 <Button asChild size="medium">
                   <a href={installHref} target="_blank" rel="noreferrer">
-                    Add integration
+                    {activeListing.publishedInMarketplace
+                      ? 'Install integration'
+                      : 'Add integration'}
                   </a>
                 </Button>
               )}

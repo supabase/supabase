@@ -36,6 +36,31 @@ const URL_SLUG_TO_LISTING: Record<string, string> = Object.fromEntries(
   Object.entries(SUPABASE_LISTING_OVERRIDES).map(([listingSlug, { slug }]) => [slug, listingSlug])
 )
 
+const MARKETPLACE_SLUGS = [
+  'aikido',
+  'aikido-security',
+  'bigquery-wrapper',
+  'doppler',
+  'firebase-wrapper',
+  'grafana',
+  'resend',
+  'stripe-wrapper',
+]
+
+/** Returns true if a listing is in the Supabase Marketplace. */
+export function isMarketplaceListing(listing: Listing): boolean {
+  if (MARKETPLACE_SLUGS.includes(listing.slug)) return true
+  return false
+}
+
+/** Returns true if a listing is a Foreign Data Wrapper (FDW). */
+function isFdwListing(listing: Listing): boolean {
+  return !!listing.categories?.some(
+    (c) =>
+      c.name.toLowerCase().includes('foreign data wrapper') || c.slug.toLowerCase().includes('fdw')
+  )
+}
+
 /** Deduplicates and merges categories from across all of a partner's listings. */
 function aggregateCategories(listings: Listing[]): Category[] {
   const seen = new Map<string, Category>()
@@ -87,7 +112,8 @@ function buildPartner(row: MarketplacePartnerRow, listings: Listing[]): Partner 
     categories: aggregateCategories(listings),
     featured: listings.some((l) => l.featured),
     publishedInCatalog: listings.some((l) => !!l.publish_marketplace),
-    publishedInMarketplace: listings.some((l) => !!l.publish_dashboard),
+    // FDW listings count as "Available in Marketplace" even without publish_dashboard.
+    publishedInMarketplace: listings.some((l) => !!l.publish_dashboard || isMarketplaceListing(l)),
   }
 }
 
@@ -165,11 +191,7 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
  */
 function getLabelForListing(listing: Listing): string {
   if (listing.publish_dashboard) return 'Marketplace Integration'
-  const isFdw = listing.categories?.some(
-    (c) =>
-      c.name.toLowerCase().includes('foreign data wrapper') || c.slug.toLowerCase().includes('fdw')
-  )
-  if (isFdw) return 'Foreign Data Wrapper'
+  if (isFdwListing(listing)) return 'Foreign Data Wrapper'
   if (listing.marketplace_url) return 'Integration'
   return 'Guide'
 }
@@ -213,10 +235,12 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
           slug: listing.slug,
           label: getLabelForListing(listing),
           content: listing.content,
+          publishedInMarketplace: listing.publish_dashboard || isMarketplaceListing(listing),
           installUrl: listing.marketplace_url ?? null,
-          dashboardUrl: listing.publish_dashboard
-            ? `https://supabase.com/dashboard/project/_/integrations/${listing.slug}/overview`
-            : null,
+          dashboardUrl:
+            listing.publish_dashboard || isMarketplaceListing(listing)
+              ? `https://supabase.com/dashboard/project/_/integrations/${isFdwListing(listing) ? listing.slug.replaceAll('-', '_') : listing.slug}/overview`
+              : null,
           docsUrl: listing.documentation_url || null,
           images: listing.images?.map(fullImageUrl) ?? [],
           youtubeId: listing.youtube_id ?? null,
@@ -239,7 +263,12 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
     slug: listing.slug,
     label: getLabelForListing(listing),
     content: listing.content,
+    publishedInMarketplace: listing.publish_dashboard || isMarketplaceListing(listing),
     installUrl: listing.marketplace_url ?? null,
+    dashboardUrl:
+      listing.publish_dashboard || isMarketplaceListing(listing)
+        ? `https://supabase.com/dashboard/project/_/integrations/${isFdwListing(listing) ? listing.slug.replaceAll('-', '_') : listing.slug}/overview`
+        : null,
     docsUrl: listing.documentation_url || null,
     images: listing.images?.map(fullImageUrl) ?? [],
     youtubeId: listing.youtube_id ?? null,

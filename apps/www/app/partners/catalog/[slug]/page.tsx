@@ -5,7 +5,7 @@ import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import type { Metadata } from 'next'
 import { serialize } from 'next-mdx-remote-client/serialize'
 import { notFound } from 'next/navigation'
-import { cache } from 'react'
+import { cache, Suspense } from 'react'
 import remarkGfm from 'remark-gfm'
 
 import PartnerCatalogDetail from './PartnerCatalogDetail'
@@ -57,6 +57,7 @@ export default async function PartnerCatalogPage({ params }: { params: Promise<P
         {
           slug: partner.slug,
           label: 'Overview',
+          publishedInMarketplace: false,
           content: partner.content,
           installUrl: partner.installUrl,
           docsUrl: partner.docsUrl,
@@ -78,5 +79,9 @@ export default async function PartnerCatalogPage({ params }: { params: Promise<P
     )
   )
 
-  return <PartnerCatalogDetail partner={partner} serializedListings={serializedListings} />
+  return (
+    <Suspense>
+      <PartnerCatalogDetail partner={partner} serializedListings={serializedListings} />
+    </Suspense>
+  )
 }

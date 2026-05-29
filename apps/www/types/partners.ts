@@ -11,6 +11,7 @@ export type ListingDetail = {
   slug: string
   label: string
   content: string
+  publishedInMarketplace: boolean
   installUrl: string | null
   dashboardUrl?: string | null
   docsUrl: string | null
