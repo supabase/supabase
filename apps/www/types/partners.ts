@@ -46,8 +46,8 @@ export function toPartner(dbPartner: DbPartner): Partner {
   return {
     categories: [{ name: category, slug: category.toLowerCase() }],
     featured: featured ?? false,
-    publishedInCatalog: false,
-    publishedInMarketplace: false,
+    publishedInCatalog: false, // has at least one listing shown on the partner catalog page
+    publishedInMarketplace: false, // has at least one one-click-installable listing in the dashboard
     type,
     slug,
     title,

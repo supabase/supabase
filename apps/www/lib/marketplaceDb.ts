@@ -1,4 +1,4 @@
-import { toPartner as miscDbToPartner, Partner } from '~/types/partners'
+import { toPartner as miscDbToPartner, Partner, type Category } from '~/types/partners'
 import { createMarketplaceClient, fullImageUrl, type Listing } from 'common/marketplace-client'
 
 import supabase from './supabaseMisc'
@@ -11,101 +11,139 @@ const isUseMarketplaceDb =
 
 const marketplaceClient = createMarketplaceClient()
 
-function toPartner(listing: Listing): Partner {
-  const {
-    categories,
-    featured,
-    slug,
-    title,
-    partner_name,
-    description,
-    content,
-    website_url,
-    documentation_url,
-    marketplace_url,
-    listing_logo,
-    images,
-    youtube_id,
-    publish_dashboard,
-  } = listing
+/** Deduplicates and merges categories from across all of a partner's listings. */
+function aggregateCategories(listings: Listing[]): Category[] {
+  const seen = new Map<string, Category>()
+  for (const listing of listings) {
+    for (const cat of listing.categories ?? []) {
+      if (!seen.has(cat.slug)) seen.set(cat.slug, { name: cat.name, slug: cat.slug })
+    }
+  }
+  return Array.from(seen.values())
+}
+
+/**
+ * Picks the listing to use for narrative content (description, docs, images…).
+ * Prefers a marketplace-published listing, then a dashboard-published one, then any.
+ */
+function selectPrimaryListing(listings: Listing[]): Listing | undefined {
+  return (
+    listings.find((l) => l.publish_marketplace) ??
+    listings.find((l) => l.publish_dashboard) ??
+    listings[0]
+  )
+}
+
+type MarketplacePartnerRow = {
+  slug: string
+  name: string | null
+  description: string | null
+  logo: string | null
+  website: string | null
+  type: 'technology' | 'expert' | null
+}
+
+function buildPartner(row: MarketplacePartnerRow, listings: Listing[]): Partner {
+  const primary = selectPrimaryListing(listings)
   return {
-    categories,
-    featured,
-    publishedInCatalog: !!marketplace_url,
-    publishedInMarketplace: !!publish_dashboard,
-    // The view definition only returns tech partners
-    type: 'technology',
-    slug,
-    title,
-    partnerName: partner_name,
-    description,
-    content,
-    websiteUrl: website_url,
-    docsUrl: documentation_url,
-    installUrl: marketplace_url,
-    logo: fullImageUrl(listing_logo),
-    images: images?.map(fullImageUrl) ?? [],
-    youtubeId: youtube_id,
+    slug: row.slug,
+    title: row.name ?? primary?.partner_name ?? '',
+    partnerName: row.name ?? primary?.partner_name ?? '',
+    description: row.description ?? primary?.description ?? '',
+    content: primary?.content ?? '',
+    websiteUrl: row.website ?? primary?.website_url ?? '',
+    docsUrl: primary?.documentation_url || null,
+    installUrl: primary?.marketplace_url ?? null,
+    // Prefer the company logo, fall back to the listing's partner logo, then listing logo
+    logo: fullImageUrl(row.logo ?? primary?.partner_logo ?? primary?.listing_logo ?? ''),
+    images: primary?.images?.map(fullImageUrl) ?? [],
+    youtubeId: primary?.youtube_id ?? null,
+    type: row.type ?? 'technology',
+    categories: aggregateCategories(listings),
+    featured: listings.some((l) => l.featured),
+    publishedInCatalog: listings.some((l) => !!l.publish_marketplace),
+    publishedInMarketplace: listings.some((l) => !!l.publish_dashboard),
   }
-}
-
-async function getPartnerListings(): Promise<Partner[]> {
-  const { data } = await marketplaceClient
-    .from('listings')
-    .select('*')
-    .is('publish_marketplace', true)
-
-  return data?.map(toPartner) ?? []
 }
 
 /**
- * Lists all partner marketplace entries for the public website, from the configured database.
+ * Marketplace DB: list all partners and related listings
  */
-export async function listPartners(): Promise<Partner[]> {
-  if (isUseMarketplaceDb) {
-    return getPartnerListings()
-  } else {
-    const { data } = await supabase
-      .from('partners')
-      .select('*')
-      .eq('approved', true)
-      .eq('type', 'technology')
-      .order('category')
-      .order('title')
+async function getPartnersFromMarketplace(): Promise<Partner[]> {
+  const [{ data: partnersData }, { data: listingsData }] = await Promise.all([
+    marketplaceClient.from('partners').select('*'),
+    marketplaceClient.from('listings').select('*'),
+  ])
 
-    return data?.map(miscDbToPartner) ?? []
+  if (!partnersData?.length) return []
+
+  const byPartnerSlug = new Map<string, Listing[]>()
+  for (const listing of listingsData ?? []) {
+    const slug = listing.partner_slug
+    if (!slug) continue
+    const arr = byPartnerSlug.get(slug) ?? []
+    arr.push(listing)
+    byPartnerSlug.set(slug, arr)
   }
-}
 
-async function getPartnerListingSlugs(): Promise<string[]> {
-  const { data } = await marketplaceClient
-    .from('listings')
-    .select('slug')
-    .is('publish_marketplace', true)
-
-  return data?.map((row) => row.slug) ?? []
+  return partnersData.flatMap((p) => {
+    const slug = p.slug
+    if (!slug) return []
+    return [
+      buildPartner(
+        {
+          slug,
+          name: p.name,
+          description: p.description,
+          logo: p.logo,
+          website: p.website,
+          type: p.type,
+        },
+        byPartnerSlug.get(slug) ?? []
+      ),
+    ]
+  })
 }
 
 /**
- * Lists all available partner marketplace listing slugs, from the configured database.
+ * Marketplace DB: get a single partner by partner slug
  */
-export async function listPartnerSlugs(): Promise<string[]> {
-  if (isUseMarketplaceDb) {
-    return getPartnerListingSlugs()
-  } else {
-    const { data } = await supabase
-      .from('partners')
-      .select('slug')
-      .eq('approved', true)
-      .eq('type', 'technology')
+async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> {
+  const [{ data: partnerData }, { data: listingsData }] = await Promise.all([
+    marketplaceClient.from('partners').select('*').eq('slug', slug).maybeSingle(),
+    marketplaceClient.from('listings').select('*').eq('partner_slug', slug),
+  ])
 
-    return data?.map((row) => row.slug) ?? []
-  }
+  const partnerSlug = partnerData?.slug
+  if (!partnerSlug) return null
+
+  return buildPartner(
+    {
+      slug: partnerSlug,
+      name: partnerData.name,
+      description: partnerData.description,
+      logo: partnerData.logo,
+      website: partnerData.website,
+      type: partnerData.type,
+    },
+    listingsData ?? []
+  )
 }
 
-async function searchPartnerListings(search: string): Promise<Partner[] | null> {
+/**
+ * Marketplace DB: list all partner slugs (for static path generation)
+ */
+async function getPartnerSlugsFromMarketplace(): Promise<string[]> {
+  const { data } = await marketplaceClient.from('partners').select('slug')
+  return data?.flatMap((row) => (row.slug ? [row.slug] : [])) ?? []
+}
+
+/**
+ * Marketplace DB: search (returns one result per partner, not per listing)
+ */
+async function searchPartnersFromMarketplace(search: string): Promise<Partner[] | null> {
   const searchTerm = search.trim()
-  let query = marketplaceClient.from('listings').select('*').is('publish_marketplace', true)
+  let query = marketplaceClient.from('listings').select('*')
 
   if (searchTerm) {
     const searchPattern = `%${searchTerm}%`
@@ -121,15 +159,82 @@ async function searchPartnerListings(search: string): Promise<Partner[] | null> 
     return null
   }
 
-  return data?.map(toPartner) ?? []
+  // Group matched listings by partner, then build one Partner per company
+  const byPartnerSlug = new Map<string, Listing[]>()
+  for (const listing of data ?? []) {
+    const slug = listing.partner_slug
+    if (!slug) continue
+    const arr = byPartnerSlug.get(slug) ?? []
+    arr.push(listing)
+    byPartnerSlug.set(slug, arr)
+  }
+
+  return Array.from(byPartnerSlug.entries()).map(([slug, listings]) => {
+    const first = listings[0]
+    return buildPartner(
+      {
+        slug,
+        name: first.partner_name,
+        description: first.description,
+        logo: first.partner_logo ?? first.listing_logo,
+        website: first.website_url,
+        type: 'technology',
+      },
+      listings
+    )
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+/**
+ * Lists all partner marketplace entries for the public website, from the configured database.
+ * Returns one entry per partner company, with categories and marketplace flags aggregated
+ * across all of that partner's listings.
+ */
+export async function listPartners(): Promise<Partner[]> {
+  if (isUseMarketplaceDb) {
+    return getPartnersFromMarketplace()
+  } else {
+    const { data } = await supabase
+      .from('partners')
+      .select('*')
+      .eq('approved', true)
+      .eq('type', 'technology')
+      .order('category')
+      .order('title')
+
+    return data?.map(miscDbToPartner) ?? []
+  }
 }
 
 /**
- * Searches for partner marketplace listings, from the configured database.
+ * Lists all available partner slugs, from the configured database.
+ * Used for static path generation on the partner detail pages.
+ */
+export async function listPartnerSlugs(): Promise<string[]> {
+  if (isUseMarketplaceDb) {
+    return getPartnerSlugsFromMarketplace()
+  } else {
+    const { data } = await supabase
+      .from('partners')
+      .select('slug')
+      .eq('approved', true)
+      .eq('type', 'technology')
+
+    return data?.map((row) => row.slug) ?? []
+  }
+}
+
+/**
+ * Searches for partners, from the configured database.
+ * Returns one result per partner company (not per listing).
  */
 export async function searchPartners(search: string): Promise<Partner[] | null> {
   if (isUseMarketplaceDb) {
-    return searchPartnerListings(search)
+    return searchPartnersFromMarketplace(search)
   } else {
     const searchTerm = search.trim()
     let query = supabase
@@ -155,25 +260,15 @@ export async function searchPartners(search: string): Promise<Partner[] | null> 
   }
 }
 
-async function getPartnerListing(slug: string): Promise<Partner | null> {
-  const { data } = await marketplaceClient
-    .from('listings')
-    .select('*')
-    .eq('slug', slug)
-    .is('publish_marketplace', true)
-    .single()
-
-  return data ? toPartner(data) : null
-}
-
 /**
  * Get a single partner by slug, from the configured database.
+ * For the marketplace DB, slug is the partner slug (not a listing slug).
  */
 export async function getPartner(slug: string): Promise<Partner | null> {
   if (isUseMarketplaceDb) {
-    return getPartnerListing(slug)
+    return getPartnerFromMarketplace(slug)
   } else {
-    let { data } = await supabase
+    const { data } = await supabase
       .from('partners')
       .select('*')
       .eq('type', 'technology')

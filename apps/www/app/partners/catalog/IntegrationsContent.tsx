@@ -81,14 +81,18 @@ export default function IntegrationsContent({
 
   const filtered = oneClickOnly ? partnerFiltered.filter(availableInMarketplace) : partnerFiltered
 
-  const featuredPartners = filtered.filter((p) => p.featured)
+  const featuredPartners = filtered
+    .filter((p) => p.featured)
+    .sort((a, b) => {
+      if (a.publishedInMarketplace === b.publishedInMarketplace) {
+        return a.title.localeCompare(b.title)
+      }
+      return a.publishedInMarketplace ? -1 : 1
+    })
   const listPartners = HAS_ACTIVE_FILTERS
     ? [...filtered.filter((p) => p.featured), ...filtered.filter((p) => !p.featured)]
     : filtered.filter((p) => !p.featured)
   const showFeatured = !HAS_ACTIVE_FILTERS && featuredPartners.length > 0
-  const totalCount = showFeatured
-    ? featuredPartners.length + listPartners.length
-    : listPartners.length
 
   return (
     <DefaultLayout>
@@ -210,7 +214,7 @@ export default function IntegrationsContent({
                     <Link
                       key={p.slug}
                       href={`/partners/catalog/${p.slug}`}
-                      className="group flex h-full flex-col gap-3 rounded-xl border bg-surface-100 p-5 transition-colors hover:bg-surface-200"
+                      className="group flex h-full flex-col gap-3 rounded-xl border bg-surface-100 p-5 transition-colors hover:bg-surface-200 overflow-hidden"
                     >
                       <div className="flex items-center gap-3">
                         <div className="relative size-10 shrink-0 rounded-full overflow-hidden bg-muted">
@@ -226,16 +230,16 @@ export default function IntegrationsContent({
                           <h3 className="text-foreground text-base font-medium tracking-tight">
                             {p.title}
                           </h3>
-                          <div className="flex items-center gap-1">
-                            {p.categories.map((c) => (
-                              <Badge key={c.name}>{c.name}</Badge>
-                            ))}
-                          </div>
                         </div>
                       </div>
                       <p className="text-foreground-lighter text-sm line-clamp-3 text-pretty">
                         {p.description}
                       </p>
+                      <div className="flex flex-wrap items-center gap-1">
+                        {p.categories.map((c) => (
+                          <Badge key={c.name}>{c.name}</Badge>
+                        ))}
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -308,12 +312,7 @@ export default function IntegrationsContent({
                           </p>
                           <div className="flex flex-wrap items-center gap-1 mt-1">
                             {p.categories.map((c) => (
-                              <span
-                                key={c.name}
-                                className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
-                              >
-                                {c.name}
-                              </span>
+                              <Badge key={c.name}>{c.name}</Badge>
                             ))}
                           </div>
                         </div>
@@ -353,12 +352,7 @@ export default function IntegrationsContent({
                           </span>
                           <div className="flex items-center gap-1">
                             {p.categories.map((c) => (
-                              <span
-                                key={c.name}
-                                className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
-                              >
-                                {c.name}
-                              </span>
+                              <Badge key={c.name}>{c.name}</Badge>
                             ))}
                           </div>
                         </div>
