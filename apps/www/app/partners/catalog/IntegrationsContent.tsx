@@ -10,6 +10,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   BadgeCheck,
+  Filter,
   LayoutGrid,
   List,
   Loader,
@@ -26,7 +27,20 @@ import {
   useQueryStates,
 } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
-import { Badge, Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  cn,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from 'ui'
 import { useDebounce } from 'use-debounce'
 
 interface Props {
@@ -105,6 +119,8 @@ export default function IntegrationsContent({
 
   const HAS_ACTIVE_FILTERS =
     search.trim() !== '' || selectedCategories.length > 0 || partnerOnly || oneClickOnly
+  const activeFilterCount =
+    selectedCategories.length + (partnerOnly ? 1 : 0) + (oneClickOnly ? 1 : 0)
 
   const categoryFiltered =
     selectedCategories.length > 0
@@ -130,6 +146,70 @@ export default function IntegrationsContent({
     : filtered.filter((p) => !p.featured)
   const showFeatured = !HAS_ACTIVE_FILTERS && featuredPartners.length > 0
 
+  // Shared filter UI — rendered in both the desktop sidebar and the mobile bottom sheet.
+  // Uses wrapping <label> elements (no id/htmlFor) to avoid duplicate HTML IDs in the DOM.
+  const filtersPanel = (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2.5">
+        <h2 className="text-xs font-mono uppercase text-foreground-lighter">Categories</h2>
+        {allCategories.map((category) => {
+          const Icon = getCategoryIcon(category.slug)
+          return (
+            <label
+              key={category.slug}
+              className="flex cursor-pointer items-center justify-between gap-3 text-foreground-light transition-colors hover:text-foreground"
+            >
+              <span className="flex flex-1 items-center gap-2 text-sm text-left">
+                <Icon size={13} className="shrink-0 text-foreground-lighter" />
+                {category.name}
+              </span>
+              <Checkbox
+                checked={selectedCategories.includes(category.slug)}
+                onCheckedChange={() => handleCategoryChange(category.slug)}
+                className="[&_input]:m-0"
+              />
+            </label>
+          )
+        })}
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-muted pt-4">
+        <label className="flex cursor-pointer items-center justify-between gap-3 text-foreground-light transition-colors hover:text-foreground">
+          <span className="flex flex-1 items-center gap-2 text-sm text-left">
+            <BadgeCheck size={13} className="shrink-0 text-foreground-lighter" />
+            Official Partners
+          </span>
+          <Checkbox
+            checked={partnerOnly}
+            onCheckedChange={(checked) => setFilters({ partner: !!checked })}
+            className="[&_input]:m-0"
+          />
+        </label>
+        <label className="flex cursor-pointer items-center justify-between gap-3 text-foreground-light transition-colors hover:text-foreground">
+          <span className="flex flex-1 items-center gap-2 text-sm text-left">
+            <Store size={13} className="shrink-0 text-foreground-lighter" />
+            Available in Marketplace
+          </span>
+          <Checkbox
+            checked={oneClickOnly}
+            onCheckedChange={(checked) => setFilters({ marketplace: !!checked })}
+            className="[&_input]:m-0"
+          />
+        </label>
+      </div>
+
+      {HAS_ACTIVE_FILTERS && (
+        <Button
+          block
+          type="dashed"
+          onClick={() => setFilters({ cat: [], partner: false, marketplace: false, q: '' })}
+        >
+          Clear all filters
+        </Button>
+      )}
+    </div>
+  )
+
   return (
     <DefaultLayout>
       <SectionContainer>
@@ -154,99 +234,52 @@ export default function IntegrationsContent({
           {/* Left sidebar — sticky search + filters */}
           <div className="relative w-full h-full">
             <div className="mb-4 flex flex-col gap-4 sticky top-20">
-              <InputGroup className="w-full">
-                <InputGroupAddon>
-                  <Search />
-                </InputGroupAddon>
-                <InputGroupInput
-                  size="small"
-                  autoComplete="off"
-                  type="search"
-                  placeholder="Search partners"
-                  value={search}
-                  onChange={(e) => setFilters({ q: e.target.value })}
-                />
-                {isSearching && (
-                  <InputGroupAddon align="inline-end">
-                    <Loader size={14} className="animate-spin" />
+              {/* Search bar + mobile filter trigger */}
+              <div className="flex gap-2">
+                <InputGroup className="flex-1">
+                  <InputGroupAddon>
+                    <Search />
                   </InputGroupAddon>
-                )}
-              </InputGroup>
+                  <InputGroupInput
+                    size="small"
+                    autoComplete="off"
+                    type="search"
+                    placeholder="Search partners"
+                    value={search}
+                    onChange={(e) => setFilters({ q: e.target.value })}
+                  />
+                  {isSearching && (
+                    <InputGroupAddon align="inline-end">
+                      <Loader size={14} className="animate-spin" />
+                    </InputGroupAddon>
+                  )}
+                </InputGroup>
 
-              <div className="hidden md:flex flex-col gap-4">
-                <h2 className="text-xs text-foreground-lighter font-mono uppercase">Categories:</h2>
-                <div className="flex flex-col gap-3">
-                  {allCategories.map((category) => {
-                    const Icon = getCategoryIcon(category.slug)
-                    return (
-                      <div
-                        key={category.slug}
-                        className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! transition-colors"
-                      >
-                        <label
-                          htmlFor={`cat-${category.slug}`}
-                          className="text-sm leading-none! flex-1 text-left flex items-center gap-1.5"
-                        >
-                          <Icon size={14} className="shrink-0 text-foreground-lighter" />
-                          {category.name}
-                        </label>
-                        <Checkbox
-                          id={`cat-${category.slug}`}
-                          checked={selectedCategories.includes(category.slug)}
-                          onCheckedChange={() => handleCategoryChange(category.slug)}
-                          className="[&_input]:m-0"
-                        />
+                {/* Mobile-only: opens bottom sheet with filters */}
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button type="default" size="small" className="shrink-0 md:hidden flex">
+                      <div className="flex gap-1.5 items-center text-foreground-lighter hover:text-foreground">
+                        <Filter size={14} />
+                        {activeFilterCount > 0 && (
+                          <span className="flex items-center justify-center text-xs text-foreground-light">
+                            {activeFilterCount}
+                          </span>
+                        )}
                       </div>
-                    )
-                  })}
-                </div>
-
-                <div className="border-t border-muted pt-4 flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! transition-colors">
-                    <label
-                      htmlFor="partner-only"
-                      className="text-sm leading-none! flex-1 text-left flex items-center gap-1.5"
-                    >
-                      <BadgeCheck size={14} className="shrink-0 text-foreground-lighter" />
-                      Official Partners
-                    </label>
-                    <Checkbox
-                      id="partner-only"
-                      checked={partnerOnly}
-                      onCheckedChange={(checked) => setFilters({ partner: !!checked })}
-                      className="[&_input]:m-0"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! transition-colors">
-                    <label
-                      htmlFor="one-click"
-                      className="text-sm leading-none! flex-1 text-left flex items-center gap-1.5"
-                    >
-                      <Store size={14} className="shrink-0 text-foreground-lighter" />
-                      Available in Marketplace
-                    </label>
-                    <Checkbox
-                      id="one-click"
-                      checked={oneClickOnly}
-                      onCheckedChange={(checked) => setFilters({ marketplace: !!checked })}
-                      className="[&_input]:m-0"
-                    />
-                  </div>
-                </div>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="flex h-screen max-h-[85dvh] flex-col">
+                    <SheetHeader className="px-4 py-3.5">
+                      <SheetTitle className="text-sm text-left">Filter partners</SheetTitle>
+                    </SheetHeader>
+                    <div className="flex-1 overflow-y-auto p-4">{filtersPanel}</div>
+                  </SheetContent>
+                </Sheet>
               </div>
 
-              <Button
-                tabIndex={HAS_ACTIVE_FILTERS ? 0 : -1}
-                block
-                type="dashed"
-                onClick={() => setFilters({ cat: [], partner: false, marketplace: false, q: '' })}
-                className={cn(
-                  'opacity-0 transition-opacity hidden md:block',
-                  HAS_ACTIVE_FILTERS && 'block! opacity-100'
-                )}
-              >
-                Clear all filters
-              </Button>
+              {/* Desktop-only filter panel */}
+              <div className="hidden md:block">{filtersPanel}</div>
             </div>
           </div>
 
