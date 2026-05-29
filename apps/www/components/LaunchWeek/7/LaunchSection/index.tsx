@@ -1,7 +1,7 @@
+import { PlayIcon, TruckIcon, XIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
 import { useState } from 'react'
-import { PlayIcon, TruckIcon, XIcon } from '@heroicons/react/outline'
-import { Badge, Modal } from 'ui'
+import { Badge, Dialog, DialogContent, DialogHeader, DialogSection, DialogTitle } from 'ui'
 
 import { Article, Product, WeekDayProps } from '../../types'
 import _days from './../days.json'
@@ -109,33 +109,32 @@ export const LaunchSection = (props: WeekDayProps) => {
                 </div>
               </div>
 
-              <Modal
-                size="xxlarge"
-                visible={videoVisible}
-                onCancel={() => setVideoVisible(false)}
-                hideFooter
-                header={
-                  <div className="flex items-center justify-between">
-                    <span className="text-foreground">{props.title}</span>
-                    <XIcon
-                      className="text-muted hover:text-foreground w-4 cursor-pointer transition"
-                      onClick={() => setVideoVisible(false)}
-                    />
-                  </div>
-                }
-              >
-                <div>
-                  <div className="video-container">
-                    <iframe
-                      src={`https://www.youtube-nocookie.com/embed/${props.youtube_id}?autoplay=1`}
-                      title="YouTube video player"
-                      frameBorder={0}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                </div>
-              </Modal>
+              <Dialog open={videoVisible} onOpenChange={(open) => setVideoVisible(open)}>
+                <DialogContent size="xxlarge">
+                  <DialogHeader>
+                    <DialogTitle>
+                      <div className="flex items-center justify-between">
+                        <span className="text-foreground">{props.title}</span>
+                        <XIcon
+                          className="text-muted hover:text-foreground w-4 cursor-pointer transition"
+                          onClick={() => setVideoVisible(false)}
+                        />
+                      </div>
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogSection>
+                    <div className="video-container">
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${props.youtube_id}?autoplay=1`}
+                        title="YouTube video player"
+                        frameBorder={0}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </DialogSection>
+                </DialogContent>
+              </Dialog>
             </>
           )}
         </div>

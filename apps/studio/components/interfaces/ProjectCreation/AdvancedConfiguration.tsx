@@ -1,12 +1,10 @@
 import { useFlag } from 'common'
-import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
+  Card,
+  CardContent,
   cn,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
   FormControl,
   FormField,
   FormItem,
@@ -17,11 +15,11 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { DocsButton } from '@/components/ui/DocsButton'
-import Panel from '@/components/ui/Panel'
 import { DOCS_URL } from '@/lib/constants'
 
 interface AdvancedConfigurationProps {
@@ -32,24 +30,12 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
   const disableOrioleProjectCreation = useFlag('disableOrioleProjectCreation')
 
   return (
-    <Panel.Content>
-      <Collapsible>
-        <CollapsibleTrigger className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
-          Advanced Configuration
-          <ChevronRight
-            size={16}
-            strokeWidth={1}
-            className="mr-2 group-data-open/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
-          />
-        </CollapsibleTrigger>
-        <CollapsibleContent
-          className={cn(
-            'pt-2 data-closed:animate-collapsible-up data-open:animate-collapsible-down'
-          )}
+    <Card className="border-0 border-b rounded-none">
+      <CardContent>
+        <CollapsibleCardSection
+          title="Advanced Configuration"
+          description="These settings cannot be changed after the project is created"
         >
-          <p className="text-xs text-foreground-lighter mb-6">
-            These settings cannot be changed after the project is created
-          </p>
           <FormField
             name="useOrioleDb"
             control={form.control}
@@ -129,8 +115,8 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
               </>
             )}
           />
-        </CollapsibleContent>
-      </Collapsible>
-    </Panel.Content>
+        </CollapsibleCardSection>
+      </CardContent>
+    </Card>
   )
 }

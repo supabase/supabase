@@ -14,7 +14,7 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { LOCAL_STORAGE_KEYS, useDebounce, useParams } from 'common'
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -24,20 +24,26 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   useIsMobile,
 } from 'ui'
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
+import { ConnectionLogsToggle } from './components/ConnectionLogsToggle'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
+import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
+import { RowSelectionHeader } from './RowSelectionHeader'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
+import {
+  columnFiltersToLogsFilters,
+  groupLogsFiltersByColumn,
+  logsFiltersToUrlParams,
+  parseLogsFilterUrlParams,
+} from './UnifiedLogs.filters'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
@@ -45,16 +51,15 @@ import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.util
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
-import { DataTableFilterCommand } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
 import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
 import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideBarLayout'
 import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions'
 import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
 import { LiveButton } from '@/components/ui/DataTable/LiveButton'
-import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
@@ -85,13 +90,14 @@ export const UnifiedLogs = () => {
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
-  const { sort, start, size, id, cursor, direction, live, ...filter } = search
-  const defaultColumnSorting = sort ? [sort] : []
+  const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnVisibility = { uuid: false }
-  const defaultRowSelection = search.id ? { [search.id]: true } : {}
-  const defaultColumnFilters = Object.entries(filter)
-    .map(([key, value]) => ({ id: key, value }))
-    .filter(({ value }) => value ?? undefined)
+  // Column filters are seeded from the repeatable `filter` URL param. Each entry
+  // (`col:opAbbrev:value`) is grouped per column into a wrapped { operator, values }
+  // shape that the query builder reads back.
+  const defaultColumnFilters = Object.entries(
+    groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
+  ).map(([id, value]) => ({ id, value }))
 
   const [topBarHeight, setTopBarHeight] = useState(0)
   const topBarRef = useRef<HTMLDivElement>(null)
@@ -109,7 +115,8 @@ export const UnifiedLogs = () => {
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>(defaultRowSelection)
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [openRowId, setOpenRowId] = useState<string | undefined>(search.id ?? undefined)
 
   const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
     LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK,
@@ -143,6 +150,8 @@ export const UnifiedLogs = () => {
 
   const {
     data: unifiedLogsData,
+    error,
+    isError,
     isLoading,
     isFetching,
     isFetchingNextPage,
@@ -152,6 +161,7 @@ export const UnifiedLogs = () => {
     fetchNextPage,
     fetchPreviousPage,
   } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
+
   const {
     data: counts,
     isPending: isLoadingCounts,
@@ -161,6 +171,7 @@ export const UnifiedLogs = () => {
     projectRef,
     search: searchParameters,
   })
+
   const {
     data: unifiedLogsChart = [],
     isFetching: isFetchingCharts,
@@ -198,15 +209,17 @@ export const UnifiedLogs = () => {
   const facets = counts?.facets
   const totalFetched = flatData?.length
 
-  // Create a filtered version of the chart config based on selected levels
+  // Create a filtered version of the chart config based on level filters in the URL.
   const filteredChartConfig = useMemo(() => {
-    const levelFilter = search.level || LEVELS
+    const levelFilters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'level')
+    const included = levelFilters.filter((f) => f.operator === '=').map((f) => f.value)
+    const excluded = new Set(levelFilters.filter((f) => f.operator === '<>').map((f) => f.value))
+    const baseLevels: readonly string[] = included.length > 0 ? included : LEVELS
+    const activeLevels = baseLevels.filter((l) => !excluded.has(l))
     return Object.fromEntries(
-      Object.entries(CHART_CONFIG).filter(([key]) =>
-        levelFilter.includes(key as (typeof LEVELS)[number])
-      )
+      Object.entries(CHART_CONFIG).filter(([key]) => activeLevels.includes(key))
     ) as ChartConfig
-  }, [search.level])
+  }, [search.filter])
 
   const getRowClassName = <
     TData extends { date: Date; level: (typeof LEVELS)[number]; timestamp: number },
@@ -221,7 +234,7 @@ export const UnifiedLogs = () => {
 
   // Generate dynamic columns based on current data
   const { columns: dynamicColumns, columnVisibility: dynamicColumnVisibility } = useMemo(() => {
-    return generateDynamicColumns(flatData)
+    return generateDynamicColumns({ data: flatData })
   }, [flatData])
 
   const table: Table<ColumnSchema> = useReactTable({
@@ -234,7 +247,7 @@ export const UnifiedLogs = () => {
       rowSelection,
       columnOrder,
     },
-    enableMultiRowSelection: false,
+    enableMultiRowSelection: true,
     columnResizeMode: 'onChange',
     filterFns: { inDateRange, arrSome },
     meta: { getRowClassName },
@@ -252,16 +265,10 @@ export const UnifiedLogs = () => {
     getFacetedMinMaxValues: getTTableFacetedMinMaxValues(),
   })
 
-  const selectedRowKey = Object.keys(rowSelection)?.[0]
   const selectedRow = useMemo(() => {
     if ((isLoading || isFetching) && !flatData.length) return
-
-    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
-  }, [isLoading, isFetching, flatData.length, table, selectedRowKey])
-
-  // REMINDER: this is currently needed for the cmdk search
-  // [Joshen] This is where facets are getting dynamically loaded
-  // TODO: auto search via API when the user changes the filter instead of hardcoded
+    return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
+  }, [isLoading, isFetching, flatData.length, table, openRowId])
 
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
@@ -287,24 +294,21 @@ export const UnifiedLogs = () => {
     })
   }, [facets])
 
-  // Debounced filter application to avoid too many API calls when user clicks multiple filters quickly
+  // Debounced filter application to avoid too many API calls when user clicks multiple filters quickly.
+  // All equality/pattern column filters serialize into the repeatable `filter` URL param. Slider/timerange
+  // column filters keep their dedicated per-column URL keys so things like the timeline brush still
+  // round-trip — they have their own range semantics and aren't covered by eq/neq/like.
   const applyFilterSearch = () => {
-    const columnFiltersWithNullable = filterFields.map((field) => {
-      const filterValue = columnFilters.find((filter) => filter.id === field.value)
-      if (!filterValue) return { id: field.value, value: null }
-      return { id: field.value, value: filterValue.value }
-    })
-
-    const search = columnFiltersWithNullable.reduce(
-      (prev, curr) => {
-        // Add to search parameters
-        prev[curr.id as string] = curr.value
-        return prev
-      },
-      {} as Record<string, unknown>
-    )
-
-    setSearch(search)
+    const filterEntries = logsFiltersToUrlParams(columnFiltersToLogsFilters(columnFilters))
+    const update: Record<string, unknown> = {
+      filter: filterEntries.length > 0 ? filterEntries : null,
+    }
+    for (const field of filterFields) {
+      if (field.type !== 'timerange') continue
+      const current = columnFilters.find((c) => c.id === field.value)?.value
+      update[field.value] = current ?? null
+    }
+    setSearch(update)
   }
 
   const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)
@@ -320,24 +324,20 @@ export const UnifiedLogs = () => {
 
   useEffect(() => {
     if (isLoading || isFetching) return
-    const selectedRowId = Object.keys(rowSelection)?.[0]
 
-    if (selectedRowId && !selectedRow) {
-      // Clear both uuid and logId when no row is selected
+    if (openRowId && !selectedRow) {
+      // Clear both uuid and logId when the open row no longer exists in data
       setSearch({ id: null })
-      setRowSelection({})
-    } else if (selectedRowId && selectedRow) {
-      setSearch({
-        id: selectedRowId,
-      })
+      setOpenRowId(undefined)
+    } else if (openRowId && selectedRow) {
+      setSearch({ id: openRowId })
       track('unified_logs_row_clicked', { logType: selectedRow.original.log_type })
-      // Don't clear rowSelection here - let it persist to maintain the selection
-    } else if (!selectedRowId && search.id) {
-      // Clear the URL parameter when no row is selected
+    } else if (!openRowId && search.id) {
+      // Clear the URL parameter when no row is open
       setSearch({ id: null })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowSelection, selectedRow, isLoading, isFetching])
+  }, [openRowId, selectedRow, isLoading, isFetching])
 
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
@@ -352,19 +352,27 @@ export const UnifiedLogs = () => {
     }
   }, [isMobile])
 
+  useEffect(() => {
+    table.resetRowSelection()
+  }, [searchParameters, table])
+
   return (
     <DataTableProvider
       table={table}
+      error={error}
       columns={UNIFIED_LOGS_COLUMNS}
       filterFields={filterFields}
       columnFilters={columnFilters}
       sorting={sorting}
       rowSelection={rowSelection}
+      openRowId={openRowId}
+      setOpenRowId={setOpenRowId}
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
       searchParameters={searchParameters}
       enableColumnOrdering={true}
       isFetching={isFetching}
+      isError={isError}
       isLoading={isLoading}
       isLoadingCounts={isLoadingCounts}
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
@@ -375,44 +383,36 @@ export const UnifiedLogs = () => {
             isFilterBarOpen={isFilterBarOpen}
             setIsFilterBarOpen={setIsFilterBarOpen}
             dateRangeDisabled={{ after: new Date() }}
+            afterFilters={<ConnectionLogsToggle />}
           />
           <ResizableHandle withHandle />
           <ResizablePanel
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
-            <div ref={topBarRef} className="top-0 z-10 flex flex-col gap-2 bg-background pb-3">
-              <div className="flex flex-wrap items-center gap-2 px-2 pt-2.5 pb-0.5">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="tiny"
-                      type="text"
-                      icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
-                      onClick={() => setIsFilterBarOpen((prev) => !prev)}
-                      className="hidden w-[26px] sm:flex"
-                      aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>
-                      Toggle controls with{' '}
-                      <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
-                        <span className="mr-1">⌘</span>
-                        <span>B</span>
-                      </Kbd>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 **:[[cmdk-input-wrapper]]:px-3! [&_button]:px-3! [&_button>span]:h-[26px]! [&_button>span]:py-0! [&_input]:h-[26px]! [&_input]:py-0!">
-                  <DataTableFilterCommand
-                    placeholder="Search logs..."
-                    searchParamsParser={SEARCH_PARAMS_PARSER}
+            <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
+              <div className="flex flex-wrap items-center gap-2 px-2 border-b">
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
+                  <Button
+                    size="tiny"
+                    type="text"
+                    icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                    onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                    className="hidden w-[26px] sm:flex"
+                    aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
                   />
+                </ShortcutTooltip>
+
+                <div className="h-full border-r" />
+
+                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
+                  <LogsFilterBar />
                 </div>
+
                 <div className="block sm:hidden">
                   <DataTableFilterControlsDrawer />
                 </div>
+
                 <div className="ml-auto flex items-center gap-x-2">
                   <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
                   <DataTableViewOptions />
@@ -425,16 +425,26 @@ export const UnifiedLogs = () => {
                   ) : null}
                 </div>
               </div>
-              <TimelineChart
-                data={unifiedLogsChart}
-                className={cn(
-                  '-mb-2',
-                  isFetchingCharts && 'opacity-60 transition-opacity duration-150'
-                )}
-                columnId="timestamp"
-                chartConfig={filteredChartConfig}
-              />
+
+              {isLoading ? (
+                <div className="h-[60px] flex items-center justify-center">
+                  <Loader2 size={14} className="animate-spin text-foreground-lighter" />
+                </div>
+              ) : (
+                <TimelineChart
+                  data={unifiedLogsChart}
+                  className={cn(
+                    '-mb-1.5 mt-1.5',
+                    isFetchingCharts && 'opacity-60 transition-opacity duration-150'
+                  )}
+                  columnId="timestamp"
+                  filterColumnId="date"
+                  chartConfig={filteredChartConfig}
+                />
+              )}
             </div>
+
+            <RowSelectionHeader />
 
             <ResizablePanelGroup
               key="main-logs"
@@ -452,11 +462,10 @@ export const UnifiedLogs = () => {
                 <div
                   className={cn(
                     'h-full [&>div]:h-full',
-                    '[&_thead_tr]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]!',
                     '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
                     '[&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]!',
-                    '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0! [&_thead_tr:hover]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]!',
-                    '[&_thead_th]:text-foreground-lighter!'
+                    '[&_thead_th]:text-foreground-lighter! [&_thead_tr:hover]:bg-surface-75',
+                    '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
                   )}
                 >
                   <DataTableInfinite
@@ -473,14 +482,14 @@ export const UnifiedLogs = () => {
                 </div>
               </ResizablePanel>
 
-              {!!selectedRow && (
+              {!!openRowId && !!selectedRow && (
                 <>
                   <LogsListPanel selectedRow={selectedRow} />
                   <ServiceFlowPanel
                     dock={dock}
                     setDock={setDock}
                     selectedRow={selectedRow?.original}
-                    selectedRowKey={selectedRowKey}
+                    selectedRowKey={openRowId}
                     searchParameters={searchParameters}
                   />
                 </>

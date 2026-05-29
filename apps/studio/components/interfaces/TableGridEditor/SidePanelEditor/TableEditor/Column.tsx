@@ -7,11 +7,11 @@ import {
   Button,
   Checkbox,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Input,
   Popover,
   PopoverContent,
@@ -167,16 +167,16 @@ export const Column = ({
                 <div className="text-xs px-2 pt-2">
                   Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
                 </div>
-                <Command_Shadcn_>
-                  <CommandList_Shadcn_>
-                    <CommandGroup_Shadcn_>
+                <Command>
+                  <CommandList>
+                    <CommandGroup>
                       {relations.map((relation, idx) => {
                         const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
                         const status = getRelationStatus(relation)
                         if (status === 'REMOVE') return null
 
                         return (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             key={key}
                             value={key}
                             className="cursor-pointer w-full"
@@ -216,23 +216,23 @@ export const Column = ({
                                 </p>
                               </div>
                             )}
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         )
                       })}
-                    </CommandGroup_Shadcn_>
-                    <CommandSeparator_Shadcn_ />
-                    <CommandGroup_Shadcn_>
-                      <CommandItem_Shadcn_
+                    </CommandGroup>
+                    <CommandSeparator />
+                    <CommandGroup>
+                      <CommandItem
                         className="cursor-pointer w-full gap-x-2"
                         onSelect={() => onEditForeignKey()}
                         onClick={() => onEditForeignKey()}
                       >
                         <Plus size={14} strokeWidth={1.5} />
                         <p>Add foreign key relation</p>
-                      </CommandItem_Shadcn_>
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
+                      </CommandItem>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
               </PopoverContent>
             </Popover>
           )}

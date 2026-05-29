@@ -7,7 +7,6 @@ import type { IntegrationDefinition } from '@/components/interfaces/Integrations
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useInstallOAuthIntegrationMutation } from '@/data/marketplace/install-oauth-integration-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface InstallOAuthIntegrationButtonProps {
   integration: IntegrationDefinition
@@ -15,7 +14,6 @@ interface InstallOAuthIntegrationButtonProps {
 
 export function InstallOAuthIntegrationButton({ integration }: InstallOAuthIntegrationButtonProps) {
   const { ref: projectRef } = useParams()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
   const requiresApiKeysCheck =
     integration.installIdentificationMethod === 'secret_key_prefix' && !!integration.secretKeyPrefix
@@ -73,22 +71,9 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
 
   const handleInstallClick = async () => {
     if (!integration || !projectRef) return
+    if (!integration.id) return toast.error('Listing ID is required')
 
-    if (integration.installUrlType === 'post') {
-      if (!integration.listingId) return toast.error('Listing ID is required')
-      installOAuthIntegration({ projectRef, id: integration.listingId })
-    } else {
-      let redirectUrl = '/'
-
-      if (integration.installUrl) {
-        const url = new URL(integration.installUrl)
-        url.searchParams.append('organization_slug', selectedOrg?.slug ?? '')
-        url.searchParams.append('project_id', projectRef)
-        redirectUrl = url.href
-      }
-
-      window.open(redirectUrl, '_blank', 'noreferrer')
-    }
+    installOAuthIntegration({ projectRef, listingSlug: integration.id })
   }
 
   return (

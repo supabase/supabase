@@ -6,14 +6,13 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useEffectEvent,
   useMemo,
   useState,
   type PropsWithChildren,
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
@@ -36,7 +35,7 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
     featurePreviews.reduce((a, b) => ({ ...a, [b.key]: false }), {})
   )
 
-  const initializeFlags = useStaticEffectEvent(() => {
+  const initializeFlags = useEffectEvent(() => {
     setFlags(
       featurePreviews.reduce((a, b) => {
         const defaultOptIn = b.isDefaultOptIn
@@ -57,7 +56,8 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
     if (typeof window !== 'undefined') {
       initializeFlags()
     }
-  }, [hasLoaded, initializeFlags])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [hasLoaded])
 
   const value = {
     flags,
@@ -89,17 +89,13 @@ export const useUnifiedLogsPreview = () => {
   const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading: isOrgLoading } =
-    useIsEnterpriseOrSupabaseOrg()
-
-  const isLoading = !flagsHaveLoaded || isOrgLoading
-  const isEligible = unifiedLogsEnabled || isEnterpriseOrSupabaseOrg
-  const isEnabled = isEligible && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isLoading = !flagsHaveLoaded
+  const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, isEligible, isLoading, enable, disable }
+  return { isEnabled, isEligible: unifiedLogsEnabled, isLoading, enable, disable }
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
@@ -128,6 +124,12 @@ export const useIsJitDbAccessEnabled = () => {
 export const useIsRLSTesterEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+}
+
+export const useIsMarketplaceEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
 }
 
 export const useFeaturePreviewModal = () => {

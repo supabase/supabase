@@ -14,7 +14,7 @@ import {
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { PostgresFlowDetail } from './ServiceFlow/components/blocks/PostgresFlowDetail'
+import { PostgresFlowDetail } from './ServiceFlow/components/PostgresFlowDetail'
 import {
   MemoizedEdgeFunctionBlock,
   MemoizedGoTrueBlock,
@@ -158,13 +158,12 @@ export function ServiceFlowPanel({
                     table={table}
                   />
                 ) : (
-                  <div className="[&>*:nth-child(even)]:bg-surface-100/50">
+                  <div>
                     <DetailSectionHeader
                       title="Request started"
                       icon={Clock}
                       summary={formattedTime ?? undefined}
                     />
-
                     <MemoizedNetworkBlock
                       data={selectedRow}
                       enrichedData={serviceFlowData?.result?.[0]}
@@ -172,7 +171,6 @@ export function ServiceFlowPanel({
                       filterFields={filterFields}
                       table={table}
                     />
-
                     {serviceFlowType === 'auth' ? (
                       <MemoizedGoTrueBlock
                         data={selectedRow}

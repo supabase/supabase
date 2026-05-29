@@ -1,9 +1,9 @@
 import { type Dispatch, type SetStateAction } from 'react'
 import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Badge,
   Select,
   SelectContent,
@@ -54,12 +54,12 @@ export const AdvancedSettings = ({
 
   return (
     <SheetSection>
-      <Accordion_Shadcn_ type="single" collapsible>
-        <AccordionItem_Shadcn_ value="advanced-settings" className="border-none">
-          <AccordionTrigger_Shadcn_ className="font-normal gap-2 py-0 justify-between text-sm hover:no-underline">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="advanced-settings" className="border-none">
+          <AccordionTrigger className="font-normal gap-2 py-0 justify-between text-sm hover:no-underline">
             Advanced settings
-          </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          </AccordionTrigger>
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
             <p className="text-foreground-light">
               Select which schemas to install the database extensions under
             </p>
@@ -161,9 +161,9 @@ export const AdvancedSettings = ({
                 </FormItemLayout>
               )
             })}
-          </AccordionContent_Shadcn_>
-        </AccordionItem_Shadcn_>
-      </Accordion_Shadcn_>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </SheetSection>
   )
 }

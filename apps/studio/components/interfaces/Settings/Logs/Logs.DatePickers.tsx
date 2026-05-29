@@ -20,7 +20,9 @@ import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TimeSplitInput } from '@/components/ui/DatePicker/TimeSplitInput'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import type { ShortcutId } from '@/state/shortcuts/registry'
 
 type Unit = 'minute' | 'hour' | 'day'
 
@@ -96,6 +98,14 @@ interface LogsDatePickerProps {
   popoverContentProps?: typeof PopoverContent
   hideWarnings?: boolean
   align?: 'start' | 'end' | 'center'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  /**
+   * Registered shortcut id whose hotkey is shown in a tooltip on the trigger
+   * button. The tooltip hides while the popover is open so it doesn't sit on
+   * top of the picker. Leave undefined to render no tooltip.
+   */
+  shortcutId?: ShortcutId
 }
 
 export const LogsDatePicker = ({
@@ -106,8 +116,17 @@ export const LogsDatePicker = ({
   popoverContentProps,
   hideWarnings,
   align = 'end',
+  open: openProp,
+  onOpenChange,
+  shortcutId,
 }: PropsWithChildren<LogsDatePickerProps>) => {
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = openProp !== undefined
+  const open = isControlled ? openProp : internalOpen
+  const setOpen = (next: boolean) => {
+    if (!isControlled) setInternalOpen(next)
+    onOpenChange?.(next)
+  }
   const [customValue, setCustomValue] = useState('')
 
   const displayedHelpers = useMemo(() => {
@@ -316,15 +335,25 @@ export const LogsDatePicker = ({
     return true
   }
 
+  const triggerButton = (
+    <PopoverTrigger asChild>
+      <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
+        {value.isHelper
+          ? value.text
+          : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
+      </Button>
+    </PopoverTrigger>
+  )
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
-          {value.isHelper
-            ? value.text
-            : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
-        </Button>
-      </PopoverTrigger>
+      {shortcutId ? (
+        <ShortcutTooltip shortcutId={shortcutId} side="bottom" open={open ? false : undefined}>
+          {triggerButton}
+        </ShortcutTooltip>
+      ) : (
+        triggerButton
+      )}
       <PopoverContent
         className="flex w-full p-0"
         side="bottom"
