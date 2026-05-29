@@ -21,8 +21,6 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   totalRows?: number
   filterRows?: number
   totalRowsFetched?: number
-  isFetching?: boolean
-  isLoading?: boolean
   hasNextPage?: boolean
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
   setColumnOrder: (columnOrder: string[]) => void

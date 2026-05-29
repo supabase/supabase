@@ -129,7 +129,7 @@ export const TextConfirmModal = forwardRef<
     }, [showCopied])
 
     const { title: _alertBaseTitle, children: _alertBaseChildren, ...alertBase } = alert?.base ?? {}
-    const alertTitleProps = alert?.title ? { label: alert.title } : {}
+    const alertTitleProps = alert?.title ? { title: alert.title } : {}
 
     return (
       <Dialog

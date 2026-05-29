@@ -14,7 +14,7 @@ import {
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { PostgresFlowDetail } from './ServiceFlow/components/blocks/PostgresFlowDetail'
+import { PostgresFlowDetail } from './ServiceFlow/components/PostgresFlowDetail'
 import {
   MemoizedEdgeFunctionBlock,
   MemoizedGoTrueBlock,

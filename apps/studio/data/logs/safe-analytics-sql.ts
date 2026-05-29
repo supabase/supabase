@@ -40,8 +40,9 @@
  * `SafeSqlFragment` (Postgres-only).
  *
  * Values of this type are either:
- * - Static strings in source code (no interpolation) via `rawSql`
- * - Outputs of `analyticsLiteral` or `quotedIdent`
+ * - Static strings in source code (no interpolation) via the `safeSql`
+ *   template tag with no interpolations
+ * - Outputs of `analyticsLiteral`, `quotedIdent`, or `keyword`
  * - Compositions via the `safeSql` template tag (which only accepts
  *   `SafeLogSqlFragment` interpolations)
  * - Compositions via `joinSqlFragments`
@@ -50,7 +51,7 @@
  */
 export type SafeLogSqlFragment = string & { readonly __safeLogSqlFragmentBrand: never }
 
-export type LogSqlFragmentSeparator =
+type LogSqlFragmentSeparator =
   | ','
   | ', '
   | ';\n'
@@ -82,10 +83,12 @@ export function safeSql(
 }
 
 /**
- * Marks a hand-written log-SQL string as a `SafeLogSqlFragment`. Use only
- * for static SQL authored in source code; never call with arbitrary input.
+ * Internal-only escape hatch for branding hand-written log-SQL produced by
+ * the helpers in this file (e.g. `analyticsLiteral`, `quotedIdent`). Not
+ * exported: external callers must compose via `safeSql` plus the sanitization
+ * helpers, never by casting arbitrary strings.
  */
-export function rawSql(sql: string): SafeLogSqlFragment {
+function rawSql(sql: string): SafeLogSqlFragment {
   return sql as SafeLogSqlFragment
 }
 
@@ -105,7 +108,7 @@ export function analyticsLiteral(value: string | number | boolean): SafeLogSqlFr
     return rawSql(String(value))
   }
   if (typeof value === 'boolean') {
-    return rawSql(value ? 'true' : 'false')
+    return value ? safeSql`true` : safeSql`false`
   }
   if (typeof value !== 'string') {
     throw new Error('analyticsLiteral: only string, number, or boolean inputs are supported')
