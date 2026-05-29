@@ -19,6 +19,8 @@ import {
   Form,
   FormControl,
   FormField,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Select,
   SelectContent,
   SelectGroup,
@@ -39,10 +41,12 @@ import {
   emailSchema,
   parseEmails,
 } from './InviteMemberButton.utils'
+import { ROLE_DESCRIPTIONS } from './Roles.constants'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
@@ -311,47 +315,40 @@ export const InviteMemberButton = () => {
                 name="role"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout label="Role">
+                  <FormItemLayout
+                    label="Role"
+                    labelOptional={
+                      <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
+                        Learn more about roles
+                      </InlineLink>
+                    }
+                  >
                     <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="text-sm capitalize">
-                          {orgScopedRoles.find((role) => role.id === Number(field.value))?.name ??
-                            'Unknown'}
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {orgScopedRoles.map((role) => {
-                              const canAssignRole = rolesAddable.includes(role.id)
-                              const isOwnerRole = role.name === 'Owner'
-                              const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                              const disabled = !canAssignRole || disabledForStripe
-                              const disabledReason = disabledForStripe
-                                ? 'Cannot be assigned in Stripe Projects organizations'
-                                : !canAssignRole
-                                  ? 'Additional permissions required to assign role'
-                                  : undefined
+                      <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                        {orgScopedRoles.map((role) => {
+                          const canAssignRole = rolesAddable.includes(role.id)
+                          const isOwnerRole = role.name === 'Owner'
+                          const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                          const disabled = !canAssignRole || disabledForStripe
+                          const disabledReason = disabledForStripe
+                            ? 'Cannot be assigned in Stripe Projects organizations'
+                            : !canAssignRole
+                              ? 'Additional permissions required to assign role'
+                              : undefined
+                          const description = disabledReason ?? ROLE_DESCRIPTIONS[role.name]
 
-                              return (
-                                <SelectItem
-                                  key={role.id}
-                                  value={role.id.toString()}
-                                  className="text-sm"
-                                  disabled={disabled}
-                                >
-                                  <div className="flex flex-col gap-0.5">
-                                    <span>{role.name}</span>
-                                    {disabledReason && (
-                                      <span className="text-xs text-foreground-lighter">
-                                        {disabledReason}
-                                      </span>
-                                    )}
-                                  </div>
-                                </SelectItem>
-                              )
-                            })}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                          return (
+                            <RadioGroupStackedItem
+                              key={role.id}
+                              id={role.id.toString()}
+                              value={role.id.toString()}
+                              disabled={disabled}
+                              label={role.name}
+                              description={description}
+                            />
+                          )
+                        })}
+                      </RadioGroupStacked>
                     </FormControl>
                   </FormItemLayout>
                 )}
