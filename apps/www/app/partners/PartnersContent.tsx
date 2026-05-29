@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowRight, ArrowUpRight, Check } from 'lucide-react'
+import { ArrowRight, Check } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
@@ -11,7 +11,7 @@ import SectionContainer from '@/components/Layouts/SectionContainer'
 import Panel from '@/components/Panel'
 import BecomeAPartner from '@/components/Partners/BecomeAPartner'
 import ProductHeaderCentered from '@/components/Sections/ProductHeaderCentered'
-import pageData, { PARTNER_FORM_URL } from '@/data/partners'
+import pageData, { PARTNER_FORM_ANCHOR } from '@/data/partners'
 
 type FeaturedPartner = { slug: string; title: string; logo: string }
 
@@ -171,8 +171,8 @@ export default function PartnersContent({ featuredPartners }: Props) {
             })}
           </div>
           <div className="mt-8 flex justify-start">
-            <Button asChild type="default" size="small" iconRight={<ArrowUpRight />}>
-              <Link href={PARTNER_FORM_URL} target="_blank">
+            <Button asChild type="default" size="small">
+              <Link href={PARTNER_FORM_ANCHOR} target="_blank">
                 Apply to partner with Supabase
               </Link>
             </Button>
@@ -209,7 +209,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
         <SectionContainer>
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <SectionHeading eyebrow="Get started" title={pageData.howToApply.title} />
-            <Button asChild size="small" type="default" iconRight={<ArrowUpRight />}>
+            <Button asChild size="small" type="default">
               <Link href={pageData.howToApply.cta.link}>{pageData.howToApply.cta.label}</Link>
             </Button>
           </div>

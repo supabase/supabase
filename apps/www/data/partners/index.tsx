@@ -11,7 +11,6 @@ import {
 } from 'lucide-react'
 
 export const PARTNER_FORM_ANCHOR = '#become-a-partner'
-export const PARTNER_FORM_URL = 'https://share.hsforms.com/1ZSo-7Y0GRfuTdvWusOP13Abvo3m'
 
 const partnersPageData = {
   metaTitle: 'Partner with Supabase',
@@ -133,7 +132,7 @@ const partnersPageData = {
     ],
     cta: {
       label: 'Apply to partner with Supabase',
-      link: PARTNER_FORM_URL,
+      link: PARTNER_FORM_ANCHOR,
     },
   },
   featuredPartners: {
@@ -218,7 +217,7 @@ const partnersPageData = {
     title: 'Partner with Supabase.',
     cta: {
       label: 'Become a partner',
-      link: PARTNER_FORM_URL,
+      link: PARTNER_FORM_ANCHOR,
     },
     icon: <ArrowUpRight strokeWidth={1.5} />,
   },
