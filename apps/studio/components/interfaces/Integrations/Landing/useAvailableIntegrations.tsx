@@ -192,7 +192,7 @@ export const useAvailableIntegrations = () => {
 
       return {
         ...integration,
-        ...Object.fromEntries(Object.entries(overrides).filter(([, v]) => v !== undefined)),
+        ...Object.fromEntries(Object.entries(overrides).filter(([, v]) => v != null)),
       }
     })
   }, [integrationsWrappers, isCLI, marketplaceWrappers])
