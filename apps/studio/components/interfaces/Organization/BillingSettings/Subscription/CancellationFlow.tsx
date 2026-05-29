@@ -17,7 +17,7 @@ import { useTrack } from '@/lib/telemetry/track'
 type CancellationFlowProps = {
   onDowngrade?: () => void
   onCancel?: () => void
-  visible?: boolean
+  visible: boolean
 }
 
 type CancellationFlowState =
@@ -33,10 +33,6 @@ export const CancellationFlow = (props: CancellationFlowProps) => {
     props.visible ? 'show-downgrade-modal' : 'closed'
   )
   useEffect(() => {
-    console.log('firing effect, visible:', props.visible)
-    if (typeof props.visible === 'undefined') {
-      return
-    }
     setFlowState(props.visible ? 'show-downgrade-modal' : 'closed')
   }, [props.visible])
 
