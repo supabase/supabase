@@ -7,6 +7,7 @@ import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remot
 import { MDXClient } from 'next-mdx-remote-client/csr'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useQueryState } from 'nuqs'
 import { useState, type Dispatch, type SetStateAction } from 'react'
 
 import 'swiper/css'
@@ -37,9 +38,9 @@ type Props = {
 
 export default function PartnerCatalogDetail({ partner, serializedListings }: Props) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState(0)
   const isNarrow = useBreakpoint('lg')
 
+  // Computed before the hook so the first slug can seed the default value.
   const allListings: ListingDetail[] = partner.listings?.length
     ? partner.listings
     : [
@@ -54,9 +55,14 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
         },
       ]
 
-  const safeTab = Math.min(activeTab, allListings.length - 1)
-  const activeListing = allListings[safeTab]
-  const activeOverview = serializedListings[safeTab] ?? serializedListings[0]
+  const [activeSlug, setActiveSlug] = useQueryState('tab', {
+    defaultValue: allListings[0]?.slug ?? '',
+    history: 'replace',
+  })
+
+  const activeListing = allListings.find((l) => l.slug === activeSlug) ?? allListings[0]
+  const activeTabIndex = allListings.indexOf(activeListing)
+  const activeOverview = serializedListings[activeTabIndex] ?? serializedListings[0]
   // Prefer the Supabase dashboard integration URL for marketplace integrations.
   const installHref = activeListing.dashboardUrl ?? activeListing.installUrl
 
@@ -138,12 +144,12 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                     key={listing.slug}
                     type="button"
                     onClick={() => {
-                      setActiveTab(i)
+                      setActiveSlug(listing.slug)
                       setFocusedImage(null)
                     }}
                     className={cn(
                       'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap',
-                      safeTab === i
+                      activeTabIndex === i
                         ? 'border-foreground text-foreground'
                         : 'border-transparent text-foreground-lighter hover:text-foreground'
                     )}
@@ -250,6 +256,15 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
             )}
           </div>
         </SectionContainer>
+
+        <div className="border-t bg-background">
+          <div className="mx-auto max-w-2xl flex flex-col items-center gap-6 py-24 px-6 text-center">
+            <h2 className="h2 text-balance">Interested in partnering with Supabase?</h2>
+            <Button asChild size="medium">
+              <Link href="/partners#become-a-partner">Become a partner</Link>
+            </Button>
+          </div>
+        </div>
       </DefaultLayout>
     </>
   )

@@ -101,10 +101,17 @@ export default function IntegrationsContent({
           <span className="text-brand font-mono uppercase tracking-widest text-sm">
             Partner Catalog
           </span>
-          <h1 className="h1 mb-0!">{metaTitle}</h1>
-          <p className="text-foreground-lighter text-xl max-w-2xl text-balance">
-            {metaDescription}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div className="flex flex-col gap-3">
+              <h1 className="h1 mb-0!">{metaTitle}</h1>
+              <p className="text-foreground-lighter text-xl max-w-2xl text-balance">
+                {metaDescription}
+              </p>
+            </div>
+            <Button asChild size="small" className="shrink-0">
+              <Link href="/partners#become-a-partner">Become a partner</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="relative grid md:grid-cols-4 md:gap-4">
