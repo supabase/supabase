@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { FeatureFlagContext, IS_PLATFORM } from 'common'
 import { fullImageUrl } from 'common/marketplace-client'
 import { Boxes } from 'lucide-react'
@@ -9,7 +8,10 @@ import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
+import {
+  useMarketplaceIntegrationsQuery,
+  type MarketplaceIntegration,
+} from '@/data/marketplace/integrations-query'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
@@ -26,10 +28,7 @@ export const useAvailableIntegrations = () => {
   const { data: cliData } = useCLIReleaseVersionQuery()
   const isCLI = !!cliData?.current
 
-  const { data, error } = useQuery({
-    ...marketplaceIntegrationsQueryOptions(),
-    enabled: isMarketplaceEnabled,
-  })
+  const { data, error } = useMarketplaceIntegrationsQuery({ enabled: isMarketplaceEnabled })
   const isPending = IS_PLATFORM && (!hasLoaded || (isMarketplaceEnabled && !data && !error))
   const isSuccess = !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!data && !error)))
   const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
@@ -54,11 +53,8 @@ export const useAvailableIntegrations = () => {
     return MarketplaceLogo
   }
 
-  const isMarketplaceWrapper = (integration: { categories?: unknown }) =>
-    Array.isArray(integration.categories) &&
-    (integration.categories as Array<{ slug: string }>).some(
-      (c) => c?.slug === 'foreign-data-wrapper'
-    )
+  const isForeignDataWrapper = (integration: MarketplaceIntegration) =>
+    integration.categories.some((c) => c?.slug === 'foreign-data-wrapper')
 
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
@@ -67,7 +63,7 @@ export const useAvailableIntegrations = () => {
   const marketplaceIntegrations: IntegrationDefinition[] = useMemo(
     () =>
       (data ?? [])
-        ?.filter((integration) => !isMarketplaceWrapper(integration))
+        ?.filter((integration) => !isForeignDataWrapper(integration))
         .map((integration) => {
           const {
             id: listingId,
@@ -99,9 +95,7 @@ export const useAvailableIntegrations = () => {
             featured: !!featured,
             type: 'oauth' as const, // Currently marketplace only supports oauth apps
             source: 'Partner' as const,
-            categories: Array.isArray(categories)
-              ? (categories as Array<{ slug: string }>).map((x) => x.slug)
-              : [],
+            categories: Array.isArray(categories) ? categories.map((x) => x.slug) : [],
             content,
             files: images?.map((image) => fullImageUrl(image)),
             description,
@@ -145,9 +139,9 @@ export const useAvailableIntegrations = () => {
   // Marketplace wrapper listings keyed by their studio-equivalent id
   // (marketplace uses dash-separated slugs, studio uses underscore-separated ids).
   const marketplaceWrappers = useMemo(() => {
-    const map: Record<string, NonNullable<typeof data>[number]> = {}
+    const map: Record<string, MarketplaceIntegration> = {}
     ;(data ?? []).forEach((integration) => {
-      if (!isMarketplaceWrapper(integration)) return
+      if (!isForeignDataWrapper(integration)) return
       const slug = integration.slug
       if (!slug) return
       map[slug.replaceAll('-', '_')] = integration

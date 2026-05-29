@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useFeatureFlags, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
@@ -10,8 +9,8 @@ import { useInstalledIntegrations } from '@/components/interfaces/Integrations/L
 import { ProjectLayout } from '@/components/layouts/ProjectLayout'
 import AlertError from '@/components/ui/AlertError'
 import { ProductMenu } from '@/components/ui/ProductMenu'
-import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
-import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
+import { useMarketplaceCategoriesQuery } from '@/data/marketplace/integration-categories-query'
+import { useMarketplaceIntegrationsQuery } from '@/data/marketplace/integrations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { withAuth } from '@/hooks/misc/withAuth'
 
@@ -54,18 +53,16 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const pageKey = categoryParam || page
 
   const { integrationsWrappers: showWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const { data: categories = [], isPending: isPendingCategories } = useQuery(
-    marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled })
-  )
-  const { data: listings = [], isPending: isPendingListings } = useQuery(
-    marketplaceIntegrationsQueryOptions({ enabled: isMarketplaceEnabled })
-  )
+  const { data: categories = [], isPending: isPendingCategories } = useMarketplaceCategoriesQuery({
+    enabled: isMarketplaceEnabled,
+  })
+  const { data: listings = [], isPending: isPendingListings } = useMarketplaceIntegrationsQuery({
+    enabled: isMarketplaceEnabled,
+  })
 
   const populatedCategoryIds = new Set(
     listings.flatMap((listing) =>
-      Array.isArray(listing.categories)
-        ? (listing.categories as Array<{ id: string }>).map((c) => c.id)
-        : []
+      Array.isArray(listing.categories) ? listing.categories.map((c) => c.id) : []
     )
   )
   const nonEmptyCategories = categories.filter(
