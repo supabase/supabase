@@ -27,6 +27,8 @@ const StorageVectorsPage: NextPageWithLayout = () => {
     return <RegionLimitation />
   } else if (IS_PLATFORM && !isVectorBucketsEnabled) {
     return <BucketsUpgradePlan type="vector" />
+  } else if (!isVectorBucketsEnabled) {
+    return null
   } else {
     return <VectorsBuckets />
   }
