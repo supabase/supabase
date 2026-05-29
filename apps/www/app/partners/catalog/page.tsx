@@ -1,5 +1,6 @@
-import { isUseMarketplaceDb, listCatalogPartners } from '~/lib/marketplaceDb'
+import { listCatalogPartners } from '~/lib/marketplaceDb'
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 
 import IntegrationsContent from './IntegrationsContent'
 
@@ -24,10 +25,12 @@ export default async function IntegrationPartnersPage() {
   const partners = await listCatalogPartners()
 
   return (
-    <IntegrationsContent
-      initialPartners={partners}
-      metaTitle={META_TITLE}
-      metaDescription={META_DESCRIPTION}
-    />
+    <Suspense>
+      <IntegrationsContent
+        initialPartners={partners}
+        metaTitle={META_TITLE}
+        metaDescription={META_DESCRIPTION}
+      />
+    </Suspense>
   )
 }

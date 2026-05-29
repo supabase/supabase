@@ -8,6 +8,13 @@ import type { Partner } from '~/types/partners'
 import { ArrowRight, ArrowUpRight, LayoutGrid, List, Loader, Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import {
+  parseAsArrayOf,
+  parseAsBoolean,
+  parseAsString,
+  parseAsStringEnum,
+  useQueryStates,
+} from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { Badge, Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { useDebounce } from 'use-debounce'
@@ -30,13 +37,28 @@ export default function IntegrationsContent({
     new Set(initialPartners?.flatMap((p) => p.categories.map((c) => c.name)))
   ).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
 
-  const [search, setSearch] = useState('')
+  const [
+    {
+      q: search,
+      cat: selectedCategories,
+      partner: partnerOnly,
+      marketplace: oneClickOnly,
+      view: viewMode,
+    },
+    setFilters,
+  ] = useQueryStates(
+    {
+      q: parseAsString.withDefault(''),
+      cat: parseAsArrayOf(parseAsString).withDefault([]),
+      partner: parseAsBoolean.withDefault(false),
+      marketplace: parseAsBoolean.withDefault(false),
+      view: parseAsStringEnum<ViewMode>(['grid', 'list']).withDefault('grid'),
+    },
+    { history: 'replace' }
+  )
+
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [partnerOnly, setPartnerOnly] = useState(false)
-  const [oneClickOnly, setOneClickOnly] = useState(false)
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const searchIdRef = useRef(0)
 
   useEffect(() => {
@@ -60,9 +82,11 @@ export default function IntegrationsContent({
   }, [debouncedSearchTerm, initialPartners])
 
   const handleCategoryChange = (category: string) =>
-    setSelectedCategories((prev) =>
-      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
-    )
+    setFilters({
+      cat: selectedCategories.includes(category)
+        ? selectedCategories.filter((c) => c !== category)
+        : [...selectedCategories, category],
+    })
 
   const OFFICIAL_PARTNER_SLUGS = new Set(['grafana', 'stripe', 'aikido', 'doppler', 'resend'])
   const availableInMarketplace = (p: Partner) => p.publishedInMarketplace
@@ -128,7 +152,7 @@ export default function IntegrationsContent({
                   type="search"
                   placeholder="Search partners"
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => setFilters({ q: e.target.value })}
                 />
                 {isSearching && (
                   <InputGroupAddon align="inline-end">
@@ -138,7 +162,7 @@ export default function IntegrationsContent({
               </InputGroup>
 
               <div className="hidden md:flex flex-col gap-4">
-                <h2 className="text-sm text-foreground-lighter">Filter by category:</h2>
+                <h2 className="text-xs text-foreground-lighter font-mono uppercase">Categories:</h2>
                 <div className="flex flex-col gap-2.5">
                   {allCategories.map((category) => (
                     <div
@@ -166,7 +190,7 @@ export default function IntegrationsContent({
                     <Checkbox
                       id="partner-only"
                       checked={partnerOnly}
-                      onCheckedChange={(checked) => setPartnerOnly(!!checked)}
+                      onCheckedChange={(checked) => setFilters({ partner: !!checked })}
                       className="[&_input]:m-0"
                     />
                     <label
@@ -180,7 +204,7 @@ export default function IntegrationsContent({
                     <Checkbox
                       id="one-click"
                       checked={oneClickOnly}
-                      onCheckedChange={(checked) => setOneClickOnly(!!checked)}
+                      onCheckedChange={(checked) => setFilters({ marketplace: !!checked })}
                       className="[&_input]:m-0"
                     />
                     <label htmlFor="one-click" className="text-sm leading-none! flex-1 text-left">
@@ -194,12 +218,7 @@ export default function IntegrationsContent({
                 tabIndex={HAS_ACTIVE_FILTERS ? 0 : -1}
                 block
                 type="dashed"
-                onClick={() => {
-                  setSelectedCategories([])
-                  setPartnerOnly(false)
-                  setOneClickOnly(false)
-                  setSearch('')
-                }}
+                onClick={() => setFilters({ cat: [], partner: false, marketplace: false, q: '' })}
                 className={cn(
                   'opacity-0 transition-opacity hidden md:block',
                   HAS_ACTIVE_FILTERS && 'block! opacity-100'
@@ -261,7 +280,7 @@ export default function IntegrationsContent({
               <div className="flex items-center rounded-lg border border-muted">
                 <button
                   title="Grid view"
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setFilters({ view: 'grid' })}
                   className={cn(
                     'relative flex items-center justify-center w-8 h-8 transition-colors rounded-l-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background',
                     viewMode === 'grid'
@@ -273,7 +292,7 @@ export default function IntegrationsContent({
                 </button>
                 <button
                   title="List view"
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setFilters({ view: 'list' })}
                   className={cn(
                     'relative flex items-center justify-center w-8 h-8 transition-colors border-l border-muted rounded-r-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background',
                     viewMode === 'list'
