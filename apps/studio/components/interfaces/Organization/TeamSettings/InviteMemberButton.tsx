@@ -96,6 +96,8 @@ export const InviteMemberButton = () => {
   const { hasAccess: hasAccessToSso } = useCheckEntitlements('auth.platform.sso')
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
+  const hasSecondaryColumn = hasSsoProvider || hasAccessToProjectLevelPermissions
+
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
   const hasOrgRole =
     (userMemberData?.role_ids ?? []).length === 1 &&
@@ -279,7 +281,7 @@ export const InviteMemberButton = () => {
           </ButtonTooltip>
         </Shortcut>
       </DialogTrigger>
-      <DialogContent size="medium">
+      <DialogContent size={hasSecondaryColumn ? 'xlarge' : 'medium'}>
         <DialogHeader>
           <DialogTitle>Invite team members</DialogTitle>
         </DialogHeader>
@@ -310,139 +312,151 @@ export const InviteMemberButton = () => {
             className="flex flex-col gap-y-4"
             onSubmit={form.handleSubmit(onInviteMember)}
           >
-            <DialogSection className="flex flex-col gap-y-4 pb-2">
-              <FormField
-                name="role"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Role"
-                    labelOptional={
-                      <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
-                        Learn more about roles
-                      </InlineLink>
-                    }
-                  >
-                    <FormControl>
-                      <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
-                        {orgScopedRoles.map((role) => {
-                          const canAssignRole = rolesAddable.includes(role.id)
-                          const isOwnerRole = role.name === 'Owner'
-                          const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                          const disabled = !canAssignRole || disabledForStripe
-                          const disabledReason = disabledForStripe
-                            ? 'Cannot be assigned in Stripe Projects organizations'
-                            : !canAssignRole
-                              ? 'Additional permissions required to assign role'
-                              : undefined
-                          const description = disabledReason ?? ROLE_DESCRIPTIONS[role.name]
+            <DialogSection className="pb-2">
+              <div
+                className={
+                  hasSecondaryColumn
+                    ? 'grid grid-cols-1 items-start gap-x-6 gap-y-4 md:grid-cols-2'
+                    : 'flex flex-col gap-y-4'
+                }
+              >
+                <FormField
+                  name="role"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Role"
+                      labelOptional={
+                        <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
+                          Learn more about roles
+                        </InlineLink>
+                      }
+                    >
+                      <FormControl>
+                        <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                          {orgScopedRoles.map((role) => {
+                            const canAssignRole = rolesAddable.includes(role.id)
+                            const isOwnerRole = role.name === 'Owner'
+                            const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                            const disabled = !canAssignRole || disabledForStripe
+                            const disabledReason = disabledForStripe
+                              ? 'Cannot be assigned in Stripe Projects organizations'
+                              : !canAssignRole
+                                ? 'Additional permissions required to assign role'
+                                : undefined
+                            const description = disabledReason ?? ROLE_DESCRIPTIONS[role.name]
 
-                          return (
-                            <RadioGroupStackedItem
-                              key={role.id}
-                              id={role.id.toString()}
-                              value={role.id.toString()}
-                              disabled={disabled}
-                              label={role.name}
-                              description={description}
+                            return (
+                              <RadioGroupStackedItem
+                                key={role.id}
+                                id={role.id.toString()}
+                                value={role.id.toString()}
+                                disabled={disabled}
+                                label={role.name}
+                                description={description}
+                              />
+                            )
+                          })}
+                        </RadioGroupStacked>
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+                <div className="flex flex-col gap-y-4">
+                  {hasSsoProvider && (
+                    <FormField
+                      name="requireSso"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItemLayout
+                          label="Invitation type"
+                          description="Choose how the invitee should authenticate"
+                        >
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Automatic (based on your account)" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectItem value="auto">
+                                    Automatic (based on your account)
+                                  </SelectItem>
+                                  <SelectItem value="sso">Require SSO authentication</SelectItem>
+                                  <SelectItem value="non-sso">
+                                    Email/password authentication
+                                  </SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                  )}
+                  {hasAccessToProjectLevelPermissions && (
+                    <FormField
+                      name="applyToOrg"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItemLayout layout="flex" label="Grant this role on all projects">
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                  )}
+                  {!applyToOrg && (
+                    <FormField
+                      name="projectRef"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItemLayout
+                          label="Select a project"
+                          description="Project access can be adjusted after the user joins"
+                        >
+                          <FormControl>
+                            <OrganizationProjectSelector
+                              fetchOnMount
+                              sameWidthAsTrigger
+                              checkPosition="left"
+                              selectedRef={projectRef}
+                              open={projectDropdownOpen}
+                              setOpen={setProjectDropdownOpen}
+                              searchPlaceholder="Search project..."
+                              onSelect={(project) => field.onChange(project.ref)}
+                              onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
                             />
-                          )
-                        })}
-                      </RadioGroupStacked>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-              {hasSsoProvider && (
-                <FormField
-                  name="requireSso"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Invitation type"
-                      description="Choose how the invitee should authenticate"
-                    >
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Automatic (based on your account)" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              <SelectItem value="auto">
-                                Automatic (based on your account)
-                              </SelectItem>
-                              <SelectItem value="sso">Require SSO authentication</SelectItem>
-                              <SelectItem value="non-sso">Email/password authentication</SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItemLayout>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
                   )}
-                />
-              )}
-              {hasAccessToProjectLevelPermissions && (
-                <FormField
-                  name="applyToOrg"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout layout="flex" label="Grant this role on all projects">
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              )}
-              {!applyToOrg && (
-                <FormField
-                  name="projectRef"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Select a project"
-                      description="Project access can be adjusted after the user joins"
-                    >
-                      <FormControl>
-                        <OrganizationProjectSelector
-                          fetchOnMount
-                          sameWidthAsTrigger
-                          checkPosition="left"
-                          selectedRef={projectRef}
-                          open={projectDropdownOpen}
-                          setOpen={setProjectDropdownOpen}
-                          searchPlaceholder="Search project..."
-                          onSelect={(project) => field.onChange(project.ref)}
-                          onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
-                        />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              )}
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout label="Email addresses">
-                    <FormControl>
-                      <ExpandingTextArea
-                        autoFocus
-                        {...field}
-                        autoComplete="off"
-                        disabled={isInviting}
-                        placeholder="name@example.com, name2@example.com, ..."
-                        className="max-h-48"
-                        data-1p-ignore
-                        data-lpignore="true"
-                        data-form-type="other"
-                        data-bwignore
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
+                  <FormField
+                    name="email"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout label="Email addresses">
+                        <FormControl>
+                          <ExpandingTextArea
+                            autoFocus
+                            {...field}
+                            autoComplete="off"
+                            disabled={isInviting}
+                            placeholder="name@example.com, name2@example.com, ..."
+                            className="max-h-48"
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            data-bwignore
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </div>
+              </div>
             </DialogSection>
             <DialogFooter className="justify-between!">
               <Button type="default" onClick={confirmOnClose}>
