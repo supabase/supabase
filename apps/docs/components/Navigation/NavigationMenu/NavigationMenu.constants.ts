@@ -338,6 +338,10 @@ export const gettingstarted: NavMenuConstant = {
   items: [
     { name: 'Build with AI tools', url: '/guides/ai-tools' },
     { name: 'API Keys', url: '/guides/getting-started/api-keys' },
+    {
+      name: 'Migrate to new API keys',
+      url: '/guides/getting-started/migrating-to-new-api-keys',
+    },
     { name: 'Local Development', url: '/guides/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {

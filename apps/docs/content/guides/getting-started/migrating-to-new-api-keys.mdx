@@ -1,0 +1,133 @@
+---
+id: 'migrating-to-new-api-keys'
+title: 'Migrate to publishable and secret API keys'
+description: 'Move from legacy JWT-based anon and service_role keys to publishable and secret keys with zero downtime.'
+---
+
+Supabase has changed the way API keys work. The legacy `anon` and `service_role` keys are based on your project's JWT secret, which makes them hard to rotate without downtime. The new publishable (`sb_publishable_...`) and secret (`sb_secret_...`) keys can be created, named, and revoked independently, so you can rotate a single key without touching the rest of your app. Read [the full announcement](https://github.com/orgs/supabase/discussions/29260) for the background.
+
+This guide walks through migrating an existing project. Both key types work at the same time, so you can swap clients one at a time and deactivate the legacy keys only once nothing depends on them.
+
+<Admonition type="note">
+
+The legacy `anon` and `service_role` keys keep working until the end of 2026. You don't have to migrate today, but doing it early lets you rotate keys safely from now on.
+
+</Admonition>
+
+## Before you start
+
+The migration maps onto your existing keys:
+
+| Legacy key     | Replace with    | Used by                                                |
+| -------------- | --------------- | ------------------------------------------------------ |
+| `anon`         | Publishable key | Browsers, mobile and desktop apps, CLIs, public source |
+| `service_role` | Secret key      | Servers, Edge Functions, workers, other backend code   |
+
+For a full explanation of each key type, see [Understanding API keys](/docs/guides/getting-started/api-keys).
+
+## Step 1: Create the new API keys
+
+Open the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard and select the **Publishable and secret API keys** tab.
+
+Older projects don't have these keys yet. If you see a **Create new API keys** button, your project is still on legacy keys only. Creating the new keys is safe: it adds a publishable key and lets you create secret keys alongside your existing `anon` and `service_role` keys. Nothing breaks, and your legacy keys keep working.
+
+After creating them you'll have:
+
+- One publishable key, shown in full because it's safe to expose.
+- A space to create secret keys. Create one secret key per backend component so you can rotate them independently. Secret key values are shown once, so store them somewhere safe.
+
+## Step 2: Swap the publishable key in client code
+
+Anywhere you use the `anon` key in public code, switch to the publishable key. This includes web pages, mobile and desktop apps, and any CLI or script that ships to users.
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://your-project.supabase.co',
+  'sb_publishable_...' // was the anon key
+)
+```
+
+The publishable key carries the same low privileges as the `anon` key, so your [Row Level Security](/docs/guides/database/postgres/row-level-security) policies behave the same. User authentication through Supabase Auth is unchanged: the user still signs in and gets their own JWT.
+
+## Step 3: Swap the secret key in backend code
+
+Anywhere you use the `service_role` key on a server you control, switch to a secret key.
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://your-project.supabase.co',
+  'sb_secret_...' // was the service_role key
+)
+```
+
+Secret keys add protections the `service_role` key doesn't have. They return HTTP 401 if used in a browser (matched on the `User-Agent` header), and you can run a separate key per service so a single leak only forces one rotation.
+
+<Admonition type="caution">
+
+Secret keys bypass Row Level Security and have full access to your data. Keep them on backends you control, out of source control, and out of client code.
+
+</Admonition>
+
+## Step 4: Update Edge Functions
+
+Edge Functions need extra attention because the platform's built-in `verify_jwt` check only understands the legacy JWT-based keys. When a caller sends a publishable or secret key on the `apikey` header, the platform does not verify it for you. You authorize the request inside the function instead.
+
+Set `verify_jwt = false` for functions that accept the new keys, then authorize in code.
+
+```toml
+[functions.my-function]
+verify_jwt = false
+```
+
+The simplest way to authorize is the [`@supabase/server`](https://github.com/supabase/server) package. Its `withSupabase` wrapper checks the caller's key against your project's keys and hands you a pre-configured client.
+
+```ts
+import { withSupabase } from 'npm:@supabase/server'
+
+export default {
+  fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
+    // ctx.supabaseAdmin is authenticated with a valid secret key
+    return Response.json({ ok: true })
+  }),
+}
+```
+
+On the platform and in local development, `@supabase/server` reads its keys from environment variables that are provisioned for you:
+
+| Variable                    | What it is                              |
+| --------------------------- | --------------------------------------- |
+| `SUPABASE_PUBLISHABLE_KEYS` | Named publishable keys as a JSON object |
+| `SUPABASE_SECRET_KEYS`      | Named secret keys as a JSON object      |
+
+For user-facing functions, keep `verify_jwt = true` and `auth: 'user'`, which still works as before. See [Securing Edge Functions](/docs/guides/functions/auth) for every auth mode and [Authorization headers](/docs/guides/functions/auth-headers) for how the headers work.
+
+## Step 5: Verify nothing uses the legacy keys
+
+Before turning the legacy keys off, confirm nothing still depends on them. The [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section shows a last-used indicator for each key. Wait until the `anon` and `service_role` keys show no recent usage, accounting for clients that call your project infrequently.
+
+Don't forget callers that are easy to miss:
+
+- Mobile or desktop app versions already in users' hands.
+- CI/CD pipelines and deployment scripts.
+- Third-party integrations and webhooks.
+- Cron jobs, workers, and `pg_net` calls.
+
+## Step 6: Deactivate the legacy keys
+
+Once the `anon` and `service_role` keys show no usage, deactivate them in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section. You can re-activate them if you find a client you missed, so this step is reversible.
+
+## Known limitations
+
+A few behaviors differ from the legacy JWT-based keys. Plan for them during the migration:
+
+- You can't send a publishable or secret key in the `Authorization: Bearer ...` header. Send it on the `apikey` header instead.
+- Edge Functions don't verify the `apikey` header for the new keys. Use `verify_jwt = false` and authorize in code, as shown in [Step 4](#step-4-update-edge-functions).
+- Public Realtime connections are limited to 24 hours unless the connection is upgraded with user-level authentication through Supabase Auth or a supported third-party auth provider.
+
+## Next steps
+
+After migrating your keys, consider moving to the [JWT signing keys](/docs/guides/auth/signing-keys) system as well. It replaces the shared JWT secret with rotatable signing keys and pairs with the publishable and secret keys to give you independent rotation across your whole project.
