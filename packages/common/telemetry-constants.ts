@@ -1157,7 +1157,7 @@ export interface SqlEditorQueryRunButtonClickedEvent {
  * @source studio
  * @page /billing
  */
-export interface StudioBillingCancelSubscriptionClicked {
+export interface StudioBillingCancelSubscriptionClickedEvent {
   action: 'studio_billing_cancel_subscription_clicked'
   properties: {
     /**
@@ -3391,7 +3391,7 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyRemovedEvent
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
-  | StudioBillingCancelSubscriptionClicked
+  | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
