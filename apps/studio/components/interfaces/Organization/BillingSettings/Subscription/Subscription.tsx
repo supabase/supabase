@@ -5,8 +5,8 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
+import { InitiateCancellationFlowButton } from './CancellationFlow'
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
@@ -84,16 +84,20 @@ const Subscription = () => {
 
                   <div>
                     {canChangeTier ? (
-                      <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                      <div className="flex space-x-2">
                         <Button
                           type="default"
                           className="pointer-events-auto"
-                          disabled={!canChangeTier}
                           onClick={() => snap.setPanelKey('subscriptionPlan')}
                         >
                           Change subscription plan
                         </Button>
-                      </ProjectUpdateDisabledTooltip>
+                        {currentPlan && currentPlan.id !== 'free' && (
+                          <InitiateCancellationFlowButton type="default">
+                            Cancel Subscription
+                          </InitiateCancellationFlowButton>
+                        )}
+                      </div>
                     ) : projectUpdateDisabled ? (
                       <Admonition
                         type="default"

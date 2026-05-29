@@ -1151,6 +1151,24 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
+ * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing
+ */
+export interface StudioBillingCancelSubscriptionClicked {
+  action: 'studio_billing_cancel_subscription_clicked'
+  properties: {
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked on the CTA button on a plan in the pricing side panel in studio.
  *
  * @group Events
@@ -3373,6 +3391,7 @@ export type TelemetryEvent =
   | StoragePublicBucketSelectPolicyRemovedEvent
   | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
+  | StudioBillingCancelSubscriptionClicked
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent

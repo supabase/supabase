@@ -183,7 +183,13 @@ export const DowngradeModal = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="warning" onClick={onConfirm}>
+          <AlertDialogAction
+            variant="warning"
+            onClick={(e) => {
+              e.preventDefault()
+              onConfirm()
+            }}
+          >
             Confirm
           </AlertDialogAction>
         </AlertDialogFooter>
