@@ -282,6 +282,7 @@ test.describe('Database', () => {
 
       // create a new table
       await page.getByRole('button', { name: 'New table' }).click()
+      await expect(page.getByText('Create a new table under public')).toBeVisible()
       await page.getByLabel('Name', { exact: true }).fill(databaseTableNameNew)
       const createTableWait = createApiResponseWaiter(
         page,
@@ -295,11 +296,19 @@ test.describe('Database', () => {
       await createTableWait
       await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameNew, { exact: true })).toBeVisible()
+      await expect(page.getByText('Table pw_database_table_crud_new is good to go!')).toBeVisible()
+      await page.getByRole('button', { name: 'Close toast' }).click()
 
       // edit a new table
-      await page.getByRole('row', { name: databaseTableNameNew }).getByRole('button').last().click()
+      await page
+        .getByRole('row', { name: databaseTableNameNew })
+        .getByRole('button', { name: `Table ${databaseTableNameNew} actions` })
+        .click()
       await page.getByRole('menuitem', { name: 'Edit table' }).click()
-      await page.getByTestId('table-name-input').fill(databaseTableNameUpdated)
+      await expect(page.getByText(`Update table ${databaseTableNameNew}`)).toBeVisible()
+      // Ensure table data is loaded
+      await expect(page.getByLabel('Name', { exact: true })).toHaveValue(databaseTableNameNew)
+      await page.getByLabel('Name', { exact: true }).fill(databaseTableNameUpdated)
       const updateTableWait = createApiResponseWaiter(
         page,
         'pg-meta',
@@ -312,12 +321,15 @@ test.describe('Database', () => {
       await updateTableWait
       await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameUpdated, { exact: true })).toBeVisible()
+      await expect(
+        page.getByText(`Successfully updated ${databaseTableNameUpdated}!`)
+      ).toBeVisible()
+      await page.getByRole('button', { name: 'Close toast' }).click()
 
       // duplicate table
       await page
         .getByRole('row', { name: databaseTableNameUpdated })
-        .getByRole('button')
-        .last()
+        .getByRole('button', { name: `Table ${databaseTableNameUpdated} actions` })
         .click()
       await page.getByRole('menuitem', { name: 'Duplicate Table' }).click()
       await page.getByLabel('Name').fill(databaseTableNameDuplicate)
@@ -329,12 +341,17 @@ test.describe('Database', () => {
       await duplicateTableWait
       await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameDuplicate, { exact: true })).toBeVisible()
+      await expect(
+        page.getByText(
+          `Table ${databaseTableNameUpdated} has been successfully duplicated into ${databaseTableNameDuplicate}!`
+        )
+      ).toBeVisible()
+      await page.getByRole('button', { name: 'Close toast' }).click()
 
       // delete tables
       await page
-        .getByRole('row', { name: `${databaseTableNameDuplicate}` })
-        .getByRole('button')
-        .last()
+        .getByRole('row', { name: databaseTableNameUpdated })
+        .getByRole('button', { name: `Table ${databaseTableNameUpdated} actions` })
         .click()
       await page.getByRole('menuitem', { name: 'Delete table' }).click()
       await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
@@ -348,9 +365,8 @@ test.describe('Database', () => {
       await deleteDuplicateWait
 
       await page
-        .getByRole('row', { name: `${databaseTableNameUpdated}` })
-        .getByRole('button')
-        .last()
+        .getByRole('row', { name: databaseTableNameDuplicate })
+        .getByRole('button', { name: `Table ${databaseTableNameDuplicate} actions` })
         .click()
       await page.getByRole('menuitem', { name: 'Delete table' }).click()
       await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
