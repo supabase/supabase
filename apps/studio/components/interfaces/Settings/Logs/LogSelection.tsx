@@ -70,6 +70,19 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
 
         return <DefaultPreviewSelectionRenderer log={apiLog} />
 
+      case 'multigres':
+        const parsedMultigresMessage = (() => {
+          if (typeof log.event_message !== 'string') return null
+          try {
+            const parsed = JSON.parse(log.event_message)
+            return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null
+          } catch {
+            return null
+          }
+        })()
+        const multigresLog = parsedMultigresMessage ? { ...log, ...parsedMultigresMessage } : log
+        return <DefaultPreviewSelectionRenderer log={multigresLog} />
+
       case 'database':
         const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
         const detail = log?.metadata?.[0]?.parsed?.[0]?.detail
