@@ -84,7 +84,7 @@ const Subscription = () => {
 
                   <div>
                     {canChangeTier ? (
-                      <div className="flex space-x-2">
+                      <div className="flex justify-between">
                         <Button
                           type="default"
                           className="pointer-events-auto"
@@ -93,7 +93,7 @@ const Subscription = () => {
                           Change subscription plan
                         </Button>
                         {currentPlan && currentPlan.id !== 'free' && (
-                          <InitiateCancellationFlowButton type="default">
+                          <InitiateCancellationFlowButton type="danger">
                             Cancel Subscription
                           </InitiateCancellationFlowButton>
                         )}
