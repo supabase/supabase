@@ -298,8 +298,21 @@ The same set drives every runtime read that depends on the new layout:
   (`getRefMarkdownForLib`) picks between
   `docs/ref/<libPath>/[<version>/]<id>.mdx` and
   `content/reference/<libPath>/<version>/<id>.mdx`.
+- The legacy section-generation script
+  [`Reference.generated.script.ts`](../../features/docs/Reference.generated.script.ts)
+  filters out libs in the set, so no `supabase_<lib>_v<ver>.yml` is read for
+  them. Migrated libs therefore drop their `specFile` field from
+  [`content/navigation.references.ts`](../../content/navigation.references.ts)
+  (see the JS v2 entry for an example).
+- Search/embeddings ingest in
+  [`scripts/search/sources/index.ts`](../../scripts/search/sources/index.ts):
+  `fetchJsLibReferenceSource()` calls `loadClientLibReferenceFromNewPipeline()`
+  which reads `content/reference/javascript/v2/{sections,functions,typeSpec}.json`
+  directly. Other libs still go through `ClientLibReferenceLoader` against
+  their YAML. To migrate another lib, swap the same way once it's in
+  `SUPPORTS_NEW_REFERENCE_PROCESS`.
 
-No other call sites need to change.
+No other call sites in the render path need to change.
 
 > ⚠️ Don't move the constant. `Reference.utils.ts` transitively pulls in
 > `next/navigation`, which crashes `tsx --conditions=react-server` (used by

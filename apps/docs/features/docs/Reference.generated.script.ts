@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
+import { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
@@ -164,6 +165,10 @@ async function writeSdkReferenceSections() {
           version,
         }))
       })
+      // Libs that opted into the new pipeline emit their own outputs via
+      // `scripts/build-reference-content.ts`. Skip them here so the legacy
+      // script doesn't need a YAML spec file for them at all.
+      .filter(({ sdkId, version }) => !SUPPORTS_NEW_REFERENCE_PROCESS.has(`${sdkId}-${version}`))
       .flatMap(async ({ sdkId, version }) => {
         const spec = await getSpec(REFERENCES[sdkId].meta[version].specFile)
 
