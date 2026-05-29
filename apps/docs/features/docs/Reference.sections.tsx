@@ -472,7 +472,7 @@ async function FunctionSection({
 
   let types: MethodTypes | VariableTypes | undefined
   if (useTypeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(sdkId, version, fn['$ref'] as string)
   }
 
   const fullDescription = [

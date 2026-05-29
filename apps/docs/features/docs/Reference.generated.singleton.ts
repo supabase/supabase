@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'
-import type { ModuleTypes } from '~/features/docs/Reference.typeSpec'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { parse } from 'yaml'
 
@@ -13,7 +13,8 @@ import { type IApiEndPoint } from './Reference.api.utils'
  * listed in `SUPPORTS_NEW_REFERENCE_PROCESS` we read from the new
  * `content/reference/<sdk>/<version>/<name>.json` layout produced by
  * `scripts/build-reference-content.ts`; otherwise fall back to the legacy
- * `features/docs/generated/<sdk>.<version>.<name>.json` files.
+ * `features/docs/generated/<sdk>.<version>.<name>.json` files (still used by
+ * SDKs whose content hasn't migrated to the new pipeline).
  */
 function generatedReferencePath(sdkId: string, version: string, name: string): string {
   if (SUPPORTS_NEW_REFERENCE_PROCESS.has(`${sdkId}-${version}`)) {
@@ -22,40 +23,39 @@ function generatedReferencePath(sdkId: string, version: string, name: string): s
   return join(process.cwd(), 'features/docs/generated', `${sdkId}.${version}.${name}.json`)
 }
 
-let typeSpec: Array<ModuleTypes>
-
-async function _typeSpecSingleton() {
-  if (!typeSpec) {
-    const rawJson = await readFile(
-      join(process.cwd(), 'features/docs', './generated/typeSpec.json'),
-      'utf-8'
-    )
-    typeSpec = JSON.parse(rawJson, (key, value) => {
-      if (key === 'methods' || key === 'variables') {
-        return new Map(Object.entries(value))
-      } else {
-        return value
-      }
-    })
-  }
-
-  return typeSpec
-}
-
 function normalizeRefPath(path: string) {
   return path.replace(/\.index(?=\.|$)/g, '').replace(/\.+/g, '.')
 }
 
-export async function getTypeSpec(ref: string) {
-  const modules = await _typeSpecSingleton()
+/**
+ * Per-lib typeSpec cache. Each entry is the parsed
+ * `content/reference/<sdk>/<version>/typeSpec.json` — a `{ methods, variables }`
+ * object keyed by normalised `$ref`. Only libraries flagged
+ * `typeSpec: true` in `content/navigation.references.ts` actually call
+ * `getTypeSpec`, and all such libraries must be in
+ * `SUPPORTS_NEW_REFERENCE_PROCESS`.
+ */
+type TypeSpecFile = {
+  methods: Record<string, MethodTypes>
+  variables: Record<string, VariableTypes>
+}
+const typeSpecCache = new Map<string, TypeSpecFile>()
 
+async function loadTypeSpec(sdkId: string, version: string): Promise<TypeSpecFile> {
+  const key = `${sdkId}.${version}`
+  const cached = typeSpecCache.get(key)
+  if (cached) return cached
+
+  const rawJson = await readFile(generatedReferencePath(sdkId, version, 'typeSpec'), 'utf-8')
+  const parsed = JSON.parse(rawJson) as TypeSpecFile
+  typeSpecCache.set(key, parsed)
+  return parsed
+}
+
+export async function getTypeSpec(sdkId: string, version: string, ref: string) {
+  const spec = await loadTypeSpec(sdkId, version)
   const normalizedRef = normalizeRefPath(ref)
-  const delimiter = normalizedRef.indexOf('.')
-  const refMod = normalizedRef.substring(0, delimiter)
-
-  const mod = modules.find((mod) => mod.name === refMod)
-  // Check methods first, then variables
-  return mod?.methods.get(normalizedRef) ?? mod?.variables.get(normalizedRef)
+  return spec.methods[normalizedRef] ?? spec.variables[normalizedRef]
 }
 
 let cliSpec: Json

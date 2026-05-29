@@ -16,6 +16,16 @@ import { dirname, extname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import matter from 'gray-matter'
 
+import {
+  buildMap,
+  KIND_VARIABLE,
+  normalizeComment,
+  parseSignature,
+  parseType,
+  type MethodTypes,
+  type VariableTypes,
+} from '../features/docs/Reference.typeSpec'
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DOCS_DIR = join(__dirname, '..')
 const SPEC_DIR = join(DOCS_DIR, 'spec/reference')
@@ -70,21 +80,14 @@ interface FunctionsEntry {
   [key: string]: unknown
 }
 
-interface TypeSpecMethod {
-  ref: string
-  params: Array<{ name: string; type: unknown; isOptional?: boolean }>
-  returnType?: unknown
-}
-
-interface TypeSpecVariable {
-  ref: string
-  type?: unknown
-  isConst?: boolean
-}
-
+/**
+ * Per-lib typeSpec.json shape. Keys are normalised `$ref`s; values mirror the
+ * legacy `MethodTypes` / `VariableTypes` so the renderer in
+ * `Reference.sections.tsx` can consume the new file without changes.
+ */
 interface TypeSpec {
-  methods: Record<string, TypeSpecMethod>
-  variables: Record<string, TypeSpecVariable>
+  methods: Record<string, MethodTypes>
+  variables: Record<string, VariableTypes>
 }
 
 interface BySlugFunction {
@@ -240,10 +243,16 @@ function normalizeRefPath(path: string): string {
  *     `@subcategory`) plus a constructed `$ref` of the form
  *     `<package>.<module…>.<class…>.<name>` (normalized to strip `.index.`).
  *   - `typeSpec`: separate `methods` and `variables` maps keyed by the same
- *     `$ref`. Methods get their first signature's parameters and return type;
- *     variables (kind 32) get their type and `isConst` flag. Not filtered by
- *     category or `excludeDefinitions`, so partials that link to "hidden"
- *     methods (e.g. a constructor) can still resolve.
+ *     `$ref`. Methods carry every signature (first → primary, rest →
+ *     `altSignatures`) with params, return type, and normalised comment
+ *     (shortText, text, tags, examples). Variables (kind 32) carry their
+ *     parsed type and `isConst` flag. Type-tree normalisation and comment
+ *     extraction are delegated to the shared helpers in
+ *     `~/features/docs/Reference.typeSpec` so the renderer can consume the
+ *     output without any shape translation.
+ *
+ *   Not filtered by category or `excludeDefinitions`, so partials that link
+ *   to "hidden" methods (e.g. a constructor) can still resolve.
  *
  * Context is threaded down through container nodes:
  *   - kind 1 (project) sets the package name and resets the path.
@@ -260,6 +269,7 @@ const PATH_CONTAINER_KINDS = new Set([2, 4, 128, 256])
 function collectFunctions(
   node: Declaration,
   out: { functions: FunctionEntry[]; typeSpec: TypeSpec },
+  idMap: Map<number, any>,
   ctx: { pkg: string | null; path: string[] } = { pkg: null, path: [] }
 ): void {
   let nextCtx = ctx
@@ -272,20 +282,37 @@ function collectFunctions(
   if (ctx.pkg && node.name) {
     const ref = normalizeRefPath([ctx.pkg, ...ctx.path, node.name].join('.'))
     if (node.signatures?.length) {
-      const sig = node.signatures[0]
-      out.typeSpec.methods[ref] = {
-        ref,
-        params: (sig.parameters ?? []).map((p) => {
-          const entry: TypeSpecMethod['params'][number] = { name: p.name, type: p.type }
-          if (p.flags?.isOptional) entry.isOptional = true
-          return entry
-        }),
-        returnType: sig.type,
+      const firstSig = node.signatures[0]
+      const { params, ret, comment: sigComment } = parseSignature(firstSig, idMap)
+
+      // Some overloaded methods carry shared JSDoc (e.g. @remarks, @example)
+      // on the declaration node rather than any individual signature. Merge
+      // node-level tags as a base so they aren't lost when the first
+      // signature only has a summary.
+      let comment = sigComment
+      if (node.comment) {
+        const nodeComment = normalizeComment(node.comment as any)
+        if (nodeComment) {
+          comment = { ...nodeComment, ...sigComment }
+        }
       }
-    } else if (node.kind === 32 && node.type) {
-      const entry: TypeSpecVariable = { ref, type: node.type }
-      if (node.flags?.isConst) entry.isConst = true
-      out.typeSpec.variables[ref] = entry
+
+      const methodEntry: MethodTypes = { name: ref, params, ret, comment }
+      if (node.signatures.length > 1) {
+        methodEntry.altSignatures = node.signatures.slice(1).map((sig) => {
+          const { params: altParams, ret: altRet } = parseSignature(sig, idMap)
+          return { params: altParams, ret: altRet }
+        }) as MethodTypes['altSignatures']
+      }
+      out.typeSpec.methods[ref] = methodEntry
+    } else if (node.kind === KIND_VARIABLE && node.type) {
+      const variableEntry: VariableTypes = {
+        name: ref,
+        type: parseType(node.type, idMap),
+        comment: node.comment ? normalizeComment(node.comment as any) : undefined,
+        isConst: node.flags?.isConst ?? false,
+      }
+      out.typeSpec.variables[ref] = variableEntry
     }
   }
 
@@ -300,7 +327,7 @@ function collectFunctions(
 
   if (node.children) {
     for (const child of node.children) {
-      collectFunctions(child, out, nextCtx)
+      collectFunctions(child, out, idMap, nextCtx)
     }
   }
 }
@@ -547,7 +574,11 @@ async function processVersion(library: string, version: string): Promise<void> {
   for (const file of files) {
     const raw = await readFile(join(versionDir, file), 'utf-8')
     const spec = JSON.parse(raw) as Declaration
-    collectFunctions(spec, collected)
+    // Build a numeric id → node map per package file so `parseType`'s reference
+    // resolution can walk dereferenced types and aliased declarations.
+    const idMap = new Map<number, any>()
+    buildMap(spec, idMap)
+    collectFunctions(spec, collected, idMap)
   }
 
   const { bySlug, sections, functionsList } = buildBySlug(collected.functions, partials, config)

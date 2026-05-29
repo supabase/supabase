@@ -1,11 +1,3 @@
-import { toHtml } from 'hast-util-to-html'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { mdxFromMarkdown } from 'mdast-util-mdx'
-import { toHast } from 'mdast-util-to-hast'
-import { mdxjs } from 'micromark-extension-mdxjs'
-import { notFound } from 'next/navigation'
-import { visit } from 'unist-util-visit'
-
 import { REFERENCES } from '~/content/navigation.references'
 import {
   getFlattenedSections,
@@ -16,6 +8,13 @@ import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { BASE_PATH } from '~/lib/constants'
+import { toHtml } from 'hast-util-to-html'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { mdxFromMarkdown } from 'mdast-util-mdx'
+import { toHast } from 'mdast-util-to-hast'
+import { mdxjs } from 'micromark-extension-mdxjs'
+import { notFound } from 'next/navigation'
+import { visit } from 'unist-util-visit'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -138,7 +137,7 @@ async function functionDetails(
 
   let types: MethodTypes | VariableTypes | undefined
   if (libraryMeta.typeSpec && '$ref' in fn) {
-    types = await getTypeSpec(fn['$ref'] as string)
+    types = await getTypeSpec(lib, version ?? libraryMeta.versions[0], fn['$ref'] as string)
   }
 
   const fullDescription = [
