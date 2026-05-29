@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import {
@@ -11,7 +12,6 @@ import {
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { handleError, post } from '@/data/fetchers'
 import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -27,13 +27,14 @@ export async function getUnifiedLogsCount(
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
   const endpoint = logsAllEndpointUrl(useOtel)
-  const { data, error } = await post(endpoint, {
-    params: { path: { ref: projectRef } },
-    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: isoTimestampEnd,
     signal,
   })
-
-  if (error) handleError(error)
 
   // Process count results into facets structure
   const facets: Record<string, FacetMetadataSchema> = {}

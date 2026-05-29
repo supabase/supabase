@@ -5,6 +5,17 @@ import * as React from "react"
 
 export const Index: Record<string, any> = {
   "default": {
+    "CollapsibleCardSection": {
+      name: "CollapsibleCardSection",
+      type: "components:fragment",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/CollapsibleCardSection")),
+      source: "",
+      files: ["registry/default//CollapsibleCardSection.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "ConfirmationModal": {
       name: "ConfirmationModal",
       type: "components:fragment",
@@ -225,6 +236,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "collapsible-card-section-demo": {
+      name: "collapsible-card-section-demo",
+      type: "components:example",
+      registryDependencies: ["collapsible-card-section"],
+      component: React.lazy(() => import("@/registry/default/example/collapsible-card-section-demo")),
+      source: "",
+      files: ["registry/default/example/collapsible-card-section-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "alert-dialog-demo": {
       name: "alert-dialog-demo",
       type: "components:example",
@@ -243,6 +265,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/alert-dialog-close-only")),
       source: "",
       files: ["registry/default/example/alert-dialog-close-only.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-async": {
+      name: "alert-dialog-async",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-async")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-async.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "alert-dialog-async-error": {
+      name: "alert-dialog-async-error",
+      type: "components:example",
+      registryDependencies: ["alert-dialog","button","admonition"],
+      component: React.lazy(() => import("@/registry/default/example/alert-dialog-async-error")),
+      source: "",
+      files: ["registry/default/example/alert-dialog-async-error.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -3147,6 +3191,160 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/mermaid-basic")),
       source: "",
       files: ["registry/default/example/mermaid-basic.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-full-example": {
+      name: "markdown-full-example",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-full-example")),
+      source: "",
+      files: ["registry/default/example/markdown-full-example.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-customization": {
+      name: "markdown-customization",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-customization")),
+      source: "",
+      files: ["registry/default/example/markdown-customization.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-headings": {
+      name: "markdown-headings",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-headings")),
+      source: "",
+      files: ["registry/default/example/markdown-headings.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-paragraphs": {
+      name: "markdown-paragraphs",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-paragraphs")),
+      source: "",
+      files: ["registry/default/example/markdown-paragraphs.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-lists": {
+      name: "markdown-lists",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-lists")),
+      source: "",
+      files: ["registry/default/example/markdown-lists.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-links": {
+      name: "markdown-links",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-links")),
+      source: "",
+      files: ["registry/default/example/markdown-links.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-inline-code": {
+      name: "markdown-inline-code",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-inline-code")),
+      source: "",
+      files: ["registry/default/example/markdown-inline-code.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-blockquotes": {
+      name: "markdown-blockquotes",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-blockquotes")),
+      source: "",
+      files: ["registry/default/example/markdown-blockquotes.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-code-blocks": {
+      name: "markdown-code-blocks",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-code-blocks")),
+      source: "",
+      files: ["registry/default/example/markdown-code-blocks.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-tables": {
+      name: "markdown-tables",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-tables")),
+      source: "",
+      files: ["registry/default/example/markdown-tables.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-images": {
+      name: "markdown-images",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-images")),
+      source: "",
+      files: ["registry/default/example/markdown-images.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-horizontal-rules": {
+      name: "markdown-horizontal-rules",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-horizontal-rules")),
+      source: "",
+      files: ["registry/default/example/markdown-horizontal-rules.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-quote-component": {
+      name: "markdown-quote-component",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-quote-component")),
+      source: "",
+      files: ["registry/default/example/markdown-quote-component.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "markdown-avatar-component": {
+      name: "markdown-avatar-component",
+      type: "components:example",
+      registryDependencies: ["markdown"],
+      component: React.lazy(() => import("@/registry/default/example/markdown-avatar-component")),
+      source: "",
+      files: ["registry/default/example/markdown-avatar-component.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

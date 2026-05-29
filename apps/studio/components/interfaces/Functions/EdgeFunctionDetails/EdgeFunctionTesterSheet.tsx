@@ -44,12 +44,11 @@ import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-que
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { prettifyJSON } from '@/lib/helpers'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   RoleImpersonationStateContextProvider,
   useGetImpersonatedRoleState,
@@ -96,7 +95,6 @@ export const EdgeFunctionTesterSheet = (props: EdgeFunctionTesterSheetProps) => 
 }
 
 const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
-  const { data: org } = useSelectedOrganizationQuery()
   const { ref: projectRef, functionSlug } = useParams()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
@@ -110,7 +108,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
   const { serviceKey } = getKeys(apiKeys)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: testEdgeFunction, isPending } = useEdgeFunctionTestMutation({
     onSuccess: (res) => setResponse(res),
     onError: (err) => {
@@ -479,16 +477,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
                     loading={isPending}
                     disabled={isPending}
                     onClick={() =>
-                      sendEvent({
-                        action: 'edge_function_test_send_button_clicked',
-                        properties: {
-                          httpMethod: method,
-                        },
-                        groups: {
-                          project: projectRef ?? 'Unknown',
-                          organization: org?.slug ?? 'Unknown',
-                        },
-                      })
+                      track('edge_function_test_send_button_clicked', { httpMethod: method })
                     }
                   >
                     Send Request

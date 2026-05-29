@@ -339,7 +339,9 @@ export function LogsSidebarMenuV2() {
           <InnerSideBarEmptyPanel
             className="mx-4"
             title="No queries created yet"
-            description="Create and save your queries to use them in the explorer"
+            description={
+              IS_PLATFORM ? 'Create and save your queries to use them in the explorer' : undefined
+            }
             actions={
               <Button asChild type="default">
                 <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>

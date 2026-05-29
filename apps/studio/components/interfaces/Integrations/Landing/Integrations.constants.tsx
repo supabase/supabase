@@ -231,8 +231,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/CronJobs/OverviewTab').then(
+                (mod) => mod.CronOverviewTab
               ),
             {
               loading: Loading,
@@ -275,8 +275,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/Vault/OverviewTab').then(
+                (mod) => mod.VaultOverviewTab
               ),
             {
               loading: Loading,
@@ -445,8 +445,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/GraphQL/OverviewTab').then(
+                (mod) => mod.GraphQLOverviewTab
               ),
             {
               loading: Loading,
@@ -480,6 +480,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
     requiredExtensions: ['wrappers', 'supabase_vault'],
     description: w.description,
     docsUrl: w.docsUrl,
+    categories: w.categories,
     meta: w,
     author: authorSupabase,
     navigation: [
@@ -640,11 +641,34 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
   },
 ]
 
-export const INTEGRATIONS: Array<IntegrationDefinition> = [
+const INTEGRATIONS_WITH_CATEGORIES = [
   ...WRAPPER_INTEGRATIONS,
-  ...SUPABASE_INTEGRATIONS,
-  ...TEMPLATE_INTEGRATIONS,
+  ...SUPABASE_INTEGRATIONS.map((integration) => {
+    const categoryMap: Record<string, string[]> = {
+      queues: ['devtools'],
+      cron: ['devtools'],
+      vault: ['security'],
+      webhooks: ['api'],
+      data_api: ['api', 'data-platform'],
+      graphiql: ['api', 'devtools'],
+    }
+    return {
+      ...integration,
+      categories: categoryMap[integration.id] || [],
+    }
+  }),
+  ...TEMPLATE_INTEGRATIONS.map((integration) => {
+    const categoryMap: Record<string, string[]> = {
+      stripe_sync_engine: ['billing'],
+    }
+    return {
+      ...integration,
+      categories: categoryMap[integration.id] || [],
+    }
+  }),
 ]
+
+export const INTEGRATIONS: Array<IntegrationDefinition> = INTEGRATIONS_WITH_CATEGORIES
 
 export const Loading = () => (
   <div className="p-10">
