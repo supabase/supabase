@@ -156,6 +156,26 @@ const nextConfig = {
         permanent: false,
       },
 
+      // Reference pages use hash anchors for sections; redirect the legacy
+      // path-style /reference/<lib>/introduction (and versioned variants)
+      // back to the base reference URL. Order matters: introduction first so
+      // it strips to a bare URL, then the section rules add a hash anchor.
+      {
+        source: '/reference/:path*/introduction',
+        destination: '/reference/:path*',
+        permanent: true,
+      },
+      {
+        source: '/reference/:lib/:version(v\\d+)/:section',
+        destination: '/reference/:lib/:version#:section',
+        permanent: true,
+      },
+      {
+        source: '/reference/:lib/:section((?!v\\d+$)[^/]+)',
+        destination: '/reference/:lib#:section',
+        permanent: true,
+      },
+
       // Redirect old external replication slugs in dev/preview envs
       {
         source: '/guides/database/replication/replication-setup',
