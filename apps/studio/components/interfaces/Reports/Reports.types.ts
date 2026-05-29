@@ -24,7 +24,7 @@ export type BaseQueries<Keys extends string> = Record<Keys, ReportQuery>
 
 export interface ReportQueryLogs {
   queryType: 'logs'
-  sql: (
+  safeSql: (
     filters: ReportFilterItem[],
     where?: string,
     orderBy?: string,

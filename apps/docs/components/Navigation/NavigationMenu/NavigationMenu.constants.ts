@@ -756,6 +756,12 @@ export const auth: NavMenuConstant = {
         },
 
         {
+          name: 'Passkey',
+          url: '/guides/auth/passkeys',
+          enabled: allAuthProvidersEnabled,
+        },
+
+        {
           name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
           items: [{ name: 'Overview', url: '/guides/auth/social-login' }, ...SocialLoginItems],
@@ -1655,10 +1661,6 @@ export const functions: NavMenuConstant = {
         {
           name: 'Troubleshooting',
           url: '/guides/functions/troubleshooting' as `/${string}`,
-        },
-        {
-          name: 'Worker timeouts and WebSocket drops',
-          url: '/troubleshooting/edge-functions-worker-timeouts-and-websocket-drops' as `/${string}`,
         },
       ],
     },

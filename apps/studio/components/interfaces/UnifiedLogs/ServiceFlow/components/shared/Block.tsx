@@ -6,16 +6,15 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { BlockFieldConfig, BlockFieldProps, ServiceFlowBlockProps } from '../../types'
 import { DetailRow } from './DetailRow'
 import { DetailSectionHeader } from './DetailSection'
-import { FieldValue } from './FieldValue'
 
-export interface BlockSection {
+interface BlockSection {
   title: string
   icon?: LucideIcon
   fields: BlockFieldConfig[]
   collapsible?: boolean
 }
 
-export interface FieldWithSeeMoreSection {
+interface FieldWithSeeMoreSection {
   type: 'fieldWithSeeMore'
   primaryField: BlockFieldConfig
   additionalFields: BlockFieldConfig[]
@@ -41,14 +40,13 @@ const FieldRow = ({
   const showSkeleton = !!config.requiresEnrichedData && !!isLoading && !value
   return (
     <DetailRow
-      label={config.label}
-      value={<FieldValue config={config} value={value} wrap={config.wrap} />}
-      filterId={config.id}
+      config={config}
+      level={data.level}
+      value={value}
       filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
       filterFields={filterFields}
       table={table}
       isLoading={showSkeleton}
-      wrap={config.wrap}
     />
   )
 }
@@ -75,7 +73,7 @@ export function createBlock(config: BlockConfig) {
     return (
       <>
         <Collapsible defaultOpen>
-          <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180!">
+          <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
             <DetailSectionHeader title={config.title} icon={config.icon} />
             <ChevronDown
               className="transition-transform duration-200"

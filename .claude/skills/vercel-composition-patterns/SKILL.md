@@ -63,7 +63,7 @@ Reference these guidelines when:
 
 ### 4. React 19 APIs (MEDIUM)
 
-> **⚠️ React 19+ only.** Supabase Studio currently uses React 18 — skip these patterns in Studio code.
+> **⚠️ React 19+ only.** Skip these patterns if you're on React 18 or earlier.
 
 - `react19-no-forwardref` - Don't use `forwardRef`; use `use()` instead of `useContext()`
 

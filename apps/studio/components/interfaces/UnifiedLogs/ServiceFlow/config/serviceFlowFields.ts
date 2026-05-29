@@ -24,23 +24,6 @@ const formatStorageDate = (dateString: string): string => {
 // NETWORK FIELDS
 // =============================================================================
 
-// Field configurations - using filterable field IDs where possible
-export const originFields: BlockFieldConfig[] = [
-  {
-    id: 'date', // Matches filterFields 'date' (timerange) - FILTERABLE
-    label: 'Time',
-    getValue: (data) => {
-      if (!data?.timestamp && !data?.date) return null
-      try {
-        const timestamp = data?.timestamp || data?.date
-        return new Date(timestamp).toLocaleString()
-      } catch {
-        return 'Invalid date'
-      }
-    },
-  },
-]
-
 // Primary Network Fields (Always Visible) - FILTERABLE
 export const networkPrimaryFields: BlockFieldConfig[] = [
   {
