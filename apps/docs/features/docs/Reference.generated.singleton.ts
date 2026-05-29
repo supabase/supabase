@@ -30,15 +30,19 @@ function normalizeRefPath(path: string) {
 /**
  * Per-lib typeSpec cache. Each entry is the parsed
  * `content/reference/<sdk>/<version>/typeSpec.json` — a `{ methods, variables }`
- * object keyed by normalised `$ref`. Only libraries flagged
- * `typeSpec: true` in `content/navigation.references.ts` actually call
- * `getTypeSpec`, and all such libraries must be in
- * `SUPPORTS_NEW_REFERENCE_PROCESS`.
+ * object keyed by normalised `$ref`. `typeSpec: true` in
+ * `content/navigation.references.ts` is set at the library level, so it
+ * applies to every version of that library — but only versions in
+ * `SUPPORTS_NEW_REFERENCE_PROCESS` actually have a typeSpec file. For
+ * versions without one (legacy versions like javascript-v1), we return an
+ * empty spec so the renderer simply omits signature/comment data instead of
+ * crashing the build.
  */
 type TypeSpecFile = {
   methods: Record<string, MethodTypes>
   variables: Record<string, VariableTypes>
 }
+const EMPTY_TYPESPEC: TypeSpecFile = { methods: {}, variables: {} }
 const typeSpecCache = new Map<string, TypeSpecFile>()
 
 async function loadTypeSpec(sdkId: string, version: string): Promise<TypeSpecFile> {
@@ -46,10 +50,18 @@ async function loadTypeSpec(sdkId: string, version: string): Promise<TypeSpecFil
   const cached = typeSpecCache.get(key)
   if (cached) return cached
 
-  const rawJson = await readFile(generatedReferencePath(sdkId, version, 'typeSpec'), 'utf-8')
-  const parsed = JSON.parse(rawJson) as TypeSpecFile
-  typeSpecCache.set(key, parsed)
-  return parsed
+  try {
+    const rawJson = await readFile(generatedReferencePath(sdkId, version, 'typeSpec'), 'utf-8')
+    const parsed = JSON.parse(rawJson) as TypeSpecFile
+    typeSpecCache.set(key, parsed)
+    return parsed
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      typeSpecCache.set(key, EMPTY_TYPESPEC)
+      return EMPTY_TYPESPEC
+    }
+    throw err
+  }
 }
 
 export async function getTypeSpec(sdkId: string, version: string, ref: string) {

@@ -551,14 +551,15 @@ async function writeNewMarkdownPartials(library: string, partials: PartialEntry[
 }
 
 /**
- * Processes one `[library]/[version]` directory: reads spec files, partials,
- * and config, then writes all five output files (`bySlug.json`, `flat.json`,
- * `sections.json`, `functions.json`, `typeSpec.json`) in parallel. `flat.json`
- * is `Object.values(bySlug)`, `sections.json` is the nested tree, `functions.json`
- * maps each slug/partial to its `$ref`, and `typeSpec.json` holds the raw
- * parameter and return-type signatures keyed by ref.
+ * In-memory computation for a single `[library]/[version]`: reads spec files,
+ * partials, and config, walks every TypeDoc declaration, and returns the five
+ * derived artifacts (`bySlug`, `flat`, `sections`, `functionsList`,
+ * `typeSpec`) plus the partial list needed for downstream `.mdx` seeding.
+ *
+ * Exported so tests can snapshot the output shape without going through the
+ * filesystem.
  */
-async function processVersion(library: string, version: string): Promise<void> {
+export async function collectReferenceContent(library: string, version: string) {
   const versionDir = join(SPEC_DIR, library, version)
   const files = (await readdir(versionDir)).filter(
     (f) => f.endsWith('.json') && f !== 'config.json'
@@ -583,6 +584,17 @@ async function processVersion(library: string, version: string): Promise<void> {
 
   const { bySlug, sections, functionsList } = buildBySlug(collected.functions, partials, config)
   const flat = Object.values(bySlug)
+  return { bySlug, flat, sections, functionsList, typeSpec: collected.typeSpec, partials }
+}
+
+/**
+ * Processes one `[library]/[version]` directory: reads spec files, partials,
+ * and config, then writes all five output files (`bySlug.json`, `flat.json`,
+ * `sections.json`, `functions.json`, `typeSpec.json`) in parallel.
+ */
+async function processVersion(library: string, version: string): Promise<void> {
+  const { bySlug, flat, sections, functionsList, typeSpec, partials } =
+    await collectReferenceContent(library, version)
 
   const counts = { markdown: 0, function: 0, subcategory: 0, category: 0 }
   for (const v of flat) {
@@ -599,7 +611,7 @@ async function processVersion(library: string, version: string): Promise<void> {
     writeFile(join(outputDir, 'flat.json'), JSON.stringify(flat)),
     writeFile(join(outputDir, 'sections.json'), JSON.stringify(sections)),
     writeFile(join(outputDir, 'functions.json'), JSON.stringify(functionsList)),
-    writeFile(join(outputDir, 'typeSpec.json'), JSON.stringify(collected.typeSpec)),
+    writeFile(join(outputDir, 'typeSpec.json'), JSON.stringify(typeSpec)),
   ])
 
   // The page renderer's `MarkdownSection` loads body text by id from
@@ -608,10 +620,10 @@ async function processVersion(library: string, version: string): Promise<void> {
   // hand-maintained legacy partials like introduction.mdx).
   await writeNewMarkdownPartials(library, partials)
 
-  const typeSpecMethods = Object.keys(collected.typeSpec.methods).length
-  const typeSpecVariables = Object.keys(collected.typeSpec.variables).length
+  const typeSpecMethods = Object.keys(typeSpec.methods).length
+  const typeSpecVariables = Object.keys(typeSpec.variables).length
   console.log(
-    `[${library}/${version}] wrote 5 files — ${collected.functions.length} declarations scanned, ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories, ${functionsList.length} functions.json entries, ${typeSpecMethods} typeSpec methods, ${typeSpecVariables} typeSpec variables`
+    `[${library}/${version}] wrote 5 files — ${counts.markdown} partials, ${counts.function} function slugs, ${counts.subcategory} subcategories, ${counts.category} categories, ${functionsList.length} functions.json entries, ${typeSpecMethods} typeSpec methods, ${typeSpecVariables} typeSpec variables`
   )
 }
 
@@ -628,7 +640,11 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+// Only run `main()` when invoked as a script (via `tsx`). Importing this
+// module from a test should not trigger the side-effecting walk.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => {
+    console.error(err)
+    process.exit(1)
+  })
+}

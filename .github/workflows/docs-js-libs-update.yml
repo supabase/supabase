@@ -51,6 +51,10 @@ jobs:
           echo "Version: ${VERSION}"
           make
 
+      - name: Refresh reference-content snapshot
+        working-directory: apps/docs
+        run: npx vitest run --update scripts/build-reference-content.test.ts
+
       - name: Generate token
         id: app-token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf
