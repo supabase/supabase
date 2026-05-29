@@ -2312,7 +2312,23 @@ module.exports = [
   {
     permanent: true,
     source: '/partners/integrations/supabase_wrapper_stripe',
-    destination: '/partners/catalog/stripe-wrapper',
+    destination: '/partners/catalog/stripe',
+  },
+  // Wrapper listing slugs → clean partner slugs
+  {
+    permanent: true,
+    source: '/partners/catalog/bigquery-wrapper',
+    destination: '/partners/catalog/bigquery',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/firebase-wrapper',
+    destination: '/partners/catalog/firebase',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/stripe-wrapper',
+    destination: '/partners/catalog/stripe',
   },
   {
     permanent: true,

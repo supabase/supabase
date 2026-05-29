@@ -19,13 +19,22 @@ const marketplaceClient = createMarketplaceClient()
 // Supabase-owned listings that are remapped to appear as independent partners in the catalog.
 // The key is the listing slug; the value is the partner name to display.
 const SUPABASE_PARTNER_SLUG = 'supabase'
-const SUPABASE_LISTING_OVERRIDES: Record<string, string> = {
-  'bigquery-wrapper': 'BigQuery',
-  'firebase-wrapper': 'Firebase',
-  'stripe-wrapper': 'Stripe',
-  vercel: 'Vercel',
-  cyberduck: 'Cyberduck',
+
+// Key = listing DB slug; Value = { display name, clean URL slug for the catalog page }
+const SUPABASE_LISTING_OVERRIDES: Record<string, { name: string; slug: string }> = {
+  'bigquery-wrapper': { name: 'BigQuery', slug: 'bigquery' },
+  'firebase-wrapper': { name: 'Firebase', slug: 'firebase' },
+  'stripe-wrapper': { name: 'Stripe', slug: 'stripe' },
+  vercel: { name: 'Vercel', slug: 'vercel' },
+  cyberduck: { name: 'Cyberduck', slug: 'cyberduck' },
 }
+
+// URL-facing slugs for overridden listings (e.g. 'bigquery', 'firebase', 'stripe').
+const OVERRIDE_URL_SLUGS = new Set(Object.values(SUPABASE_LISTING_OVERRIDES).map((o) => o.slug))
+// Reverse map: URL slug → listing DB slug (e.g. 'bigquery' → 'bigquery-wrapper').
+const URL_SLUG_TO_LISTING: Record<string, string> = Object.fromEntries(
+  Object.entries(SUPABASE_LISTING_OVERRIDES).map(([listingSlug, { slug }]) => [slug, listingSlug])
+)
 
 /** Deduplicates and merges categories from across all of a partner's listings. */
 function aggregateCategories(listings: Listing[]): Category[] {
@@ -93,10 +102,6 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
 
   if (!partnersData?.length) return []
 
-  // Diagnostic: log all listing slugs so mismatches with SUPABASE_LISTING_OVERRIDES are obvious.
-  // Remove once the correct slugs are confirmed.
-  console.log('[catalog] listing slugs from DB:', (listingsData ?? []).map((l) => l.slug).sort())
-
   // Check listing.slug first so the override works regardless of what partner_slug the DB has.
   const overriddenListings = new Map<string, Listing>()
   const byPartnerSlug = new Map<string, Listing[]>()
@@ -115,11 +120,9 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
     byPartnerSlug.set(slug, arr)
   }
 
-  // Exclude 'supabase' and any slug that is itself an overridden listing (prevents duplicates).
+  // Exclude 'supabase' and any partner whose URL slug is covered by an override.
   const regularPartners = partnersData
-    .filter(
-      (p) => p.slug && p.slug !== SUPABASE_PARTNER_SLUG && !(p.slug in SUPABASE_LISTING_OVERRIDES)
-    )
+    .filter((p) => p.slug && p.slug !== SUPABASE_PARTNER_SLUG && !OVERRIDE_URL_SLUGS.has(p.slug))
     .flatMap((p) => {
       const slug = p.slug
       if (!slug) return []
@@ -138,11 +141,12 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
       ]
     })
 
-  const virtualPartners = Array.from(overriddenListings.values()).map((listing) =>
-    buildPartner(
+  const virtualPartners = Array.from(overriddenListings.entries()).map(([listingSlug, listing]) => {
+    const override = SUPABASE_LISTING_OVERRIDES[listingSlug]
+    return buildPartner(
       {
-        slug: listing.slug,
-        name: SUPABASE_LISTING_OVERRIDES[listing.slug],
+        slug: override.slug,
+        name: override.name,
         description: listing.description,
         logo: listing.listing_logo,
         website: listing.website_url,
@@ -150,7 +154,7 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
       },
       [listing]
     )
-  )
+  })
 
   return [...regularPartners, ...virtualPartners]
 }
@@ -174,12 +178,17 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
   // 'supabase' never appears directly as a catalog partner
   if (slug === SUPABASE_PARTNER_SLUG) return null
 
-  // Supabase-owned listings that are remapped to independent partners
-  if (slug in SUPABASE_LISTING_OVERRIDES) {
+  // Supabase-owned listings remapped to independent partners.
+  // Accept both the clean URL slug ('bigquery') and the listing DB slug ('bigquery-wrapper').
+  const listingSlugForOverride =
+    URL_SLUG_TO_LISTING[slug] ?? (slug in SUPABASE_LISTING_OVERRIDES ? slug : null)
+
+  if (listingSlugForOverride) {
+    const override = SUPABASE_LISTING_OVERRIDES[listingSlugForOverride]
     const { data: listing } = await marketplaceClient
       .from('listings')
       .select('*')
-      .eq('slug', slug)
+      .eq('slug', listingSlugForOverride)
       .maybeSingle()
 
     if (!listing) return null
@@ -187,8 +196,8 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
     return {
       ...buildPartner(
         {
-          slug: listing.slug,
-          name: SUPABASE_LISTING_OVERRIDES[slug],
+          slug: override.slug,
+          name: override.name,
           description: listing.description,
           logo: listing.listing_logo,
           website: listing.website_url,
@@ -260,12 +269,17 @@ async function getPartnerSlugsFromMarketplace(): Promise<string[]> {
       .in('slug', Object.keys(SUPABASE_LISTING_OVERRIDES)),
   ])
 
-  // Exclude any partner slug that is also an overridden listing slug to prevent duplicates.
+  // Exclude any partner whose URL slug is covered by an override.
   const partnerSlugs =
     partnerRows?.flatMap((row) =>
-      row.slug && !(row.slug in SUPABASE_LISTING_OVERRIDES) ? [row.slug] : []
+      row.slug && !OVERRIDE_URL_SLUGS.has(row.slug) ? [row.slug] : []
     ) ?? []
-  const overriddenSlugs = overriddenRows?.flatMap((row) => (row.slug ? [row.slug] : [])) ?? []
+  // Map each listing DB slug to its clean URL slug (e.g. 'bigquery-wrapper' → 'bigquery').
+  const overriddenSlugs =
+    overriddenRows?.flatMap((row) => {
+      const override = row.slug ? SUPABASE_LISTING_OVERRIDES[row.slug] : null
+      return override ? [override.slug] : []
+    }) ?? []
   return [...partnerSlugs, ...overriddenSlugs]
 }
 
@@ -290,11 +304,11 @@ async function searchPartnersFromMarketplace(search: string): Promise<Partner[] 
     return null
   }
 
-  // Check listing.slug first so the override works regardless of partner_slug in the DB.
+  // Use clean URL slug as map key for overridden listings.
   const byPartnerSlug = new Map<string, Listing[]>()
   for (const listing of data ?? []) {
     if (listing.slug in SUPABASE_LISTING_OVERRIDES) {
-      byPartnerSlug.set(listing.slug, [listing])
+      byPartnerSlug.set(SUPABASE_LISTING_OVERRIDES[listing.slug].slug, [listing])
       continue
     }
 
@@ -308,11 +322,12 @@ async function searchPartnersFromMarketplace(search: string): Promise<Partner[] 
 
   return Array.from(byPartnerSlug.entries()).map(([partnerSlug, listings]) => {
     const first = listings[0]
-    const isOverridden = partnerSlug in SUPABASE_LISTING_OVERRIDES
+    const listingSlug = URL_SLUG_TO_LISTING[partnerSlug]
+    const isOverridden = !!listingSlug
     return buildPartner(
       {
         slug: partnerSlug,
-        name: isOverridden ? SUPABASE_LISTING_OVERRIDES[partnerSlug] : first.partner_name,
+        name: isOverridden ? SUPABASE_LISTING_OVERRIDES[listingSlug].name : first.partner_name,
         description: first.description,
         logo: isOverridden ? first.listing_logo : (first.partner_logo ?? first.listing_logo),
         website: first.website_url,

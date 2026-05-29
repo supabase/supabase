@@ -317,17 +317,32 @@ const PartnerDetails = ({
             </div>
           ))}
 
-          <div className="flex items-center justify-between py-2">
-            <span className="text-foreground-lighter">Website</span>
-            <a
-              href={partner.websiteUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="text-brand-link hover:underline transition-colors"
-            >
-              {new URL(partner.websiteUrl).host}
-            </a>
-          </div>
+          {partner.websiteUrl && (
+            <div className="flex items-center justify-between py-2">
+              <span className="text-foreground-lighter">Website</span>
+              <a
+                href={
+                  partner.websiteUrl.startsWith('http')
+                    ? partner.websiteUrl
+                    : `https://${partner.websiteUrl}`
+                }
+                target="_blank"
+                rel="noreferrer"
+                className="text-brand-link hover:underline transition-colors"
+              >
+                {(() => {
+                  try {
+                    const url = partner.websiteUrl.startsWith('http')
+                      ? partner.websiteUrl
+                      : `https://${partner.websiteUrl}`
+                    return new URL(url).host
+                  } catch {
+                    return partner.websiteUrl
+                  }
+                })()}
+              </a>
+            </div>
+          )}
 
           {partner.type === 'technology' && activeListing.docsUrl && (
             <div className="flex items-center justify-between py-2">

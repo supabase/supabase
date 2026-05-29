@@ -23,16 +23,6 @@ export const metadata: Metadata = {
 export default async function IntegrationPartnersPage() {
   const partners = await listCatalogPartners()
 
-  console.log('isUseMarketplaceDb', isUseMarketplaceDb)
-  console.log(
-    'partners',
-    partners.map((p) => ({
-      slug: p.slug,
-      title: p.title,
-      publishedInMarketplace: p.publishedInMarketplace,
-    }))
-  )
-
   return (
     <IntegrationsContent
       initialPartners={partners}
