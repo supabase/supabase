@@ -1,12 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -18,6 +10,15 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import { HooksListing } from '@/components/interfaces/Auth/Hooks/HooksListing'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const Hooks: NextPageWithLayout = () => {
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(

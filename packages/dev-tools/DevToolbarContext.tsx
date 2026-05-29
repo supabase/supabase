@@ -1,14 +1,14 @@
 'use client'
 
-import { type ClientTelemetryEvent, ensurePlatformSuffix, posthogClient } from 'common'
+import { ensurePlatformSuffix, posthogClient, type ClientTelemetryEvent } from 'common'
 import {
-  type ReactNode,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
+  type ReactNode,
 } from 'react'
 
 import type {
@@ -18,7 +18,11 @@ import type {
 } from './types'
 import { getCookie } from './utils'
 
-const IS_LOCAL_DEV = process.env.NODE_ENV === 'development'
+// Duplicated for tree-shaking — bundler must see literal process.env reference.
+// Keep in sync: index.ts, DevToolbar.tsx, DevToolbarTrigger.tsx, feature-flags.tsx
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const IS_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
+const IS_LOCAL_DEV = env === 'local'
 const MAX_EVENTS = 200
 const STORAGE_KEY = 'dev-telemetry-toolbar-enabled'
 
@@ -56,7 +60,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   }, [])
 
   useEffect(() => {
-    if (!IS_LOCAL_DEV) return
+    if (!IS_TOOLBAR_ENABLED) return
 
     let stored: string | null = null
     try {
@@ -105,7 +109,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   }, [appendEvent, isEnabled])
 
   useEffect(() => {
-    if (!isEnabled || typeof EventSource === 'undefined') return
+    if (!IS_LOCAL_DEV || !isEnabled || typeof EventSource === 'undefined') return
 
     let eventSource: EventSource | null = null
     let isMounted = true
@@ -176,7 +180,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
     }
   }, [apiUrl, appendEvent, isEnabled])
 
-  if (!IS_LOCAL_DEV) {
+  if (!IS_TOOLBAR_ENABLED) {
     return <>{children}</>
   }
 

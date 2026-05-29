@@ -3,14 +3,14 @@ import { compact } from 'lodash'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import apiWrapper from 'lib/api/apiWrapper'
+import apiWrapper from '@/lib/api/apiWrapper'
 import {
   deleteSnippet,
   getSnippets,
   saveSnippet,
   SnippetSchema,
   updateSnippet,
-} from 'lib/api/snippets.utils'
+} from '@/lib/api/snippets.utils'
 
 const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -31,7 +31,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type GetRequestData = paths['/platform/projects/{ref}/content']['get']['parameters']['query']
 type GetResponseData =
   paths['/platform/projects/{ref}/content']['get']['responses']['200']['content']['application/json']
 

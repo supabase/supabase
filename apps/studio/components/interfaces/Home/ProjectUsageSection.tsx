@@ -1,11 +1,11 @@
 import { AlertCircle } from 'lucide-react'
 
-import { ProjectUsageLoadingState } from 'components/layouts/ProjectLayout/LoadingState'
-import InformationBox from 'components/ui/InformationBox'
-import { useProjectLogRequestsCountQuery } from 'data/analytics/project-log-requests-count-query'
-import { useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import ProjectUsage from './ProjectUsage'
+import { ProjectUsageLoadingState } from '@/components/layouts/ProjectLayout/LoadingState'
+import InformationBox from '@/components/ui/InformationBox'
+import { useProjectLogRequestsCountQuery } from '@/data/analytics/project-log-requests-count-query'
+import { useProjectLogStatsQuery } from '@/data/analytics/project-log-stats-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const ProjectUsageSection = () => {
   const { data: project } = useSelectedProjectQuery()

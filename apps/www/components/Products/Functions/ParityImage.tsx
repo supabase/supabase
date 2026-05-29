@@ -22,7 +22,7 @@ const ParityImage = () => (
       className="object-cover absolute z-0 inset-0 hidden dark:block"
     />
     <div className="relative z-10 p-4 font-mono bg-surface-200 border-2 border-dashed rounded-2xl justify-center items-center gap-1 flex">
-      <div className="py-2 px-4 bg-alternative-200 rounded-lg shadow border flex-col justify-center items-center">
+      <div className="py-2 px-4 bg-alternative-200 rounded-lg shadow-sm border flex-col justify-center items-center">
         <div className="text-foreground uppercase tracking-wide">Dev</div>
       </div>
       <svg width="32" height="7" viewBox="0 0 32 7" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -36,7 +36,7 @@ const ParityImage = () => (
         />
       </svg>
 
-      <div className="py-2 px-4 bg-alternative-200 rounded-lg shadow border flex-col justify-center items-center">
+      <div className="py-2 px-4 bg-alternative-200 rounded-lg shadow-sm border flex-col justify-center items-center">
         <div className="text-foreground uppercase tracking-wide">Prod</div>
       </div>
     </div>

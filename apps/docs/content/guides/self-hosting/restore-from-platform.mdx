@@ -4,7 +4,7 @@ description: 'Restore your database from the Supabase platform to a self-hosted 
 subtitle: 'Restore your database from the Supabase platform to a self-hosted instance.'
 ---
 
-This guide walks you through restoring your database from a Supabase platform project to a [self-hosted Docker instance](/docs/guides/self-hosting/docker). Storage objects transfer or redeploying edge functions is not covered here.
+This guide walks you through restoring your database from a Supabase platform project to a [self-hosted Docker instance](/docs/guides/self-hosting/docker). Transferring storage objects or redeploying edge functions is not covered here.
 
 ## Before you begin
 
@@ -24,15 +24,15 @@ On your managed Supabase project dashboard, click [**Connect**](/dashboard/proje
 
 Export roles, schema, and data as three separate SQL files:
 
-```bash
+```sh
 supabase db dump --db-url "[CONNECTION_STRING]" -f roles.sql --role-only
 ```
 
-```bash
+```sh
 supabase db dump --db-url "[CONNECTION_STRING]" -f schema.sql
 ```
 
-```bash
+```sh
 supabase db dump --db-url "[CONNECTION_STRING]" -f data.sql --use-copy --data-only
 ```
 
@@ -64,7 +64,7 @@ Use your domain name, your server IP, or localhost for `[your-domain]` depending
 
 Run `psql` to restore:
 
-```bash
+```sh
 psql \
   --single-transaction \
   --variable ON_ERROR_STOP=1 \
@@ -81,7 +81,7 @@ Setting `session_replication_role` to `replica` disables triggers during the dat
 
 Connect to your self-hosted database and run a few checks:
 
-```bash
+```sh
 psql "postgres://postgres.your-tenant-id:[POSTGRES_PASSWORD]@[your-domain]:5432/postgres"
 ```
 
@@ -119,7 +119,13 @@ Your `auth.users` table and related data are included in the database dump, so u
 
 ## Postgres version compatibility
 
-Managed Supabase may run a newer Postgres version (Postgres 17) than the self-hosted Docker image (currently Postgres 15). The `supabase db dump` command produces plain SQL files that work across major Postgres versions.
+Managed Supabase may run a newer Postgres version (Postgres 17) than the self-hosted Docker image (currently it's Postgres 15 by default). The `supabase db dump` command produces plain SQL files that work across major Postgres versions.
+
+<Admonition type="tip">
+
+If your managed project runs Postgres 17, consider starting your self-hosted deployment with Postgres 17 as well. See the [Postgres 17 guide](/docs/guides/self-hosting/postgres-upgrade-17) for setup instructions.
+
+</Admonition>
 
 Keep in mind:
 
@@ -141,7 +147,7 @@ The platform may run a newer Postgres version (17 vs 15) and newer Auth service 
 
 **Workaround:** Edit `data.sql` before restoring:
 
-```bash
+```sh
 # Comment out PG17-only transaction_timeout
 sed -i 's/^SET transaction_timeout/-- &/' data.sql
 ```

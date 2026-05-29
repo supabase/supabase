@@ -40,8 +40,7 @@ const page: GoPageInput = {
       title: 'Watch the recording',
       description:
         'Join agency leaders and Supabase as they share how top agencies balance velocity with control when using AI coding tools to build production applications.',
-      // TODO: Add YouTube URL when recording is available
-      children: <MediaBlock />,
+      children: <MediaBlock youtubeUrl="https://www.youtube.com/watch?v=D_Qhiyyp6_M" />,
     },
     {
       type: 'feature-grid',

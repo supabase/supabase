@@ -1,4 +1,4 @@
-import type { components } from 'data/api'
+import type { components } from '@/data/api'
 
 type AuthConfig = components['schemas']['GoTrueConfigResponse']
 
@@ -12,6 +12,7 @@ export const isSmtpEnabled = (config?: Partial<AuthConfig>): boolean => {
     config?.SMTP_SENDER_NAME &&
     config?.SMTP_USER &&
     config?.SMTP_HOST &&
+    config?.SMTP_PASS &&
     config?.SMTP_PORT &&
     (config?.SMTP_MAX_FREQUENCY ?? 0) >= 0
   )

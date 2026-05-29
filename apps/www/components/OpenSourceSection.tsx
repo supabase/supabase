@@ -31,7 +31,7 @@ const OpenSourceSection = () => {
           asChild
           size="small"
           type="default"
-          className="!pl-2.5"
+          className="pl-2.5!"
         >
           <Link
             href="https://github.com/supabase"

@@ -1,11 +1,12 @@
 import dayjs from 'dayjs'
+
+import { PERMISSION_LIST, ScopedAccessTokenPermission } from './AccessToken.constants'
 import {
   AccessTokenSort,
   AccessTokenSortColumn,
   AccessTokenSortOrder,
   BaseToken,
 } from './AccessToken.types'
-import { PERMISSION_LIST, ScopedAccessTokenPermission } from './AccessToken.constants'
 
 export const handleSortChange = (
   currentSort: AccessTokenSort,

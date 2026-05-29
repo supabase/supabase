@@ -4,13 +4,13 @@ import { Calculator, Calendar, CreditCard, Settings, Smile, User } from 'lucide-
 import * as React from 'react'
 import {
   CommandDialog,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  CommandShortcut_Shadcn_,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
 } from 'ui'
 
 export default function CommandDialogDemo() {
@@ -32,47 +32,47 @@ export default function CommandDialogDemo() {
     <>
       <p className="text-sm text-muted-foreground">
         Press{' '}
-        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded-sm border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
           <span className="text-xs">⌘</span>J
         </kbd>
       </p>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput_Shadcn_ placeholder="Type a command or search..." />
-        <CommandList_Shadcn_>
-          <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-          <CommandGroup_Shadcn_ heading="Suggestions">
-            <CommandItem_Shadcn_>
+        <CommandInput placeholder="Type a command or search..." />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup heading="Suggestions">
+            <CommandItem>
               <Calendar className="mr-2 h-4 w-4" />
               <span>Calendar</span>
-            </CommandItem_Shadcn_>
-            <CommandItem_Shadcn_>
+            </CommandItem>
+            <CommandItem>
               <Smile className="mr-2 h-4 w-4" />
               <span>Search Emoji</span>
-            </CommandItem_Shadcn_>
-            <CommandItem_Shadcn_>
+            </CommandItem>
+            <CommandItem>
               <Calculator className="mr-2 h-4 w-4" />
               <span>Calculator</span>
-            </CommandItem_Shadcn_>
-          </CommandGroup_Shadcn_>
-          <CommandSeparator_Shadcn_ />
-          <CommandGroup_Shadcn_ heading="Settings">
-            <CommandItem_Shadcn_>
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Settings">
+            <CommandItem>
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
-              <CommandShortcut_Shadcn_>⌘P</CommandShortcut_Shadcn_>
-            </CommandItem_Shadcn_>
-            <CommandItem_Shadcn_>
+              <CommandShortcut>⌘P</CommandShortcut>
+            </CommandItem>
+            <CommandItem>
               <CreditCard className="mr-2 h-4 w-4" />
               <span>Billing</span>
-              <CommandShortcut_Shadcn_>⌘B</CommandShortcut_Shadcn_>
-            </CommandItem_Shadcn_>
-            <CommandItem_Shadcn_>
+              <CommandShortcut>⌘B</CommandShortcut>
+            </CommandItem>
+            <CommandItem>
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
-              <CommandShortcut_Shadcn_>⌘S</CommandShortcut_Shadcn_>
-            </CommandItem_Shadcn_>
-          </CommandGroup_Shadcn_>
-        </CommandList_Shadcn_>
+              <CommandShortcut>⌘S</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
       </CommandDialog>
     </>
   )

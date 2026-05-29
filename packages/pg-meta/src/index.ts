@@ -18,56 +18,42 @@ import version from './pg-meta-version'
 import views from './pg-meta-views'
 import * as query from './query/index'
 
-// Studio SQL queries
-export {
-  getUserSQL,
-  getIndexStatusesSQL,
-  getUsersCountSQL,
-  getPaginatedUsersSQL,
-  getIndexWorkerStatusSQL,
-  USER_SEARCH_INDEXES,
-  type OptimizedSearchColumns,
-  type UsersCursor,
-} from './sql/studio/auth'
-export {
-  getLargestSizeLimitBucketsSqlUnoptimized,
-  LARGEST_SIZE_LIMIT_BUCKETS_COUNT,
-} from './sql/studio/storage'
-export {
-  getExposedTablesSql,
-  getExposedTableCountsSql,
-  getExposedFunctionsSql,
-  getExposedFunctionCountsSql,
-  buildTablePrivilegesSql,
-  buildFunctionPrivilegesSql,
-  buildDefaultPrivilegesSql,
-  getDefaultPrivilegesStateSql,
-} from './sql/studio/privileges'
-export {
-  getIndexesSQL,
-  getDatabaseExtensionDefaultSchemaSQL,
-  getCronJobsMinimalSql,
-  getCronJobsSql,
-  getJobRunDetailsPageCountSql,
-  getDeleteOldCronJobRunDetailsByCtidSql,
-  getScheduleDeleteCronJobRunDetailsSql,
-  getTableRowsCountSql,
-} from './sql/studio/database'
-export {
-  type ForeignKey,
-  FOREIGN_KEY_CASCADE_ACTION,
-  getAddPrimaryKeySQL,
-  getDropConstraintSQL,
-  getAddForeignKeySQL,
-  getRemoveForeignKeySQL,
-  getUpdateIdentitySequenceSQL,
-  getDuplicateIdentitySequenceSQL,
-  getDuplicateTableSQL,
-  getDuplicateRowsSQL,
-  getEnableRLSSQL,
-} from './sql/studio/table-editor'
+/**
+ * Studio specific SQL queries
+ * [Joshen] If it gets cumbersome, we can also consider path exports for studio queries
+ * So consumption can look something like:
+ * import { ... } from '@supabase/pg-meta/table-editor'
+ */
+export * from './sql/studio/advisor'
+export * from './sql/studio/auth'
+export * from './sql/studio/storage'
+export * from './sql/studio/database'
+export * from './sql/studio/table-editor'
+export * from './sql/studio/sql-editor'
+export * from './sql/studio/role-impersonation'
+export * from './sql/studio/integrations'
 
-export { getLiveTupleEstimate } from './sql/studio/get-live-tuple-estimate'
+export {
+  ident,
+  literal,
+  keyword,
+  safeSql,
+  rawSql,
+  untrustedSql,
+  acceptUntrustedSql,
+  joinSqlFragments,
+} from './pg-format'
+export type { SafeSqlFragment, UntrustedSqlFragment, DisplayableSqlFragment } from './pg-format'
+
+export type { PGTable, PGTablePrimaryKey, PGTableRelationship } from './pg-meta-tables'
+export type { PGColumn } from './pg-meta-columns'
+export type { PGPolicy } from './pg-meta-policies'
+export type { PGTrigger, PGTriggerCreate, PGTriggerUpdate } from './pg-meta-triggers'
+export type { PGView } from './pg-meta-views'
+export type { PGMaterializedView } from './pg-meta-materialized-views'
+export type { PGForeignTable } from './pg-meta-foreign-tables'
+export type { PGSchema } from './pg-meta-schemas'
+export type { PGPublication } from './pg-meta-publications'
 
 export default {
   roles,

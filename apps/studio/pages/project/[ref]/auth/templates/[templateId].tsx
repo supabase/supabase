@@ -1,33 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { TEMPLATES_SCHEMAS } from 'components/interfaces/Auth/AuthTemplatesValidation'
-import { slugifyTitle } from 'components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
-import { TemplateEditor } from 'components/interfaces/Auth/EmailTemplates/TemplateEditor'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import type { NextPageWithLayout } from 'types'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Switch,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -54,7 +33,27 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from 'ui/src/components/shadcn/ui/breadcrumb'
-import { z } from 'zod'
+import * as z from 'zod'
+
+import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/EmailTemplates/AuthTemplatesValidation'
+import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
+import {
+  isCustomEmailTemplateEditingRestricted,
+  isCustomEmailTemplateRestrictionStatusKnown,
+  slugifyTitle,
+} from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
@@ -76,6 +75,21 @@ const RedirectToTemplates = () => {
   )
 
   const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
+    authConfig,
+    organization: selectedOrganization,
+    projectInsertedAt: selectedProject?.inserted_at,
+  })
+  const isTemplateEditBlocked =
+    isTemplateRestrictionStatusKnown &&
+    isCustomEmailTemplateEditingRestricted({
+      authConfig,
+      organization: selectedOrganization,
+      projectInsertedAt: selectedProject?.inserted_at,
+    })
+  const isTemplateEditorReadOnly = !isTemplateRestrictionStatusKnown || isTemplateEditBlocked
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -126,9 +140,9 @@ const RedirectToTemplates = () => {
     defaultValues,
   })
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: z.infer<typeof TemplateFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    updateAuthConfig({ projectRef: projectRef, config: { ...values } })
+    updateAuthConfig({ projectRef: projectRef, config: { ...values }, skipInvalidation: true })
   }
 
   useEffect(() => {
@@ -213,11 +227,11 @@ const RedirectToTemplates = () => {
                   </PageSectionSummary>
                 </PageSectionMeta>
                 <PageSectionContent>
-                  <Form_Shadcn_ {...templateForm}>
+                  <Form {...templateForm}>
                     <form onSubmit={templateForm.handleSubmit(onSubmit)} className="space-y-4">
                       <Card>
                         <CardContent>
-                          <FormField_Shadcn_
+                          <FormField
                             control={templateForm.control}
                             name={templateEnabledKey as keyof z.infer<typeof TemplateFormSchema>}
                             render={({ field }) => (
@@ -226,13 +240,13 @@ const RedirectToTemplates = () => {
                                 label="Enable notification"
                                 description="Send this email to users when triggered"
                               >
-                                <FormControl_Shadcn_>
+                                <FormControl>
                                   <Switch
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                     disabled={!canUpdateConfig}
                                   />
-                                </FormControl_Shadcn_>
+                                </FormControl>
                               </FormItemLayout>
                             )}
                           />
@@ -258,7 +272,7 @@ const RedirectToTemplates = () => {
                         </CardFooter>
                       </Card>
                     </form>
-                  </Form_Shadcn_>
+                  </Form>
                 </PageSectionContent>
               </PageSection>
             )}
@@ -272,8 +286,13 @@ const RedirectToTemplates = () => {
                 </PageSectionMeta>
               )}
               <PageSectionContent>
+                {isTemplateEditBlocked && (
+                  <div className="mb-4">
+                    <CustomEmailTemplateRestrictionAdmonition />
+                  </div>
+                )}
                 <Card>
-                  <TemplateEditor template={template} />
+                  <TemplateEditor template={template} isReadOnly={isTemplateEditorReadOnly} />
                 </Card>
               </PageSectionContent>
             </PageSection>

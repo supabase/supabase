@@ -1,11 +1,14 @@
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
+import { InlineLink } from '@/components/ui/InlineLink'
+import {
+  ProjectUpgradeEligibilityValidationError,
+  ProjectUpgradeEligibilityWarning,
+} from '@/data/config/project-upgrade-eligibility-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   const { ref } = useParams()
@@ -28,7 +31,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
 const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
-      return error.dependents.join(', ')
+      return (error.dependents ?? []).join(', ') || 'Objects depending on pg_cron'
     case 'indexes_referencing_ll_to_earth':
       return `${error.schema_name}.${error.index_name}`
     case 'function_using_obsolete_lang':
@@ -126,6 +129,8 @@ export const ValidationErrorsWarning = ({
 }: {
   validationErrors: ProjectUpgradeEligibilityValidationError[]
 }) => {
+  if (validationErrors.length === 0) return null
+
   return (
     <Admonition type="note" showIcon={false} title="A newer version of Postgres is available">
       <div className="flex flex-col gap-3">
@@ -141,4 +146,48 @@ export const ValidationErrorsWarning = ({
       </div>
     </Admonition>
   )
+}
+
+const getWarningTitle = (warning: ProjectUpgradeEligibilityWarning): string => {
+  switch (warning.type) {
+    case 'pg_graphql_introspection_change':
+      return 'GraphQL introspection will be disabled by default after upgrade'
+  }
+}
+
+const getWarningDescription = (warning: ProjectUpgradeEligibilityWarning): string => {
+  switch (warning.type) {
+    case 'pg_graphql_introspection_change':
+      return 'After upgrading, queries to `__schema` and `__type` will return an error unless introspection is explicitly re-enabled on the schema. Regular data queries are not affected.'
+  }
+}
+
+const getWarningLink = (warning: ProjectUpgradeEligibilityWarning): string => {
+  switch (warning.type) {
+    case 'pg_graphql_introspection_change':
+      return `${DOCS_URL}/guides/platform/upgrading#upgrading-to-pg_graphql-160`
+  }
+}
+
+export const ValidationWarningsAdmonition = ({
+  warnings,
+}: {
+  warnings: ProjectUpgradeEligibilityWarning[]
+}) => {
+  if (warnings.length === 0) return null
+
+  return warnings.map((warning, idx) => (
+    <Admonition
+      key={`${warning.type}-${idx}`}
+      type="default"
+      title={getWarningTitle(warning)}
+      description={getWarningDescription(warning)}
+    >
+      <Button asChild type="default" className="mt-2">
+        <Link href={getWarningLink(warning)} target="_blank" rel="noreferrer">
+          Read upgrade notes
+        </Link>
+      </Button>
+    </Admonition>
+  ))
 }

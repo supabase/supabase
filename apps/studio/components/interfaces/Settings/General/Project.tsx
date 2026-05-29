@@ -1,4 +1,3 @@
-import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent } from 'ui'
 import {
@@ -12,17 +11,42 @@ import {
 
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
+import { ResumeProjectButton } from '@/components/interfaces/Project/ResumeProjectButton'
+import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export const Project = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isBranch = Boolean(project?.parent_project_ref)
+  const isPaused = project?.status === PROJECT_STATUS.INACTIVE
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
     'project_settings:restart_project',
   ])
+  const {
+    data: pauseStatus,
+    isError: isPauseStatusError,
+    isSuccess: isPauseStatusSuccess,
+  } = useProjectPauseStatusQuery({ ref: project?.ref }, { enabled: isPaused })
+
+  const shouldShowDashboardLink =
+    isPaused && (isPauseStatusError || (isPauseStatusSuccess && !pauseStatus.can_restore))
+
+  const primaryActionLabel = isPaused
+    ? shouldShowDashboardLink
+      ? 'View project dashboard'
+      : 'Resume project'
+    : projectSettingsRestartProject
+      ? 'Restart project'
+      : 'Restart database'
+
+  const primaryActionDescription = isPaused
+    ? isPauseStatusSuccess && !pauseStatus.can_restore
+      ? 'This project can no longer be resumed here. Open the dashboard to download backups and view recovery options.'
+      : isPauseStatusError
+        ? 'Open the dashboard to manage this paused project.'
+        : 'Bring your paused project back online.'
+    : 'Your project will not be available for a few minutes.'
 
   return (
     <>
@@ -31,7 +55,9 @@ export const Project = () => {
           <PageSectionSummary>
             <PageSectionTitle>Project availability</PageSectionTitle>
             <PageSectionDescription>
-              Restart or pause your project when performing maintenance
+              {isPaused
+                ? 'Resume your paused project or review recovery options'
+                : 'Restart or pause your project when performing maintenance'}
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
@@ -40,72 +66,45 @@ export const Project = () => {
             <CardContent>
               <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
                 <div>
-                  <p className="text-sm">
-                    {projectSettingsRestartProject ? 'Restart project' : 'Restart database'}
-                  </p>
+                  <p className="text-sm">{primaryActionLabel}</p>
                   <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">
-                      Your project will not be available for a few minutes.
-                    </p>
+                    <p className="text-sm text-foreground-light">{primaryActionDescription}</p>
                   </div>
                 </div>
-                <RestartServerButton />
+                {isPaused ? (
+                  shouldShowDashboardLink ? (
+                    <Button asChild type="default">
+                      <Link href={`/project/${project?.ref}`}>View project dashboard</Link>
+                    </Button>
+                  ) : (
+                    <ResumeProjectButton />
+                  )
+                ) : (
+                  <RestartServerButton />
+                )}
               </div>
             </CardContent>
-            <CardContent>
-              <div
-                className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4"
-                id="pause-project"
-              >
-                <div>
-                  <p className="text-sm">Pause project</p>
-                  <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">
-                      Your project will not be accessible while it is paused.
-                    </p>
-                  </div>
-                </div>
-                <PauseProjectButton />
-              </div>
-            </CardContent>
-          </Card>
-        </PageSectionContent>
-      </PageSection>
-
-      {!isBranch && (
-        <PageSection>
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Project usage</PageSectionTitle>
-            </PageSectionSummary>
-          </PageSectionMeta>
-          <PageSectionContent>
-            <Card>
+            {!isPaused && (
               <CardContent>
-                <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
-                  <div className="flex space-x-4">
-                    <BarChart2 strokeWidth={2} />
-                    <div>
-                      <p className="text-sm">Project usage statistics have been moved</p>
-                      <p className="text-foreground-light text-sm">
-                        You may view your project's usage under your organization's settings
+                <div
+                  className="flex w-full flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4"
+                  id="pause-project"
+                >
+                  <div>
+                    <p className="text-sm">Pause project</p>
+                    <div className="max-w-[420px]">
+                      <p className="text-sm text-foreground-light">
+                        Your project will not be accessible while it is paused.
                       </p>
                     </div>
                   </div>
-
-                  {!!organization && !!project && (
-                    <Button asChild type="default">
-                      <Link href={`/org/${organization.slug}/usage?projectRef=${project.ref}`}>
-                        View project usage
-                      </Link>
-                    </Button>
-                  )}
+                  <PauseProjectButton />
                 </div>
               </CardContent>
-            </Card>
-          </PageSectionContent>
-        </PageSection>
-      )}
+            )}
+          </Card>
+        </PageSectionContent>
+      </PageSection>
     </>
   )
 }

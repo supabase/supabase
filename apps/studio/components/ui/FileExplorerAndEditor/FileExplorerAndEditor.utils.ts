@@ -1,6 +1,7 @@
-import { formatBytes } from '@/lib/helpers'
 import { BlobReader, BlobWriter, TextWriter, ZipReader } from '@zip.js/zip.js'
+
 import { FileAction, type FileActionResult, type FileData } from './FileExplorerAndEditor.types'
+import { formatBytes } from '@/lib/helpers'
 
 // Configuration for zip file extraction
 export const ZIP_EXTRACTION_CONFIG = {

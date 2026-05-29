@@ -1,8 +1,9 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PGPolicy } from '@supabase/pg-meta'
+import { ident, keyword, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { isEqual } from 'lodash'
 
 // [Joshen] Not used but keeping this for now in case we do an inline editor
-export const generatePlaceholder = (policy?: PostgresPolicy) => {
+export const generatePlaceholder = (policy?: PGPolicy) => {
   if (policy === undefined) {
     return `
 -- Press tab to use this code\n
@@ -61,20 +62,23 @@ export const generateCreatePolicyQuery = ({
   table: string
   behavior: string
   command: string
-  roles: string
-  using?: string
-  check?: string
-}) => {
-  const querySkeleton = `create policy "${name}" on "${schema}"."${table}" as ${behavior} for ${command} to ${roles}`
-  const query =
-    command === 'insert'
-      ? `${querySkeleton} with check (${check});`
-      : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
-  return query
+  roles: SafeSqlFragment
+  using?: SafeSqlFragment
+  check?: SafeSqlFragment
+}): SafeSqlFragment => {
+  const skeleton = safeSql`create policy ${ident(name)} on ${ident(schema)}.${ident(table)} as ${keyword(behavior)} for ${keyword(command)} to ${roles}`
+  if (command === 'insert') {
+    return safeSql`${skeleton} with check (${check ?? safeSql``});`
+  }
+  const withUsing = safeSql`${skeleton} using (${using ?? safeSql``})`
+  if ((check ?? '').length > 0) {
+    return safeSql`${withUsing} with check (${check ?? safeSql``});`
+  }
+  return safeSql`${withUsing};`
 }
 
 export const checkIfPolicyHasChanged = (
-  selectedPolicy: PostgresPolicy,
+  selectedPolicy: PGPolicy,
   policyForm: {
     name: string
     roles: string[]

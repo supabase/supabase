@@ -1,26 +1,27 @@
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import { useCallback } from 'react'
+
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
+  RequestsByCountryMapRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
-  RequestsByCountryMapRenderer,
   TotalRequestsChartRenderer,
-} from 'components/interfaces/Reports/renderers/ApiRenderers'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { useApiReport } from 'data/reports/api-report-query'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { useCallback } from 'react'
-import type { NextPageWithLayout } from 'types'
-import { ObservabilityLink } from 'components/ui/ObservabilityLink'
+} from '@/components/interfaces/Reports/renderers/ApiRenderers'
+import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
+import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
+import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { useApiReport } from '@/data/reports/api-report-query'
+import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import type { NextPageWithLayout } from '@/types'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()

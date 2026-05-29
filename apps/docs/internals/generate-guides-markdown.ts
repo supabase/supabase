@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
 
@@ -59,6 +59,44 @@ function convertStepHike(content: string): string {
       stepNum++
     }
     return items.join('\n\n')
+  })
+}
+
+/**
+ * For getting-started.mdx: replaces `{[ ...objects ].map(...)}` resource-card
+ * grids with a markdown bullet list of `[title](href), description`. Without
+ * this, the rendered output leaves raw JS code in the markdown since stripping
+ * JSX components doesn't touch JS expressions wrapped in `{...}`.
+ */
+function convertResourceLists(content: string): string {
+  return content.replace(/\{\s*\[\s*\{[\s\S]*?\},?\s*\][\s\S]*?\}\)\}/g, (block) => {
+    const arrMatch = block.match(/\[([\s\S]+?)\]\s*\.(?:filter|map)\b/)
+    if (!arrMatch) return block
+
+    // Collect top-level { ... } object literals from the array body.
+    const arr = arrMatch[1]
+    const objs: string[] = []
+    let depth = 0
+    let start = -1
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i] === '{') {
+        if (depth === 0) start = i
+        depth++
+      } else if (arr[i] === '}' && --depth === 0 && start !== -1) {
+        objs.push(arr.slice(start, i + 1))
+        start = -1
+      }
+    }
+
+    return objs
+      .map((o) => {
+        const title = o.match(/title:\s*['"`]([^'"`]+)['"`]/)?.[1]
+        const href = o.match(/href:\s*['"`]([^'"`]+)['"`]/)?.[1]
+        const desc = o.match(/description:\s*[`'"]([^`'"]+)[`'"]/)?.[1]
+        return title && href ? `- [${title}](${href})${desc ? `. ${desc}` : ''}` : ''
+      })
+      .filter(Boolean)
+      .join('\n')
   })
 }
 
@@ -127,7 +165,11 @@ async function generate() {
 
         const withPartials = await inlinePartials(rawContent)
         const withSteps = convertStepHike(withPartials)
-        const processed = stripJsxTags(withSteps)
+        const withLists =
+          filePath === 'content/guides/getting-started.mdx'
+            ? convertResourceLists(withSteps)
+            : withSteps
+        const processed = stripJsxTags(withLists)
 
         const header = [
           data.title ? `# ${data.title}` : '',

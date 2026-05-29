@@ -1,6 +1,5 @@
-import type { SubMenuSection } from 'components/ui/ProductMenu/ProductMenu.types'
-
 import type { SidebarSection } from './AccountLayout.types'
+import type { SubMenuSection } from '@/components/ui/ProductMenu/ProductMenu.types'
 
 /**
  * Converts AccountLayout SidebarSection[] to SubMenuSection[] for SubMenu/ProductMenu.
@@ -19,6 +18,7 @@ export function toSubMenuSections(sections: SidebarSection[]): SubMenuSection[] 
           key: l.key,
           label: l.label,
           href: l.href,
+          shortcutId: l.shortcutId,
         })),
     }))
     .filter((s) => s.key || s.heading)

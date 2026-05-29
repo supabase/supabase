@@ -1,32 +1,32 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import { MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { Overview } from 'components/interfaces/BranchManagement/Overview'
-import BranchLayout from 'components/layouts/BranchLayout/BranchLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { AlertError } from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { NoPermission } from 'components/ui/NoPermission'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
-import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
+
+import { Overview } from '@/components/interfaces/BranchManagement/Overview'
+import BranchLayout from '@/components/layouts/BranchLayout/BranchLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useBranchDeleteMutation } from '@/data/branches/branch-delete-mutation'
+import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
+import type { NextPageWithLayout } from '@/types'
 
 const BranchesPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -37,7 +37,7 @@ const BranchesPage: NextPageWithLayout = () => {
 
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -108,18 +108,14 @@ const BranchesPage: NextPageWithLayout = () => {
           if (branchRef === ref) {
             router.push(`/project/${projectRef}/branches`)
           }
-          // Track delete button click
-          sendEvent({
-            action: 'branch_delete_button_clicked',
-            properties: {
+          track(
+            'branch_delete_button_clicked',
+            {
               branchType: persistent ? 'persistent' : 'preview',
               origin: 'branches_page',
             },
-            groups: {
-              project: projectRef ?? 'Unknown',
-              organization: selectedOrg?.slug ?? 'Unknown',
-            },
-          })
+            { project: projectRef }
+          )
         },
       }
     )

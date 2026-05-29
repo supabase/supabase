@@ -6,9 +6,10 @@ vi.mock('./util', () => ({
   assertSelfHosted: vi.fn(),
 }))
 
-vi.mock('lib/constants/api', () => ({
+vi.mock('@/lib/constants/api', () => ({
   PROJECT_ENDPOINT: 'localhost:8000',
   PROJECT_ENDPOINT_PROTOCOL: 'http',
+  PROJECT_DB_HOST: 'localhost',
 }))
 
 describe('api/self-hosted/settings', () => {

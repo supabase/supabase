@@ -5,7 +5,7 @@ import yaml from 'js-yaml'
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { Button, cn } from 'ui'
-import { CodeBlock, type CodeBlockLang } from 'ui/src/components/CodeBlock'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
 import { getMcpButtonData } from '../utils/getMcpButtonData'
@@ -106,7 +106,10 @@ export function McpConfigurationDisplay({
                 ? 'Or add'
                 : 'Add'}{' '}
             this configuration to{' '}
-            <code className="px-1 py-0.5 bg-surface-200 rounded">{selectedClient.configFile}</code>:
+            <code className="px-1 py-0.5 bg-surface-200 rounded-sm">
+              {selectedClient.configFile}
+            </code>
+            :
           </div>
           <CodeBlock
             value={configValue}

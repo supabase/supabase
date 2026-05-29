@@ -1,16 +1,16 @@
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
+import {
+  aggregate1MinTo2Min,
+  mapMultiResponseToAnalyticsData,
+  mapResponseToAnalyticsData,
+} from './infra-monitoring-queries'
 import type {
   InfraMonitoringMultiData,
   InfraMonitoringMultiResponse,
   InfraMonitoringSingleResponse,
 } from './infra-monitoring-query'
-import {
-  aggregate1MinTo2Min,
-  mapResponseToAnalyticsData,
-  mapMultiResponseToAnalyticsData,
-} from './infra-monitoring-queries'
 
 const mockMultiResponse: InfraMonitoringMultiResponse = {
   data: [

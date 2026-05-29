@@ -66,12 +66,13 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
             value: value ?? '',
           }))
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
           const existing = ctx.res.getHeader('Set-Cookie') ?? []
           ctx.res.setHeader('Set-Cookie', [
             ...(Array.isArray(existing) ? existing : [String(existing)]),
             ...cookiesToSet.map(({ name, value, options }) => serialize(name, value, options)),
           ])
+          Object.entries(headers).forEach(([key, value]) => ctx.res.setHeader(key, value))
         },
       },
     }

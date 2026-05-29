@@ -2,10 +2,10 @@ import type { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supaba
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { captureCriticalError } from 'lib/error-reporting'
-import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
-import { UseCustomMutationOptions } from 'types'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth } from '@/lib/gotrue'
+import { UseCustomMutationOptions } from '@/types'
 
 interface MFAChallengeAndVerifyVariables extends MFAChallengeAndVerifyParams {
   refreshFactors?: boolean

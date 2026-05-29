@@ -1,7 +1,9 @@
+import { Edge } from '@xyflow/react'
 import { createContext, useContext, type ReactNode } from 'react'
 
 export type SchemaGraphContextType = {
   isDownloading: boolean
+  selectedEdge: Edge | undefined
   onEditColumn: (tableId: number, columnId: string) => void
   onEditTable: (tableId: number) => void
 }

@@ -40,7 +40,7 @@ curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/se
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "region": "us-east-1"
+    "read_replica_region": "us-east-1"
   }'
 
 # Delete a Read Replica

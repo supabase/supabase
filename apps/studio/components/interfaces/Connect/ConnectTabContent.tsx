@@ -1,19 +1,20 @@
+import { useParams } from 'common'
 import dynamic from 'next/dynamic'
 import { forwardRef, HTMLAttributes, useMemo } from 'react'
-
-import { useParams } from 'common'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { pluckObjectFields } from 'lib/helpers'
-import { useTrack } from 'lib/telemetry/track'
-import { cn, CopyCallbackContext } from 'ui'
+import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { CopyCallbackContext } from 'ui-patterns/SimpleCodeBlock'
+
 import { getAddons } from '../Billing/Subscription/Subscription.utils'
 import type { projectKeys } from './Connect.types'
 import { getConnectionStrings } from './DatabaseSettings.utils'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { pluckObjectFields } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
   projectKeys: projectKeys

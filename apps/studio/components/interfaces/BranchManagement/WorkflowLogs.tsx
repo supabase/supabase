@@ -1,13 +1,3 @@
-import AlertError from 'components/ui/AlertError'
-import { ActionRunData } from 'data/actions/action-detail-query'
-import { useActionRunLogsQuery } from 'data/actions/action-logs-query'
-import {
-  useActionsQuery,
-  type ActionRunStep,
-  type ActionStatus,
-} from 'data/actions/action-runs-query'
-import type { Branch } from 'data/branches/branches-query'
-import dayjs from 'dayjs'
 import { groupBy } from 'lodash'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
@@ -28,6 +18,15 @@ import { GenericSkeletonLoader, TimestampInfo } from 'ui-patterns'
 
 import { ActionStatusBadge, ActionStatusBadgeCondensed, STATUS_TO_LABEL } from './ActionStatusBadge'
 import BranchStatusBadge from './BranchStatusBadge'
+import AlertError from '@/components/ui/AlertError'
+import { ActionRunData } from '@/data/actions/action-detail-query'
+import { useActionRunLogsQuery } from '@/data/actions/action-logs-query'
+import {
+  useActionsQuery,
+  type ActionRunStep,
+  type ActionStatus,
+} from '@/data/actions/action-runs-query'
+import type { Branch } from '@/data/branches/branches-query'
 
 interface WorkflowLogsProps {
   branch: Branch
@@ -99,7 +98,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
 
         <DialogSectionSeparator />
 
-        <DialogSection className={cn('!px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '!py-0')}>
+        <DialogSection className={cn('px-0!', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : 'py-0!')}>
           {!selectedWorkflowRun ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-4" />}

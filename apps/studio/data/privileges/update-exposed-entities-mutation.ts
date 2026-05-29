@@ -1,10 +1,11 @@
 import { buildFunctionPrivilegesSql, buildTablePrivilegesSql } from '@supabase/pg-meta'
+import { joinSqlFragments, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useMutation } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { UseCustomMutationOptions } from 'types'
 
-import type { ConnectionVars } from '../common.types'
+import type { ConnectionVars } from '@/data/common.types'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateExposedEntitiesVariables = ConnectionVars & {
   tableIdsToAdd: number[]
@@ -23,7 +24,7 @@ export async function updateExposedEntities({
 }: UpdateExposedEntitiesVariables): Promise<void> {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const sqlParts: string[] = []
+  const sqlParts: Array<SafeSqlFragment> = []
 
   if (tableIdsToAdd.length > 0) {
     sqlParts.push(buildTablePrivilegesSql(tableIdsToAdd, 'grant'))
@@ -46,7 +47,7 @@ export async function updateExposedEntities({
   await executeSql({
     projectRef,
     connectionString,
-    sql: sqlParts.join('\n'),
+    sql: joinSqlFragments(sqlParts, '\n'),
     queryKey: ['update-exposed-entities'],
   })
 }

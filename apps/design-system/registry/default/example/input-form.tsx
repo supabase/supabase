@@ -5,13 +5,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input,
 } from 'ui'
 import { z } from 'zod'
@@ -41,26 +41,26 @@ export default function InputForm() {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
-            <FormItem_Shadcn_>
-              <FormLabel_Shadcn_>Username</FormLabel_Shadcn_>
-              <FormControl_Shadcn_>
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
                 <Input placeholder="shadcn" {...field} />
-              </FormControl_Shadcn_>
-              <FormDescription_Shadcn_>This is your public display name.</FormDescription_Shadcn_>
-              <FormMessage_Shadcn_ />
-            </FormItem_Shadcn_>
+              </FormControl>
+              <FormDescription>This is your public display name.</FormDescription>
+              <FormMessage />
+            </FormItem>
           )}
         />
         <Button htmlType="submit" type="secondary">
           Submit
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

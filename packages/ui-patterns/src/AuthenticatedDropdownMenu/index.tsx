@@ -85,7 +85,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                   return (
                     <div
                       key={`${site}-auth-dropdown-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
-                      className="flex cursor-text items-center text-foreground rounded-sm px-2 py-1.5 text-xs outline-none space-x-2"
+                      className="flex cursor-text items-center text-foreground rounded-xs px-2 py-1.5 text-xs outline-hidden space-x-2"
                       {...sectionItem.otherProps}
                     >
                       <DropdownItemContent {...sectionItem} />

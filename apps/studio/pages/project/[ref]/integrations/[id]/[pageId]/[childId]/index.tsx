@@ -1,10 +1,6 @@
 import { useParams } from 'common'
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
-import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -18,7 +14,10 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
-import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
+import type { NextPageWithLayout } from '@/types'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -38,7 +37,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   // Get the corresponding component dynamically
   const Component = useMemo(
-    () => integration?.navigate(id!, pageId, childId),
+    () => integration?.navigate({ id, pageId, childId }),
     [integration, id, pageId, childId]
   )
 
@@ -99,7 +98,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
 IntegrationPage.getLayout = (page) => (
   <DefaultLayout>
-    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
+    <ProjectIntegrationsLayoutDispatch>{page}</ProjectIntegrationsLayoutDispatch>
   </DefaultLayout>
 )
 

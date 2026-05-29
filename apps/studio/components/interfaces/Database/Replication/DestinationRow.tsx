@@ -1,19 +1,9 @@
 import { useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
-import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { Minus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from 'state/replication-pipeline-request-status'
 import {
   Button,
   TableCell,
@@ -26,12 +16,22 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
+import { AlertError } from '@/components/ui/AlertError'
+import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
+import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
+import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 interface DestinationRowProps {
   destinationId: number
@@ -99,7 +99,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       return console.error('Project ref is required')
     }
     if (!pipeline) {
-      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+      return toast.error('No pipeline found')
     }
 
     try {
@@ -114,7 +114,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       setShowDeleteDestinationForm(false)
       toast.success(`Deleted destination "${destinationName}"`)
     } catch (error) {
-      toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
+      toast.error(`Failed to delete destination: ${(error as ResponseError).message}`)
     } finally {
       setIsDeleting(false)
     }
@@ -129,7 +129,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   return (
     <>
       {isPipelineError && (
-        <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
+        <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
       )}
       {isPipelineSuccess && (
         <TableRow>
@@ -138,6 +138,8 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
               <BigQuery size={18} className="text-foreground-light" />
             ) : type === 'Analytics Bucket' ? (
               <AnalyticsBucket size={18} className="text-foreground-light" />
+            ) : type === 'DuckLake' ? (
+              <Database size={18} className="text-foreground-light" />
             ) : (
               <Database size={18} className="text-foreground-light" />
             )}
