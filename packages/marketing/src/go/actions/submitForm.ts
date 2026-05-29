@@ -208,8 +208,13 @@ export async function submitFormAction(
       })
       client = new CRMClient(crmConfig)
     } catch (err: any) {
-      debug('CRM config error', { error: err.message })
-      return { success: false, errors: [err.message] }
+      // Config failures (e.g. a missing credential env var) name internal
+      // infrastructure — log server-side, return a generic message.
+      console.error('[go/form] CRM config error', err?.message)
+      return {
+        success: false,
+        errors: ['Something went wrong submitting the form. Please try again.'],
+      }
     }
 
     // Build HubSpot fields: apply optional field name mapping
@@ -273,11 +278,17 @@ export async function submitFormAction(
     })
 
     if (errors.length > 0) {
-      debug(
-        'CRM submission errors',
+      // Log the raw upstream CRM error messages server-side only — they can
+      // contain provider status codes, request IDs, and schema hints that must
+      // not reach the browser. The client gets a generic message.
+      console.error(
+        '[go/form] CRM submission errors',
         errors.map((e) => e.message)
       )
-      return { success: false, errors: errors.map((e) => e.message) }
+      return {
+        success: false,
+        errors: ['Something went wrong submitting the form. Please try again.'],
+      }
     }
 
     debug('Submission successful')
