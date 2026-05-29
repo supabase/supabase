@@ -309,8 +309,12 @@ export const LOG_TABLE_SQL: Record<LogsTableName, SafeLogSqlFragment> = {
 /**
  * SQL query to retrieve only one log
  */
-export const genSingleLogQuery = (table: LogsTableName, id: string): SafeLogSqlFragment =>
-  safeSql`select id, timestamp, event_message, metadata from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
+export const genSingleLogQuery = (table: LogsTableName, id: string): SafeLogSqlFragment => {
+  if (table === LogsTableName.MULTIGRES) {
+    return safeSql`select id, timestamp, event_message from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
+  }
+  return safeSql`select id, timestamp, event_message, metadata from ${LOG_TABLE_SQL[table]} where id = ${analyticsLiteral(id)} limit 1`
+}
 
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
