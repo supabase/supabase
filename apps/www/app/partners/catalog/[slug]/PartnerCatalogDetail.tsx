@@ -1,31 +1,24 @@
-import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
+'use client'
+
 import { CH } from '@code-hike/mdx/components'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
-import { type GetStaticPaths, type GetStaticProps } from 'next'
 import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client'
 import { MDXClient } from 'next-mdx-remote-client/csr'
-import { serialize } from 'next-mdx-remote-client/serialize'
-import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, type Dispatch, type SetStateAction } from 'react'
-import remarkGfm from 'remark-gfm'
 
 import 'swiper/css'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { getCatalogPartner, listCatalogPartnerSlugs } from '~/lib/marketplaceDb'
 import { type ListingDetail, type Partner } from '~/types/partners'
 import { useBreakpoint } from 'common'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
-
-import Error404 from '../../404'
 
 function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
   return {
@@ -37,20 +30,16 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
   }
 }
 
-type PartnerData = {
+type Props = {
   partner: Partner
   serializedListings: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>[]
 }
 
-function PartnerPage({ partner, serializedListings }: PartnerData) {
+export default function PartnerCatalogDetail({ partner, serializedListings }: Props) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState(0)
   const isNarrow = useBreakpoint('lg')
 
-  if (!partner) return <Error404 />
-
-  // For marketplace DB, partner.listings has per-listing content.
-  // For legacy DB, synthesise a single tab from the top-level partner data.
   const allListings: ListingDetail[] = partner.listings?.length
     ? partner.listings
     : [
@@ -68,20 +57,11 @@ function PartnerPage({ partner, serializedListings }: PartnerData) {
   const safeTab = Math.min(activeTab, allListings.length - 1)
   const activeListing = allListings[safeTab]
   const activeOverview = serializedListings[safeTab] ?? serializedListings[0]
+  // Prefer the Supabase dashboard integration URL for marketplace integrations.
+  const installHref = activeListing.dashboardUrl ?? activeListing.installUrl
 
   return (
     <>
-      <NextSeo
-        title={`${partner.title} | Works With Supabase`}
-        description={partner.description}
-        openGraph={{
-          title: `${partner.title} | Works With Supabase`,
-          description: partner.description,
-          url: `https://supabase.com/partners/catalog/${partner.slug}`,
-          images: [{ url: partner.images?.[0] ?? partner.logo }],
-        }}
-      />
-
       <AnimatePresence>
         {focusedImage && (
           <motion.div
@@ -96,7 +76,7 @@ function PartnerPage({ partner, serializedListings }: PartnerData) {
             <motion.div
               layoutId={`partner-image-${focusedImage}`}
               transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-              className="relative w-full max-w-6xl aspect-[16/8] rounded-md border bg-muted"
+              className="relative w-full max-w-6xl aspect-16/8 rounded-md border bg-muted"
               onClick={(e) => e.stopPropagation()}
             >
               <Image
@@ -138,9 +118,9 @@ function PartnerPage({ partner, serializedListings }: PartnerData) {
                   {partner.title}
                 </h1>
               </div>
-              {activeListing.installUrl && (
+              {installHref && (
                 <Button asChild size="medium">
-                  <a href={activeListing.installUrl} target="_blank" rel="noreferrer">
+                  <a href={installHref} target="_blank" rel="noreferrer">
                     Add integration
                   </a>
                 </Button>
@@ -254,13 +234,13 @@ function PartnerPage({ partner, serializedListings }: PartnerData) {
               {!isNarrow && <PartnerDetails partner={partner} activeListing={activeListing} />}
             </div>
 
-            {activeListing.installUrl && (
+            {installHref && (
               <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-xs max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl self-center">
                     Get started with {partner.title} and Supabase.
                   </h1>
-                  <a href={activeListing.installUrl} target="_blank" rel="noreferrer">
+                  <a href={installHref} target="_blank" rel="noreferrer">
                     <Button size="medium" type="secondary">
                       Add integration
                     </Button>
@@ -275,13 +255,13 @@ function PartnerPage({ partner, serializedListings }: PartnerData) {
   )
 }
 
-const PartnerDetails = ({
+function PartnerDetails({
   partner,
   activeListing,
 }: {
   partner: Partner
   activeListing: ListingDetail
-}) => {
+}) {
   return (
     <div className="lg:col-span-3">
       <div className="sticky top-20 flex flex-col gap-4">
@@ -368,63 +348,3 @@ const PartnerDetails = ({
     </div>
   )
 }
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  const slugs = await listCatalogPartnerSlugs()
-
-  const paths = slugs?.map((slug) => ({ params: { slug } })) ?? []
-
-  return { paths, fallback: 'blocking' }
-}
-
-export const getStaticProps: GetStaticProps<PartnerData> = async ({ params }) => {
-  const partner = await getCatalogPartner(params!.slug as string)
-
-  if (!partner) {
-    return { notFound: true }
-  }
-
-  const codeHikeOptions: CodeHikeConfig = {
-    theme: codeHikeTheme,
-    lineNumbers: true,
-    showCopyButton: true,
-    skipLanguages: [],
-    autoImport: false,
-  }
-
-  // For marketplace DB, partner.listings has all per-listing content.
-  // For legacy DB, fall back to a single synthetic listing from partner-level data.
-  const listingsForTabs: ListingDetail[] = partner.listings?.length
-    ? partner.listings
-    : [
-        {
-          slug: partner.slug,
-          label: 'Overview',
-          content: partner.content,
-          installUrl: partner.installUrl,
-          docsUrl: partner.docsUrl,
-          images: partner.images,
-          youtubeId: partner.youtubeId,
-        },
-      ]
-
-  const serializedListings = await Promise.all(
-    listingsForTabs.map((listing) =>
-      serialize({
-        source: listing.content,
-        options: {
-          mdxOptions: {
-            remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
-          },
-        },
-      })
-    )
-  )
-
-  return {
-    props: { partner, serializedListings },
-    revalidate: 1800,
-  }
-}
-
-export default PartnerPage

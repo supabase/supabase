@@ -165,8 +165,11 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
  */
 function getLabelForListing(listing: Listing): string {
   if (listing.publish_dashboard) return 'Marketplace Integration'
-  const t = listing.title.toLowerCase()
-  if (t.includes('foreign data wrapper') || /\bfdw\b/.test(t)) return 'Foreign Data Wrapper'
+  const isFdw = listing.categories?.some(
+    (c) =>
+      c.name.toLowerCase().includes('foreign data wrapper') || c.slug.toLowerCase().includes('fdw')
+  )
+  if (isFdw) return 'Foreign Data Wrapper'
   if (listing.marketplace_url) return 'Integration'
   return 'Guide'
 }
@@ -211,6 +214,9 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
           label: getLabelForListing(listing),
           content: listing.content,
           installUrl: listing.marketplace_url ?? null,
+          dashboardUrl: listing.publish_dashboard
+            ? `https://supabase.com/dashboard/project/_/integrations/${listing.slug}/overview`
+            : null,
           docsUrl: listing.documentation_url || null,
           images: listing.images?.map(fullImageUrl) ?? [],
           youtubeId: listing.youtube_id ?? null,

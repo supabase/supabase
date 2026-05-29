@@ -12,6 +12,7 @@ export type ListingDetail = {
   label: string
   content: string
   installUrl: string | null
+  dashboardUrl?: string | null
   docsUrl: string | null
   images: string[]
   youtubeId: string | null
