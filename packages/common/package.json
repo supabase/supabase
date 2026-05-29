@@ -40,6 +40,7 @@
   "peerDependencies": {
     "@supabase/auth-js": "catalog:",
     "@supabase/supabase-js": "catalog:",
+    "lucide-react": "*",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

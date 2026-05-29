@@ -5,7 +5,17 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 import { searchCatalogPartners } from '~/lib/marketplaceDb'
 import type { Partner } from '~/types/partners'
-import { ArrowRight, ArrowUpRight, LayoutGrid, List, Loader, Search } from 'lucide-react'
+import { getCategoryIcon } from 'common/marketplace-categories'
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BadgeCheck,
+  LayoutGrid,
+  List,
+  Loader,
+  Search,
+  Store,
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -33,9 +43,10 @@ export default function IntegrationsContent({
   metaDescription,
 }: Props) {
   const [partners, setPartners] = useState(initialPartners)
+  // Deduplicate by slug, keep name for display, sort alphabetically.
   const allCategories = Array.from(
-    new Set(initialPartners?.flatMap((p) => p.categories.map((c) => c.name)))
-  ).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+    new Map(initialPartners?.flatMap((p) => p.categories).map((c) => [c.slug, c]) ?? []).values()
+  ).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
 
   const [
     {
@@ -81,11 +92,12 @@ export default function IntegrationsContent({
       })
   }, [debouncedSearchTerm, initialPartners])
 
-  const handleCategoryChange = (category: string) =>
+  // selectedCategories holds slugs; toggle by slug
+  const handleCategoryChange = (slug: string) =>
     setFilters({
-      cat: selectedCategories.includes(category)
-        ? selectedCategories.filter((c) => c !== category)
-        : [...selectedCategories, category],
+      cat: selectedCategories.includes(slug)
+        ? selectedCategories.filter((s) => s !== slug)
+        : [...selectedCategories, slug],
     })
 
   const OFFICIAL_PARTNER_SLUGS = new Set(['grafana', 'stripe', 'aikido', 'doppler', 'resend'])
@@ -96,7 +108,7 @@ export default function IntegrationsContent({
 
   const categoryFiltered =
     selectedCategories.length > 0
-      ? partners.filter((p) => p.categories.some((c) => selectedCategories.includes(c.name)))
+      ? partners.filter((p) => p.categories.some((c) => selectedCategories.includes(c.slug)))
       : partners
 
   const partnerFiltered = partnerOnly
@@ -163,53 +175,62 @@ export default function IntegrationsContent({
 
               <div className="hidden md:flex flex-col gap-4">
                 <h2 className="text-xs text-foreground-lighter font-mono uppercase">Categories:</h2>
-                <div className="flex flex-col gap-2.5">
-                  {allCategories.map((category) => (
-                    <div
-                      key={category}
-                      className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! transition-colors"
-                    >
-                      <Checkbox
-                        id={`cat-${category}`}
-                        checked={selectedCategories.includes(category)}
-                        onCheckedChange={() => handleCategoryChange(category)}
-                        className="[&_input]:m-0"
-                      />
-                      <label
-                        htmlFor={`cat-${category}`}
-                        className="text-sm leading-none! flex-1 text-left"
+                <div className="flex flex-col gap-3">
+                  {allCategories.map((category) => {
+                    const Icon = getCategoryIcon(category.slug)
+                    return (
+                      <div
+                        key={category.slug}
+                        className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! transition-colors"
                       >
-                        {category}
-                      </label>
-                    </div>
-                  ))}
+                        <label
+                          htmlFor={`cat-${category.slug}`}
+                          className="text-sm leading-none! flex-1 text-left flex items-center gap-1.5"
+                        >
+                          <Icon size={14} className="shrink-0 text-foreground-lighter" />
+                          {category.name}
+                        </label>
+                        <Checkbox
+                          id={`cat-${category.slug}`}
+                          checked={selectedCategories.includes(category.slug)}
+                          onCheckedChange={() => handleCategoryChange(category.slug)}
+                          className="[&_input]:m-0"
+                        />
+                      </div>
+                    )
+                  })}
                 </div>
 
                 <div className="border-t border-muted pt-4 flex flex-col gap-2.5">
                   <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! transition-colors">
+                    <label
+                      htmlFor="partner-only"
+                      className="text-sm leading-none! flex-1 text-left flex items-center gap-1.5"
+                    >
+                      <BadgeCheck size={14} className="shrink-0 text-foreground-lighter" />
+                      Official Partners
+                    </label>
                     <Checkbox
                       id="partner-only"
                       checked={partnerOnly}
                       onCheckedChange={(checked) => setFilters({ partner: !!checked })}
                       className="[&_input]:m-0"
                     />
-                    <label
-                      htmlFor="partner-only"
-                      className="text-sm leading-none! flex-1 text-left"
-                    >
-                      Official Partners
-                    </label>
                   </div>
                   <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! transition-colors">
+                    <label
+                      htmlFor="one-click"
+                      className="text-sm leading-none! flex-1 text-left flex items-center gap-1.5"
+                    >
+                      <Store size={14} className="shrink-0 text-foreground-lighter" />
+                      Available in Marketplace
+                    </label>
                     <Checkbox
                       id="one-click"
                       checked={oneClickOnly}
                       onCheckedChange={(checked) => setFilters({ marketplace: !!checked })}
                       className="[&_input]:m-0"
                     />
-                    <label htmlFor="one-click" className="text-sm leading-none! flex-1 text-left">
-                      Available in Marketplace
-                    </label>
                   </div>
                 </div>
               </div>
