@@ -756,6 +756,12 @@ export const auth: NavMenuConstant = {
         },
 
         {
+          name: 'Passkey',
+          url: '/guides/auth/passkeys',
+          enabled: allAuthProvidersEnabled,
+        },
+
+        {
           name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
           items: [{ name: 'Overview', url: '/guides/auth/social-login' }, ...SocialLoginItems],
@@ -1783,6 +1789,10 @@ export const functions: NavMenuConstant = {
           name: 'Image Transformation & Optimization',
           url: '/guides/functions/examples/image-manipulation' as `/${string}`,
         },
+        {
+          name: 'Resumable WebSockets with replay',
+          url: '/guides/functions/examples/resumable-websockets' as `/${string}`,
+        },
       ],
     },
     {
@@ -2522,6 +2532,7 @@ export const security: NavMenuConstant = {
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
       ],
     },
   ],
@@ -2781,6 +2792,18 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/branching' as `/${string}`,
             },
             {
+              name: 'Logs',
+              url: '/guides/platform/manage-your-usage/logs' as `/${string}`,
+            },
+            {
+              name: 'Logs Ingest',
+              url: '/guides/platform/manage-your-usage/logs-ingest' as `/${string}`,
+            },
+            {
+              name: 'Logs Query',
+              url: '/guides/platform/manage-your-usage/logs-query' as `/${string}`,
+            },
+            {
               name: 'Log Drains',
               url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
             },
@@ -2854,6 +2877,10 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Advanced log filtering',
           url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
+        },
+        {
+          name: 'Logs field reference',
+          url: '/guides/telemetry/log-field-reference' as `/${string}`,
         },
         {
           name: 'Log drains',

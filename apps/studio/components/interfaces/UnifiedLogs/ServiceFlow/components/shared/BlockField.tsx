@@ -1,6 +1,5 @@
 import { Skeleton } from 'ui'
 
-import { getStatusLevel } from '../../../UnifiedLogs.utils'
 import { BlockFieldProps } from '../../types'
 import { TruncatedTextWithPopover } from './TruncatedTextWithPopover'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
@@ -37,11 +36,7 @@ export const BlockField = ({
         {shouldShowSkeleton ? (
           <Skeleton className="h-4 w-24" />
         ) : isStatusField && displayValue !== 'N/A' ? (
-          <DataTableColumnStatusCode
-            value={displayValue}
-            level={getStatusLevel(displayValue)}
-            className="text-xs"
-          />
+          <DataTableColumnStatusCode value={displayValue} level={data?.level} className="text-xs" />
         ) : isApiKeyField && displayValue !== 'N/A' ? (
           <TruncatedTextWithPopover
             text={stringValue}

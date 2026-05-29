@@ -28,20 +28,25 @@ export function RLSToggleDialog({
   onOpenChange,
   onConfirm,
 }: RLSToggleDialogProps) {
-  const title = isEnabled ? 'Disable Row Level Security' : 'Enable Row Level Security'
-  const description = isEnabled
-    ? 'This table will become publicly readable and writable. Anyone can view, add, update, or delete data in this table, and existing RLS policies will no longer apply.'
-    : 'RLS restricts table access until policies allow a request. Existing queries may stop returning rows until policies are added.'
-  const confirmLabel = isEnabled ? 'Disable RLS' : 'Enable RLS'
-  const confirmVariant = isEnabled ? 'danger' : 'primary'
-
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {isEnabled ? 'Disable Row Level Security' : 'Enable Row Level Security'}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            {description}{' '}
+            {isEnabled ? (
+              <>
+                This table will become publicly readable and writable.{' '}
+                <span className="font-medium text-foreground">
+                  Anyone can view, add, update, or delete data in this table
+                </span>
+                , and existing RLS policies will no longer apply.
+              </>
+            ) : (
+              'RLS restricts table access until policies allow a request. Existing queries may stop returning rows until policies are added.'
+            )}{' '}
             <InlineLink href={`${DOCS_URL}/guides/database/postgres/row-level-security`}>
               Learn more
             </InlineLink>
@@ -51,11 +56,11 @@ export function RLSToggleDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            variant={confirmVariant}
+            variant={isEnabled ? 'danger' : 'primary'}
             loading={isSubmitting}
             onClick={() => onConfirm()}
           >
-            {confirmLabel}
+            {isEnabled ? 'Disable RLS' : 'Enable RLS'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -13,7 +13,6 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { useParams } from 'common'
 import { isEmpty, noop, partition } from 'lodash'
 import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
@@ -37,9 +36,8 @@ import { Column } from './Column'
 import type { ImportContent, TableField } from './TableEditor.types'
 import InformationBox from '@/components/ui/InformationBox'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ColumnManagementProps {
   table: TableField
@@ -66,14 +64,11 @@ export const ColumnManagement = ({
   onClearImportContent = noop,
   onUpdateFkRelations,
 }: ColumnManagementProps) => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
-
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -186,14 +181,7 @@ export const ColumnManagement = ({
                     type="default"
                     onClick={() => {
                       onSelectImportData()
-                      sendEvent({
-                        action: 'import_data_button_clicked',
-                        properties: { tableType: 'New Table' },
-                        groups: {
-                          project: projectRef ?? 'Unknown',
-                          organization: org?.slug ?? 'Unknown',
-                        },
-                      })
+                      track('import_data_button_clicked', { tableType: 'New Table' })
                     }}
                   >
                     Import data from CSV

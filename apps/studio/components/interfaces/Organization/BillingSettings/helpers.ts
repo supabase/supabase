@@ -5,6 +5,8 @@ const pricingMetricBytes = [
   PricingMetric.EGRESS,
   PricingMetric.CACHED_EGRESS,
   PricingMetric.STORAGE_SIZE,
+  PricingMetric.LOG_INGESTION,
+  PricingMetric.LOG_QUERYING,
 ]
 
 const pricingMetricNotHrs = [
