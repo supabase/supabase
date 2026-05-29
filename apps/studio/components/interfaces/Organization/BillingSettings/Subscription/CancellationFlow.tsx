@@ -135,9 +135,9 @@ export const InitiateCancellationFlowButton = (props: InitiateCancellationFlowBu
   const [visible, setVisible] = useState(false)
 
   const tooltipText = [
+    [isAwsManaged, 'You cannot change the plan for an organization managed by AWS Marketplace'],
     [!isDowngradeablePlan, 'Reach out to us via support to update your plan'],
     [!canUpdateSubscription, "You need additional permissions to change your organization's plan."],
-    [isAwsManaged, 'You cannot change the plan for an organization managed by AWS Marketplace'],
   ].find(([cond]) => cond)?.[1]
 
   return (
