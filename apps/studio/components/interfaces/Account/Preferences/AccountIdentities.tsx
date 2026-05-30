@@ -35,6 +35,8 @@ import {
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
+import type { UserIdentity } from '@supabase/supabase-js'
+import { useUser } from 'common'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useUnlinkIdentityMutation } from '@/data/profile/profile-unlink-identity-mutation'
@@ -49,6 +51,7 @@ const getProviderName = (provider: string) =>
 
 export const AccountIdentities = () => {
   const router = useRouter()
+  const user = useUser()
 
   const { data, isPending: isLoading, isSuccess } = useProfileIdentitiesQuery()
   const identities = data?.identities ?? []
@@ -56,23 +59,28 @@ export const AccountIdentities = () => {
     ? dayjs().utc().diff(dayjs(data?.email_change_sent_at).utc(), 'minute') > 10
     : false
 
-  const [selectedProviderUnlink, setSelectedProviderUnlink] = useState<string>()
+  const hasPassword =
+    user?.app_metadata?.provider === 'email' ||
+    user?.user_metadata?.has_password === true
+
+  const oauthIdentities = identities.filter((i) => i.provider !== 'email')
+
+  const [selectedIdentityToUnlink, setSelectedIdentityToUnlink] = useState<UserIdentity>()
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
 
   const { mutate: unlinkIdentity, isPending: isUnlinking } = useUnlinkIdentityMutation({
     onSuccess: () => {
       toast.success(
-        `Successfully unlinked ${getProviderName(selectedProviderUnlink ?? '')} identity!`
+        `Successfully unlinked ${getProviderName(selectedIdentityToUnlink?.provider ?? '')} identity!`
       )
-      setSelectedProviderUnlink(undefined)
+      setSelectedIdentityToUnlink(undefined)
     },
   })
 
   const [, message] = router.asPath.split('#message=')
 
   const onConfirmUnlinkIdentity = async () => {
-    const identity = identities.find((i) => i.provider === selectedProviderUnlink)
-    if (identity) unlinkIdentity(identity)
+    if (selectedIdentityToUnlink) unlinkIdentity(selectedIdentityToUnlink)
   }
 
   useEffect(() => {
@@ -108,6 +116,11 @@ export const AccountIdentities = () => {
                     : provider === 'email'
                       ? 'email-icon2'
                       : 'saml-icon'
+
+                const isLastOAuthWithoutPassword =
+                  provider !== 'email' &&
+                  oauthIdentities.length <= 1 &&
+                  !hasPassword
 
                 return (
                   <CardContent key={identity_id} className="flex justify-between items-center py-4">
@@ -155,8 +168,16 @@ export const AccountIdentities = () => {
                           type="text"
                           icon={<Unlink />}
                           className="w-7"
-                          onClick={() => setSelectedProviderUnlink(provider)}
-                          tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
+                          disabled={isLastOAuthWithoutPassword}
+                          onClick={() => setSelectedIdentityToUnlink(identity)}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: isLastOAuthWithoutPassword
+                                ? 'You must set a password for your account before unlinking this identity'
+                                : 'Unlink identity',
+                            },
+                          }}
                         />
                       )}
                     </div>
@@ -195,16 +216,30 @@ export const AccountIdentities = () => {
           variant="warning"
           size="small"
           loading={isUnlinking}
-          visible={!!selectedProviderUnlink}
-          title={`Unlink ${getProviderName(selectedProviderUnlink ?? '')} identity`}
-          onCancel={() => setSelectedProviderUnlink(undefined)}
+          visible={!!selectedIdentityToUnlink}
+          title={`Unlink ${getProviderName(selectedIdentityToUnlink?.provider ?? '')} identity`}
+          onCancel={() => setSelectedIdentityToUnlink(undefined)}
           onConfirm={onConfirmUnlinkIdentity}
           confirmLabel="Unlink identity"
           confirmLabelLoading="Unlinking identity"
           alert={{
             base: { variant: 'warning' },
-            title: `Confirm to disconnect your ${getProviderName(selectedProviderUnlink ?? '')} identity`,
-            description: `After disconnecting, you will only be able to sign in via ${selectedProviderUnlink === 'github' ? 'email and password' : 'your GitHub identity'}`,
+            title: `Confirm to disconnect your ${getProviderName(selectedIdentityToUnlink?.provider ?? '')} identity`,
+            description: `After disconnecting, you will only be able to sign in via ${
+              Array.from(
+                new Set(
+                  identities
+                    .filter((i) => i.identity_id !== selectedIdentityToUnlink?.identity_id)
+                    .map((i) =>
+                      i.provider === 'email'
+                        ? hasPassword
+                          ? 'email and password'
+                          : 'email (recovery/reset password)'
+                        : getProviderName(i.provider)
+                    )
+                )
+              ).join(' or ')
+            }`,
           }}
         />
       </PageSectionContent>

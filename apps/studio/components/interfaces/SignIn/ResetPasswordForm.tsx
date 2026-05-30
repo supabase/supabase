@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
+import { useParams, useUser } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -43,7 +43,13 @@ type FormData = z.infer<typeof passwordSchema>
 export const ResetPasswordForm = () => {
   const router = useRouter()
   const { type } = useParams()
-  const requireCurrentPassword = type === 'change'
+  const user = useUser()
+
+  const hasPassword =
+    user?.app_metadata?.provider === 'email' ||
+    user?.user_metadata?.has_password === true
+
+  const requireCurrentPassword = type === 'change' && hasPassword
 
   const [showConditions, setShowConditions] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
@@ -59,6 +65,7 @@ export const ResetPasswordForm = () => {
     const toastId = toast.loading('Saving password...')
     const { error } = await auth.updateUser({
       password: data.password,
+      data: { has_password: true },
       ...(requireCurrentPassword ? { current_password: data.currentPassword } : {}),
     })
 
