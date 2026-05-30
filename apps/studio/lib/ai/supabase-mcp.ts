@@ -1,9 +1,9 @@
+import { createMCPClient } from '@ai-sdk/mcp'
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js' // .js required for esbuild ESM resolution
 import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { createSupabaseApiPlatform } from '@supabase/mcp-server-supabase/platform/api'
-import { StreamTransport } from '@supabase/mcp-utils'
-import { createMCPClient } from '@ai-sdk/mcp'
 
-import { API_URL } from 'lib/constants'
+import { API_URL } from '@/lib/constants'
 
 export async function createSupabaseMCPClient({
   accessToken,
@@ -12,11 +12,7 @@ export async function createSupabaseMCPClient({
   accessToken: string
   projectId: string
 }) {
-  // Create an in-memory transport pair
-  const clientTransport = new StreamTransport()
-  const serverTransport = new StreamTransport()
-  clientTransport.readable.pipeTo(serverTransport.writable)
-  serverTransport.readable.pipeTo(clientTransport.writable)
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
 
   // Instantiate the MCP server and connect to its transport
   const apiUrl = API_URL?.replace('/platform', '')

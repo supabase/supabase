@@ -1,21 +1,30 @@
 import dayjs from 'dayjs'
 
-import {
-  isUnixMicro,
-  unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import type { AnalyticsInterval } from 'data/analytics/constants'
-import { get } from 'data/fetchers'
-import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
 import { ReportConfig } from './reports.types'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
-import { fetchLogs } from 'data/reports/report.utils'
 import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
   transformStatusCodeData,
-} from 'components/interfaces/Reports/Reports.utils'
+} from '@/components/interfaces/Reports/Reports.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { SelectFilters } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import {
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { AnalyticsInterval } from '@/data/analytics/constants'
+import {
+  analyticsLiteral,
+  joinSqlFragments,
+  safeSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
+import {
+  analyticsIntervalToGranularity,
+  fetchLogs,
+  SAFE_COMPARISON_OPERATOR_SQL,
+  SAFE_GRANULARITY_SQL,
+} from '@/data/reports/report.utils'
 
 type EdgeFunctionReportFilters = {
   status_code: NumericFilter | null
@@ -24,44 +33,48 @@ type EdgeFunctionReportFilters = {
   functions: SelectFilters
 }
 
-export function filterToWhereClause(filters?: EdgeFunctionReportFilters): string {
-  const whereClauses: string[] = []
+export function filterToWhereClause(filters?: EdgeFunctionReportFilters): SafeLogSqlFragment {
+  const whereClauses: SafeLogSqlFragment[] = []
 
   if (filters?.functions && filters.functions.length > 0) {
-    whereClauses.push(`function_id IN (${filters.functions.map((id) => `'${id}'`).join(',')})`)
+    const ids = joinSqlFragments(filters.functions.map(analyticsLiteral), ',')
+    whereClauses.push(safeSql`function_id IN (${ids})`)
   }
 
   if (filters?.status_code) {
+    const op = SAFE_COMPARISON_OPERATOR_SQL[filters.status_code.operator]
     whereClauses.push(
-      `response.status_code ${filters.status_code.operator} ${filters.status_code.value}`
+      safeSql`response.status_code ${op} ${analyticsLiteral(filters.status_code.value)}`
     )
   }
 
   if (filters?.region && filters.region.length > 0) {
-    whereClauses.push(
-      `h.x_sb_edge_region IN (${filters.region.map((region) => `'${region}'`).join(',')})`
-    )
+    const regions = joinSqlFragments(filters.region.map(analyticsLiteral), ',')
+    whereClauses.push(safeSql`h.x_sb_edge_region IN (${regions})`)
   }
 
   if (filters?.execution_time) {
+    const op = SAFE_COMPARISON_OPERATOR_SQL[filters.execution_time.operator]
     whereClauses.push(
-      `m.execution_time_ms ${filters.execution_time.operator} ${filters.execution_time.value}`
+      safeSql`m.execution_time_ms ${op} ${analyticsLiteral(filters.execution_time.value)}`
     )
   }
 
-  return whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
+  if (whereClauses.length === 0) return safeSql``
+  return safeSql`WHERE ${joinSqlFragments(whereClauses, ' AND ')}`
 }
 
 const METRIC_SQL: Record<
   string,
-  (interval: AnalyticsInterval, filters?: EdgeFunctionReportFilters) => string
+  (interval: AnalyticsInterval, filters?: EdgeFunctionReportFilters) => SafeLogSqlFragment
 > = {
   TotalInvocations: (interval, filters) => {
+    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
     const whereClause = filterToWhereClause(filters)
-    return `
+    return safeSql`
 --edgefn-report-invocations
 select
-  timestamp_trunc(timestamp, ${analyticsIntervalToGranularity(interval)}) as timestamp,
+  timestamp_trunc(timestamp, ${granularity}) as timestamp,
   function_id,
   count(*) as count
 from
@@ -79,11 +92,12 @@ order by
 `
   },
   ExecutionStatusCodes: (interval, filters) => {
+    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
     const whereClause = filterToWhereClause(filters)
-    return `
+    return safeSql`
 --edgefn-report-execution-status-codes
 select
-  timestamp_trunc(timestamp, ${analyticsIntervalToGranularity(interval)}) as timestamp,
+  timestamp_trunc(timestamp, ${granularity}) as timestamp,
   response.status_code as status_code,
   count(response.status_code) as count
 from
@@ -100,14 +114,14 @@ order by
 `
   },
   InvocationsByRegion: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
+    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
     const whereClause = filterToWhereClause(filters)
-    const hasWhere = whereClause.includes('WHERE')
-    const regionCondition = hasWhere
-      ? 'AND h.x_sb_edge_region is not null'
-      : 'WHERE h.x_sb_edge_region is not null'
+    const regionCondition =
+      whereClause.length > 0
+        ? safeSql`AND h.x_sb_edge_region is not null`
+        : safeSql`WHERE h.x_sb_edge_region is not null`
 
-    return `
+    return safeSql`
 --edgefn-report-invocations-by-region
 select
   timestamp_trunc(timestamp, ${granularity}) as timestamp,
@@ -128,10 +142,10 @@ order by
 `
   },
   ExecutionTime: (interval, filters) => {
-    const granularity = analyticsIntervalToGranularity(interval)
+    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
     const whereClause = filterToWhereClause(filters)
 
-    return `
+    return safeSql`
 --edgefn-report-execution-time
 select
   timestamp_trunc(timestamp, ${granularity}) as timestamp,

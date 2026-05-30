@@ -1,11 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { NoPermission } from 'components/ui/NoPermission'
-import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
-import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -23,6 +17,12 @@ import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
+import { AlertError } from '@/components/ui/AlertError'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
+import { APIKeysData, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()

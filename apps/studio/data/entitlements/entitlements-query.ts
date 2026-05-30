@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { organizationKeys } from 'data/organizations/keys'
-import { UseCustomQueryOptions } from 'types'
-import { ResponseError } from 'types/base'
+
+import { get, handleError } from '@/data/fetchers'
+import { organizationKeys } from '@/data/organizations/keys'
+import { UseCustomQueryOptions } from '@/types'
+import { ResponseError } from '@/types/base'
 
 export type FeatureKey =
   components['schemas']['ListEntitlementsResponse']['entitlements'][number]['feature']['key']

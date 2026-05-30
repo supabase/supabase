@@ -1,10 +1,10 @@
 import { getLiveTupleEstimate } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import type { ConnectionVars } from 'data/common.types'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { UseCustomQueryOptions } from 'types'
 
-import { getLiveTupleEstimateKey } from '../database/keys'
+import type { ConnectionVars } from '@/data/common.types'
+import { getLiveTupleEstimateKey } from '@/data/database/keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { UseCustomQueryOptions } from '@/types'
 
 type DatabaseCronJobsCountEstimateVariables = ConnectionVars
 

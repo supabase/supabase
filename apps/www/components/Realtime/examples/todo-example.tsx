@@ -257,7 +257,7 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => handleToggleTodo(todo)} 
-                      className={\`w-5 h-5 rounded flex items-center justify-center border \${
+                      className={\`w-5 h-5 rounded-sm flex items-center justify-center border \${
                         todo.completed 
                           ? 'bg-green-900 border-green-700 text-green-400' 
                           : 'border-neutral-600'
@@ -315,12 +315,12 @@ export default function App() {
               onChange={(e) => setNewTodo(e.target.value)}
               placeholder="Add a new todo..."
               disabled={!isConnected || !user}
-              className="flex-1 px-4 py-2 bg-neutral-800 text-neutral-100 border border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-transparent placeholder-neutral-500"
+              className="flex-1 px-4 py-2 bg-neutral-800 text-neutral-100 border border-neutral-700 rounded-md focus:outline-hidden focus:ring-2 focus:ring-neutral-600 focus:border-transparent placeholder-neutral-500"
             />
             <button
               type="submit"
               disabled={!newTodo.trim() || !isConnected || !user}
-              className="px-4 py-2 bg-neutral-800 text-neutral-300 border border-neutral-700 rounded-md hover:bg-neutral-700 focus:outline-none disabled:opacity-50 disabled:hover:bg-neutral-800"
+              className="px-4 py-2 bg-neutral-800 text-neutral-300 border border-neutral-700 rounded-md hover:bg-neutral-700 focus:outline-hidden disabled:opacity-50 disabled:hover:bg-neutral-800"
             >
               Add
             </button>

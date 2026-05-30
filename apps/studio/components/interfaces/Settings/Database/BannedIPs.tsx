@@ -1,14 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
-import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
-import { useUserIPAddressQuery } from 'data/misc/user-ip-address-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { Globe } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -22,6 +13,16 @@ import {
   PageSectionTitle,
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useBannedIPsDeleteMutation } from '@/data/banned-ips/banned-ips-delete-mutations'
+import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
+import { useUserIPAddressQuery } from '@/data/misc/user-ip-address-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const BannedIPs = () => {
   const { ref } = useParams()

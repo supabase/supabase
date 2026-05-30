@@ -1,10 +1,11 @@
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateSettingsMenu } from './SettingsMenu.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 /**
  * Menu-only component for the settings section. Used by the desktop sidebar and by the
@@ -20,7 +21,12 @@ export const SettingsProductMenu = () => {
 
   const menu = useGenerateSettingsMenu()
 
-  return <ProductMenu page={page} menu={menu} />
+  return (
+    <>
+      <ProductMenuShortcuts menu={menu} />
+      <ProductMenu page={page} menu={menu} />
+    </>
+  )
 }
 
 interface SettingsLayoutProps {

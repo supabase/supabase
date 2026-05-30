@@ -19,13 +19,11 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
 7. Do NOT use `import { serve } from "https://deno.land/std@0.168.0/http/server.ts"`. Instead use the built-in `Deno.serve`.
 8. Following environment variables (ie. secrets) are pre-populated in both local and hosted Supabase environments. Users don't need to manually set them:
    - SUPABASE_URL
-   - SUPABASE_ANON_KEY
-   - SUPABASE_SERVICE_ROLE_KEY
+   - SUPABASE_PUBLISHABLE_KEYS
+   - SUPABASE_SECRET_KEYS
    - SUPABASE_DB_URL
-9. To set other environment variables (ie. secrets) users can put them in a env file and run the `supabase secrets set --env-file path/to/env-file`
-10. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with `/function-name` so they are routed correctly.
-11. File write operations are ONLY permitted on `/tmp` directory. You can use either Deno or Node File APIs.
-12. Use `EdgeRuntime.waitUntil(promise)` static method to run long-running tasks in the background without blocking response to a request. Do NOT assume it is available in the request / execution context.
+
+You then need to use `JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)` or `JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)` to access the actual keys in the code. For example, `Deno.env.get(SUPABASE_SECRET_KEYS['default'])` to access the default service key. 9. To set other environment variables (ie. secrets) users can put them in a env file and run the `supabase secrets set --env-file path/to/env-file` 10. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with `/function-name` so they are routed correctly. 11. File write operations are ONLY permitted on `/tmp` directory. You can use either Deno or Node File APIs. 12. Use `EdgeRuntime.waitUntil(promise)` static method to run long-running tasks in the background without blocking response to a request. Do NOT assume it is available in the request / execution context.
 
 ## Example Templates
 

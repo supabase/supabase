@@ -6,13 +6,11 @@ import { retry } from '@octokit/plugin-retry'
 import crypto from 'node:crypto'
 
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
+import { OCTOKIT_RETRY_OPTIONS } from './octokit.constants'
+
+export { OCTOKIT_RETRY_OPTIONS }
 
 const RetryOctokit = Octokit.plugin(retry)
-
-export const OCTOKIT_RETRY_OPTIONS = {
-  retries: 5,
-  retryAfter: 1,
-} as const
 
 let octokitInstance: InstanceType<typeof RetryOctokit>
 

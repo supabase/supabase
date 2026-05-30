@@ -1,13 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import NoPermission from 'components/ui/NoPermission'
-import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
-import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
-import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Check, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
@@ -39,6 +31,16 @@ import { DeleteAppModal } from './DeleteAppModal'
 import { OAuthAppRow } from './OAuthAppRow'
 import { PublishAppSidePanel } from './PublishAppSidePanel'
 import { RevokeAppModal } from './RevokeAppModal'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { AuthorizedApp, useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
+import { OAuthAppCreateResponse } from '@/data/oauth/oauth-app-create-mutation'
+import { OAuthApp, useOAuthAppsQuery } from '@/data/oauth/oauth-apps-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -159,21 +161,30 @@ export const OAuthApps = () => {
               </PageSectionDescription>
             </PageSectionSummary>
             <PageSectionAside>
-              <ButtonTooltip
-                disabled={!canCreateOAuthApps}
-                type="primary"
-                onClick={() => setShowPublishModal(true)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canCreateOAuthApps
-                      ? 'You need additional permissions to create apps'
-                      : undefined,
-                  },
+              <Shortcut
+                id={SHORTCUT_IDS.ORG_OAUTH_APPS_PUBLISH}
+                onTrigger={() => {
+                  if (canCreateOAuthApps) setShowPublishModal(true)
                 }}
+                side="bottom"
+                tooltipOpen={showPublishModal ? false : undefined}
               >
-                Publish OAuth app
-              </ButtonTooltip>
+                <ButtonTooltip
+                  disabled={!canCreateOAuthApps}
+                  type="primary"
+                  onClick={() => setShowPublishModal(true)}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canCreateOAuthApps
+                        ? 'You need additional permissions to create apps'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Publish OAuth app
+                </ButtonTooltip>
+              </Shortcut>
             </PageSectionAside>
           </PageSectionMeta>
           <PageSectionContent className="space-y-4">
@@ -199,7 +210,7 @@ export const OAuthApps = () => {
                 className={cn(
                   'flex items-center justify-between p-4 px-6 border first:rounded-t last:rounded-b',
                   'bg-background-alternative',
-                  'rounded'
+                  'rounded-sm'
                 )}
               >
                 <div className="absolute top-4 right-4">

@@ -1,37 +1,37 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { VectorBucketIndex } from 'data/storage/vector-buckets-indexes-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { SqlEditor } from 'icons'
-import { DOCS_URL } from 'lib/constants'
 import { ChevronDown, ListPlus } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
-  CodeBlock,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  cn,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Sheet,
   SheetContent,
   SheetHeader,
   SheetSection,
   SheetTitle,
   SheetTrigger,
-  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 
 interface VectorBucketTableExamplesSheetProps {
@@ -67,11 +67,11 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
           <SheetHeader>
             <SheetTitle>
               Insert vectors into{' '}
-              <code className="text-code-inline !text-sm">{index.indexName}</code>
+              <code className="text-code-inline text-sm!">{index.indexName}</code>
             </SheetTitle>
           </SheetHeader>
 
-          <div className="overflow-auto flex-grow">
+          <div className="overflow-auto grow">
             <VectorBucketIndexExamples
               bucketName={index.vectorBucketName}
               indexName={index.indexName}
@@ -212,8 +212,8 @@ const result = await index.putVectors({
       </p>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between">
-          <Popover_Shadcn_ modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover modal={false} open={showLanguage} onOpenChange={onShowLanguageChange}>
+            <PopoverTrigger asChild>
               <div className="flex cursor-pointer">
                 <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
                   Language
@@ -226,30 +226,30 @@ const result = await index.putVectors({
                   {language === 'javascript' ? 'JavaScript' : 'SQL'}
                 </Button>
               </div>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-32" side="bottom" align="end">
-              <Command_Shadcn_>
-                <CommandList_Shadcn_>
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
+            </PopoverTrigger>
+            <PopoverContent className="p-0 w-32" side="bottom" align="end">
+              <Command>
+                <CommandList>
+                  <CommandGroup>
+                    <CommandItem
                       className="cursor-pointer"
                       onSelect={() => onLanguageChange('sql')}
                       onClick={() => onLanguageChange('sql')}
                     >
                       <p>SQL</p>
-                    </CommandItem_Shadcn_>
-                    <CommandItem_Shadcn_
+                    </CommandItem>
+                    <CommandItem
                       className="cursor-pointer"
                       onSelect={() => onLanguageChange('javascript')}
                       onClick={() => onLanguageChange('javascript')}
                     >
                       <p>JavaScript</p>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
 
           <DocsButton
             href={`${DOCS_URL}/guides/storage/vector/storing-vectors?queryGroups=language&language=${language}#basic-vector-insertion`}

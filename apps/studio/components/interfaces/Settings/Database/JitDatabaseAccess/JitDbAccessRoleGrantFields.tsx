@@ -1,31 +1,51 @@
-import { DatePicker } from 'components/ui/DatePicker'
-import { InlineLink } from 'components/ui/InlineLink'
 import dayjs from 'dayjs'
-import { DOCS_URL } from 'lib/constants'
+import type { Control } from 'react-hook-form'
 import {
-  Checkbox_Shadcn_,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Checkbox,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 
-import { JIT_EXPIRY_MODE_OPTIONS, JIT_MAX_CUSTOM_EXPIRY_YEARS } from './JitDbAccess.constants'
-import type { JitRoleGrantDraft, JitRoleOption } from './JitDbAccess.types'
-import { getRelativeDatetimeByMode } from './JitDbAccess.utils'
+import type { JitRoleGrantDraft, JitRoleOption, JitUserRuleDraft } from './JitDbAccess.types'
+import { createEmptyIpRange, getRelativeDatetimeByMode } from './JitDbAccess.utils'
+import { DatePicker } from '@/components/ui/DatePicker'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
+
+const EXPIRY_MODE_OPTIONS: Array<{ value: JitRoleGrantDraft['expiryMode']; label: string }> = [
+  { value: '1h', label: '1 hour' },
+  { value: '1d', label: '1 day' },
+  { value: '7d', label: '7 days' },
+  { value: '30d', label: '30 days' },
+  { value: 'custom', label: 'Custom' },
+  { value: 'never', label: 'Never' },
+]
+
+const MAX_CUSTOM_EXPIRY_YEARS = 1
+const BRANCH_SCOPE_OPTIONS = [
+  { value: 'all', label: 'All project databases' },
+  { value: 'preview', label: 'Preview branches only' },
+] as const
 
 interface JitDbAccessRoleGrantFieldsProps {
+  control: Control<JitUserRuleDraft>
+  grantIndex: number
   role: JitRoleOption
   grant: JitRoleGrantDraft
   onChange: (next: JitRoleGrantDraft) => void
 }
 
 export function JitDbAccessRoleGrantFields({
+  control,
+  grantIndex,
   role,
   grant,
   onChange,
@@ -38,11 +58,9 @@ export function JitDbAccessRoleGrantFields({
     <div className={grant.enabled ? 'bg-surface-100' : 'bg-background'}>
       <label
         htmlFor={checkboxId}
-        className={`grid w-full cursor-pointer select-none grid-cols-[16px_minmax(0,1fr)] items-start gap-x-3 px-4 py-3 transition-colors ${
-          grant.enabled ? 'hover:bg-surface-200/40' : 'hover:bg-surface-100/50'
-        }`}
+        className="grid w-full cursor-pointer select-none grid-cols-[16px_minmax(0,1fr)] items-start gap-x-3 px-4 py-3 transition-colors hover:bg-surface-200/40"
       >
-        <Checkbox_Shadcn_
+        <Checkbox
           id={checkboxId}
           checked={grant.enabled}
           onCheckedChange={(value) => {
@@ -71,7 +89,7 @@ export function JitDbAccessRoleGrantFields({
           className="mt-0.5"
         />
         <div className="min-w-0 flex-1">
-          <code className="text-code-inline dark:!bg-surface-300 dark:!border-control !tracking-normal">
+          <code className="text-code-inline dark:bg-surface-300! dark:border-control! tracking-normal!">
             {role.label}
           </code>
         </div>
@@ -80,16 +98,16 @@ export function JitDbAccessRoleGrantFields({
       {grant.enabled && (
         <div className="grid grid-cols-[16px_minmax(0,1fr)] gap-x-3 px-4 pb-3">
           <div aria-hidden />
+
           <div className="space-y-4">
             {isSuperuserRole && (
               <Admonition
                 type="warning"
-                showIcon={false}
                 layout="vertical"
-                title="Grants full database control"
+                className="mb-3"
+                title="The selected role has unrestricted access and bypasses row-level security"
                 description={
                   <>
-                    The selected role has unrestricted access and bypasses row-level security.
                     Consider using a{' '}
                     <InlineLink href={`${DOCS_URL}/guides/database/postgres/roles`}>
                       custom Postgres role
@@ -103,27 +121,75 @@ export function JitDbAccessRoleGrantFields({
             {isReadOnlyRole && (
               <Admonition
                 type="warning"
-                showIcon={false}
                 layout="vertical"
-                title="Grants read-only access to all schemas"
+                title="The selected role has read-only access to all schemas"
                 description={
                   <>
-                    The selected role has read-only access to all schemas. Consider using a{' '}
+                    Consider using a{' '}
                     <InlineLink href={`${DOCS_URL}/guides/database/postgres/roles`}>
                       custom Postgres role
                     </InlineLink>{' '}
                     with only the permissions required.
                   </>
                 }
-                className="rounded-md"
+                className="mb-3"
               />
             )}
 
-            <div className="space-y-2 border-t border-muted pt-3">
-              <p className="text-sm text-foreground">Expires in</p>
+            <FormItemLayout
+              isReactForm={false}
+              label="Applies to"
+              description={
+                <p className="text-xs text-foreground-lighter">
+                  {grant.branchesOnly
+                    ? 'Can only be requested from preview branch databases.'
+                    : 'Can be requested from production and preview branch databases.'}
+                </p>
+              }
+            >
+              <Select
+                value={grant.branchesOnly ? 'preview' : 'all'}
+                onValueChange={(value) => onChange({ ...grant, branchesOnly: value === 'preview' })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select database scope" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BRANCH_SCOPE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormItemLayout>
+
+            <FormItemLayout
+              isReactForm={false}
+              label="Expires in"
+              description={
+                grant.hasExpiry && grant.expiry ? (
+                  <p className="text-xs text-foreground-lighter">
+                    Expires at{' '}
+                    <TimestampInfo
+                      utcTimestamp={grant.expiry}
+                      className="text-foreground-lighter"
+                      labelFormat="DD MMM, HH:mm"
+                    />
+                  </p>
+                ) : grant.expiryMode === 'never' ? (
+                  <div className="mt-3 mx-0.5 flex w-full items-center gap-x-2">
+                    <WarningIcon />
+                    <span className="text-left text-xs text-foreground-lighter">
+                      No expiry means ongoing database access until manually revoked.
+                    </span>
+                  </div>
+                ) : undefined
+              }
+            >
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <Select_Shadcn_
+                  <Select
                     value={grant.expiryMode}
                     onValueChange={(value) => {
                       const nextMode = value as JitRoleGrantDraft['expiryMode']
@@ -154,17 +220,17 @@ export function JitDbAccessRoleGrantFields({
                       })
                     }}
                   >
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="Expires in" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      {JIT_EXPIRY_MODE_OPTIONS.map((option) => (
-                        <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Expires in" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EXPIRY_MODE_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
                           {option.label}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ))}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {grant.expiryMode === 'custom' && (
@@ -174,7 +240,7 @@ export function JitDbAccessRoleGrantFields({
                     contentSide="top"
                     to={grant.expiry || undefined}
                     minDate={new Date()}
-                    maxDate={dayjs().add(JIT_MAX_CUSTOM_EXPIRY_YEARS, 'year').toDate()}
+                    maxDate={dayjs().add(MAX_CUSTOM_EXPIRY_YEARS, 'year').toDate()}
                     onChange={(value) => {
                       const selectedDate = value.to || value.from || ''
                       onChange({
@@ -189,46 +255,31 @@ export function JitDbAccessRoleGrantFields({
                   </DatePicker>
                 )}
               </div>
+            </FormItemLayout>
 
-              {grant.hasExpiry && grant.expiry && (
-                <p className="text-xs text-foreground-lighter">
-                  Expires at{' '}
-                  <TimestampInfo
-                    utcTimestamp={grant.expiry}
-                    className="text-foreground-lighter"
-                    labelFormat="DD MMM, HH:mm"
-                  />
+            <FormItemLayout
+              isReactForm={false}
+              label={
+                <p className="text-sm text-foreground">
+                  Restricted IP addresses{' '}
+                  <span className="font-normal text-foreground-lighter">(optional)</span>
                 </p>
-              )}
-
-              {grant.expiryMode === 'never' && (
-                <div className="mt-3 mx-0.5 flex w-full items-center gap-x-2">
-                  <WarningIcon />
-                  <span className="text-left text-xs text-foreground-lighter">
-                    No expiry means ongoing database access until manually revoked.
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-sm text-foreground">
-                Restricted IP addresses{' '}
-                <span className="font-normal text-foreground-lighter">(optional)</span>
-              </p>
-              <Input_Shadcn_
-                value={grant.ipRanges}
-                onChange={(event) =>
-                  onChange({
-                    ...grant,
-                    hasIpRestriction: event.target.value.trim().length > 0,
-                    ipRanges: event.target.value,
-                  })
-                }
-                placeholder="e.g. 192.168.0.0/24, 203.0.113.4/32"
+              }
+            >
+              <SingleValueFieldArray
+                control={control}
+                name={`grants.${grantIndex}.ipRanges` as const}
+                valueFieldName="value"
+                createEmptyRow={createEmptyIpRange}
+                placeholder="192.168.0.0/24"
+                addLabel="Add IP restriction"
+                removeLabel="Remove IP restriction"
+                minimumRows={1}
+                inputAutoComplete="off"
+                rowsClassName="space-y-2"
+                addButtonClassName="w-min"
               />
-              <p className="text-xs text-foreground-lighter">Comma-separated CIDR ranges</p>
-            </div>
+            </FormItemLayout>
           </div>
         </div>
       )}

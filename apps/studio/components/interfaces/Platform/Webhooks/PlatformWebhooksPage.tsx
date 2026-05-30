@@ -1,7 +1,4 @@
-import { useParams } from 'common'
-import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -22,7 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label_Shadcn_,
+  Label,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -52,6 +49,12 @@ import {
   setPendingSigningSecretReveal,
   shouldHandleEndpointNotFound,
 } from './PlatformWebhooksPage.utils'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const PANEL_VALUES = ['create', 'edit'] as const
 
@@ -295,6 +298,12 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
   const isEndpointSheetOpen = panel === 'create' || (panel === 'edit' && !!selectedEndpoint)
 
+  useShortcut(
+    SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_ENDPOINT_URL,
+    () => selectedEndpoint && handleCopy(selectedEndpoint.url, 'endpoint URL'),
+    { enabled: isEndpointView && !isEndpointSheetOpen }
+  )
+
   useEffect(() => {
     if (!selectedEndpoint && !!deliveryId) {
       setDeliveryId(null)
@@ -316,6 +325,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       <PlatformWebhooksHeader
         hasSelectedEndpoint={!!selectedEndpoint}
         headerTitle={headerTitle}
+        featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS}
         headerDescription={headerDescription}
         endpointStatus={
           selectedEndpoint ? (selectedEndpoint.enabled ? 'enabled' : 'disabled') : undefined
@@ -323,16 +333,25 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         endpointActions={
           selectedEndpoint ? (
             <>
-              <Button
-                type="default"
-                icon={<Pencil size={14} />}
-                onClick={() => {
+              <Shortcut
+                id={SHORTCUT_IDS.PLATFORM_WEBHOOKS_EDIT_ENDPOINT}
+                onTrigger={() => {
                   setEditEnabledOverride(null)
                   setPanel('edit')
                 }}
+                options={{ enabled: !isEndpointSheetOpen }}
               >
-                Edit
-              </Button>
+                <Button
+                  type="default"
+                  icon={<Pencil size={14} />}
+                  onClick={() => {
+                    setEditEnabledOverride(null)
+                    setPanel('edit')
+                  }}
+                >
+                  Edit
+                </Button>
+              </Shortcut>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" icon={<EllipsisVertical />} className="w-7" />
@@ -382,6 +401,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 deliverySearch={deliverySearch}
                 filteredDeliveries={filteredDeliveries}
                 selectedEndpoint={selectedEndpoint}
+                onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}
                 onDeliverySearchChange={setDeliverySearch}
                 onOpenDelivery={(id) => {
                   setDeliveryDetailsTab('event')
@@ -482,7 +502,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
           {/* Content */}
           <div className="space-y-4 mx-5 pb-5">
             <div className="space-y-1">
-              <Label_Shadcn_>Signing secret</Label_Shadcn_>
+              <Label>Signing secret</Label>
               <Input
                 copy
                 readOnly

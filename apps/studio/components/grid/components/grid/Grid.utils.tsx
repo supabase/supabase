@@ -1,15 +1,15 @@
-import { SupaRow } from 'components/grid/types'
-import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { DocsButton } from 'components/ui/DocsButton'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { DOCS_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { RowsChangeData } from 'react-data-grid'
 import { toast } from 'sonner'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import type { Dictionary } from 'types'
 
 import { useTableRowOperations } from '../../hooks/useTableRowOperations'
+import { SupaRow } from '@/components/grid/types'
+import { convertByteaToHex } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { DOCS_URL } from '@/lib/constants'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
+import type { Dictionary } from '@/types'
 
 export function useOnRowsChange(rows: SupaRow[]) {
   const snap = useTableEditorTableStateSnapshot()

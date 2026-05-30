@@ -1,12 +1,12 @@
 import { getExposeQueuesSQL, HIDE_QUEUES_FROM_POSTGREST_SQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { databaseKeys } from 'data/database/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { isGreaterThanOrEqual } from 'lib/semver'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { databaseQueuesKeys } from './keys'
+import { databaseKeys } from '@/data/database/keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { isGreaterThanOrEqual } from '@/lib/semver'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueExposePostgrestVariables = {
   projectRef: string

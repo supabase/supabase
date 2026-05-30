@@ -8,11 +8,8 @@ import {
   type PaginationState,
   type SortingState,
 } from '@tanstack/react-table'
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { ChevronLeft, ChevronRight, RotateCcw, Search } from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
+import { ChevronLeft, ChevronRight, Copy, RotateCcw, Search } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   Badge,
   Button,
@@ -24,14 +21,21 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableHeadSort,
   TableRow,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { TanStackTableHeadSort } from 'ui-patterns/Table'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
+import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface DetailItemProps {
   label: string
@@ -50,6 +54,7 @@ interface PlatformWebhooksEndpointDetailsProps {
   deliverySearch: string
   filteredDeliveries: WebhookDelivery[]
   selectedEndpoint: WebhookEndpoint
+  onCopyUrl: () => void
   onDeliverySearchChange: (value: string) => void
   onOpenDelivery: (deliveryId: string) => void
   onRetryDelivery: (deliveryId: string) => void
@@ -59,39 +64,24 @@ const DELIVERIES_PAGE_SIZE = 5
 const DELIVERY_ACTIONS_COLUMN_ID = 'actions'
 const DEFAULT_DELIVERY_SORTING: SortingState = [{ id: 'attemptAt', desc: true }]
 
-const getCurrentSort = (sorting: SortingState) => {
-  if (sorting.length === 0) return ''
-
-  const [currentSort] = sorting
-  return `${currentSort.id}:${currentSort.desc ? 'desc' : 'asc'}`
-}
-
-const getAriaSort = (
-  sorting: SortingState,
-  columnId: string
-): 'ascending' | 'descending' | 'none' => {
-  const currentSort = sorting.find((sort) => sort.id === columnId)
-
-  if (!currentSort) return 'none'
-  return currentSort.desc ? 'descending' : 'ascending'
-}
-
 const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Status</TanStackTableHeadSort>,
     cell: ({ row }) => (
       <Badge variant={statusBadgeVariant[row.original.status]}>{row.original.status}</Badge>
     ),
   },
   {
     accessorKey: 'eventType',
-    header: 'Event type',
+    header: ({ column }) => (
+      <TanStackTableHeadSort column={column}>Event type</TanStackTableHeadSort>
+    ),
     cell: ({ row }) => <code className="text-code-inline">{row.original.eventType}</code>,
   },
   {
     accessorKey: 'responseCode',
-    header: 'Response',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Response</TanStackTableHeadSort>,
     sortingFn: (rowA, rowB, columnId) => {
       const responseA = rowA.getValue<number | undefined>(columnId) ?? -1
       const responseB = rowB.getValue<number | undefined>(columnId) ?? -1
@@ -110,7 +100,9 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   },
   {
     accessorKey: 'attemptAt',
-    header: 'Attempted',
+    header: ({ column }) => (
+      <TanStackTableHeadSort column={column}>Attempted</TanStackTableHeadSort>
+    ),
     cell: ({ row }) => (
       <TimestampInfo
         className="text-sm text-foreground-lighter"
@@ -163,6 +155,7 @@ export const PlatformWebhooksEndpointDetails = ({
   deliverySearch,
   filteredDeliveries,
   selectedEndpoint,
+  onCopyUrl,
   onDeliverySearchChange,
   onOpenDelivery,
   onRetryDelivery,
@@ -170,23 +163,16 @@ export const PlatformWebhooksEndpointDetails = ({
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
   const hasName = selectedEndpoint.name.trim().length > 0
   const hasDescription = selectedEndpoint.description.trim().length > 0
+  const deliverySearchRef = useRef<HTMLInputElement>(null)
   const [sorting, setSorting] = useState<SortingState>(DEFAULT_DELIVERY_SORTING)
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, () => deliverySearchRef.current?.focus(), {
+    label: 'Search deliveries',
+  })
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DELIVERIES_PAGE_SIZE,
   })
-  const currentSort = getCurrentSort(sorting)
-
-  const handleSortChange = (columnId: string) => {
-    const currentColumnSort = sorting.find((sort) => sort.id === columnId)
-
-    if (!currentColumnSort) {
-      setSorting([{ id: columnId, desc: false }])
-      return
-    }
-
-    setSorting([{ id: columnId, desc: !currentColumnSort.desc }])
-  }
 
   const table = useReactTable({
     data: filteredDeliveries,
@@ -223,8 +209,21 @@ export const PlatformWebhooksEndpointDetails = ({
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
               {hasName && <DetailItem label="Name">{selectedEndpoint.name}</DetailItem>}
 
-              <DetailItem label="URL" ddClassName="text-sm break-all">
-                {selectedEndpoint.url}
+              <DetailItem label="URL" ddClassName="flex items-start gap-2 text-sm">
+                <span className="break-all">{selectedEndpoint.url}</span>
+                <ShortcutTooltip
+                  shortcutId={SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_ENDPOINT_URL}
+                  label="Copy endpoint URL"
+                >
+                  <Button
+                    type="text"
+                    size="tiny"
+                    className="mt-0.5 shrink-0 h-5 w-5 p-0"
+                    icon={<Copy size={12} />}
+                    aria-label="Copy endpoint URL"
+                    onClick={onCopyUrl}
+                  />
+                </ShortcutTooltip>
               </DetailItem>
 
               {hasDescription && (
@@ -275,12 +274,14 @@ export const PlatformWebhooksEndpointDetails = ({
         <h2 className="text-foreground text-xl">Deliveries</h2>
         <div className="flex items-center justify-between gap-2">
           <Input
+            ref={deliverySearchRef}
             placeholder="Search deliveries"
             size="tiny"
             icon={<Search />}
             value={deliverySearch}
             className="w-full lg:w-52"
             onChange={(event) => onDeliverySearchChange(event.target.value)}
+            onKeyDown={onSearchInputEscape(deliverySearch, onDeliverySearchChange)}
           />
         </div>
         <Card className="overflow-hidden">
@@ -290,25 +291,25 @@ export const PlatformWebhooksEndpointDetails = ({
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     const columnId = header.column.id
-                    const canSort = header.column.getCanSort()
+                    const sort = header.column.getIsSorted()
 
                     return (
                       <TableHead
                         key={header.id}
-                        aria-sort={canSort ? getAriaSort(sorting, columnId) : undefined}
+                        aria-sort={
+                          header.column.getCanSort()
+                            ? sort === 'asc'
+                              ? 'ascending'
+                              : sort === 'desc'
+                                ? 'descending'
+                                : 'none'
+                            : undefined
+                        }
                         className={columnId === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1' : ''}
                       >
-                        {header.isPlaceholder ? null : canSort ? (
-                          <TableHeadSort
-                            column={columnId}
-                            currentSort={currentSort}
-                            onSortChange={handleSortChange}
-                          >
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                          </TableHeadSort>
-                        ) : (
-                          flexRender(header.column.columnDef.header, header.getContext())
-                        )}
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
                       </TableHead>
                     )
                   })}

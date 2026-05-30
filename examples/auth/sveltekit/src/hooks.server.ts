@@ -8,7 +8,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       getAll() {
         return event.cookies.getAll()
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         /**
          * Note: You have to add the `path` variable to the
          * set and remove method due to sveltekit's cookie API
@@ -18,6 +18,9 @@ export const handle: Handle = async ({ event, resolve }) => {
         cookiesToSet.forEach(({ name, value, options }) =>
           event.cookies.set(name, value, { ...options, path: '/' })
         )
+        if (Object.keys(headers).length > 0) {
+          event.setHeaders(headers)
+        }
       },
     },
   })

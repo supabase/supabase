@@ -1,44 +1,19 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import {
-  getAddons,
-  subscriptionHasHipaaAddon,
-} from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { ProjectUpdateDisabledTooltip } from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import AlertError from 'components/ui/AlertError'
-import { ResourceItem } from 'components/ui/Resource/ResourceItem'
-import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsAwsCloudProvider,
-  useIsOrioleDbInAws,
-  useIsProjectActive,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
-import { AlertCircle, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
-import Link from 'next/link'
-import { useAddonsPagePanel } from 'state/addons-page'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection } from 'ui-patterns/PageSection'
 
@@ -51,6 +26,31 @@ import {
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
+import {
+  getAddons,
+  subscriptionHasHipaaAddon,
+} from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { ProjectUpdateDisabledTooltip } from '@/components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
+import { ResourceList } from '@/components/ui/Resource/ResourceList'
+import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsCloudProvider,
+  useIsOrioleDbInAws,
+  useIsProjectActive,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { getDatabaseMajorVersion, getSemanticVersion } from '@/lib/helpers'
+import { useAddonsPagePanel } from '@/state/addons-page'
 
 export const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -67,10 +67,7 @@ export const Addons = () => {
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const { data: parentProject } = useProjectDetailQuery({
-    ref: selectedProject?.parent_project_ref,
-  })
-  const isBranch = parentProject !== undefined
+  const isBranch = selectedProject?.parent_project_ref
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
@@ -140,30 +137,30 @@ export const Addons = () => {
 
   const listTopSpacing = isBranch ? 'mt-6' : undefined
   const resourceItemClassName =
-    'min-h-[128px] !border-b last:!border-b-0 [&>div:first-child]:hidden @lg:[&>div:first-child]:flex'
+    'min-h-[128px] border-b! last:border-b-0! [&>div:first-child]:hidden @lg:[&>div:first-child]:flex'
 
   let pitrAlert = null
 
   if (pitrAlertState === 'hipaa') {
     pitrAlert = (
-      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-        <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
+      <Alert className="rounded-none border-0 border-b px-6">
+        <AlertTitle>PITR cannot be changed with HIPAA</AlertTitle>
+        <AlertDescription>
           All projects should have PITR enabled by default and cannot be changed with HIPAA enabled.
           Contact support for further assistance.
-        </AlertDescription_Shadcn_>
+        </AlertDescription>
         <div className="mt-4">
           <Button type="default" asChild>
             <SupportLink>Contact support</SupportLink>
           </Button>
         </div>
-      </Alert_Shadcn_>
+      </Alert>
     )
   } else if (pitrAlertState === 'legacy-project') {
     pitrAlert = (
-      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-        <AlertTitle_Shadcn_>Your project is too old to enable PITR</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
+      <Alert className="rounded-none border-0 border-b px-6">
+        <AlertTitle>Your project is too old to enable PITR</AlertTitle>
+        <AlertDescription>
           <p className="text-sm leading-normal mb-2">
             Reach out to us via support if you're interested
           </p>
@@ -178,17 +175,15 @@ export const Addons = () => {
               Contact support
             </SupportLink>
           </Button>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        </AlertDescription>
+      </Alert>
     )
   } else if (pitrAlertState === 'orioledb') {
     pitrAlert = (
-      <Alert_Shadcn_ className="rounded-none border-0 border-b px-6">
-        <AlertTitle_Shadcn_>PITR not supported</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
-          Point in time recovery is not supported with OrioleDB
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+      <Alert className="rounded-none border-0 border-b px-6">
+        <AlertTitle>PITR not supported</AlertTitle>
+        <AlertDescription>Point in time recovery is not supported with OrioleDB</AlertDescription>
+      </Alert>
     )
   }
 
@@ -196,20 +191,18 @@ export const Addons = () => {
     <PageContainer size="default">
       <PageSection className="last:pb-0 gap-0">
         {isBranch && (
-          <Alert_Shadcn_ variant="default" className="mt-6">
-            <AlertCircle strokeWidth={2} />
-            <AlertTitle_Shadcn_>
-              You are currently on a preview branch of your project
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Updating add-ons here will only apply to this preview branch. To manage add-ons for
-              your main branch, please visit the{' '}
-              <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
-                main branch
-              </Link>
-              .
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition
+            type="default"
+            className="mb-4"
+            title="You are currently on a preview branch of your project"
+          >
+            Updating add-ons here will only apply to this preview branch. To manage add-ons for your
+            main branch, please visit the{' '}
+            <InlineLink href={`/project/${selectedProject.parent_project_ref}/settings/addons`}>
+              main branch
+            </InlineLink>
+            .
+          </Admonition>
         )}
 
         {isLoading && (
@@ -272,15 +265,13 @@ export const Addons = () => {
                   <p className="m-0 text-foreground-light text-sm">
                     Reserve a dedicated IPv4 address for your project.
                   </p>
-                  <Link
+                  <InlineLink
+                    className="text-foreground-light"
                     href={`${DOCS_URL}/guides/platform/ipv4-address`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-link text-sm"
-                    onClick={(event) => event.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     About IPv4 deprecation
-                  </Link>
+                  </InlineLink>
                 </div>
               </ResourceItem>
             )}
@@ -324,15 +315,13 @@ export const Addons = () => {
                 <p className="m-0 text-foreground-light text-sm">
                   Restore your database to a specific moment in the past.
                 </p>
-                <Link
+                <InlineLink
                   href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-link text-sm"
-                  onClick={(event) => event.stopPropagation()}
+                  className="text-foreground-light"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   About PITR backups
-                </Link>
+                </InlineLink>
               </div>
             </ResourceItem>
 
@@ -382,15 +371,13 @@ export const Addons = () => {
                   <p className="m-0 text-foreground-light text-sm">
                     Serve your project on your own domain name.
                   </p>
-                  <Link
+                  <InlineLink
                     href={`${DOCS_URL}/guides/platform/custom-domains`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-link text-sm"
-                    onClick={(event) => event.stopPropagation()}
+                    className="text-foreground-light"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     About custom domains
-                  </Link>
+                  </InlineLink>
                 </div>
               </ResourceItem>
             )}

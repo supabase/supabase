@@ -1,20 +1,27 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Modal,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
+import { useUserInviteMutation } from '@/data/auth/user-invite-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export type InviteUserModalProps = {
   visible: boolean
@@ -60,45 +67,45 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   }
 
   return (
-    <Modal
-      hideFooter
-      size="small"
-      key="invite-user-modal"
-      visible={visible}
-      header="Invite a new user"
-      onCancel={handleToggle}
-    >
-      <Form_Shadcn_ {...form}>
-        <Modal.Content>
-          <form id={formId} onSubmit={form.handleSubmit(onInviteUser)} noValidate>
-            <FormField_Shadcn_
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItemLayout layout="vertical" label="User email">
-                  <FormControl_Shadcn_ className="relative col-span-6">
-                    <Input_Shadcn_ {...field} />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-          </form>
-        </Modal.Content>
+    <Dialog key="invite-user-modal" open={visible} onOpenChange={handleToggle}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Invite a new user</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <DialogSection>
+            <form id={formId} onSubmit={form.handleSubmit(onInviteUser)} noValidate>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="User email">
+                    <FormControl className="relative col-span-6">
+                      <Input {...field} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </DialogSection>
 
-        <Modal.Content>
-          <Button
-            form={formId}
-            block
-            size="small"
-            htmlType="submit"
-            loading={isInviting}
-            disabled={!canInviteUsers || isInviting}
-          >
-            Invite user
-          </Button>
-        </Modal.Content>
-      </Form_Shadcn_>
-    </Modal>
+          <DialogFooter>
+            <Button type="default" onClick={handleToggle}>
+              Cancel
+            </Button>
+            <Button
+              form={formId}
+              htmlType="submit"
+              loading={isInviting}
+              disabled={!canInviteUsers || isInviting}
+            >
+              Invite user
+            </Button>
+          </DialogFooter>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
 

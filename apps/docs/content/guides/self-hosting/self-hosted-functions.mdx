@@ -16,8 +16,8 @@ On managed Supabase platform, Edge Functions are deployed across multiple region
 
 The default `hello` function is located at `volumes/functions/hello/index.ts`. You can invoke it immediately after starting your stack:
 
-```bash
-curl http://<your-domain>:8000/functions/v1/hello
+```sh
+curl http://<your-domain>/functions/v1/hello
 ```
 
 This returns `"Hello from Edge Functions!"`.
@@ -26,12 +26,12 @@ This returns `"Hello from Edge Functions!"`.
 
 ### Step 1: Add a new function directory and the function code
 
-```
+```sh
 mkdir -p volumes/functions/my-function &&
 touch volumes/functions/my-function/index.ts
 ```
 
-add the following code to `index.ts`:
+Add the following code to `index.ts`:
 
 ```typescript
 Deno.serve(async (req: Request) => {
@@ -46,22 +46,22 @@ Deno.serve(async (req: Request) => {
 
 ### Step 2: Restart the functions service to pick up the new function
 
-```bash
+```sh
 docker compose restart functions --no-deps
 ```
 
 ### Step 3: Invoke your function
 
-```bash
-curl -X POST http://<your-domain>:8000/functions/v1/my-function \
+```sh
+curl -X POST http://<your-domain>/functions/v1/my-function \
   -H 'Content-Type: application/json' \
   -d '{"name": "World"}'
 ```
 
 You should be able to see the response from `my-function`:
 
-```
-{"message":"Hello, World!"}
+```json
+{ "message": "Hello, World!" }
 ```
 
 ## Custom environment variables
@@ -70,13 +70,13 @@ You should be able to see the response from `my-function`:
 
 For multiple variables or secrets, create a separate env file, e.g., `.env.functions` in your `docker/` directory:
 
-```bash
+```
 MY_CUSTOM_VAR=some-value
 ```
 
 Add `env_file` to the `functions` service in `docker-compose.yml` (variables in `env_file` load first, then `environment` values take precedence):
 
-```yaml
+```yaml name=docker-compose.yml
 functions:
   env_file:
     - .env.functions
@@ -93,7 +93,7 @@ Don't commit `.env.functions` to version control if it contains secrets. Add it 
 
 Restart the functions service:
 
-```bash
+```sh
 docker compose up -d --force-recreate --no-deps functions
 ```
 
@@ -101,7 +101,7 @@ docker compose up -d --force-recreate --no-deps functions
 
 For one or two variables, you can add them directly under `environment` in `docker-compose.yml`:
 
-```yaml
+```yaml name=docker-compose.yml
 functions:
   environment:
     # Custom variables
@@ -115,7 +115,7 @@ Then define `MY_CUSTOM_VAR` in your main `.env` file, or specify the value direc
 
 ### Accessing variables in functions
 
-All container environment variables are forwarded to function workers by `main/index.ts`. Access them with:
+All container environment variables are forwarded to the function workers by `main/index.ts`. Access them with:
 
 ```typescript
 const customVar = Deno.env.get('MY_CUSTOM_VAR')
@@ -125,14 +125,16 @@ const customVar = Deno.env.get('MY_CUSTOM_VAR')
 
 The functions service is pre-configured with the following environment variables:
 
-| Variable                    | Value                       | Purpose                                                             |
-| --------------------------- | --------------------------- | ------------------------------------------------------------------- |
-| `SUPABASE_URL`              | `http://kong:8000`          | Internal API gateway URL                                            |
-| `SUPABASE_PUBLIC_URL`       | `http://<your-domain>:8000` | Base URL for accessing Supabase from the Internet                   |
-| `JWT_SECRET`                | Your secret key             | Legacy symmetric encryption key used to sign and verify JWTs        |
-| `SUPABASE_ANON_KEY`         | Your anon key               | Client-side API key with limited permissions (`anon` role).         |
-| `SUPABASE_SERVICE_ROLE_KEY` | Your service role key       | Server-side API key with full database access (`service_role` role) |
-| `SUPABASE_DB_URL`           | Postgres connection string  | Can be used for direct database access                              |
+| Variable                    | Value                             | Purpose                                           |
+| --------------------------- | --------------------------------- | ------------------------------------------------- |
+| `SUPABASE_URL`              | `http://kong:8000`                | Internal API gateway URL                          |
+| `SUPABASE_PUBLIC_URL`       | `http(s)://<your-domain>`         | Base URL for accessing Supabase from the Internet |
+| `JWT_SECRET`                | `your-jwt-secret`                 | Legacy symmetric encryption key for JWTs          |
+| `SUPABASE_ANON_KEY`         | `your-anon-key`                   | Client-side API key (`anon` role).                |
+| `SUPABASE_SERVICE_ROLE_KEY` | `your-service-role-key`           | Server-side API key (`service_role` role)         |
+| `SUPABASE_DB_URL`           | `postgresql://...`                | Postgres connection string                        |
+| `SUPABASE_PUBLISHABLE_KEYS` | `{"default":"sb_publishable_...}` | New publishable API key                           |
+| `SUPABASE_SECRET_KEYS`      | `{"default":"sb_secret_...}`      | New secret API key                                |
 
 Here's an example function that queries a table using `@supabase/supabase-js`:
 
@@ -159,7 +161,7 @@ This is a key distinction that affects how you build URLs in your functions:
 
 - **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
 
-- **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance (e.g., `<your-domain>:8000`). Use it if your function needs to build URLs that HTTP clients can reach from the outside.
+- **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance. Use it if your function needs to build URLs that HTTP clients can reach from the outside.
 
 ## Managing functions via dashboard
 
@@ -169,13 +171,13 @@ Self-hosted Studio [mounts](https://github.com/supabase/supabase/blob/df8729a82b
 
 To deploy a function to a remote server running self-hosted Supabase, copy the function directory with `scp`:
 
-```bash
+```sh
 scp -r ./my-function user@<your-domain>:/path/to/self-hosted/volumes/functions/
 ```
 
 Then restart the functions service on the remote host:
 
-```bash
+```sh
 ssh user@<your-domain> 'cd /path/to/self-hosted && docker compose restart functions --no-deps'
 ```
 
@@ -203,7 +205,7 @@ The request URL must include the function name after `/functions/v1/`. For examp
 
 Check the functions service logs:
 
-```bash
+```sh
 docker compose logs functions
 ```
 
@@ -218,7 +220,7 @@ Common causes: syntax errors in your function code, invalid imports, or missing 
 
 Restart the functions service:
 
-```bash
+```sh
 docker compose restart functions --no-deps
 ```
 
@@ -230,7 +232,7 @@ docker compose restart functions --no-deps
 
 Use the following command to recreate the container, not just `restart`:
 
-```bash
+```sh
 docker compose up -d --force-recreate --no-deps functions
 ```
 

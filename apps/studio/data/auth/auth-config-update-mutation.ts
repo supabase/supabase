@@ -1,15 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, patch } from 'data/fetchers'
-import { lintKeys } from 'data/lint/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import type { ProjectAuthConfigData } from './auth-config-query'
 import { authKeys } from './keys'
+import type { components } from '@/data/api'
+import { handleError, patch } from '@/data/fetchers'
+import { lintKeys } from '@/data/lint/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type AuthConfigUpdateVariables = {
   projectRef: string
   config: Partial<components['schemas']['UpdateGoTrueConfigBody']>
+  skipInvalidation?: boolean
 }
 
 export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
@@ -41,16 +43,27 @@ export const useAuthConfigUpdateMutation = ({
   return useMutation<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>({
     mutationFn: (vars) => updateAuthConfig(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
-      ])
-      await queryClient.refetchQueries({
-        queryKey: lintKeys.lint(projectRef),
-        type: 'active',
-      })
+      const { projectRef, skipInvalidation = false } = variables
+
+      if (!skipInvalidation) {
+        queryClient.setQueryData<ProjectAuthConfigData>(authKeys.authConfig(projectRef), data)
+        await queryClient.invalidateQueries({
+          queryKey: authKeys.authConfig(projectRef),
+          refetchType: 'none',
+        })
+      }
+
       await onSuccess?.(data, variables, context)
+
+      queryClient
+        .invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
+        .then(() =>
+          queryClient.refetchQueries({
+            queryKey: lintKeys.lint(projectRef),
+            type: 'active',
+          })
+        )
+        .catch(() => undefined)
     },
     async onError(data, variables, context) {
       if (onError === undefined) {

@@ -5,33 +5,18 @@ import {
   Edge,
   ReactFlow,
   ReactFlowProvider,
+  useNodesInitialized,
   useReactFlow,
 } from '@xyflow/react'
 import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useEffectEvent, useMemo, useState } from 'react'
 
 import '@xyflow/react/dist/style.css'
 
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import {
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from 'data/read-replicas/replicas-status-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import {
-  useIsAwsCloudProvider,
-  useIsOrioleDb,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
-import { timeout } from 'lib/helpers'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -51,6 +36,22 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import {
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from '@/data/read-replicas/replicas-status-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import {
+  useIsAwsCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { timeout } from '@/lib/helpers'
 
 interface InstanceConfigurationUIProps {
   diagramOnly?: boolean
@@ -169,7 +170,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                     target: primary.identifier,
                     type: 'smoothstep',
                     animated: true,
-                    className: '!cursor-default',
+                    className: 'cursor-default!',
                   },
                 ]
               : []),
@@ -180,7 +181,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                 target: database.identifier,
                 type: 'smoothstep',
                 animated: true,
-                className: '!cursor-default',
+                className: 'cursor-default!',
                 data: {
                   status: database.status,
                   identifier: database.identifier,
@@ -210,8 +211,17 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     []
   )
 
-  const setReactFlow = async () => {
-    const graph = getDagreGraphLayout(nodes, edges)
+  const nodesInitialized = useNodesInitialized()
+  const [hasMeasuredLayout, setHasMeasuredLayout] = useState(false)
+
+  const setReactFlow = async ({ measured }: { measured: boolean }) => {
+    // Merge in React Flow's measured dimensions (if any) so dagre can use real
+    // heights instead of the first-paint fallbacks.
+    const measuredNodes = nodes.map((node) => {
+      const existing = reactFlow.getNode(node.id)
+      return existing?.measured ? { ...node, measured: existing.measured } : node
+    })
+    const graph = getDagreGraphLayout(measuredNodes, edges)
     const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
     reactFlow.setNodes(updatedNodes)
     reactFlow.setEdges(graph.edges)
@@ -219,15 +229,32 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
     await timeout(1)
     reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
+    if (measured) setHasMeasuredLayout(true)
   }
 
+  // First pass: lay out using fallback heights for any not-yet-measured nodes.
+  // The diagram is kept invisible until the measured pass below has run, so the
+  // user never sees the fallback positions.
   // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
   // even if I change the dependency array to just data. Not blocker, just an area to optimize
   useEffect(() => {
     if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0 && view === 'flow') {
-      setReactFlow()
+      setReactFlow({ measured: false })
     }
   }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
+
+  // Second pass: once React Flow has measured the nodes, re-run the layout so
+  // dagre uses real heights. Only `nodesInitialized` going true should trigger
+  // this — the first-pass effect above handles node/view changes.
+  const runMeasuredLayout = useEffectEvent(() => {
+    if (nodesInitialized && nodes.length > 0 && view === 'flow') {
+      setReactFlow({ measured: true })
+    }
+  })
+  useEffect(() => {
+    runMeasuredLayout()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [nodesInitialized])
 
   return (
     <div className={cn('nowheel', diagramOnly ? 'h-full' : 'border-y')}>
@@ -236,8 +263,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
-        {/* Sometimes the read replicas are loaded before the project info and causes  read replicas to be shown on Fly deploys.
-            You can replicate this to going to this page and refresh. This isLoadingProject flag fixes that. */}
         {(isLoading || isLoadingProject) && (
           <Loader2 className="animate-spin text-foreground-light" />
         )}
@@ -316,7 +341,12 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                 colorMode={'' as unknown as ColorMode}
                 fitView
                 fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
-                className="instance-configuration"
+                // Keep the diagram invisible (but laid out, so nodes can be
+                // measured) until the measured-height layout pass has run.
+                className={cn(
+                  'instance-configuration transition-opacity duration-150',
+                  hasMeasuredLayout ? 'opacity-100' : 'opacity-0'
+                )}
                 zoomOnPinch={false}
                 zoomOnScroll={false}
                 nodesDraggable={false}

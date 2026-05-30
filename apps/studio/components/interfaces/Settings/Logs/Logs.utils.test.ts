@@ -4,6 +4,7 @@ import type { LogData } from './Logs.types'
 import {
   buildLogsPrompt,
   extractEdgeFunctionName,
+  formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
 } from './Logs.utils'
@@ -32,6 +33,72 @@ describe('Logs.utils', () => {
       const result = formatLogsAsJson(rows)
       expect(result).toContain('"id": "1"')
       expect(result).toContain('"id": "2"')
+    })
+  })
+
+  describe('formatLogsAsCsv', () => {
+    test('returns empty string for empty list', () => {
+      expect(formatLogsAsCsv([])).toBe('')
+    })
+
+    test('formats single row with header line', () => {
+      const rows: LogData[] = [createLog({ id: '1', event_message: 'hello' })]
+      const result = formatLogsAsCsv(rows)
+      const [header, row] = result.split('\r\n')
+      expect(header.split(',').sort()).toEqual(['event_message', 'id', 'timestamp'].sort())
+      expect(row).toContain('1')
+      expect(row).toContain('hello')
+    })
+
+    test('formats multiple rows', () => {
+      const rows: LogData[] = [
+        createLog({ id: '1', event_message: 'first' }),
+        createLog({ id: '2', event_message: 'second' }),
+      ]
+      const lines = formatLogsAsCsv(rows).split('\r\n')
+      expect(lines).toHaveLength(3)
+      expect(lines[1]).toContain('first')
+      expect(lines[2]).toContain('second')
+    })
+
+    test('escapes commas, quotes, and newlines per RFC 4180', () => {
+      const rows: LogData[] = [
+        createLog({
+          id: 'a,b',
+          event_message: 'line1\nline2',
+        }),
+        createLog({
+          id: 'c"d',
+          event_message: 'has "quotes"',
+        }),
+      ]
+      const result = formatLogsAsCsv(rows)
+      expect(result).toContain('"a,b"')
+      expect(result).toContain('"line1\nline2"')
+      expect(result).toContain('"c""d"')
+      expect(result).toContain('"has ""quotes"""')
+    })
+
+    test('emits columns based on the first row', () => {
+      const rows: LogData[] = [
+        { id: '1', event_message: 'first', timestamp: 1 },
+        // Extra `status` key on later rows is dropped because headers
+        // come from the first row.
+        { id: '2', event_message: 'second', timestamp: 2, status: '500' } as LogData,
+      ]
+      const result = formatLogsAsCsv(rows)
+      expect(result).not.toContain('500')
+      expect(result.split('\r\n')[0]).toBe('id,event_message,timestamp')
+    })
+
+    test('renders null as the string "null" and undefined as empty', () => {
+      const rows: LogData[] = [
+        { id: '1', event_message: null as unknown as string, timestamp: undefined as any },
+      ]
+      const result = formatLogsAsCsv(rows)
+      const dataRow = result.split('\r\n')[1]
+      // Order matches first-row keys: id, event_message, timestamp
+      expect(dataRow).toBe('1,null,')
     })
   })
 

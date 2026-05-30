@@ -1,15 +1,16 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { handleError, put } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
 
 import { jitDbAccessKeys } from './keys'
+import { handleError, put } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
 
 type JitDbAccessGrantVariables = {
   projectRef: string
   userId: string
   roles: Array<{
     role: string
+    branches_only?: boolean
     expires_at?: number // Unix timestamp in seconds per role
     allowed_networks?: {
       allowed_cidrs?: Array<{ cidr: string }>
@@ -57,7 +58,7 @@ export const useJitDbAccessGrantMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to grant JIT database access: ${data.message}`)
+        toast.error(`Failed to grant temporary access: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

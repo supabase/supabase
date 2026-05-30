@@ -6,11 +6,19 @@ import { describe, expect, it, vi } from 'vitest'
 import { PLATFORM_WEBHOOKS_MOCK_DATA } from './PlatformWebhooks.mock'
 import { PlatformWebhooksEndpointDetails } from './PlatformWebhooksEndpointDetails'
 
-vi.mock('components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () => ({
+vi.mock('@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () => ({
   DataTableColumnStatusCode: ({ value }: { value: number }) => <span>{value}</span>,
 }))
 
-vi.mock('components/ui/ButtonTooltip', () => ({
+vi.mock('@/components/ui/ShortcutTooltip', () => ({
+  ShortcutTooltip: ({ children }: { children: unknown }) => <>{children}</>,
+}))
+
+vi.mock('@/state/shortcuts/useShortcut', () => ({
+  useShortcut: vi.fn(),
+}))
+
+vi.mock('@/components/ui/ButtonTooltip', () => ({
   ButtonTooltip: ({
     icon,
     children,
@@ -51,6 +59,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
         deliverySearch=""
         filteredDeliveries={allDeliveries}
         selectedEndpoint={selectedEndpoint}
+        onCopyUrl={vi.fn()}
         onDeliverySearchChange={vi.fn()}
         onOpenDelivery={vi.fn()}
         onRetryDelivery={vi.fn()}
@@ -106,6 +115,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
         deliverySearch="project"
         filteredDeliveries={projectDeliveries}
         selectedEndpoint={selectedEndpoint}
+        onCopyUrl={vi.fn()}
         onDeliverySearchChange={vi.fn()}
         onOpenDelivery={vi.fn()}
         onRetryDelivery={vi.fn()}

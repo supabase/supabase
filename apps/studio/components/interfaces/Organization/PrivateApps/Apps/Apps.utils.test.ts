@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+
 import type { PrivateApp } from '../PrivateApps.types'
 import type { AppsSort } from './Apps.types'
 import { handleSortChange, sortApps } from './Apps.utils'

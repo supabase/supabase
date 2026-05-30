@@ -32,7 +32,7 @@ const TabsWithHighlights = (props: Props) => {
   return (
     <div className="relative flex flex-col gap-8 lg:gap-12 items-center">
       {/* Threshold element used to load video 500px before reaching the video component */}
-      <div ref={sectionRef} className="absolute -top-[500px] not-sr-only" />
+      <div ref={sectionRef} className="absolute top-[-500px] not-sr-only" />
       <div className="relative w-full col-span-full flex justify-center gap-2" role="tablist">
         {props.tabs.map((tab, index) => (
           <Tab
@@ -103,7 +103,7 @@ const Tab = ({ label, isActive, onClick }: TabProps) => (
     className={cn(
       'py-1.5 px-3 lg:py-2 lg:px-8 border rounded-full bg-alternative hover:border-foreground text-sm opacity-80 transition-all',
       'hover:border-foreground-lighter hover:text-foreground',
-      isActive ? 'opacity-100 !border-foreground' : ''
+      isActive ? 'opacity-100 border-foreground!' : ''
     )}
   >
     {label}

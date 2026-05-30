@@ -1,22 +1,21 @@
 import { useParams } from 'common'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { EmptyRealtime } from './EmptyRealtime'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
+import { useRealtimeInspectorShortcuts } from './useRealtimeInspectorShortcuts'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 /**
  * Acts as a container component for the entire log display
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
 
   // Check if realtime publications are available
@@ -32,6 +31,8 @@ export const RealtimeInspector = () => {
     ((realtimePublication?.tables ?? []).length > 0 || realtimePublication?.tables === null)
 
   const [sendMessageShown, setSendMessageShown] = useState(false)
+  const [channelPopoverOpen, setChannelPopoverOpen] = useState(false)
+  const [filterPopoverOpen, setFilterPopoverOpen] = useState(false)
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
     enabled: false,
     projectRef: ref!,
@@ -48,8 +49,37 @@ export const RealtimeInspector = () => {
     enableBroadcast: true,
   })
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
+
+  const hasChannel = realtimeConfig.channelName.length > 0
+  const isListening = realtimeConfig.enabled
+
+  const handleJoinChannel = useCallback(() => {
+    if (!hasChannel) {
+      setChannelPopoverOpen(true)
+    }
+  }, [hasChannel])
+
+  const handleToggleFilters = useCallback(() => {
+    if (hasChannel) {
+      setFilterPopoverOpen(true)
+    }
+  }, [hasChannel])
+
+  const handleBroadcast = useCallback(() => {
+    if (isListening) {
+      setSendMessageShown(true)
+    }
+  }, [isListening])
+
+  useRealtimeInspectorShortcuts({
+    hasChannel,
+    isListening,
+    onJoinChannel: handleJoinChannel,
+    onToggleFilters: handleToggleFilters,
+    onBroadcast: handleBroadcast,
+  })
 
   // Update enableDbChanges when publications change
   useEffect(() => {
@@ -58,13 +88,20 @@ export const RealtimeInspector = () => {
 
   return (
     <div className="flex flex-col grow h-full">
-      <Header config={realtimeConfig} onChangeConfig={setRealtimeConfig} />
+      <Header
+        config={realtimeConfig}
+        onChangeConfig={setRealtimeConfig}
+        channelPopoverOpen={channelPopoverOpen}
+        onChannelPopoverChange={setChannelPopoverOpen}
+        filterPopoverOpen={filterPopoverOpen}
+        onFilterPopoverChange={setFilterPopoverOpen}
+      />
       <div className="relative flex flex-col grow">
         <div className="flex grow">
           {(logData ?? []).length > 0 ? (
             <MessagesTable
-              hasChannelSet={realtimeConfig.channelName.length > 0}
-              enabled={realtimeConfig.enabled}
+              hasChannelSet={hasChannel}
+              enabled={isListening}
               data={logData}
               showSendMessage={() => setSendMessageShown(true)}
             />
@@ -77,10 +114,7 @@ export const RealtimeInspector = () => {
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          sendEvent({
-            action: 'realtime_inspector_broadcast_sent',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('realtime_inspector_broadcast_sent')
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />

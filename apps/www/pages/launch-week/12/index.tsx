@@ -101,7 +101,7 @@ export default function LaunchWeekIndex() {
           <SectionContainer id="meetups" className="scroll-mt-[60px] lw-nav-anchor">
             <LW12Meetups meetups={[]} />
           </SectionContainer>
-          <SectionContainer className="!pt-8 scroll-mt-[60px] lw-nav-anchor" id="awards">
+          <SectionContainer className="pt-8! scroll-mt-[60px] lw-nav-anchor" id="awards">
             <LaunchWeekPrizeSection />
           </SectionContainer>
           <CTABanner />

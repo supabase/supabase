@@ -1,29 +1,8 @@
-import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
+import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AlertError } from 'components/ui/AlertError'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useIndexWorkerStatusQuery } from 'data/auth/index-worker-status-query'
-import { authKeys } from 'data/auth/keys'
-import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { useUserIndexStatusesQuery } from 'data/auth/user-search-indexes-query'
-import { useUsersCountQuery } from 'data/auth/users-count-query'
-import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
   ExternalLinkIcon,
   InfoIcon,
@@ -34,25 +13,26 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   LoadingLine,
   ResizablePanel,
   ResizablePanelGroup,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -63,6 +43,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { SortDropdown } from './SortDropdown'
+import { useAuthUsersShortcuts } from './useAuthUsersShortcuts'
 import { UserPanel } from './UserPanel'
 import type { SpecificFilterColumn } from './Users.constants'
 import {
@@ -75,7 +56,26 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useIndexWorkerStatusQuery } from '@/data/auth/index-worker-status-query'
+import { authKeys } from '@/data/auth/keys'
+import { useUserDeleteMutation } from '@/data/auth/user-delete-mutation'
+import { useUserIndexStatusesQuery } from '@/data/auth/user-search-indexes-query'
+import { useUsersCountQuery } from '@/data/auth/users-count-query'
+import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -89,6 +89,7 @@ order by timestamp desc
 limit 100`
 
 export const UsersV2 = () => {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const {
@@ -96,11 +97,12 @@ export const UsersV2 = () => {
     isPending: isPendingProject,
     isError: isProjectError,
   } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+
   const gridRef = useRef<DataGridHandle>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const xScroll = useRef<number>(0)
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const {
     authenticationShowProviderFilter: showProviderFilter,
@@ -190,10 +192,10 @@ export const UsersV2 = () => {
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
   const [showFreeformWarning, setShowFreeformWarning] = useState(false)
   const [showCreateIndexesModal, setShowCreateIndexesModal] = useState(false)
+  const [search, setSearch] = useState(filterKeywords)
 
   const { data: totalUsersCountData, isSuccess: isCountLoaded } = useUsersCountQuery(
     {
@@ -341,10 +343,6 @@ export const UsersV2 = () => {
     keywords: filterKeywords,
     filter_column: specificFilterColumn === 'freeform' ? undefined : specificFilterColumn,
   }
-  const telemetryGroups = {
-    project: projectRef ?? 'Unknown',
-    organization: selectedOrg?.slug ?? 'Unknown',
-  }
 
   const updateStorageFilter = (value: SpecificFilterColumn) => {
     setLocalStorageFilter(value)
@@ -357,6 +355,22 @@ export const UsersV2 = () => {
   const updateSortByValue = (value: string) => {
     if (isCountWithinThresholdForSortBy) setLocalStorageSortByValue(value)
     setSortByValue(value)
+  }
+
+  const onSelectImpersonateUser = async (user: User, destination: 'sql' | 'table-editor') => {
+    await roleImpersonationState.setRole({
+      type: 'postgrest',
+      role: 'authenticated',
+      userType: 'native',
+      user,
+      aal: 'aal1',
+    })
+
+    if (destination === 'sql') {
+      router.push(`/project/${projectRef}/sql`)
+    } else {
+      router.push(`/project/${projectRef}/editor`)
+    }
   }
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
@@ -435,6 +449,24 @@ export const UsersV2 = () => {
     }
   }
 
+  const handleRefresh = () => {
+    refetch()
+    track('auth_users_search_submitted', {
+      trigger: 'refresh_button',
+      ...telemetryProps,
+    })
+  }
+
+  const { onCellKeyDown, showDeleteModal, setShowDeleteModal } = useAuthUsersShortcuts({
+    gridRef,
+    searchInputRef,
+    users,
+    selectedUsers,
+    setSelectedUsers,
+    setSearch,
+    onRefresh: handleRefresh,
+  })
+
   useEffect(() => {
     if (
       !isRefetching &&
@@ -449,6 +481,7 @@ export const UsersV2 = () => {
         visibleColumns: selectedColumns,
         setSortByValue: updateSortByValue,
         onSelectDeleteUser: setSelectedUserToDelete,
+        onSelectImpersonateUser,
       })
       setColumns(columns)
       if (columns.length < userTableColumns.length) {
@@ -488,10 +521,10 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0 border-b" title="Users" />
+        <FormHeader className="py-4 px-6 mb-0! border-b" title="Users" />
 
         {showImprovedSearchOptIn && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 relative">
+          <Alert className="rounded-none mb-0 border-0 relative">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setImprovedSearchDismissed(true)}
@@ -502,8 +535,8 @@ export const UsersV2 = () => {
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>
             <InfoIcon className="size-4" />
-            <AlertTitle_Shadcn_>Upgrade to an improved search experience</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="flex justify-between items-center">
+            <AlertTitle>Upgrade to an improved search experience</AlertTitle>
+            <AlertDescription className="flex justify-between items-center">
               <div>
                 Enable faster and more reliable searching, sorting, and filtering of your users.
               </div>
@@ -515,15 +548,15 @@ export const UsersV2 = () => {
               >
                 Upgrade search
               </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         {indexWorkerInProgress && (
-          <Alert_Shadcn_ className="rounded-none mb-0 border-0 border-t">
+          <Alert className="rounded-none mb-0 border-0 border-t">
             <InfoIcon className="size-4" />
-            <AlertTitle_Shadcn_>Index creation is in progress</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="flex justify-between items-center">
+            <AlertTitle>Index creation is in progress</AlertTitle>
+            <AlertDescription className="flex justify-between items-center">
               <div>
                 The indexes are currently being created. This process may take some time depending
                 on the number of users in your project.
@@ -537,8 +570,8 @@ export const UsersV2 = () => {
                   View logs
                 </Link>
               </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
@@ -559,9 +592,11 @@ export const UsersV2 = () => {
             <>
               <div className="flex flex-wrap items-center gap-2">
                 <UsersSearch
+                  ref={searchInputRef}
+                  search={search}
+                  setSearch={setSearch}
                   improvedSearchEnabled={improvedSearchEnabled}
                   telemetryProps={telemetryProps}
-                  telemetryGroups={telemetryGroups}
                   onSelectFilterColumn={(value) => {
                     if (value === 'freeform') {
                       if (isCountWithinThresholdForSortBy) {
@@ -577,47 +612,43 @@ export const UsersV2 = () => {
 
                 {showUserTypeFilter &&
                   (specificFilterColumn === 'freeform' || improvedSearchEnabled) && (
-                    <Select_Shadcn_
+                    <Select
                       value={filterUserType}
                       onValueChange={(val) => {
                         setFilterUserType(val as Filter)
-                        sendEvent({
-                          action: 'auth_users_search_submitted',
-                          properties: {
-                            trigger: 'user_type_filter',
-                            ...telemetryProps,
-                            user_type: val,
-                          },
-                          groups: telemetryGroups,
+                        track('auth_users_search_submitted', {
+                          trigger: 'user_type_filter',
+                          ...telemetryProps,
+                          user_type: val,
                         })
                       }}
                     >
-                      <SelectTrigger_Shadcn_
+                      <SelectTrigger
                         size="tiny"
                         className={cn(
-                          'w-[140px] !bg-transparent',
+                          'w-[140px] bg-transparent!',
                           filterUserType === 'all' && 'border-dashed'
                         )}
                       >
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectGroup_Shadcn_>
-                          <SelectItem_Shadcn_ value="all" className="text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="all" className="text-xs">
                             All users
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="verified" className="text-xs">
+                          </SelectItem>
+                          <SelectItem value="verified" className="text-xs">
                             Verified users
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                          </SelectItem>
+                          <SelectItem value="unverified" className="text-xs">
                             Unverified users
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                          </SelectItem>
+                          <SelectItem value="anonymous" className="text-xs">
                             Anonymous users
-                          </SelectItem_Shadcn_>
-                        </SelectGroup_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   )}
 
                 {showProviderFilter &&
@@ -634,14 +665,10 @@ export const UsersV2 = () => {
                       className="w-52"
                       onSaveFilters={(providers) => {
                         setSelectedProviders(providers)
-                        sendEvent({
-                          action: 'auth_users_search_submitted',
-                          properties: {
-                            trigger: 'provider_filter',
-                            ...telemetryProps,
-                            providers,
-                          },
-                          groups: telemetryGroups,
+                        track('auth_users_search_submitted', {
+                          trigger: 'provider_filter',
+                          ...telemetryProps,
+                          providers,
                         })
                       }}
                     />
@@ -688,6 +715,7 @@ export const UsersV2 = () => {
                       visibleColumns: value,
                       setSortByValue: updateSortByValue,
                       onSelectDeleteUser: setSelectedUserToDelete,
+                      onSelectImpersonateUser,
                     })
 
                     setSelectedColumns(value)
@@ -704,15 +732,11 @@ export const UsersV2 = () => {
                   setSortByValue={(value) => {
                     const [sortColumn, sortOrder] = value.split(':')
                     updateSortByValue(value)
-                    sendEvent({
-                      action: 'auth_users_search_submitted',
-                      properties: {
-                        trigger: 'sort_change',
-                        ...telemetryProps,
-                        sort_column: sortColumn,
-                        sort_order: sortOrder,
-                      },
-                      groups: telemetryGroups,
+                    track('auth_users_search_submitted', {
+                      trigger: 'sort_change',
+                      ...telemetryProps,
+                      sort_column: sortColumn,
+                      sort_order: sortOrder,
                     })
                   }}
                   showSortByEmail={showSortByEmail}
@@ -722,27 +746,15 @@ export const UsersV2 = () => {
               </div>
 
               <div className="flex items-center gap-x-2">
-                {isNewAPIDocsEnabled && (
-                  <APIDocsButton section={['user-management']} source="auth-users" />
-                )}
                 <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}
                   type="default"
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
-                  onClick={() => {
-                    refetch()
-                    sendEvent({
-                      action: 'auth_users_search_submitted',
-                      properties: {
-                        trigger: 'refresh_button',
-                        ...telemetryProps,
-                      },
-                      groups: telemetryGroups,
-                    })
-                  }}
+                  onClick={handleRefresh}
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
+                  aria-label="Refresh"
                 />
                 <AddUserDropdown />
               </div>
@@ -752,14 +764,14 @@ export const UsersV2 = () => {
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
         <ResizablePanelGroup
           orientation="horizontal"
-          className="relative flex flex-grow bg-alternative min-h-0"
+          className="relative flex grow bg-alternative min-h-0"
           autoSaveId="query-performance-layout-v1"
         >
           <ResizablePanel>
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}
-                className="flex-grow border-t-0"
+                className="grow border-t-0! border-b-0!"
                 rowHeight={44}
                 headerRowHeight={36}
                 columns={columns}
@@ -768,7 +780,7 @@ export const UsersV2 = () => {
                   const isSelected = row.id === selectedUser
                   return [
                     `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                     '[&>.rdg-cell:first-child>div]:ml-4',
                   ].join(' ')
                 }}
@@ -780,6 +792,7 @@ export const UsersV2 = () => {
                     toast(`Only up to ${MAX_BULK_DELETE} users can be selected at a time`)
                   } else setSelectedUsers(rows)
                 }}
+                onCellKeyDown={onCellKeyDown}
                 onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
                 onColumnsReorder={(source, target) => {
                   const sourceIdx = columns.findIndex((col) => col.key === source)

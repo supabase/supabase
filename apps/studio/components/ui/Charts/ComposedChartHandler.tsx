@@ -1,15 +1,7 @@
-import Panel from 'components/ui/Panel'
-import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
-import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
-import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
-import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
-import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
 import dayjs from 'dayjs'
 import { List, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import type { UpdateDateRange } from 'pages/project/[ref]/observability/database'
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Card, cn, WarningIcon } from 'ui'
 
 import type { ChartHighlightAction } from './ChartHighlightActions'
@@ -17,6 +9,14 @@ import type { ChartData } from './Charts.types'
 import { ComposedChart } from './ComposedChart'
 import { MultiAttribute } from './ComposedChart.utils'
 import { useChartHighlight } from './useChartHighlight'
+import Panel from '@/components/ui/Panel'
+import { AnalyticsInterval, DataPoint } from '@/data/analytics/constants'
+import { useInfraMonitoringQueries } from '@/data/analytics/infra-monitoring-queries'
+import { InfraMonitoringAttribute } from '@/data/analytics/infra-monitoring-query'
+import { useProjectDailyStatsQueries } from '@/data/analytics/project-daily-stats-queries'
+import { ProjectDailyStatsAttribute } from '@/data/analytics/project-daily-stats-query'
+import type { UpdateDateRange } from '@/pages/project/[ref]/observability/database'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export interface ComposedChartHandlerProps {
   id?: string
@@ -44,6 +44,12 @@ export interface ComposedChartHandlerProps {
   docsUrl?: string
   hide?: boolean
   syncId?: string
+  YAxisProps?: {
+    width?: number
+    tickFormatter?: (value: number) => string
+    domain?: [number | string, number | string]
+    allowDataOverflow?: boolean
+  }
 }
 
 /**
@@ -79,7 +85,11 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
     }
   }, [])
 
-  return <div ref={ref}>{React.cloneElement(children as React.ReactElement, { isVisible })}</div>
+  return (
+    <div ref={ref}>
+      {React.cloneElement(children as React.ReactElement<{ isVisible: boolean }>, { isVisible })}
+    </div>
+  )
 }
 
 /**
@@ -347,7 +357,7 @@ const useAttributeQueries = (
   )
 
   const referenceLineQueries = referenceLines.map((line) => {
-    let value = line.value || 0
+    let value = line.value ?? line.customValue ?? 0
 
     return {
       data: {

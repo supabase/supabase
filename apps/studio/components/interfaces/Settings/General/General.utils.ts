@@ -1,8 +1,8 @@
 import type {
   OrganizationRole,
   OrganizationRolesResponse,
-} from 'data/organization-members/organization-roles-query'
-import type { OrganizationMember } from 'data/organizations/organization-members-query'
+} from '@/data/organization-members/organization-roles-query'
+import type { OrganizationMember } from '@/data/organizations/organization-members-query'
 
 export interface ProjectAccessMember {
   id: string

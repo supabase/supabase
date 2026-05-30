@@ -1,5 +1,4 @@
-import { SupaTable } from 'components/grid/types'
-
+import { SupaTable } from '@/components/grid/types'
 import { Lint } from '@/data/lint/lint-query'
 
 export const getEntityLintDetails = (
@@ -23,6 +22,16 @@ export const getEntityLintDetails = (
     count: matchingLint ? 1 : 0,
     matchingLint,
   }
+}
+
+export const getTablePoliciesUrl = (
+  projectRef: string | undefined,
+  schema: string | undefined,
+  name: string | undefined
+): string => {
+  return `/project/${projectRef ?? ''}/auth/policies?search=${encodeURIComponent(
+    name ?? ''
+  )}&schema=${encodeURIComponent(schema ?? '')}`
 }
 
 export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {

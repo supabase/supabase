@@ -1,24 +1,25 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { useState } from 'react'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   Badge,
   Button,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
   TooltipContent,
   TooltipTrigger,
-  Tooltip,
 } from 'ui'
+
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { ASSISTANT_MODELS, isAdvanceOnlyModelId } from 'lib/ai/model.utils'
-import type { AssistantModelId } from 'lib/ai/model.utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { ASSISTANT_MODELS, isAdvanceOnlyModelId } from '@/lib/ai/model.utils'
+import type { AssistantModelId } from '@/lib/ai/model.utils'
 
 interface ModelSelectorProps {
   selectedModel: AssistantModelId
@@ -52,8 +53,8 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           type="default"
           className="text-foreground-light"
@@ -61,13 +62,13 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
         >
           {selectedModel}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-44" align="start" side="top">
-        <Command_Shadcn_>
-          <CommandList_Shadcn_>
-            <CommandGroup_Shadcn_>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-44" align="start" side="top">
+        <Command>
+          <CommandList>
+            <CommandGroup>
               {ASSISTANT_MODELS.map((m) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={m.id}
                   value={m.id}
                   disabled={isLoadingEntitlements && isAdvanceOnlyModelId(m.id)}
@@ -93,12 +94,12 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                   ) : (
                     selectedModel === m.id && <Check className="h-3.5 w-3.5" />
                   )}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

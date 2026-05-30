@@ -1,6 +1,7 @@
 import { IS_PLATFORM } from 'common'
-import { InternalServerError } from 'lib/api/apiHelpers'
 import z from 'zod'
+
+import { InternalServerError } from '@/lib/api/apiHelpers'
 
 export type IncidentCache = {
   affected_regions: Array<string> | null

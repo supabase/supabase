@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+
 import useLatest from '../misc/useLatest'
 
 export interface ConfirmOnCloseModalProps {

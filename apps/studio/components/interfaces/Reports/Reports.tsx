@@ -1,36 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
-import NoPermission from 'components/ui/NoPermission'
-import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import { analyticsKeys } from 'data/analytics/keys'
-import { useContentQuery } from 'data/content/content-query'
-import {
-  UpsertContentPayload,
-  useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import dayjs from 'dayjs'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
-import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
 import { groupBy, isEqual, isNull } from 'lodash'
 import { Plus, RefreshCw, Save } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { Dashboards } from 'types'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
@@ -38,16 +13,34 @@ import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import NoPermission from '@/components/ui/NoPermission'
+import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { analyticsKeys } from '@/data/analytics/keys'
+import { useContentQuery } from '@/data/content/content-query'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import type { Dashboards } from '@/types'
 
 const DEFAULT_CHART_COLUMN_COUNT = 1
 const DEFAULT_CHART_ROW_COUNT = 1
 
 const Reports = () => {
-  const router = useRouter()
   const { id: reportId, ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const queryClient = useQueryClient()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -75,7 +68,7 @@ const Reports = () => {
       if (vars.payload.type === 'report') toast.error(`Failed to update report: ${error.message}`)
     },
   })
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const currentReport = userContents?.content.find((report) => report.id === reportId)
   const currentReportContent = currentReport?.content as Dashboards.Content
@@ -348,10 +341,7 @@ const Reports = () => {
         },
       }
     )
-    sendEvent({
-      action: 'custom_report_assistant_sql_block_added',
-      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
-    })
+    track('custom_report_assistant_sql_block_added')
   }
 
   useEffect(() => {
@@ -461,7 +451,7 @@ const Reports = () => {
         {config?.layout !== undefined && config.layout.length === 0 ? (
           <div
             className={cn(
-              'flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 border-default transition duration-100',
+              'flex min-h-full items-center justify-center rounded-sm border-2 border-dashed p-16 border-default transition duration-100',
               isDraggedOver ? 'bg-surface-100' : ''
             )}
             onDragOver={onDragOverEmptyState}
@@ -484,7 +474,7 @@ const Reports = () => {
             )}
           </div>
         ) : (
-          <div className="relative mb-16 flex-grow">
+          <div className="relative mb-16 grow">
             {config && startDate && endDate && (
               <GridResize
                 startDate={startDate}

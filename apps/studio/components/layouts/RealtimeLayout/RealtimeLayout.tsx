@@ -1,11 +1,12 @@
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 /**
  * Menu-only component for the Realtime section. Used by the desktop sidebar and by the
@@ -28,13 +29,16 @@ export const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLa
   const { data: project } = useSelectedProjectQuery()
   const router = useRouter()
   const page = router.pathname.split('/')[4]
+  const menu = generateRealtimeMenu(project)
 
   return (
     <ProjectLayout
       product="Realtime"
       browserTitle={{ section: title }}
-      productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project)} />}
+      productMenu={<ProductMenu page={page} menu={menu} />}
+      isBlocking={false}
     >
+      <ProductMenuShortcuts menu={menu} />
       {children}
     </ProjectLayout>
   )

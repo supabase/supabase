@@ -1,6 +1,6 @@
-import { ConnectionTimeoutError } from 'types/api-errors'
-import type { ClassifiedError } from 'types/api-errors'
-import type { ResponseError } from 'types/base'
+import { ConnectionTimeoutError } from '@/types/api-errors'
+import type { ClassifiedError } from '@/types/api-errors'
+import type { ResponseError } from '@/types/base'
 
 type ErrorConstructor = new (
   ...args: ConstructorParameters<typeof ResponseError>

@@ -1,5 +1,6 @@
 import { openai } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import * as bedrockModule from './bedrock'
 import { getModel } from './model'
 import { DEFAULT_COMPLETION_MODEL, openaiModelEntry } from './model.utils'
@@ -25,17 +26,17 @@ describe('getModel', () => {
     process.env = { ...originalEnv }
   })
 
-  it('returns bedrock model without promptProviderOptions', async () => {
+  it('returns bedrock model without systemProviderOptions', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
     vi.stubEnv('AWS_BEDROCK_ROLE_ARN', 'test')
 
-    const { modelParams, error, promptProviderOptions } = await getModel({
+    const { modelParams, error, systemProviderOptions } = await getModel({
       provider: 'bedrock',
       routingKey: 'test',
     })
 
     expect(modelParams?.model).toEqual('bedrock-model')
-    expect(promptProviderOptions).toBeUndefined()
+    expect(systemProviderOptions).toBeUndefined()
     expect(error).toBeUndefined()
   })
 
@@ -49,14 +50,14 @@ describe('getModel', () => {
   it('returns openai model with default model', async () => {
     vi.stubEnv('OPENAI_API_KEY', 'test-key')
 
-    const { modelParams, promptProviderOptions } = await getModel({
+    const { modelParams, systemProviderOptions } = await getModel({
       provider: 'openai',
       modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
     })
 
     expect(modelParams?.model).toEqual('openai-model')
     expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
-    expect(promptProviderOptions).toBeUndefined()
+    expect(systemProviderOptions).toBeUndefined()
   })
 
   it('returns error when OPENAI_API_KEY is not available', async () => {

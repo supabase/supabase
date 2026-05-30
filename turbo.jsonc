@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/turbo/schema.json",
+  "ui": "stream",
+  "cacheMaxAge": "14d",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**/*", "!.next/dev/**/*"],
+    },
+    "lint": {
+      "outputs": [],
+    },
+    "clean": {
+      "outputs": [],
+      "cache": false,
+    },
+    "dev": {
+      "cache": false,
+    },
+    "test": {
+      "cache": false,
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": [],
+    },
+  },
+}

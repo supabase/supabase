@@ -45,8 +45,8 @@ export type AvailableColors =
 export const SIZE = {
   text: {
     tiny: 'text-xs',
-    small: 'text-sm leading-4',
-    medium: 'text-sm',
+    small: 'text-base md:text-sm leading-4',
+    medium: 'text-base md:text-sm',
     large: 'text-base',
     xlarge: 'text-base',
   },

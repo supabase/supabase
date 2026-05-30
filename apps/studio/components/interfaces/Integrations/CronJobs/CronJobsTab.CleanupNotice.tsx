@@ -2,7 +2,6 @@ import { getScheduleDeleteCronJobRunDetailsSql } from '@supabase/pg-meta'
 import { CheckCircle2, XCircle } from 'lucide-react'
 import {
   Button,
-  CodeBlock,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -11,16 +10,17 @@ import {
   DialogTitle,
   DialogTrigger,
   Progress,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
 import {
@@ -91,7 +91,7 @@ const CronJobRunDetailsOverflowDialog = ({
           <p className="text-sm">
             The dashboard fetches data for the cron jobs overview by running a join between the{' '}
             <code className="text-code-inline">cron.job</code> and{' '}
-            <code className="text-code-inline !break-keep">cron.job_run_details</code> tables to
+            <code className="text-code-inline break-keep!">cron.job_run_details</code> tables to
             show each cron job's latest run.
           </p>
 
@@ -107,7 +107,7 @@ const CronJobRunDetailsOverflowDialog = ({
               </TooltipContent>
             </Tooltip>{' '}
             exceeds safety thresholds, likely due to the size of{' '}
-            <code className="text-code-inline !break-keep">cron.job_run_details</code> table.
+            <code className="text-code-inline break-keep!">cron.job_run_details</code> table.
           </p>
         </DialogSection>
 
@@ -139,22 +139,22 @@ const CronJobRunDetailsOverflowDialog = ({
             ) : (
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <div className="sm:w-64">
-                  <Select_Shadcn_
+                  <Select
                     disabled={isBusy}
                     value={cleanupInterval}
                     onValueChange={setCleanupInterval}
                   >
-                    <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Select an interval" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select an interval" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {CLEANUP_INTERVALS.map((option) => (
-                        <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                        <SelectItem key={option.value} value={option.value}>
                           {option.label}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ))}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <Button
                   type="default"

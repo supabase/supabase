@@ -1,6 +1,7 @@
-import { fillTimeseries } from 'components/interfaces/Settings/Logs/Logs.utils'
-import type { Datum } from 'components/ui/Charts/Charts.types'
 import { useMemo } from 'react'
+
+import { fillTimeseries } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { Datum } from '@/components/ui/Charts/Charts.types'
 
 export type FillTimeseriesOptions<T extends Datum = Datum> = {
   /** The timeseries data to fill gaps in */

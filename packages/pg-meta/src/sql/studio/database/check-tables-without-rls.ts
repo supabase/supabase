@@ -1,4 +1,4 @@
-import { literal } from '../../../pg-format'
+import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 
 /**
  * Builds a SQL query that returns entities exposed through the Data API that
@@ -12,10 +12,14 @@ import { literal } from '../../../pg-format'
  * Checks against the _target_ schemas rather than the currently active
  * PostgREST config, so it works correctly when enabling the Data API.
  */
-export const getUnsafeEntitiesInApiSql = ({ schemas }: { schemas: Array<string> }) => {
-  const schemaList = schemas.map(literal).join(', ')
+export const getUnsafeEntitiesInApiSql = ({
+  schemas,
+}: {
+  schemas: Array<string>
+}): SafeSqlFragment => {
+  const schemaList = joinSqlFragments(schemas.map(literal), ', ')
 
-  return /* SQL */ `
+  return safeSql`
     select
       n.nspname as schema,
       c.relname as name,

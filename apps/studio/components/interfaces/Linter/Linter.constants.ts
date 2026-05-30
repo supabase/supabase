@@ -1,4 +1,8 @@
-import { Lint } from 'data/lint/lint-query'
+import { ReactNode } from 'react'
+
+import { Lint } from '@/data/lint/lint-query'
+import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
+
 export enum LINTER_LEVELS {
   ERROR = 'ERROR',
   WARN = 'WARN',
@@ -8,30 +12,39 @@ export enum LINTER_LEVELS {
 export type LintInfo = {
   name: string
   title: string
-  icon: JSX.Element
+  icon: ReactNode
   link: (args: { projectRef: string; metadata: Lint['metadata'] }) => string
   linkText: string
   docsLink: string
   category: 'security' | 'performance'
 }
 
-export const LINT_TABS = [
+export const LINT_TABS: ReadonlyArray<{
+  id: LINTER_LEVELS
+  label: string
+  description: string
+  descriptionShort: string
+  shortcutId: ShortcutId
+}> = [
   {
     id: LINTER_LEVELS.ERROR,
     label: 'Errors',
     description: 'You should consider these issues urgent and fix them as soon as you can.',
     descriptionShort: 'Require immediate attention',
+    shortcutId: SHORTCUT_IDS.ADVISORS_TAB_ERRORS,
   },
   {
     id: LINTER_LEVELS.WARN,
     label: 'Warnings',
     description: 'You should try and read through these issues and fix them if necessary.',
     descriptionShort: 'To resolve only if necessary',
+    shortcutId: SHORTCUT_IDS.ADVISORS_TAB_WARNINGS,
   },
   {
     id: LINTER_LEVELS.INFO,
     label: 'Info',
     description: 'You should read through these suggestions and consider implementing them.',
     descriptionShort: 'For consideration to implement',
+    shortcutId: SHORTCUT_IDS.ADVISORS_TAB_INFO,
   },
 ]
