@@ -7,10 +7,10 @@ import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
 import { navigateToSection } from './Content/Content.utils'
-import { NotExposedEntitiesIndicator } from './NotExposedEntitiesIndicator'
 import { API_DOCS_CATEGORIES, DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
 import { useApiDocsFunctions, useApiDocsTables } from './useApiDocsEntities'
 import { InfiniteListDefault, type RowComponentBaseProps } from '@/components/ui/InfiniteList'
+import { NotExposedEntitiesIndicator } from '@/components/ui/NotExposedEntitiesIndicator'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { usePaginatedBucketsQuery, type Bucket } from '@/data/storage/buckets-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -207,6 +207,7 @@ const TablesSubsections = (): ReactNode => {
         count={excludedCount}
         entityNoun="table"
         entityNounPlural="tables"
+        onNavigate={() => snap.setShowProjectApiDocs(false)}
       />
     </>
   )
@@ -237,6 +238,7 @@ const DbFunctionsSubsections = (): ReactNode => {
         count={excludedCount}
         entityNoun="function"
         entityNounPlural="functions"
+        onNavigate={() => snap.setShowProjectApiDocs(false)}
       />
     </>
   )

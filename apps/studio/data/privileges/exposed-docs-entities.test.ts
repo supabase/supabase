@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { partitionExposedDocsEntities, type ExposedEntityStatus } from './useApiDocsEntities'
+import { partitionExposedDocsEntities, type ExposedEntityStatus } from './exposed-docs-entities'
 
 type SpecEntity = { name: string }
 type StatusItem = { name: string; status: ExposedEntityStatus }
